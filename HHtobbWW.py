@@ -1,6 +1,5 @@
 import sys
 import os
-from itertools import chain  
 
 from bamboo.analysismodules import NanoAODHistoModule
 from bamboo.analysisutils import makeMultiPrimaryDatasetTriggerSelection
