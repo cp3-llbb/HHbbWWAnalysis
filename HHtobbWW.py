@@ -1,5 +1,6 @@
 import sys
 import os
+from itertools import chain
 
 from bamboo.analysismodules import NanoAODHistoModule
 from bamboo.analysisutils import makeMultiPrimaryDatasetTriggerSelection
@@ -9,7 +10,7 @@ from bamboo import treefunctions as op
 from bamboo.plots import Plot, EquidistantBinning, SummedPlot
 from bamboo import treefunctions as op
 
-sys.path.append(os.path.abspath('.')) # Add scripts in this directory -- TODO : make cleaner
+sys.path.append('/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/') # Add scripts in this directory -- TODO : make cleaner
 from plotDef import makeDileptonPlots, makeJetsPlots, makeFatJetPlots
 
 class NanoHHTobbWW(NanoAODHistoModule):
@@ -39,41 +40,33 @@ class NanoHHTobbWW(NanoAODHistoModule):
             # Rochester corrections #
             configureRochesterCorrection(tree._Muon.calc,os.path.join(os.path.dirname(__file__), "data", "RoccoR2016.txt"))
 
-            # Trriger efficiencies #
+            # Trigger efficiencies #
             triggersPerPrimaryDataset = {
-                "DoubleMuon" : [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
-                                 tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ,
-                                 tree.HLT.Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL,
-                                 tree.HLT.Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ ],
-                "DoubleEG"   : [ tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ ],  # double electron (loosely isolated)
-                "MuonEG"     : [ tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL ]
-                }
-            if self.isMC(sample) or "2016F" in sample or "2016G" in sample or "2016H" in sample:
-                triggersPerPrimaryDataset["MuonEG"] += [ ## added from 2016F on
-                        tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ,
-                        tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ
-                        ]
-            if "2016H" not in sample:
-                triggersPerPrimaryDataset["MuonEG"] += [ ## removed for 2016H
-                        tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL
-                        ]
+                "SingleMuon" : [ tree.HLT.IsoMu24],
+                "SingleEG"   : [ tree.HLT.Ele27_WPTight_Gsf],
+                "DoubleMuon" :[tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
+                "DoubleEGamma":[tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
+                "MuonEG":[tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ,tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ]}
 
             # Jet treatment #
+            cachJEC_dir = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/cacheJEC'
             if self.isMC(sample):   # if MC -> needs smearing
                 configureJets(tree, "Jet", "AK4PFchs",
                     jec="Summer16_07Aug2017_V20_MC",
                     smear="Summer16_25nsV1_MC",
-                    jesUncertaintySources=["Total"], mayWriteCache=isNotWorker)
+                    jesUncertaintySources=["Total"],
+                    mayWriteCache=isNotWorker,
+                    cachedir=cachJEC_dir)
             else:                   # If data -> extract info from config 
                 if "2016B" in sample or "2016C" in sample or "2016D" in sample:
-                    configureJets(tree, "Jet", "AK4PFchs",
-                        jec="Summer16_07Aug2017BCD_V11_DATA", mayWriteCache=isNotWorker)
+                    configureJets(tree,"Jet","AK4PFchs",
+                        jec="Summer16_07Aug2017BCD_V11_DATA", mayWriteCache=isNotWorker,cachedir=cachJEC_dir)
                 elif "2016E" in sample or "2016F" in sample:
-                    configureJets(tree, "Jet", "AK4PFchs",
-                        jec="Summer16_07Aug2017EF_V11_DATA", mayWriteCache=isNotWorker)
+                    configureJets(tree,"Jet","AK4PFchs",
+                        jec="Summer16_07Aug2017EF_V11_DATA", mayWriteCache=isNotWorker,cachedir=cachJEC_dir)
                 elif "2016G" in sample or "2016H" in sample:
-                    configureJets(tree, "Jet", "AK4PFchs",
-                        jec="Summer16_07Aug2017GH_V11_DATA", mayWriteCache=isNotWorker)
+                    configureJets(tree,"Jet","AK4PFchs",
+                        jec="Summer16_07Aug2017GH_V11_DATA", mayWriteCache=isNotWorker,cachedir=cachJEC_dir)
 
         ############################################################################################
         # ERA 2017 #
@@ -142,8 +135,8 @@ class NanoHHTobbWW(NanoAODHistoModule):
         #        elif "2018D" in sample:
         #            configureJets(tree, "Jet", "AK4PFchs",
         #                jec="Autumn18_RunD_V8_DATA", mayWriteCache=isNotWorker)
-        #else:
-        #    raise RuntimeError("Unknown era {0}".format(era))
+        else:
+            raise RuntimeError("Unknown era {0}".format(era))
 
         # Get weights #
         if self.isMC(sample):
@@ -327,7 +320,7 @@ class NanoHHTobbWW(NanoAODHistoModule):
                                cut=[op.OR(op.rng_len(bjetsBoosted)==0,op.AND(op.rng_len(jets)>=2,op.rng_len(bjetsResolved)>=1))])
 
         # Counting events from different selections for debugging #
-        # Passign Boosted selection #
+        # Passing Boosted selection #
         PassedBoosted = Plot.make1D("PassedBoosted",
                                     op.c_int(1),
                                     hasBoostedJets,
@@ -579,10 +572,10 @@ class NanoHHTobbWW(NanoAODHistoModule):
                                suffix      = "hasOsdilep_OutZ_ResolvedJets",
                                channel     = "MuEl")
 
-        ## helper selection (OR) to make sure jet calculations are only done once
-        #hasOSLL = noSel.refine("hasOSLL", cut=op.OR(*( hasOSLL_cmbRng(rng) for rng in osLLRng.values())))
-        #forceDefine(t._Jet.calcProd, hasOSLL)
-        #for varNm in t._Jet.available:
-        #    forceDefine(t._Jet[varNm], hasOSLL)
+       ## helper selection (OR) to make sure jet calculations are only done once
+       #hasOSLL = noSel.refine("hasOSLL", cut=op.OR(*( hasOSLL_cmbRng(rng) for rng in osLLRng.values())))
+       #forceDefine(t._Jet.calcProd, hasOSLL)
+       #for varNm in t._Jet.available:
+       #    forceDefine(t._Jet[varNm], hasOSLL)
         return plots
 
