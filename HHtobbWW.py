@@ -41,32 +41,45 @@ class NanoHHTobbWW(NanoAODHistoModule):
             configureRochesterCorrection(tree._Muon.calc,os.path.join(os.path.dirname(__file__), "data", "RoccoR2016.txt"))
 
             # Trigger efficiencies #
-            triggersPerPrimaryDataset = {
-                "SingleMuon" : [ tree.HLT.IsoMu24],
-                "SingleEG"   : [ tree.HLT.Ele27_WPTight_Gsf],
-                "DoubleMuon" :[tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
-                "DoubleEGamma":[tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
-                "MuonEG":[tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ,tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ]}
+            if self.isMC(sample):
+                triggersPerPrimaryDataset = {
+                    "SingleMuon" :  [ tree.HLT.IsoMu24],
+                    "SingleEG"   :  [ tree.HLT.Ele27_WPTight_Gsf],
+                    "DoubleMuon" :  [tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
+                                     tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
+                    "DoubleEGamma": [tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
+                    "MuonEG":       [tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ,
+                                     tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ]}
+            else: # Some branches have different names in data
+                triggersPerPrimaryDataset = {
+                    "SingleMuon" :  [ tree.HLT.IsoMu24],
+                    "SingleEG"   :  [ tree.HLT.Ele27_WPTight_Gsf],
+                    "DoubleMuon" :  [tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
+                                     tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
+                    "DoubleEGamma": [tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
+                    "MuonEG":       [tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL, 
+                                     tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL]}
+
 
             # Jet treatment #
-        #    cachJEC_dir = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/cacheJEC'
-        #    if self.isMC(sample):   # if MC -> needs smearing
-        #        configureJets(tree, "Jet", "AK4PFchs",
-        #            jec="Summer16_07Aug2017_V20_MC",
-        #            smear="Summer16_25nsV1_MC",
-        #            jesUncertaintySources=["Total"],
-        #            mayWriteCache=isNotWorker,
-        #            cachedir=cachJEC_dir)
-        #    else:                   # If data -> extract info from config 
-        #        if "2016B" in sample or "2016C" in sample or "2016D" in sample:
-        #            configureJets(tree,"Jet","AK4PFchs",
-        #                jec="Summer16_07Aug2017BCD_V11_DATA", mayWriteCache=isNotWorker,cachedir=cachJEC_dir)
-        #        elif "2016E" in sample or "2016F" in sample:
-        #            configureJets(tree,"Jet","AK4PFchs",
-        #                jec="Summer16_07Aug2017EF_V11_DATA", mayWriteCache=isNotWorker,cachedir=cachJEC_dir)
-        #        elif "2016G" in sample or "2016H" in sample:
-        #            configureJets(tree,"Jet","AK4PFchs",
-        #                jec="Summer16_07Aug2017GH_V11_DATA", mayWriteCache=isNotWorker,cachedir=cachJEC_dir)
+            cachJEC_dir = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/cacheJEC'
+            if self.isMC(sample):   # if MC -> needs smearing
+                configureJets(tree, "Jet", "AK4PFchs",
+                    jec="Summer16_07Aug2017_V20_MC",
+                    #smear="Summer16_25nsV1_MC",
+                    jesUncertaintySources=["Total"],
+                    mayWriteCache=isNotWorker,
+                    cachedir=cachJEC_dir)
+            else:                   # If data -> extract info from config 
+                if "2016B" in sample or "2016C" in sample or "2016D" in sample:
+                    configureJets(tree,"Jet","AK4PFchs",
+                        jec="Summer16_07Aug2017BCD_V11_DATA", mayWriteCache=isNotWorker,cachedir=cachJEC_dir)
+                elif "2016E" in sample or "2016F" in sample:
+                    configureJets(tree,"Jet","AK4PFchs",
+                        jec="Summer16_07Aug2017EF_V11_DATA", mayWriteCache=isNotWorker,cachedir=cachJEC_dir)
+                elif "2016G" in sample or "2016H" in sample:
+                    configureJets(tree,"Jet","AK4PFchs",
+                        jec="Summer16_07Aug2017GH_V11_DATA", mayWriteCache=isNotWorker,cachedir=cachJEC_dir)
 
         ############################################################################################
         # ERA 2017 #

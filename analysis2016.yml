@@ -325,7 +325,7 @@ samples:
     era: '2016'
     run_range: [272007, 275376]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20 
+    split: 20
 
   MuonEG_2016B:
     db: das:/MuonEG/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD
@@ -474,7 +474,7 @@ samples:
     era: '2016'
     run_range: [278820, 280385]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 50
+    split: 10
 
 #### era H
   DoubleMuon_2016H:
@@ -551,7 +551,7 @@ plotIt:
     - muiso
     - elid
      # on the pileup
-     pileup
+    - pileup
      # on the trigger
     - eleltrig
     - mumutrig
