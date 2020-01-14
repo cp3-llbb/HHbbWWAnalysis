@@ -41,25 +41,47 @@ class NanoHHTobbWW(NanoAODHistoModule):
             configureRochesterCorrection(tree._Muon.calc,os.path.join(os.path.dirname(__file__), "data", "RoccoR2016.txt"))
 
             # Trigger efficiencies #
-            if self.isMC(sample):
+            # tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_(DZ) 
+            # tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_(DZ) 
+            # -> can be present with, without and without both the DZ
+            if self.isMC(sample) or "2016F" in sample or "2016G" in sample:# or "2016H" in sample:
+                # Found in 2016F : both
+                # Found in 2016G : both
                 triggersPerPrimaryDataset = {
                     "SingleMuon" :  [ tree.HLT.IsoMu24],
                     "SingleEG"   :  [ tree.HLT.Ele27_WPTight_Gsf],
-                    "DoubleMuon" :  [tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
-                                     tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
-                    "DoubleEGamma": [tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
-                    "MuonEG":       [tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ,
-                                     tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ]}
-            else: # Some branches have different names in data
+                    "DoubleMuon" :  [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
+                                      tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
+                    "DoubleEGamma": [ tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
+                    "MuonEG":       [ tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ,
+                                      tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ,
+                                      tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL,
+                                      tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL]}
+            elif "2016H" in sample:
+                # Found in 2016H : has DZ but not without
                 triggersPerPrimaryDataset = {
                     "SingleMuon" :  [ tree.HLT.IsoMu24],
                     "SingleEG"   :  [ tree.HLT.Ele27_WPTight_Gsf],
-                    "DoubleMuon" :  [tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
-                                     tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
-                    "DoubleEGamma": [tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
-                    "MuonEG":       [tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL, 
-                                     tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL]}
+                    "DoubleMuon" :  [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
+                                      tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
+                    "DoubleEGamma": [ tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
+                    "MuonEG":       [ tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ,
+                                      tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ]}
 
+            elif "2016B" in sample or "2016C" in sample or "2016D" in sample or "2016E" in sample : 
+                # Found in 2016B : only without DZ
+                # Found in 2016C : only without DZ
+                # Found in 2016D : only without DZ
+                # Found in 2016E : only without DZ
+
+                triggersPerPrimaryDataset = {
+                    "SingleMuon" :  [ tree.HLT.IsoMu24],
+                    "SingleEG"   :  [ tree.HLT.Ele27_WPTight_Gsf],
+                    "DoubleMuon" :  [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
+                                      tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
+                    "DoubleEGamma": [ tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
+                    "MuonEG":       [ tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL, 
+                                      tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL]} 
 
             # Jet treatment #
             cachJEC_dir = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/cacheJEC'
