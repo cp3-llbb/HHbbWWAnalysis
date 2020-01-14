@@ -66,7 +66,7 @@ class NanoHHTobbWW(NanoAODHistoModule):
             if self.isMC(sample):   # if MC -> needs smearing
                 configureJets(tree, "Jet", "AK4PFchs",
                     jec="Summer16_07Aug2017_V20_MC",
-                    #smear="Summer16_25nsV1_MC",
+                    smear="Summer16_25nsV1_MC",
                     jesUncertaintySources=["Total"],
                     mayWriteCache=isNotWorker,
                     cachedir=cachJEC_dir)
@@ -182,6 +182,7 @@ class NanoHHTobbWW(NanoAODHistoModule):
         plots = []
 
         forceDefine(t._Muon.calcProd, noSel)
+        forceDefine(t._Jet.calcProd, noSel) # calculate once per event (for every event)
 
         #############################################################################
         ################################  Muons #####################################
