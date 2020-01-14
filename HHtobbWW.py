@@ -298,13 +298,13 @@ class NanoHHTobbWW(NanoAODHistoModule):
         # Boosted and resolved jets categories #
         if era == "2016": # Must check that subJet exists before looking at the btag
             lambda_boosted  = lambda fatjet : op.OR(op.AND(fatjet.subJet1._idx.result != -1,fatjet.subJet1.btagDeepB > 0.6321), op.AND(fatjet.subJet2._idx.result != -1,fatjet.subJet2.btagDeepB > 0.6321))
-            lambda_resolved = lambda jet    : jet.btagDeepB > 0.6321
+            lambda_resolved = lambda jet    : jet.btagDeepFlavB > 0.3093
         elif era =="2017":
             lambda_boosted  = lambda fatjet : op.OR(op.AND(fatjet.subJet1._idx.result != -1,fatjet.subJet1.btagDeepB > 0.4941), op.AND(fatjet.subJet2._idx.result != -1,fatjet.subJet2.btagDeepB > 0.4941))
-            lambda_resolved = lambda jet    : jet.btagDeepB > 0.4941
+            lambda_resolved = lambda jet    : jet.btagDeepFlavB > 0.3033
         elif era == "2018":
             lambda_boosted  = lambda fatjet : op.OR(op.AND(fatjet.subJet1._idx.result != -1,fatjet.subJet1.btagDeepB > 0.4184), op.AND(fatjet.subJet2._idx.result != -1,fatjet.subJet2.btagDeepB > 0.4184))
-            lambda_resolved = lambda jet    : jet.btagDeepB > 0.4184
+            lambda_resolved = lambda jet    : jet.btagDeepFlavB > 0.2770
 
         # Select the bjets we want #
         bjetsResolved = op.select(jets, lambda_resolved)
