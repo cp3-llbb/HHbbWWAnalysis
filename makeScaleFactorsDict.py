@@ -33,7 +33,6 @@ class MakeScaleFactorsDict():
         """
         N_format = base_str.count('{')
         if len(format_dict.keys())>1: # More than one formatting
-            #assert N_format == len(format_dict.keys())
             # Flatten the nested keys if need be #
             keys = self.flattenTuple(tuple(format_dict.keys()))
             aList = []
@@ -45,7 +44,6 @@ class MakeScaleFactorsDict():
                 aList.append(os.path.join(self.trigger_path,base_str.format(**d)))
             aTup = tuple(aList)
         else:
-            #assert N_format == 1
             l = []
             for k,val in format_dict.items():
                 if not isinstance(k,tuple):
@@ -66,13 +64,10 @@ class MakeScaleFactorsDict():
         else:
             self.full_dict[key_entry] = aTup
 
-    def addScaleFactor(self,key_entry,base_key,base_str,format_dict):
+    def addScaleFactor(self,key_entry,base_key,base_str,format_dict,sublevel=None,lowercase_keys=False):
         N_format_key = base_key.count('{') 
         N_format_str = base_str.count('{')
-        print ('------------------')
-        pprint(format_dict)
         if len(format_dict.keys())>1: # More than one formatting
-            #assert max(N_format_key,N_format_str) == len(format_dict.keys())
             aDict = {}
             # Find the format keys in base_key and base_str #
             base_key_formatkeys = re.findall(r"\{([A-Za-z0-9_]+)\}", base_key)
@@ -92,35 +87,76 @@ class MakeScaleFactorsDict():
             # get format keys in base_str but not in base_key #
             onlybase_str_formatkeys = [b for b in base_str_formatkeys if b not in base_key_formatkeys]
             # Generate base_key combinations #
-            al = [format_dict[k] for k in base_key_formatkeys]
-            comb_key = itertools.product(*al)
+            # Check if tuple in the key of format_dict #
+            if tuple_in_base_key:
+                al = []
+                for key in format_dict.keys():
+                    if isinstance(key,tuple):
+                        for k in key: # We assume that if one of the val in tuple is in onlybase_str_formatkeys, the others are as well
+                            if k in base_key_formatkeys:
+                                al.append(format_dict[key])
+                                break
+                    else:
+                        if key in base_key_formatkeys:
+                            al.append(format_dict[key])
+            else:
+                al = [format_dict[k] for k in base_key_formatkeys]
+            if (len(al)==1): # Otherwise will do product on tuple
+                comb_key = itertools.product(al[0])
+            elif (len(al)>1):
+                comb_key = itertools.product(*al)
+            # Loop over key combinations #
             for combk in comb_key:
-                dk = dict((k,v) for k,v in zip(base_key_formatkeys,combk))
+                if lowercase_keys:
+                    dk = dict((k,v.lower()) for k,v in zip(base_key_formatkeys,self.flattenTuple(combk)))
+                else:
+                    dk = dict((k,v) for k,v in zip(base_key_formatkeys,self.flattenTuple(combk)))
                 aList = []
-                #if tuple_in_base_str:
-                #    bl = []
-                #    for key in format_dict.keys():
-                #        if isinstance(key,tuple):
-                #            for k in key:
-                #else:
-                #    print ([format_dict[k] for k in onlybase_str_formatkeys])
-                #    comb_val = itertools.product(*[format_dict[k] for k in onlybase_str_formatkeys])
+                # Generate values combination for each key combination #
+                # Check if tuple, must not be inter product #
+                if tuple_in_base_str:
+                    bl = []
+                    for key in format_dict.keys():
+                        if isinstance(key,tuple):
+                            for k in key: # We assume that if one of the val in tuple is in onlybase_str_formatkeys, the others are as well
+                                if k in onlybase_str_formatkeys: 
+                                    bl.append(key)
+                                    break
+                        else:
+                            if key in onlybase_str_formatkeys:
+                                bl.append(key) 
+                    comb_val = itertools.product(*[format_dict[k] for k in bl])
+                else:
+                    comb_val = itertools.product(*[format_dict[k] for k in onlybase_str_formatkeys])
+                # Generate list of values comb and add that to tmp dict #
                 for combv in comb_val:
-                    nd = dict((k,v) for k,v in zip(onlybase_str_formatkeys,combv))
+                    print (combv)
+                    nd = dict((k,v) for k,v in zip(onlybase_str_formatkeys,self.flattenTuple(combv)))
                     dv = {**dk,**nd}
-                    aList.append(os.path.join(self.scalefactors_path,base_str.format(**dv)))
-                sys.exit()
+                    print (dv)
+                    print (os.path.join(self.scalefactors_path,base_str.format(**dv)))
+                    if sublevel is not None: 
+                        for key in dv.keys():# Find the associated key in the format_dict
+                            if key in sublevel.keys(): 
+                                tup = sublevel[key][dv[key]] # Recover tuple corresponding to entry
+                                aList.append(tuple((tup,os.path.join(self.scalefactors_path,base_str.format(**dv)))))
+                    else:
+                        aList.append(os.path.join(self.scalefactors_path,base_str.format(**dv)))
+                        
                 aDict[base_key.format(**dk)] = tuple(aList)
-        else:
-            #assert N_format_key == 1 and N_format_str == 1  # Simple scalefactor
+        else:# Simple scalefactor
             aDict = {}
-            for k,val in format_dict.items():
-                keys = self.flattenTuple(k)
-                for v in val:
-                    v = self.flattenTuple(v)
-                    dk = dict((k.lower(),v) for k,v in zip(keys,v))
-                    dv = dict((k,v) for k,v in zip(keys,v))
-                    aDict[base_key.format(**dk)] = os.path.join(self.scalefactors_path,base_str.format(**dv))
+            key = list(format_dict.keys())[0] # Can be str or tuple
+            val = list(format_dict.values())[0]    # Must be a list
+            for v in val:
+                if isinstance(key,tuple):
+                    d = dict((k,av) for k,av in zip(key,v))
+                else:
+                    d = {key:v}
+                if lowercase_keys:
+                    aDict[base_key.format(**d).lower()] = os.path.join(self.scalefactors_path,base_str.format(**d))
+                else:
+                    aDict[base_key.format(**d)] = os.path.join(self.scalefactors_path,base_str.format(**d))
 
         # Check if key already present #
         if key_entry in self.full_dict.keys():
@@ -133,14 +169,19 @@ class MakeScaleFactorsDict():
 
 inst = MakeScaleFactorsDict(os.path.join(os.path.abspath('.'),'data','TriggerEfficienciesStudies'),os.path.join(os.path.abspath('.'),'data','ScaleFactors_FullRunII'))
 #inst.addEfficiency('doubleEleLeg_HHMoriond17_2016','{wp}.json',{'wp':["Electron_IsoEle23Leg", "Electron_IsoEle12Leg", "Electron_IsoEle23Leg", "Electron_IsoEle12Leg"]})
-inst.addEfficiency('doubleEleLeg_HHMoriond17_2016','{wp}_{calib}.json',{('wp','calib'):[("Electron_IsoEle23Leg",'testA'), ("Electron_IsoEle12Leg",'testB'), ("Electron_IsoEle23Leg",'testC'), ("Electron_IsoEle12Leg",'testA')]})
+#inst.addEfficiency('doubleEleLeg_HHMoriond17_2016','{wp}_{calib}.json',{('wp','calib'):[("Electron_IsoEle23Leg",'testA'), ("Electron_IsoEle12Leg",'testB'), ("Electron_IsoEle23Leg",'testC'), ("Electron_IsoEle12Leg",'testA')]})
 #inst.addEfficiency('mutrig_2016_94X','{trig}_PtEtaBins_2016Run{eras}.json',{'trig':["IsoMu24_OR_IsoTkMu24","Mu50_OR_TkMu50"],'eras':["BtoF", "GtoH"]})
 #inst.addEfficiency('doubleEleLeg_HHMoriond17_2016','{type}_{other}_{wp}_{calib}.json',{'type':['TypeI','TypeII'],'other':['otherA','otherB'],('wp','calib'):[("Electron_IsoEle23Leg",'testA'), ("Electron_IsoEle12Leg",'testB'), ("Electron_IsoEle23Leg",'testC'), ("Electron_IsoEle12Leg",'testA')]})
 #inst.addScaleFactor('electron_2016_94X',"id_{wp}","Electron_EGamma_SF2D_2016Legacy_{wp}_Fall17V2.json",{"wp":["Loose", "Medium", "Tight", "MVA80","MVA90", "MVA80noiso", "MVA90noiso"]})
 #inst.addScaleFactor('btag_2016_94X','{algo}_{wp}',"BTagging_{wp}_{flav}_{algo}.json",{'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"],'flav':["lightjets_incl","cjets_comb","bjets_comb"]})
-#inst.addScaleFactor('btag_2016_94X','{algo}_{wp}',"BTagging_{wp}_{flav}_{calib}_{algo}_2017BtoF.json",{'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"],('flav','calib'):[("lightjets", "incl"),("cjets","comb"),("bjets","comb")]})
-#inst.addScaleFactor('muon_2017_94X','id_{wp}',"Muon_NUM_{wp}ID_DEN_genTracks_pt_abseta_2017RunBCDEF.json",{'wp':["Loose", "Medium", "Tight", "Soft", "MediumPrompt"]})
+#inst.addScaleFactor('muon_2017_94X','id_{wp}',"Muon_NUM_{wp}ID_DEN_genTracks_pt_abseta_2017RunBCDEF.json",{'wp':["Loose", "Medium", "Tight", "Soft", "MediumPrompt"]},True)
 #inst.addScaleFactor('muon_2017_94X_supp','iso_{isowp}_id_{idwp}',"Muon_NUM_{isowp}RelIso_DEN_{idwp}ID_pt_abseta_2017RunBCDEF.json",{'wp':["Loose", "Medium", "Tight", "Soft", "MediumPrompt"]})
+inst.addScaleFactor('muon_2016_94X','id_{wp}',"Muon_NUM_{wp}ID_DEN_genTracks_eta_pt_{uncer}_2016Run{era}.json",
+                    {'wp':["Loose", "Medium", "Tight"],
+                     'uncer':['sys','stat'],
+                     'era':["BCDEF", "GH"]},
+                    sublevel = {'era':{'BCDEF':('Run2016B','Run2016C','Run2016D','Run2016E','Run2016F'),'GH':('Run2016G', 'Run2016H')}},
+                    lowercase_keys=True)
 dico = inst.getScaleFactorsDict()
 pprint (dico)
 
