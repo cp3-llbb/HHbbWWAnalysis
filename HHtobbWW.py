@@ -12,6 +12,7 @@ from bamboo import treefunctions as op
 
 sys.path.append('/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/') # Add scripts in this directory -- TODO : make cleaner
 from plotDef import makeDileptonPlots, makeJetsPlots, makeFatJetPlots
+from scaleFactors import ScaleFactors
 
 class NanoHHTobbWW(NanoAODHistoModule):
     """ Example module: HH->bbW(->e/µ nu)W(->e/µ nu) histograms from NanoAOD """
@@ -186,7 +187,13 @@ class NanoHHTobbWW(NanoAODHistoModule):
         from bamboo.analysisutils import forceDefine
 
         era = sampleCfg['era']
-        # Get pile-up configs #
+
+        # Initialize scalefactors class #
+        SF = ScaleFactors()
+
+        #############################################################################
+        ##########################    Pile-up    ####################################
+        #############################################################################
         puWeightsFile = None
         if era == "2016":
             sfTag="94X"
@@ -213,15 +220,15 @@ class NanoHHTobbWW(NanoAODHistoModule):
         muons = op.select(muonsByPt, lambda mu : op.AND(mu.p4.Pt() > 10., op.abs(mu.p4.Eta()) < 2.4, mu.tightId, mu.pfRelIso04_all<0.15))
       
         # Scalefactors #
-        #if era=="2016":
-        #    doubleMuTrigSF = get_scalefactor("dilepton", ("doubleMuLeg_HHMoriond17_2016"), systName="mumutrig")    
-        #    muMediumIDSF = get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_medium"), combine="weight", systName="muid")
-        #    muMediumISOSF = get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), combine="weight", systName="muiso")
-        #    TrkIDSF = get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "highpt"), combine="weight")
-        #    TrkISOSF = get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "isotrk_loose_idtrk_tightidandipcut"), combine="weight")
-        #else:
-        #    muMediumIDSF = get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_medium"), systName="muid")
-        #    muMediumISOSF = get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), systName="muiso") 
+        if era=="2016":
+            doubleMuTrigSF = SF.get_scalefactor("dilepton", ("doubleMuLeg_HHMoriond17_2016"), systName="mumutrig")    
+            muMediumIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_medium"), combine="weight", systName="muid")
+            muMediumISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), combine="weight", systName="muiso")
+            TrkIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "highpt"), combine="weight")
+            TrkISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "isotrk_loose_idtrk_tightidandipcut"), combine="weight")
+        else:
+            muMediumIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_medium"), systName="muid")
+            muMediumISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), systName="muiso") 
 
         #############################################################################
         #############################  Electrons  ###################################
@@ -232,11 +239,11 @@ class NanoHHTobbWW(NanoAODHistoModule):
         electrons = op.select(electronsByPt, lambda ele : op.AND(ele.p4.Pt() > 15., op.abs(ele.p4.Eta()) < 2.5 , ele.cutBased>=3 )) # //cut-based ID Fall17 V2 the recomended one from POG for the FullRunII
 
         # Scalefactors #
-        #elMediumIDSF = get_scalefactor("lepton", ("electron_{0}_{1}".format(era,sfTag), "id_medium"), systName="elid")
-        #doubleEleTrigSF = get_scalefactor("dilepton", ("doubleEleLeg_HHMoriond17_2016"), systName="eleltrig")     
+        #elMediumIDSF = SF.get_scalefactor("lepton", ("electron_{0}_{1}".format(era,sfTag), "id_medium"), systName="elid")
+        #doubleEleTrigSF = SF.get_scalefactor("dilepton", ("doubleEleLeg_HHMoriond17_2016"), systName="eleltrig")     
 
-        #elemuTrigSF = get_scalefactor("dilepton", ("elemuLeg_HHMoriond17_2016"), systName="elmutrig")
-        #mueleTrigSF = get_scalefactor("dilepton", ("mueleLeg_HHMoriond17_2016"), systName="mueltrig")
+        #elemuTrigSF = SF.get_scalefactor("dilepton", ("elemuLeg_HHMoriond17_2016"), systName="elmutrig")
+        #mueleTrigSF = SF.get_scalefactor("dilepton", ("mueleLeg_HHMoriond17_2016"), systName="mueltrig")
 
         OsElEl = op.combine(electrons, N=2, pred=lambda el1,el2 : op.AND(el1.charge != el2.charge , el1.p4.Pt() > 25, el2.p4.Pt() > 15 ))
         OsMuMu = op.combine(muons, N=2, pred=lambda mu1,mu2 : op.AND(mu1.charge != mu2.charge , mu1.p4.Pt() > 25, mu2.p4.Pt() > 15 ))
