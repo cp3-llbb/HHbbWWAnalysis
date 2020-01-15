@@ -12,7 +12,7 @@ from bamboo import treefunctions as op
 
 sys.path.append('/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/') # Add scripts in this directory -- TODO : make cleaner
 from plotDef import makeDileptonPlots, makeJetsPlots, makeFatJetPlots
-from scaleFactors import ScaleFactors
+from scalefactorsbbWW import ScaleFactorsbbWW
 
 class NanoHHTobbWW(NanoAODHistoModule):
     """ Example module: HH->bbW(->e/µ nu)W(->e/µ nu) histograms from NanoAOD """
@@ -220,15 +220,15 @@ class NanoHHTobbWW(NanoAODHistoModule):
         muons = op.select(muonsByPt, lambda mu : op.AND(mu.p4.Pt() > 10., op.abs(mu.p4.Eta()) < 2.4, mu.tightId, mu.pfRelIso04_all<0.15))
       
         # Scalefactors #
-        if era=="2016":
-            doubleMuTrigSF = SF.get_scalefactor("dilepton", ("doubleMuLeg_HHMoriond17_2016"), systName="mumutrig")    
-            muMediumIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_medium"), combine="weight", systName="muid")
-            muMediumISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), combine="weight", systName="muiso")
-            TrkIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "highpt"), combine="weight")
-            TrkISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "isotrk_loose_idtrk_tightidandipcut"), combine="weight")
-        else:
-            muMediumIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_medium"), systName="muid")
-            muMediumISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), systName="muiso") 
+        #if era=="2016":
+        #    doubleMuTrigSF = SF.get_scalefactor("dilepton", ("doubleMuLeg_HHMoriond17_2016"), systName="mumutrig")    
+        #    muMediumIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_medium"), combine="weight", systName="muid")
+        #    muMediumISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), combine="weight", systName="muiso")
+        #    TrkIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "highpt"), combine="weight")
+        #    TrkISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "isotrk_loose_idtrk_tightidandipcut"), combine="weight")
+        #else:
+        #    muMediumIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_medium"), systName="muid")
+        #    muMediumISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), systName="muiso") 
 
         #############################################################################
         #############################  Electrons  ###################################
@@ -239,11 +239,11 @@ class NanoHHTobbWW(NanoAODHistoModule):
         electrons = op.select(electronsByPt, lambda ele : op.AND(ele.p4.Pt() > 15., op.abs(ele.p4.Eta()) < 2.5 , ele.cutBased>=3 )) # //cut-based ID Fall17 V2 the recomended one from POG for the FullRunII
 
         # Scalefactors #
-        #elMediumIDSF = SF.get_scalefactor("lepton", ("electron_{0}_{1}".format(era,sfTag), "id_medium"), systName="elid")
-        #doubleEleTrigSF = SF.get_scalefactor("dilepton", ("doubleEleLeg_HHMoriond17_2016"), systName="eleltrig")     
+        elMediumIDSF = SF.get_scalefactor("lepton", ("electron_{0}_{1}".format(era,sfTag), "id_medium"), systName="elid")
+        doubleEleTrigSF = SF.get_scalefactor("dilepton", ("doubleEleLeg_HHMoriond17_2016"), systName="eleltrig")     
 
-        #elemuTrigSF = SF.get_scalefactor("dilepton", ("elemuLeg_HHMoriond17_2016"), systName="elmutrig")
-        #mueleTrigSF = SF.get_scalefactor("dilepton", ("mueleLeg_HHMoriond17_2016"), systName="mueltrig")
+        elemuTrigSF = SF.get_scalefactor("dilepton", ("elemuLeg_HHMoriond17_2016"), systName="elmutrig")
+        mueleTrigSF = SF.get_scalefactor("dilepton", ("mueleLeg_HHMoriond17_2016"), systName="mueltrig")
 
         OsElEl = op.combine(electrons, N=2, pred=lambda el1,el2 : op.AND(el1.charge != el2.charge , el1.p4.Pt() > 25, el2.p4.Pt() > 15 ))
         OsMuMu = op.combine(muons, N=2, pred=lambda mu1,mu2 : op.AND(mu1.charge != mu2.charge , mu1.p4.Pt() > 25, mu2.p4.Pt() > 15 ))
@@ -325,15 +325,23 @@ class NanoHHTobbWW(NanoAODHistoModule):
         jets = op.select(jetsSel, lambda j : op.AND(op.NOT(op.rng_any(electrons, lambda ele : op.deltaR(j.p4, ele.p4) < 0.3 )), op.NOT(op.rng_any(muons, lambda mu : op.deltaR(j.p4, mu.p4) < 0.3 ))))
         fatjets = op.select(fatjetsSel, lambda j : op.AND(op.NOT(op.rng_any(electrons, lambda ele : op.deltaR(j.p4, ele.p4) < 0.3 )), op.NOT(op.rng_any(muons, lambda mu : op.deltaR(j.p4, mu.p4) < 0.3 ))))
         # Boosted and resolved jets categories #
+        # Boosted -> at least one AK8 jet (fatjet) with at least one subjet passing medium working point of DeepCSV (btagDeepB branch)
+        # Resolved -> at least two Ak4 jets (jet) with at least one passing the medium working point of DeepJet (btagDeepFlavB branch)
         if era == "2016": # Must check that subJet exists before looking at the btag
             lambda_boosted  = lambda fatjet : op.OR(op.AND(fatjet.subJet1._idx.result != -1,fatjet.subJet1.btagDeepB > 0.6321), op.AND(fatjet.subJet2._idx.result != -1,fatjet.subJet2.btagDeepB > 0.6321))
             lambda_resolved = lambda jet    : jet.btagDeepFlavB > 0.3093
+
         elif era =="2017":
             lambda_boosted  = lambda fatjet : op.OR(op.AND(fatjet.subJet1._idx.result != -1,fatjet.subJet1.btagDeepB > 0.4941), op.AND(fatjet.subJet2._idx.result != -1,fatjet.subJet2.btagDeepB > 0.4941))
             lambda_resolved = lambda jet    : jet.btagDeepFlavB > 0.3033
         elif era == "2018":
             lambda_boosted  = lambda fatjet : op.OR(op.AND(fatjet.subJet1._idx.result != -1,fatjet.subJet1.btagDeepB > 0.4184), op.AND(fatjet.subJet2._idx.result != -1,fatjet.subJet2.btagDeepB > 0.4184))
             lambda_resolved = lambda jet    : jet.btagDeepFlavB > 0.2770
+
+        # Scalefactors : 2017 and 2018 not yet present in the dict #
+        Btag_discriVar = { "DeepCSVDiscri": lambda j : j.btagDeepB, "DeepJetDiscri": lambda j : j.btagDeepFlavB}
+        DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+sfTag, "DeepJet_medium"), additionalVariables=Btag_discriVar, systName="deepjet")
+        DeepCSVMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+sfTag, "DeepCSV_medium"), additionalVariables=Btag_discriVar, systName="deepcsv")
 
         # Select the bjets we want #
         bjetsResolved = op.select(jets, lambda_resolved)
