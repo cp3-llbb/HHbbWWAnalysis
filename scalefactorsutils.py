@@ -132,10 +132,12 @@ class MakeScaleFactorsDict():
                 comb_key = itertools.product(*al)
             # Loop over key combinations #
             for combk in comb_key:
+                dk_forvalues = dict((k,v) for k,v in zip(base_key_formatkeys,self.flattenTuple(combk))) # Save for values in case lowercase keys acked
                 if lowercase_keys:
-                    dk = dict((k,v.lower()) for k,v in zip(base_key_formatkeys,self.flattenTuple(combk)))
+                    dk = dict((k,v.lower()) for k,v in dk_forvalues.items())
                 else:
-                    dk = dict((k,v) for k,v in zip(base_key_formatkeys,self.flattenTuple(combk)))
+                    dk = dict((k,v) for k,v in dk_forvalues.items())
+                    
                 aList = []
                 # Generate values combination for each key combination #
                 # Check if tuple, must not be inter product #
@@ -156,7 +158,7 @@ class MakeScaleFactorsDict():
                 # Generate list of values comb and add that to tmp dict #
                 for combv in comb_val:
                     nd = dict((k,v) for k,v in zip(onlybase_str_formatkeys,self.flattenTuple(combv)))
-                    dv = {**dk,**nd}
+                    dv = {**dk_forvalues,**nd}
                     if sublevel is not None: 
                         for key in dv.keys():# Find the associated key in the format_dict
                             if key in sublevel.keys(): 

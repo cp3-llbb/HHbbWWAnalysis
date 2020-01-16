@@ -19,7 +19,7 @@ class ScaleFactorsbbWW:
          # (better to do that here so that it is not buil everytime we ask for scalefactors #
         instance = MakeScaleFactorsDict(efficiencies_path  = os.path.join(os.path.abspath('.'),'data','TriggerEfficienciesStudies'),
                                         scalefactors_path  = os.path.join(os.path.abspath('.'),'data','ScaleFactors_FullRunII'),
-                                        check_path         = False)
+                                        check_path         = True)
            # 2016 legacy:
            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaRunIIRecommendations#Fall17v2
            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonReferenceEffs2016LegacyRereco#Efficiencies
@@ -33,13 +33,13 @@ class ScaleFactorsbbWW:
         instance.addScaleFactor(key_entry       = 'muon_2016_94X',
                                 base_key        = 'id_{wp}',
                                 base_str        = "Muon_NUM_{wp}ID_DEN_genTracks_eta_pt_{uncer}_2016Run{era}.json",
-                                format_dict     = {'wp':["Loose", "Medium", "Tight"],'uncer':['sys','stat'],'era':["BCDEF", "GH"]},
+                                format_dict     = {'wp':["Loose", "Medium", "Tight"],'uncer':['syst','stat'],'era':["BCDEF", "GH"]},
                                 sublevel        = {'era':{'BCDEF':('Run2016B','Run2016C','Run2016D','Run2016E','Run2016F'),'GH':('Run2016G', 'Run2016H')}},
                                 lowercase_keys  = True)
         instance.addScaleFactor(key_entry       = 'muon_2016_94X',
-                                base_key        = 'iso_{isowp}_id_{idwp}',
-                                base_str        = "Muon_NUM_{isowp}RelIso_DEN_{idwp}ID_eta_pt_{uncer}_2016Run{era}.json",
-                                format_dict     = {('isowp','idwp'):[("Loose", "Loose"), ("Loose", "Medium"), ("Loose", "TightIDandIPCut"),("Tight", "Medium"), ("Tight", "TightIDandIPCut")],'uncer':['sys','stat'],'era':["BCDEF", "GH"]},
+                                base_key        = 'iso_{isowp}_id_{idwp}{ip}',
+                                base_str        = "Muon_NUM_{isowp}RelIso_DEN_{idwp}ID{ip}_eta_pt_{uncer}_2016Run{era}.json",
+                                format_dict     = {('isowp','idwp','ip'):[("Loose", "Loose", ""), ("Loose", "Medium", ""), ("Loose", "Tight", "andIPCut"),("Tight", "Medium", ""), ("Tight", "Tight", "andIPCut")],'uncer':['syst','stat'],'era':["BCDEF", "GH"]},
                                 sublevel        = {'era':{'BCDEF':('Run2016B','Run2016C','Run2016D','Run2016E','Run2016F'),'GH':('Run2016G', 'Run2016H')}},
                                 lowercase_keys  = True)
         instance.addScaleFactor(key_entry       = 'muon_2016_94X',
@@ -50,8 +50,8 @@ class ScaleFactorsbbWW:
                                 lowercase_keys  = True)
         instance.addScaleFactor(key_entry       = 'muon_2016_94X',
                                 base_key        = 'isotrk_{isowp}_idtrk_{idwp}',
-                                base_str        = "Muon_NUM_{isowp}RelTrkIso_DEN_{idwp}_eta_pair_newTuneP_probe_pt_{uncer}_2016Run{era}.json",
-                                format_dict     = {('isowp','idwp'):[("Loose", "TightIDandIPCut")],'uncer':['sys','stat'],'era':["BCDEF", "GH"]},
+                                base_str        = "Muon_NUM_{isowp}RelTkIso_DEN_{idwp}_eta_pair_newTuneP_probe_pt_{uncer}_2016Run{era}.json",
+                                format_dict     = {('isowp','idwp'):[("Loose", "HighPtIDandIPCut")],'uncer':['syst','stat'],'era':["BCDEF", "GH"]},
                                 sublevel        = {'era':{'BCDEF':('Run2016B','Run2016C','Run2016D','Run2016E','Run2016F'),'GH':('Run2016G', 'Run2016H')}},
                                 lowercase_keys  = True)
         instance.addScaleFactor(key_entry       = 'btag_2016_94X',
@@ -61,7 +61,7 @@ class ScaleFactorsbbWW:
         instance.addScaleFactor(key_entry       = 'subjet_btag_2016_94X',
                                 base_key        = '{algo}_{wp}',
                                 base_str        = "BTagging_{wp}_{flav}_{calib}_subjet_{algo}.json",
-                                format_dict     = {'algo':["DeepCSV"],'wp':["loose", "medium", "tight"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
+                                format_dict     = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
  
         #------- single muon trigger ----------#
         instance.addEfficiency(key_entry   = 'mutrig_2016_94X',
