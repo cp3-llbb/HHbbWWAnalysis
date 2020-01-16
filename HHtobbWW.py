@@ -19,6 +19,12 @@ class NanoHHTobbWW(NanoAODHistoModule):
     def __init__(self, args):
             super(NanoHHTobbWW, self).__init__(args)
             self.calcToAdd += ["nJet", "nMuon"]
+            # Set ratio plots #
+            self.plotDefaults = {"show-ratio": True,
+                                 "y-axis": "Events",
+                                 "ratio-y-axis-range" : [0.001, 0.5],
+                                 "ratio-y-axis" : 'Ratio Data/MC'}
+
 
     def prepareTree(self, tree, sample=None, sampleCfg=None, enableSystematics=None):
         # JEC's Recommendation for Full RunII: https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC
@@ -189,7 +195,7 @@ class NanoHHTobbWW(NanoAODHistoModule):
         era = sampleCfg['era']
 
         # Initialize scalefactors class #
-        SF = ScaleFactors()
+        SF = ScaleFactorsbbWW()
 
         #############################################################################
         ##########################    Pile-up    ####################################
@@ -220,15 +226,15 @@ class NanoHHTobbWW(NanoAODHistoModule):
         muons = op.select(muonsByPt, lambda mu : op.AND(mu.p4.Pt() > 10., op.abs(mu.p4.Eta()) < 2.4, mu.tightId, mu.pfRelIso04_all<0.15))
       
         # Scalefactors #
-        #if era=="2016":
-        #    doubleMuTrigSF = SF.get_scalefactor("dilepton", ("doubleMuLeg_HHMoriond17_2016"), systName="mumutrig")    
-        #    muMediumIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_medium"), combine="weight", systName="muid")
-        #    muMediumISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), combine="weight", systName="muiso")
-        #    TrkIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "highpt"), combine="weight")
-        #    TrkISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "isotrk_loose_idtrk_tightidandipcut"), combine="weight")
-        #else:
-        #    muMediumIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_medium"), systName="muid")
-        #    muMediumISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), systName="muiso") 
+        if self.isMC(sample):
+            if era=="2016":
+                muMediumIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_medium"), combine="weight", systName="muid")
+                muMediumISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), combine="weight", systName="muiso")
+                TrkIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "idtrk_highpt"), combine="weight")         # Need to ask what it is
+                TrkISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "isotrk_loose_idtrk_highptidandipcut"), combine="weight") # Need to ask what it is
+            else:
+                muMediumIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_medium"), systName="muid")
+                muMediumISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), systName="muiso") 
 
         #############################################################################
         #############################  Electrons  ###################################
@@ -239,22 +245,65 @@ class NanoHHTobbWW(NanoAODHistoModule):
         electrons = op.select(electronsByPt, lambda ele : op.AND(ele.p4.Pt() > 15., op.abs(ele.p4.Eta()) < 2.5 , ele.cutBased>=3 )) # //cut-based ID Fall17 V2 the recomended one from POG for the FullRunII
 
         # Scalefactors #
-        elMediumIDSF = SF.get_scalefactor("lepton", ("electron_{0}_{1}".format(era,sfTag), "id_medium"), systName="elid")
-        doubleEleTrigSF = SF.get_scalefactor("dilepton", ("doubleEleLeg_HHMoriond17_2016"), systName="eleltrig")     
+        if self.isMC(sample):
+            elMediumIDSF = SF.get_scalefactor("lepton", ("electron_{0}_{1}".format(era,sfTag), "id_medium"), systName="elid")
 
-        elemuTrigSF = SF.get_scalefactor("dilepton", ("elemuLeg_HHMoriond17_2016"), systName="elmutrig")
-        mueleTrigSF = SF.get_scalefactor("dilepton", ("mueleLeg_HHMoriond17_2016"), systName="mueltrig")
-
+        #############################################################################
+        #############################   Dilepton  ###################################
+        #############################################################################
+        # Combine dileptons #
         OsElEl = op.combine(electrons, N=2, pred=lambda el1,el2 : op.AND(el1.charge != el2.charge , el1.p4.Pt() > 25, el2.p4.Pt() > 15 ))
         OsMuMu = op.combine(muons, N=2, pred=lambda mu1,mu2 : op.AND(mu1.charge != mu2.charge , mu1.p4.Pt() > 25, mu2.p4.Pt() > 15 ))
         OsElMu = op.combine((electrons, muons), pred=lambda el,mu : op.AND(el.charge != mu.charge ,el.p4.Pt() > 25, mu.p4.Pt() > 15 ))
-        OsMuEl = op.combine((electrons, muons), pred=lambda el,mu : op.AND(el.charge != mu.charge ,el.p4.Pt() > 15, mu.p4.Pt() > 25 ))
+        OsMuEl = op.combine((muons, electrons), pred=lambda mu,el : op.AND(el.charge != mu.charge ,el.p4.Pt() > 15, mu.p4.Pt() > 25 ))
 
-        hasOsElEl = noSel.refine("hasOsElEl",cut=[ op.rng_len(OsElEl) >= 1 ])
-        hasOsMuMu = noSel.refine("hasOsMuMu",cut=[ op.rng_len(OsMuMu) >= 1 ])
-        hasOsElMu = noSel.refine("hasOsElMu",cut=[ op.rng_len(OsElMu) >= 1 ])
-        hasOsMuEl = noSel.refine("hasOsMuEl",cut=[ op.rng_len(OsMuEl) >= 1 ])
+        # Scalefactors #
+        if self.isMC(sample):
+            doubleEleTrigSF = SF.get_scalefactor("dilepton", ("doubleEleLeg_HHMoriond17_2016"), systName="eleltrig")     
+            doubleMuTrigSF  = SF.get_scalefactor("dilepton", ("doubleMuLeg_HHMoriond17_2016"), systName="mumutrig")    
+            elemuTrigSF     = SF.get_scalefactor("dilepton", ("elemuLeg_HHMoriond17_2016"), systName="elmutrig")
+            mueleTrigSF     = SF.get_scalefactor("dilepton", ("mueleLeg_HHMoriond17_2016"), systName="mueltrig")
 
+        llSF =  {
+            "ElEl" : (lambda ll : [ elMediumIDSF(ll[0][0]),                                                                     # First lepton SF
+                                    elMediumIDSF(ll[0][1]),                                                                     # Second lepton SF
+                                    doubleEleTrigSF(ll[0])]),                                                                   # Dilepton SF
+            "MuMu" : (lambda ll : [ muMediumIDSF(ll[0][0]), muMediumISOSF(ll[0][0]), TrkIDSF(ll[0][0]), TrkISOSF(ll[0][0]),     # First lepton SF
+                                    muMediumIDSF(ll[0][1]), muMediumISOSF(ll[0][1]), TrkIDSF(ll[0][1]), TrkISOSF(ll[0][1]),     # Second lepton SF
+                                    doubleMuTrigSF(ll[0])]),                                                                    # Dilepton SF
+            "ElMu" : (lambda ll : [ elMediumIDSF(ll[0][0]),                                                                     # First lepton SF
+                                    muMediumIDSF(ll[0][1]), muMediumISOSF(ll[0][1]), TrkIDSF(ll[0][1]), TrkISOSF(ll[0][1]),     # Second lepton SF
+                                    elemuTrigSF(ll[0])]),                                                                       # Dilepton SF
+            "MuEl" : (lambda ll : [ muMediumIDSF(ll[0][0]), muMediumISOSF(ll[0][0]), TrkIDSF(ll[0][0]), TrkISOSF(ll[0][0]),     # First lepton SF
+                                    elMediumIDSF(ll[0][1]),                                                                     # Second lepton SF
+                                    mueleTrigSF(ll[0])]),                                                                       # Dilepton SF
+                # ll is a proxy list of dileptons 
+                # ll[0] is the first dilepton 
+                # ll[0][0] is the first lepton and ll[0][1] the second in the dilepton
+                }
+        llSFApplied = {
+            "ElEl": llSF["ElEl"](OsElEl) if isMC else None,
+            "MuMu": llSF["MuMu"](OsMuMu) if isMC else None,
+            "ElMu": llSF["ElMu"](OsElMu) if isMC else None,
+            "MuEl": llSF["MuEl"](OsMuEl) if isMC else None,
+                      }
+
+        # Selection #
+        hasOsElEl = noSel.refine("hasOsElEl",
+                                 cut = [op.rng_len(OsElEl) >= 1],
+                                 weight = llSFApplied["ElEl"])
+        hasOsMuMu = noSel.refine("hasOsMuMu",
+                                 cut = [op.rng_len(OsMuMu) >= 1],
+                                 weight = llSFApplied["MuMu"])
+        hasOsElMu = noSel.refine("hasOsElMu",
+                                 cut = [op.rng_len(OsElMu) >= 1],
+                                 weight = llSFApplied["ElMu"])
+        hasOsMuEl = noSel.refine("hasOsMuEl",
+                                 cut = [op.rng_len(OsMuEl) >= 1],
+                                 weight = llSFApplied["MuEl"])
+
+
+        # Plots #
         plots.append(Plot.make1D("ElEl_channel",op.rng_len(OsElEl),noSel,EquidistantBinning(10,0,10.),title='Number of dilepton events in ElEl channel',xTitle='N_{dilepton} (ElEl channel)'))
         plots.append(Plot.make1D("MuMu_channel",op.rng_len(OsMuMu),noSel,EquidistantBinning(10,0,10.),title='Number of dilepton events in MuMu channel',xTitle='N_{dilepton} (MuMu channel)'))
         plots.append(Plot.make1D("ElMu_channel",op.rng_len(OsElMu),noSel,EquidistantBinning(10,0,10.),title='Number of dilepton events in ElMu channel',xTitle='N_{dilepton} (ElMu channel)'))
@@ -338,36 +387,51 @@ class NanoHHTobbWW(NanoAODHistoModule):
             lambda_boosted  = lambda fatjet : op.OR(op.AND(fatjet.subJet1._idx.result != -1,fatjet.subJet1.btagDeepB > 0.4184), op.AND(fatjet.subJet2._idx.result != -1,fatjet.subJet2.btagDeepB > 0.4184))
             lambda_resolved = lambda jet    : jet.btagDeepFlavB > 0.2770
 
-        # Scalefactors : 2017 and 2018 not yet present in the dict #
-        Btag_discriVar = { "DeepCSVDiscri": lambda j : j.btagDeepB, "DeepJetDiscri": lambda j : j.btagDeepFlavB}
-        DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+sfTag, "DeepJet_medium"), additionalVariables=Btag_discriVar, systName="deepjet")
-        DeepCSVMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+sfTag, "DeepCSV_medium"), additionalVariables=Btag_discriVar, systName="deepcsv")
-
         # Select the bjets we want #
-        bjetsResolved = op.select(jets, lambda_resolved)
         bjetsBoosted  = op.select(fatjets, lambda_boosted)
+        bjetsResolved = op.select(jets, lambda_resolved)
+
+        # Scalefactors : 2017 and 2018 not yet present in the dict #
+        DeepCSVMediumSFApplied = None
+        DeepJetMediumSFApplied = None
+        if self.isMC(sample):
+            pass
+            #DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
+            #DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
+            #DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
+            #DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
+            #DeepCSVMediumSFApplied = [DeepCSVMediumSF(bjetsBoosted[0].subJet1)] # Must be applied on subjets
+            #DeepJetMediumSFApplied = [DeepJetMediumSF(bjetsResolved[0])]
+
     
         # Define the boosted and Resolved (+exclusive) selections #
         hasBoostedJets = noSel.refine("hasBoostedJets",
-                               cut=[op.rng_len(bjetsBoosted)>=1])
+                               cut=[op.rng_len(bjetsBoosted)>=1],
+                               weight = DeepCSVMediumSFApplied)
+        hasResolvedJets = noSel.refine("hasResolvedJets",
+                               cut=[op.rng_len(jets)>=2,op.rng_len(bjetsResolved)>=1],
+                               weight = DeepJetMediumSFApplied)
+        hasExlusiveResolvedJets = noSel.refine("hasExlusiveResolved",
+                               cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1,op.rng_len(bjetsBoosted)==0],
+                               weight = DeepJetMediumSFApplied)
+
         hasNotBoostedJets = noSel.refine("hasNotBoostedJets",
                                cut=[op.rng_len(bjetsBoosted)==0])
-        hasResolvedJets = noSel.refine("hasResolvedJets",
-                               cut=[op.rng_len(jets)>=2,op.rng_len(bjetsResolved)>=1])
         hasNotResolvedJets = noSel.refine("hasNotResolvedJets",
                                cut=[op.OR(op.rng_len(jets)<=1,op.rng_len(bjetsResolved)==0)])
         hasBoostedAndResolvedJets = noSel.refine("hasBoostedAndResolvedJets", 
                                cut=[op.rng_len(bjetsBoosted)>=1,op.rng_len(jets)>=2,op.rng_len(bjetsResolved)>=1])
         hasNotBoostedAndResolvedJets = noSel.refine("hasNotBoostedAndResolvedJets", 
                                cut=[op.OR(op.rng_len(bjetsBoosted)==0,op.rng_len(jets)<=1,op.rng_len(bjetsResolved)==0)])
-        hasExlusiveResolvedJets = noSel.refine("hasExlusiveResolved",
-                               cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1,op.rng_len(bjetsBoosted)==0])
         hasNotExlusiveResolvedJets = noSel.refine("hasNotExlusiveResolved",
                                cut=[op.OR(op.OR(op.rng_len(jets)<=1,op.rng_len(bjetsResolved)==0),op.AND(op.rng_len(bjetsBoosted)>=1,op.rng_len(jets)>=2,op.rng_len(bjetsResolved)>=1))])
         hasExlusiveBoostedJets = noSel.refine("hasExlusiveBoostedJets",
-                               cut=[op.rng_len(bjetsBoosted)>=1,op.OR(op.rng_len(jets)<=1,op.rng_len(bjetsResolved)==0)])
+                               cut=[op.rng_len(bjetsBoosted)>=1,op.OR(op.rng_len(jets)<=1,op.rng_len(bjetsResolved)==0)],
+                               weight = DeepCSVMediumSFApplied)
         hasNotExlusiveBoostedJets = noSel.refine("hasNotExlusiveBoostedJets",
                                cut=[op.OR(op.rng_len(bjetsBoosted)==0,op.AND(op.rng_len(jets)>=2,op.rng_len(bjetsResolved)>=1))])
+        # Note that these selection should be done the same (and SF) when combining the OS lepton selection #
+        # Because so far there is no way to "concatenate" two refine's #
 
         # Counting events from different selections for debugging #
         # Passing Boosted selection #
@@ -513,47 +577,34 @@ class NanoHHTobbWW(NanoAODHistoModule):
         #############################################################################
         ##################### Jets + Dilepton combination ###########################
         #############################################################################
-        # Combine dilepton and Resolved (Exclusive = NOT Boosted) selections #
-        hasOsElElOutZResolvedJets = hasOsElElOutZ.refine("hasOsElElOutZResolvedJets", 
-                                      cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1,op.rng_len(bjetsBoosted)==0]) 
-        hasOsMuMuOutZResolvedJets = hasOsMuMuOutZ.refine("hasOsMuMuOutZResolvedJets",  
-                                      cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1,op.rng_len(bjetsBoosted)==0]) 
-        hasOsElMuOutZResolvedJets = hasOsElMuOutZ.refine("hasOsElMuOutZResolvedJets", 
-                                      cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1,op.rng_len(bjetsBoosted)==0])
-        hasOsMuElOutZResolvedJets = hasOsMuElOutZ.refine("hasOsMuElOutZResolvedJets", 
-                                      cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1,op.rng_len(bjetsBoosted)==0])
-
         # Combine dilepton and Boosted selections #
         hasOsElElOutZBoostedJets = hasOsElElOutZ.refine("hasOsElElOutZBoostedJets", 
-                                      cut=[op.rng_len(bjetsBoosted)>=1])
+                                      cut=[op.rng_len(bjetsBoosted)>=1],
+                                      weight = DeepCSVMediumSFApplied)
         hasOsMuMuOutZBoostedJets = hasOsMuMuOutZ.refine("hasOsMuMuOutZBoostedJets", 
-                                      cut=[op.rng_len(bjetsBoosted)>=1])
+                                      cut=[op.rng_len(bjetsBoosted)>=1],
+                                      weight = DeepCSVMediumSFApplied)
         hasOsElMuOutZBoostedJets = hasOsElMuOutZ.refine("hasOsElMuOutZBoostedJets", 
-                                      cut=[op.rng_len(bjetsBoosted)>=1])
+                                      cut=[op.rng_len(bjetsBoosted)>=1],
+                                      weight = DeepCSVMediumSFApplied)
         hasOsMuElOutZBoostedJets = hasOsMuElOutZ.refine("hasOsMuElOutZBoostedJets", 
-                                      cut=[op.rng_len(bjetsBoosted)>=1])
+                                      cut=[op.rng_len(bjetsBoosted)>=1],
+                                      weight = DeepCSVMediumSFApplied)
 
-        # Plot dilepton with OS, Z peak and Resolved jets selections #
-        plots += makeDileptonPlots(self,
-                                   sel         = hasOsElElOutZResolvedJets,
-                                   dilepton    = OsElEl[0],
-                                   suffix      = 'hasOsdilep_OutZ_ResolvedJets',
-                                   channel     = 'ElEl')
-        plots += makeDileptonPlots(self,
-                                   sel         = hasOsMuMuOutZResolvedJets,
-                                   dilepton    = OsMuMu[0],
-                                   suffix      = 'hasOsdilep_OutZ_ResolvedJets',
-                                   channel     = 'MuMu')
-        plots += makeDileptonPlots(self,
-                                   sel         = hasOsElMuOutZResolvedJets,
-                                   dilepton    = OsElMu[0],
-                                   suffix      = 'hasOsdilep_OutZ_ResolvedJets',
-                                   channel     = 'ElMu')
-        plots += makeDileptonPlots(self,
-                                   sel         = hasOsMuElOutZResolvedJets,
-                                   dilepton    = OsMuEl[0],
-                                   suffix      = 'hasOsdilep_OutZ_ResolvedJets',
-                                   channel     = 'MuEl')
+        # Combine dilepton and Resolved (Exclusive = NOT Boosted) selections #
+        hasOsElElOutZResolvedJets = hasOsElElOutZ.refine("hasOsElElOutZResolvedJets", 
+                                      cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1,op.rng_len(bjetsBoosted)==0],
+                                      weight = DeepJetMediumSFApplied)
+        hasOsMuMuOutZResolvedJets = hasOsMuMuOutZ.refine("hasOsMuMuOutZResolvedJets",  
+                                      cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1,op.rng_len(bjetsBoosted)==0], 
+                                      weight = DeepJetMediumSFApplied)
+        hasOsElMuOutZResolvedJets = hasOsElMuOutZ.refine("hasOsElMuOutZResolvedJets", 
+                                      cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1,op.rng_len(bjetsBoosted)==0],
+                                      weight = DeepJetMediumSFApplied)
+        hasOsMuElOutZResolvedJets = hasOsMuElOutZ.refine("hasOsMuElOutZResolvedJets", 
+                                      cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1,op.rng_len(bjetsBoosted)==0],
+                                      weight = DeepJetMediumSFApplied)
+
 
         # Plot dilepton with OS dilepton, Z peak and Boosted jets selections #
         plots += makeDileptonPlots(self,
@@ -599,6 +650,29 @@ class NanoHHTobbWW(NanoAODHistoModule):
                                  fatjet    = bjetsBoosted[0],
                                  suffix    = "hasOsdilep_OutZ_BoostedJets",
                                  channel   = "MuEl")
+
+        # Plot dilepton with OS, Z peak and Resolved jets selections #
+        plots += makeDileptonPlots(self,
+                                   sel         = hasOsElElOutZResolvedJets,
+                                   dilepton    = OsElEl[0],
+                                   suffix      = 'hasOsdilep_OutZ_ResolvedJets',
+                                   channel     = 'ElEl')
+        plots += makeDileptonPlots(self,
+                                   sel         = hasOsMuMuOutZResolvedJets,
+                                   dilepton    = OsMuMu[0],
+                                   suffix      = 'hasOsdilep_OutZ_ResolvedJets',
+                                   channel     = 'MuMu')
+        plots += makeDileptonPlots(self,
+                                   sel         = hasOsElMuOutZResolvedJets,
+                                   dilepton    = OsElMu[0],
+                                   suffix      = 'hasOsdilep_OutZ_ResolvedJets',
+                                   channel     = 'ElMu')
+        plots += makeDileptonPlots(self,
+                                   sel         = hasOsMuElOutZResolvedJets,
+                                   dilepton    = OsMuEl[0],
+                                   suffix      = 'hasOsdilep_OutZ_ResolvedJets',
+                                   channel     = 'MuEl')
+
 
         # Plotting the jets for OS dilepton, Z peak and Resolved jets selections #
         plots += makeJetsPlots(self,
