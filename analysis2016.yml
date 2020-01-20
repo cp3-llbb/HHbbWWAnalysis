@@ -109,7 +109,7 @@ samples:
     files: dascache/ZZTo2L2Nu.dat
     generated-events: 'genEventSumw'
     cross-section: 0.5644     
-    group: ZZ
+    group: VV # ZZ
     era: '2016'
     split : 44 # 44 files
 
@@ -118,7 +118,7 @@ samples:
     files: dascache/ZZTo2L2Q.dat
     generated-events: 'genEventSumw'
     cross-section: 3.222     
-    group: ZZ
+    group: VV #ZZ
     era: '2016'
     split: 8 # 8 files
 
@@ -127,7 +127,7 @@ samples:
     files: dascache/ZZTo4L.dat
     generated-events: 'genEventSumw'
     cross-section: 1.256 
-    group: ZZ
+    group: VV #ZZ
     era: '2016'
     split: 90 # 90 files
 
@@ -192,7 +192,7 @@ samples:
     files: dascache/WWToLNu2Q.dat
     generated-events: 'genEventSumw'
     cross-section: 43.53
-    group: others
+    group: VV #others
     era: '2016'
     split: 7 # 7 files
 
@@ -201,7 +201,7 @@ samples:
     files: dascache/WWTo2L2Nu.dat
     generated-events: 'genEventSumw'
     cross-section: 10.48
-    group: others
+    group: VV # others
     era: '2016'
     split: 4 # 4 files
         ##################
@@ -210,7 +210,7 @@ samples:
     files: dascache/WZTo2L2Q.dat
     generated-events: 'genEventSumw'
     cross-section: 5.606    
-    group: WZ # #TODO should add the WZ samples to the others bkg
+    group: VV # #TODO should add the WZ samples to the others bkg
     era: '2016'
     split: 27 # 27 files
 
@@ -247,7 +247,7 @@ samples:
     files: dascache/WWW.dat
     generated-events: 'genEventSumw'
     cross-section: 0.2086
-    group: others 
+    group: VVV #others 
     era: '2016'
     split: 2 # 2 files
 
@@ -256,7 +256,7 @@ samples:
     files: dascache/WWZ.dat
     generated-events: 'genEventSumw'
     cross-section: 0.1651
-    group: others
+    group: VVV #others
     era: '2016'
     split: 2 # 2 files
 
@@ -265,7 +265,7 @@ samples:
     files: dascache/WZZ.dat
     generated-events: 'genEventSumw'
     cross-section: 0.05565  
-    group: others
+    group: VVV #others
     era: '2016'
     split: 3 # 3 files
 
@@ -274,7 +274,7 @@ samples:
     files: dascache/ZZZ.dat
     generated-events: 'genEventSumw'
     cross-section: 0.01398  
-    group: others
+    group: VVV #others
     era: '2016'
     split: 1 # 1 file
 
@@ -283,7 +283,7 @@ samples:
     files: dascache/WJetsToLNu.dat
     generated-events: 'genEventSumw'
     cross-section: 60430.0
-    group: others
+    group: Wjets #others
     era: '2016'
     split: 92 # 92 files 
 
@@ -292,7 +292,7 @@ samples:
     files: dascache/TTWJetsToQQ.dat
     generated-events: 'genEventSumw'
     cross-section: 0.405
-    group: others
+    group: ttV #others
     era: '2016'
     split: 3 # 3 files
 
@@ -301,7 +301,7 @@ samples:
     files: dascache/TTWJetsToLNu.dat
     generated-events: 'genEventSumw'
     cross-section: 0.2001
-    group: others
+    group: ttV #others
     era: '2016'
     split: 7 # 7 files
 
@@ -310,7 +310,7 @@ samples:
     files: dascache/TTZToQQ.dat
     generated-events: 'genEventSumw'
     cross-section: 0.5297   
-    group: others
+    group: ttV #others
     era: '2016'
     split: 2 # 2 files
 
@@ -319,7 +319,7 @@ samples:
     files: dascache/TTZToLLNuNu.dat
     generated-events: 'genEventSumw'
     cross-section: 0.2529   
-    group: others
+    group: ttV #others
     era: '2016'
     split: 11 # 11 files
 
@@ -533,30 +533,38 @@ plotIt:
   groups:
     data:
       legend: data
+    ttbar:
+      fill-color: "#cc7a16"
+      legend: tt Full Lept
+      order: 1
     DY:
-      fill-color: "#0000FF" 
+      fill-color: "#1a83a1"
       legend: Drell-Yan
       order: 2
-    ttbar:
-      legend: tt Full Lept
-      fill-color: "#00ffc7" 
-      order: 1
     ST:
-      fill-color: "#ffc800"    
+      fill-color: "#99053d"
       legend: Single Top
       order: 3
-    ZZ: 
-      fill-color: "#ff4800"
-      legend: ZZ
-      order: 5
-    SM:
-      fill-color: "#ff0038"
-      legend: tth, Zh
+    Wjets:
+      fill-color: "#d95564"
+      legend: W+jets
       order: 4
-    others: 
-      fill-color: "#00ff48"
-      legend: others #: tt+V, W+Jets , VVV, VV
-      order: 6    
+    VV: 
+      fill-color: "#ccbf45"
+      legend: VV
+      order: 5
+    ttV:
+      fill-color: "#174704"
+      legend: tt+V
+      order: 6
+    SM:
+      fill-color: "#06b894"
+      legend: SM Higgs (ttH, ZH)
+      order: 7
+    VVV:
+      fill-color: "#593b04"
+      legend: VVV
+      order: 8
   systematics:
       # on the jets
     - jer
