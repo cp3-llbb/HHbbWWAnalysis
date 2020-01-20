@@ -46,7 +46,11 @@ class NanoHHTobbWW(NanoAODHistoModule):
         ############################################################################################
         if era == "2016":
             # Rochester corrections #
-            configureRochesterCorrection(tree._Muon.calc,os.path.join(os.path.dirname(__file__), "data", "RoccoR2016.txt"))
+            configureRochesterCorrection(variProxy  = tree._Muon.calc,
+                                         paramsFile = os.path.join(os.path.dirname(__file__), "data", "RoccoR2016.txt"),
+                                         isMC       = self.isMC(sample),
+                                         backend    = be, 
+                                         uName      = sample)
 
             # Trigger efficiencies #
             # tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_(DZ) 
