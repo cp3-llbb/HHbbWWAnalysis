@@ -17,8 +17,8 @@ class ScaleFactorsbbWW:
 
          # Scale factors dictionary construction #
          # (better to do that here so that it is not buil everytime we ask for scalefactors #
-        instance = MakeScaleFactorsDict(efficiencies_path  = os.path.join(os.path.abspath('.'),'data','TriggerEfficienciesStudies'),
-                                        scalefactors_path  = os.path.join(os.path.abspath('.'),'data','ScaleFactors_FullRunII'),
+        instance = MakeScaleFactorsDict(efficiencies_path  = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','TriggerEfficienciesStudies'),
+                                        scalefactors_path  = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_FullRunII'),
                                         check_path         = True)
            # 2016 legacy:
            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaRunIIRecommendations#Fall17v2
