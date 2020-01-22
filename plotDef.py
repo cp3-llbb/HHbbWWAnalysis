@@ -198,7 +198,7 @@ def makeFatJetPlots(self, sel, fatjets, suffix, channel):
     plots.append(Plot.make1D("%s_%s_fatjet_pt"%(channel,suffix),
                              fatjets[0].p4.pt(),
                              sel,
-                             EquidistantBinning(100,0,300.),
+                             EquidistantBinning(100,150,500.),
                              title='Transverse momentum of the fatjet',
                              xTitle="P_{T}(fatjet) [GeV]"))
     plots.append(Plot.make1D("%s_%s_fatjet_eta"%(channel,suffix),
@@ -216,13 +216,13 @@ def makeFatJetPlots(self, sel, fatjets, suffix, channel):
     plots.append(Plot.make1D("%s_%s_fatjet_mass"%(channel,suffix),
                              fatjets[0].mass,
                              sel,
-                             EquidistantBinning(100,0.,500.),
+                             EquidistantBinning(100,0.,600.),
                              title='Invariant mass of the fatjet',
                              xTitle="M(fatjet)"))
     plots.append(Plot.make1D("%s_%s_fatjet_softdropmass"%(channel,suffix),
                              fatjets[0].msoftdrop,
                              sel,
-                             EquidistantBinning(100,0.,500.),
+                             EquidistantBinning(100,0.,300.),
                              title='Soft Drop mass of the fatjet',
                              xTitle="M_{Soft Drop}(fatjet) [GeV]"))
     return plots
