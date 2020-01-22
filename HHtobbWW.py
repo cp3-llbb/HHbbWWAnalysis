@@ -22,8 +22,8 @@ class NanoHHTobbWW(NanoAODHistoModule):
             # Set ratio plots #
             self.plotDefaults = {"show-ratio": True,
                                  "y-axis": "Events",
-                                 "log-y"  : "both",
-                                 "ratio-y-axis-range" : [0.001, 1],
+                                 #"log-y"  : "both",
+                                 "ratio-y-axis-range" : [0.5,2],
                                  "ratio-y-axis" : 'Ratio Data/MC'}
 
 
@@ -276,6 +276,12 @@ class NanoHHTobbWW(NanoAODHistoModule):
         OsElMu = op.combine((electrons, muons), pred=lambda el,mu : op.AND(el.charge != mu.charge ,el.p4.Pt() > 25, mu.p4.Pt() > 15 ))
         OsMuEl = op.combine((muons, electrons), pred=lambda mu,el : op.AND(el.charge != mu.charge ,el.p4.Pt() > 15, mu.p4.Pt() > 25 ))
 
+        # Plots Numbers of dilepton in each channel #
+        plots.append(Plot.make1D("ElEl_channel",op.rng_len(OsElEl),noSel,EquidistantBinning(5,0,5.),title='Number of dilepton events in ElEl channel',xTitle='N_{dilepton} (ElEl channel)'))
+        plots.append(Plot.make1D("MuMu_channel",op.rng_len(OsMuMu),noSel,EquidistantBinning(5,0,5.),title='Number of dilepton events in MuMu channel',xTitle='N_{dilepton} (MuMu channel)'))
+        plots.append(Plot.make1D("ElMu_channel",op.rng_len(OsElMu),noSel,EquidistantBinning(5,0,5.),title='Number of dilepton events in ElMu channel',xTitle='N_{dilepton} (ElMu channel)'))
+        plots.append(Plot.make1D("MuEl_channel",op.rng_len(OsMuEl),noSel,EquidistantBinning(5,0,5.),title='Number of dilepton events in MuEl channel',xTitle='N_{dilepton} (MuEl channel)'))
+
         # Scalefactors #
        # if self.isMC(sample):
        #     doubleEleTrigSF = SF.get_scalefactor("dilepton", ("doubleEleLeg_HHMoriond17_2016"), systName="eleltrig")     
@@ -324,14 +330,6 @@ class NanoHHTobbWW(NanoAODHistoModule):
                                  cut = [op.rng_len(OsMuEl) >= 1,                        # Require at least one dilepton MuEl
                                         (op.rng_len(electrons)+op.rng_len(muons))<=2],  # Not more than two tight leptons
                                  weight = llSFApplied["MuEl"])
-
-
-        # Plots #
-        plots.append(Plot.make1D("ElEl_channel",op.rng_len(OsElEl),noSel,EquidistantBinning(5,0,5.),title='Number of dilepton events in ElEl channel',xTitle='N_{dilepton} (ElEl channel)'))
-        plots.append(Plot.make1D("MuMu_channel",op.rng_len(OsMuMu),noSel,EquidistantBinning(5,0,5.),title='Number of dilepton events in MuMu channel',xTitle='N_{dilepton} (MuMu channel)'))
-        plots.append(Plot.make1D("ElMu_channel",op.rng_len(OsElMu),noSel,EquidistantBinning(5,0,5.),title='Number of dilepton events in ElMu channel',xTitle='N_{dilepton} (ElMu channel)'))
-        plots.append(Plot.make1D("MuEl_channel",op.rng_len(OsMuEl),noSel,EquidistantBinning(5,0,5.),title='Number of dilepton events in MuEl channel',xTitle='N_{dilepton} (MuEl channel)'))
-
 
         hasOsCutChannelList = [
                              {'channel':'ElEl','sel':hasOsElEl,'dilepton':OsElEl[0],'suffix':'hasOsElEl'},
@@ -604,6 +602,19 @@ class NanoHHTobbWW(NanoAODHistoModule):
                                       cut=[op.rng_len(bjetsBoosted)>=1],
                                       weight = DeepCSVMediumSFApplied)
 
+        hasOsElElLowMllCutOutZExclusiveBoostedJets = hasOsElElLowMllCutOutZ.refine("hasOsElElLowMllCutOutZExclusiveBoostedJets", 
+                                      cut=[op.rng_len(bjetsBoosted)>=1,op.OR(op.rng_len(jets)<=1,op.rng_len(bjetsResolved)==0)],
+                                      weight = DeepCSVMediumSFApplied)
+        hasOsMuMuLowMllCutOutZExclusiveBoostedJets = hasOsMuMuLowMllCutOutZ.refine("hasOsMuMuLowMllCutOutZExclusiveBoostedJets", 
+                                      cut=[op.rng_len(bjetsBoosted)>=1,op.OR(op.rng_len(jets)<=1,op.rng_len(bjetsResolved)==0)],
+                                      weight = DeepCSVMediumSFApplied)
+        hasOsElMuLowMllCutExclusiveBoostedJets = hasOsElMuLowMllCut.refine("hasOsElMuLowMllCutExclusiveBoostedJets", 
+                                      cut=[op.rng_len(bjetsBoosted)>=1,op.OR(op.rng_len(jets)<=1,op.rng_len(bjetsResolved)==0)],
+                                      weight = DeepCSVMediumSFApplied)
+        hasOsMuElLowMllCutExclusiveBoostedJets = hasOsMuElLowMllCut.refine("hasOsMuElLowMllCutExclusiveBoostedJets", 
+                                      cut=[op.rng_len(bjetsBoosted)>=1,op.OR(op.rng_len(jets)<=1,op.rng_len(bjetsResolved)==0)],
+                                      weight = DeepCSVMediumSFApplied)
+
 
         # Boosted + OS dilepton plots #
         hasOsMllCutBoostedChannelList = [
@@ -611,6 +622,11 @@ class NanoHHTobbWW(NanoAODHistoModule):
                              {'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZBoostedJets,'dilepton':OsMuMu[0],'suffix':'hasOsMuMuLowMllCutOutZBoostedJets'},
                              {'channel':'ElMu','sel':hasOsElMuLowMllCutBoostedJets,    'dilepton':OsElMu[0],'suffix':'hasOsElMuLowMllCutBoostedJets'},
                              {'channel':'MuEl','sel':hasOsMuElLowMllCutBoostedJets,    'dilepton':OsMuEl[0],'suffix':'hasOsMuElLowMllCutBoostedJets'},
+
+                             {'channel':'ElEl','sel':hasOsElElLowMllCutOutZExclusiveBoostedJets,'dilepton':OsElEl[0],'suffix':'hasOsElElLowMllCutOutZExclusiveBoostedJets'},
+                             {'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZExclusiveBoostedJets,'dilepton':OsMuMu[0],'suffix':'hasOsMuMuLowMllCutOutZExclusiveBoostedJets'},
+                             {'channel':'ElMu','sel':hasOsElMuLowMllCutExclusiveBoostedJets,    'dilepton':OsElMu[0],'suffix':'hasOsElMuLowMllCutExclusiveBoostedJets'},
+                             {'channel':'MuEl','sel':hasOsMuElLowMllCutExclusiveBoostedJets,    'dilepton':OsMuEl[0],'suffix':'hasOsMuElLowMllCutExclusiveBoostedJets'},
                            ]
 
         for channelDict in hasOsMllCutBoostedChannelList:
@@ -626,6 +642,19 @@ class NanoHHTobbWW(NanoAODHistoModule):
   
         ##### RESOLVED #####
         # Combine dilepton and Exclusive Resolved (Exclusive = NOT Boosted) selections #
+        hasOsElElLowMllCutOutZResolvedJets = hasOsElElLowMllCutOutZ.refine("hasOsElElLowMllCutOutZResolvedJets", 
+                                      cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1],
+                                      weight = DeepJetMediumSFApplied)
+        hasOsMuMuLowMllCutOutZResolvedJets = hasOsMuMuLowMllCutOutZ.refine("hasOsMuMuLowMllCutOutZResolvedJets", 
+                                      cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1], 
+                                      weight = DeepJetMediumSFApplied)
+        hasOsElMuLowMllCutResolvedJets = hasOsElMuLowMllCut.refine("hasOsElMuLowMllCutResolvedJets", 
+                                      cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1],
+                                      weight = DeepJetMediumSFApplied)
+        hasOsMuElLowMllCutResolvedJets = hasOsMuElLowMllCut.refine("hasOsMuElLowMllCutResolvedJets", 
+                                      cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1],
+                                      weight = DeepJetMediumSFApplied)
+
         hasOsElElLowMllCutOutZExclusiveResolvedJets = hasOsElElLowMllCutOutZ.refine("hasOsElElLowMllCutOutZExclusiveResolvedJets", 
                                       cut=[op.rng_len(jets)>=2, op.rng_len(bjetsResolved)>=1,op.rng_len(bjetsBoosted)==0],
                                       weight = DeepJetMediumSFApplied)
@@ -641,6 +670,11 @@ class NanoHHTobbWW(NanoAODHistoModule):
 
         # ExclusiveResolved + OS dilepton plots #
         hasOsMllCutExclusiveResolvedChannelList = [
+                             {'channel':'ElEl','sel':hasOsElElLowMllCutOutZResolvedJets,'dilepton':OsElEl[0],'suffix':'hasOsElElLowMllCutOutZResolvedJets'},
+                             {'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZResolvedJets,'dilepton':OsMuMu[0],'suffix':'hasOsMuMuLowMllCutOutZResolvedJets'},
+                             {'channel':'ElMu','sel':hasOsElMuLowMllCutResolvedJets,    'dilepton':OsElMu[0],'suffix':'hasOsElMuLowMllCutResolvedJets'},
+                             {'channel':'MuEl','sel':hasOsMuElLowMllCutResolvedJets,    'dilepton':OsMuEl[0],'suffix':'hasOsMuElLowMllCutResolvedJets'},
+
                              {'channel':'ElEl','sel':hasOsElElLowMllCutOutZExclusiveResolvedJets,'dilepton':OsElEl[0],'suffix':'hasOsElElLowMllCutOutZExclusiveResolvedJets'},
                              {'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZExclusiveResolvedJets,'dilepton':OsMuMu[0],'suffix':'hasOsMuMuLowMllCutOutZExclusiveResolvedJets'},
                              {'channel':'ElMu','sel':hasOsElMuLowMllCutExclusiveResolvedJets,    'dilepton':OsElMu[0],'suffix':'hasOsElMuLowMllCutExclusiveResolvedJets'},
