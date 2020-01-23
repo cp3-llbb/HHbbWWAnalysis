@@ -96,33 +96,34 @@ class NanoHHTobbWW(NanoAODHistoModule):
                                       tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL]} 
 
             # Jet treatment #
-            #cachJEC_dir = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/cacheJEC'
-            #if self.isMC(sample):   # if MC -> needs smearing
-            #    configureJets(variProxy             = tree._Jet, 
-            #                  jetType               = "AK4PFchs",
-            #                  jec                   = "Summer16_07Aug2017_V20_MC",
-            #                  smear                 = "Summer16_25nsV1_MC",
-            #                  jesUncertaintySources = ["Total"],
-            #                  mayWriteCache         = isNotWorker,
-            #                  isMC                  = self.isMC(sample),
-            #                  backend               = be, 
-            #                  uName                 = sample,
-            #                  cachedir              = cachJEC_dir)
-            #else:                   # If data -> extract info from config 
-            #    jecTag = None
-            #    if "2016B" in sample or "2016C" in sample or "2016D" in sample:
-            #        jecTag = "Summer16_07Aug2017BCD_V11_DATA"
-            #    elif "2016E" in sample or "2016F" in sample:
-            #        jecTag = "Summer16_07Aug2017EF_V11_DATA"
-            #    elif "2016G" in sample or "2016H" in sample:
-            #        jecTag = "Summer16_07Aug2017GH_V11_DATA"
-            #        configureJets(tree,"Jet","AK4PFchs",
-            #            jec="Summer16_07Aug2017GH_V11_DATA", mayWriteCache=isNotWorker,cachedir=cachJEC_dir)
-            #    configureJets(variProxy             = tree._Jet, 
-            #                  jetType               = "AK4PFchs",
-            #                  jec                   = jecTag,
-            #                  mayWriteCache         = isNotWorker,
-            #                  cachedir              = cachJEC_dir)
+            cachJEC_dir = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/cacheJEC'
+            if self.isMC(sample):   # if MC -> needs smearing
+                configureJets(variProxy             = tree._Jet, 
+                              jetType               = "AK4PFchs",
+                              jec                   = "Summer16_07Aug2017_V20_MC",
+                              smear                 = "Summer16_25nsV1_MC",
+                              jesUncertaintySources = ["Total"],
+                              mayWriteCache         = isNotWorker,
+                              isMC                  = self.isMC(sample),
+                              backend               = be, 
+                              uName                 = sample,
+                              cachedir              = cachJEC_dir)
+            else:                   # If data -> extract info from config 
+                jecTag = None
+                if "2016B" in sample or "2016C" in sample or "2016D" in sample:
+                    jecTag = "Summer16_07Aug2017BCD_V11_DATA"
+                elif "2016E" in sample or "2016F" in sample:
+                    jecTag = "Summer16_07Aug2017EF_V11_DATA"
+                elif "2016G" in sample or "2016H" in sample:
+                    jecTag = "Summer16_07Aug2017GH_V11_DATA"
+                configureJets(variProxy             = tree._Jet, 
+                              jetType               = "AK4PFchs",
+                              jec                   = jecTag,
+                              mayWriteCache         = isNotWorker,
+                              isMC                  = self.isMC(sample),
+                              backend               = be, 
+                              uName                 = sample,
+                              cachedir              = cachJEC_dir)
 
         ############################################################################################
         # ERA 2017 #
@@ -231,7 +232,7 @@ class NanoHHTobbWW(NanoAODHistoModule):
         plots = []
 
         forceDefine(t._Muon.calcProd, noSel)
-        #forceDefine(t._Jet.calcProd, noSel) # calculate once per event (for every event)
+        forceDefine(t._Jet.calcProd, noSel) # calculate once per event (for every event)
 
         #############################################################################
         ################################  Muons #####################################
@@ -245,13 +246,13 @@ class NanoHHTobbWW(NanoAODHistoModule):
         # Scalefactors #
         if self.isMC(sample):
             if era=="2016":
-                muMediumIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_tight"), combine="weight", systName="muid")
-                muMediumISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), combine="weight", systName="muiso")
+                muTightIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_tight"), combine="weight", systName="muid")
+                muTightISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), combine="weight", systName="muiso")
                 TrkIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "idtrk_highpt"), combine="weight")         # Need to ask what it is
                 TrkISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "isotrk_loose_idtrk_highptidandipcut"), combine="weight") # Need to ask what it is
             else:
-                muMediumIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_medium"), systName="muid")
-                muMediumISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), systName="muiso") 
+                muTightIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_tight"), systName="muid")
+                muTightISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), systName="muiso") 
 
         #############################################################################
         #############################  Electrons  ###################################
@@ -265,7 +266,7 @@ class NanoHHTobbWW(NanoAODHistoModule):
 
         # Scalefactors #
         if self.isMC(sample):
-            elMediumIDSF = SF.get_scalefactor("lepton", ("electron_{0}_{1}".format(era,sfTag), "id_tight"), systName="elid")
+            elTightIDSF = SF.get_scalefactor("lepton", ("electron_{0}_{1}".format(era,sfTag), "id_tight"), systName="elid")
 
         #############################################################################
         #############################   Dilepton  ###################################
@@ -283,34 +284,34 @@ class NanoHHTobbWW(NanoAODHistoModule):
         plots.append(Plot.make1D("MuEl_channel",op.rng_len(OsMuEl),noSel,EquidistantBinning(5,0,5.),title='Number of dilepton events in MuEl channel',xTitle='N_{dilepton} (MuEl channel)'))
 
         # Scalefactors #
-       # if self.isMC(sample):
-       #     doubleEleTrigSF = SF.get_scalefactor("dilepton", ("doubleEleLeg_HHMoriond17_2016"), systName="eleltrig")     
-       #     doubleMuTrigSF  = SF.get_scalefactor("dilepton", ("doubleMuLeg_HHMoriond17_2016"), systName="mumutrig")    
-       #     elemuTrigSF     = SF.get_scalefactor("dilepton", ("elemuLeg_HHMoriond17_2016"), systName="elmutrig")
-       #     mueleTrigSF     = SF.get_scalefactor("dilepton", ("mueleLeg_HHMoriond17_2016"), systName="mueltrig")
+        if self.isMC(sample):
+            doubleEleTrigSF = SF.get_scalefactor("dilepton", ("doubleEleLeg_HHMoriond17_2016"), systName="eleltrig")     
+            doubleMuTrigSF  = SF.get_scalefactor("dilepton", ("doubleMuLeg_HHMoriond17_2016"), systName="mumutrig")    
+            elemuTrigSF     = SF.get_scalefactor("dilepton", ("elemuLeg_HHMoriond17_2016"), systName="elmutrig")
+            mueleTrigSF     = SF.get_scalefactor("dilepton", ("mueleLeg_HHMoriond17_2016"), systName="mueltrig")
 
-       # llSF =  {
-       #     "ElEl" : (lambda ll : [ elMediumIDSF(ll[0][0]),                                                                     # First lepton SF
-       #                             elMediumIDSF(ll[0][1]),                                                                     # Second lepton SF
-       #                             doubleEleTrigSF(ll[0])]),                                                                   # Dilepton SF
-       #     "MuMu" : (lambda ll : [ muMediumIDSF(ll[0][0]), muMediumISOSF(ll[0][0]), TrkIDSF(ll[0][0]), TrkISOSF(ll[0][0]),     # First lepton SF
-       #                             muMediumIDSF(ll[0][1]), muMediumISOSF(ll[0][1]), TrkIDSF(ll[0][1]), TrkISOSF(ll[0][1]),     # Second lepton SF
-       #                             doubleMuTrigSF(ll[0])]),                                                                    # Dilepton SF
-       #     "ElMu" : (lambda ll : [ elMediumIDSF(ll[0][0]),                                                                     # First lepton SF
-       #                             muMediumIDSF(ll[0][1]), muMediumISOSF(ll[0][1]), TrkIDSF(ll[0][1]), TrkISOSF(ll[0][1]),     # Second lepton SF
-       #                             elemuTrigSF(ll[0])]),                                                                       # Dilepton SF
-       #     "MuEl" : (lambda ll : [ muMediumIDSF(ll[0][0]), muMediumISOSF(ll[0][0]), TrkIDSF(ll[0][0]), TrkISOSF(ll[0][0]),     # First lepton SF
-       #                             elMediumIDSF(ll[0][1]),                                                                     # Second lepton SF
-       #                             mueleTrigSF(ll[0])]),                                                                       # Dilepton SF
-       #         # ll is a proxy list of dileptons 
-       #         # ll[0] is the first dilepton 
-       #         # ll[0][0] is the first lepton and ll[0][1] the second in the dilepton
-       #         }
+        llSF =  {
+            "ElEl" : (lambda ll : [ elTightIDSF(ll[0][0]),                                                                     # First lepton SF
+                                    elTightIDSF(ll[0][1]),                                                                     # Second lepton SF
+                                    doubleEleTrigSF(ll[0])]),                                                                   # Dilepton SF
+            "MuMu" : (lambda ll : [ muTightIDSF(ll[0][0]), muTightISOSF(ll[0][0]), TrkIDSF(ll[0][0]), TrkISOSF(ll[0][0]),     # First lepton SF
+                                    muTightIDSF(ll[0][1]), muTightISOSF(ll[0][1]), TrkIDSF(ll[0][1]), TrkISOSF(ll[0][1]),     # Second lepton SF
+                                    doubleMuTrigSF(ll[0])]),                                                                    # Dilepton SF
+            "ElMu" : (lambda ll : [ elTightIDSF(ll[0][0]),                                                                     # First lepton SF
+                                    muTightIDSF(ll[0][1]), muTightISOSF(ll[0][1]), TrkIDSF(ll[0][1]), TrkISOSF(ll[0][1]),     # Second lepton SF
+                                    elemuTrigSF(ll[0])]),                                                                       # Dilepton SF
+            "MuEl" : (lambda ll : [ muTightIDSF(ll[0][0]), muTightISOSF(ll[0][0]), TrkIDSF(ll[0][0]), TrkISOSF(ll[0][0]),     # First lepton SF
+                                    elTightIDSF(ll[0][1]),                                                                     # Second lepton SF
+                                    mueleTrigSF(ll[0])]),                                                                       # Dilepton SF
+                # ll is a proxy list of dileptons 
+                # ll[0] is the first dilepton 
+                # ll[0][0] is the first lepton and ll[0][1] the second in the dilepton
+                }
         llSFApplied = {
-            "ElEl": None, #llSF["ElEl"](OsElEl) if isMC else None,
-            "MuMu": None, #llSF["MuMu"](OsMuMu) if isMC else None,
-            "ElMu": None, #llSF["ElMu"](OsElMu) if isMC else None,
-            "MuEl": None, #llSF["MuEl"](OsMuEl) if isMC else None,
+            "ElEl": llSF["ElEl"](OsElEl) if isMC else None,
+            "MuMu": llSF["MuMu"](OsMuMu) if isMC else None,
+            "ElMu": llSF["ElMu"](OsElMu) if isMC else None,
+            "MuEl": llSF["MuEl"](OsMuEl) if isMC else None,
                       }
 
         # Selection #
