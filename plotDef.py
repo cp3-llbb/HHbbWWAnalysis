@@ -15,13 +15,13 @@ def makeDileptonPlots(self, sel, dilepton, suffix, channel):
     plots.append(Plot.make1D("%s_%s_leadlepton_pt"%(channel,suffix), 
                              dilepton[0].p4.Pt(), 
                              sel, 
-                             EquidistantBinning(100, 0., 500.), 
+                             EquidistantBinning(100, 0., 300.), 
                              title="Transverse momentum of the leading lepton (channel %s)"%channel, 
                              xTitle= "P_{T}(leading lepton) [GeV]"))
     plots.append(Plot.make1D("%s_%s_subleadlepton_pt"%(channel,suffix), 
                              dilepton[1].p4.Pt(), 
                              sel, 
-                             EquidistantBinning(100, 0., 500.), 
+                             EquidistantBinning(100, 0., 300.), 
                              title="Transverse momentum of the subleading lepton (channel %s)"%channel, 
                              xTitle= "P_{T}(leading lepton) [GeV]"))
 
@@ -57,7 +57,7 @@ def makeDileptonPlots(self, sel, dilepton, suffix, channel):
     plots.append(Plot.make1D("%s_%s_dilepton_invariantMass"%(channel,suffix), 
                              op.invariant_mass(dilepton[0].p4,dilepton[1].p4), 
                              sel, 
-                             EquidistantBinning(100, 0., 800.), 
+                             EquidistantBinning(100, 0., 400.), 
                              title="Dilepton invariant mass (channel %s)"%channel, 
                              xTitle= "Invariant mass [GeV]"))
 
@@ -138,7 +138,7 @@ def makeSeparateJetsPlots(self, sel, leadjet, subleadjet, suffix, channel, plot_
     plots.append(Plot.make1D(lead_base_name.format(var="pt"),
                              leadjet.p4.pt(),
                              sel,
-                             EquidistantBinning(100,0,500.),
+                             EquidistantBinning(100,0,300.),
                              title='Transverse momentum of the %s'%lead_base_title,
                              xTitle="P_{T}(%s) [GeV]"%lead_base_title,))
     plots.append(Plot.make1D(lead_base_name.format(var="eta"),
@@ -157,7 +157,7 @@ def makeSeparateJetsPlots(self, sel, leadjet, subleadjet, suffix, channel, plot_
     plots.append(Plot.make1D(sublead_base_name.format(var="pt"),
                              subleadjet.p4.pt(),
                              sel,
-                             EquidistantBinning(100,0,500.),
+                             EquidistantBinning(100,0,300.),
                              title='Transverse momentum of the %s'%sublead_base_title,
                              xTitle="P_{T}(%s) [GeV]"%sublead_base_title,))
     plots.append(Plot.make1D(sublead_base_name.format(var="eta"),
@@ -198,7 +198,7 @@ def makeFatJetPlots(self, sel, fatjets, suffix, channel):
     plots.append(Plot.make1D("%s_%s_fatjet_pt"%(channel,suffix),
                              fatjets[0].p4.pt(),
                              sel,
-                             EquidistantBinning(100,150,500.),
+                             EquidistantBinning(100,150,600.),
                              title='Transverse momentum of the fatjet',
                              xTitle="P_{T}(fatjet) [GeV]"))
     plots.append(Plot.make1D("%s_%s_fatjet_eta"%(channel,suffix),
@@ -216,13 +216,13 @@ def makeFatJetPlots(self, sel, fatjets, suffix, channel):
     plots.append(Plot.make1D("%s_%s_fatjet_mass"%(channel,suffix),
                              fatjets[0].mass,
                              sel,
-                             EquidistantBinning(100,0.,600.),
+                             EquidistantBinning(100,0.,200.),
                              title='Invariant mass of the fatjet',
                              xTitle="M(fatjet)"))
     plots.append(Plot.make1D("%s_%s_fatjet_softdropmass"%(channel,suffix),
                              fatjets[0].msoftdrop,
                              sel,
-                             EquidistantBinning(100,0.,300.),
+                             EquidistantBinning(100,0.,200.),
                              title='Soft Drop mass of the fatjet',
                              xTitle="M_{Soft Drop}(fatjet) [GeV]"))
     return plots

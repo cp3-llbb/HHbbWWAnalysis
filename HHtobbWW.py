@@ -18,21 +18,23 @@ class NanoHHTobbWW(NanoAODHistoModule):
     """ Example module: HH->bbW(->e/µ nu)W(->e/µ nu) histograms from NanoAOD """
     def __init__(self, args):
             super(NanoHHTobbWW, self).__init__(args)
-            self.calcToAdd += ["nJet", "nMuon"]
-            # Set ratio plots #
+            # Set plots options #
             self.plotDefaults = {"show-ratio": True,
                                  "y-axis": "Events",
                                  #"log-y"  : "both",
                                  "ratio-y-axis-range" : [0.5,2],
-                                 "ratio-y-axis" : 'Ratio Data/MC'}
+                                 "ratio-y-axis" : 'Ratio Data/MC',
+                                 "sort-by-yields" : False}
 
 
     def prepareTree(self, tree, sample=None, sampleCfg=None, enableSystematics=None):
         # JEC's Recommendation for Full RunII: https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC
         # JER : -----------------------------: https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
         # Get base aguments #
-        tree,noSel,be,lumiArgs = super(NanoHHTobbWW,self).prepareTree(tree, sample=sample, sampleCfg=sampleCfg)
         era = sampleCfg['era']
+        isMC = self.isMC(sample)
+        metName = "METFixEE2017" if era == "2017" else "MET"
+        tree,noSel,be,lumiArgs = super(NanoHHTobbWW,self).prepareTree(tree, sample=sample, sampleCfg=sampleCfg, calcToAdd=["nJet", metName, "nMuon"])
         triggersPerPrimaryDataset = {}
         from bamboo.analysisutils import configureJets ,configureRochesterCorrection
 
@@ -61,7 +63,7 @@ class NanoHHTobbWW(NanoAODHistoModule):
                 # Found in 2016G : both
                 triggersPerPrimaryDataset = {
                     "SingleMuon" :  [ tree.HLT.IsoMu24],
-                    "SingleEG"   :  [ tree.HLT.Ele27_WPTight_Gsf],
+                    "SingleElectron":  [ tree.HLT.Ele27_WPTight_Gsf],
                     "DoubleMuon" :  [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
                                       tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
                     "DoubleEGamma": [ tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
@@ -73,7 +75,7 @@ class NanoHHTobbWW(NanoAODHistoModule):
                 # Found in 2016H : has DZ but not without
                 triggersPerPrimaryDataset = {
                     "SingleMuon" :  [ tree.HLT.IsoMu24],
-                    "SingleEG"   :  [ tree.HLT.Ele27_WPTight_Gsf],
+                    "SingleElectron":  [ tree.HLT.Ele27_WPTight_Gsf],
                     "DoubleMuon" :  [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
                                       tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
                     "DoubleEGamma": [ tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
@@ -88,7 +90,7 @@ class NanoHHTobbWW(NanoAODHistoModule):
 
                 triggersPerPrimaryDataset = {
                     "SingleMuon" :  [ tree.HLT.IsoMu24],
-                    "SingleEG"   :  [ tree.HLT.Ele27_WPTight_Gsf],
+                    "SingleElectron":  [ tree.HLT.Ele27_WPTight_Gsf],
                     "DoubleMuon" :  [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
                                       tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
                     "DoubleEGamma": [ tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
@@ -344,10 +346,6 @@ class NanoHHTobbWW(NanoAODHistoModule):
         # Dilepton Z peak exclusion (charge already done in previous selection) # 
         lambda_lowMllCut    = lambda dilep: op.invariant_mass(dilep[0].p4, dilep[1].p4)>12.
         lambda_outZ         = lambda dilep: op.NOT(op.in_range(80.,op.invariant_mass(dilep[0].p4, dilep[1].p4),100.))
-        #lambda_mllLowerband = lambda dilep: op.in_range(12.,op.invariant_mass(dilep[0].p4, dilep[1].p4),80.)
-        #lambda_mllUpperband = lambda dilep: op.invariant_mass(dilep[0].p4, dilep[1].p4)>100.
-        #lambda_mllCut       = lambda dilep: op.OR(lambda_mllLowerband(dilep),lambda_mllUpperband(dilep))
-        #lambda_OSdilep      = lambda dilep: dilep[0].charge*dilep[1].charge == -1 # Must have been done before
 
         hasOsElElLowMllCutOutZ = hasOsElEl.refine("hasOsElElLowMllCutOutZ",cut=[lambda_lowMllCut(OsElEl[0]),lambda_outZ(OsElEl[0])])
         hasOsMuMuLowMllCutOutZ = hasOsMuMu.refine("hasOsMuMuLowMllCutOutZ",cut=[lambda_lowMllCut(OsMuMu[0]),lambda_outZ(OsMuMu[0])])
@@ -367,11 +365,15 @@ class NanoHHTobbWW(NanoAODHistoModule):
         #############################################################################
         ################################  Jets  #####################################
         #############################################################################
-        # select jets   // 2016 - 2017 - 2018   ( j.jetId &2) ->      tight jet ID
+        # select jets   // 2016 (medium) - 2017 - 2018 (tight)  ( j.jetId &2) ->      tight jet ID
         jetsByPt = op.sort(t.Jet, lambda jet : -jet.p4.Pt())
-        jetsSel = op.select(jetsByPt, lambda j : op.AND(j.p4.Pt() > 20., op.abs(j.p4.Eta())< 2.4, (j.jetId &2)))        # Jets = AK4 jets
         fatjetsByPt = op.sort(t.FatJet, lambda fatjet : -fatjet.p4.Pt())
-        fatjetsSel = op.select(fatjetsByPt, lambda j : op.AND(j.p4.Pt() > 20., op.abs(j.p4.Eta())< 2.4, (j.jetId &2)))        # FatJets = AK8 jets
+        if era == "2016":
+            jetsSel = op.select(jetsByPt, lambda j : op.AND(j.p4.Pt() > 25., op.abs(j.p4.Eta())< 2.4, (j.jetId &1)))        # Jets = AK4 jets
+            fatjetsSel = op.select(fatjetsByPt, lambda j : op.AND(j.p4.Pt() > 25., op.abs(j.p4.Eta())< 2.4, (j.jetId &1)))        # FatJets = AK8 jets
+        elif era == "2017" or era == "2018":
+            jetsSel = op.select(jetsByPt, lambda j : op.AND(j.p4.Pt() > 25., op.abs(j.p4.Eta())< 2.4, (j.jetId &2)))        # Jets = AK4 jets
+            fatjetsSel = op.select(fatjetsByPt, lambda j : op.AND(j.p4.Pt() > 25., op.abs(j.p4.Eta())< 2.4, (j.jetId &2)))        # FatJets = AK8 jets
 
         # exclude from the jetsSel any jet that happens to include within its reconstruction cone a muon or an electron.
         jets = op.select(jetsSel, lambda j : op.AND(op.NOT(op.rng_any(electrons, lambda ele : op.deltaR(j.p4, ele.p4) < 0.3 )), op.NOT(op.rng_any(muons, lambda mu : op.deltaR(j.p4, mu.p4) < 0.3 ))))
@@ -404,11 +406,12 @@ class NanoHHTobbWW(NanoAODHistoModule):
         if self.isMC(sample):
             pass
             #DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
-            #DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
             #DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
-            #DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
             #DeepCSVMediumSFApplied = [DeepCSVMediumSF(bjetsBoosted[0].subJet1)] # Must be applied on subjets : need to check each time which one has been btagged
-            #DeepJetMediumSFApplied = [DeepJetMediumSF(bjetsResolved[0])]
+
+            #DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
+            #DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
+            #DeepJetMediumSFApplied = [DeepJetMediumSF(bjetsResolved[0])] # TODO : check if more than one bjet and apply to all
 
     
         # Define the boosted and Resolved (+exclusive) selections #
