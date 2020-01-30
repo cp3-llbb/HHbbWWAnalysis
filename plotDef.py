@@ -63,7 +63,20 @@ def makeDileptonPlots(self, sel, dilepton, suffix, channel):
 
     return plots
 
-##########################  JETS PLOTS #################################
+########################## DELTA PLOTS #################################
+def makeDeltaRPlots(self,sel,cont1,cont2,suffix,channel):
+    plots = [] 
+    mixedCont = op.combine((cont1,cont2))
+    plots.append(Plot.make1D("%s_%s_DeltaR"%(channel,suffix), 
+                             op.map(mixedCont,lambda c : op.deltaR(c[0].p4,c[1].p4)),
+                             sel, 
+                             EquidistantBinning(20,0.,1.), 
+                             title="deltaR %s"%channel, 
+                             xTitle= "#Delta R"))
+
+    return plots
+
+########################## JETS PLOTS #################################
 def makeJetsPlots(self,sel,bjets,lightjets,alljets,suffix,channel):
     plots = []
 
