@@ -11,7 +11,7 @@ from bamboo.plots import Plot, EquidistantBinning, SummedPlot
 from bamboo import treefunctions as op
 
 sys.path.append('/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/') # Add scripts in this directory -- TODO : make cleaner
-from plotDef import makeDileptonPlots, makeJetsPlots, makeFatJetPlots
+from plotDef import makeDileptonPlots, makeJetsPlots, makeFatJetPlots, makeDeltaRPlots
 from scalefactorsbbWW import ScaleFactorsbbWW
 
 class NanoHHTobbWW(NanoAODHistoModule):
@@ -20,9 +20,10 @@ class NanoHHTobbWW(NanoAODHistoModule):
             super(NanoHHTobbWW, self).__init__(args)
             # Set plots options #
             self.plotDefaults = {"show-ratio": True,
+                                 "normalized": True,
                                  "y-axis": "Events",
                                  #"log-y"  : "both",
-                                 "ratio-y-axis-range" : [0.5,2],
+                                 "ratio-y-axis-range" : [0.5,1.5],
                                  "ratio-y-axis" : 'Ratio Data/MC',
                                  "sort-by-yields" : False}
 
@@ -375,6 +376,29 @@ class NanoHHTobbWW(NanoAODHistoModule):
             jetsSel = op.select(jetsByPt, lambda j : op.AND(j.p4.Pt() > 25., op.abs(j.p4.Eta())< 2.4, (j.jetId &2)))        # Jets = AK4 jets
             fatjetsSel = op.select(fatjetsByPt, lambda j : op.AND(j.p4.Pt() > 25., op.abs(j.p4.Eta())< 2.4, (j.jetId &2)))        # FatJets = AK8 jets
 
+        # Plot lepton/jet angle separartion
+        DeltaRChannelList = [
+                     {'channel':'ElEl','sel':hasOsElElLowMllCutOutZ,'cont1':electrons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronJetDeltaR'},
+                     {'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZ,'cont1':electrons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronJetDeltaR'},
+                     {'channel':'ElMu','sel':hasOsElMuLowMllCut,    'cont1':electrons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronJetDeltaR'},
+                     {'channel':'MuEl','sel':hasOsMuElLowMllCut,    'cont1':electrons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronJetDeltaR'},
+                     {'channel':'ElEl','sel':hasOsElElLowMllCutOutZ,'cont1':electrons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronFatjetDeltaR'},
+                     {'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZ,'cont1':electrons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronFatjetDeltaR'},
+                     {'channel':'ElMu','sel':hasOsElMuLowMllCut,    'cont1':electrons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronFatjetDeltaR'},
+                     {'channel':'MuEl','sel':hasOsMuElLowMllCut,    'cont1':electrons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronFatjetDeltaR'},
+                     {'channel':'ElEl','sel':hasOsElElLowMllCutOutZ,'cont1':muons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonJetDeltaR'},
+                     {'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZ,'cont1':muons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonJetDeltaR'},
+                     {'channel':'ElMu','sel':hasOsElMuLowMllCut,    'cont1':muons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonJetDeltaR'},
+                     {'channel':'MuEl','sel':hasOsMuElLowMllCut,    'cont1':muons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonJetDeltaR'},
+                     {'channel':'ElEl','sel':hasOsElElLowMllCutOutZ,'cont1':muons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonFatjetDeltaR'},
+                     {'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZ,'cont1':muons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonFatjetDeltaR'},
+                     {'channel':'ElMu','sel':hasOsElMuLowMllCut,    'cont1':muons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonFatjetDeltaR'},
+                     {'channel':'MuEl','sel':hasOsMuElLowMllCut,    'cont1':muons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonFatjetDeltaR'},
+                   ]
+
+        for channelDict in DeltaRChannelList:
+            plots.extend(makeDeltaRPlots(self, **channelDict))
+
         # exclude from the jetsSel any jet that happens to include within its reconstruction cone a muon or an electron.
         jets = op.select(jetsSel, lambda j : op.AND(op.NOT(op.rng_any(electrons, lambda ele : op.deltaR(j.p4, ele.p4) < 0.3 )), op.NOT(op.rng_any(muons, lambda mu : op.deltaR(j.p4, mu.p4) < 0.3 ))))
         fatjets = op.select(fatjetsSel, lambda j : op.AND(op.NOT(op.rng_any(electrons, lambda ele : op.deltaR(j.p4, ele.p4) < 0.3 )), op.NOT(op.rng_any(muons, lambda mu : op.deltaR(j.p4, mu.p4) < 0.3 ))))
@@ -572,20 +596,20 @@ class NanoHHTobbWW(NanoAODHistoModule):
                                 xTitle="Number of subjets in boosted jet"))
 
         # Plot jets quantities without the dilepton selections #
-        
-        JetNoChannelBoostedList = [
-                             {'channel':'NoChannel','sel':hasBoostedJets,'fatjets':bjetsBoosted,'suffix':"hasBoostedJets"},
-                             {'channel':'NoChannel','sel':hasExclusiveBoostedJets,'fatjets':bjetsBoosted,'suffix':"hasExclusiveBoostedJets"}
-                           ]
-        JetNoChannelResolvedList = [
-                             {'channel':'NoChannel','sel':hasResolvedJets,'bjets':bjetsResolved,'lightjets':lightjetsResolved,'alljets':jets,'suffix':"hasResolvedJets"},
-                             {'channel':'NoChannel','sel':hasExclusiveResolvedJets,'bjets':bjetsResolved,'lightjets':lightjetsResolved,'alljets':jets,'suffix':"hasExclusiveResolvedJets"}
-                           ]
-        for channelDict in JetNoChannelBoostedList:
-            plots.extend(makeFatJetPlots(self, **channelDict))
+        # DEPRECATED  
+        #JetNoChannelBoostedList = [
+        #                     {'channel':'NoChannel','sel':hasBoostedJets,'fatjets':bjetsBoosted,'suffix':"hasBoostedJets"},
+        #                     {'channel':'NoChannel','sel':hasExclusiveBoostedJets,'fatjets':bjetsBoosted,'suffix':"hasExclusiveBoostedJets"}
+        #                   ]
+        #JetNoChannelResolvedList = [
+        #                     {'channel':'NoChannel','sel':hasResolvedJets,'bjets':bjetsResolved,'lightjets':lightjetsResolved,'alljets':jets,'suffix':"hasResolvedJets"},
+        #                     {'channel':'NoChannel','sel':hasExclusiveResolvedJets,'bjets':bjetsResolved,'lightjets':lightjetsResolved,'alljets':jets,'suffix':"hasExclusiveResolvedJets"}
+        #                   ]
+        #for channelDict in JetNoChannelBoostedList:
+        #    plots.extend(makeFatJetPlots(self, **channelDict))
 
-        for channelDict in JetNoChannelResolvedList:
-            plots.extend(makeJetsPlots(self, **channelDict))
+        #for channelDict in JetNoChannelResolvedList:
+        #    plots.extend(makeJetsPlots(self, **channelDict))
 
         #############################################################################
         ##################### Jets + Dilepton combination ###########################
