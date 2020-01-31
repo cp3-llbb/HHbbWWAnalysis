@@ -70,9 +70,23 @@ def makeDeltaRPlots(self,sel,cont1,cont2,suffix,channel):
     plots.append(Plot.make1D("%s_%s_DeltaR"%(channel,suffix), 
                              op.map(mixedCont,lambda c : op.deltaR(c[0].p4,c[1].p4)),
                              sel, 
-                             EquidistantBinning(20,0.,1.), 
-                             title="deltaR %s"%channel, 
+                             EquidistantBinning(100,0.,5.), 
+                             title="#Delta R %s"%channel, 
                              xTitle= "#Delta R"))
+
+    mixedCont_inDeltaR_0p4 = op.combine((cont1,cont2),pred=lambda c1,c2 : op.deltaR(c1.p4,c2.p4)<0.4)
+    plots.append(Plot.make1D("%s_%s_ID_DeltaRCut_0p4"%(channel,suffix), 
+                             op.map(mixedCont_inDeltaR_0p4,lambda c : c[0].genPartFlav), # Print gen flavour of first cont (aka lepton)
+                             sel, 
+                             EquidistantBinning(22,0.,22.), 
+                             title="%s genFlavour ID : #Delta R < 0.4"%channel, 
+                             xTitle= "#Delta R"))
+        # Electron/Muon  genPartFlav :    1       -> prompt electron
+        #                                 3,4,5   -> light quark, c quark, b quark
+        #                                 15      -> tau 
+        #                                 22      -> photon conversion (only electron)
+
+
 
     return plots
 
