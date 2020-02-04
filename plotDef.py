@@ -64,7 +64,7 @@ def makeDileptonPlots(self, sel, dilepton, suffix, channel):
     return plots
 
 ########################## DELTA PLOTS #################################
-def makeDeltaRPlots(self,sel,cont1,cont2,suffix,channel):
+def makeDeltaRPlots(self,sel,cont1,cont2,suffix,channel,isMC):
     plots = [] 
     mixedCont = op.combine((cont1,cont2))
     plots.append(Plot.make1D("%s_%s_DeltaR"%(channel,suffix), 
@@ -75,12 +75,21 @@ def makeDeltaRPlots(self,sel,cont1,cont2,suffix,channel):
                              xTitle= "#Delta R"))
 
     mixedCont_inDeltaR_0p4 = op.combine((cont1,cont2),pred=lambda c1,c2 : op.deltaR(c1.p4,c2.p4)<0.4)
-    plots.append(Plot.make1D("%s_%s_ID_DeltaRCut_0p4"%(channel,suffix), 
-                             op.map(mixedCont_inDeltaR_0p4,lambda c : c[0].genPartFlav), # Print gen flavour of first cont (aka lepton)
-                             sel, 
-                             EquidistantBinning(22,0.,22.), 
-                             title="%s genFlavour ID : #Delta R < 0.4"%channel, 
-                             xTitle= "#Delta R"))
+    mixedCont_outDeltaR_0p4 = op.combine((cont1,cont2),pred=lambda c1,c2 : op.deltaR(c1.p4,c2.p4)>=0.4)
+    if isMC: # We don't have gen level info on data
+        plots.append(Plot.make1D("%s_%s_ID_DeltaRCut_Below0p4"%(channel,suffix), 
+                                 op.map(mixedCont_inDeltaR_0p4,lambda c : c[0].genPartFlav), # Print gen flavour of first cont (aka lepton)
+                                 sel, 
+                                 EquidistantBinning(22,0.,22.), 
+                                 title="%s genFlavour ID : #Delta R < 0.4"%channel, 
+                                 xTitle= "ID"))
+        plots.append(Plot.make1D("%s_%s_ID_DeltaRCut_Above0p4"%(channel,suffix), 
+                                 op.map(mixedCont_outDeltaR_0p4,lambda c : c[0].genPartFlav), # Print gen flavour of first cont (aka lepton)
+                                 sel, 
+                                 EquidistantBinning(22,0.,22.), 
+                                 title="%s genFlavour ID : #Delta R > 0.4"%channel, 
+                                 xTitle= "#ID"))
+ 
         # Electron/Muon  genPartFlav :    1       -> prompt electron
         #                                 3,4,5   -> light quark, c quark, b quark
         #                                 15      -> tau 
