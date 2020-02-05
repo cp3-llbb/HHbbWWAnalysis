@@ -45,7 +45,7 @@ samples:
     db: das:/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
     files: dascache/TT.dat
     generated-events: 'genEventSumw'
-    cross-section: 730.6  # pb
+    cross-section: 831.76  #730.6  # pb
     group: ttbar
     era: '2016'
     split: 85 # 85 files
@@ -325,7 +325,8 @@ samples:
 
 ##### era B
   SingleMuon_2016B:
-    db: ["das:/SingleMuon/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD", "das:/SingleMuon/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD"]
+    #db: ["das:/SingleMuon/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD", "das:/SingleMuon/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD"]
+    db: ["das:/SingleMuon/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD"]
     files: dascache/SingleMuon_2016B.dat
     group: data
     era: '2016'
@@ -334,7 +335,8 @@ samples:
     split: 20
 
   SingleElectron_2016B:
-    db: ["das:/SingleElectron/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD", "das:/SingleElectron/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD"]
+    #db: ["das:/SingleElectron/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD", "das:/SingleElectron/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD"]
+    db: ["das:/SingleElectron/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD"]
     files: dascache/SingleElectron_2016B.dat
     group: data
     era: '2016'
@@ -343,7 +345,8 @@ samples:
     split: 20
 
   DoubleMuon_2016B:
-    db: ["das:/DoubleMuon/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD", "das:/DoubleMuon/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD"]
+    #db: ["das:/DoubleMuon/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD", "das:/DoubleMuon/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD"]
+    db: ["das:/DoubleMuon/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD"]
     files: dascache/DoubleMuon_2016B.dat
     group: data
     era: '2016'
@@ -352,7 +355,8 @@ samples:
     split: 20
 
   DoubleEGamma_2016B:
-    db: ["das:/DoubleEG/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD", "das:/DoubleEG/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD"]
+    #db: ["das:/DoubleEG/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD", "das:/DoubleEG/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD"]
+    db: ["das:/DoubleEG/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD"]
     files: dascache/DoubleEGamma_2016B.dat
     group: data
     era: '2016'
@@ -361,7 +365,8 @@ samples:
     split: 20
 
   MuonEG_2016B:
-    db: ["das:/MuonEG/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD", "das:/MuonEG/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD"]
+    #db: ["das:/MuonEG/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD", "das:/MuonEG/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD"]
+    db: ["das:/MuonEG/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD"]
     files: dascache/MuonEG_2016B.dat
     group: data
     era: '2016'
@@ -661,7 +666,7 @@ plotIt:
       legend: data
     ttbar:
       fill-color: "#cc7a16"
-      legend: tt Full Lept
+      legend: tt
       order: 1
     ST:
       fill-color: "#99053d"

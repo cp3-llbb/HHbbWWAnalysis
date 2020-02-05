@@ -104,7 +104,7 @@ def makeJetsPlots(self,sel,bjets,lightjets,alljets,suffix,channel):
     plots = []
 
     # Selection for bjets and mixed categories #
-    bjetsCategory = sel.refine(suffix+"bjetsCategory",cut=[op.rng_len(bjets) >= 2])
+    bjetsCategory = sel.refine(suffix+"bjetsCategory",cut=[op.rng_len(bjets) >= 2]) # TODO : might want to veto more than 2 bjets 
     mixedCategory = sel.refine(suffix+"mixedCategory",cut=[op.rng_len(bjets) == 1])
 
     ## Inclusive plots (len(alljets)>=2 by definition ): leading = highest Pt jet, subleading : second highest Pt jet #
@@ -135,6 +135,14 @@ def makeJetsPlots(self,sel,bjets,lightjets,alljets,suffix,channel):
                                        suffix        = suffix,
                                        channel       = channel,
                                        plot_type     = "mixed"))
+
+    # Number of Resolved jets #
+    plots.append(make1D("%s_%s_NResolvedJets"%(channel,suffix),                                   
+                        op.rng_len(bjets),
+                        sel,
+                        EquidistantBinning(5,0.,5.),                                              
+                        title='Number of Resolved jets (%s channel)'%channel,                     
+                        xTitle='N Resolved jets'))   
     return plots
 
 ##########################  JETS SEPARATE PLOTS #################################
@@ -174,7 +182,7 @@ def makeSeparateJetsPlots(self, sel, leadjet, subleadjet, suffix, channel, plot_
     plots.append(Plot.make1D(lead_base_name.format(var="pt"),
                              leadjet.p4.pt(),
                              sel,
-                             EquidistantBinning(100,0,300.),
+                             EquidistantBinning(100,20,500.),
                              title='Transverse momentum of the %s'%lead_base_title,
                              xTitle="P_{T}(%s) [GeV]"%lead_base_title,))
     plots.append(Plot.make1D(lead_base_name.format(var="eta"),
@@ -193,7 +201,7 @@ def makeSeparateJetsPlots(self, sel, leadjet, subleadjet, suffix, channel, plot_
     plots.append(Plot.make1D(sublead_base_name.format(var="pt"),
                              subleadjet.p4.pt(),
                              sel,
-                             EquidistantBinning(100,0,300.),
+                             EquidistantBinning(100,20,500.),
                              title='Transverse momentum of the %s'%sublead_base_title,
                              xTitle="P_{T}(%s) [GeV]"%sublead_base_title,))
     plots.append(Plot.make1D(sublead_base_name.format(var="eta"),
@@ -234,33 +242,42 @@ def makeFatJetPlots(self, sel, fatjets, suffix, channel):
     plots.append(Plot.make1D("%s_%s_fatjet_pt"%(channel,suffix),
                              fatjets[0].p4.pt(),
                              sel,
-                             EquidistantBinning(100,150,600.),
+                             EquidistantBinning(50,150,800.),
                              title='Transverse momentum of the fatjet',
                              xTitle="P_{T}(fatjet) [GeV]"))
     plots.append(Plot.make1D("%s_%s_fatjet_eta"%(channel,suffix),
                              fatjets[0].p4.eta(),
                              sel,
-                             EquidistantBinning(20,-3.,3.),
+                             EquidistantBinning(10,-3.,3.),
                              title='Pseudorapidity of the fatjet',
                              xTitle="#eta(fatjet)"))
     plots.append(Plot.make1D("%s_%s_fatjet_phi"%(channel,suffix),
                              fatjets[0].p4.phi(),
                              sel,
-                             EquidistantBinning(20,-3.2,3.2),
+                             EquidistantBinning(10,-3.2,3.2),
                              title='Azimutal angle of the fatjet',
                              xTitle="#phi(fatjet)"))
     plots.append(Plot.make1D("%s_%s_fatjet_mass"%(channel,suffix),
                              fatjets[0].mass,
                              sel,
-                             EquidistantBinning(100,0.,200.),
+                             EquidistantBinning(50,0.,200.),
                              title='Invariant mass of the fatjet',
                              xTitle="M(fatjet)"))
     plots.append(Plot.make1D("%s_%s_fatjet_softdropmass"%(channel,suffix),
                              fatjets[0].msoftdrop,
                              sel,
-                             EquidistantBinning(100,0.,200.),
+                             EquidistantBinning(50,0.,200.),
                              title='Soft Drop mass of the fatjet',
                              xTitle="M_{Soft Drop}(fatjet) [GeV]"))
+
+    # Number of Boosed jets #
+    plots.append(make1D("%s_%s_NBoostedJets"%(channel,suffix),                                   
+                        op.rng_len(fatjets),
+                        sel,
+                        EquidistantBinning(5,0.,5.),                                              
+                        title='Number of Boosted jets (%s channel)'%channel,                     
+                        xTitle='N Boosted jets'))   
+
     return plots
 
 ##########################  FATJETS SUBJETS (AK8) PLOT #################################
