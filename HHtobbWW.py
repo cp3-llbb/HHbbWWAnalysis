@@ -22,8 +22,8 @@ class NanoHHTobbWW(NanoAODHistoModule):
             self.plotDefaults = {"show-ratio": True,
                                  "normalized": True,
                                  "y-axis": "Events",
-                                 #"log-y"  : "both",
-                                 "ratio-y-axis-range" : [0.5,1.5],
+                                 "log-y"  : "both",
+                                 "ratio-y-axis-range" : [0.8,1.2],
                                  "ratio-y-axis" : 'Ratio Data/MC',
                                  "sort-by-yields" : False}
 
@@ -242,7 +242,8 @@ class NanoHHTobbWW(NanoAODHistoModule):
         #############################################################################
         # Wp // 2016- 2017 -2018   // https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2#Muon_Isolation
         muonsByPt = op.sort(t.Muon, lambda mu : -mu.p4.Pt())
-        muons = op.select(muonsByPt, lambda mu : op.AND(mu.p4.Pt() > 15., op.abs(mu.p4.Eta()) < 2.4, mu.tightId, mu.pfRelIso04_all<0.15))
+        #muons = op.select(muonsByPt, lambda mu : op.AND(mu.p4.Pt() > 15., op.abs(mu.p4.Eta()) < 2.4, mu.mediumId, mu.pfRelIso04_all<0.15)) # MEDIUM
+        muons = op.select(muonsByPt, lambda mu : op.AND(mu.p4.Pt() > 15., op.abs(mu.p4.Eta()) < 2.4, mu.tightId, mu.pfRelIso04_all<0.15)) # TIGHT
             # Subleading lepton pt cut is at 15 GeV so better start at that point
             # isolation : tight (Muon::PFIsoTight) cut value = 0.15 (ε~0.95)
       
@@ -263,7 +264,8 @@ class NanoHHTobbWW(NanoAODHistoModule):
         #Wp  // 2016: Electron_cutBased_Sum16==3  -> medium     // 2017 -2018  : Electron_cutBased ==3   --> medium ( Fall17_V2)
         # asking for electrons to be in the Barrel region with dz<1mm & dxy< 0.5mm   //   Endcap region dz<2mm & dxy< 0.5mm 
         electronsByPt = op.sort(t.Electron, lambda ele : -ele.p4.Pt())
-        electrons = op.select(electronsByPt, lambda ele : op.AND(ele.p4.Pt() > 15., op.abs(ele.p4.Eta()) < 2.5 , ele.cutBased>=4 )) # //cut-based ID Fall17 V2 the recommended one from POG for the FullRunII
+        #electrons = op.select(electronsByPt, lambda ele : op.AND(ele.p4.Pt() > 15., op.abs(ele.p4.Eta()) < 2.5 , ele.cutBased>=3 )) # //cut-based ID Fall17 V2 the recommended one from POG for the FullRunII MEDIUM
+        electrons = op.select(electronsByPt, lambda ele : op.AND(ele.p4.Pt() > 15., op.abs(ele.p4.Eta()) < 2.5 , ele.cutBased>=4 )) # //cut-based ID Fall17 V2 the recommended one from POG for the FullRunII TIGHT 
             # electron cut based ID = 0:fail, 1: veto, 2:loose, 3:medium, 4:tight (From root file -> Events tree)
             # Subleading lepton pt cut is at 15 GeV so better start at that point
 
@@ -378,22 +380,22 @@ class NanoHHTobbWW(NanoAODHistoModule):
 
         # Plot lepton/jet angle separartion
         DeltaRChannelList = [
-                     {'channel':'ElEl','sel':hasOsElElLowMllCutOutZ,'cont1':electrons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronJetDeltaR'},
-                     {'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZ,'cont1':electrons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronJetDeltaR'},
-                     {'channel':'ElMu','sel':hasOsElMuLowMllCut,    'cont1':electrons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronJetDeltaR'},
-                     {'channel':'MuEl','sel':hasOsMuElLowMllCut,    'cont1':electrons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronJetDeltaR'},
-                     {'channel':'ElEl','sel':hasOsElElLowMllCutOutZ,'cont1':electrons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronFatjetDeltaR'},
-                     {'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZ,'cont1':electrons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronFatjetDeltaR'},
-                     {'channel':'ElMu','sel':hasOsElMuLowMllCut,    'cont1':electrons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronFatjetDeltaR'},
-                     {'channel':'MuEl','sel':hasOsMuElLowMllCut,    'cont1':electrons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronFatjetDeltaR'},
-                     {'channel':'ElEl','sel':hasOsElElLowMllCutOutZ,'cont1':muons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonJetDeltaR'},
-                     {'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZ,'cont1':muons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonJetDeltaR'},
-                     {'channel':'ElMu','sel':hasOsElMuLowMllCut,    'cont1':muons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonJetDeltaR'},
-                     {'channel':'MuEl','sel':hasOsMuElLowMllCut,    'cont1':muons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonJetDeltaR'},
-                     {'channel':'ElEl','sel':hasOsElElLowMllCutOutZ,'cont1':muons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonFatjetDeltaR'},
-                     {'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZ,'cont1':muons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonFatjetDeltaR'},
-                     {'channel':'ElMu','sel':hasOsElMuLowMllCut,    'cont1':muons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonFatjetDeltaR'},
-                     {'channel':'MuEl','sel':hasOsMuElLowMllCut,    'cont1':muons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonFatjetDeltaR'},
+                     {'isMC':isMC,'channel':'ElEl','sel':hasOsElElLowMllCutOutZ,'cont1':electrons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronJet'},
+                     {'isMC':isMC,'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZ,'cont1':electrons,'cont2':jetsSel,'suffix':'hasOsMuMuLowMllCutOutZ_ElectronJet'},
+                     {'isMC':isMC,'channel':'ElMu','sel':hasOsElMuLowMllCut,    'cont1':electrons,'cont2':jetsSel,'suffix':'hasOsElMuLowMllCutOutZ_ElectronJet'},
+                     {'isMC':isMC,'channel':'MuEl','sel':hasOsMuElLowMllCut,    'cont1':electrons,'cont2':jetsSel,'suffix':'hasOsMuElLowMllCutOutZ_ElectronJet'},
+                     {'isMC':isMC,'channel':'ElEl','sel':hasOsElElLowMllCutOutZ,'cont1':electrons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_ElectronFatjet'},
+                     {'isMC':isMC,'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZ,'cont1':electrons,'cont2':fatjetsSel,'suffix':'hasOsMuMuLowMllCutOutZ_ElectronFatjet'},
+                     {'isMC':isMC,'channel':'ElMu','sel':hasOsElMuLowMllCut,    'cont1':electrons,'cont2':fatjetsSel,'suffix':'hasOsElMuLowMllCutOutZ_ElectronFatjet'},
+                     {'isMC':isMC,'channel':'MuEl','sel':hasOsMuElLowMllCut,    'cont1':electrons,'cont2':fatjetsSel,'suffix':'hasOsMuElLowMllCutOutZ_ElectronFatjet'},
+                     {'isMC':isMC,'channel':'ElEl','sel':hasOsElElLowMllCutOutZ,'cont1':muons,'cont2':jetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonJet'},
+                     {'isMC':isMC,'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZ,'cont1':muons,'cont2':jetsSel,'suffix':'hasOsMuMuLowMllCutOutZ_MuonJet'},
+                     {'isMC':isMC,'channel':'ElMu','sel':hasOsElMuLowMllCut,    'cont1':muons,'cont2':jetsSel,'suffix':'hasOsElMuLowMllCutOutZ_MuonJet'},
+                     {'isMC':isMC,'channel':'MuEl','sel':hasOsMuElLowMllCut,    'cont1':muons,'cont2':jetsSel,'suffix':'hasOsMuElLowMllCutOutZ_MuonJet'},
+                     {'isMC':isMC,'channel':'ElEl','sel':hasOsElElLowMllCutOutZ,'cont1':muons,'cont2':fatjetsSel,'suffix':'hasOsElElLowMllCutOutZ_MuonFatjet'},
+                     {'isMC':isMC,'channel':'MuMu','sel':hasOsMuMuLowMllCutOutZ,'cont1':muons,'cont2':fatjetsSel,'suffix':'hasOsMuMuLowMllCutOutZ_MuonFatjet'},
+                     {'isMC':isMC,'channel':'ElMu','sel':hasOsElMuLowMllCut,    'cont1':muons,'cont2':fatjetsSel,'suffix':'hasOsElMuLowMllCutOutZ_MuonFatjet'},
+                     {'isMC':isMC,'channel':'MuEl','sel':hasOsMuElLowMllCut,    'cont1':muons,'cont2':fatjetsSel,'suffix':'hasOsMuElLowMllCutOutZ_MuonFatjet'},
                    ]
 
         for channelDict in DeltaRChannelList:
@@ -428,14 +430,13 @@ class NanoHHTobbWW(NanoAODHistoModule):
         DeepCSVMediumSFApplied = None
         DeepJetMediumSFApplied = None
         if self.isMC(sample):
-            pass
-            #DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
-            #DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
-            #DeepCSVMediumSFApplied = [DeepCSVMediumSF(bjetsBoosted[0].subJet1)] # Must be applied on subjets : need to check each time which one has been btagged
+            DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
+            DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
+            DeepJetMediumSFApplied = [DeepJetMediumSF(bjetsResolved[0])] # TODO : check if more than one bjet and apply to all
+#            DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
+#            DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
+#            DeepCSVMediumSFApplied = [DeepCSVMediumSF(bjetsBoosted[0].subJet1)] # Must be applied on subjets : need to check each time which one has been btagged
 
-            #DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
-            #DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
-            #DeepJetMediumSFApplied = [DeepJetMediumSF(bjetsResolved[0])] # TODO : check if more than one bjet and apply to all
 
     
         # Define the boosted and Resolved (+exclusive) selections #
@@ -551,20 +552,6 @@ class NanoHHTobbWW(NanoAODHistoModule):
                                  xTitle='Failed combination')
         plots.append(SummedPlot("BoostedAndResolvedCase",[FailedBoth,PassedBoth],xTitle="Boosted and Resolved selection"))
 
-        # Count number of boosted and resolved jets #
-        plots.append(Plot.make1D("NBoostedJets",
-                     op.rng_len(bjetsBoosted),
-                     hasBoostedJets,
-                     EquidistantBinning(5,0.,5.),
-                     title='Number of boosted jets in boosted case',
-                     xTitle='N boosted bjets'))
-        plots.append(Plot.make1D("NResolvedJets",
-                     op.rng_len(bjetsResolved),
-                     hasResolvedJets,
-                     EquidistantBinning(5,0.,5.),
-                     title='Number of resolved jets in resolved case',
-                     xTitle='N resolved bjets'))
-
         # Plot number of subjets in the boosted fatjets #
         lambda_noSubjet  = lambda fatjet : op.AND(fatjet.subJet1._idx.result == -1, op.AND(fatjet.subJet2._idx.result == -1 )) 
         lambda_oneSubjet = lambda fatjet : op.AND(fatjet.subJet1._idx.result != -1, op.AND(fatjet.subJet2._idx.result == -1 ))
@@ -642,7 +629,6 @@ class NanoHHTobbWW(NanoAODHistoModule):
         hasOsMuElLowMllCutExclusiveBoostedJets = hasOsMuElLowMllCut.refine("hasOsMuElLowMllCutExclusiveBoostedJets", 
                                       cut=[op.rng_len(bjetsBoosted)>=1,op.OR(op.rng_len(jets)<=1,op.rng_len(bjetsResolved)==0)],
                                       weight = DeepCSVMediumSFApplied)
-
 
         # Boosted + OS dilepton plots #
         hasOsMllCutBoostedChannelList = [
