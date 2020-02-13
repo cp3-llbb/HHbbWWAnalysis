@@ -125,7 +125,7 @@ class ScaleFactorsbbWW:
                                             additionalVariables = additionalVariables, 
                                             sfLib               = self.all_scalefactors, 
                                             paramDefs           = self.binningVariables, 
-                                            #getFlavour          = (lambda j : j.hadronFlavour), 
+                                            getFlavour          = (lambda j : j.hadronFlavour), 
                                             systName            = systName)
     
 
