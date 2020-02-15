@@ -2,6 +2,17 @@ from bamboo.plots import Plot, EquidistantBinning, SummedPlot
 from bamboo import treefunctions as op
 
 ##########################  DILEPTON PLOT #################################
+def makeYieldPlot(self, sel, name, title, order):
+    plot = Plot.make1D(name,   
+                       op.c_int(1),
+                       sel,
+                       EquidistantBinning(1, 0., 1.),
+                       title = title + " Yield",
+                       xTitle = title + " Yield",
+                       plotopts = {"for-yields":True, "yields-title":title, 'yields-table-order':order})
+    return plot
+
+##########################  DILEPTON PLOT #################################
 def makeDileptonPlots(self, sel, dilepton, suffix, channel):
     """
     Make dilepton basic plots
@@ -37,7 +48,7 @@ def makeDileptonPlots(self, sel, dilepton, suffix, channel):
                              sel, 
                              EquidistantBinning(20, -3., 3.), 
                              title="Pseudorapidity of the second lepton (channel %s)"%channel, 
-                             xTitle= "#eta (second sublepton) [GeV]"))
+                             xTitle= "#eta (second lepton) [GeV]"))
 
     # Phi plot #
     plots.append(Plot.make1D("%s_%s_firstlepton_phi"%(channel,suffix), 
