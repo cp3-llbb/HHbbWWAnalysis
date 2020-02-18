@@ -34,7 +34,7 @@ def makeDileptonPlots(self, sel, dilepton, suffix, channel):
                              sel, 
                              EquidistantBinning(100, 0., 300.), 
                              title="Transverse momentum of the second lepton (channel %s)"%channel, 
-                             xTitle= "P_{T}(first lepton) [GeV]"))
+                             xTitle= "P_{T}(second lepton) [GeV]"))
 
     # Eta plot #
     plots.append(Plot.make1D("%s_%s_firstlepton_eta"%(channel,suffix), 
