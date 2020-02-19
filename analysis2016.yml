@@ -45,7 +45,7 @@ samples:
     db: das:/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
     files: dascache/TT.dat
     generated-events: 'genEventSumw'
-    cross-section: 831.76  #730.6  # pb
+    cross-section: 730.6  # pb # (new) 831.76 # (old) 730.6
     group: ttbar
     era: '2016'
     split: 85 # 85 files
@@ -109,7 +109,7 @@ samples:
     files: dascache/ZZTo2L2Nu.dat
     generated-events: 'genEventSumw'
     cross-section: 0.5644     
-    group: VV # ZZ
+    group: VVV # ZZ
     era: '2016'
     split : 44 # 44 files
 
@@ -118,7 +118,7 @@ samples:
     files: dascache/ZZTo2L2Q.dat
     generated-events: 'genEventSumw'
     cross-section: 3.222     
-    group: VV #ZZ
+    group: VVV #ZZ
     era: '2016'
     split: 8 # 8 files
 
@@ -127,7 +127,7 @@ samples:
     files: dascache/ZZTo4L.dat
     generated-events: 'genEventSumw'
     cross-section: 1.256 
-    group: VV #ZZ
+    group: VVV #ZZ
     era: '2016'
     split: 90 # 90 files
 
@@ -192,7 +192,7 @@ samples:
     files: dascache/WWToLNu2Q.dat
     generated-events: 'genEventSumw'
     cross-section: 43.53
-    group: VV #others
+    group: VVV #others
     era: '2016'
     split: 7 # 7 files
 
@@ -201,7 +201,7 @@ samples:
     files: dascache/WWTo2L2Nu.dat
     generated-events: 'genEventSumw'
     cross-section: 10.48
-    group: VV # others
+    group: VVV # others
     era: '2016'
     split: 4 # 4 files
         ##################
@@ -210,7 +210,7 @@ samples:
     files: dascache/WZTo2L2Q.dat
     generated-events: 'genEventSumw'
     cross-section: 5.606    
-    group: VV # #TODO should add the WZ samples to the others bkg
+    group: VVV # #TODO should add the WZ samples to the others bkg
     era: '2016'
     split: 27 # 27 files
 
@@ -249,7 +249,7 @@ samples:
     cross-section: 0.2086
     group: VVV #others 
     era: '2016'
-    split: 2 # 2 files
+    split: 1 # 2 files
 
   WWZ:
     db: das:/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -258,7 +258,7 @@ samples:
     cross-section: 0.1651
     group: VVV #others
     era: '2016'
-    split: 2 # 2 files
+    split: 1 # 2 files
 
   WZZ:
     db: das:/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -267,7 +267,7 @@ samples:
     cross-section: 0.05565  
     group: VVV #others
     era: '2016'
-    split: 3 # 3 files
+    split: 1 # 3 files
 
   ZZZ:
     db: das:/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -659,6 +659,10 @@ plotIt:
     experiment: CMS
     extra-label: 2016 Data -- Work in progress
     show-overflow: true
+    margin_left: 0.01
+    margin_right: 0.03
+    margin_top: 0.05 
+    margin_bottom: 0.13
   legend:
     position: [0.7, 0.6, 0.91, 0.91]
   groups:
@@ -680,9 +684,9 @@ plotIt:
       fill-color: "#d95564"
       legend: W+jets
       order: 4
-    VV: 
+    VVV: 
       fill-color: "#ccbf45"
-      legend: VV
+      legend: VV(V)
       order: 5
     ttV:
       fill-color: "#174704"
@@ -692,10 +696,10 @@ plotIt:
       fill-color: "#06b894"
       legend: SM Higgs (ttH, ZH)
       order: 7
-    VVV:
-      fill-color: "#593b04"
-      legend: VVV
-      order: 8
+#    VVV:
+#      fill-color: "#593b04"
+#      legend: VVV
+#      order: 8
   systematics:
       # on the jets
     - jer
