@@ -381,6 +381,7 @@ class NanoHHTobbWW(NanoAODHistoModule):
             plots.extend(makeDileptonPlots(self, **channelDict))
             # MET plots #
             plots.extend(makeMETPlots(self      = self,
+                                      sel       = channelDict['sel'],
                                       met       = corrMET,
                                       suffix    = channelDict['suffix'],
                                       channel   = channelDict['channel']))
@@ -411,6 +412,7 @@ class NanoHHTobbWW(NanoAODHistoModule):
             plots.extend(makeDileptonPlots(self, **channelDict))
             # MET plots #
             plots.extend(makeMETPlots(self      = self,
+                                      sel       = channelDict['sel'],
                                       met       = corrMET,
                                       suffix    = channelDict['suffix'],
                                       channel   = channelDict['channel']))
@@ -710,6 +712,7 @@ class NanoHHTobbWW(NanoAODHistoModule):
             plots.extend(makeDileptonPlots(self, **channelDict))
             # MET plots #
             plots.extend(makeMETPlots(self      = self,
+                                      sel       = channelDict['sel'],
                                       met       = corrMET,
                                       suffix    = channelDict['suffix'],
                                       channel   = channelDict['channel']))
@@ -767,6 +770,7 @@ class NanoHHTobbWW(NanoAODHistoModule):
             plots.extend(makeDileptonPlots(self, **channelDict))
             # MET plots #
             plots.extend(makeMETPlots(self      = self,
+                                      sel       = channelDict['sel'],
                                       met       = corrMET,
                                       suffix    = channelDict['suffix'],
                                       channel   = channelDict['channel']))

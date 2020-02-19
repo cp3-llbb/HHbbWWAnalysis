@@ -39,23 +39,23 @@ def makeMETPlots(self, sel, met, suffix, channel):
                              xTitle= "P_{T}(MET) [GeV]"))
     # Phi plot #
     plots.append(Plot.make1D("%s_%s_met_phi"%(channel,suffix), 
-                             met.phi(), 
+                             met.phi, 
                              sel, 
                              EquidistantBinning(20, -3.2, 3.2), 
                              title="Azimutal angle of the MET (channel %s)"%channel, 
                              xTitle= "#phi (MET) [GeV]"))
 
-    # Sum ET #
-    plots.append(Plot.make1D("%s_%s_met_sumEt"%(channel,suffix), 
-                             met.sumEt(), 
-                             sel, 
-                             EquidistantBinning(100, 0., 500.),
-                             title="Energy transver sum of MET (channel %s)"%channel, 
-                             xTitle= "#sum(E_{T}) (MET) [GeV]"))
+    # Sum ET # not in corrected version 
+#    plots.append(Plot.make1D("%s_%s_met_sumEt"%(channel,suffix), 
+#                             met.sumEt, 
+#                             sel, 
+#                             EquidistantBinning(100, 0., 500.),
+#                             title="Energy transver sum of MET (channel %s)"%channel, 
+#                             xTitle= "#sum(E_{T}) (MET) [GeV]"))
 
 
 
-    return plot
+    return plots
 
 ##########################  DILEPTON PLOT #################################
 def makeDileptonPlots(self, sel, dilepton, suffix, channel):
