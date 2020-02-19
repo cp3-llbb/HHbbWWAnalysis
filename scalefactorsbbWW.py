@@ -82,6 +82,7 @@ class ScaleFactorsbbWW:
                                base_str    = "{wp}.json",
                                format_dict = {'wp':["Electron_IsoEle23Leg", "Electron_IsoEle12Leg", "Muon_XPathIsoMu23leg", "Muon_XPathIsoMu8leg"]})
 
+
             # 2017: 
             # https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017
             # https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X

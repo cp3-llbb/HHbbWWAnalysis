@@ -1,8 +1,15 @@
 from bamboo.plots import Plot, EquidistantBinning, SummedPlot
 from bamboo import treefunctions as op
 
-##########################  DILEPTON PLOT #################################
+##########################  YIELD PLOT #################################
 def makeYieldPlot(self, sel, name, title, order):
+    """
+    Make Yield plot and use it alos in the latex yield table
+    sel     = refine selection
+    name    = name of the PDF to be produced
+    title   = title that will be used in the LateX yield table
+    order   = int that gives the entry order in yield table (user must ensure the order)
+    """
     plot = Plot.make1D(name,   
                        op.c_int(1),
                        sel,
@@ -10,6 +17,44 @@ def makeYieldPlot(self, sel, name, title, order):
                        title = title + " Yield",
                        xTitle = title + " Yield",
                        plotopts = {"for-yields":True, "yields-title":title, 'yields-table-order':order})
+    return plot
+
+##########################  MET PLOT #################################
+def makeMETPlots(self, sel, met, suffix, channel):
+    """
+    Make MET basic plots
+    sel         = refine selection 
+    met         = MET object
+    suffix      = string identifying the selecton 
+    channel     = string identifying the channel of the dilepton (can be "NoChannel")
+    """
+
+    plots = []
+    # PT plot #
+    plots.append(Plot.make1D("%s_%s_met_pt"%(channel,suffix), 
+                             met.pt, 
+                             sel, 
+                             EquidistantBinning(100, 0., 500.), 
+                             title="Transverse momentum of the MET (channel %s)"%channel, 
+                             xTitle= "P_{T}(MET) [GeV]"))
+    # Phi plot #
+    plots.append(Plot.make1D("%s_%s_met_phi"%(channel,suffix), 
+                             met.phi(), 
+                             sel, 
+                             EquidistantBinning(20, -3.2, 3.2), 
+                             title="Azimutal angle of the MET (channel %s)"%channel, 
+                             xTitle= "#phi (MET) [GeV]"))
+
+    # Sum ET #
+    plots.append(Plot.make1D("%s_%s_met_sumEt"%(channel,suffix), 
+                             met.sumEt(), 
+                             sel, 
+                             EquidistantBinning(100, 0., 500.),
+                             title="Energy transver sum of MET (channel %s)"%channel, 
+                             xTitle= "#sum(E_{T}) (MET) [GeV]"))
+
+
+
     return plot
 
 ##########################  DILEPTON PLOT #################################
@@ -253,7 +298,7 @@ def makeFatJetPlots(self, sel, fatjets, suffix, channel):
     plots.append(Plot.make1D("%s_%s_fatjet_pt"%(channel,suffix),
                              fatjets[0].p4.pt(),
                              sel,
-                             EquidistantBinning(50,150,800.),
+                             EquidistantBinning(100,200,500.),
                              title='Transverse momentum of the fatjet',
                              xTitle="P_{T}(fatjet) [GeV]"))
     plots.append(Plot.make1D("%s_%s_fatjet_eta"%(channel,suffix),
