@@ -10,7 +10,7 @@ from bamboo import treefunctions as op
 from bamboo.plots import Plot, EquidistantBinning, SummedPlot
 
 sys.path.append('/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/') # Add scripts in this directory -- TODO : make cleaner
-from plotDef import makeDileptonPlots, makeJetsPlots, makeFatJetPlots, makeMETPlots, makeDeltaRPlots, makeYieldPlot
+from plotDef import makeDileptonPlots, makeJetsPlots, makeFatJetPlots, makeMETPlots, makeDeltaRPlots, makeYieldPlot, makeHighLevelQuantities
 from scalefactorsbbWW import ScaleFactorsbbWW
 from METScripts import METFilter, METcorrection
 
@@ -202,7 +202,8 @@ class NanoHHTobbWW(NanoAODHistoModule):
 
         # Get weights #
         if self.isMC(sample):
-            noSel = noSel.refine("genWeight", weight=op.abs(tree.genWeight), cut=op.OR(*chain.from_iterable(triggersPerPrimaryDataset.values()),tree.genWeight<0))
+            #noSel = noSel.refine("genWeight", weight=op.abs(tree.genWeight), cut=op.OR(*chain.from_iterable(triggersPerPrimaryDataset.values()),tree.genWeight<0))
+            noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(triggersPerPrimaryDataset.values())))
         else:
             noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, triggersPerPrimaryDataset))
 
@@ -783,10 +784,52 @@ class NanoHHTobbWW(NanoAODHistoModule):
                                        suffix      = channelDict['suffix'],
                                        channel     = channelDict['channel']))
 
-       ## helper selection (OR) to make sure jet calculations are only done once
-       #hasOSLL = noSel.refine("hasOSLL", cut=op.OR(*( hasOSLL_cmbRng(rng) for rng in osLLRng.values())))
-       #forceDefine(t._Jet.calcProd, hasOSLL)
-       #for varNm in t._Jet.available:
-       #    forceDefine(t._Jet[varNm], hasOSLL)
+        # High level quantities #
+        highLevelBaseQuantities = { # No need to repeat for each channelDict
+             'met'          : corrMET,
+             'jets'         : jets, 
+             'resolvedjets' : bjetsResolved,
+             'lightjets'    : lightjetsResolved,
+             'boostedjets'  : bjetsBoosted,
+                                  }
+ 
+        hasOsMllCutHighLevelVariablesChannelList = [
+            # Boosted #
+            {'channel'      :'ElEl',
+             'dilepton'     : OsElEl[0],
+             'sel'          : hasOsElElLowMllCutOutZBoostedJets,
+             'suffix'       : 'hasOsElElLowMllCutOutZBoostedJets'},
+            {'channel'      :'MuMu',
+             'dilepton'     : OsMuMu[0],
+             'sel'          : hasOsMuMuLowMllCutOutZBoostedJets,
+             'suffix'       : 'hasOsMuMuLowMllCutOutZBoostedJets'},
+            {'channel'      :'ElMu',
+             'dilepton'     : OsElMu[0],
+             'sel'          : hasOsElMuLowMllCutBoostedJets,
+             'suffix'       : 'hasOsElMuLowMllCutBoostedJets'},
+            # Resolved #
+            {'channel'      :'ElEl',
+             'dilepton'     : OsElEl[0],
+             'sel'          : hasOsElElLowMllCutOutZExclusiveResolvedJets,
+             'suffix'       : 'hasOsElElLowMllCutOutZExclusiveResolvedJets'},
+            {'channel'      :'MuMu',
+             'dilepton'     : OsMuMu[0],
+             'sel'          : hasOsMuMuLowMllCutOutZExclusiveResolvedJets,
+             'suffix'       : 'hasOsMuMuLowMllCutOutZExclusiveResolvedJets'},
+            {'channel'      :'ElMu',
+             'dilepton'     : OsElMu[0],
+             'sel'          : hasOsElMuLowMllCutExclusiveResolvedJets,
+             'suffix'       : 'hasOsElMuLowMllCutExclusiveResolvedJets'},
+                                                   ]
+
+        for channelDict in hasOsMllCutHighLevelVariablesChannelList:
+            plots.extend(makeHighLevelQuantities(self,**highLevelBaseQuantities,**channelDict))
+
+
+        ## helper selection (OR) to make sure jet calculations are only done once
+        #hasOSLL = noSel.refine("hasOSLL", cut=op.OR(*( hasOSLL_cmbRng(rng) for rng in osLLRng.values())))
+        #forceDefine(t._Jet.calcProd, hasOSLL)
+        #for varNm in t._Jet.available:
+        #    forceDefine(t._Jet[varNm], hasOSLL)
         return plots
 
