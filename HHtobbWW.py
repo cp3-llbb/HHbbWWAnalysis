@@ -27,7 +27,6 @@ class NanoHHTobbWW(NanoAODHistoModule):
                                  "ratio-y-axis-range" : [0.8,1.2],
                                  "ratio-y-axis" : 'Ratio Data/MC',
                                  "sort-by-yields" : False}
-                                 #"for-yields" : True}
 
 
     def prepareTree(self, tree, sample=None, sampleCfg=None, enableSystematics=None):
@@ -202,8 +201,8 @@ class NanoHHTobbWW(NanoAODHistoModule):
 
         # Get weights #
         if self.isMC(sample):
-            #noSel = noSel.refine("genWeight", weight=op.abs(tree.genWeight), cut=op.OR(*chain.from_iterable(triggersPerPrimaryDataset.values()),tree.genWeight<0))
-            noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(triggersPerPrimaryDataset.values())))
+            noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(triggersPerPrimaryDataset.values()),tree.genWeight<0))
+            #noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(triggersPerPrimaryDataset.values())))
         else:
             noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, triggersPerPrimaryDataset))
 
@@ -495,10 +494,10 @@ class NanoHHTobbWW(NanoAODHistoModule):
         # Scalefactors : 2017 and 2018 not yet present in the dict #
         DeepCSVMediumSFApplied = None
         DeepJetMediumSFApplied = None
-#        if self.isMC(sample):
-#            DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
-#            DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
-#            DeepJetMediumSFApplied = [DeepJetMediumSF(bjetsResolved[0])] # TODO : check if more than one bjet and apply to all
+        if self.isMC(sample):
+            DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
+            DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
+            DeepJetMediumSFApplied = [DeepJetMediumSF(bjetsResolved[0])] # TODO : check if more than one bjet and apply to all
 #            DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
 #            DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
 #            DeepCSVMediumSFApplied = [DeepCSVMediumSF(bjetsBoosted[0].subJet1)] # Must be applied on subjets : need to check each time which one has been btagged
