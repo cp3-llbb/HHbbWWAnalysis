@@ -201,8 +201,9 @@ class NanoHHTobbWW(NanoAODHistoModule):
 
         # Get weights #
         if self.isMC(sample):
-            noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(triggersPerPrimaryDataset.values()),tree.genWeight<0))
-            #noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(triggersPerPrimaryDataset.values())))
+            noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(triggersPerPrimaryDataset.values())))
+            #noSel = noSel.refine("genWeight", weight=op.abs(tree.genWeight), cut=op.OR(*chain.from_iterable(triggersPerPrimaryDataset.values())))
+            #noSel = noSel.refine("negWeight", cut=[tree.genWeight<0])
         else:
             noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, triggersPerPrimaryDataset))
 
@@ -214,8 +215,72 @@ class NanoHHTobbWW(NanoAODHistoModule):
 
         era = sampleCfg['era']
 
+        isMC = self.isMC(sample)
+        plots = []
+
+        # Forcedefne #
+        forceDefine(t._Muon.calcProd, noSel)
+        forceDefine(t._Jet.calcProd, noSel) # calculate once per event (for every event)
+
         # Initialize scalefactors class #
         SF = ScaleFactorsbbWW()
+
+        ############################################################################
+        ########################### TTbar reweighting #############################
+        ############################################################################
+        if self.isMC(sample):
+            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting#Use_case_3_ttbar_MC_is_used_to_m
+            # Get tops #
+            genTop = op.select(t.GenPart,lambda g : g.statusFlags==13 and g.pdgId==6)
+            genTop = op.sort(genTop,lambda t : -t.pt)
+            genAntitop = op.select(t.GenPart,lambda g : g.statusFlags==13 and g.pdgId==-6)
+            genAntitop = op.sort(genAntitop,lambda t : -t.pt)
+                # statusFlags==13 : isLastCopy
+                # Pdgid == 6 : top
+            # Check if there are tops #
+            hastop = noSel.refine("hastop",cut=[op.rng_len(genTop)>=1])
+            hasantitop = noSel.refine("hasantitop",cut=[op.rng_len(genAntitop)>=1])
+            hasttbar = noSel.refine("hasttbar",cut=[op.rng_len(genTop)>=1,op.rng_len(genAntitop)>=1])
+
+            # Check plots #
+            plots.append(Plot.make1D("N_tops",
+                                    op.rng_len(genTop),
+                                    noSel,
+                                    EquidistantBinning(5,0.,5.),
+                                    title='N tops',
+                                    xTitle='N tops'))
+            plots.append(Plot.make1D("N_antitops",
+                                    op.rng_len(genAntitop),
+                                    noSel,
+                                    EquidistantBinning(5,0.,5.),
+                                    title='N antitops',
+                                    xTitle='N antitops'))
+            plots.append(Plot.make1D("top_pt",
+                                    genTop[0].pt,
+                                    hastop,
+                                    EquidistantBinning(50,0,500),
+                                    title='P_{T} top',
+                                    xTitle='P_{T} top'))
+            plots.append(Plot.make1D("antitop_pt",
+                                    genAntitop[0].pt,
+                                    hasantitop,
+                                    EquidistantBinning(50,0,500),
+                                    title='P_{T} antitop',
+                                    xTitle='P_{T} antitop'))
+            # Compute weight if there is a ttbar #
+            ttbar_SF = lambda t : op.exp(0.0615-0.0005*t.pt)
+            ttbar_weight = lambda t,tbar : op.sqrt(ttbar_SF(t)*ttbar_SF(tbar))
+            plots.append(Plot.make1D("ttbar_weight",
+                                    ttbar_weight(genTop[0],genAntitop[0]),
+                                    hasttbar,
+                                    EquidistantBinning(50,0.,2.),
+                                    title='ttbar weight',
+                                    xTitle='ttbar weight'))
+            # Apply correction to TT #
+            if sample.startswith("TT"):
+                noSel = noSel.refine("ttbarWeight",weight=ttbar_weight(genTop[0],genAntitop[0]))
+
+
 
         #############################################################################
         ##########################    Pile-up    ####################################
@@ -233,11 +298,6 @@ class NanoHHTobbWW(NanoAODHistoModule):
         if self.isMC(sample) and puWeightsFile is not None:
             from bamboo.analysisutils import makePileupWeight
             noSel = noSel.refine("puWeight", weight=makePileupWeight(puWeightsFile, t.Pileup_nTrueInt, systName="pileup"))
-        isMC = self.isMC(sample)
-        plots = []
-
-        forceDefine(t._Muon.calcProd, noSel)
-        forceDefine(t._Jet.calcProd, noSel) # calculate once per event (for every event)
 
         #############################################################################
         ################################# MET #######################################
@@ -365,9 +425,9 @@ class NanoHHTobbWW(NanoAODHistoModule):
                                  weight = llSFApplied["ElMu"])
 
         # Yield plots #
-        plots.append(makeYieldPlot(self,hasOsElEl,"OSElEl_yield","OS leptons (channel $e^+e^-$)",0))
-        plots.append(makeYieldPlot(self,hasOsMuMu,"OSMuMu_yield","OS leptons (channel : $\mu^+\mu^-$)",1))
-        plots.append(makeYieldPlot(self,hasOsElMu,"OSMuEl_yield","OS leptons (channel $e^{\pm}\mu^{\mp}$)",2))
+        plots.append(makeYieldPlot(self,hasOsElEl,"OSElEl","OS leptons (channel $e^+e^-$)",0))
+        plots.append(makeYieldPlot(self,hasOsMuMu,"OSMuMu","OS leptons (channel : $\mu^+\mu^-$)",1))
+        plots.append(makeYieldPlot(self,hasOsElMu,"OSMuEl","OS leptons (channel $e^{\pm}\mu^{\mp}$)",2))
 
         # Dilepton channel plot #
 
@@ -395,9 +455,9 @@ class NanoHHTobbWW(NanoAODHistoModule):
         hasOsElMuLowMllCut     = hasOsElMu.refine("hasOsElMuLowMllCut",cut=[lambda_lowMllCut(OsElMu[0])]) # Z peak cut not needed because Opposite Flavour
 
         # Yield plots #
-        plots.append(makeYieldPlot(self,hasOsElElLowMllCutOutZ,"OSElElMllCutOutZ_yield","OS leptons + $M_{ll}$ (channel : $e^+e^-$)",3))
-        plots.append(makeYieldPlot(self,hasOsMuMuLowMllCutOutZ,"OSMuMuMllCutOutZ_yield","OS leptons + $M_{ll}$ (channel : $\mu^+\mu^-$)",4))
-        plots.append(makeYieldPlot(self,hasOsElMuLowMllCut,"OSMuMuMllCut_yield","OS leptons + $M_{ll}$ (channel : $e^{\pm}\mu^{\mp}$)",5))
+        plots.append(makeYieldPlot(self,hasOsElElLowMllCutOutZ,"OSElElMllCutOutZ","OS leptons + $M_{ll}$ (channel : $e^+e^-$)",3))
+        plots.append(makeYieldPlot(self,hasOsMuMuLowMllCutOutZ,"OSMuMuMllCutOutZ","OS leptons + $M_{ll}$ (channel : $\mu^+\mu^-$)",4))
+        plots.append(makeYieldPlot(self,hasOsElMuLowMllCut,"OSMuMuMllCut","OS leptons + $M_{ll}$ (channel : $e^{\pm}\mu^{\mp}$)",5))
 
         # Dilepton plots #
 
@@ -461,13 +521,13 @@ class NanoHHTobbWW(NanoAODHistoModule):
         hasOsMuMuLowMllCutOutZAtLeast1Fatjet = hasOsMuMuLowMllCutOutZ.refine("hasOsMuMuLowMllCutOutZAtLeast1Fatjet",cut=[op.rng_len(fatjets)>=1])
         hasOsElMuLowMllCutAtLeast1Fatjet     = hasOsElMuLowMllCut.refine("hasOsElMuLowMllCutOutZAtLeast1Fatjet",cut=[op.rng_len(fatjets)>=1])
         
-        plots.append(makeYieldPlot(self,hasOsElElLowMllCutOutZAtLeast2Jets,"OSElElMllCutOutZAtLeast2Jets_yield","OS leptons + $M_{ll}$ + Jets $\geq 2$ (channel : $e^+e^-$)",6))
-        plots.append(makeYieldPlot(self,hasOsMuMuLowMllCutOutZAtLeast2Jets,"OSMuMuMllCutOutZAtLeast2Jets_yield","OS leptons + $M_{ll}$ + Jets $\geq 2$ (channel : $\mu^+\mu^-$)",7))
-        plots.append(makeYieldPlot(self,hasOsElMuLowMllCutAtLeast2Jets,"OSElMuMllCutAtLeast2Jets_yield","OS leptons + $M_{ll}$ + Jets $\geq 2$ (channel : $e^{\pm}\mu^{\mp}$",8))
+        plots.append(makeYieldPlot(self,hasOsElElLowMllCutOutZAtLeast2Jets,"OSElElMllCutOutZAtLeast2Jets","OS leptons + $M_{ll}$ + Jets $\geq 2$ (channel : $e^+e^-$)",6))
+        plots.append(makeYieldPlot(self,hasOsMuMuLowMllCutOutZAtLeast2Jets,"OSMuMuMllCutOutZAtLeast2Jets","OS leptons + $M_{ll}$ + Jets $\geq 2$ (channel : $\mu^+\mu^-$)",7))
+        plots.append(makeYieldPlot(self,hasOsElMuLowMllCutAtLeast2Jets,"OSElMuMllCutAtLeast2Jets","OS leptons + $M_{ll}$ + Jets $\geq 2$ (channel : $e^{\pm}\mu^{\mp}$",8))
 
-        plots.append(makeYieldPlot(self,hasOsElElLowMllCutOutZAtLeast1Fatjet,"OSElElMllCutOutZAtLeast1Fatjet_yield","OS leptons + $M_{ll}$ + Fatjets $\geq 1$ (channel : $e^+e^-$)",9))
-        plots.append(makeYieldPlot(self,hasOsMuMuLowMllCutOutZAtLeast1Fatjet,"OSMuMuMllCutOutZAtLeast1Fatjet_yield","OS leptons + $M_{ll}$ + Fatjets $\geq 1$ (channel : $\mu^+\mu^-$)",10))
-        plots.append(makeYieldPlot(self,hasOsElMuLowMllCutAtLeast1Fatjet,"OSElMuMllCutAtLeast1Fatjet_yield","OS leptons + $M_{ll}$ + Fatjets $\geq 1$ (channel : $e^{\pm}\mu^{\mp}$)",11))
+        plots.append(makeYieldPlot(self,hasOsElElLowMllCutOutZAtLeast1Fatjet,"OSElElMllCutOutZAtLeast1Fatjet","OS leptons + $M_{ll}$ + Fatjets $\geq 1$ (channel : $e^+e^-$)",9))
+        plots.append(makeYieldPlot(self,hasOsMuMuLowMllCutOutZAtLeast1Fatjet,"OSMuMuMllCutOutZAtLeast1Fatjet","OS leptons + $M_{ll}$ + Fatjets $\geq 1$ (channel : $\mu^+\mu^-$)",10))
+        plots.append(makeYieldPlot(self,hasOsElMuLowMllCutAtLeast1Fatjet,"OSElMuMllCutAtLeast1Fatjet","OS leptons + $M_{ll}$ + Fatjets $\geq 1$ (channel : $e^{\pm}\mu^{\mp}$)",11))
 
         # Boosted and resolved jets categories #
         # Boosted -> at least one AK8 jet (fatjet) with at least one subjet passing medium working point of DeepCSV (btagDeepB branch)
@@ -688,13 +748,13 @@ class NanoHHTobbWW(NanoAODHistoModule):
                                       weight = DeepCSVMediumSFApplied)
 
         # Yield plots #
-        plots.append(makeYieldPlot(self,hasOsElElLowMllCutOutZBoostedJets,"OSElElMllCutOutZBoosted_yield","OS leptons + $M_{ll}$ + Boosted (channel : $e^+e^-$)",12))
-        plots.append(makeYieldPlot(self,hasOsMuMuLowMllCutOutZBoostedJets,"OSMuMuMllCutOutZBoosted_yield","OS leptons + $M_{ll}$ + Boosted (channel : $\mu^+\mu^-$)",13))
-        plots.append(makeYieldPlot(self,hasOsElMuLowMllCutBoostedJets,"OSMuMuMllCutBoosted_yield","OS leptons + $M_{ll}$ + Boosted (channel : $e^{\pm}\mu^{\mp}$)",14))
+        plots.append(makeYieldPlot(self,hasOsElElLowMllCutOutZBoostedJets,"OSElElMllCutOutZBoosted","OS leptons + $M_{ll}$ + Boosted (channel : $e^+e^-$)",12))
+        plots.append(makeYieldPlot(self,hasOsMuMuLowMllCutOutZBoostedJets,"OSMuMuMllCutOutZBoosted","OS leptons + $M_{ll}$ + Boosted (channel : $\mu^+\mu^-$)",13))
+        plots.append(makeYieldPlot(self,hasOsElMuLowMllCutBoostedJets,"OSMuMuMllCutBoosted","OS leptons + $M_{ll}$ + Boosted (channel : $e^{\pm}\mu^{\mp}$)",14))
 
-        plots.append(makeYieldPlot(self,hasOsElElLowMllCutOutZExclusiveBoostedJets,"OSElElMllCutOutZExclusiveBoosted_yield","OS leptons + $M_{ll}$ + Exclusive Boosted (channel : $e^+e^-$)",15))
-        plots.append(makeYieldPlot(self,hasOsMuMuLowMllCutOutZExclusiveBoostedJets,"OSMuMuMllCutOutZExclusiveBoosted_yield","OS leptons + $M_{ll}$ + Exclusive Boosted (channel : $\mu^+\mu^-$)",16))
-        plots.append(makeYieldPlot(self,hasOsElMuLowMllCutExclusiveBoostedJets,"OSMuMuMllCutExclusiveBoosted_yield","OS leptons + $M_{ll}$ + Exclusive Boosted (channel : $e^{\pm}\mu^{\mp}$)",17))
+        plots.append(makeYieldPlot(self,hasOsElElLowMllCutOutZExclusiveBoostedJets,"OSElElMllCutOutZExclusiveBoosted","OS leptons + $M_{ll}$ + Exclusive Boosted (channel : $e^+e^-$)",15))
+        plots.append(makeYieldPlot(self,hasOsMuMuLowMllCutOutZExclusiveBoostedJets,"OSMuMuMllCutOutZExclusiveBoosted","OS leptons + $M_{ll}$ + Exclusive Boosted (channel : $\mu^+\mu^-$)",16))
+        plots.append(makeYieldPlot(self,hasOsElMuLowMllCutExclusiveBoostedJets,"OSMuMuMllCutExclusiveBoosted","OS leptons + $M_{ll}$ + Exclusive Boosted (channel : $e^{\pm}\mu^{\mp}$)",17))
 
         # Boosted + OS dilepton plots #
         hasOsMllCutBoostedChannelList = [
@@ -746,13 +806,13 @@ class NanoHHTobbWW(NanoAODHistoModule):
                                       weight = DeepJetMediumSFApplied)
 
         # Yield plots #
-        plots.append(makeYieldPlot(self,hasOsElElLowMllCutOutZResolvedJets,"OSElElMllCutOutZResolved_yield","OS leptons + $M_{ll}$ + Resolved (channel : $e^+e^-$)",18))
-        plots.append(makeYieldPlot(self,hasOsMuMuLowMllCutOutZResolvedJets,"OSMuMuMllCutOutZResolved_yield","OS leptons + $M_{ll}$ + Resolved (channel : $\mu^+\mu^-$)",19))
-        plots.append(makeYieldPlot(self,hasOsElMuLowMllCutResolvedJets,"OSMuMuMllCutResolved_yield","OS leptons + $M_{ll}$ + Resolved (channel : $e^{\pm}\mu^{\mp}$)",20))
+        plots.append(makeYieldPlot(self,hasOsElElLowMllCutOutZResolvedJets,"OSElElMllCutOutZResolved","OS leptons + $M_{ll}$ + Resolved (channel : $e^+e^-$)",18))
+        plots.append(makeYieldPlot(self,hasOsMuMuLowMllCutOutZResolvedJets,"OSMuMuMllCutOutZResolved","OS leptons + $M_{ll}$ + Resolved (channel : $\mu^+\mu^-$)",19))
+        plots.append(makeYieldPlot(self,hasOsElMuLowMllCutResolvedJets,"OSMuMuMllCutResolved","OS leptons + $M_{ll}$ + Resolved (channel : $e^{\pm}\mu^{\mp}$)",20))
 
-        plots.append(makeYieldPlot(self,hasOsElElLowMllCutOutZExclusiveResolvedJets,"OSElElMllCutOutZExclusiveResolved_yield","OS leptons + $M_{ll}$ + Exclusive Resolved (channel : $e^+e^-$)",21))
-        plots.append(makeYieldPlot(self,hasOsMuMuLowMllCutOutZExclusiveResolvedJets,"OSMuMuMllCutOutZExclusiveResolved_yield","OS leptons + $M_{ll}$ + Exclusive Resolved (channel : $\mu^+\mu^-$)",22))
-        plots.append(makeYieldPlot(self,hasOsElMuLowMllCutExclusiveResolvedJets,"OSMuMuMllCutExclusiveResolved_yield","OS leptons + $M_{ll}$ + Exclusive Resolved (channel : $e^{\pm}\mu^{\mp}$)",23))
+        plots.append(makeYieldPlot(self,hasOsElElLowMllCutOutZExclusiveResolvedJets,"OSElElMllCutOutZExclusiveResolved","OS leptons + $M_{ll}$ + Exclusive Resolved (channel : $e^+e^-$)",21))
+        plots.append(makeYieldPlot(self,hasOsMuMuLowMllCutOutZExclusiveResolvedJets,"OSMuMuMllCutOutZExclusiveResolved","OS leptons + $M_{ll}$ + Exclusive Resolved (channel : $\mu^+\mu^-$)",22))
+        plots.append(makeYieldPlot(self,hasOsElMuLowMllCutExclusiveResolvedJets,"OSMuMuMllCutExclusiveResolved","OS leptons + $M_{ll}$ + Exclusive Resolved (channel : $e^{\pm}\mu^{\mp}$)",23))
 
         # ExclusiveResolved + OS dilepton plots #
         hasOsMllCutExclusiveResolvedChannelList = [
