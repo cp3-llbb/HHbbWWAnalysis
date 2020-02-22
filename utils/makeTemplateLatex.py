@@ -41,7 +41,7 @@ class TemplateLatex:
                         # Dilepton #
                         ("_dilepton_pt" , "Dilepton $P_T$"),
                         ("_dilepton_deltaPhi" , "Dilepton $\Delta \phi$"),
-                        ("_dilepton_deltaR" , "Dilepton $\DeltaR$"),
+                        ("_dilepton_deltaR" , "Dilepton $\Delta R$"),
                         ("_dilepton_invariantMass" , "Dilepton invariant mass"),
                         # Resolved Jets #
                         ("_leadjet_pt" , "Leading jet $P_T$"),
@@ -56,11 +56,11 @@ class TemplateLatex:
                         ("_lightjet_pt" , "Lightjet $P_T$"),
                         ("_lightjet_eta" , "Lightjet $\eta$"),
                         ("_lightjet_phi" , "Lightjet $\phi$"),
-                        ("_resolvedjets_N" , "Number of resolved bjets")
+                        ("_resolvedjets_N" , "Number of resolved bjets"),
                         # Resolved Dijet #
                         ("_dijet_pt" , "Dijet $P_T$"),
                         ("_dijet_deltaPhi" , "Dijet $\Delta \phi$"),
-                        ("_dijet_deltaR" , "Dijet $\DeltaR$"),
+                        ("_dijet_deltaR" , "Dijet $\Delta R$"),
                         ("_dijet_invariantMass" , "Dijet invariant mass"),
                         # Fatjet #
                         ("_fatjet_pt" , "Fatjet $P_T$"),
@@ -68,14 +68,14 @@ class TemplateLatex:
                         ("_fatjet_phi" , "Fatjet $\phi$"),
                         ("_fatjet_mass" , "Fatjet mass"),
                         ("_fatjet_softdropmass" , "Fatjet SoftDrop mass"),
-                        ("_boostedjets_N" , "Number of boosted bjets (fatjets)")
+                        ("_boostedjets_N" , "Number of boosted bjets (fatjets)"),
                         # Highlevel variables 
-                        ("_highlevelvariable_DilepMETdeltaPhi", "Dilepton-MET $\Delta \phi$")
-                        ("_highlevelvariable_DilepMETdeltapt", "Dilepton-MET $P_T$")
-                        ("_highlevelvariable_mTll", "Dilepton-MET tranverse mass")
-                        ("_highlevelvariable_mTlljj", "Dilepton-Dijet-MET tranverse mass")
-                        ("_highlevelvariable_HT2", "$H_{T2}$ (scalar sum of the magnitudes of the HH decay momentas)")
-                        ("_highlevelvariable_HTR2", "$H_{T2R}$ (ratio of $H_{T2}$ and scalar sum of the transverse momenta HH decay products")
+                        ("_highlevelvariable_DilepMETdeltaPhi", "Dilepton-MET $\Delta \phi$"),
+                        ("_highlevelvariable_DilepMETdeltapt", "Dilepton-MET $P_T$"),
+                        ("_highlevelvariable_mTll", "Dilepton-MET tranverse mass"),
+                        ("_highlevelvariable_mTlljj", "Dilepton-Dijet-MET tranverse mass"),
+                        ("_highlevelvariable_HT2.", "$H_{T2}$ (scalar sum of the magnitudes of the HH decay momentas)"),
+                        ("_highlevelvariable_HT2R.", "$H_{T2}^R$ (ratio of $H_{T2}$ and scalar sum of the transverse momenta HH decay products"),
 
                      #   ("_ElectronFatjet_DeltaR" , "\Delta R(Electron, Fatjet)"),
                      #   ("_ElectronJet_DeltaR" , "\Delta R(Electron, Jet)"),
@@ -83,6 +83,7 @@ class TemplateLatex:
                      #   ("_MuonJet_DeltaR" , "\Delta R(Muon, Fatjet)"),
                         ])
                 # "_" at beginning is useful to distinguish leading and subleading
+                # "." at end is useful to distinguish "HT2" and "HT2R"
         self.content = ""
 
         self.ClassifyPlots()
@@ -126,9 +127,11 @@ class TemplateLatex:
     \usetheme{Madrid}
     \usecolortheme{beaver}
     \setbeamertemplate{navigation symbols}{}
+    \setbeamerfont{frametitle}{size=\small}
 }
 \usepackage{graphicx}
 \usepackage[english]{babel}
+\usepackage[absolute,overlay]{textpos}
 \begin{document}
                         """
 
@@ -141,16 +144,16 @@ class TemplateLatex:
                 valid_plot = False # If empty frame, will not print it
                 frame = r"""
 \begin{frame}
-    \begin{textblock*}{0.5\linewidth}(1.8cm,1.4cm)
+    \begin{textblock*}{0.5\linewidth}(2cm,1.5cm)
         $e^+e^-$
     \end{textblock*}
-    \begin{textblock*}{0.5\linewidth}(7.1cm,1.4cm)
+    \begin{textblock*}{0.5\linewidth}(7.5cm,1.5cm)
         $\mu^+\mu^-$
     \end{textblock*}
-    \begin{textblock*}{0.5\linewidth}(4.5cm,5.5cm)
+    \begin{textblock*}{0.5\linewidth}(4.7cm,5.5cm)
         $e^{\pm}\mu^{\mp}$
-    \end{textblock*}}
-                         """
+    \end{textblock*}
+                            """
                 frame += "\n\t"
                 frame += r"\frametitle{Selection : %s, variable : %s}"%(sel_name,var_name) 
                 frame += "\n\t"
@@ -158,7 +161,7 @@ class TemplateLatex:
                 for chan,chan_name in self.channels.items():
                     frame += "\n\t\t"
                     try:
-                        frame += "\includegraphics[trim={2cm 0 0 0 },clip,width=0.42\linewidth]{%s}"%(self.channeldict[chan][sel][var])
+                        frame += "\includegraphics[width=0.45\linewidth]{%s}"%(self.channeldict[chan][sel][var])
                         valid_plot = True
                     except Exception as e:
                         logging.debug('Could not find plot with channel "%s", selection "%s" and variable "%s" due to Exception "%s"'%(chan,sel,var,e))
