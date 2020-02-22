@@ -2,6 +2,18 @@ import math
 from bamboo.plots import Plot, EquidistantBinning, SummedPlot
 from bamboo import treefunctions as op
 
+######################## Channel title #################################
+def channelTitle(channel):
+    #if (channel == "ElEl"):
+    #    return "e^{+}e^{-}"
+    #elif (channel == "MuMu"):
+    #    return "#mu^{+}#mu^{-}"
+    #elif (channel == "ElMu"):
+    #    return "e^{#pm}#mu^{#mp}"
+    #else:
+    #    return channel
+    return channel
+
 ##########################  YIELD PLOT #################################
 def makeYieldPlot(self, sel, name, title, order):
     """
@@ -11,7 +23,7 @@ def makeYieldPlot(self, sel, name, title, order):
     title   = title that will be used in the LateX yield table
     order   = int that gives the entry order in yield table (user must ensure the order)
     """
-    plot = Plot.make1D(name,   
+    plot = Plot.make1D("Yield_"+name,   
                        op.c_int(1),
                        sel,
                        EquidistantBinning(1, 0., 1.),
@@ -32,9 +44,7 @@ def makeMETPlots(self, sel, met, suffix, channel):
 
     plots = []
 
-    channel = "e^{+}e^{-}" if "ElEl" in channel
-    channel = "#mu^{+}#mu^{-}" if "MuMu" in channel
-    channel = "e^{#pm}#mu^{#mp}" if "ElMu" in channel
+    channel = channelTitle(channel)
 
     # PT plot #
     plots.append(Plot.make1D("%s_%s_met_pt"%(channel,suffix), 
@@ -64,9 +74,7 @@ def makeDileptonPlots(self, sel, dilepton, suffix, channel):
     """
     plots = []
 
-    channel = "e^{+}e^{-}" if "ElEl" in channel
-    channel = "#mu^{+}#mu^{-}" if "MuMu" in channel
-    channel = "e^{#pm}#mu^{#mp}" if "ElMu" in channel
+    channel = channelTitle(channel)
 
     # PT plot #
     plots.append(Plot.make1D("%s_%s_firstlepton_pt"%(channel,suffix), 
@@ -74,19 +82,19 @@ def makeDileptonPlots(self, sel, dilepton, suffix, channel):
                              sel, 
                              EquidistantBinning(50,0.,300.),
                              title="Transverse momentum of the first lepton (channel %s)"%channel, 
-                             xTitle= "P_{T}(first lepton) [GeV]"))
+                             xTitle= "P_{T} (first lepton) [GeV]"))
     plots.append(Plot.make1D("%s_%s_secondlepton_pt"%(channel,suffix), 
                              dilepton[1].p4.Pt(), 
                              sel, 
                              EquidistantBinning(50,0.,300.),
                              title="Transverse momentum of the second lepton (channel %s)"%channel, 
-                             xTitle= "P_{T}(second lepton) [GeV]"))
+                             xTitle= "P_{T} (second lepton) [GeV]"))
     plots.append(Plot.make1D("%s_%s_dilepton_pt"%(channel,suffix), 
                              (dilepton[0].p4+dilepton[1].p4).Pt(), 
                              sel, 
                              EquidistantBinning(50,0.,300.),
                              title="Transverse momentum of the dilepton (channel %s)"%channel, 
-                             xTitle= "P_{T}(dilepton) [GeV]"))
+                             xTitle= "P_{T} (dilepton) [GeV]"))
 
     # Eta plot #
     plots.append(Plot.make1D("%s_%s_firstlepton_eta"%(channel,suffix), 
@@ -143,9 +151,7 @@ def makeDileptonPlots(self, sel, dilepton, suffix, channel):
 def makeDeltaRPlots(self,sel,cont1,cont2,suffix,channel,isMC):
     plots = [] 
 
-    channel = "e^{+}e^{-}" if "ElEl" in channel
-    channel = "#mu^{+}#mu^{-}" if "MuMu" in channel
-    channel = "e^{#pm}#mu^{#mp}" if "ElMu" in channel
+    channel = channelTitle(channel)
 
     mixedCont = op.combine((cont1,cont2))
     plots.append(Plot.make1D("%s_%s_DeltaR"%(channel,suffix), 
@@ -184,9 +190,7 @@ def makeDeltaRPlots(self,sel,cont1,cont2,suffix,channel,isMC):
 def makeJetsPlots(self,sel,bjets,lightjets,alljets,suffix,channel):
     plots = []
 
-    channel = "e^{+}e^{-}" if "ElEl" in channel
-    channel = "#mu^{+}#mu^{-}" if "MuMu" in channel
-    channel = "e^{#pm}#mu^{#mp}" if "ElMu" in channel
+    channel = channelTitle(channel)
 
     # Selection for bjets and mixed categories #
     bjetsCategory = sel.refine(suffix+"bjetsCategory",cut=[op.rng_len(bjets) >= 2]) # TODO : might want to veto more than 2 bjets 
@@ -244,10 +248,6 @@ def makeSeparateJetsPlots(self, sel, leadjet, subleadjet, suffix, channel, plot_
     """
  
     plots = []
-
-    channel = "e^{+}e^{-}" if "ElEl" in channel
-    channel = "#mu^{+}#mu^{-}" if "MuMu" in channel
-    channel = "e^{#pm}#mu^{#mp}" if "ElMu" in channel
 
     if plot_type == "inclusive":
         lead_base_name      = "%s_%sinclusive_leadjet_{var}"%(channel,suffix)
@@ -350,9 +350,7 @@ def makeFatJetPlots(self, sel, fatjets, suffix, channel):
  
     plots = []
 
-    channel = "e^{+}e^{-}" if "ElEl" in channel
-    channel = "#mu^{+}#mu^{-}" if "MuMu" in channel
-    channel = "e^{#pm}#mu^{#mp}" if "ElMu" in channel
+    channel = channelTitle(channel)
 
     # fatjet plots (always present by selection) #
     plots.append(Plot.make1D("%s_%s_fatjet_pt"%(channel,suffix),
@@ -399,6 +397,9 @@ def makeFatJetPlots(self, sel, fatjets, suffix, channel):
 #########################  High-level quantities ################################
 def makeHighLevelQuantities(self,sel,dilepton,met,jets,resolvedjets,lightjets,boostedjets,suffix,channel):
     plots = []
+
+    channel = channelTitle(channel)
+
     # Categories spltting #
     # Check if boosted category : make selection on number of boosted jets #
     isBoosted = sel.refine(suffix+"highlevelBoosted",cut=[op.rng_len(boostedjets)>=1]) 
@@ -460,10 +461,6 @@ def makeHighLevelQuantities(self,sel,dilepton,met,jets,resolvedjets,lightjets,bo
 
 def makeSeparateHighLevelQuantities(self,sel,met,l1,l2,j1,j2,suffix,channel):
     plots = []
-
-    channel = "e^{+}e^{-}" if "ElEl" in channel
-    channel = "#mu^{+}#mu^{-}" if "MuMu" in channel
-    channel = "e^{#pm}#mu^{#mp}" if "ElMu" in channel
 
     # Useful lambdas #
     ll_p4 = lambda l1,l2 : l1.p4+l2.p4
