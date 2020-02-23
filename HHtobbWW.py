@@ -241,41 +241,41 @@ class NanoHHTobbWW(NanoAODHistoModule):
             hastop = noSel.refine("hastop",cut=[op.rng_len(genTop)>=1])
             hasantitop = noSel.refine("hasantitop",cut=[op.rng_len(genAntitop)>=1])
             hasttbar = noSel.refine("hasttbar",cut=[op.rng_len(genTop)>=1,op.rng_len(genAntitop)>=1])
-
-            # Check plots #
-            plots.append(Plot.make1D("N_tops",
-                                    op.rng_len(genTop),
-                                    noSel,
-                                    EquidistantBinning(5,0.,5.),
-                                    title='N tops',
-                                    xTitle='N tops'))
-            plots.append(Plot.make1D("N_antitops",
-                                    op.rng_len(genAntitop),
-                                    noSel,
-                                    EquidistantBinning(5,0.,5.),
-                                    title='N antitops',
-                                    xTitle='N antitops'))
-            plots.append(Plot.make1D("top_pt",
-                                    genTop[0].pt,
-                                    hastop,
-                                    EquidistantBinning(50,0,500),
-                                    title='P_{T} top',
-                                    xTitle='P_{T} top'))
-            plots.append(Plot.make1D("antitop_pt",
-                                    genAntitop[0].pt,
-                                    hasantitop,
-                                    EquidistantBinning(50,0,500),
-                                    title='P_{T} antitop',
-                                    xTitle='P_{T} antitop'))
-            # Compute weight if there is a ttbar #
+#
+#            # Check plots #
+#            plots.append(Plot.make1D("N_tops",
+#                                    op.rng_len(genTop),
+#                                    noSel,
+#                                    EquidistantBinning(5,0.,5.),
+#                                    title='N tops',
+#                                    xTitle='N tops'))
+#            plots.append(Plot.make1D("N_antitops",
+#                                    op.rng_len(genAntitop),
+#                                    noSel,
+#                                    EquidistantBinning(5,0.,5.),
+#                                    title='N antitops',
+#                                    xTitle='N antitops'))
+#            plots.append(Plot.make1D("top_pt",
+#                                    genTop[0].pt,
+#                                    hastop,
+#                                    EquidistantBinning(50,0,500),
+#                                    title='P_{T} top',
+#                                    xTitle='P_{T} top'))
+#            plots.append(Plot.make1D("antitop_pt",
+#                                    genAntitop[0].pt,
+#                                    hasantitop,
+#                                    EquidistantBinning(50,0,500),
+#                                    title='P_{T} antitop',
+#                                    xTitle='P_{T} antitop'))
+#            # Compute weight if there is a ttbar #
             ttbar_SF = lambda t : op.exp(0.0615-0.0005*t.pt)
             ttbar_weight = lambda t,tbar : op.sqrt(ttbar_SF(t)*ttbar_SF(tbar))
-            plots.append(Plot.make1D("ttbar_weight",
-                                    ttbar_weight(genTop[0],genAntitop[0]),
-                                    hasttbar,
-                                    EquidistantBinning(50,0.,2.),
-                                    title='ttbar weight',
-                                    xTitle='ttbar weight'))
+#            plots.append(Plot.make1D("ttbar_weight",
+#                                    ttbar_weight(genTop[0],genAntitop[0]),
+#                                    hasttbar,
+#                                    EquidistantBinning(100,0.,2.),
+#                                    title='ttbar weight',
+#                                    xTitle='ttbar weight'))
             # Apply correction to TT #
             if sample.startswith("TT"):
                 noSel = noSel.refine("ttbarWeight",weight=ttbar_weight(genTop[0],genAntitop[0]))
