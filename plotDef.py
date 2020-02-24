@@ -5,9 +5,9 @@ from bamboo import treefunctions as op
 ######################## Channel title #################################
 def channelTitleLabel(channel):
     if (channel == "ElEl"):
-        channel = "e^{+} e^{-}"
+        channel = "e^{+}e^{-}"
     elif (channel == "MuMu"):
-        channel ="#mu^{+} #mu^{-}"
+        channel ="#mu^{+}#mu^{-}"
     elif (channel == "ElMu"):
         channel = "e^{#pm} #mu^{#mp}"
     channelLabel = {'labels': [{'text': channel, 'position': [0.23, 0.87], 'size': 36}]}
@@ -145,7 +145,7 @@ def makeDileptonPlots(self, sel, dilepton, suffix, channel):
                              sel, 
                              EquidistantBinning(50, 0., 5.), 
                              title="Dilepton Delta R (channel %s)"%channel, 
-                             xTitle= "\Delta R (dilepton)",
+                             xTitle= "#Delta R (dilepton)",
                              plotopts = channelLabel))
     # InvMass plot #
     plots.append(Plot.make1D("%s_%s_dilepton_invariantMass"%(channel,suffix), 
@@ -193,6 +193,7 @@ def makeDeltaRPlots(self,sel,cont1,cont2,suffix,channel,isMC):
         #                                 3,4,5   -> light quark, c quark, b quark
         #                                 15      -> tau 
         #                                 22      -> photon conversion (only electron)
+        # script : https://github.com/cms-nanoAOD/cmssw/blob/6f76b77b43c852475cff452a97203441a9c962d1/PhysicsTools/NanoAOD/plugins/CandMCMatchTableProducer.cc#L99-L138
 
 
 
@@ -503,7 +504,7 @@ def makeSeparateHighLevelQuantities(self,sel,met,l1,l2,j1,j2,suffix,channel):
                              sel,
                              EquidistantBinning(20,0.,3.2),
                              title='Azimutal angle between dilepton and MET (%s channel)'%channel,
-                             xTitle="| #Delta \phi (ll,MET)|",
+                             xTitle="|#Delta \phi (ll,MET)|",
                              plotopts = channelLabel))
     plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepMETpt"%(channel,suffix),
                              op.sqrt(op.pow(met.pt*op.cos(met.phi)+ll_p4(l1,l2).Px(),2)+op.pow(met.pt*op.sin(met.phi)+ll_p4(l1,l2).Py(),2)),
@@ -551,7 +552,7 @@ def makeSeparateHighLevelQuantities(self,sel,met,l1,l2,j1,j2,suffix,channel):
                              sel,
                              EquidistantBinning(50,0.,1.),
                              title='Di-Higgs magnitude ratio (%s channel)'%channel,
-                             xTitle="H_{T2}^R [GeV]",
+                             xTitle="H_{T2}^{R} [GeV]",
                              plotopts = channelLabel))
 
     return plots 
