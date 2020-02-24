@@ -142,18 +142,7 @@ class TemplateLatex:
         for sel,sel_name in self.selections.items():
             for var, var_name in self.variables.items():
                 valid_plot = False # If empty frame, will not print it
-                frame = r"""
-\begin{frame}
-    \begin{textblock*}{0.5\linewidth}(2cm,1.5cm)
-        $e^+e^-$
-    \end{textblock*}
-    \begin{textblock*}{0.5\linewidth}(7.5cm,1.5cm)
-        $\mu^+\mu^-$
-    \end{textblock*}
-    \begin{textblock*}{0.5\linewidth}(4.7cm,5.5cm)
-        $e^{\pm}\mu^{\mp}$
-    \end{textblock*}
-                            """
+                frame = r"\begin{frame}"
                 frame += "\n\t"
                 frame += r"\frametitle{Selection : %s, variable : %s}"%(sel_name,var_name) 
                 frame += "\n\t"
