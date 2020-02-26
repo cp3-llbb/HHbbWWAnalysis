@@ -1,35 +1,31 @@
 import math 
 from bamboo import treefunctions as op
 
-def METFilter(flags, era):
+def METFilter(flags, era, isMC):
     # from https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2
-    if era == '2018':
-        cuts = [
-                flags.goodVertices,
-                flags.globalSuperTightHalo2016Filter, # not tested need to be careful
-                flags.HBHENoiseFilter,
-                flags.HBHENoiseIsoFilter,
-                flags.EcalDeadCellTriggerPrimitiveFilter,
-                flags.BadPFMuonFilter,
-                flags.ecalBadCalibFilterV2 ]
-    
-    elif era=='2017':
-        cuts = [
-                flags.goodVertices,
-                flags.globalSuperTightHalo2016Filter,
-                flags.HBHENoiseFilter,
-                flags.HBHENoiseIsoFilter,
-                flags.EcalDeadCellTriggerPrimitiveFilter,
-                flags.BadPFMuonFilter,
-                flags.ecalBadCalibFilterV2 ]
-    elif era=='2016':
-        cuts=[
-                flags.goodVertices,
-                flags.globalSuperTightHalo2016Filter,
-                flags.HBHENoiseFilter,
-                flags.HBHENoiseIsoFilter,
-                flags.EcalDeadCellTriggerPrimitiveFilter,
-                flags.BadPFMuonFilter ]
+    #
+    # from  https://gitlab.cern.ch/cms-hh-bbww/cms-hh-to-bbww/blob/master/Legacy/event_selection.md
+    #   primary vertex filter ("Flag_goodVertices"): data and MC 2016, 2017, 2018.
+    #   beam halo filter ("Flag_globalSuperTightHalo2016Filter"): data and MC 2016, 2017, 2018.
+    #   HBHE noise filter ("Flag_HBHENoiseFilter"): data and MC 2016, 2017, 2018.
+    #   HBHEiso noise filter ("Flag_HBHENoiseIsoFilter"): data and MC 2016, 2017, 2018.
+    #   ECAL TP filter ("Flag_EcalDeadCellTriggerPrimitiveFilter"): data and MC 2016, 2017, 2018.
+    #   Bad PF Muon Filter ("Flag_BadPFMuonFilter"): data and MC 2016, 2017, 2018.
+    #   ECAL bad calibration filter ("Flag_ecalBadCalibReducedMINIAODFilter"): data and MC 2017, 2018.
+    #   ECAL endcap bad SC noise filter ("Flag_eeBadScFilter"): data 2016, 2017, 2018.
+    cuts = [
+           flags.goodVertices,
+           flags.globalSuperTightHalo2016Filter,
+           flags.HBHENoiseFilter,
+           flags.HBHENoiseIsoFilter,
+           flags.EcalDeadCellTriggerPrimitiveFilter,
+           flags.BadPFMuonFilter
+            ]
+    if "2017" in era or "2018" in era:
+        cuts.append(flags.ecalBadCalibReducedMINIAODFilter) # Only 2017-2018 : both MC and data
+    if not isMC:
+        cuts.append(flags.eeBadScFilter) # Only data 
+
     return cuts
 
 

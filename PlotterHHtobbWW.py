@@ -20,13 +20,83 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW):
         return super(PlotterNanoHHtobbWW,self).prepareTree(tree, sample, sampleCfg, enableSystematics)
 
     def definePlots(self, t, noSel, sample=None, sampleCfg=None): 
-        noSel = super(PlotterNanoHHtobbWW,self).preparePlots(t, noSel, sample, sampleCfg)
+        noSel = super(PlotterNanoHHtobbWW,self).prepareObjects(t, noSel, sample, sampleCfg)
 
         plots = []
 
         era = sampleCfg['era']
 
         isMC = self.isMC(sample)
+
+        #############################################################################
+        #                               Dilepton                                    #
+        #############################################################################
+        # Combine dileptons #
+        # Get OS leptons #
+        lambdaOS  = lambda l1,l2 : l1.charge != l2.charge
+        preOsElEl = op.combine(self.electrons, N=2, pred=lambdaOS)
+        preOsMuMu = op.combine(self.muons, N=2, pred=lambdaOS)
+        preOsElMu = op.combine((self.electrons, self.muons), pred=lambdaOS)
+    
+        # PT cut on leading > 25 GeV #
+        lambdaPTCut = lambda dilep : op.OR( dilep[0].p4.Pt() > 25 , dilep[1].p4.Pt() > 25)
+        self.OsElEl = op.select(preOsElEl, pred=lambdaPTCut)
+        self.OsMuMu = op.select(preOsMuMu, pred=lambdaPTCut)
+        self.OsElMu = op.select(preOsElMu, pred=lambdaPTCut)
+ 
+        # Scalefactors #
+        if self.isMC(sample):
+            doubleEleTrigSF = SF.get_scalefactor("dilepton", ("doubleEleLeg_HHMoriond17_2016"), systName="eleltrig")     
+            doubleMuTrigSF  = SF.get_scalefactor("dilepton", ("doubleMuLeg_HHMoriond17_2016"), systName="mumutrig")    
+            elemuTrigSF     = SF.get_scalefactor("dilepton", ("elemuLeg_HHMoriond17_2016"), systName="elmutrig")
+            mueleTrigSF     = SF.get_scalefactor("dilepton", ("mueleLeg_HHMoriond17_2016"), systName="mueltrig")
+
+            # From https://gitlab.cern.ch/ttH_leptons/doc/blob/master/Legacy/data_to_mc_corrections.md#trigger-efficiency-scale-factors
+        ttH_doubleMuon_trigSF = op.systematic(op.c_float(1.010), name="ttH_doubleMuon_trigSF", up=op.c_float(1.020), down=op.c_float(1.000))
+        ttH_doubleElectron_trigSF = op.systematic(op.c_float(1.020), name="ttH_doubleElectron_trigSF", up=op.c_float(1.040), down=op.c_float(1.000))
+        ttH_electronMuon_trigSF = op.systematic(op.c_float(1.020), name="ttH_electronMuon_trigSF", up=op.c_float(1.030), down=op.c_float(1.010))
+
+        llSF =  {
+            "ElEl" : (lambda ll : [ elTightIDSF(ll[0][0]),                                                                     # First lepton SF
+                                    elTightIDSF(ll[0][1]),                                                                     # Second lepton SF
+                                    #doubleEleTrigSF(ll[0]),                                                                  # Dilepton SF
+                                    ttH_doubleElectron_trigSF,
+                                  ]),
+            "MuMu" : (lambda ll : [ muTightIDSF(ll[0][0]), muTightISOSF(ll[0][0]),                                             # First lepton SF
+                                    muTightIDSF(ll[0][1]), muTightISOSF(ll[0][1]),                                             # Second lepton SF
+                                    #doubleMuTrigSF(ll[0]),                                                                   # Dilepton SF
+                                    ttH_doubleMuon_trigSF,
+                                  ]),
+            "ElMu" : (lambda ll : [ elTightIDSF(ll[0][0]),                                                                     # First lepton SF
+                                    muTightIDSF(ll[0][1]), muTightISOSF(ll[0][1]),                                             # Second lepton SF
+                                    #elemuTrigSF(ll[0]),                                                                      # Dilepton SF
+                                    ttH_electronMuon_trigSF,
+                                  ]),
+                # ll is a proxy list of dileptons 
+                # ll[0] is the first dilepton 
+                # ll[0][0] is the first lepton and ll[0][1] the second in the dilepton
+                }
+
+
+        self.llSFApplied = {
+            "ElEl": llSF["ElEl"](self.OsElEl) if isMC else None,
+            "MuMu": llSF["MuMu"](self.OsMuMu) if isMC else None,
+            "ElMu": llSF["ElMu"](self.OsElMu) if isMC else None,
+                      }
+
+
+
+
+
+        ############################################################
+        #                       Selections                         #
+        ############################################################
+        # At least 2 fakeables leptons #
+        hasAtLeast2Fakes = noSel.refine("hasAtLeast2Fakes",
+                                        cut = [(op.rng_len(self.muonsPreSel) + op.rng_len(self.electronsPreSel))>=2])
+        hasAtLeast2FakesPtCut = hasAtLeast2Fakes.refine("hasAtLeast2FakesPtCut",
+                                        cut = [op.AND()]
+
         ############################################################
         #                    Dilepton plots                        #
         ############################################################

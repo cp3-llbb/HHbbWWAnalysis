@@ -2,6 +2,8 @@ import math
 from bamboo.plots import Plot, EquidistantBinning, SummedPlot
 from bamboo import treefunctions as op
 
+# TODO : remove the self
+
 ######################## Channel title #################################
 def channelTitleLabel(channel):
     if (channel == "ElEl"):
