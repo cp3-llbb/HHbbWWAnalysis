@@ -50,7 +50,7 @@ samples:
 #    era: '2016'
 #    split: 85 # 85 files
 
-   TT:  # TODO : errors -> xsec = 831.76 +19.77 -29.20 +35.06 -35.06 pb
+  TT:  # TODO : errors -> xsec = 831.76 +19.77 -29.20 +35.06 -35.06 pb
     db: das:/TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
     files: dascache/TT.dat
     generated-events: 'genEventSumw'
@@ -93,7 +93,7 @@ samples:
     cross-section: 80.95  # TODO  to check !   Opb on the xsc uncertainty for now 
     group: ST
     era: '2016'
-    split: 26 # 26 files
+    split: 35 # 35 files
 
   ST_tchannel_top_4f:
     db: das:/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -102,7 +102,7 @@ samples:
     cross-section: 136.02 # TODO  to check!  Opb on the xsc uncertainty for now 
     group: ST
     era: '2016'
-    split: 34 # 34 files
+    split: 51 # 51 files #
 
   # ST_schannel_4f: # Comment to avoid double counting
   #   db: das:/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -658,6 +658,35 @@ samples:
     run_range: [280919, 284044]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 10
+
+###### Signal
+#  GluGluToHHTo2B2VTo2L2Nu:
+#    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+#    files: dascache/GluGluToHHTo2B2VTo2L2Nu.dat
+#    generated-events: 'genEventSumw'
+#    cross-section: 1000
+#    era: '2016'
+#    split: 10
+#    line-color: "#e31b1b"
+#    line-type: 1
+#    legend: HH (SM) 1000 pb
+#    order: 1
+#    type: signal
+#  GluGluToRadionToHHTo2B2VTo2L2Nu_M-750:
+#    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+#    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.dat
+#    generated-events: 'genEventSumw'
+#    cross-section: 1000
+#    era: '2016'
+#    split: 10
+#    line-color: "#f2050d"
+#    line-type: 1
+#    legend: HH (Radion, M = 750 GeV) 1000 pb
+#    order: 12
+#    type: signal
+
+
+
 
 
 plotIt:
