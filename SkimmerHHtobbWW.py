@@ -28,7 +28,6 @@ class SkimmerNanoHHtobbWW(BaseNanoHHtobbWW):
         varsToKeep["run"] = t.run
         varsToKeep["ls"] = t.luminosityBlock
 
-
 #         varsToKeep = {"nMuon": None, "Muon_eta": None, "Muon_pt": None} ## from input file         
 #         varsToKeep["nSelMuons"] = op.static_cast("UInt_t", op.rng_len(muons)) ## TBranch doesn't accept size_t         
 #         varsToKeep["selMu_miniPFRelIsoNeu"] = op.map(muons, lambda mu : mu.miniPFRelIso_all - mu.miniPFRelIso_chg)
