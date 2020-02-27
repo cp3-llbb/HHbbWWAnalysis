@@ -3,7 +3,7 @@ import sys
 from itertools import chain
 
 from bamboo import treefunctions as op
-from bamboo.analysismodules import NanoAODHistoModule, NanoAODSkimmerModule
+from bamboo.analysismodules import NanoAODModule, NanoAODHistoModule, NanoAODSkimmerModule
 from bamboo.analysisutils import makeMultiPrimaryDatasetTriggerSelection
 from bamboo.scalefactors import binningVariables_nano
 
@@ -13,7 +13,7 @@ from METScripts import METFilter, METcorrection
 #===============================================================================================#
 #                                  BaseHHtobbWW                                                 #
 #===============================================================================================#
-class BaseNanoHHtobbWW(NanoAODHistoModule,NanoAODSkimmerModule):
+class BaseNanoHHtobbWW(NanoAODModule):
     """ Base module: HH->bbW(->e/µ nu)W(->e/µ nu) histograms from NanoAOD """
     def __init__(self, args):
             super(BaseNanoHHtobbWW, self).__init__(args)
@@ -215,6 +215,8 @@ class BaseNanoHHtobbWW(NanoAODHistoModule,NanoAODSkimmerModule):
 
         isMC = self.isMC(sample)
 
+        objDict = dict()
+
         # Forcedefne #
         forceDefine(t._Muon.calcProd, noSel)
         forceDefine(t._Jet.calcProd, noSel) # calculate once per event (for every event)
@@ -315,7 +317,10 @@ class BaseNanoHHtobbWW(NanoAODHistoModule,NanoAODSkimmerModule):
 
         # MET corrections #
         MET = t.MET if era != "2017" else t.METFixEE2017
-        self.corrMET = METcorrection(MET,t.PV,sample,era,self.isMC(sample))
+        corrMET = METcorrection(MET,t.PV,sample,era,self.isMC(sample))
+
+        # Register #
+        objDict["corrMET"] = corrMET 
 
         #############################################################################
         #                                 Muons                                     #
@@ -331,19 +336,19 @@ class BaseNanoHHtobbWW(NanoAODHistoModule,NanoAODSkimmerModule):
                                                     mu.sip3d <= 8,
                                                     mu.looseId,
                                               )
-        self.muonsPreSel = op.select(muonsByPt, lambda_muonPreSel)
+        muonsPreSel = op.select(muonsByPt, lambda_muonPreSel)
         # Fakeable selection #
         lambda_muonFakeSel = lambda mu : op.AND(
                                                     op.OR(mu.mvaTTH < 0.85, mu.jetRelIso<0.5), # Lepton MVA id from ttH
                                                         # If mvaTTH < 0.85 : jetRelIso <0.5 (and deepJet medium ?)
                                                 )
-        self.muonsFakeSel = op.select(self.muonsPreSel, lambda_muonFakeSel)
+        muonsFakeSel = op.select(muonsPreSel, lambda_muonFakeSel)
         # Tight selection #
         lambda_muonTightSel = lambda mu : op.AND(
                                                     mu.mvaTTH >= 0.85, # Lepton MVA id from ttH
                                                     mu.mediumId
                                                 )
-        self.muonsTightSel = op.select(self.muonsFakeSel, lambda_muonTightSel)
+        muonsTightSel = op.select(muonsFakeSel, lambda_muonTightSel)
 
         # Scalefactors #
         if self.isMC(sample):
@@ -358,6 +363,11 @@ class BaseNanoHHtobbWW(NanoAODHistoModule,NanoAODSkimmerModule):
 #            else:
 #                muTightIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_tight"), systName="muid")
 #                muTightISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), systName="muiso") 
+
+        # Register #
+        objDict['muonsPreSel'] = muonsPreSel
+        objDict['muonsFakeSel'] = muonsFakeSel
+        objDict['muonsTightSel'] = muonsTightSel 
 
         #############################################################################
         #                              Electrons                                    #
@@ -376,10 +386,10 @@ class BaseNanoHHtobbWW(NanoAODHistoModule,NanoAODSkimmerModule):
                                                     ele.cutBased>=2,     # cut-based ID Fall17 V2 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)
                                                     ele.lostHits <=1    # number of missing inner hits
                                               )
-        self.electronsPreSelInclu = op.select(electronsByPt, lambda_electronPreSel) # can include a muon in cone
-        lambda_cleanElectron = lambda ele : op.NOT(op.rng_any(self.muonsPreSel, lambda mu : op.deltaR(mu.p4, ele.p4) < 0.3 ))
+        electronsPreSelInclu = op.select(electronsByPt, lambda_electronPreSel) # can include a muon in cone
+        lambda_cleanElectron = lambda ele : op.NOT(op.rng_any(muonsPreSel, lambda mu : op.deltaR(mu.p4, ele.p4) < 0.3 ))
             # No overlap between electron and muon in cone of DR<=0.3
-        self.electronsPreSel = op.select(self.electronsPreSelInclu, lambda_cleanElectron)
+        electronsPreSel = op.select(electronsPreSelInclu, lambda_cleanElectron)
         # Fakeable selection #
         lambda_electronFakeSel = lambda ele : op.AND(
                                                     ele.hoe <= 0.10,
@@ -389,16 +399,21 @@ class BaseNanoHHtobbWW(NanoAODHistoModule,NanoAODSkimmerModule):
                                                     ele.lostHits == 0,    # number of missing inner hits
                                                     ele.convVeto        # Passes conversion veto
                                                 )
-        self.electronsFakeSel = op.select(self.electronsPreSel, lambda_electronFakeSel)
+        electronsFakeSel = op.select(electronsPreSel, lambda_electronFakeSel)
         # Tight selection #
         lambda_electronTightSel = lambda ele : op.AND(
                                                     ele.mvaTTH >= 0.80
                                                 )
-        self.electronsTightSel = op.select(self.electronsFakeSel, lambda_electronTightSel)
+        electronsTightSel = op.select(electronsFakeSel, lambda_electronTightSel)
 
         # Scalefactors #
         if self.isMC(sample):
             elTightIDSF = SF.get_scalefactor("lepton", ("electron_{0}_{1}".format(era,sfTag), "id_tight"), systName="elid")
+
+        # Register #
+        objDict['electronsPreSel'] = electronsPreSel
+        objDict['electronsFakeSel'] = electronsFakeSel
+        objDict['electronsTightSel'] = electronsTightSel 
 
         #############################################################################
         #                                AK4 Jets                                   #
@@ -417,13 +432,13 @@ class BaseNanoHHtobbWW(NanoAODHistoModule,NanoAODSkimmerModule):
                                                         j.p4.Pt() > 25.,
                                                         op.abs(j.p4.Eta())< 2.4
                                                     )
-        self.ak4JetsPreSel = op.select(ak4JetsByPt, lambda_ak4JetsPreSel)
+        ak4JetsPreSel = op.select(ak4JetsByPt, lambda_ak4JetsPreSel)
         # Cleaning #
         lambda_cleanAk4Jets = lambda j : op.AND(
-                                                op.NOT(op.rng_any(self.electronsPreSel, lambda ele : op.deltaR(j.p4, ele.p4) < 0.4 )), 
-                                                op.NOT(op.rng_any(self.muonsPreSel, lambda mu : op.deltaR(j.p4, mu.p4) < 0.4 )))
+                                                op.NOT(op.rng_any(electronsPreSel, lambda ele : op.deltaR(j.p4, ele.p4) < 0.4 )), 
+                                                op.NOT(op.rng_any(muonsPreSel, lambda mu : op.deltaR(j.p4, mu.p4) < 0.4 )))
             # remove jets within cone of DR<0.4 of preselected electrons and muons
-        self.ak4Jets = op.select(self.ak4JetsPreSel,lambda_cleanAk4Jets)
+        ak4Jets = op.select(ak4JetsPreSel,lambda_cleanAk4Jets)
     
         ############     Btagging     #############
         # The pfDeepFlavour (DeepJet) algorithm is used
@@ -437,15 +452,21 @@ class BaseNanoHHtobbWW(NanoAODHistoModule,NanoAODSkimmerModule):
             lambda_ak4Btag =   lambda jet    : jet.btagDeepFlavB > 0.2770
             lambda_ak4NoBtag = lambda jet    : jet.btagDeepFlavB <= 0.2770
 
-        self.ak4BJets     = op.select(self.ak4Jets, lambda_ak4Btag)
-        self.ak4LightJets = op.select(self.ak4Jets, lambda_ak4NoBtag)
+        ak4BJets     = op.select(ak4Jets, lambda_ak4Btag)
+        ak4LightJets = op.select(ak4Jets, lambda_ak4NoBtag)
 
         ############     ScaleFactors    #############
         self.DeepJetMediumSFApplied = None
         if self.isMC(sample):
             DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
             self.DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
-            DeepJetMediumSFApplied = [self.DeepJetMediumSF(self.ak4BJets[0])] # TODO : check if more than one bjet and apply to all
+            DeepJetMediumSFApplied = [self.DeepJetMediumSF(ak4BJets[0])] # TODO : check if more than one bjet and apply to all
+
+        # Register #
+        objDict['ak4JetsPreSel'] = ak4JetsPreSel 
+        objDict['ak4Jets'] = ak4Jets 
+        objDict['ak4BJets'] = ak4BJets
+        objDict['ak4LightJets'] = ak4LightJets 
 
         #############################################################################
         #                                AK8 Jets                                   #
@@ -468,14 +489,14 @@ class BaseNanoHHtobbWW(NanoAODHistoModule,NanoAODSkimmerModule):
                                                         op.AND(j.msoftdrop > 30, j.msoftdrop < 210),
                                                         j.tau2/j.tau1 < 0.75
                                                     )
-        self.ak8JetsPreSel = op.select(ak8JetsByPt, lambda_ak8JetsPreSel)
+        ak8JetsPreSel = op.select(ak8JetsByPt, lambda_ak8JetsPreSel)
         # Cleaning #
         lambda_cleanAk8Jets = lambda j : op.AND(
-                                                op.NOT(op.rng_any(self.electronsPreSel, lambda ele : op.deltaR(j.p4, ele.p4) < 0.8 )), 
-                                                op.NOT(op.rng_any(self.muonsPreSel, lambda mu : op.deltaR(j.p4, mu.p4) < 0.8 ))
+                                                op.NOT(op.rng_any(electronsPreSel, lambda ele : op.deltaR(j.p4, ele.p4) < 0.8 )), 
+                                                op.NOT(op.rng_any(muonsPreSel, lambda mu : op.deltaR(j.p4, mu.p4) < 0.8 ))
                                             )
             # remove jets within cone of DR<0.8 of preselected electrons and muons
-        self.ak8Jets = op.select(self.ak8JetsPreSel,lambda_cleanAk8Jets)
+        ak8Jets = op.select(ak8JetsPreSel,lambda_cleanAk8Jets)
 
         ############     Btagging     #############
         # The DeepCSV b-tagging algorithm is used on subjets 
@@ -489,20 +510,24 @@ class BaseNanoHHtobbWW(NanoAODHistoModule,NanoAODSkimmerModule):
         elif era =="2017":
             lambda_ak8Btag = lambda fatjet : op.AND (fatjet.subJet1.p4.Pt() > 30,
                                                      fatjet.subJet2.p4.Pt() > 30,
-                                                     op.OR(fatjetself.ak8BJets.subJet1.btagDeepB > 0.4941, fatjet.subJet2.btagDeepB > 0.4941))
+                                                     op.OR(fatjetak8BJets.subJet1.btagDeepB > 0.4941, fatjet.subJet2.btagDeepB > 0.4941))
         elif era == "2018":
             lambda_ak8Btag = lambda fatjet : op.AND (fatjet.subJet1.p4.Pt() > 30,
                                                      fatjet.subJet2.p4.Pt() > 30,
                                                      op.OR(fatjet.subJet1.btagDeepB > 0.4184, fatjet.subJet2.btagDeepB > 0.4184))
 
-        self.ak8BJets = op.select(self.ak8Jets, lambda_ak8Btag)
+        ak8BJets = op.select(ak8Jets, lambda_ak8Btag)
 
         ############     ScaleFactors    #############
         if self.isMC(sample): # Needs new nanoAOD version 
             pass
 #            DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
 #            DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
-#            DeepCSVMediumSFApplied = [DeepCSVMediumSF(self.ak8BJets[0].subJet1)] # Must be applied on subjets : need to check each time which one has been btagged
- 
+#            DeepCSVMediumSFApplied = [DeepCSVMediumSF(ak8BJets[0].subJet1)] # Must be applied on subjets : need to check each time which one has been btagged
+         # Register #
+        objDict['ak8JetsPreSel'] = ak8JetsPreSel 
+        objDict['ak8Jets'] = ak8Jets 
+        objDict['ak8BJets'] = ak8BJets 
 
-        return noSel
+        # Return #
+        return noSel, objDict
