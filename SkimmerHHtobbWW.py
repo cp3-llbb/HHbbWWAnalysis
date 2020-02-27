@@ -14,7 +14,7 @@ class SkimmerNanoHHtobbWW(BaseNanoHHtobbWW):
     """ Plotter module: HH->bbW(->e/µ nu)W(->e/µ nu) histograms from NanoAOD """
     def __init__(self, args):
         super(SkimmerNanoHHtobbWW, self).__init__(args)
-        #self.BaseClass = BaseNanoHHtobbWW(args)
+        self.BaseClass = BaseNanoHHtobbWW(args)
 
     def prepareTree(self, tree, sample=None, sampleCfg=None):
         #return super(SkimmerNanoHHtobbWW,self).prepareTree(tree, sample, sampleCfg)
