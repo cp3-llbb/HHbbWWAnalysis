@@ -215,8 +215,6 @@ class BaseNanoHHtobbWW(NanoAODModule):
 
         isMC = self.isMC(sample)
 
-        objDict = dict()
-
         # Forcedefne #
         forceDefine(t._Muon.calcProd, noSel)
         forceDefine(t._Jet.calcProd, noSel) # calculate once per event (for every event)
@@ -307,7 +305,9 @@ class BaseNanoHHtobbWW(NanoAODModule):
             puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "puweights2018.json")
         if self.isMC(sample) and puWeightsFile is not None:
             from bamboo.analysisutils import makePileupWeight
-            noSel = noSel.refine("puWeight", weight=makePileupWeight(puWeightsFile, t.Pileup_nTrueInt, systName="pileup"))
+            self.PUWeight = makePileupWeight(puWeightsFile, t.Pileup_nTrueInt, systName="pileup")
+            #noSel = noSel.refine("puWeight", weight=makePileupWeight(puWeightsFile, t.Pileup_nTrueInt, systName="pileup"))
+            noSel = noSel.refine("puWeight", weight=self.PUWeight)
 
         #############################################################################
         #                                 MET                                       #
@@ -317,17 +317,14 @@ class BaseNanoHHtobbWW(NanoAODModule):
 
         # MET corrections #
         MET = t.MET if era != "2017" else t.METFixEE2017
-        corrMET = METcorrection(MET,t.PV,sample,era,self.isMC(sample))
-
-        # Register #
-        objDict["corrMET"] = corrMET 
+        self.corrMET = METcorrection(MET,t.PV,sample,era,self.isMC(sample))
 
         #############################################################################
         #                                 Muons                                     #
         #############################################################################
         # Preselection #
         muonsByPt = op.sort(t.Muon, lambda mu : -mu.p4.Pt())
-        lambda_muonPreSel = lambda mu : op.AND(
+        self.lambda_muonPreSel = lambda mu : op.AND(
                                                     mu.p4.Pt() >= 5.,
                                                     op.abs(mu.p4.Eta()) <= 2.4,
                                                     op.abs(mu.dxy) <= 0.05,
@@ -336,19 +333,19 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                     mu.sip3d <= 8,
                                                     mu.looseId,
                                               )
-        muonsPreSel = op.select(muonsByPt, lambda_muonPreSel)
+        self.muonsPreSel = op.select(muonsByPt, self.lambda_muonPreSel)
         # Fakeable selection #
-        lambda_muonFakeSel = lambda mu : op.AND(
+        self.lambda_muonFakeSel = lambda mu : op.AND(
                                                     op.OR(mu.mvaTTH < 0.85, mu.jetRelIso<0.5), # Lepton MVA id from ttH
                                                         # If mvaTTH < 0.85 : jetRelIso <0.5 (and deepJet medium ?)
                                                 )
-        muonsFakeSel = op.select(muonsPreSel, lambda_muonFakeSel)
+        self.muonsFakeSel = op.select(self.muonsPreSel, self.lambda_muonFakeSel)
         # Tight selection #
-        lambda_muonTightSel = lambda mu : op.AND(
+        self.lambda_muonTightSel = lambda mu : op.AND(
                                                     mu.mvaTTH >= 0.85, # Lepton MVA id from ttH
                                                     mu.mediumId
                                                 )
-        muonsTightSel = op.select(muonsFakeSel, lambda_muonTightSel)
+        self.muonsTightSel = op.select(self.muonsFakeSel, self.lambda_muonTightSel)
 
         # Scalefactors #
         if self.isMC(sample):
@@ -364,11 +361,6 @@ class BaseNanoHHtobbWW(NanoAODModule):
 #                muTightIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_tight"), systName="muid")
 #                muTightISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), systName="muiso") 
 
-        # Register #
-        objDict['muonsPreSel'] = muonsPreSel
-        objDict['muonsFakeSel'] = muonsFakeSel
-        objDict['muonsTightSel'] = muonsTightSel 
-
         #############################################################################
         #                              Electrons                                    #
         #############################################################################
@@ -376,105 +368,97 @@ class BaseNanoHHtobbWW(NanoAODModule):
             # 1/E-1/P = 1/E - 1/sqrt(Px²+Py²+Pz²)
         # Preselection #
         electronsByPt = op.sort(t.Electron, lambda ele : -ele.p4.Pt())
-        lambda_electronPreSel = lambda ele : op.AND(
-                                                    ele.p4.Pt() >= 7.,
-                                                    op.abs(ele.p4.Eta()) <= 2.5,
-                                                    op.abs(ele.dxy) <= 0.05,
-                                                    op.abs(ele.dz) <= 0.1,
-                                                    ele.miniPFRelIso_all <= 0.4, # mini PF relative isolation, total (with scaled rho*EA PU corrections)
-                                                    ele.sip3d <= 8,
-                                                    ele.cutBased>=2,     # cut-based ID Fall17 V2 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)
-                                                    ele.lostHits <=1    # number of missing inner hits
-                                              )
-        electronsPreSelInclu = op.select(electronsByPt, lambda_electronPreSel) # can include a muon in cone
-        lambda_cleanElectron = lambda ele : op.NOT(op.rng_any(muonsPreSel, lambda mu : op.deltaR(mu.p4, ele.p4) < 0.3 ))
+        self.lambda_electronPreSel = lambda ele : op.AND(
+                                                        ele.p4.Pt() >= 7.,
+                                                        op.abs(ele.p4.Eta()) <= 2.5,
+                                                        op.abs(ele.dxy) <= 0.05,
+                                                        op.abs(ele.dz) <= 0.1,
+                                                        ele.miniPFRelIso_all <= 0.4, # mini PF relative isolation, total (with scaled rho*EA PU corrections)
+                                                        ele.sip3d <= 8,
+                                                        ele.cutBased>=2,     # cut-based ID Fall17 V2 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)
+                                                        ele.lostHits <=1    # number of missing inner hits
+                                                        )
+        self.electronsPreSelInclu = op.select(electronsByPt, self.lambda_electronPreSel) # can include a muon in cone
+        self.lambda_cleanElectron = lambda ele : op.NOT(op.rng_any(self.muonsPreSel, lambda mu : op.deltaR(mu.p4, ele.p4) < 0.3 ))
             # No overlap between electron and muon in cone of DR<=0.3
-        electronsPreSel = op.select(electronsPreSelInclu, lambda_cleanElectron)
+        self.electronsPreSel = op.select(self.electronsPreSelInclu, self.lambda_cleanElectron)
         # Fakeable selection #
-        lambda_electronFakeSel = lambda ele : op.AND(
-                                                    ele.hoe <= 0.10,
-                                                    ele.eInvMinusPInv >= -0.04,
-                                                    op.OR(ele.mvaTTH <= 0.80, op.AND(ele.jetRelIso<0.5, ele.mvaFall17V2noIso_WP80)), # Lepton MVA id from ttH
-                                                        # If mvaTTH < 0.80 : jetRelIso <0.5 (and deepJet medium ?) and Fall17V2noIso_WP80
-                                                    ele.lostHits == 0,    # number of missing inner hits
-                                                    ele.convVeto        # Passes conversion veto
-                                                )
-        electronsFakeSel = op.select(electronsPreSel, lambda_electronFakeSel)
+        self.lambda_electronFakeSel = lambda ele : op.AND(
+                                                        op.OR(
+                                                                op.AND(op.abs(ele.eta)<1.479, ele.sieie<=0.011), # Eta of ele or SR ?
+                                                                op.AND(op.AND(op.abs(ele.eta)>=1.479,op.abs(ele.eta)<=2.5), ele.sieie<=0.030)),
+                                                        ele.hoe <= 0.10,
+                                                        ele.eInvMinusPInv >= -0.04,
+                                                        op.OR(ele.mvaTTH <= 0.80, op.AND(ele.jetRelIso<0.5, ele.mvaFall17V2noIso_WP80)), # Lepton MVA id from ttH
+                                                            # If mvaTTH < 0.80 : jetRelIso <0.5 (and deepJet medium ?) and Fall17V2noIso_WP80
+                                                        ele.lostHits == 0,    # number of missing inner hits
+                                                        ele.convVeto        # Passes conversion veto
+                                                        )
+        self.electronsFakeSel = op.select(self.electronsPreSel, self.lambda_electronFakeSel)
         # Tight selection #
-        lambda_electronTightSel = lambda ele : op.AND(
+        self.lambda_electronTightSel = lambda ele : op.AND(
                                                     ele.mvaTTH >= 0.80
                                                 )
-        electronsTightSel = op.select(electronsFakeSel, lambda_electronTightSel)
+        self.electronsTightSel = op.select(self.electronsFakeSel, self.lambda_electronTightSel)
 
         # Scalefactors #
         if self.isMC(sample):
             elTightIDSF = SF.get_scalefactor("lepton", ("electron_{0}_{1}".format(era,sfTag), "id_tight"), systName="elid")
 
-        # Register #
-        objDict['electronsPreSel'] = electronsPreSel
-        objDict['electronsFakeSel'] = electronsFakeSel
-        objDict['electronsTightSel'] = electronsTightSel 
-
         #############################################################################
         #                                AK4 Jets                                   #
         #############################################################################
-        ak4JetsByPt = op.sort(t.Jet, lambda jet : -jet.p4.Pt())
+        self.ak4JetsByPt = op.sort(t.Jet, lambda jet : -jet.p4.Pt())
         # Preselection #
         if era == "2016":
-            lambda_ak4JetsPreSel = lambda j : op.AND(
+            self.lambda_ak4JetsPreSel = lambda j : op.AND(
                                                         j.jetId & 1, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
                                                         j.p4.Pt() > 25.,
                                                         op.abs(j.p4.Eta())< 2.4
                                                     )
         elif  era == "2017" or era == "2018":
-            lambda_ak4JetsPreSel = lambda j : op.AND(
+            self.lambda_ak4JetsPreSel = lambda j : op.AND(
                                                         j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
                                                         j.p4.Pt() > 25.,
                                                         op.abs(j.p4.Eta())< 2.4
                                                     )
-        ak4JetsPreSel = op.select(ak4JetsByPt, lambda_ak4JetsPreSel)
+        self.ak4JetsPreSel = op.select(self.ak4JetsByPt, self.lambda_ak4JetsPreSel)
         # Cleaning #
-        lambda_cleanAk4Jets = lambda j : op.AND(
-                                                op.NOT(op.rng_any(electronsPreSel, lambda ele : op.deltaR(j.p4, ele.p4) < 0.4 )), 
-                                                op.NOT(op.rng_any(muonsPreSel, lambda mu : op.deltaR(j.p4, mu.p4) < 0.4 )))
+        self.lambda_cleanAk4Jets = lambda j : op.AND(
+                                                op.NOT(op.rng_any(self.electronsPreSel, lambda ele : op.deltaR(j.p4, ele.p4) < 0.4 )), 
+                                                op.NOT(op.rng_any(self.muonsPreSel, lambda mu : op.deltaR(j.p4, mu.p4) < 0.4 )))
             # remove jets within cone of DR<0.4 of preselected electrons and muons
-        ak4Jets = op.select(ak4JetsPreSel,lambda_cleanAk4Jets)
+        self.ak4Jets = op.select(self.ak4JetsPreSel,self.lambda_cleanAk4Jets)
     
         ############     Btagging     #############
         # The pfDeepFlavour (DeepJet) algorithm is used
         if era == "2016": # Must check that subJet exists before looking at the btag
-            lambda_ak4Btag =   lambda jet    : jet.btagDeepFlavB > 0.3093
-            lambda_ak4NoBtag = lambda jet    : jet.btagDeepFlavB <= 0.3093
+            self.lambda_ak4Btag =   lambda jet    : jet.btagDeepFlavB > 0.3093
+            self.lambda_ak4NoBtag = lambda jet    : jet.btagDeepFlavB <= 0.3093
         elif era =="2017":
-            lambda_ak4Btag =   lambda jet    : jet.btagDeepFlavB > 0.3033
+            self.lambda_ak4Btag =   lambda jet    : jet.btagDeepFlavB > 0.3033
             lambda_ak4NoBtag = lambda jet    : jet.btagDeepFlavB <= 0.3033
         elif era == "2018":
-            lambda_ak4Btag =   lambda jet    : jet.btagDeepFlavB > 0.2770
-            lambda_ak4NoBtag = lambda jet    : jet.btagDeepFlavB <= 0.2770
+            self.lambda_ak4Btag =   lambda jet    : jet.btagDeepFlavB > 0.2770
+            self.lambda_ak4NoBtag = lambda jet    : jet.btagDeepFlavB <= 0.2770
 
-        ak4BJets     = op.select(ak4Jets, lambda_ak4Btag)
-        ak4LightJets = op.select(ak4Jets, lambda_ak4NoBtag)
+        self.ak4BJets     = op.select(self.ak4Jets, self.lambda_ak4Btag)
+        self.ak4LightJets = op.select(self.ak4Jets, self.lambda_ak4NoBtag)
 
         ############     ScaleFactors    #############
         self.DeepJetMediumSFApplied = None
         if self.isMC(sample):
             DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
             self.DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
-            DeepJetMediumSFApplied = [self.DeepJetMediumSF(ak4BJets[0])] # TODO : check if more than one bjet and apply to all
-
-        # Register #
-        objDict['ak4JetsPreSel'] = ak4JetsPreSel 
-        objDict['ak4Jets'] = ak4Jets 
-        objDict['ak4BJets'] = ak4BJets
-        objDict['ak4LightJets'] = ak4LightJets 
+            DeepJetMediumSFApplied = [self.DeepJetMediumSF(self.ak4BJets[0])] # TODO : check if more than one bjet and apply to all
 
         #############################################################################
         #                                AK8 Jets                                   #
         #############################################################################
-        ak8JetsByPt = op.sort(t.FatJet, lambda jet : -jet.p4.Pt())
+        self.ak8JetsByPt = op.sort(t.FatJet, lambda jet : -jet.p4.Pt())
         # Preselection #
         if era == "2016":
-            lambda_ak8JetsPreSel = lambda j : op.AND(
+            self.lambda_ak8JetsPreSel = lambda j : op.AND(
                                                         j.jetId & 1, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
                                                         j.p4.Pt() > 200.,
                                                         op.abs(j.p4.Eta())< 2.4,
@@ -482,21 +466,21 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                         j.tau2/j.tau1 < 0.75
                                                     )
         elif  era == "2017" or era == "2018":
-            lambda_ak8JetsPreSel = lambda j : op.AND(
+            self.lambda_ak8JetsPreSel = lambda j : op.AND(
                                                         j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
                                                         j.p4.Pt() > 200.,
                                                         op.abs(j.p4.Eta())< 2.4,
                                                         op.AND(j.msoftdrop > 30, j.msoftdrop < 210),
                                                         j.tau2/j.tau1 < 0.75
                                                     )
-        ak8JetsPreSel = op.select(ak8JetsByPt, lambda_ak8JetsPreSel)
+        self.ak8JetsPreSel = op.select(self.ak8JetsByPt, self.lambda_ak8JetsPreSel)
         # Cleaning #
-        lambda_cleanAk8Jets = lambda j : op.AND(
-                                                op.NOT(op.rng_any(electronsPreSel, lambda ele : op.deltaR(j.p4, ele.p4) < 0.8 )), 
-                                                op.NOT(op.rng_any(muonsPreSel, lambda mu : op.deltaR(j.p4, mu.p4) < 0.8 ))
+        self.lambda_cleanAk8Jets = lambda j : op.AND(
+                                                op.NOT(op.rng_any(self.electronsPreSel, lambda ele : op.deltaR(j.p4, ele.p4) < 0.8 )), 
+                                                op.NOT(op.rng_any(self.muonsPreSel, lambda mu : op.deltaR(j.p4, mu.p4) < 0.8 ))
                                             )
             # remove jets within cone of DR<0.8 of preselected electrons and muons
-        ak8Jets = op.select(ak8JetsPreSel,lambda_cleanAk8Jets)
+        self.ak8Jets = op.select(self.ak8JetsPreSel,self.lambda_cleanAk8Jets)
 
         ############     Btagging     #############
         # The DeepCSV b-tagging algorithm is used on subjets 
@@ -504,30 +488,26 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                         #op.AND(fatjet.subJet1._idx.result != -1,fatjet.subJet1.btagDeepB > 0.6321), 
                                                         #op.AND(fatjet.subJet2._idx.result != -1,fatjet.subJet2.btagDeepB > 0.6321)))
         if era == "2016": 
-            lambda_ak8Btag = lambda fatjet : op.AND (fatjet.subJet1.p4.Pt() > 30,
+            self.lambda_ak8Btag = lambda fatjet : op.AND (fatjet.subJet1.p4.Pt() > 30,
                                                      fatjet.subJet2.p4.Pt() > 30,
                                                      op.OR(fatjet.subJet1.btagDeepB > 0.6321, fatjet.subJet2.btagDeepB > 0.6321))
         elif era =="2017":
-            lambda_ak8Btag = lambda fatjet : op.AND (fatjet.subJet1.p4.Pt() > 30,
+            self.lambda_ak8Btag = lambda fatjet : op.AND (fatjet.subJet1.p4.Pt() > 30,
                                                      fatjet.subJet2.p4.Pt() > 30,
-                                                     op.OR(fatjetak8BJets.subJet1.btagDeepB > 0.4941, fatjet.subJet2.btagDeepB > 0.4941))
+                                                     op.OR(fatjetself.ak8BJets.subJet1.btagDeepB > 0.4941, fatjet.subJet2.btagDeepB > 0.4941))
         elif era == "2018":
-            lambda_ak8Btag = lambda fatjet : op.AND (fatjet.subJet1.p4.Pt() > 30,
+            self.lambda_ak8Btag = lambda fatjet : op.AND (fatjet.subJet1.p4.Pt() > 30,
                                                      fatjet.subJet2.p4.Pt() > 30,
                                                      op.OR(fatjet.subJet1.btagDeepB > 0.4184, fatjet.subJet2.btagDeepB > 0.4184))
 
-        ak8BJets = op.select(ak8Jets, lambda_ak8Btag)
+            self.ak8BJets = op.select(self.ak8Jets, self.lambda_ak8Btag)
 
         ############     ScaleFactors    #############
         if self.isMC(sample): # Needs new nanoAOD version 
             pass
 #            DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
 #            DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
-#            DeepCSVMediumSFApplied = [DeepCSVMediumSF(ak8BJets[0].subJet1)] # Must be applied on subjets : need to check each time which one has been btagged
-         # Register #
-        objDict['ak8JetsPreSel'] = ak8JetsPreSel 
-        objDict['ak8Jets'] = ak8Jets 
-        objDict['ak8BJets'] = ak8BJets 
+#            DeepCSVMediumSFApplied = [DeepCSVMediumSF(self.ak8BJets[0].subJet1)] # Must be applied on subjets : need to check each time which one has been btagged
 
         # Return #
-        return noSel, objDict
+        return noSel
