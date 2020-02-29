@@ -520,7 +520,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                         op.AND(fatjet.subJet1.pt >30, fatjet.subJet1.btagDeepB > 0.4184),
                                                         op.AND(fatjet.subJet2.pt >30, fatjet.subJet2.btagDeepB > 0.4184))
 
-            self.ak8BJets = op.select(self.ak8Jets, self.lambda_ak8Btag)
+        self.ak8BJets = op.select(self.ak8Jets, self.lambda_ak8Btag)
 
         ############     ScaleFactors    #############
         if self.isMC(sample): # Needs new nanoAOD version 

@@ -4,7 +4,7 @@ from bamboo import treefunctions as op
 
 # TODO : remove the self
 
-######################## Channel title #################################
+########################   Channel title   #############################
 def channelTitleLabel(channel):
     if (channel == "ElEl"):
         channel = "e^{+}e^{-}"
@@ -15,26 +15,67 @@ def channelTitleLabel(channel):
     channelLabel = {'labels': [{'text': channel, 'position': [0.23, 0.87], 'size': 36}]}
     return channelLabel 
 
-##########################  YIELD PLOT #################################
-def makeYieldPlot(self, sel, name, title, order):
-    """
-    Make Yield plot and use it alos in the latex yield table
-    sel     = refine selection
-    name    = name of the PDF to be produced
-    title   = title that will be used in the LateX yield table
-    order   = int that gives the entry order in yield table (user must ensure the order)
-    """
-    plot = Plot.make1D("Yield_"+name,   
-                       op.c_int(1),
+######################  Plot Objects Number  ###########################
+def objectsNumberPlot(channel,objName,suffix,objCont,sel,Nmax,xTitle):
+    channelLabel = channelTitleLabel(channel)
+    return Plot.make1D(channel+"_"+suffix+"_"+objName+"_N",
+                       op.rng_len(objCont),
                        sel,
-                       EquidistantBinning(1, 0., 1.),
-                       title = title + " Yield",
-                       xTitle = title + " Yield",
-                       plotopts = {"for-yields":True, "yields-title":title, 'yields-table-order':order})
-    return plot
+                       EquidistantBinning(Nmax,0.,Nmax),
+                       xTitle = xTitle,
+                       plotopts = channelLabel)
+
+#######################   Channel Plot   ###############################
+def channelPlot(sel,DilepElEl,DilepMuMu,DilepElMu,suffix,channel):
+    """
+    Plots the number of events in each channel
+    """
+    plots = []
+    plots.append(objectsNumberPlot(channel = channel,
+                                   suffix  = suffix,
+                                   objName = "DilepElEl",
+                                   objCont = DilepElEl,
+                                   sel     = sel,
+                                   Nmax    = 5,
+                                   xTitle  = "N(e^{+}e^{-})"))
+    plots.append(objectsNumberPlot(channel = channel,
+                                   suffix  = suffix,
+                                   objName = "DilepMuMu",
+                                   objCont = DilepMuMu,
+                                   sel     = sel,
+                                   Nmax    = 5,
+                                   xTitle  = "N(#mu^{+}#mu^{-})"))
+    plots.append(objectsNumberPlot(channel = channel,
+                                   suffix  = suffix,
+                                   objName = "DilepElMu",
+                                   objCont = DilepElMu,
+                                   sel     = sel,
+                                   Nmax    = 5,
+                                   xTitle  = "N(e^{#pm} #mu^{#mp}"))
+    return plots
+
+##########################  YIELD PLOT #################################
+class makeYieldPlots:
+    def __init__(self):
+        self.calls = 0
+    def addYield(self, sel, name, title):
+        """
+        Make Yield plot and use it also in the latex yield table
+        sel     = refine selection
+        name    = name of the PDF to be produced
+        title   = title that will be used in the LateX yield table
+        """
+        plot = Plot.make1D("Yield_"+name,   
+                           op.c_int(1),
+                           sel,
+                           EquidistantBinning(1, 0., 1.),
+                           title = title + " Yield",
+                           xTitle = title + " Yield")
+        self.calls += 1
+        return plot
 
 ##########################  MET PLOT #################################
-def makeMETPlots(self, sel, met, suffix, channel):
+def makeMETPlots(sel, met, suffix, channel):
     """
     Make MET basic plots
     sel         = refine selection 
@@ -67,7 +108,7 @@ def makeMETPlots(self, sel, met, suffix, channel):
     return plots
 
 ##########################  DILEPTON PLOT #################################
-def makeDileptonPlots(self, sel, dilepton, suffix, channel):
+def makeDileptonPlots(sel, dilepton, suffix, channel):
     """
     Make dilepton basic plots
     sel         = refine selection 
@@ -161,7 +202,7 @@ def makeDileptonPlots(self, sel, dilepton, suffix, channel):
     return plots
 
 ########################## DELTA PLOTS #################################
-def makeDeltaRPlots(self,sel,cont1,cont2,suffix,channel,isMC):
+def makeDeltaRPlots(sel,cont1,cont2,suffix,channel,isMC):
     plots = [] 
 
     channelLabel = channelTitleLabel(channel)
@@ -201,19 +242,18 @@ def makeDeltaRPlots(self,sel,cont1,cont2,suffix,channel,isMC):
 
     return plots
 
-########################## JETS PLOTS #################################
-def makeJetsPlots(self,sel,bjets,lightjets,alljets,suffix,channel):
+########################## BJETS PLOTS #################################
+def makeAk4BJetsPlots(sel,bjets,lightjets,alljets,suffix,channel):
     plots = []
 
     channelLabel = channelTitleLabel(channel)
 
     # Selection for bjets and mixed categories #
-    bjetsCategory = sel.refine(suffix+"bjetsCategory",cut=[op.rng_len(bjets) >= 2]) # TODO : might want to veto more than 2 bjets 
-    mixedCategory = sel.refine(suffix+"mixedCategory",cut=[op.rng_len(bjets) == 1])
+    bjetsCategory = sel.refine(channel+suffix+"bjetsCategory",cut=[op.rng_len(bjets) >= 2]) # TODO : might want to veto more than 2 bjets 
+    mixedCategory = sel.refine(channel+suffix+"mixedCategory",cut=[op.rng_len(bjets) == 1])
 
     ## Inclusive plots (len(alljets)>=2 by definition ): leading = highest Pt jet, subleading : second highest Pt jet #
-    plots.extend(makeSeparateJetsPlots(self          = self,
-                                       sel           = sel,
+    plots.extend(makeSeparateJetsPlots(sel           = sel,
                                        leadjet       = alljets[0],
                                        subleadjet    = alljets[1],
                                        suffix        = suffix,
@@ -222,8 +262,7 @@ def makeJetsPlots(self,sel,bjets,lightjets,alljets,suffix,channel):
 
     ## Bjets plots (if len(bjets)>=2) : leading = highest Pt bjet, subleading : second highest Pt bjet #
     # Must check len(bjets)>=2
-    plots.extend(makeSeparateJetsPlots(self          = self,
-                                       sel           = bjetsCategory,
+    plots.extend(makeSeparateJetsPlots(sel           = bjetsCategory,
                                        leadjet       = bjets[0],
                                        subleadjet    = bjets[1],
                                        suffix        = suffix,
@@ -232,35 +271,26 @@ def makeJetsPlots(self,sel,bjets,lightjets,alljets,suffix,channel):
 
     ## Mixed plots (if len(bjets)==1, >0 by definition) : leading = bjet, subleading = highest Pt non-bjet
     # Must check len(bjets)==1
-    plots.extend(makeSeparateJetsPlots(self          = self,
-                                       sel           = mixedCategory,
+    plots.extend(makeSeparateJetsPlots(sel           = mixedCategory,
                                        leadjet       = bjets[0],
                                        subleadjet    = lightjets[0],
                                        suffix        = suffix,
                                        channel       = channel,
                                        plot_type     = "mixed"))
 
-    # Number of Resolved jets #
-    plots.append(Plot.make1D("%s_%s_resolvedjets_N"%(channel,suffix),                                   
-                             op.rng_len(bjets),
-                             sel,
-                             EquidistantBinning(5,0.,5.),                                              
-                             title='Number of Resolved jets (%s channel)'%channel,                     
-                             xTitle='N Resolved jets',
-                             plotopts = channelLabel))
     return plots
 
 ##########################  JETS SEPARATE PLOTS #################################
-def makeSeparateJetsPlots(self, sel, leadjet, subleadjet, suffix, channel, plot_type):
+def makeSeparateJetsPlots(sel, leadjet, subleadjet, suffix, channel, plot_type):
     """
     Make basic plots
     sel         = refine selection 
-    leadjet     = Depends on scenario (plot_type) : highest-Pt jet ("inclusive"), highest-Pt bjet ("bjets"), only bjet ("mixed")
-    subleadjet  = Depends on scenario (plot_type) : second-highest-Pt jet ("inclusive"), second-highest-Pt bjet ("bjets"), highest-Pt lightjet ("mixed")
+    leadjet     = Depends on scenario (plot_type) : highest-Pt jet ("inclusive" and "NoBtag"), highest-Pt bjet ("bjets"), only bjet ("mixed")
+    subleadjet  = Depends on scenario (plot_type) : second-highest-Pt jet ("inclusive" and "NoBtag"), second-highest-Pt bjet ("bjets"), highest-Pt lightjet ("mixed")
     jets        = jet container (content depends on plot_type) 
     suffix      = string identifying the selection 
     channel     = string identifying the channel of the dilepton (can be "NoChannel")
-    plot_type   = defines the scenario : "inclusive", "bjets", "mixed"
+    plot_type   = defines the scenario : "inclusive", "bjets", "mixed", "NoBtag"
     """
  
     plots = []
@@ -268,20 +298,25 @@ def makeSeparateJetsPlots(self, sel, leadjet, subleadjet, suffix, channel, plot_
     channelLabel = channelTitleLabel(channel)
 
     if plot_type == "inclusive":
-        lead_base_name      = "%s_%sinclusive_leadjet_{var}"%(channel,suffix)
+        lead_base_name      = "%s_%sInclusive_leadjet_{var}"%(channel,suffix)
         lead_base_title     = "leading jet"
-        sublead_base_name   = "%s_%sinclusive_subleadjet_{var}"%(channel,suffix)
+        sublead_base_name   = "%s_%sInclusive_subleadjet_{var}"%(channel,suffix)
         sublead_base_title  = "subleading jet"
     elif plot_type == "bjets":
-        lead_base_name      = "%s_%sbjets_leadjet_{var}"%(channel,suffix)
+        lead_base_name      = "%s_%sBjets_leadBjet_{var}"%(channel,suffix)
         lead_base_title     = "leading bjet"
-        sublead_base_name   = "%s_%sbjets_subleadjet_{var}"%(channel,suffix)
+        sublead_base_name   = "%s_%sBjets_subleadBjet_{var}"%(channel,suffix)
         sublead_base_title  = "subleading bjet"
     elif plot_type == "mixed":
-        lead_base_name      = "%s_%smixed_bjet_{var}"%(channel,suffix)
+        lead_base_name      = "%s_%sMixed_bjet_{var}"%(channel,suffix)
         lead_base_title     = "bjet"
-        sublead_base_name   = "%s_%smixed_lightjet_{var}"%(channel,suffix)
+        sublead_base_name   = "%s_%sMixed_lightjet_{var}"%(channel,suffix)
         sublead_base_title  = "lightjet"
+    elif plot_type == "NoBtag":
+        lead_base_name      = "%s_%sNoBtag_leadjet_{var}"%(channel,suffix)
+        lead_base_title     = "leadjet"
+        sublead_base_name   = "%s_%sNoBtag_subleadjet_{var}"%(channel,suffix)
+        sublead_base_title  = "subleadjet"
     else:
         print ("[ERROR] Jet plot type no understood")
         sys.exit(1)
@@ -367,11 +402,11 @@ def makeSeparateJetsPlots(self, sel, leadjet, subleadjet, suffix, channel, plot_
     return plots
 
 ##########################  JETS (AK4) PLOT #################################
-def makeFatJetPlots(self, sel, fatjets, suffix, channel):
+def makeAk8Plots(sel, fatjet, suffix, channel):
     """
     Make fatjet subjet basic plots
     sel         = refine selection 
-    fatjets     = fatjet container (AK8 jet) 
+    fatjet      = fatjet (AK8 jet) 
     suffix      = string identifying the selecton 
     channel     = string identifying the channel of the dilepton (can be "NoChannel")
     """
@@ -382,54 +417,45 @@ def makeFatJetPlots(self, sel, fatjets, suffix, channel):
 
     # fatjet plots (always present by selection) #
     plots.append(Plot.make1D("%s_%s_fatjet_pt"%(channel,suffix),
-                             fatjets[0].p4.pt(),
+                             fatjet.p4.pt(),
                              sel,
                              EquidistantBinning(50,200,600.),
                              title='Transverse momentum of the fatjet',
                              xTitle="P_{T}(fatjet) [GeV]",
                              plotopts = channelLabel))
     plots.append(Plot.make1D("%s_%s_fatjet_eta"%(channel,suffix),
-                             fatjets[0].p4.eta(),
+                             fatjet.p4.eta(),
                              sel,
                              EquidistantBinning(10,-3.,3.),
                              title='Pseudorapidity of the fatjet',
                              xTitle="#eta(fatjet)",
                              plotopts = channelLabel))
     plots.append(Plot.make1D("%s_%s_fatjet_phi"%(channel,suffix),
-                             fatjets[0].p4.phi(),
+                             fatjet.p4.phi(),
                              sel,
                              EquidistantBinning(10,-3.2,3.2),
                              title='Azimutal angle of the fatjet',
                              xTitle="#phi(fatjet)",
                              plotopts = channelLabel))
     plots.append(Plot.make1D("%s_%s_fatjet_mass"%(channel,suffix),
-                             fatjets[0].mass,
+                             fatjet.mass,
                              sel,
                              EquidistantBinning(50,0.,200.),
                              title='Invariant mass of the fatjet',
                              xTitle="M(fatjet)",
                              plotopts = channelLabel))
     plots.append(Plot.make1D("%s_%s_fatjet_softdropmass"%(channel,suffix),
-                             fatjets[0].msoftdrop,
+                             fatjet.msoftdrop,
                              sel,
                              EquidistantBinning(50,0.,200.),
                              title='Soft Drop mass of the fatjet',
                              xTitle="M_{Soft Drop}(fatjet) [GeV]",
                              plotopts = channelLabel))
 
-    # Number of Boosted jets #
-    plots.append(Plot.make1D("%s_%s_boostedjets_N"%(channel,suffix),                                   
-                             op.rng_len(fatjets),
-                             sel,
-                             EquidistantBinning(5,0.,5.),                                              
-                             title='Number of Boosted jets (%s channel)'%channel,                     
-                             xTitle='N Boosted jets',   
-                             plotopts = channelLabel))
-
     return plots
 
 #########################  High-level quantities ################################
-def makeHighLevelQuantities(self,sel,dilepton,met,jets,resolvedjets,lightjets,boostedjets,suffix,channel):
+def makeHighLevelQuantities(sel,dilepton,met,jets,resolvedjets,lightjets,boostedjets,suffix,channel):
     plots = []
 
     # Categories spltting #
@@ -449,8 +475,7 @@ def makeHighLevelQuantities(self,sel,dilepton,met,jets,resolvedjets,lightjets,bo
 
     # Pass to function #
     # Boosted #
-    plots.extend(makeSeparateHighLevelQuantities(self       = self,
-                                                 sel        = isBoosted,
+    plots.extend(makeSeparateHighLevelQuantities(sel        = isBoosted,
                                                  met        = met,
                                                  l1         = dilepton[0],
                                                  l2         = dilepton[1],
@@ -459,8 +484,7 @@ def makeHighLevelQuantities(self,sel,dilepton,met,jets,resolvedjets,lightjets,bo
                                                  suffix     = suffix,
                                                  channel    = channel))
     # Resolved inclusive #
-    plots.extend(makeSeparateHighLevelQuantities(self       = self,
-                                                 sel        = isResolved,
+    plots.extend(makeSeparateHighLevelQuantities(sel        = isResolved,
                                                  met        = met,
                                                  l1         = dilepton[0],
                                                  l2         = dilepton[1],
@@ -469,8 +493,7 @@ def makeHighLevelQuantities(self,sel,dilepton,met,jets,resolvedjets,lightjets,bo
                                                  suffix     = suffix+"inclusive",
                                                  channel    = channel))
     # Resolved bjets #
-    plots.extend(makeSeparateHighLevelQuantities(self       = self,
-                                                 sel        = isResolved_bjets,
+    plots.extend(makeSeparateHighLevelQuantities(sel        = isResolved_bjets,
                                                  met        = met,
                                                  l1         = dilepton[0],
                                                  l2         = dilepton[1],
@@ -479,8 +502,7 @@ def makeHighLevelQuantities(self,sel,dilepton,met,jets,resolvedjets,lightjets,bo
                                                  suffix     = suffix+"bjets",
                                                  channel    = channel))
     # Resolved bjets #
-    plots.extend(makeSeparateHighLevelQuantities(self       = self,
-                                                 sel        = isResolved_mixed,
+    plots.extend(makeSeparateHighLevelQuantities(sel        = isResolved_mixed,
                                                  met        = met,
                                                  l1         = dilepton[0],
                                                  l2         = dilepton[1],
@@ -491,7 +513,7 @@ def makeHighLevelQuantities(self,sel,dilepton,met,jets,resolvedjets,lightjets,bo
 
     return plots
 
-def makeSeparateHighLevelQuantities(self,sel,met,l1,l2,j1,j2,suffix,channel):
+def makeSeparateHighLevelQuantities(sel,met,l1,l2,j1,j2,suffix,channel):
     plots = []
 
     channelLabel = channelTitleLabel(channel)
@@ -560,7 +582,7 @@ def makeSeparateHighLevelQuantities(self,sel,met,l1,l2,j1,j2,suffix,channel):
     return plots 
 
 ##########################  FATJETS SUBJETS (AK8) PLOT #################################
-def makeFatJetSubJetPlots(self, sel, fatjet, suffix, channel): # Mostly debugging 
+def makeFatJetSubJetPlots(sel, fatjet, suffix, channel): # Mostly debugging 
     """
     Make fatjet subjet basic plots
     sel         = refine selection 
