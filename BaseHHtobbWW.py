@@ -322,6 +322,13 @@ class BaseNanoHHtobbWW(NanoAODModule):
         #############################################################################
         #                                 Muons                                     #
         #############################################################################
+        if era == "2016": 
+            self.lambda_lepton_associatedJetNoBtag = lambda lep : lep.jet.btagDeepFlavB < 0.3093
+        elif era =="2017":
+            self.lambda_lepton_associatedJetNoBtag = lambda lep : lep.jet.btagDeepFlavB < 0.3033
+        elif era == "2018":
+            self.lambda_lepton_associatedJetNoBtag = lambda lep : lep.jet.btagDeepFlavB < 0.2770
+
         # Preselection #
         muonsByPt = op.sort(t.Muon, lambda mu : -mu.p4.Pt())
         self.lambda_muonPreSel = lambda mu : op.AND(
@@ -335,8 +342,20 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                               )
         self.muonsPreSel = op.select(muonsByPt, self.lambda_muonPreSel)
         # Fakeable selection #
+        self.lambda_muon_conept = lambda mu : op.switch(mu.mvaTTH >= 0.85, mu.pt, op.static_cast("float",0.9*mu.jet.pt))
+        self.lambda_muon_x = lambda mu : op.min(op.max(0.,(0.9*mu.pt*(1+mu.jetRelIso))-20.)/(45.-20.), 1.)
+                    # x = min(max(0, jet_pt-PT_min)/(PT_max-PT_min), 1) where jet_pt = 0.9*PT_muon*(1+MuonJetRelIso), PT_min=25, PT_max=40
+        if era == "2016": 
+            self.lambda_muon_btagInterpolation = lambda mu : self.lambda_muon_x(mu)*0.0614 + (1-self.lambda_muon_x(mu))*0.3093
+        elif era =="2017":
+            self.lambda_muon_btagInterpolation = lambda mu : self.lambda_muon_x(mu)*0.0521 + (1-self.lambda_muon_x(mu))*0.3033
+        elif era == "2018":
+            self.lambda_muon_btagInterpolation = lambda mu : self.lambda_muon_x(mu)*0.0494 + (1-self.lambda_muon_x(mu))*0.2770
+            # return x*WP_loose+(1-x)*WP_medium
         self.lambda_muonFakeSel = lambda mu : op.AND(
-                                                    op.OR(mu.mvaTTH < 0.85, mu.jetRelIso<0.5), # Lepton MVA id from ttH
+                                                    self.lambda_muon_conept(mu) >= 10, 
+                                                    self.lambda_lepton_associatedJetNoBtag(mu),
+                                                    op.OR(mu.mvaTTH >= 0.85, op.AND(mu.jetRelIso<0.5 , self.lambda_muon_btagInterpolation(mu))), # Lepton MVA id from ttH -> needs to read slide
                                                         # If mvaTTH < 0.85 : jetRelIso <0.5 (and deepJet medium ?)
                                                 )
         self.muonsFakeSel = op.select(self.muonsPreSel, self.lambda_muonFakeSel)
@@ -364,8 +383,6 @@ class BaseNanoHHtobbWW(NanoAODModule):
         #############################################################################
         #                              Electrons                                    #
         #############################################################################
-        #lambda_OoEminusOoP = lambda p : (1/p.p4.E())-(1/op.sqrt(op.sum(op.pow(p.p4.Px(),2),op.pow(p.p4.Py(),2),op.pow(p.p4.Pz(),2))))
-            # 1/E-1/P = 1/E - 1/sqrt(Px²+Py²+Pz²)
         # Preselection #
         electronsByPt = op.sort(t.Electron, lambda ele : -ele.p4.Pt())
         self.lambda_electronPreSel = lambda ele : op.AND(
@@ -383,13 +400,16 @@ class BaseNanoHHtobbWW(NanoAODModule):
             # No overlap between electron and muon in cone of DR<=0.3
         self.electronsPreSel = op.select(self.electronsPreSelInclu, self.lambda_cleanElectron)
         # Fakeable selection #
+        self.lambda_electron_conept = lambda ele : op.switch(ele.mvaTTH >= 0.80, ele.pt, op.static_cast("Float_t",0.9*ele.jet.pt))
         self.lambda_electronFakeSel = lambda ele : op.AND(
+                                                        self.lambda_electron_conept(ele)>10,
                                                         op.OR(
-                                                                op.AND(op.abs(ele.eta)<1.479, ele.sieie<=0.011), # Eta of ele or SR ?
+                                                                op.AND(op.abs(ele.eta)<1.479, ele.sieie<=0.011), 
                                                                 op.AND(op.AND(op.abs(ele.eta)>=1.479,op.abs(ele.eta)<=2.5), ele.sieie<=0.030)),
+                                                        self.lambda_lepton_associatedJetNoBtag(ele),
                                                         ele.hoe <= 0.10,
                                                         ele.eInvMinusPInv >= -0.04,
-                                                        op.OR(ele.mvaTTH <= 0.80, op.AND(ele.jetRelIso<0.5, ele.mvaFall17V2noIso_WP80)), # Lepton MVA id from ttH
+                                                        op.OR(ele.mvaTTH >= 0.80, op.AND(ele.jetRelIso<0.7, ele.mvaFall17V2noIso_WP80)), # Lepton MVA id from ttH
                                                             # If mvaTTH < 0.80 : jetRelIso <0.5 (and deepJet medium ?) and Fall17V2noIso_WP80
                                                         ele.lostHits == 0,    # number of missing inner hits
                                                         ele.convVeto        # Passes conversion veto
@@ -432,7 +452,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
     
         ############     Btagging     #############
         # The pfDeepFlavour (DeepJet) algorithm is used
-        if era == "2016": # Must check that subJet exists before looking at the btag
+        if era == "2016": 
             self.lambda_ak4Btag =   lambda jet    : jet.btagDeepFlavB > 0.3093
             self.lambda_ak4NoBtag = lambda jet    : jet.btagDeepFlavB <= 0.3093
         elif era =="2017":
@@ -488,17 +508,17 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                         #op.AND(fatjet.subJet1._idx.result != -1,fatjet.subJet1.btagDeepB > 0.6321), 
                                                         #op.AND(fatjet.subJet2._idx.result != -1,fatjet.subJet2.btagDeepB > 0.6321)))
         if era == "2016": 
-            self.lambda_ak8Btag = lambda fatjet : op.AND (fatjet.subJet1.p4.Pt() > 30,
-                                                     fatjet.subJet2.p4.Pt() > 30,
-                                                     op.OR(fatjet.subJet1.btagDeepB > 0.6321, fatjet.subJet2.btagDeepB > 0.6321))
+            self.lambda_ak8Btag = lambda fatjet : op.OR(
+                                                        op.AND(fatjet.subJet1.pt >30, fatjet.subJet1.btagDeepB > 0.6321),
+                                                        op.AND(fatjet.subJet2.pt >30, fatjet.subJet2.btagDeepB > 0.6321))
         elif era =="2017":
-            self.lambda_ak8Btag = lambda fatjet : op.AND (fatjet.subJet1.p4.Pt() > 30,
-                                                     fatjet.subJet2.p4.Pt() > 30,
-                                                     op.OR(fatjetself.ak8BJets.subJet1.btagDeepB > 0.4941, fatjet.subJet2.btagDeepB > 0.4941))
+            self.lambda_ak8Btag = lambda fatjet : op.OR(
+                                                        op.AND(fatjet.subJet1.pt >30, fatjet.subJet1.btagDeepB > 0.4941),
+                                                        op.AND(fatjet.subJet2.pt >30, fatjet.subJet2.btagDeepB > 0.4941))
         elif era == "2018":
-            self.lambda_ak8Btag = lambda fatjet : op.AND (fatjet.subJet1.p4.Pt() > 30,
-                                                     fatjet.subJet2.p4.Pt() > 30,
-                                                     op.OR(fatjet.subJet1.btagDeepB > 0.4184, fatjet.subJet2.btagDeepB > 0.4184))
+            self.lambda_ak8Btag = lambda fatjet : op.OR(
+                                                        op.AND(fatjet.subJet1.pt >30, fatjet.subJet1.btagDeepB > 0.4184),
+                                                        op.AND(fatjet.subJet2.pt >30, fatjet.subJet2.btagDeepB > 0.4184))
 
             self.ak8BJets = op.select(self.ak8Jets, self.lambda_ak8Btag)
 
