@@ -66,13 +66,31 @@ class makeYieldPlots:
         title   = title that will be used in the LateX yield table
         """
         plot = Plot.make1D("Yield_"+name,   
-                           op.c_int(1),
+                           op.c_int(0),
                            sel,
                            EquidistantBinning(1, 0., 1.),
                            title = title + " Yield",
-                           xTitle = title + " Yield")
+                           xTitle = title + " Yield",
+                           plotopts = {"for-yields":True, "yields-title":title, 'yields-table-order':self.calls})
         self.calls += 1
         return plot
+
+def makeYieldPlot(sel, name, title, order):
+    """
+    Make Yield plot and use it also in the latex yield table
+    sel     = refine selection
+    name    = name of the PDF to be produced
+    title   = title that will be used in the LateX yield table
+    order   = int that gives the entry order in yield table (user must ensure the order)
+    """
+    plot = Plot.make1D("Yield_"+name,   
+                       op.c_int(0),
+                       sel,
+                       EquidistantBinning(1, 0., 1.),
+                       title = title + " Yield",
+                       xTitle = title + " Yield",
+                       plotopts = {"for-yields":True, "yields-title":title, 'yields-table-order':order})
+    return plot
 
 ##########################  MET PLOT #################################
 def makeMETPlots(sel, met, suffix, channel):

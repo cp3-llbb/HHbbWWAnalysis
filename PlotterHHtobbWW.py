@@ -47,6 +47,21 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
         ElMuHasFakeableDilepton = noSel.refine("ElMuHasFakeableDilepton",
                                         cut = [op.rng_len(OsElMuFakeable)>0])
 
+#        plots.append(Plot.make1D("test1",
+#                                 op.rng_len(self.electronsFakeSel),
+#                                 ElElHasFakeableDilepton,
+#                                 EquidistantBinning(1, 0., 1.),
+#                                 xTitle = 'test'))
+#        plots.append(Plot.make1D("test2",
+#                                 self.muonsFakeSel[0].pt,
+#                                 noSel.refine('test',cut=[op.rng_len(self.muonsFakeSel)>0]),
+#                                 EquidistantBinning(1, 0., 1.),
+#                                 xTitle = 'test'))
+#        plots.append(Plot.make1D("test3",
+#                                 op.rng_len(OsMuMuFakeable),
+#                                 noSel,
+#                                 EquidistantBinning(1, 0., 1.),
+#                                 xTitle = 'test'))
         # Yield #
         plots.append(yieldPlots.addYield(ElElHasFakeableDilepton,"ElElHasFakeableDilepton","OS fakeable leptons (channel $e^+e^-$)"))
         plots.append(yieldPlots.addYield(MuMuHasFakeableDilepton,"MuMuHasFakeableDilepton","OS fakeable leptons (channel $\mu^+\mu^-$)"))
@@ -103,7 +118,7 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
                                  channel    = "ElMu"))
 
 #    If both fakeable leptons are electrons, the event needs to pass either the single electron or the double electron trigger; if both fakeable leptons are muons, the event needs to pass either the single muon or the double muon trigger; if one fakeable lepton is an electron and the other fakeable lepton is a muon, the event needs to pass either the single electron or the single muon or the muon+electron trigger
-
+#
 #        # Scalefactors #
 #        if self.isMC(sample):
 #            doubleEleTrigSF = SF.get_scalefactor("dilepton", ("doubleEleLeg_HHMoriond17_2016"), systName="eleltrig")     
