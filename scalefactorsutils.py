@@ -40,13 +40,15 @@ class MakeScaleFactorsDict():
 
 
 
-    def addEfficiency(self,key_entry,base_str,format_dict):
+    def addEfficiency(self,key_entry,base_str,format_dict,sublevel=None):
         """
         key_entry   : new efficiency entry of the dict 
         base_str    : string to be formatted with {keyword} (not empty, can be several)
         format_dict : dict whose keys correspond to the ones in base_str and values are list of str to be formatted
+        sublevel    : dict where keys are in format_dict and values are run numbers
         Note : if key already present, the content will be appended to the tuple
         Note : if one doesn't want all combinations, the keys and related values can be expressed as tuples in format_dict
+        Will generate one entry in the dict as a *tuple*
         """
         N_format = base_str.count('{')
         if len(format_dict.keys())>1: # More than one formatting
@@ -58,7 +60,13 @@ class MakeScaleFactorsDict():
                 # Flatten the nested comb if need be #
                 t = self.flattenTuple(c)
                 d = dict((k,v) for k,v in zip(keys,t))
-                aList.append(self.makeFullEfficiencyPath(base_str.format(**d)))
+                if sublevel is not None: 
+                    for key in d.keys(): # Find the associated key 
+                        if key in sublevel.keys(): 
+                            tup = sublevel[key][d[key]] # Recover tuple corresponding to entry
+                            aList.append(tuple((tup,self.makeFullEfficiencyPath(base_str.format(**d)))))
+                else:
+                    aList.append(self.makeFullEfficiencyPath(base_str.format(**d)))
             aTup = tuple(aList)
         else:
             l = []
@@ -87,8 +95,11 @@ class MakeScaleFactorsDict():
         base_key    : string to be formatted with {keyword} (not empty, can be several) and used as nested dict key
         base_str    : string to be formatted with {keyword} (not empty, can be several) and used as nested dict value
         format_dict : dict whose keys correspond to the ones in base_str and base_key and values are list of str to be formatted
+        sublevel    : dict where keys are in format_dict and values are run numbers
+        lowercase_keys : lower case the keys in the entry dict
         Note : if key already present, the content will be appended to the tuple
         Note : if one doesn't want all combinations, the keys and related values can be expressed as tuples in format_dict
+        Will generate one entry in the dict as a *dict* whose keys are working points
         """
         N_format_key = base_key.count('{') 
         N_format_str = base_str.count('{')
@@ -187,4 +198,5 @@ class MakeScaleFactorsDict():
             self.full_dict[key_entry].update(aDict)
         else:
             self.full_dict[key_entry] = aDict
+
 
