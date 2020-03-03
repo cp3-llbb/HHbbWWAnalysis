@@ -18,6 +18,9 @@ class SkimmerNanoHHtobbWW(BaseNanoHHtobbWW,SkimmerModule):
     def defineSkimSelection(self, t, noSel, sample=None, sampleCfg=None): 
         noSel = self.prepareObjects(t, noSel, sample, sampleCfg)
 
+        era = sampleCfg['era'] 
+        isMC = self.isMC(sample)
+
         # Initialize varsToKeep dict #
         varsToKeep = dict()  
 
@@ -123,12 +126,9 @@ class SkimmerNanoHHtobbWW(BaseNanoHHtobbWW,SkimmerModule):
         # HME #
 
         # Event Weight #
-        varsToKeep["MC_weight"] = t.genWeight
-        varsToKeep["PU_weight"] = self.PUWeight
-
-#         varsToKeep["nSelMuons"] = op.static_cast("UInt_t", op.rng_len(muons)) ## TBranch doesn't accept size_t         
-#         varsToKeep["selMu_miniPFRelIsoNeu"] = op.map(muons, lambda mu : mu.miniPFRelIso_all - mu.miniPFRelIso_chg)
-
+        if isMC:
+            varsToKeep["MC_weight"] = t.genWeight
+            varsToKeep["PU_weight"] = self.PUWeight
 
         return noSel, varsToKeep
 

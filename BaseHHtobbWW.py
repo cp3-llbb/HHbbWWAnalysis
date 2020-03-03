@@ -42,7 +42,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
         isNotWorker = (self.args.distributed != "worker") 
 
         # Rochester and JEC corrections (depends on era) #     
-
+        cachJEC_dir = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/cacheJEC'
         ############################################################################################
         # ERA 2016 #
         ############################################################################################
@@ -98,7 +98,6 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                       tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL]} 
 
             # Jet treatment #
-            cachJEC_dir = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/cacheJEC'
             if self.isMC(sample):   # if MC -> needs smearing
                 configureJets(variProxy             = tree._Jet, 
                               jetType               = "AK4PFchs",
@@ -225,70 +224,70 @@ class BaseNanoHHtobbWW(NanoAODModule):
         ###########################################################################
         #                           TTbar reweighting                             #
         ###########################################################################
-        if self.isMC(sample) and sample.startswith("TT"):
-            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting#Use_case_3_ttbar_MC_is_used_to_m
-            # Get tops #
-            genTop_all = op.select(t.GenPart,lambda g : g.pdgId==6)
-            genTop = op.select(genTop_all,lambda g : g.statusFlags & ( 0x1 << 13))
-            genAntitop_all = op.select(t.GenPart,lambda g : g.pdgId==-6)
-            genAntitop = op.select(genAntitop_all,lambda g : g.statusFlags & ( 0x1 << 13))
-                # statusFlags==13 : isLastCopy
-                # Pdgid == 6 : top
-            hasttbar = noSel.refine("hasttbar",cut=[op.rng_len(genTop)>=1,op.rng_len(genAntitop)>=1])
-
-            # Check plots #
-            #plots.append(Plot.make1D("N_tops",
-            #                        op.rng_len(genTop),
-            #                        noSel,
-            #                        EquidistantBinning(5,0.,5.),
-            #                        title='N tops',
-            #                        xTitle='N tops'))
-            #plots.append(Plot.make1D("N_antitops",
-            #                        op.rng_len(genAntitop),
-            #                        noSel,
-            #                        EquidistantBinning(5,0.,5.),
-            #                        title='N antitops',
-            #                        xTitle='N antitops'))
-            ## Top pt #
-            #plots.append(Plot.make1D("top_pt",
-            #                        genTop[0].pt,
-            #                        hasttbar,
-            #                        EquidistantBinning(50,0,500),
-            #                        xTitle='P_{T} top'))
-            ## Antitop Pt #
-            #plots.append(Plot.make1D("antitop_pt",
-            #                        genAntitop[0].pt,
-            #                        hasttbar,
-            #                        EquidistantBinning(50,0,500),
-            #                        xTitle='P_{T} lead antitop'))
-            ## Top - Antitop plots #
-            #plots.append(Plot.make2D("top_pt_vs_antitop_pt",
-            #                        [genTop[0].pt,genAntitop[0].pt],
-            #                        hasttbar,
-            #                        [EquidistantBinning(50,0,500),EquidistantBinning(50,0,500)],
-            #                        xTitle='P_{T} lead top',
-            #                        yTitle='P_{T} lead antitop'))
- 
-
-            # Compute weight if there is a ttbar #
-            ttbar_SF = lambda t : op.exp(0.0615-0.0005*t.pt)
-            ttbar_weight = lambda t,tbar : op.sqrt(ttbar_SF(t)*ttbar_SF(tbar))
-            #plots.append(Plot.make1D("ttbar_weight",
-            #                        ttbar_weight(genTop[0],genAntitop[0]),
-            #                        hasttbar,
-            #                        EquidistantBinning(100,0.,2.),
-            #                        title='ttbar weight',
-            #                        xTitle='ttbar weight'))
-            #plots.append(Plot.make3D("ttbar_weight_vs_pt",
-            #                        [genTop[0].pt,genAntitop[0].pt,ttbar_weight(genTop[0],genAntitop[0])],
-            #                        hasttbar,
-            #                        [EquidistantBinning(50,0,500),EquidistantBinning(50,0,500),EquidistantBinning(100,0.,2.)],
-            #                        title='ttbar weight',
-            #                        xTitle='top P_{T}',
-            #                        yTitle='antitop P_{T}',
-            #                        zTitle='ttbar weight'))
-            # Apply correction to TT #
-            noSel = noSel.refine("ttbarWeight",weight=ttbar_weight(genTop[0],genAntitop[0]))
+#        if self.isMC(sample) and sample.startswith("TT"):
+#            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting#Use_case_3_ttbar_MC_is_used_to_m
+#            # Get tops #
+#            genTop_all = op.select(t.GenPart,lambda g : g.pdgId==6)
+#            genTop = op.select(genTop_all,lambda g : g.statusFlags & ( 0x1 << 13))
+#            genAntitop_all = op.select(t.GenPart,lambda g : g.pdgId==-6)
+#            genAntitop = op.select(genAntitop_all,lambda g : g.statusFlags & ( 0x1 << 13))
+#                # statusFlags==13 : isLastCopy
+#                # Pdgid == 6 : top
+#            hasttbar = noSel.refine("hasttbar",cut=[op.rng_len(genTop)>=1,op.rng_len(genAntitop)>=1])
+#
+#            # Check plots #
+#            #plots.append(Plot.make1D("N_tops",
+#            #                        op.rng_len(genTop),
+#            #                        noSel,
+#            #                        EquidistantBinning(5,0.,5.),
+#            #                        title='N tops',
+#            #                        xTitle='N tops'))
+#            #plots.append(Plot.make1D("N_antitops",
+#            #                        op.rng_len(genAntitop),
+#            #                        noSel,
+#            #                        EquidistantBinning(5,0.,5.),
+#            #                        title='N antitops',
+#            #                        xTitle='N antitops'))
+#            ## Top pt #
+#            #plots.append(Plot.make1D("top_pt",
+#            #                        genTop[0].pt,
+#            #                        hasttbar,
+#            #                        EquidistantBinning(50,0,500),
+#            #                        xTitle='P_{T} top'))
+#            ## Antitop Pt #
+#            #plots.append(Plot.make1D("antitop_pt",
+#            #                        genAntitop[0].pt,
+#            #                        hasttbar,
+#            #                        EquidistantBinning(50,0,500),
+#            #                        xTitle='P_{T} lead antitop'))
+#            ## Top - Antitop plots #
+#            #plots.append(Plot.make2D("top_pt_vs_antitop_pt",
+#            #                        [genTop[0].pt,genAntitop[0].pt],
+#            #                        hasttbar,
+#            #                        [EquidistantBinning(50,0,500),EquidistantBinning(50,0,500)],
+#            #                        xTitle='P_{T} lead top',
+#            #                        yTitle='P_{T} lead antitop'))
+# 
+#
+#            # Compute weight if there is a ttbar #
+#            ttbar_SF = lambda t : op.exp(0.0615-0.0005*t.pt)
+#            ttbar_weight = lambda t,tbar : op.sqrt(ttbar_SF(t)*ttbar_SF(tbar))
+#            #plots.append(Plot.make1D("ttbar_weight",
+#            #                        ttbar_weight(genTop[0],genAntitop[0]),
+#            #                        hasttbar,
+#            #                        EquidistantBinning(100,0.,2.),
+#            #                        title='ttbar weight',
+#            #                        xTitle='ttbar weight'))
+#            #plots.append(Plot.make3D("ttbar_weight_vs_pt",
+#            #                        [genTop[0].pt,genAntitop[0].pt,ttbar_weight(genTop[0],genAntitop[0])],
+#            #                        hasttbar,
+#            #                        [EquidistantBinning(50,0,500),EquidistantBinning(50,0,500),EquidistantBinning(100,0.,2.)],
+#            #                        title='ttbar weight',
+#            #                        xTitle='top P_{T}',
+#            #                        yTitle='antitop P_{T}',
+#            #                        zTitle='ttbar weight'))
+#            # Apply correction to TT #
+#            noSel = noSel.refine("ttbarWeight",weight=ttbar_weight(genTop[0],genAntitop[0]))
 
         #############################################################################
         #                             Pile-up                                       #
@@ -322,12 +321,17 @@ class BaseNanoHHtobbWW(NanoAODModule):
         #############################################################################
         #                                 Muons                                     #
         #############################################################################
+        # lepton lambdas #
+        self.lambda_hasAssociatedJet = lambda lep : op.AND(lep.jet.idx != -1 , op.deltaR(lep.p4,lep.jet.p4) <= 0.4)
         if era == "2016": 
-            self.lambda_lepton_associatedJetNoBtag = lambda lep : lep.jet.btagDeepFlavB < 0.3093
+            self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
+                                                                        lep.jet.btagDeepFlavB < 0.3093)
         elif era =="2017":
-            self.lambda_lepton_associatedJetNoBtag = lambda lep : lep.jet.btagDeepFlavB < 0.3033
+            self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
+                                                                        lep.jet.btagDeepFlavB < 0.3033)
         elif era == "2018":
-            self.lambda_lepton_associatedJetNoBtag = lambda lep : lep.jet.btagDeepFlavB < 0.2770
+            self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
+                                                                        lep.jet.btagDeepFlavB < 0.2770)
 
         # Preselection #
         muonsByPt = op.sort(t.Muon, lambda mu : -mu.p4.Pt())
@@ -342,7 +346,10 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                               )
         self.muonsPreSel = op.select(muonsByPt, self.lambda_muonPreSel)
         # Fakeable selection #
-        self.lambda_muon_conept = lambda mu : op.switch(mu.mvaTTH >= 0.85, mu.pt, op.static_cast("float",0.9*mu.jet.pt))
+        #self.lambda_muon_conept = lambda mu : op.switch(mu.mvaTTH >= 0.85, mu.pt, op.static_cast("float",0.9*mu.jet.pt))
+        self.lambda_muon_conept = lambda mu : op.multiSwitch((mu.mvaTTH >= 0.85, mu.pt>=10),
+                                                             (self.lambda_hasAssociatedJet(mu), 0.9*mu.jet.pt>=10),
+                                                             op.c_bool(False))
         self.lambda_muon_x = lambda mu : op.min(op.max(0.,(0.9*mu.pt*(1+mu.jetRelIso))-20.)/(45.-20.), 1.)
                     # x = min(max(0, jet_pt-PT_min)/(PT_max-PT_min), 1) where jet_pt = 0.9*PT_muon*(1+MuonJetRelIso), PT_min=25, PT_max=40
         if era == "2016": 
@@ -352,11 +359,14 @@ class BaseNanoHHtobbWW(NanoAODModule):
         elif era == "2018":
             self.lambda_muon_btagInterpolation = lambda mu : self.lambda_muon_x(mu)*0.0494 + (1-self.lambda_muon_x(mu))*0.2770
             # return x*WP_loose+(1-x)*WP_medium
+        self.lambda_muon_deepJetInterpIfMvaFailed = lambda mu : op.AND(self.lambda_hasAssociatedJet(mu),
+                                                                      mu.jet.btagDeepFlavB < self.lambda_muon_btagInterpolation(mu))
         self.lambda_muonFakeSel = lambda mu : op.AND(
-                                                    self.lambda_muon_conept(mu) >= 10, 
+                                                    self.lambda_muon_conept(mu),
                                                     self.lambda_lepton_associatedJetNoBtag(mu),
-                                                    op.OR(mu.mvaTTH >= 0.85, op.AND(mu.jetRelIso<0.5 , self.lambda_muon_btagInterpolation(mu))), # Lepton MVA id from ttH -> needs to read slide
-                                                        # If mvaTTH < 0.85 : jetRelIso <0.5 (and deepJet medium ?)
+                                                    op.OR(mu.mvaTTH >= 0.85, op.AND(mu.jetRelIso<0.5 , self.lambda_muon_deepJetInterpIfMvaFailed(mu))), 
+                                                        # If mvaTTH < 0.85 : jetRelIso <0.5 and < deepJet medium with interpolation
+                                                        # https://indico.cern.ch/event/812025/contributions/3475878/attachments/1867083/3070589/gp-fr-run2b.pdf (slide 7)
                                                 )
         self.muonsFakeSel = op.select(self.muonsPreSel, self.lambda_muonFakeSel)
         # Tight selection #
@@ -400,9 +410,12 @@ class BaseNanoHHtobbWW(NanoAODModule):
             # No overlap between electron and muon in cone of DR<=0.3
         self.electronsPreSel = op.select(self.electronsPreSelInclu, self.lambda_cleanElectron)
         # Fakeable selection #
-        self.lambda_electron_conept = lambda ele : op.switch(ele.mvaTTH >= 0.80, ele.pt, op.static_cast("Float_t",0.9*ele.jet.pt))
+        #self.lambda_electron_conept = lambda ele : op.switch(ele.mvaTTH >= 0.80, ele.pt, op.static_cast("Float_t",0.9*ele.jet.pt))
+        self.lambda_electron_conept = lambda ele : op.multiSwitch((ele.mvaTTH >= 0.80, ele.pt>=10),
+                                                                   (self.lambda_hasAssociatedJet(ele), 0.9*ele.jet.pt>=10),
+                                                                   op.c_bool(False))
         self.lambda_electronFakeSel = lambda ele : op.AND(
-                                                        self.lambda_electron_conept(ele)>10,
+                                                        self.lambda_electron_conept(ele),
                                                         op.OR(
                                                                 op.AND(op.abs(ele.eta)<1.479, ele.sieie<=0.011), 
                                                                 op.AND(op.AND(op.abs(ele.eta)>=1.479,op.abs(ele.eta)<=2.5), ele.sieie<=0.030)),
@@ -508,16 +521,13 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                         #op.AND(fatjet.subJet1._idx.result != -1,fatjet.subJet1.btagDeepB > 0.6321), 
                                                         #op.AND(fatjet.subJet2._idx.result != -1,fatjet.subJet2.btagDeepB > 0.6321)))
         if era == "2016": 
-            self.lambda_ak8Btag = lambda fatjet : op.OR(
-                                                        op.AND(fatjet.subJet1.pt >30, fatjet.subJet1.btagDeepB > 0.6321),
+            self.lambda_ak8Btag = lambda fatjet : op.OR(op.AND(fatjet.subJet1.pt >30, fatjet.subJet1.btagDeepB > 0.6321),
                                                         op.AND(fatjet.subJet2.pt >30, fatjet.subJet2.btagDeepB > 0.6321))
         elif era =="2017":
-            self.lambda_ak8Btag = lambda fatjet : op.OR(
-                                                        op.AND(fatjet.subJet1.pt >30, fatjet.subJet1.btagDeepB > 0.4941),
+            self.lambda_ak8Btag = lambda fatjet : op.OR(op.AND(fatjet.subJet1.pt >30, fatjet.subJet1.btagDeepB > 0.4941),
                                                         op.AND(fatjet.subJet2.pt >30, fatjet.subJet2.btagDeepB > 0.4941))
         elif era == "2018":
-            self.lambda_ak8Btag = lambda fatjet : op.OR(
-                                                        op.AND(fatjet.subJet1.pt >30, fatjet.subJet1.btagDeepB > 0.4184),
+            self.lambda_ak8Btag = lambda fatjet : op.OR(op.AND(fatjet.subJet1.pt >30, fatjet.subJet1.btagDeepB > 0.4184),
                                                         op.AND(fatjet.subJet2.pt >30, fatjet.subJet2.btagDeepB > 0.4184))
 
         self.ak8BJets = op.select(self.ak8Jets, self.lambda_ak8Btag)
