@@ -202,6 +202,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
             #noSel = noSel.refine("genWeight", weight=op.abs(tree.genWeight), cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
             #noSel = noSel.refine("negWeight", cut=[tree.genWeight<0])
         else:
+            #pass # ONLY FOR SYNCHRO
             noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset))
 
         return tree,noSel,be,lumiArgs
@@ -221,70 +222,21 @@ class BaseNanoHHtobbWW(NanoAODModule):
         ###########################################################################
         #                           TTbar reweighting                             #
         ###########################################################################
-#        if self.isMC(sample) and sample.startswith("TT"):
-#            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting#Use_case_3_ttbar_MC_is_used_to_m
-#            # Get tops #
-#            genTop_all = op.select(t.GenPart,lambda g : g.pdgId==6)
-#            genTop = op.select(genTop_all,lambda g : g.statusFlags & ( 0x1 << 13))
-#            genAntitop_all = op.select(t.GenPart,lambda g : g.pdgId==-6)
-#            genAntitop = op.select(genAntitop_all,lambda g : g.statusFlags & ( 0x1 << 13))
-#                # statusFlags==13 : isLastCopy
-#                # Pdgid == 6 : top
-#            hasttbar = noSel.refine("hasttbar",cut=[op.rng_len(genTop)>=1,op.rng_len(genAntitop)>=1])
-#
-#            # Check plots #
-#            #plots.append(Plot.make1D("N_tops",
-#            #                        op.rng_len(genTop),
-#            #                        noSel,
-#            #                        EquidistantBinning(5,0.,5.),
-#            #                        title='N tops',
-#            #                        xTitle='N tops'))
-#            #plots.append(Plot.make1D("N_antitops",
-#            #                        op.rng_len(genAntitop),
-#            #                        noSel,
-#            #                        EquidistantBinning(5,0.,5.),
-#            #                        title='N antitops',
-#            #                        xTitle='N antitops'))
-#            ## Top pt #
-#            #plots.append(Plot.make1D("top_pt",
-#            #                        genTop[0].pt,
-#            #                        hasttbar,
-#            #                        EquidistantBinning(50,0,500),
-#            #                        xTitle='P_{T} top'))
-#            ## Antitop Pt #
-#            #plots.append(Plot.make1D("antitop_pt",
-#            #                        genAntitop[0].pt,
-#            #                        hasttbar,
-#            #                        EquidistantBinning(50,0,500),
-#            #                        xTitle='P_{T} lead antitop'))
-#            ## Top - Antitop plots #
-#            #plots.append(Plot.make2D("top_pt_vs_antitop_pt",
-#            #                        [genTop[0].pt,genAntitop[0].pt],
-#            #                        hasttbar,
-#            #                        [EquidistantBinning(50,0,500),EquidistantBinning(50,0,500)],
-#            #                        xTitle='P_{T} lead top',
-#            #                        yTitle='P_{T} lead antitop'))
-# 
-#
-#            # Compute weight if there is a ttbar #
-#            ttbar_SF = lambda t : op.exp(0.0615-0.0005*t.pt)
-#            ttbar_weight = lambda t,tbar : op.sqrt(ttbar_SF(t)*ttbar_SF(tbar))
-#            #plots.append(Plot.make1D("ttbar_weight",
-#            #                        ttbar_weight(genTop[0],genAntitop[0]),
-#            #                        hasttbar,
-#            #                        EquidistantBinning(100,0.,2.),
-#            #                        title='ttbar weight',
-#            #                        xTitle='ttbar weight'))
-#            #plots.append(Plot.make3D("ttbar_weight_vs_pt",
-#            #                        [genTop[0].pt,genAntitop[0].pt,ttbar_weight(genTop[0],genAntitop[0])],
-#            #                        hasttbar,
-#            #                        [EquidistantBinning(50,0,500),EquidistantBinning(50,0,500),EquidistantBinning(100,0.,2.)],
-#            #                        title='ttbar weight',
-#            #                        xTitle='top P_{T}',
-#            #                        yTitle='antitop P_{T}',
-#            #                        zTitle='ttbar weight'))
-#            # Apply correction to TT #
-#            noSel = noSel.refine("ttbarWeight",weight=ttbar_weight(genTop[0],genAntitop[0]))
+        if self.isMC(sample) and sample.startswith("TT"):
+            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting#Use_case_3_ttbar_MC_is_used_to_m
+            # Get tops #
+            genTop_all = op.select(t.GenPart,lambda g : g.pdgId==6)
+            genTop = op.select(genTop_all,lambda g : g.statusFlags & ( 0x1 << 13))
+            genAntitop_all = op.select(t.GenPart,lambda g : g.pdgId==-6)
+            genAntitop = op.select(genAntitop_all,lambda g : g.statusFlags & ( 0x1 << 13))
+                # statusFlags==13 : isLastCopy
+                # Pdgid == 6 : top
+            #hasttbar = noSel.refine("hasttbar",cut=[op.rng_len(genTop)>=1,op.rng_len(genAntitop)>=1])
+            # Lambda to compute weight if there is a ttbar #
+            ttbar_SF = lambda t : op.exp(0.0615-0.0005*t.pt)
+            ttbar_weight = lambda t,tbar : op.sqrt(ttbar_SF(t)*ttbar_SF(tbar))
+           # Apply correction to TT #
+            noSel = noSel.refine("ttbarWeight",weight=ttbar_weight(genTop[0],genAntitop[0]))
 
         #############################################################################
         #                             Pile-up                                       #

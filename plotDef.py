@@ -151,7 +151,7 @@ def makeMETPlots(sel, met, suffix, channel):
     return plots
 
 ##########################  DILEPTON PLOT #################################
-def makeDileptonPlots(sel, dilepton, suffix, channel):
+def makeDileptonPlots(sel, dilepton, suffix, channel, isMC=False):
     """
     Make dilepton basic plots
     sel         = refine selection 
@@ -241,6 +241,23 @@ def makeDileptonPlots(sel, dilepton, suffix, channel):
                              title="Dilepton invariant mass (channel %s)"%channel, 
                              xTitle= "Invariant mass (dilepton) [GeV]",
                              plotopts = channelLabel))
+
+    # GenPartFlav (if isMC) #
+    if isMC:
+        plots.append(Plot.make1D("%s_%s_firstlepton_genPartFlav"%(channel,suffix), 
+                                 dilepton[0].genPartFlav,
+                                 sel, 
+                                 EquidistantBinning(22, 0., 22.), 
+                                 title="Flavour of genParticle (channel %s)"%channel, 
+                                 xTitle= "GenParticle flavour (first lepton)",
+                                 plotopts = channelLabel))
+        plots.append(Plot.make1D("%s_%s_secondlepton_genPartFlav"%(channel,suffix), 
+                                 dilepton[1].genPartFlav,
+                                 sel, 
+                                 EquidistantBinning(22, 0., 22.), 
+                                 title="Flavour of genParticle (channel %s)"%channel, 
+                                 xTitle= "GenParticle flavour (second lepton)",
+                                 plotopts = channelLabel))
 
     return plots
 
