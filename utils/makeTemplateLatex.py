@@ -21,13 +21,18 @@ class TemplateLatex:
                         ])
             
         self.selections = collections.OrderedDict([
-                        ('ExclusiveResolvedJets_' , "Resolved Jets"),
-                        ('ExclusiveResolvedJetsinclusive_' , "Resolved Jets (inclusive)"),
-                        ('ExclusiveResolvedJetsbjets_' , "Resolved Jets (2 bjets)"),
-                        ('ExclusiveResolvedJetsmixed_' , "Resolved Jets (bjet + lightjet)"),
-                        ('BoostedJets_' , "Boosted Jets"),
+                        ('ExclusiveResolvedNoBtag_' , "Exclusive Resolved Jets (no Btag)"),
+                        ('ExclusiveResolvedOneBtag_' , "Exclusive Resolved Jets (1 Btag)"),
+                        ('ExclusiveResolvedTwoBtags_' , "Exclusive Resolved Jets (2 Btags)"),
+                        ('InclusiveBoostedJets_' , "Inclusive Boosted Jets"),
                         ])
         self.variables = collections.OrderedDict([
+                        # Triggers #
+                        ("_trigger_singleMuon" , "Single Muon Trigger"),
+                        ("_trigger_singleElectron" , "Single Electron Trigger"),
+                        ("_trigger_doubleMuon" , "Double Muon Trigger"),
+                        ("_trigger_doubleElectron" , "Double Electron Trigger"),
+                        ("_trigger_MuonElectron" , "Muon-Electron Trigger"),
                         # MET #
                         ("_met_pt" , "MET $P_T$"),
                         ("_met_phi" , "MET $\phi$"),
@@ -50,24 +55,26 @@ class TemplateLatex:
                         ("_subleadjet_pt" , "Subleading jet $P_T$"),
                         ("_subleadjet_eta" , "Subleading jet $\eta$"),
                         ("_subleadjet_phi" , "Subleading jet $\phi$"),
-                        ("_bjet_pt" , "Bjet $P_T$"),
-                        ("_bjet_eta" , "Bjet $\eta$"),
-                        ("_bjet_phi" , "Bjet $\phi$"),
-                        ("_lightjet_pt" , "Lightjet $P_T$"),
-                        ("_lightjet_eta" , "Lightjet $\eta$"),
-                        ("_lightjet_phi" , "Lightjet $\phi$"),
-                        ("_resolvedjets_N" , "Number of resolved bjets"),
+                        ("_leadbjet_pt" , "Leading jet $P_T$"),
+                        ("_leadbjet_eta" , "Leading jet $\eta$"),
+                        ("_leadbjet_phi" , "Leading jet $\phi$"),
+                        ("_subleadbjet_pt" , "Subleading jet $P_T$"),
+                        ("_subleadbjet_eta" , "Subleading jet $\eta$"),
+                        ("_Ak4Jets_N" , "Number of Ak4 jets"),
                         # Resolved Dijet #
                         ("_dijet_pt" , "Dijet $P_T$"),
                         ("_dijet_deltaPhi" , "Dijet $\Delta \phi$"),
                         ("_dijet_deltaR" , "Dijet $\Delta R$"),
                         ("_dijet_invariantMass" , "Dijet invariant mass"),
+                        ("_Ak4BJets_N" , "Number of Ak4 bjets"),
                         # Fatjet #
                         ("_fatjet_pt" , "Fatjet $P_T$"),
                         ("_fatjet_eta" , "Fatjet $\eta$"),
                         ("_fatjet_phi" , "Fatjet $\phi$"),
                         ("_fatjet_mass" , "Fatjet mass"),
                         ("_fatjet_softdropmass" , "Fatjet SoftDrop mass"),
+                        ("_Ak8Jets_N" , "Number of Ak8 jets"),
+                        ("_Ak8BJets_N" , "Number of Ak8 bjets"),
                         ("_boostedjets_N" , "Number of boosted bjets (fatjets)"),
                         # Highlevel variables 
                         ("_highlevelvariable_DilepMETdeltaPhi", "Dilepton-MET $\Delta \phi$"),

@@ -116,7 +116,19 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
         plots.append(yieldPlots.addYield(ElElHasFakeableDileptonPreMllCutOutZTightVeto,"ElElHasFakeableDileptonPreMllCutOutZTightVeto","OS fakeable leptons + $M_{ll}$ cut + Two tights veto (channel $e^+e^-$)"))
         plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonPreMllCutOutZTightVeto,"MuMuHasFakeableDileptonPreMllCutOutZTightVeto","OS fakeable leptons + $M_{ll}$ cut + Two tights veto (channel $\mu^+\mu^-$)"))
         plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonPreMllCutTightVeto,"ElMuHasFakeableDileptonPreMllCutTightVeto","OS fakeable leptons + $M_{ll}$ cut + Two tights veto (channel $e^{\pm}\mu^{\mp}$)"))
-
+        # Trigger Plots #
+        plots.extend(triggerPlots(sel         = ElElHasFakeableDileptonPreMllCutOutZTightVeto,
+                                  triggerDict = self.triggersPerPrimaryDataset,
+                                  suffix      = "ElElHasFakeableDileptonPreMllCutOutZTightVeto",
+                                  channel     = "ElEl"))
+        plots.extend(triggerPlots(sel         = MuMuHasFakeableDileptonPreMllCutOutZTightVeto,
+                                  triggerDict = self.triggersPerPrimaryDataset,
+                                  suffix      = "MuMuHasFakeableDileptonPreMllCutOutZTightVeto",
+                                  channel     = "MuMu"))
+        plots.extend(triggerPlots(sel         = ElMuHasFakeableDileptonPreMllCutTightVeto,
+                                  triggerDict = self.triggersPerPrimaryDataset,
+                                  suffix      = "ElMuHasFakeableDileptonPreMllCutTightVeto",
+                                  channel     = "ElMu"))
 
         # Dilepton channel plots #
         plots.extend(channelPlot(sel        = ElElHasFakeableDileptonPreMllCutOutZTightVeto,
@@ -138,19 +150,6 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
                                  suffix     = "HasFakeableDileptonPreMllCutTightVeto",
                                  channel    = "ElMu"))
 
-        # Trigger Plots #
-        plots.extend(triggerPlots(sel         = ElElHasFakeableDileptonPreMllCutOutZTightVeto,
-                                  triggerDict = self.triggersPerPrimaryDataset,
-                                  suffix      = "ElElHasFakeableDileptonPreMllCutOutZTightVeto",
-                                  channel     = "ElEl"))
-        plots.extend(triggerPlots(sel         = MuMuHasFakeableDileptonPreMllCutOutZTightVeto,
-                                  triggerDict = self.triggersPerPrimaryDataset,
-                                  suffix      = "MuMuHasFakeableDileptonPreMllCutOutZTightVeto",
-                                  channel     = "MuMu"))
-        plots.extend(triggerPlots(sel         = ElMuHasFakeableDileptonPreMllCutTightVeto,
-                                  triggerDict = self.triggersPerPrimaryDataset,
-                                  suffix      = "ElMuHasFakeableDileptonPreMllCutTightVeto",
-                                  channel     = "ElMu"))
 
 #    If both fakeable leptons are electrons, the event needs to pass either the single electron or the double electron trigger; if both fakeable leptons are muons, the event needs to pass either the single muon or the double muon trigger; if one fakeable lepton is an electron and the other fakeable lepton is a muon, the event needs to pass either the single electron or the single muon or the muon+electron trigger
         #############################################################################
@@ -187,7 +186,7 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
                                                     
         for channelDict in HasFakeableDileptonTwoAk4JetsChannelList:
             # Dilepton #
-            plots.extend(makeDileptonPlots(**channelDict))
+            plots.extend(makeDileptonPlots(**channelDict,isMC=isMC))
             # Ak4 Jets #
             plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**HasFakeableDileptonTwoAk4JetsBaseDictJetsN))
             plots.extend(makeAk4JetsPlots(**{k:channelDict[k] for k in commonItems},**HasFakeableDileptonTwoAk4JetsBaseDictJetsPlots))
@@ -313,7 +312,7 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
 
         for channelDict in HasFakeableDileptonResolvedJetsChannelListLeptons:
             # Dilepton #
-            plots.extend(makeDileptonPlots(**channelDict))
+            plots.extend(makeDileptonPlots(**channelDict,isMC=isMC))
             # Number of jets #
             plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**HasFakeableDileptonResolvedJetsBaseDictJetsN))
             # MET #
@@ -371,7 +370,7 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
                                                     
         for channelDict in HasFakeableDileptonOneAk8JetJetsChannelList:
             # Dilepton #
-            plots.extend(makeDileptonPlots(**channelDict))
+            plots.extend(makeDileptonPlots(**channelDict,isMC=isMC))
             # Ak8 Jets #
             plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**HasFakeableDileptonOneAk8JetsBaseDictFatjetsN))
             plots.extend(makeAk8Plots(fatjet=self.ak8Jets[0],**{k:channelDict[k] for k in commonItems}))
@@ -431,7 +430,7 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
 
         for channelDict in HasFakeableDileptonBoostedJetsChannelList:
             # Dilepton #
-            plots.extend(makeDileptonPlots(**channelDict))
+            plots.extend(makeDileptonPlots(**channelDict,isMC=isMC))
             # Ak8 Jets #
             plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**HasFakeableDileptonBoostedJetsBaseDictJetsN))
             plots.extend(makeAk8Plots(fatjet=self.ak8BJets[0],**{k:channelDict[k] for k in commonItems}))
@@ -443,111 +442,111 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
         #############################################################################
         #                     High-level combinations                               #
         #############################################################################
-#        HasOsPreMllCutHighLevelVariablesChannelList = [
-#            # Resolved No Btag #
-#            {'channel'      : 'ElEl',
-#             'met'          : self.corrMET,
-#             'l1'           : OsElElFakeable[0][0],
-#             'l2'           : OsElElFakeable[0][1],
-#             'j1'           : self.ak4Jets[0],
-#             'j2'           : self.ak4Jets[1],
-#             'sel'          : ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag ,
-#             'suffix'       : 'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag'},
-#            {'channel'      : 'MuMu',
-#             'met'          : self.corrMET,
-#             'l1'           : OsMuMuFakeable[0][0],
-#             'l2'           : OsMuMuFakeable[0][1],
-#             'j1'           : self.ak4Jets[0],
-#             'j2'           : self.ak4Jets[1],
-#             'sel'          : MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag,
-#             'suffix'       : 'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag'},
-#            {'channel'      : 'ElMu',
-#             'met'          : self.corrMET,
-#             'l1'           : OsElMuFakeable[0][0],
-#             'l2'           : OsElMuFakeable[0][1],
-#             'j1'           : self.ak4Jets[0],
-#             'j2'           : self.ak4Jets[1],
-#             'sel'          : ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag,
-#             'suffix'       : 'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag'},
-#            # Resolved One Btag #
-#            {'channel'      : 'ElEl',
-#             'met'          : self.corrMET,
-#             'l1'           : OsElElFakeable[0][0],
-#             'l2'           : OsElElFakeable[0][1],
-#             'j1'           : self.ak4BJets[0],
-#             'j2'           : self.ak4Jets[0],
-#             'sel'          : ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag,
-#             'suffix'       : 'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag'},
-#            {'channel'      : 'MuMu',
-#             'met'          : self.corrMET,
-#             'l1'           : OsMuMuFakeable[0][0],
-#             'l2'           : OsMuMuFakeable[0][1],
-#             'j1'           : self.ak4BJets[0],
-#             'j2'           : self.ak4Jets[0],
-#             'sel'          : MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag, 
-#             'suffix'       : 'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag'},
-#            {'channel'      : 'ElMu',
-#             'met'          : self.corrMET,
-#             'l1'           : OsElMuFakeable[0][0],
-#             'l2'           : OsElMuFakeable[0][1],
-#             'j1'           : self.ak4BJets[0],
-#             'j2'           : self.ak4Jets[0],
-#             'sel'          : ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag, 
-#             'suffix'       : 'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag'},
-#            # Resolved Two Btags  #
-#            {'channel'      : 'ElEl',
-#             'met'          : self.corrMET,
-#             'l1'           : OsElElFakeable[0][0],
-#             'l2'           : OsElElFakeable[0][1],
-#             'j1'           : self.ak4BJets[0],
-#             'j2'           : self.ak4BJets[1],
-#             'sel'          : ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags, 
-#             'suffix'       : 'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags'},
-#            {'channel'      : 'MuMu',
-#             'met'          : self.corrMET,
-#             'l1'           : OsMuMuFakeable[0][0],
-#             'l2'           : OsMuMuFakeable[0][1],
-#             'j1'           : self.ak4BJets[0],
-#             'j2'           : self.ak4BJets[1],
-#             'sel'          : MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags, 
-#             'suffix'       : 'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags'},
-#            {'channel'      : 'ElMu',
-#             'met'          : self.corrMET,
-#             'l1'           : OsElMuFakeable[0][0],
-#             'l2'           : OsElMuFakeable[0][1],
-#             'j1'           : self.ak4BJets[0],
-#             'j2'           : self.ak4BJets[1],
-#             'sel'          : ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags,
-#             'suffix'       : 'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags'},
-#            # Boosted #
-#            {'channel'      : 'ElEl',
-#             'met'          : self.corrMET,
-#             'l1'           : OsElElFakeable[0][0],
-#             'l2'           : OsElElFakeable[0][1],
-#             'j1'           : self.ak8BJets[0].subJet1,
-#             'j2'           : self.ak8BJets[0].subJet2,
-#             'sel'          : ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted, 
-#             'suffix'       : 'ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted'},
-#            {'channel'      : 'MuMu',
-#             'met'          : self.corrMET,
-#             'l1'           : OsMuMuFakeable[0][0],
-#             'l2'           : OsMuMuFakeable[0][1],
-#             'j1'           : self.ak8BJets[0].subJet1,
-#             'j2'           : self.ak8BJets[0].subJet2,
-#             'sel'          : MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted, 
-#             'suffix'       : 'MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted'},
-#            {'channel'      : 'ElMu',
-#             'met'          : self.corrMET,
-#             'l1'           : OsElMuFakeable[0][0],
-#             'l2'           : OsElMuFakeable[0][1],
-#             'j1'           : self.ak8BJets[0].subJet1,
-#             'j2'           : self.ak8BJets[0].subJet2,
-#             'sel'          : ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveBoosted, 
-#             'suffix'       : 'ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveBoosted'},
-#                                      ]
-#
-#        for channelDict in HasOsPreMllCutHighLevelVariablesChannelList:
-#            plots.extend(makeHighLevelQuantities(**channelDict))
+        HasOsPreMllCutHighLevelVariablesChannelList = [
+            # Resolved No Btag #
+            {'channel'      : 'ElEl',
+             'met'          : self.corrMET,
+             'l1'           : OsElElFakeable[0][0],
+             'l2'           : OsElElFakeable[0][1],
+             'j1'           : self.ak4Jets[0],
+             'j2'           : self.ak4Jets[1],
+             'sel'          : ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag ,
+             'suffix'       : 'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag'},
+            {'channel'      : 'MuMu',
+             'met'          : self.corrMET,
+             'l1'           : OsMuMuFakeable[0][0],
+             'l2'           : OsMuMuFakeable[0][1],
+             'j1'           : self.ak4Jets[0],
+             'j2'           : self.ak4Jets[1],
+             'sel'          : MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag,
+             'suffix'       : 'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag'},
+            {'channel'      : 'ElMu',
+             'met'          : self.corrMET,
+             'l1'           : OsElMuFakeable[0][0],
+             'l2'           : OsElMuFakeable[0][1],
+             'j1'           : self.ak4Jets[0],
+             'j2'           : self.ak4Jets[1],
+             'sel'          : ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag,
+             'suffix'       : 'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag'},
+            # Resolved One Btag #
+            {'channel'      : 'ElEl',
+             'met'          : self.corrMET,
+             'l1'           : OsElElFakeable[0][0],
+             'l2'           : OsElElFakeable[0][1],
+             'j1'           : self.ak4BJets[0],
+             'j2'           : self.ak4Jets[0],
+             'sel'          : ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag,
+             'suffix'       : 'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag'},
+            {'channel'      : 'MuMu',
+             'met'          : self.corrMET,
+             'l1'           : OsMuMuFakeable[0][0],
+             'l2'           : OsMuMuFakeable[0][1],
+             'j1'           : self.ak4BJets[0],
+             'j2'           : self.ak4Jets[0],
+             'sel'          : MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag, 
+             'suffix'       : 'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag'},
+            {'channel'      : 'ElMu',
+             'met'          : self.corrMET,
+             'l1'           : OsElMuFakeable[0][0],
+             'l2'           : OsElMuFakeable[0][1],
+             'j1'           : self.ak4BJets[0],
+             'j2'           : self.ak4Jets[0],
+             'sel'          : ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag, 
+             'suffix'       : 'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag'},
+            # Resolved Two Btags  #
+            {'channel'      : 'ElEl',
+             'met'          : self.corrMET,
+             'l1'           : OsElElFakeable[0][0],
+             'l2'           : OsElElFakeable[0][1],
+             'j1'           : self.ak4BJets[0],
+             'j2'           : self.ak4BJets[1],
+             'sel'          : ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags, 
+             'suffix'       : 'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags'},
+            {'channel'      : 'MuMu',
+             'met'          : self.corrMET,
+             'l1'           : OsMuMuFakeable[0][0],
+             'l2'           : OsMuMuFakeable[0][1],
+             'j1'           : self.ak4BJets[0],
+             'j2'           : self.ak4BJets[1],
+             'sel'          : MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags, 
+             'suffix'       : 'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags'},
+            {'channel'      : 'ElMu',
+             'met'          : self.corrMET,
+             'l1'           : OsElMuFakeable[0][0],
+             'l2'           : OsElMuFakeable[0][1],
+             'j1'           : self.ak4BJets[0],
+             'j2'           : self.ak4BJets[1],
+             'sel'          : ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags,
+             'suffix'       : 'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags'},
+            # Boosted #
+            {'channel'      : 'ElEl',
+             'met'          : self.corrMET,
+             'l1'           : OsElElFakeable[0][0],
+             'l2'           : OsElElFakeable[0][1],
+             'j1'           : self.ak8BJets[0].subJet1,
+             'j2'           : self.ak8BJets[0].subJet2,
+             'sel'          : ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted, 
+             'suffix'       : 'ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted'},
+            {'channel'      : 'MuMu',
+             'met'          : self.corrMET,
+             'l1'           : OsMuMuFakeable[0][0],
+             'l2'           : OsMuMuFakeable[0][1],
+             'j1'           : self.ak8BJets[0].subJet1,
+             'j2'           : self.ak8BJets[0].subJet2,
+             'sel'          : MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted, 
+             'suffix'       : 'MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted'},
+            {'channel'      : 'ElMu',
+             'met'          : self.corrMET,
+             'l1'           : OsElMuFakeable[0][0],
+             'l2'           : OsElMuFakeable[0][1],
+             'j1'           : self.ak8BJets[0].subJet1,
+             'j2'           : self.ak8BJets[0].subJet2,
+             'sel'          : ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveBoosted, 
+             'suffix'       : 'ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveBoosted'},
+                                      ]
+
+        for channelDict in HasOsPreMllCutHighLevelVariablesChannelList:
+            plots.extend(makeHighLevelQuantities(**channelDict))
 
         return plots
 
