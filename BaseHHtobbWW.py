@@ -7,7 +7,6 @@ from bamboo.analysismodules import NanoAODModule, NanoAODHistoModule, NanoAODSki
 from bamboo.analysisutils import makeMultiPrimaryDatasetTriggerSelection
 from bamboo.scalefactors import binningVariables_nano
 
-from scalefactorsbbWW import ScaleFactorsbbWW
 from METScripts import METFilter, METcorrection
 
 #===============================================================================================#
@@ -35,7 +34,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
         isMC = self.isMC(sample)
         metName = "METFixEE2017" if era == "2017" else "MET"
         tree,noSel,be,lumiArgs = super(BaseNanoHHtobbWW,self).prepareTree(tree, sample=sample, sampleCfg=sampleCfg, calcToAdd=["nJet", metName, "nMuon"])
-        triggersPerPrimaryDataset = {}
+        self.triggersPerPrimaryDataset = {}
         from bamboo.analysisutils import configureJets ,configureRochesterCorrection
 
         ## Check distributed option #
@@ -61,7 +60,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
             if self.isMC(sample) or "2016F" in sample or "2016G" in sample:# or "2016H" in sample:
                 # Found in 2016F : both
                 # Found in 2016G : both
-                triggersPerPrimaryDataset = {
+                self.triggersPerPrimaryDataset = {
                     "SingleMuon" :  [ tree.HLT.IsoMu24],
                     "SingleElectron":  [ tree.HLT.Ele27_WPTight_Gsf],
                     "DoubleMuon" :  [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
@@ -73,7 +72,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                       tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL]}
             elif "2016H" in sample:
                 # Found in 2016H : has DZ but not without
-                triggersPerPrimaryDataset = {
+                self.triggersPerPrimaryDataset = {
                     "SingleMuon" :  [ tree.HLT.IsoMu24],
                     "SingleElectron":  [ tree.HLT.Ele27_WPTight_Gsf],
                     "DoubleMuon" :  [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
@@ -88,7 +87,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                 # Found in 2016D : only without DZ
                 # Found in 2016E : only without DZ
 
-                triggersPerPrimaryDataset = {
+                self.triggersPerPrimaryDataset = {
                     "SingleMuon" :  [ tree.HLT.IsoMu24],
                     "SingleElectron":  [ tree.HLT.Ele27_WPTight_Gsf],
                     "DoubleMuon" :  [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
@@ -131,7 +130,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
         ############################################################################################
         #elif era == "2017":
         #    configureRochesterCorrection(tree._Muon.calc,os.path.join(os.path.dirname(__file__), "data", "RoccoR2017.txt"))
-        #    triggersPerPrimaryDataset = {
+        #    self.triggersPerPrimaryDataset = {
         #        "DoubleMuon" : [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
         #                         tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ,
         #                         tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8,
@@ -164,7 +163,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
         ############################################################################################
         #elif era == "2018":
         #    configureRochesterCorrection(tree._Muon.calc,os.path.join(os.path.dirname(__file__), "data", "RoccoR2018.txt"))
-        #    triggersPerPrimaryDataset = {
+        #    self.triggersPerPrimaryDataset = {
         #        "DoubleMuon" : [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
         #                         tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ,
         #                         tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8,
@@ -196,13 +195,14 @@ class BaseNanoHHtobbWW(NanoAODModule):
         else:
             raise RuntimeError("Unknown era {0}".format(era))
 
-        # Get weights #
+        # Triggers and Gen Weight #
         if self.isMC(sample):
-            noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(triggersPerPrimaryDataset.values())))
-            #noSel = noSel.refine("genWeight", weight=op.abs(tree.genWeight), cut=op.OR(*chain.from_iterable(triggersPerPrimaryDataset.values())))
+            #pass # ONLY FOR SYNCHRO
+            noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
+            #noSel = noSel.refine("genWeight", weight=op.abs(tree.genWeight), cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
             #noSel = noSel.refine("negWeight", cut=[tree.genWeight<0])
         else:
-            noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, triggersPerPrimaryDataset))
+            noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset))
 
         return tree,noSel,be,lumiArgs
 
@@ -217,9 +217,6 @@ class BaseNanoHHtobbWW(NanoAODModule):
         # Forcedefne #
         forceDefine(t._Muon.calcProd, noSel)
         forceDefine(t._Jet.calcProd, noSel) # calculate once per event (for every event)
-
-        # Initialize scalefactors class #
-        SF = ScaleFactorsbbWW()
 
         ###########################################################################
         #                           TTbar reweighting                             #
@@ -294,13 +291,13 @@ class BaseNanoHHtobbWW(NanoAODModule):
         #############################################################################
         puWeightsFile = None
         if era == "2016":
-            sfTag="94X"
+            self.sfTag="94X"
             puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "puweights2016.json")
         elif era == "2017":
-            sfTag="94X"     
+            self.sfTag="94X"     
             puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "puweights2017.json")
         elif era == "2018":
-            sfTag="102X"
+            self.sfTag="102X"
             puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "puweights2018.json")
         if self.isMC(sample) and puWeightsFile is not None:
             from bamboo.analysisutils import makePileupWeight
@@ -347,9 +344,9 @@ class BaseNanoHHtobbWW(NanoAODModule):
         self.muonsPreSel = op.select(muonsByPt, self.lambda_muonPreSel)
         # Fakeable selection #
         #self.lambda_muon_conept = lambda mu : op.switch(mu.mvaTTH >= 0.85, mu.pt, op.static_cast("float",0.9*mu.jet.pt))
-        self.lambda_muon_conept = lambda mu : op.multiSwitch((mu.mvaTTH >= 0.85, mu.pt>=10),
-                                                             (self.lambda_hasAssociatedJet(mu), 0.9*mu.jet.pt>=10),
-                                                             op.c_bool(False))
+        self.lambda_muon_conept = lambda mu : op.multiSwitch((mu.mvaTTH >= 0.85, op.static_cast("Float_t",mu.pt)),
+                                                             (self.lambda_hasAssociatedJet(mu), op.static_cast("Float_t",0.9*mu.jet.pt)),
+                                                             op.c_float(0.)) # No associated jet and fails MVA , returns 0 GeV (will be excluded)
         self.lambda_muon_x = lambda mu : op.min(op.max(0.,(0.9*mu.pt*(1+mu.jetRelIso))-20.)/(45.-20.), 1.)
                     # x = min(max(0, jet_pt-PT_min)/(PT_max-PT_min), 1) where jet_pt = 0.9*PT_muon*(1+MuonJetRelIso), PT_min=25, PT_max=40
         if era == "2016": 
@@ -362,7 +359,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
         self.lambda_muon_deepJetInterpIfMvaFailed = lambda mu : op.AND(self.lambda_hasAssociatedJet(mu),
                                                                       mu.jet.btagDeepFlavB < self.lambda_muon_btagInterpolation(mu))
         self.lambda_muonFakeSel = lambda mu : op.AND(
-                                                    self.lambda_muon_conept(mu),
+                                                    self.lambda_muon_conept(mu) >= op.c_float(10.),
                                                     self.lambda_lepton_associatedJetNoBtag(mu),
                                                     op.OR(mu.mvaTTH >= 0.85, op.AND(mu.jetRelIso<0.5 , self.lambda_muon_deepJetInterpIfMvaFailed(mu))), 
                                                         # If mvaTTH < 0.85 : jetRelIso <0.5 and < deepJet medium with interpolation
@@ -375,20 +372,6 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                     mu.mediumId
                                                 )
         self.muonsTightSel = op.select(self.muonsFakeSel, self.lambda_muonTightSel)
-
-        # Scalefactors #
-        if self.isMC(sample):
-            muTightIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_tight"), combine="weight", systName="muid")
-            muTightISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), combine="weight", systName="muiso")
-#            if era=="2016":
-#                muTightIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_tight"), combine="weight", systName="muid")
-#                muTightISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), combine="weight", systName="muiso")
-#                TrkIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "idtrk_highpt"), combine="weight")         # Need to ask what it is
-#                TrkISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "isotrk_loose_idtrk_highptidandipcut"), combine="weight") # Need to ask what it is
-#
-#            else:
-#                muTightIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "id_tight"), systName="muid")
-#                muTightISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, sfTag), "iso_tight_id_medium"), systName="muiso") 
 
         #############################################################################
         #                              Electrons                                    #
@@ -411,11 +394,11 @@ class BaseNanoHHtobbWW(NanoAODModule):
         self.electronsPreSel = op.select(self.electronsPreSelInclu, self.lambda_cleanElectron)
         # Fakeable selection #
         #self.lambda_electron_conept = lambda ele : op.switch(ele.mvaTTH >= 0.80, ele.pt, op.static_cast("Float_t",0.9*ele.jet.pt))
-        self.lambda_electron_conept = lambda ele : op.multiSwitch((ele.mvaTTH >= 0.80, ele.pt>=10),
-                                                                   (self.lambda_hasAssociatedJet(ele), 0.9*ele.jet.pt>=10),
-                                                                   op.c_bool(False))
+        self.lambda_electron_conept = lambda ele : op.multiSwitch((ele.mvaTTH >= 0.80, op.static_cast("Float_t",ele.pt)),
+                                                                  (self.lambda_hasAssociatedJet(ele), op.static_cast("Float_t",0.9*ele.jet.pt)),
+                                                                  op.c_float(0.)) # No associated jet and fails MVA , returns 0 GeV (will be excluded)
         self.lambda_electronFakeSel = lambda ele : op.AND(
-                                                        self.lambda_electron_conept(ele),
+                                                        self.lambda_electron_conept(ele) >= 10,
                                                         op.OR(
                                                                 op.AND(op.abs(ele.eta)<1.479, ele.sieie<=0.011), 
                                                                 op.AND(op.AND(op.abs(ele.eta)>=1.479,op.abs(ele.eta)<=2.5), ele.sieie<=0.030)),
@@ -433,10 +416,6 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                     ele.mvaTTH >= 0.80
                                                 )
         self.electronsTightSel = op.select(self.electronsFakeSel, self.lambda_electronTightSel)
-
-        # Scalefactors #
-        if self.isMC(sample):
-            elTightIDSF = SF.get_scalefactor("lepton", ("electron_{0}_{1}".format(era,sfTag), "id_tight"), systName="elid")
 
         #############################################################################
         #                                AK4 Jets                                   #
@@ -477,13 +456,6 @@ class BaseNanoHHtobbWW(NanoAODModule):
 
         self.ak4BJets     = op.select(self.ak4Jets, self.lambda_ak4Btag)
         self.ak4LightJets = op.select(self.ak4Jets, self.lambda_ak4NoBtag)
-
-        ############     ScaleFactors    #############
-        self.DeepJetMediumSFApplied = None
-        if self.isMC(sample):
-            DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
-            self.DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
-            DeepJetMediumSFApplied = [self.DeepJetMediumSF(self.ak4BJets[0])] # TODO : check if more than one bjet and apply to all
 
         #############################################################################
         #                                AK8 Jets                                   #
@@ -531,13 +503,6 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                         op.AND(fatjet.subJet2.pt >30, fatjet.subJet2.btagDeepB > 0.4184))
 
         self.ak8BJets = op.select(self.ak8Jets, self.lambda_ak8Btag)
-
-        ############     ScaleFactors    #############
-        if self.isMC(sample): # Needs new nanoAOD version 
-            pass
-#            DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
-#            DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
-#            DeepCSVMediumSFApplied = [DeepCSVMediumSF(self.ak8BJets[0].subJet1)] # Must be applied on subjets : need to check each time which one has been btagged
 
         # Return #
         return noSel

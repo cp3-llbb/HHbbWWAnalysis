@@ -75,23 +75,48 @@ class makeYieldPlots:
         self.calls += 1
         return plot
 
-def makeYieldPlot(sel, name, title, order):
-    """
-    Make Yield plot and use it also in the latex yield table
-    sel     = refine selection
-    name    = name of the PDF to be produced
-    title   = title that will be used in the LateX yield table
-    order   = int that gives the entry order in yield table (user must ensure the order)
-    """
-    plot = Plot.make1D("Yield_"+name,   
-                       op.c_int(0),
-                       sel,
-                       EquidistantBinning(1, 0., 1.),
-                       title = title + " Yield",
-                       xTitle = title + " Yield",
-                       plotopts = {"for-yields":True, "yields-title":title, 'yields-table-order':order})
-    return plot
+######################   TRIGGER PLOTS  ##############################
+def triggerPlots(sel,triggerDict,suffix,channel):
+    plots = []
+    channelLabel = channelTitleLabel(channel)
+    
+    # Single Electron #
+    plots.append(Plot.make1D("%s_%s_trigger_singleElectron"%(channel,suffix), 
+                             op.OR(*triggerDict["DoubleMuon"]),
+                             sel, 
+                             EquidistantBinning(2, 0., 2.), 
+                             xTitle= "SingleElectron trigger",
+                             plotopts = channelLabel))
+    # Single Muon #
+    plots.append(Plot.make1D("%s_%s_trigger_singleMuon"%(channel,suffix), 
+                             op.OR(*triggerDict['SingleMuon']), 
+                             sel, 
+                             EquidistantBinning(2, 0., 2.), 
+                             xTitle= "SingleMuon trigger",
+                             plotopts = channelLabel))
+    # Double Electron #
+    plots.append(Plot.make1D("%s_%s_trigger_doubleElectron"%(channel,suffix), 
+                             op.OR(*triggerDict['DoubleEGamma']), 
+                             sel, 
+                             EquidistantBinning(2, 0., 2.), 
+                             xTitle= "DoubleEGamma trigger",
+                             plotopts = channelLabel))
+    # Double Muon #
+    plots.append(Plot.make1D("%s_%s_trigger_doubleMuon"%(channel,suffix), 
+                             op.OR(*triggerDict['DoubleMuon']), 
+                             sel, 
+                             EquidistantBinning(2, 0., 2.), 
+                             xTitle= "DoubleMuon trigger",
+                             plotopts = channelLabel))
+    # Muon-Electron #
+    plots.append(Plot.make1D("%s_%s_trigger_MuonElectron"%(channel,suffix), 
+                             op.OR(*triggerDict['MuonEG']), 
+                             sel, 
+                             EquidistantBinning(2, 0., 2.), 
+                             xTitle= "MuonEG trigger",
+                             plotopts = channelLabel))
 
+    return plots
 ##########################  MET PLOT #################################
 def makeMETPlots(sel, met, suffix, channel):
     """
@@ -140,14 +165,14 @@ def makeDileptonPlots(sel, dilepton, suffix, channel):
 
     # PT plot #
     plots.append(Plot.make1D("%s_%s_firstlepton_pt"%(channel,suffix), 
-                             dilepton[0].p4.Pt(), 
+                             dilepton[0].pt, 
                              sel, 
                              EquidistantBinning(50,0.,300.),
                              title="Transverse momentum of the first lepton (channel %s)"%channel, 
                              xTitle= "P_{T} (first lepton) [GeV]",
                              plotopts = channelLabel))
     plots.append(Plot.make1D("%s_%s_secondlepton_pt"%(channel,suffix), 
-                             dilepton[1].p4.Pt(), 
+                             dilepton[1].pt, 
                              sel, 
                              EquidistantBinning(50,0.,300.),
                              title="Transverse momentum of the second lepton (channel %s)"%channel, 
@@ -163,14 +188,14 @@ def makeDileptonPlots(sel, dilepton, suffix, channel):
 
     # Eta plot #
     plots.append(Plot.make1D("%s_%s_firstlepton_eta"%(channel,suffix), 
-                             dilepton[0].p4.Eta(), 
+                             dilepton[0].eta, 
                              sel, 
                              EquidistantBinning(20, -3., 3.), 
                              title="Pseudorapidity of the first lepton (channel %s)"%channel, 
                              xTitle= "#eta (first lepton)",
                              plotopts = channelLabel))
     plots.append(Plot.make1D("%s_%s_secondlepton_eta"%(channel,suffix), 
-                             dilepton[1].p4.Eta(), 
+                             dilepton[1].eta, 
                              sel, 
                              EquidistantBinning(20, -3., 3.), 
                              title="Pseudorapidity of the second lepton (channel %s)"%channel, 
@@ -179,14 +204,14 @@ def makeDileptonPlots(sel, dilepton, suffix, channel):
 
     # Phi plot #
     plots.append(Plot.make1D("%s_%s_firstlepton_phi"%(channel,suffix), 
-                             dilepton[0].p4.Phi(), 
+                             dilepton[0].phi, 
                              sel, 
                              EquidistantBinning(20, -3.2, 3.2), 
                              title="Azimutal angle of the first lepton (channel %s)"%channel, 
                              xTitle= "#phi (first lepton)",
                              plotopts = channelLabel))
     plots.append(Plot.make1D("%s_%s_secondlepton_phi"%(channel,suffix), 
-                             dilepton[1].p4.Phi(), 
+                             dilepton[1].phi, 
                              sel, 
                              EquidistantBinning(20, -3.2, 3.2), 
                              title="Azimutal angle of the second lepton (channel %s)"%channel, 
@@ -276,7 +301,7 @@ def makeAk4BJetsPlots(sel,bjets,lightjets,alljets,suffix,channel):
                                        subleadjet    = alljets[1],
                                        suffix        = suffix,
                                        channel       = channel,
-                                       plot_type     = "inclusive"))
+                                       tag     = "inclusive"))
 
     ## Bjets plots (if len(bjets)>=2) : leading = highest Pt bjet, subleading : second highest Pt bjet #
     # Must check len(bjets)>=2
@@ -285,7 +310,7 @@ def makeAk4BJetsPlots(sel,bjets,lightjets,alljets,suffix,channel):
                                        subleadjet    = bjets[1],
                                        suffix        = suffix,
                                        channel       = channel,
-                                       plot_type     = "bjets"))
+                                       tag     = "bjets"))
 
     ## Mixed plots (if len(bjets)==1, >0 by definition) : leading = bjet, subleading = highest Pt non-bjet
     # Must check len(bjets)==1
@@ -294,68 +319,58 @@ def makeAk4BJetsPlots(sel,bjets,lightjets,alljets,suffix,channel):
                                        subleadjet    = lightjets[0],
                                        suffix        = suffix,
                                        channel       = channel,
-                                       plot_type     = "mixed"))
+                                       tag     = "mixed"))
 
     return plots
 
 ##########################  JETS SEPARATE PLOTS #################################
-def makeSeparateJetsPlots(sel, leadjet, subleadjet, suffix, channel, plot_type):
+def makeAk4JetsPlots(sel, leadjet, subleadjet, suffix, channel, tag, lead_is_b=False, sublead_is_b=False):
     """
     Make basic plots
     sel         = refine selection 
-    leadjet     = Depends on scenario (plot_type) : highest-Pt jet ("inclusive" and "NoBtag"), highest-Pt bjet ("bjets"), only bjet ("mixed")
-    subleadjet  = Depends on scenario (plot_type) : second-highest-Pt jet ("inclusive" and "NoBtag"), second-highest-Pt bjet ("bjets"), highest-Pt lightjet ("mixed")
-    jets        = jet container (content depends on plot_type) 
+    leadjet     = Depends on scenario (tag) : highest-Pt jet ("inclusive" and other tags), highest-Pt bjet ("bjets"), only bjet ("mixed")
+    subleadjet  = Depends on scenario (tag) : second-highest-Pt jet ("inclusive" and other tags), second-highest-Pt bjet ("bjets"), highest-Pt lightjet ("mixed")
     suffix      = string identifying the selection 
     channel     = string identifying the channel of the dilepton (can be "NoChannel")
-    plot_type   = defines the scenario : "inclusive", "bjets", "mixed", "NoBtag"
+    tag         = defines the subcategory
+    lead_is_b   = boolean for the titles
+    sublead_is_b= boolean for the titles
     """
  
     plots = []
 
     channelLabel = channelTitleLabel(channel)
 
-    if plot_type == "inclusive":
-        lead_base_name      = "%s_%sInclusive_leadjet_{var}"%(channel,suffix)
-        lead_base_title     = "leading jet"
-        sublead_base_name   = "%s_%sInclusive_subleadjet_{var}"%(channel,suffix)
-        sublead_base_title  = "subleading jet"
-    elif plot_type == "bjets":
-        lead_base_name      = "%s_%sBjets_leadBjet_{var}"%(channel,suffix)
+    if lead_is_b:
+        lead_base_name      = "%s_%s%s_leadbjet_{var}"%(channel,suffix,tag)
         lead_base_title     = "leading bjet"
-        sublead_base_name   = "%s_%sBjets_subleadBjet_{var}"%(channel,suffix)
-        sublead_base_title  = "subleading bjet"
-    elif plot_type == "mixed":
-        lead_base_name      = "%s_%sMixed_bjet_{var}"%(channel,suffix)
-        lead_base_title     = "bjet"
-        sublead_base_name   = "%s_%sMixed_lightjet_{var}"%(channel,suffix)
-        sublead_base_title  = "lightjet"
-    elif plot_type == "NoBtag":
-        lead_base_name      = "%s_%sNoBtag_leadjet_{var}"%(channel,suffix)
-        lead_base_title     = "leadjet"
-        sublead_base_name   = "%s_%sNoBtag_subleadjet_{var}"%(channel,suffix)
-        sublead_base_title  = "subleadjet"
     else:
-        print ("[ERROR] Jet plot type no understood")
-        sys.exit(1)
+        lead_base_name      = "%s_%s%s_leadjet_{var}"%(channel,suffix,tag)
+        lead_base_title     = "leading jet"
+    if sublead_is_b:
+        sublead_base_name   = "%s_%s%s_subleadbjet_{var}"%(channel,suffix,tag)
+        sublead_base_title  = "subleading bjet"
+    else:
+        sublead_base_name   = "%s_%s%s_subleadjet_{var}"%(channel,suffix,tag)
+        sublead_base_title  = "subleading jet"
 
     # leadjet plots #
     plots.append(Plot.make1D(lead_base_name.format(var="pt"),
-                             leadjet.p4.pt(),
+                             leadjet.p4.Pt(),
                              sel,
                              EquidistantBinning(50,0.,300.),
                              title='Transverse momentum of the %s'%lead_base_title,
                              xTitle="P_{T}(%s) [GeV]"%lead_base_title,
                              plotopts = channelLabel))
     plots.append(Plot.make1D(lead_base_name.format(var="eta"),
-                             leadjet.p4.eta(),
+                             leadjet.eta,
                              sel,
                              EquidistantBinning(20,-3.,3.),
                              title='Pseudorapidity of the %s'%lead_base_title,
                              xTitle="#eta(%s)"%lead_base_title,
                              plotopts = channelLabel))
     plots.append(Plot.make1D(lead_base_name.format(var="phi"),
-                             leadjet.p4.phi(),
+                             leadjet.phi,
                              sel,
                              EquidistantBinning(20,-3.2,3.2),
                              title='Azimutal angle of the %s'%lead_base_title,
@@ -363,28 +378,28 @@ def makeSeparateJetsPlots(sel, leadjet, subleadjet, suffix, channel, plot_type):
                              plotopts = channelLabel))
     # subleadjet plots #
     plots.append(Plot.make1D(sublead_base_name.format(var="pt"),
-                             subleadjet.p4.pt(),
+                             subleadjet.pt,
                              sel,
                              EquidistantBinning(50,0.,300.),
                              title='Transverse momentum of the %s'%sublead_base_title,
                              xTitle="P_{T}(%s) [GeV]"%sublead_base_title,
                              plotopts = channelLabel))
     plots.append(Plot.make1D(sublead_base_name.format(var="eta"),
-                             subleadjet.p4.eta(),
+                             subleadjet.eta,
                              sel,
                              EquidistantBinning(20,-3.,3.),
                              title='Pseudorapidity of the %s'%sublead_base_title,
                              xTitle="#eta(%s)"%sublead_base_title,
                              plotopts = channelLabel))
     plots.append(Plot.make1D(sublead_base_name.format(var="phi"),
-                             subleadjet.p4.phi(),
+                             subleadjet.phi,
                              sel,
                              EquidistantBinning(20,-3.2,3.2),
                              title='Azimutal angle of the %s'%sublead_base_title,
                              xTitle="#phi(%s)"%sublead_base_title,
                              plotopts = channelLabel))
     # Dijet Pt plot #
-    plots.append(Plot.make1D("%s_%s%s_dijet_pt"%(channel,suffix,plot_type), 
+    plots.append(Plot.make1D("%s_%s%s_dijet_pt"%(channel,suffix,tag), 
                              (leadjet.p4+subleadjet.p4).Pt(), 
                              sel, 
                              EquidistantBinning(50,0.,300.),
@@ -392,7 +407,7 @@ def makeSeparateJetsPlots(sel, leadjet, subleadjet, suffix, channel, plot_type):
                              xTitle= "P_{T}(dijet) [GeV]",
                              plotopts = channelLabel))
     # DeltaPhi plot #
-    plots.append(Plot.make1D("%s_%s%s_dijet_deltaPhi"%(channel,suffix,plot_type), 
+    plots.append(Plot.make1D("%s_%s%s_dijet_deltaPhi"%(channel,suffix,tag), 
                              op.abs(op.deltaPhi(leadjet.p4,subleadjet.p4)), 
                              sel, 
                              EquidistantBinning(20,0, 3.2),
@@ -401,7 +416,7 @@ def makeSeparateJetsPlots(sel, leadjet, subleadjet, suffix, channel, plot_type):
                              plotopts = channelLabel))
 
     # DeltaR plot #
-    plots.append(Plot.make1D("%s_%s%s_dijet_deltaR"%(channel,suffix,plot_type), 
+    plots.append(Plot.make1D("%s_%s%s_dijet_deltaR"%(channel,suffix,tag), 
                              op.deltaR(leadjet.p4,subleadjet.p4), 
                              sel, 
                              EquidistantBinning(50, 0., 5.), 
@@ -409,7 +424,7 @@ def makeSeparateJetsPlots(sel, leadjet, subleadjet, suffix, channel, plot_type):
                              xTitle= "#Delta R (dijet)",
                              plotopts = channelLabel))
     # invariant mass plot #
-    plots.append(Plot.make1D("%s_%s%s_dijet_invariantMass"%(channel,suffix,plot_type),
+    plots.append(Plot.make1D("%s_%s%s_dijet_invariantMass"%(channel,suffix,tag),
                              op.invariant_mass(leadjet.p4,subleadjet.p4),
                              sel,
                              EquidistantBinning(50, 0., 500.), 
@@ -473,7 +488,7 @@ def makeAk8Plots(sel, fatjet, suffix, channel):
     return plots
 
 #########################  High-level quantities ################################
-def makeHighLevelQuantities(sel,dilepton,met,jets,resolvedjets,lightjets,boostedjets,suffix,channel):
+def makeAllHighLevelQuantities(sel,dilepton,met,jets,resolvedjets,lightjets,boostedjets,suffix,channel):
     plots = []
 
     # Categories spltting #
@@ -531,7 +546,7 @@ def makeHighLevelQuantities(sel,dilepton,met,jets,resolvedjets,lightjets,boosted
 
     return plots
 
-def makeSeparateHighLevelQuantities(sel,met,l1,l2,j1,j2,suffix,channel):
+def makeHighLevelQuantities(sel,met,l1,l2,j1,j2,suffix,channel):
     plots = []
 
     channelLabel = channelTitleLabel(channel)

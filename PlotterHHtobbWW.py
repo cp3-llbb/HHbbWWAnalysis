@@ -8,6 +8,7 @@ from bamboo.plots import Plot, EquidistantBinning, SummedPlot
 sys.path.append('/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/') # Add scripts in this directory -- TODO : make cleaner
 from BaseHHtobbWW import BaseNanoHHtobbWW
 from plotDef import *
+from scalefactorsbbWW import ScaleFactorsbbWW
 
 #===============================================================================================#
 #                                 PlotterHHtobbWW                                               #
@@ -29,6 +30,28 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
         yieldPlots = makeYieldPlots()
 
         #############################################################################
+        #                             Scalefactors                                  #
+        #############################################################################
+        if isMC:
+            # Initialize scalefactors class #
+            SF = ScaleFactorsbbWW()    
+            ####  Muons ####
+            muTightIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, self.sfTag), "id_tight"), combine="weight", systName="muid")
+            muTightISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, self.sfTag), "iso_tight_id_medium"), combine="weight", systName="muiso")
+            ####  Electrons ####
+            elTightIDSF = SF.get_scalefactor("lepton", ("electron_{0}_{1}".format(era,self.sfTag), "id_tight"), systName="elid")
+            #### Triggers (from TTH) ####
+            ttH_doubleMuon_trigSF = op.systematic(op.c_float(1.010), name="ttH_doubleMuon_trigSF", up=op.c_float(1.020), down=op.c_float(1.000))
+            ttH_doubleElectron_trigSF = op.systematic(op.c_float(1.020), name="ttH_doubleElectron_trigSF", up=op.c_float(1.040), down=op.c_float(1.000))
+            ttH_electronMuon_trigSF = op.systematic(op.c_float(1.020), name="ttH_electronMuon_trigSF", up=op.c_float(1.030), down=op.c_float(1.010))
+            #### Ak4 Btagging ####
+            DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
+            DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+self.sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
+            #### Ak8 Btagging ####
+            DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
+            DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+self.sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
+
+        #############################################################################
         #                               Dilepton                                    #
         #############################################################################
         # Make dilepton fakeable pairs wrt to channel #
@@ -39,258 +62,311 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
         OsMuMuFakeable = op.combine(self.muonsFakeSel, N=2, pred=lambdaFakeableDilepton)
         OsElMuFakeable = op.combine((self.electronsFakeSel, self.muonsFakeSel), pred=lambdaFakeableDilepton)
 
+        # Applied SF #
+        ElElTriggerSFApplied = [ttH_doubleElectron_trigSF] if isMC else None
+        MuMuTriggerSFApplied = [ttH_doubleMuon_trigSF] if isMC else None
+        ElMuTriggerSFApplied = [ttH_electronMuon_trigSF] if isMC else None
+
         # At least 2 fakeables leptons #
         ElElHasFakeableDilepton = noSel.refine("ElElHasFakeableDilepton",
-                                        cut = [op.rng_len(OsElElFakeable)>0])
+                                        cut = [op.rng_len(OsElElFakeable)>0],
+                                        weight = ElElTriggerSFApplied)
         MuMuHasFakeableDilepton = noSel.refine("MuMuHasFakeableDilepton",
-                                        cut = [op.rng_len(OsMuMuFakeable)>0])
+                                        cut = [op.rng_len(OsMuMuFakeable)>0],
+                                        weight = MuMuTriggerSFApplied)
         ElMuHasFakeableDilepton = noSel.refine("ElMuHasFakeableDilepton",
-                                        cut = [op.rng_len(OsElMuFakeable)>0])
+                                        cut = [op.rng_len(OsElMuFakeable)>0],
+                                        weight = ElMuTriggerSFApplied)
 
-#        plots.append(Plot.make1D("test1",
-#                                 op.rng_len(self.electronsFakeSel),
-#                                 ElElHasFakeableDilepton,
-#                                 EquidistantBinning(1, 0., 1.),
-#                                 xTitle = 'test'))
-#        plots.append(Plot.make1D("test2",
-#                                 self.muonsFakeSel[0].pt,
-#                                 noSel.refine('test',cut=[op.rng_len(self.muonsFakeSel)>0]),
-#                                 EquidistantBinning(1, 0., 1.),
-#                                 xTitle = 'test'))
-#        plots.append(Plot.make1D("test3",
-#                                 op.rng_len(OsMuMuFakeable),
-#                                 noSel,
-#                                 EquidistantBinning(1, 0., 1.),
-#                                 xTitle = 'test'))
         # Yield #
         plots.append(yieldPlots.addYield(ElElHasFakeableDilepton,"ElElHasFakeableDilepton","OS fakeable leptons (channel $e^+e^-$)"))
         plots.append(yieldPlots.addYield(MuMuHasFakeableDilepton,"MuMuHasFakeableDilepton","OS fakeable leptons (channel $\mu^+\mu^-$)"))
         plots.append(yieldPlots.addYield(ElMuHasFakeableDilepton,"ElMuHasFakeableDilepton","OS fakeable leptons (channel $e^{\pm}\mu^{\mp}$)"))
     
-        # Dilepton Z peak exclusion (charge already done in previous selection) # 
-        lambda_lowMllCut    = lambda dilep: op.invariant_mass(dilep[0].p4, dilep[1].p4)>12.
-        lambda_outZ         = lambda dilep: op.NOT(op.in_range(80.,op.invariant_mass(dilep[0].p4, dilep[1].p4),100.))
+        # Mll cut + Z peak exclusion (charge already done in previous selection) in **preselected** leptons # 
+        OsElElPresel = op.combine(self.electronsPreSel, N=2, pred=lambdaOS)
+        OsMuMuPresel = op.combine(self.muonsPreSel, N=2, pred=lambdaOS)
+        OsElMuPresel = op.combine((self.electronsPreSel, self.muonsPreSel), pred=lambdaOS)
+        lambda_lowMllCut    = lambda dileptons: op.NOT(op.rng_any(dileptons, lambda dilep : op.invariant_mass(dilep[0].p4, dilep[1].p4)<12.))
+            # If any dilepton preselected below 12GeV, returns False
+        lambda_outZ         = lambda dileptons: op.NOT(op.rng_any(dileptons, lambda dilep : op.in_range(80.,op.invariant_mass(dilep[0].p4, dilep[1].p4),100.)))
+            # If any dilepton preselected within Z peak, returns False
 
-        ElElHasFakeableDileptonMllCutOutZ = ElElHasFakeableDilepton.refine("ElElHasFakeableDileptonMllCutOutZ", 
-                                cut=[lambda_lowMllCut(OsElElFakeable[0]),lambda_outZ(OsElElFakeable[0])])
-        MuMuHasFakeableDileptonMllCutOutZ = MuMuHasFakeableDilepton.refine("MuMuHasFakeableDileptonMllCutOutZ", 
-                                cut=[lambda_lowMllCut(OsMuMuFakeable[0]),lambda_outZ(OsMuMuFakeable[0])])
-        ElMuHasFakeableDileptonMllCut     = ElMuHasFakeableDilepton.refine("ElMuHasFakeableDileptonMllCutOutZ", 
-                                cut=[lambda_lowMllCut(OsElMuFakeable[0])])
+        ElElHasFakeableDileptonPreMllCutOutZ = ElElHasFakeableDilepton.refine("ElElHasFakeableDileptonPreMllCutOutZ", 
+                                cut=[lambda_lowMllCut(OsElElPresel), lambda_outZ(OsElElPresel)])
+        MuMuHasFakeableDileptonPreMllCutOutZ = MuMuHasFakeableDilepton.refine("MuMuHasFakeableDileptonPreMllCutOutZ", 
+                                cut=[lambda_lowMllCut(OsMuMuPresel),lambda_outZ(OsMuMuPresel)])
+        ElMuHasFakeableDileptonPreMllCut     = ElMuHasFakeableDilepton.refine("ElMuHasFakeableDileptonPreMllCut", 
+                                cut=[lambda_lowMllCut(OsElMuPresel)])
 
         # Yield #
-        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonMllCutOutZ,"ElElHasFakeableDileptonMllCutOutZ","OS fakeable leptons + M_{ll} cut (channel $e^+e^-$)"))
-        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonMllCutOutZ,"MuMuHasFakeableDileptonMllCutOutZ","OS fakeable leptons + M_{ll} cut (channel $\mu^+\mu^-$)"))
-        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonMllCut,"ElMuHasFakeableDileptonMllCut","OS fakeable leptons + M_{ll} cut (channel $e^{\pm}\mu^{\mp}$)"))
+        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonPreMllCutOutZ,"ElElHasFakeableDileptonPreMllCutOutZ","OS fakeable leptons + $M_{ll}$ cut (channel $e^+e^-$)"))
+        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonPreMllCutOutZ,"MuMuHasFakeableDileptonPreMllCutOutZ","OS fakeable leptons + $M_{ll}$ cut (channel $\mu^+\mu^-$)"))
+        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonPreMllCut,"ElMuHasFakeableDileptonPreMllCut","OS fakeable leptons + $M_{ll}$ cut (channel $e^{\pm}\mu^{\mp}$)"))
 
         # Tight cut veto : no more than two tight leptons in the event #
-        ElElHasFakeableDileptonMllCutOutZTightVeto = ElElHasFakeableDileptonMllCutOutZ.refine("ElElHasFakeableDileptonMllCutOutZTightVeto", 
+        ElElHasFakeableDileptonPreMllCutOutZTightVeto = ElElHasFakeableDileptonPreMllCutOutZ.refine("ElElHasFakeableDileptonPreMllCutOutZTightVeto", 
                                 cut=[op.rng_len(self.muonsTightSel)+op.rng_len(self.electronsTightSel) <= 2])
-        MuMuHasFakeableDileptonMllCutOutZTightVeto = MuMuHasFakeableDileptonMllCutOutZ.refine("MuMuHasFakeableDileptonMllCutOutZTightVeto", 
+        MuMuHasFakeableDileptonPreMllCutOutZTightVeto = MuMuHasFakeableDileptonPreMllCutOutZ.refine("MuMuHasFakeableDileptonPreMllCutOutZTightVeto", 
                                 cut=[op.rng_len(self.muonsTightSel)+op.rng_len(self.electronsTightSel) <= 2])
-        ElMuHasFakeableDileptonMllCutTightVeto     = ElMuHasFakeableDileptonMllCut.refine("ElMuHasFakeableDileptonMllCutTightVeto", 
+        ElMuHasFakeableDileptonPreMllCutTightVeto     = ElMuHasFakeableDileptonPreMllCut.refine("ElMuHasFakeableDileptonPreMllCutTightVeto", 
                                 cut=[op.rng_len(self.muonsTightSel)+op.rng_len(self.electronsTightSel) <= 2])
 
         # Yield #
-        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonMllCutOutZTightVeto,"ElElHasFakeableDileptonMllCutOutZTightVeto","OS fakeable leptons + M_{ll} cut + Two tights veto (channel $e^+e^-$)"))
-        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonMllCutOutZTightVeto,"MuMuHasFakeableDileptonMllCutOutZTightVeto","OS fakeable leptons + M_{ll} cut + Two tights veto (channel $\mu^+\mu^-$)"))
-        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonMllCutTightVeto,"ElMuHasFakeableDileptonMllCutTightVeto","OS fakeable leptons + M_{ll} cut + Two tights veto (channel $e^{\pm}\mu^{\mp}$)"))
+        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonPreMllCutOutZTightVeto,"ElElHasFakeableDileptonPreMllCutOutZTightVeto","OS fakeable leptons + $M_{ll}$ cut + Two tights veto (channel $e^+e^-$)"))
+        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonPreMllCutOutZTightVeto,"MuMuHasFakeableDileptonPreMllCutOutZTightVeto","OS fakeable leptons + $M_{ll}$ cut + Two tights veto (channel $\mu^+\mu^-$)"))
+        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonPreMllCutTightVeto,"ElMuHasFakeableDileptonPreMllCutTightVeto","OS fakeable leptons + $M_{ll}$ cut + Two tights veto (channel $e^{\pm}\mu^{\mp}$)"))
 
 
         # Dilepton channel plots #
-        plots.extend(channelPlot(sel        = ElElHasFakeableDileptonMllCutOutZTightVeto,
+        plots.extend(channelPlot(sel        = ElElHasFakeableDileptonPreMllCutOutZTightVeto,
                                  DilepElEl  = OsElElFakeable,
                                  DilepMuMu  = OsMuMuFakeable,
                                  DilepElMu  = OsElMuFakeable,
-                                 suffix     = "HasFakeableDileptonMllCutOutZTightVeto",
+                                 suffix     = "HasFakeableDileptonPreMllCutOutZTightVeto",
                                  channel    = "ElEl"))
-        plots.extend(channelPlot(sel        = MuMuHasFakeableDileptonMllCutOutZTightVeto,
+        plots.extend(channelPlot(sel        = MuMuHasFakeableDileptonPreMllCutOutZTightVeto,
                                  DilepElEl  = OsElElFakeable,
                                  DilepMuMu  = OsMuMuFakeable,
                                  DilepElMu  = OsElMuFakeable,
-                                 suffix     = "HasFakeableDileptonMllCutOutZTightVeto",
+                                 suffix     = "HasFakeableDileptonPreMllCutOutZTightVeto",
                                  channel    = "MuMu"))
-        plots.extend(channelPlot(sel        = ElMuHasFakeableDileptonMllCutTightVeto,
+        plots.extend(channelPlot(sel        = ElMuHasFakeableDileptonPreMllCutTightVeto,
                                  DilepElEl  = OsElElFakeable,
                                  DilepMuMu  = OsMuMuFakeable,
                                  DilepElMu  = OsElMuFakeable,
-                                 suffix     = "HasFakeableDileptonMllCutTightVeto",
+                                 suffix     = "HasFakeableDileptonPreMllCutTightVeto",
                                  channel    = "ElMu"))
 
-#    If both fakeable leptons are electrons, the event needs to pass either the single electron or the double electron trigger; if both fakeable leptons are muons, the event needs to pass either the single muon or the double muon trigger; if one fakeable lepton is an electron and the other fakeable lepton is a muon, the event needs to pass either the single electron or the single muon or the muon+electron trigger
-#
-#        # Scalefactors #
-#        if self.isMC(sample):
-#            doubleEleTrigSF = SF.get_scalefactor("dilepton", ("doubleEleLeg_HHMoriond17_2016"), systName="eleltrig")     
-#            doubleMuTrigSF  = SF.get_scalefactor("dilepton", ("doubleMuLeg_HHMoriond17_2016"), systName="mumutrig")    
-#            elemuTrigSF     = SF.get_scalefactor("dilepton", ("elemuLeg_HHMoriond17_2016"), systName="elmutrig")
-#            mueleTrigSF     = SF.get_scalefactor("dilepton", ("mueleLeg_HHMoriond17_2016"), systName="mueltrig")
-#
-#            # From https://gitlab.cern.ch/ttH_leptons/doc/blob/master/Legacy/data_to_mc_corrections.md#trigger-efficiency-scale-factors
-#        ttH_doubleMuon_trigSF = op.systematic(op.c_float(1.010), name="ttH_doubleMuon_trigSF", up=op.c_float(1.020), down=op.c_float(1.000))
-#        ttH_doubleElectron_trigSF = op.systematic(op.c_float(1.020), name="ttH_doubleElectron_trigSF", up=op.c_float(1.040), down=op.c_float(1.000))
-#        ttH_electronMuon_trigSF = op.systematic(op.c_float(1.020), name="ttH_electronMuon_trigSF", up=op.c_float(1.030), down=op.c_float(1.010))
-#
-#        llSF =  {
-#            "ElEl" : (lambda ll : [ elTightIDSF(ll[0][0]),                                                                     # First lepton SF
-#                                    elTightIDSF(ll[0][1]),                                                                     # Second lepton SF
-#sFakeableDileptonMllCutOutZTightVeto                                    #doubleEleTrigSF(ll[0]),                                                                  # Dilepton SF
-#                                    ttH_doubleElectron_trigSF,
-#                                  ]),
-#            "MuMu" : (lambda ll : [ muTightIDSF(ll[0][0]), muTightISOSF(ll[0][0]),                                             # First lepton SF
-#                                    muTightIDSF(ll[0][1]), muTightISOSF(ll[0][1]),                                             # Second lepton SF
-#                                    #doubleMuTrigSF(ll[0]),                                                                   # Dilepton SF
-#                                    ttH_doubleMuon_trigSF,
-#                                  ]),
-#            "ElMu" : (lambda ll : [ elTightIDSF(ll[0][0]),                                                                     # First lepton SF
-#                                    muTightIDSF(ll[0][1]), muTightISOSF(ll[0][1]),                                             # Second lepton SF
-#                                    #elemuTrigSF(ll[0]),                                                                      # Dilepton SF
-#                                    ttH_electronMuon_trigSF,
-#                                  ]),
-#                # ll is a proxy list of dileptons 
-#                # ll[0] is the first dilepton 
-#                # ll[0][0] is the first lepton and ll[0][1] the second in the dilepton
-#                }
-#
-#
-#        self.llSFApplied = {
-#            "ElEl": llSF["ElEl"](self.OsElEl) if isMC else None,
-#            "MuMu": llSF["MuMu"](self.OsMuMu) if isMC else None,
-#            "ElMu": llSF["ElMu"](self.OsElMu) if isMC else None,
-#                      }
+        # Trigger Plots #
+        plots.extend(triggerPlots(sel         = ElElHasFakeableDileptonPreMllCutOutZTightVeto,
+                                  triggerDict = self.triggersPerPrimaryDataset,
+                                  suffix      = "ElElHasFakeableDileptonPreMllCutOutZTightVeto",
+                                  channel     = "ElEl"))
+        plots.extend(triggerPlots(sel         = MuMuHasFakeableDileptonPreMllCutOutZTightVeto,
+                                  triggerDict = self.triggersPerPrimaryDataset,
+                                  suffix      = "MuMuHasFakeableDileptonPreMllCutOutZTightVeto",
+                                  channel     = "MuMu"))
+        plots.extend(triggerPlots(sel         = ElMuHasFakeableDileptonPreMllCutTightVeto,
+                                  triggerDict = self.triggersPerPrimaryDataset,
+                                  suffix      = "ElMuHasFakeableDileptonPreMllCutTightVeto",
+                                  channel     = "ElMu"))
 
+#    If both fakeable leptons are electrons, the event needs to pass either the single electron or the double electron trigger; if both fakeable leptons are muons, the event needs to pass either the single muon or the double muon trigger; if one fakeable lepton is an electron and the other fakeable lepton is a muon, the event needs to pass either the single electron or the single muon or the muon+electron trigger
         #############################################################################
         #                              AK4 Jets                                     #
         #############################################################################
         # Jet Selection #
-        ElElHasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets = ElElHasFakeableDileptonMllCutOutZTightVeto.refine("ElElHasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets", 
+        ElElHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets = ElElHasFakeableDileptonPreMllCutOutZTightVeto.refine("ElElHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets", 
                                 cut=[op.rng_len(self.ak4Jets)>=2])
-        MuMuHasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets = MuMuHasFakeableDileptonMllCutOutZTightVeto.refine("MuMuHasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets", 
+        MuMuHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets = MuMuHasFakeableDileptonPreMllCutOutZTightVeto.refine("MuMuHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets", 
                                 cut=[op.rng_len(self.ak4Jets)>=2])
-        ElMuHasFakeableDileptonMllCutTightVetoTwoAk4Jets     = ElMuHasFakeableDileptonMllCutTightVeto.refine("ElMuHasFakeableDileptonMllCutTightVetoTwoAk4Jets", 
+        ElMuHasFakeableDileptonPreMllCutTightVetoTwoAk4Jets     = ElMuHasFakeableDileptonPreMllCutTightVeto.refine("ElMuHasFakeableDileptonPreMllCutTightVetoTwoAk4Jets", 
                                 cut=[op.rng_len(self.ak4Jets)>=2])
 
         # Yield 
-        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets,
-                                         "ElElHasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets",
-                                         "OS leptons + Ak4 Jets (channel $e^+e^-$)"))
-        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets,
-                                         "MuMuHasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets",
-                                         "OS leptons + Ak4 Jets (channel $\mu^+\mu^-$)"))
-        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonMllCutTightVetoTwoAk4Jets,
-                                         "ElMuHasFakeableDileptonMllCutTightVetoTwoAk4Jets",
-                                         "OS leptons + Ak4 Jets (channel $e^{\pm}\mu^{\mp}$)"))
+        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets,
+                                         "ElElHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets",
+                                         "OS leptons + Ak4 Jets $\geq 2$ (channel $e^+e^-$)"))
+        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets,
+                                         "MuMuHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets",
+                                         "OS leptons + Ak4 Jets $\geq 2$ (channel $\mu^+\mu^-$)"))
+        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonPreMllCutTightVetoTwoAk4Jets,
+                                         "ElMuHasFakeableDileptonPreMllCutTightVetoTwoAk4Jets",
+                                         "OS leptons + Ak4 Jets $\geq 2$ (channel $e^{\pm}\mu^{\mp}$)"))
 
         # Plots #
         HasFakeableDileptonTwoAk4JetsChannelList = [
-                             {'channel':'ElEl','sel':ElElHasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets,'dilepton':OsElElFakeable[0],'suffix':'HasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets'},
-                             {'channel':'MuMu','sel':MuMuHasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets,'dilepton':OsMuMuFakeable[0],'suffix':'HasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets'},
-                             {'channel':'ElMu','sel':ElMuHasFakeableDileptonMllCutTightVetoTwoAk4Jets,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonMllCutTightVetoTwoAk4Jets'},
+                             {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets,'dilepton':OsElElFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets'},
+                             {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets,'dilepton':OsMuMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets'},
+                             {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoTwoAk4Jets,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutTightVetoTwoAk4Jets'},
                                                   ]
         commonItems = ['channel','sel','suffix']
-        HasFakeableDileptonTwoAk4JetsBaseDictJetsPlots = {'leadjet':self.ak4Jets[0],'subleadjet':self.ak4Jets[1],'plot_type':'NoBtag'}
-        HasFakeableDileptonTwoAk4JetsBaseDictJetsN = {'objName':'Ak4Jets','objCont':self.ak4Jets,'Nmax':5,'xTitle':'N(Ak4 jets)'}
+        HasFakeableDileptonTwoAk4JetsBaseDictJetsPlots = {'leadjet':self.ak4Jets[0],'subleadjet':self.ak4Jets[1],'tag':'','lead_is_b':False,'sublead_is_b':False}
+        HasFakeableDileptonTwoAk4JetsBaseDictJetsN = {'objName':'Ak4Jets','objCont':self.ak4Jets,'Nmax':10,'xTitle':'N(Ak4 jets)'}
                                                     
         for channelDict in HasFakeableDileptonTwoAk4JetsChannelList:
             # Dilepton #
             plots.extend(makeDileptonPlots(**channelDict))
             # Ak4 Jets #
             plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**HasFakeableDileptonTwoAk4JetsBaseDictJetsN))
-            plots.extend(makeSeparateJetsPlots(**{k:channelDict[k] for k in commonItems},**HasFakeableDileptonTwoAk4JetsBaseDictJetsPlots))
+            plots.extend(makeAk4JetsPlots(**{k:channelDict[k] for k in commonItems},**HasFakeableDileptonTwoAk4JetsBaseDictJetsPlots))
             # MET #
             plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
 
 
         #############################################################################
-        #                            Resolved jets                                  #
+        #                              Ak4 Btagging                                 #
         #############################################################################
         # Resolved selection #
-        ElElHasFakeableDileptonMllCutOutZTightVetoInclusiveResolved = ElElHasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets.refine("ElElHasFakeableDileptonMllCutOutZTightVetoInclusiveResolved", 
-                                cut=[op.rng_len(self.ak4BJets) >= 1])
-        MuMuHasFakeableDileptonMllCutOutZTightVetoInclusiveResolved = MuMuHasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets.refine("MuMuHasFakeableDileptonMllCutOutZTightVetoInclusiveResolved", 
-                                cut=[op.rng_len(self.ak4BJets) >= 1])
-        ElMuHasFakeableDileptonMllCutTightVetoInclusiveResolved = ElMuHasFakeableDileptonMllCutTightVetoTwoAk4Jets.refine("ElMuHasFakeableDileptonMllCutTightVetoInclusiveResolved", 
-                                cut=[op.rng_len(self.ak4BJets) >= 1])
+        # Inclusive resolved #
+#        ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveResolved = ElElHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets.refine(
+#                                "ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveResolved", 
+#                                cut=[op.rng_len(self.ak4BJets) >= 1])
+#        MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveResolved = MuMuHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets.refine(
+#                                "MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveResolved", 
+#                                cut=[op.rng_len(self.ak4BJets) >= 1])
+#        ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveResolved = ElMuHasFakeableDileptonPreMllCutTightVetoTwoAk4Jets.refine("
+#                                ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveResolved", 
+#                                cut=[op.rng_len(self.ak4BJets) >= 1])
+        # Applied SF #
+        Ak4BtaggingOneBtag  = [DeepJetMediumSF(self.ak4BJets[0])] if isMC else None
+        Ak4BtaggingTwoBtags = [DeepJetMediumSF(self.ak4BJets[0]),DeepJetMediumSF(self.ak4BJets[1])] if isMC else None
 
-        ElElHasFakeableDileptonMllCutOutZTightVetoExclusiveResolved = ElElHasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets.refine("ElElHasFakeableDileptonMllCutOutZTightVetoExclusiveResolved", 
-                                cut=[op.rng_len(self.ak4BJets)>=1,op.rng_len(self.ak8BJets)==0])
-        MuMuHasFakeableDileptonMllCutOutZTightVetoExclusiveResolved = MuMuHasFakeableDileptonMllCutOutZTightVetoTwoAk4Jets.refine("MuMuHasFakeableDileptonMllCutOutZTightVetoExclusiveResolved", 
-                                cut=[op.rng_len(self.ak4BJets)>=1,op.rng_len(self.ak8BJets)==0])
-        ElMuHasFakeableDileptonMllCutTightVetoExclusiveResolved = ElMuHasFakeableDileptonMllCutTightVetoTwoAk4Jets.refine("ElMuHasFakeableDileptonMllCutTightVetoExclusiveResolved", 
-                                cut=[op.rng_len(self.ak4BJets)>=1,op.rng_len(self.ak8BJets)==0])
+        # Exclusive Resolved No Btag #
+        ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag = ElElHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets.refine(
+                                "ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag", 
+                                cut=[op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0])
+        MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag = MuMuHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets.refine(
+                                "MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag", 
+                                cut=[op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0])
+        ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag = ElMuHasFakeableDileptonPreMllCutTightVetoTwoAk4Jets.refine(
+                                "ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag", 
+                                cut=[op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0])
+        # Exclusive resolved 1 Btag #
+        ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag = ElElHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets.refine(
+                                "ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag", 
+                                cut=[op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
+                                weight=Ak4BtaggingOneBtag)
+        MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag = MuMuHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets.refine(
+                                "MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag", 
+                                cut=[op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
+                                weight=Ak4BtaggingOneBtag)
+        ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag = ElMuHasFakeableDileptonPreMllCutTightVetoTwoAk4Jets.refine(
+                                "ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag", 
+                                cut=[op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
+                                weight=Ak4BtaggingOneBtag)
+        # Exclusive resolved 2 Btags #
+        ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags = ElElHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets.refine(
+                                "ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags", 
+                                cut=[op.rng_len(self.ak4BJets)==2,op.rng_len(self.ak8BJets)==0],
+                                weight=Ak4BtaggingTwoBtags)
+        MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags = MuMuHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets.refine(
+                                "MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags", 
+                                cut=[op.rng_len(self.ak4BJets)==2,op.rng_len(self.ak8BJets)==0],
+                                weight=Ak4BtaggingTwoBtags)
+        ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags = ElMuHasFakeableDileptonPreMllCutTightVetoTwoAk4Jets.refine(
+                                "ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags", 
+                                cut=[op.rng_len(self.ak4BJets)==2,op.rng_len(self.ak8BJets)==0],
+                                weight=Ak4BtaggingTwoBtags)
+
                                 
         # Yield 
-        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonMllCutOutZTightVetoInclusiveResolved,
-                                         "ElElHasFakeableDileptonMllCutOutZTightVetoInclusiveResolved",
-                                         "OS leptons + Inclusive Resolved Jets (channel $e^+e^-$)"))
-        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonMllCutOutZTightVetoInclusiveResolved,
-                                         "MuMuHasFakeableDileptonMllCutOutZTightVetoInclusiveResolved",
-                                         "OS leptons + Inclusive Resolved Jets (channel $\mu^+\mu^-$)"))
-        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonMllCutTightVetoInclusiveResolved,
-                                         "ElMuHasFakeableDileptonMllCutTightVetoInclusiveResolved",
-                                         "OS leptons + Inclusive Resolved Jets (channel $e^{\pm}\mu^{\mp}$)"))
-        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonMllCutOutZTightVetoExclusiveResolved,
-                                         "ElElHasFakeableDileptonMllCutOutZTightVetoExclusiveResolved",
-                                         "OS leptons + Exclusive Resolved Jets (channel $e^+e^-$)"))
-        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonMllCutOutZTightVetoExclusiveResolved,
-                                         "MuMuHasFakeableDileptonMllCutOutZTightVetoExclusiveResolved",
-                                         "OS leptons + Exclusive Resolved Jets (channel $\mu^+\mu^-$)"))
-        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonMllCutTightVetoExclusiveResolved,
-                                         "ElMuHasFakeableDileptonMllCutTightVetoExclusiveResolved",
-                                         "OS leptons + Exclusive Resolved Jets (channel $e^{\pm}\mu^{\mp}$)"))
+#        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveResolved,
+#                                         "ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveResolved",
+#                                         "OS leptons + Inclusive Resolved Jets (channel $e^+e^-$)"))
+#        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveResolved,
+#                                         "MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveResolved",
+#                                         "OS leptons + Inclusive Resolved Jets (channel $\mu^+\mu^-$)"))
+#        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveResolved,
+#                                         "ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveResolved",
+#                                         "OS leptons + Inclusive Resolved Jets (channel $e^{\pm}\mu^{\mp}$)"))
 
-        # Plots #
-        HasFakeableDileptonResolvedJetsChannelList = [
-             {'channel':'ElEl','sel':ElElHasFakeableDileptonMllCutOutZTightVetoInclusiveResolved,'dilepton':OsElElFakeable[0],'suffix':'HasFakeableDileptonMllCutOutZTightVetoInclusiveResolved'},
-             {'channel':'MuMu','sel':MuMuHasFakeableDileptonMllCutOutZTightVetoInclusiveResolved,'dilepton':OsMuMuFakeable[0],'suffix':'HasFakeableDileptonMllCutOutZTightVetoInclusiveResolved'},
-             {'channel':'ElMu','sel':ElMuHasFakeableDileptonMllCutTightVetoInclusiveResolved,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonMllCutTightVetoInclusiveResolved'},
-             {'channel':'ElEl','sel':ElElHasFakeableDileptonMllCutOutZTightVetoExclusiveResolved,'dilepton':OsElElFakeable[0],'suffix':'HasFakeableDileptonMllCutOutZTightVetoExclusiveResolved'},
-             {'channel':'MuMu','sel':MuMuHasFakeableDileptonMllCutOutZTightVetoExclusiveResolved,'dilepton':OsMuMuFakeable[0],'suffix':'HasFakeableDileptonMllCutOutZTightVetoExclusiveResolved'},
-             {'channel':'ElMu','sel':ElMuHasFakeableDileptonMllCutTightVetoExclusiveResolved,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonMllCutTightVetoExclusiveResolved'},
-                                                  ]
+        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag,
+                                         "ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag",
+                                         "OS leptons + Exclusive Resolved Jets (0 bjet) (channel $e^+e^-$)"))
+        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag,
+                                         "MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag",
+                                         "OS leptons + Exclusive Resolved Jets (0 bjet) (channel $\mu^+\mu^-$)"))
+        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag,
+                                         "ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag",
+                                         "OS leptons + Exclusive Resolved Jets (0 bjet) (channel $e^{\pm}\mu^{\mp}$)"))
+
+        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag,
+                                         "ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag",
+                                         "OS leptons + Exclusive Resolved Jets (1 bjet) (channel $e^+e^-$)"))
+        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag,
+                                         "MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag",
+                                         "OS leptons + Exclusive Resolved Jets (1 bjet) (channel $\mu^+\mu^-$)"))
+        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag,
+                                         "ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag",
+                                         "OS leptons + Exclusive Resolved Jets (1 bjet) (channel $e^{\pm}\mu^{\mp}$)"))
+
+        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags,
+                                         "ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags",
+                                         "OS leptons + Exclusive Resolved Jets (2 bjets) (channel $e^+e^-$)"))
+        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags,
+                                         "MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags",
+                                         "OS leptons + Exclusive Resolved Jets (2 bjets) (channel $\mu^+\mu^-$)"))
+        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags,
+                                         "ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags",
+                                         "OS leptons + Exclusive Resolved Jets (2 bjets) (channel $e^{\pm}\mu^{\mp}$)"))
+
+        # Dilepton plots #
+        HasFakeableDileptonResolvedJetsChannelListLeptons = [
+#             {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveResolved,'dilepton':OsElElFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoInclusiveResolved'},
+#             {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveResolved,'dilepton':OsMuMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoInclusiveResolved'},
+#             {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveResolved,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutTightVetoInclusiveResolved'},
+             {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag,'dilepton':OsElElFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag'},
+             {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag,'dilepton':OsMuMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag'},
+             {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag'},
+             {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag,'dilepton':OsElElFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag'},
+             {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag,'dilepton':OsMuMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag'},
+             {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag'},
+             {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags,'dilepton':OsElElFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags'},
+             {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags,'dilepton':OsMuMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags'},
+             {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags'},
+                                                            ]
+
         commonItems = ['channel','sel','suffix']
-        HasFakeableDileptonResolvedJetsBaseDictJetsPlots = {'bjets':self.ak4BJets, 'lightjets':self.ak4LightJets, 'alljets': self.ak4Jets}
-        HasFakeableDileptonResolvedJetsBaseDictJetsN = {'objName':'Ak4BJets','objCont':self.ak4BJets,'Nmax':5,'xTitle':'N(Ak4 Bjets)'}
+        HasFakeableDileptonResolvedJetsBaseDictJetsN = {'objName':'Ak4BJets','objCont':self.ak4BJets,'Nmax':10,'xTitle':'N(Ak4 Bjets)'}
 
-        for channelDict in HasFakeableDileptonResolvedJetsChannelList:
+        for channelDict in HasFakeableDileptonResolvedJetsChannelListLeptons:
             # Dilepton #
             plots.extend(makeDileptonPlots(**channelDict))
-            # Ak4 Jets #
+            # Number of jets #
             plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**HasFakeableDileptonResolvedJetsBaseDictJetsN))
-            plots.extend(makeAk4BJetsPlots(**{k:channelDict[k] for k in commonItems},**HasFakeableDileptonResolvedJetsBaseDictJetsPlots))
             # MET #
             plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
  
+
+        # Dijet plots #
+        HasFakeableDileptonResolvedJetsChannelListJets = [
+            {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag,'suffix':'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag','leadjet':self.ak4LightJets[0],'subleadjet':self.ak4LightJets[1],'tag':'NoBtag','lead_is_b':False,'sublead_is_b':False},
+            {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag,'suffix':'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag','leadjet':self.ak4LightJets[0],'subleadjet':self.ak4LightJets[1],'tag':'NoBtag','lead_is_b':False,'sublead_is_b':False},
+            {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag,'suffix':'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag','leadjet':self.ak4LightJets[0],'subleadjet':self.ak4LightJets[1],'tag':'NoBtag','lead_is_b':False,'sublead_is_b':False},
+
+            {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag,'suffix':'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag','leadjet':self.ak4BJets[0],'subleadjet':self.ak4LightJets[0],'tag':'OneBtag','lead_is_b':True,'sublead_is_b':False},
+            {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag,'suffix':'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag','leadjet':self.ak4BJets[0],'subleadjet':self.ak4LightJets[0],'tag':'OneBtag','lead_is_b':True,'sublead_is_b':False},
+            {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag,'suffix':'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag','leadjet':self.ak4BJets[0],'subleadjet':self.ak4LightJets[0],'tag':'OneBtag','lead_is_b':True,'sublead_is_b':False},
+
+            {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags,'suffix':'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags','leadjet':self.ak4BJets[0],'subleadjet':self.ak4BJets[1],'tag':'TwoBtags','lead_is_b':True,'sublead_is_b':True},
+            {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags,'suffix':'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags','leadjet':self.ak4BJets[0],'subleadjet':self.ak4BJets[1],'tag':'TwoBtags','lead_is_b':True,'sublead_is_b':True},
+            {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags,'suffix':'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags','leadjet':self.ak4BJets[0],'subleadjet':self.ak4BJets[1],'tag':'TwoBtags','lead_is_b':True,'sublead_is_b':True},
+                                                          ]
+        for channelDict in HasFakeableDileptonResolvedJetsChannelListJets:
+            plots.extend(makeAk4JetsPlots(**channelDict))
+
         #############################################################################
         #                              AK8 Jets                                     #
         #############################################################################
         # Jet Selection #
-        ElElHasFakeableDileptonMllCutOutZTightVetoOneAk8Jet = ElElHasFakeableDileptonMllCutOutZTightVeto.refine("ElElHasFakeableDileptonMllCutOutZTightVetoOneAk8Jet", 
+        ElElHasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet = ElElHasFakeableDileptonPreMllCutOutZTightVeto.refine("ElElHasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet", 
                                 cut=[op.rng_len(self.ak8Jets)>=1])
-        MuMuHasFakeableDileptonMllCutOutZTightVetoOneAk8Jet = MuMuHasFakeableDileptonMllCutOutZTightVeto.refine("MuMuHasFakeableDileptonMllCutOutZTightVetoOneAk8Jet", 
+        MuMuHasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet = MuMuHasFakeableDileptonPreMllCutOutZTightVeto.refine("MuMuHasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet", 
                                 cut=[op.rng_len(self.ak8Jets)>=1])
-        ElMuHasFakeableDileptonMllCutTightVetoOneAk8Jet     = ElMuHasFakeableDileptonMllCutTightVeto.refine("ElMuHasFakeableDileptonMllCutTightVetoOneAk8Jet", 
+        ElMuHasFakeableDileptonPreMllCutTightVetoOneAk8Jet     = ElMuHasFakeableDileptonPreMllCutTightVeto.refine("ElMuHasFakeableDileptonPreMllCutTightVetoOneAk8Jet", 
                                 cut=[op.rng_len(self.ak8Jets)>=1])
 
         # Yield 
-        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonMllCutOutZTightVetoOneAk8Jet,
-                                         "ElElHasFakeableDileptonMllCutOutZTightVetoOneAk8Jet",
-                                         "OS leptons + Ak4 Jets (channel $e^+e^-$)"))
-        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonMllCutOutZTightVetoOneAk8Jet,
-                                         "MuMuHasFakeableDileptonMllCutOutZTightVetoOneAk8Jet",
-                                         "OS leptons + Ak4 Jets (channel $\mu^+\mu^-$)"))
-        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonMllCutTightVetoOneAk8Jet,
-                                         "ElMuHasFakeableDileptonMllCutTightVetoOneAk8Jet",
-                                         "OS leptons + Ak4 Jets (channel $e^{\pm}\mu^{\mp}$)"))
+        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet,
+                                         "ElElHasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet",
+                                         "OS leptons + Ak8 Jets $\geq 1$ (channel $e^+e^-$)"))
+        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet,
+                                         "MuMuHasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet",
+                                         "OS leptons + Ak8 Jets $\geq 1$ (channel $\mu^+\mu^-$)"))
+        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonPreMllCutTightVetoOneAk8Jet,
+                                         "ElMuHasFakeableDileptonPreMllCutTightVetoOneAk8Jet",
+                                         "OS leptons + Ak8 Jets $\geq 1$ (channel $e^{\pm}\mu^{\mp}$)"))
 
         # Plots #
         HasFakeableDileptonOneAk8JetJetsChannelList = [
-                             {'channel':'ElEl','sel':ElElHasFakeableDileptonMllCutOutZTightVetoOneAk8Jet,'dilepton':OsElElFakeable[0],'suffix':'HasFakeableDileptonMllCutOutZTightVetoOneAk8Jet'},
-                             {'channel':'MuMu','sel':MuMuHasFakeableDileptonMllCutOutZTightVetoOneAk8Jet,'dilepton':OsMuMuFakeable[0],'suffix':'HasFakeableDileptonMllCutOutZTightVetoOneAk8Jet'},
-                             {'channel':'ElMu','sel':ElMuHasFakeableDileptonMllCutTightVetoOneAk8Jet,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonMllCutTightVetoOneAk8Jet'},
+                             {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet,'dilepton':OsElElFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet'},
+                             {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet,'dilepton':OsMuMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet'},
+                             {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoOneAk8Jet,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutTightVetoOneAk8Jet'},
                                                   ]
         commonItems = ['channel','sel','suffix']
-        HasFakeableDileptonOneAk8JetsBaseDictFatjetsN = {'objName':'Ak8Jets','objCont':self.ak8Jets,'Nmax':5,'xTitle':'N(Ak8 jets)'}
+        HasFakeableDileptonOneAk8JetsBaseDictFatjetsN = {'objName':'Ak8Jets','objCont':self.ak8Jets,'Nmax':10,'xTitle':'N(Ak8 jets)'}
 
                                                     
         for channelDict in HasFakeableDileptonOneAk8JetJetsChannelList:
@@ -307,51 +383,51 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
         #                             Boosted jets                                  #
         #############################################################################
         # Boosted selection #
-        ElElHasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted = ElElHasFakeableDileptonMllCutOutZTightVetoOneAk8Jet.refine("ElElHasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted", 
+        ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted = ElElHasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet.refine("ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted", 
                                 cut=[op.rng_len(self.ak8BJets)>=1])
-        MuMuHasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted = MuMuHasFakeableDileptonMllCutOutZTightVetoOneAk8Jet.refine("MuMuHasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted", 
+        MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted = MuMuHasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet.refine("MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted", 
                                 cut=[op.rng_len(self.ak8BJets)>=1])
-        ElMuHasFakeableDileptonMllCutTightVetoInclusiveBoosted     = ElMuHasFakeableDileptonMllCutTightVetoOneAk8Jet.refine("ElMuHasFakeableDileptonMllCutTightVetoInclusiveBoosted", 
+        ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveBoosted     = ElMuHasFakeableDileptonPreMllCutTightVetoOneAk8Jet.refine("ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveBoosted", 
                                 cut=[op.rng_len(self.ak8BJets)>=1])
 
-        ElElHasFakeableDileptonMllCutOutZTightVetoExclusiveBoosted = ElElHasFakeableDileptonMllCutOutZTightVetoOneAk8Jet.refine("ElElHasFakeableDileptonMllCutOutZTightVetoExclusiveBoosted", 
-                                cut=[op.rng_len(self.ak8BJets)>=1, op.OR(op.rng_len(self.ak4Jets)<=1 , op.rng_len(self.ak4BJets)==0)])
-        MuMuHasFakeableDileptonMllCutOutZTightVetoExclusiveBoosted = MuMuHasFakeableDileptonMllCutOutZTightVetoOneAk8Jet.refine("MuMuHasFakeableDileptonMllCutOutZTightVetoExclusiveBoosted", 
-                                cut=[op.rng_len(self.ak8BJets)>=1, op.OR(op.rng_len(self.ak4Jets)<=1 , op.rng_len(self.ak4BJets)==0)])
-        ElMuHasFakeableDileptonMllCutTightVetoExclusiveBoosted     = ElMuHasFakeableDileptonMllCutTightVetoOneAk8Jet.refine("ElMuHasFakeableDileptonMllCutTightVetoExclusiveBoosted", 
-                                cut=[op.rng_len(self.ak8BJets)>=1, op.OR(op.rng_len(self.ak4Jets)<=1 , op.rng_len(self.ak4BJets)==0)])
+#        ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveBoosted = ElElHasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet.refine("ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveBoosted", 
+#                                cut=[op.rng_len(self.ak8BJets)>=1, op.OR(op.rng_len(self.ak4Jets)<=1 , op.rng_len(self.ak4BJets)==0)])
+#        MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveBoosted = MuMuHasFakeableDileptonPreMllCutOutZTightVetoOneAk8Jet.refine("MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveBoosted", 
+#                                cut=[op.rng_len(self.ak8BJets)>=1, op.OR(op.rng_len(self.ak4Jets)<=1 , op.rng_len(self.ak4BJets)==0)])
+#        ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveBoosted     = ElMuHasFakeableDileptonPreMllCutTightVetoOneAk8Jet.refine("ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveBoosted", 
+#                                cut=[op.rng_len(self.ak8BJets)>=1, op.OR(op.rng_len(self.ak4Jets)<=1 , op.rng_len(self.ak4BJets)==0)])
 
         # Yield 
-        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted,
-                                         "ElElHasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted",
+        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted,
+                                         "ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted",
                                          "OS leptons + Inclusive Boosted Jets (channel $e^+e^-$)"))
-        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted,
-                                         "MuMuHasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted",
+        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted,
+                                         "MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted",
                                          "OS leptons + Inclusive Boosted Jets (channel $\mu^+\mu^-$)"))
-        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonMllCutTightVetoInclusiveBoosted,
-                                         "ElMuHasFakeableDileptonMllCutTightVetoInclusiveBoosted",
+        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveBoosted,
+                                         "ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveBoosted",
                                          "OS leptons + Inclusive Boosted Jets (channel $e^{\pm}\mu^{\mp}$)"))
-        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonMllCutOutZTightVetoExclusiveBoosted,
-                                         "ElElHasFakeableDileptonMllCutOutZTightVetoExclusiveBoosted",
-                                         "OS leptons + Exclusive Boosted Jets (channel $e^+e^-$)"))
-        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonMllCutOutZTightVetoExclusiveBoosted,
-                                         "MuMuHasFakeableDileptonMllCutOutZTightVetoExclusiveBoosted",
-                                         "OS leptons + Exclusive Boosted Jets (channel $\mu^+\mu^-$)"))
-        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonMllCutTightVetoExclusiveBoosted,
-                                         "ElMuHasFakeableDileptonMllCutTightVetoExclusiveBoosted",
-                                         "OS leptons + Exclusive Boosted Jets (channel $e^{\pm}\mu^{\mp}$)"))
+#        plots.append(yieldPlots.addYield(ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveBoosted,
+#                                         "ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveBoosted",
+#                                         "OS leptons + Exclusive Boosted Jets (channel $e^+e^-$)"))
+#        plots.append(yieldPlots.addYield(MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveBoosted,
+#                                         "MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveBoosted",
+#                                         "OS leptons + Exclusive Boosted Jets (channel $\mu^+\mu^-$)"))
+#        plots.append(yieldPlots.addYield(ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveBoosted,
+#                                         "ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveBoosted",
+#                                         "OS leptons + Exclusive Boosted Jets (channel $e^{\pm}\mu^{\mp}$)"))
 
         # Plots #
         HasFakeableDileptonBoostedJetsChannelList = [
-             {'channel':'ElEl','sel':ElElHasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted,'dilepton':OsElElFakeable[0],'suffix':'HasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted'},
-             {'channel':'MuMu','sel':MuMuHasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted,'dilepton':OsMuMuFakeable[0],'suffix':'HasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted'},
-             {'channel':'ElMu','sel':ElMuHasFakeableDileptonMllCutTightVetoInclusiveBoosted,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonMllCutTightVetoInclusiveBoosted'},
-             {'channel':'ElEl','sel':ElElHasFakeableDileptonMllCutOutZTightVetoExclusiveBoosted,'dilepton':OsElElFakeable[0],'suffix':'HasFakeableDileptonMllCutOutZTightVetoExclusiveBoosted'},
-             {'channel':'MuMu','sel':MuMuHasFakeableDileptonMllCutOutZTightVetoExclusiveBoosted,'dilepton':OsMuMuFakeable[0],'suffix':'HasFakeableDileptonMllCutOutZTightVetoExclusiveBoosted'},
-             {'channel':'ElMu','sel':ElMuHasFakeableDileptonMllCutTightVetoExclusiveBoosted,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonMllCutTightVetoExclusiveBoosted'},
+             {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted,'dilepton':OsElElFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted'},
+             {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted,'dilepton':OsMuMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted'},
+             {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveBoosted,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutTightVetoInclusiveBoosted'},
+#             {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveBoosted,'dilepton':OsElElFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoExclusiveBoosted'},
+#             {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveBoosted,'dilepton':OsMuMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutOutZTightVetoExclusiveBoosted'},
+#             {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveBoosted,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutTightVetoExclusiveBoosted'},
                                                   ]
         commonItems = ['channel','sel','suffix']
-        HasFakeableDileptonBoostedJetsBaseDictJetsN = {'objName':'Ak8BJets','objCont':self.ak8BJets,'Nmax':5,'xTitle':'N(Ak8 Bjets)'}
+        HasFakeableDileptonBoostedJetsBaseDictJetsN = {'objName':'Ak8BJets','objCont':self.ak8BJets,'Nmax':10,'xTitle':'N(Ak8 Bjets)'}
 
         for channelDict in HasFakeableDileptonBoostedJetsChannelList:
             # Dilepton #
@@ -367,45 +443,111 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
         #############################################################################
         #                     High-level combinations                               #
         #############################################################################
-        highLevelBaseQuantities = { # No need to repeat for each channelDict
-             'met'          : self.corrMET,
-             'jets'         : self.ak4Jets, 
-             'resolvedjets' : self.ak4BJets,
-             'lightjets'    : self.ak4LightJets,
-             'boostedjets'  : self.ak8BJets,
-                                  }
- 
-        HasOsMllCutHighLevelVariablesChannelList = [
-            # Resolved #
-            {'channel'      :'ElEl',
-             'dilepton'     : OsElElFakeable[0],
-             'sel'          : ElElHasFakeableDileptonMllCutOutZTightVetoExclusiveResolved,
-             'suffix'       : 'HasFakeableDileptonMllCutOutZTightVetoExclusiveResolved'},
-            {'channel'      :'MuMu',
-             'dilepton'     : OsMuMuFakeable[0],
-             'sel'          : MuMuHasFakeableDileptonMllCutOutZTightVetoExclusiveResolved,
-             'suffix'       : 'MuMuHasFakeableDileptonMllCutOutZTightVetoExclusiveResolved'},
-            {'channel'      :'ElMu',
-             'dilepton'     : OsElMuFakeable[0],
-             'sel'          : ElMuHasFakeableDileptonMllCutTightVetoExclusiveResolved,
-             'suffix'       : 'ElMuHasFakeableDileptonMllCutTightVetoExclusiveResolved'},
-            # Boosted #
-            {'channel'      :'ElEl',
-             'dilepton'     : OsElElFakeable[0],
-             'sel'          : ElElHasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted,
-             'suffix'       : 'HasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted'},
-            {'channel'      :'MuMu',
-             'dilepton'     : OsMuMuFakeable[0],
-             'sel'          : MuMuHasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted,
-             'suffix'       : 'MuMuHasFakeableDileptonMllCutOutZTightVetoInclusiveBoosted'},
-            {'channel'      :'ElMu',
-             'dilepton'     : OsElMuFakeable[0],
-             'sel'          : ElMuHasFakeableDileptonMllCutTightVetoInclusiveBoosted,
-             'suffix'       : 'ElMuHasFakeableDileptonMllCutTightVetoInclusiveBoosted'}
-                                                    ]
-
-        for channelDict in HasOsMllCutHighLevelVariablesChannelList:
-            plots.extend(makeHighLevelQuantities(**highLevelBaseQuantities,**channelDict))
+#        HasOsPreMllCutHighLevelVariablesChannelList = [
+#            # Resolved No Btag #
+#            {'channel'      : 'ElEl',
+#             'met'          : self.corrMET,
+#             'l1'           : OsElElFakeable[0][0],
+#             'l2'           : OsElElFakeable[0][1],
+#             'j1'           : self.ak4Jets[0],
+#             'j2'           : self.ak4Jets[1],
+#             'sel'          : ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag ,
+#             'suffix'       : 'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag'},
+#            {'channel'      : 'MuMu',
+#             'met'          : self.corrMET,
+#             'l1'           : OsMuMuFakeable[0][0],
+#             'l2'           : OsMuMuFakeable[0][1],
+#             'j1'           : self.ak4Jets[0],
+#             'j2'           : self.ak4Jets[1],
+#             'sel'          : MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag,
+#             'suffix'       : 'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag'},
+#            {'channel'      : 'ElMu',
+#             'met'          : self.corrMET,
+#             'l1'           : OsElMuFakeable[0][0],
+#             'l2'           : OsElMuFakeable[0][1],
+#             'j1'           : self.ak4Jets[0],
+#             'j2'           : self.ak4Jets[1],
+#             'sel'          : ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag,
+#             'suffix'       : 'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag'},
+#            # Resolved One Btag #
+#            {'channel'      : 'ElEl',
+#             'met'          : self.corrMET,
+#             'l1'           : OsElElFakeable[0][0],
+#             'l2'           : OsElElFakeable[0][1],
+#             'j1'           : self.ak4BJets[0],
+#             'j2'           : self.ak4Jets[0],
+#             'sel'          : ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag,
+#             'suffix'       : 'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag'},
+#            {'channel'      : 'MuMu',
+#             'met'          : self.corrMET,
+#             'l1'           : OsMuMuFakeable[0][0],
+#             'l2'           : OsMuMuFakeable[0][1],
+#             'j1'           : self.ak4BJets[0],
+#             'j2'           : self.ak4Jets[0],
+#             'sel'          : MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag, 
+#             'suffix'       : 'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag'},
+#            {'channel'      : 'ElMu',
+#             'met'          : self.corrMET,
+#             'l1'           : OsElMuFakeable[0][0],
+#             'l2'           : OsElMuFakeable[0][1],
+#             'j1'           : self.ak4BJets[0],
+#             'j2'           : self.ak4Jets[0],
+#             'sel'          : ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag, 
+#             'suffix'       : 'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag'},
+#            # Resolved Two Btags  #
+#            {'channel'      : 'ElEl',
+#             'met'          : self.corrMET,
+#             'l1'           : OsElElFakeable[0][0],
+#             'l2'           : OsElElFakeable[0][1],
+#             'j1'           : self.ak4BJets[0],
+#             'j2'           : self.ak4BJets[1],
+#             'sel'          : ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags, 
+#             'suffix'       : 'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags'},
+#            {'channel'      : 'MuMu',
+#             'met'          : self.corrMET,
+#             'l1'           : OsMuMuFakeable[0][0],
+#             'l2'           : OsMuMuFakeable[0][1],
+#             'j1'           : self.ak4BJets[0],
+#             'j2'           : self.ak4BJets[1],
+#             'sel'          : MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags, 
+#             'suffix'       : 'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags'},
+#            {'channel'      : 'ElMu',
+#             'met'          : self.corrMET,
+#             'l1'           : OsElMuFakeable[0][0],
+#             'l2'           : OsElMuFakeable[0][1],
+#             'j1'           : self.ak4BJets[0],
+#             'j2'           : self.ak4BJets[1],
+#             'sel'          : ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags,
+#             'suffix'       : 'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags'},
+#            # Boosted #
+#            {'channel'      : 'ElEl',
+#             'met'          : self.corrMET,
+#             'l1'           : OsElElFakeable[0][0],
+#             'l2'           : OsElElFakeable[0][1],
+#             'j1'           : self.ak8BJets[0].subJet1,
+#             'j2'           : self.ak8BJets[0].subJet2,
+#             'sel'          : ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted, 
+#             'suffix'       : 'ElElHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted'},
+#            {'channel'      : 'MuMu',
+#             'met'          : self.corrMET,
+#             'l1'           : OsMuMuFakeable[0][0],
+#             'l2'           : OsMuMuFakeable[0][1],
+#             'j1'           : self.ak8BJets[0].subJet1,
+#             'j2'           : self.ak8BJets[0].subJet2,
+#             'sel'          : MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted, 
+#             'suffix'       : 'MuMuHasFakeableDileptonPreMllCutOutZTightVetoInclusiveBoosted'},
+#            {'channel'      : 'ElMu',
+#             'met'          : self.corrMET,
+#             'l1'           : OsElMuFakeable[0][0],
+#             'l2'           : OsElMuFakeable[0][1],
+#             'j1'           : self.ak8BJets[0].subJet1,
+#             'j2'           : self.ak8BJets[0].subJet2,
+#             'sel'          : ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveBoosted, 
+#             'suffix'       : 'ElMuHasFakeableDileptonPreMllCutTightVetoInclusiveBoosted'},
+#                                      ]
+#
+#        for channelDict in HasOsPreMllCutHighLevelVariablesChannelList:
+#            plots.extend(makeHighLevelQuantities(**channelDict))
 
         return plots
 
