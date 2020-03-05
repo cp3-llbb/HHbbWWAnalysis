@@ -181,7 +181,7 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
                              {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoTwoAk4Jets,    'dilepton':OsElMuFakeable[0],'suffix':'HasFakeableDileptonPreMllCutTightVetoTwoAk4Jets'},
                                                   ]
         commonItems = ['channel','sel','suffix']
-        HasFakeableDileptonTwoAk4JetsBaseDictJetsPlots = {'leadjet':self.ak4Jets[0],'subleadjet':self.ak4Jets[1],'tag':'','lead_is_b':False,'sublead_is_b':False}
+        HasFakeableDileptonTwoAk4JetsBaseDictJetsPlots = {'leadjet':self.ak4Jets[0],'subleadjet':self.ak4Jets[1],'lead_is_b':False,'sublead_is_b':False}
         HasFakeableDileptonTwoAk4JetsBaseDictJetsN = {'objName':'Ak4Jets','objCont':self.ak4Jets,'Nmax':10,'xTitle':'N(Ak4 jets)'}
                                                     
         for channelDict in HasFakeableDileptonTwoAk4JetsChannelList:
@@ -321,17 +321,17 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
 
         # Dijet plots #
         HasFakeableDileptonResolvedJetsChannelListJets = [
-            {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag,'suffix':'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag','leadjet':self.ak4LightJets[0],'subleadjet':self.ak4LightJets[1],'tag':'NoBtag','lead_is_b':False,'sublead_is_b':False},
-            {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag,'suffix':'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag','leadjet':self.ak4LightJets[0],'subleadjet':self.ak4LightJets[1],'tag':'NoBtag','lead_is_b':False,'sublead_is_b':False},
-            {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag,'suffix':'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag','leadjet':self.ak4LightJets[0],'subleadjet':self.ak4LightJets[1],'tag':'NoBtag','lead_is_b':False,'sublead_is_b':False},
+            {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag,'suffix':'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag','leadjet':self.ak4LightJets[0],'subleadjet':self.ak4LightJets[1],'lead_is_b':False,'sublead_is_b':False},
+            {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag,'suffix':'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedNoBtag','leadjet':self.ak4LightJets[0],'subleadjet':self.ak4LightJets[1],'lead_is_b':False,'sublead_is_b':False},
+            {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag,'suffix':'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedNoBtag','leadjet':self.ak4LightJets[0],'subleadjet':self.ak4LightJets[1],'lead_is_b':False,'sublead_is_b':False},
 
-            {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag,'suffix':'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag','leadjet':self.ak4BJets[0],'subleadjet':self.ak4LightJets[0],'tag':'OneBtag','lead_is_b':True,'sublead_is_b':False},
-            {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag,'suffix':'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag','leadjet':self.ak4BJets[0],'subleadjet':self.ak4LightJets[0],'tag':'OneBtag','lead_is_b':True,'sublead_is_b':False},
-            {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag,'suffix':'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag','leadjet':self.ak4BJets[0],'subleadjet':self.ak4LightJets[0],'tag':'OneBtag','lead_is_b':True,'sublead_is_b':False},
+            {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag,'suffix':'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag','leadjet':self.ak4BJets[0],'subleadjet':self.ak4LightJets[0],'lead_is_b':True,'sublead_is_b':False},
+            {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag,'suffix':'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedOneBtag','leadjet':self.ak4BJets[0],'subleadjet':self.ak4LightJets[0],'lead_is_b':True,'sublead_is_b':False},
+            {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag,'suffix':'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedOneBtag','leadjet':self.ak4BJets[0],'subleadjet':self.ak4LightJets[0],'lead_is_b':True,'sublead_is_b':False},
 
-            {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags,'suffix':'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags','leadjet':self.ak4BJets[0],'subleadjet':self.ak4BJets[1],'tag':'TwoBtags','lead_is_b':True,'sublead_is_b':True},
-            {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags,'suffix':'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags','leadjet':self.ak4BJets[0],'subleadjet':self.ak4BJets[1],'tag':'TwoBtags','lead_is_b':True,'sublead_is_b':True},
-            {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags,'suffix':'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags','leadjet':self.ak4BJets[0],'subleadjet':self.ak4BJets[1],'tag':'TwoBtags','lead_is_b':True,'sublead_is_b':True},
+            {'channel':'ElEl','sel':ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags,'suffix':'ElElHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags','leadjet':self.ak4BJets[0],'subleadjet':self.ak4BJets[1],'lead_is_b':True,'sublead_is_b':True},
+            {'channel':'MuMu','sel':MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags,'suffix':'MuMuHasFakeableDileptonPreMllCutOutZTightVetoExclusiveResolvedTwoBtags','leadjet':self.ak4BJets[0],'subleadjet':self.ak4BJets[1],'lead_is_b':True,'sublead_is_b':True},
+            {'channel':'ElMu','sel':ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags,'suffix':'ElMuHasFakeableDileptonPreMllCutTightVetoExclusiveResolvedTwoBtags','leadjet':self.ak4BJets[0],'subleadjet':self.ak4BJets[1],'lead_is_b':True,'sublead_is_b':True},
                                                           ]
         for channelDict in HasFakeableDileptonResolvedJetsChannelListJets:
             plots.extend(makeAk4JetsPlots(**channelDict))
