@@ -82,7 +82,7 @@ def triggerPlots(sel,triggerDict,suffix,channel):
     
     # Single Electron #
     plots.append(Plot.make1D("%s_%s_trigger_singleElectron"%(channel,suffix), 
-                             op.OR(*triggerDict["DoubleMuon"]),
+                             op.OR(*triggerDict["SingleElectron"]),
                              sel, 
                              EquidistantBinning(2, 0., 2.), 
                              xTitle= "SingleElectron trigger",

@@ -21,10 +21,12 @@ class TemplateLatex:
                         ])
             
         self.selections = collections.OrderedDict([
+                        ('TwoAk4Jets_' , "At least two Ak4 Jets (before Btagging)"),
+                        ('OneAk8Jet_' , "At least one Ak8 Jet (before Btagging)"),
                         ('ExclusiveResolvedNoBtag_' , "Exclusive Resolved Jets (no Btag)"),
                         ('ExclusiveResolvedOneBtag_' , "Exclusive Resolved Jets (1 Btag)"),
                         ('ExclusiveResolvedTwoBtags_' , "Exclusive Resolved Jets (2 Btags)"),
-                        ('InclusiveBoostedJets_' , "Inclusive Boosted Jets"),
+                        ('InclusiveBoosted_' , "Inclusive Boosted Jets"),
                         ])
         self.variables = collections.OrderedDict([
                         # Triggers #
