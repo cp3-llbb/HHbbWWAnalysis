@@ -197,13 +197,13 @@ class BaseNanoHHtobbWW(NanoAODModule):
 
         # Triggers and Gen Weight #
         if self.isMC(sample):
-            #pass # ONLY FOR SYNCHRO
-            noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
+            pass # ONLY FOR SYNCHRO
+            #noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
             #noSel = noSel.refine("genWeight", weight=op.abs(tree.genWeight), cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
             #noSel = noSel.refine("negWeight", cut=[tree.genWeight<0])
         else:
-            #pass # ONLY FOR SYNCHRO
-            noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset))
+            pass # ONLY FOR SYNCHRO
+            #noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset))
 
         return tree,noSel,be,lumiArgs
 
@@ -222,21 +222,21 @@ class BaseNanoHHtobbWW(NanoAODModule):
         ###########################################################################
         #                           TTbar reweighting                             #
         ###########################################################################
-        if self.isMC(sample) and sample.startswith("TT"):
-            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting#Use_case_3_ttbar_MC_is_used_to_m
-            # Get tops #
-            genTop_all = op.select(t.GenPart,lambda g : g.pdgId==6)
-            genTop = op.select(genTop_all,lambda g : g.statusFlags & ( 0x1 << 13))
-            genAntitop_all = op.select(t.GenPart,lambda g : g.pdgId==-6)
-            genAntitop = op.select(genAntitop_all,lambda g : g.statusFlags & ( 0x1 << 13))
-                # statusFlags==13 : isLastCopy
-                # Pdgid == 6 : top
-            #hasttbar = noSel.refine("hasttbar",cut=[op.rng_len(genTop)>=1,op.rng_len(genAntitop)>=1])
-            # Lambda to compute weight if there is a ttbar #
-            ttbar_SF = lambda t : op.exp(0.0615-0.0005*t.pt)
-            ttbar_weight = lambda t,tbar : op.sqrt(ttbar_SF(t)*ttbar_SF(tbar))
-           # Apply correction to TT #
-            noSel = noSel.refine("ttbarWeight",weight=ttbar_weight(genTop[0],genAntitop[0]))
+        #if self.isMC(sample) and sample.startswith("TT"):
+        #    # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting#Use_case_3_ttbar_MC_is_used_to_m
+        #    # Get tops #
+        #    genTop_all = op.select(t.GenPart,lambda g : g.pdgId==6)
+        #    genTop = op.select(genTop_all,lambda g : g.statusFlags & ( 0x1 << 13))
+        #    genAntitop_all = op.select(t.GenPart,lambda g : g.pdgId==-6)
+        #    genAntitop = op.select(genAntitop_all,lambda g : g.statusFlags & ( 0x1 << 13))
+        #        # statusFlags==13 : isLastCopy
+        #        # Pdgid == 6 : top
+        #    #hasttbar = noSel.refine("hasttbar",cut=[op.rng_len(genTop)>=1,op.rng_len(genAntitop)>=1])
+        #    # Lambda to compute weight if there is a ttbar #
+        #    ttbar_SF = lambda t : op.exp(0.0615-0.0005*t.pt)
+        #    ttbar_weight = lambda t,tbar : op.sqrt(ttbar_SF(t)*ttbar_SF(tbar))
+        #   # Apply correction to TT #
+        #    noSel = noSel.refine("ttbarWeight",weight=ttbar_weight(genTop[0],genAntitop[0]))
 
         #############################################################################
         #                             Pile-up                                       #
@@ -268,9 +268,9 @@ class BaseNanoHHtobbWW(NanoAODModule):
         self.corrMET = METcorrection(MET,t.PV,sample,era,self.isMC(sample))
 
         #############################################################################
-        #                                 Muons                                     #
+        #                      Lepton Lambdas Variables                             #
         #############################################################################
-        # lepton lambdas #
+        # Associated jet Btagging #
         self.lambda_hasAssociatedJet = lambda lep : op.AND(lep.jet.idx != -1 , op.deltaR(lep.p4,lep.jet.p4) <= 0.4)
         if era == "2016": 
             self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
@@ -282,23 +282,29 @@ class BaseNanoHHtobbWW(NanoAODModule):
             self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
                                                                         lep.jet.btagDeepFlavB < 0.2770)
 
-        # Preselection #
-        muonsByPt = op.sort(t.Muon, lambda mu : -mu.p4.Pt())
-        self.lambda_muonPreSel = lambda mu : op.AND(
-                                                    mu.p4.Pt() >= 5.,
-                                                    op.abs(mu.p4.Eta()) <= 2.4,
-                                                    op.abs(mu.dxy) <= 0.05,
-                                                    op.abs(mu.dz) <= 0.1,
-                                                    mu.miniPFRelIso_all <= 0.4, # mini PF relative isolation, total (with scaled rho*EA PU corrections)
-                                                    mu.sip3d <= 8,
-                                                    mu.looseId,
-                                              )
-        self.muonsPreSel = op.select(muonsByPt, self.lambda_muonPreSel)
-        # Fakeable selection #
-        #self.lambda_muon_conept = lambda mu : op.switch(mu.mvaTTH >= 0.85, mu.pt, op.static_cast("float",0.9*mu.jet.pt))
-        self.lambda_muon_conept = lambda mu : op.multiSwitch((mu.mvaTTH >= 0.85, op.static_cast("Float_t",mu.pt)),
-                                                             (self.lambda_hasAssociatedJet(mu), op.static_cast("Float_t",0.9*mu.jet.pt)),
-                                                             op.c_float(0.)) # No associated jet and fails MVA , returns 0 GeV (will be excluded)
+        # Cone pt #
+                    # Def conept : https://github.com/CERN-PH-CMG/cmgtools-lite/blob/f8a34c64a4489d94ff9ac4c0d8b0b06dad46e521/TTHAnalysis/python/tools/conept.py#L74
+        self.lambda_conept_electron = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
+                                                                  # if (abs(lep.pdgId)!=11 and abs(lep.pdgId)!=13): return lep.pt : anything that is not muon or electron
+                                                                  (op.AND(op.abs(lep.pdgId)==11 , lep.mvaTTH > 0.90) , op.static_cast("Float_t",lep.pt)),
+                                                                  # if (abs(lep.pdgId)!=13 or lep.mediumMuonId>0) and lep.mvaTTH > 0.90: return lep.pt 
+                                                                    # if electron, check above MVA 
+                                                                    # If muon, check that passes medium and above MVA
+                                                                  op.static_cast("Float_t",0.9*lep.pt/lep.jetPtRelv2))
+                                                                  # else: return 0.90 * lep.pt / lep.jetPtRatiov2
+
+                    # Def conept : https://github.com/CERN-PH-CMG/cmgtools-lite/blob/f8a34c64a4489d94ff9ac4c0d8b0b06dad46e521/TTHAnalysis/python/tools/conept.py#L74
+        self.lambda_conept_muon = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
+                                                               # if (abs(lep.pdgId)!=11 and abs(lep.pdgId)!=13): return lep.pt : anything that is not muon or electron
+                                                              (op.AND(op.abs(lep.pdgId)==13 , lep.mediumId ,lep.mvaTTH > 0.90) , op.static_cast("Float_t",lep.pt)),
+                                                               # if (abs(lep.pdgId)!=13 or lep.mediumMuonId>0) and lep.mvaTTH > 0.90: return lep.pt 
+                                                                    # if electron, check above MVA 
+                                                                    # If muon, check that passes medium and above MVA
+                                                               op.static_cast("Float_t",0.9*lep.pt/lep.jetPtRelv2))
+                                                               # else: return 0.90 * lep.pt / lep.jetPtRatiov2
+
+        # Btag interpolation #
+                    # https://indico.cern.ch/event/812025/contributions/3475878/attachments/1867083/3070589/gp-fr-run2b.pdf (slide 7)
         self.lambda_muon_x = lambda mu : op.min(op.max(0.,(0.9*mu.pt*(1+mu.jetRelIso))-20.)/(45.-20.), 1.)
                     # x = min(max(0, jet_pt-PT_min)/(PT_max-PT_min), 1) where jet_pt = 0.9*PT_muon*(1+MuonJetRelIso), PT_min=25, PT_max=40
         if era == "2016": 
@@ -310,12 +316,30 @@ class BaseNanoHHtobbWW(NanoAODModule):
             # return x*WP_loose+(1-x)*WP_medium
         self.lambda_muon_deepJetInterpIfMvaFailed = lambda mu : op.AND(self.lambda_hasAssociatedJet(mu),
                                                                       mu.jet.btagDeepFlavB < self.lambda_muon_btagInterpolation(mu))
+
+
+        #############################################################################
+        #                                 Muons                                     #
+        #############################################################################
+
+        # Preselection #
+        muonsByPt = op.sort(t.Muon, lambda mu : -self.lambda_conept_muon(mu)) # Ordering done by conept
+        self.lambda_muonPreSel = lambda mu : op.AND(
+                                                    mu.p4.Pt() >= 5.,
+                                                    op.abs(mu.p4.Eta()) <= 2.4,
+                                                    op.abs(mu.dxy) <= 0.05,
+                                                    op.abs(mu.dz) <= 0.1,
+                                                    mu.miniPFRelIso_all <= 0.4, # mini PF relative isolation, total (with scaled rho*EA PU corrections)
+                                                    mu.sip3d <= 8,
+                                                    mu.looseId,
+                                              )
+        self.muonsPreSel = op.select(muonsByPt, self.lambda_muonPreSel)
+        # Fakeable selection #
         self.lambda_muonFakeSel = lambda mu : op.AND(
-                                                    self.lambda_muon_conept(mu) >= op.c_float(10.),
+                                                    self.lambda_conept_muon(mu) >= op.c_float(10.),
                                                     self.lambda_lepton_associatedJetNoBtag(mu),
                                                     op.OR(mu.mvaTTH >= 0.85, op.AND(mu.jetRelIso<0.5 , self.lambda_muon_deepJetInterpIfMvaFailed(mu))), 
                                                         # If mvaTTH < 0.85 : jetRelIso <0.5 and < deepJet medium with interpolation
-                                                        # https://indico.cern.ch/event/812025/contributions/3475878/attachments/1867083/3070589/gp-fr-run2b.pdf (slide 7)
                                                 )
         self.muonsFakeSel = op.select(self.muonsPreSel, self.lambda_muonFakeSel)
         # Tight selection #
@@ -329,7 +353,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
         #                              Electrons                                    #
         #############################################################################
         # Preselection #
-        electronsByPt = op.sort(t.Electron, lambda ele : -ele.p4.Pt())
+        electronsByPt = op.sort(t.Electron, lambda ele : -self.lambda_conept_electron(ele)) # Ordering done by conept
         self.lambda_electronPreSel = lambda ele : op.AND(
                                                         ele.p4.Pt() >= 7.,
                                                         op.abs(ele.p4.Eta()) <= 2.5,
@@ -345,12 +369,8 @@ class BaseNanoHHtobbWW(NanoAODModule):
             # No overlap between electron and muon in cone of DR<=0.3
         self.electronsPreSel = op.select(self.electronsPreSelInclu, self.lambda_cleanElectron)
         # Fakeable selection #
-        #self.lambda_electron_conept = lambda ele : op.switch(ele.mvaTTH >= 0.80, ele.pt, op.static_cast("Float_t",0.9*ele.jet.pt))
-        self.lambda_electron_conept = lambda ele : op.multiSwitch((ele.mvaTTH >= 0.80, op.static_cast("Float_t",ele.pt)),
-                                                                  (self.lambda_hasAssociatedJet(ele), op.static_cast("Float_t",0.9*ele.jet.pt)),
-                                                                  op.c_float(0.)) # No associated jet and fails MVA , returns 0 GeV (will be excluded)
         self.lambda_electronFakeSel = lambda ele : op.AND(
-                                                        self.lambda_electron_conept(ele) >= 10,
+                                                        self.lambda_conept_electron(ele) >= 10,
                                                         op.OR(
                                                                 op.AND(op.abs(ele.eta)<1.479, ele.sieie<=0.011), 
                                                                 op.AND(op.AND(op.abs(ele.eta)>=1.479,op.abs(ele.eta)<=2.5), ele.sieie<=0.030)),
@@ -413,12 +433,16 @@ class BaseNanoHHtobbWW(NanoAODModule):
         #                                AK8 Jets                                   #
         #############################################################################
         self.ak8JetsByPt = op.sort(t.FatJet, lambda jet : -jet.p4.Pt())
+        lambda_subJet1_exists = lambda fatjet : fatjet.subJet1._idx.result != -1
         # Preselection #
         if era == "2016":
             self.lambda_ak8JetsPreSel = lambda j : op.AND(
                                                         j.jetId & 1, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
                                                         j.p4.Pt() > 200.,
                                                         op.abs(j.p4.Eta())< 2.4,
+                                                        op.AND(j.subJet1._idx.result != -1, j.subJet1.pt > 20. , op.abs(j.subJet1.eta)<2.4,
+                                                               j.subJet2._idx.result != -1, j.subJet2.pt > 20. , op.abs(j.subJet2.eta)<2.4),
+                                                               # Fatjet subjets must exist before checking Pt and eta 
                                                         op.AND(j.msoftdrop > 30, j.msoftdrop < 210),
                                                         j.tau2/j.tau1 < 0.75
                                                     )
@@ -427,6 +451,9 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                         j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
                                                         j.p4.Pt() > 200.,
                                                         op.abs(j.p4.Eta())< 2.4,
+                                                        op.AND(j.subJet1._idx.result != -1, j.subJet1.pt > 20. , op.abs(j.subJet1.eta)<2.4,
+                                                               j.subJet2._idx.result != -1, j.subJet2.pt > 20. , op.abs(j.subJet2.eta)<2.4),
+                                                               # Fatjet subjets must exist before checking Pt and eta 
                                                         op.AND(j.msoftdrop > 30, j.msoftdrop < 210),
                                                         j.tau2/j.tau1 < 0.75
                                                     )

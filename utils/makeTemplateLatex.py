@@ -143,9 +143,10 @@ class TemplateLatex:
 \usepackage[absolute,overlay]{textpos}
 \begin{document}
                         """
+        self.content += "\n"
 
     def makeFooter(self):
-        self.content += "\n\end{document}"
+        self.content += "\n\end{document}\n"
 
     def makeFrames(self):
         for sel,sel_name in self.selections.items():
@@ -167,6 +168,7 @@ class TemplateLatex:
     \end{figure}
 \end{frame}
                         """
+                frame += "\n%"+"-"*80+"\n"
                 
                 if valid_plot:
                     self.content += frame

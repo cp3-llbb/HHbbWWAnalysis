@@ -51,7 +51,7 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
             DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
             DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+self.sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
 
-        #############################################################################
+        ##############################################################################
         #                               Dilepton                                    #
         #############################################################################
         # Make dilepton fakeable pairs wrt to channel #
@@ -136,6 +136,11 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
                                                  self.lambda_muonTightSel(OsElMuDilepton[0][1]),
                                                  lambda_is_matched(OsElMuDilepton[0])])
 
+        # Yield #
+        plots.append(yieldPlots.addYield(ElElHasTightDileptonPreMllCutOutZTightVeto,"ElElHasTightDileptonPreMllCutOutZTightVeto","OS tight leptons + $M_{ll}$ cut + Two tights veto (channel $e^+e^-$)"))
+        plots.append(yieldPlots.addYield(MuMuHasTightDileptonPreMllCutOutZTightVeto,"MuMuHasTightDileptonPreMllCutOutZTightVeto","OS tight leptons + $M_{ll}$ cut + Two tights veto (channel $\mu^+\mu^-$)"))
+        plots.append(yieldPlots.addYield(ElMuHasTightDileptonPreMllCutTightVeto,"ElMuHasTightDileptonPreMllCutTightVeto","OS tight leptons + $M_{ll}$ cut + Two tights veto (channel $e^{\pm}\mu^{\mp}$)"))
+
 
         # Trigger Plots #
         plots.extend(triggerPlots(sel         = ElElHasTightDileptonPreMllCutOutZTightVeto,
@@ -156,19 +161,19 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
                                  DilepElEl  = OsElElDilepton,
                                  DilepMuMu  = OsMuMuDilepton,
                                  DilepElMu  = OsElMuDilepton,
-                                 suffix     = "HasTightDileptonPreMllCutOutZTightVeto",
+                                 suffix     = "ElElHasTightDileptonPreMllCutOutZTightVeto",
                                  channel    = "ElEl"))
         plots.extend(channelPlot(sel        = MuMuHasTightDileptonPreMllCutOutZTightVeto,
                                  DilepElEl  = OsElElDilepton,
                                  DilepMuMu  = OsMuMuDilepton,
                                  DilepElMu  = OsElMuDilepton,
-                                 suffix     = "HasTightDileptonPreMllCutOutZTightVeto",
+                                 suffix     = "MuMuHasTightDileptonPreMllCutOutZTightVeto",
                                  channel    = "MuMu"))
         plots.extend(channelPlot(sel        = ElMuHasTightDileptonPreMllCutTightVeto,
                                  DilepElEl  = OsElElDilepton,
                                  DilepMuMu  = OsMuMuDilepton,
                                  DilepElMu  = OsElMuDilepton,
-                                 suffix     = "HasTightDileptonPreMllCutTightVeto",
+                                 suffix     = "ElMuHasTightDileptonPreMllCutTightVeto",
                                  channel    = "ElMu"))
 
 
@@ -214,6 +219,30 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
             # MET #
             plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
 
+        # Check plots #
+        ElElHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets = ElElHasFakeableDileptonPreMllCutOutZTightVeto.refine("ElElHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets",
+                                cut=[op.rng_len(self.ak4Jets)>=2])
+        MuMuHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets = MuMuHasFakeableDileptonPreMllCutOutZTightVeto.refine("MuMuHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets",
+                                cut=[op.rng_len(self.ak4Jets)>=2])
+        ElMuHasFakeableDileptonPreMllCutTightVetoTwoAk4Jets = ElMuHasFakeableDileptonPreMllCutTightVeto.refine("ElMuHasFakeableDileptonPreMllCutTightVetoTwoAk4Jets",
+                                cut=[op.rng_len(self.ak4Jets)>=2])
+
+        # Dilepton channel plots #
+        plots.extend(makeDileptonCheckPlots(self        = self,
+                                            sel         = ElElHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets,
+                                            suffix      = "ElElHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets",
+                                            dilepton    = OsElElDilepton[0],
+                                            channel     = 'ElEl'))
+        plots.extend(makeDileptonCheckPlots(self        = self,
+                                            sel         = MuMuHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets,
+                                            suffix      = "MuMuHasFakeableDileptonPreMllCutOutZTightVetoTwoAk4Jets",
+                                            dilepton    = OsMuMuDilepton[0],
+                                            channel     = 'MuMu'))
+        plots.extend(makeDileptonCheckPlots(self        = self,
+                                            sel         = ElMuHasFakeableDileptonPreMllCutTightVetoTwoAk4Jets,
+                                            suffix      = "ElMuHasFakeableDileptonPreMllCutTightVetoTwoAk4Jets",
+                                            dilepton    = OsElMuDilepton[0],
+                                            channel     = 'ElMu'))
 
         #############################################################################
         #                              Ak4 Btagging                                 #
