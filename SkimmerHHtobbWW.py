@@ -34,8 +34,8 @@ class SkimmerNanoHHtobbWW(BaseNanoHHtobbWW,SkimmerModule):
         varsToKeep["n_presel_ele"]      = op.static_cast("UInt_t",op.rng_len(self.electronsPreSel))
         varsToKeep["n_fakeablesel_ele"] = op.static_cast("UInt_t",op.rng_len(self.electronsFakeSel))
         varsToKeep["n_mvasel_ele"]      = op.static_cast("UInt_t",op.rng_len(self.electronsTightSel))
-        varsToKeep["n_presel_ak4Jet"]   = op.static_cast("UInt_t",op.rng_len(self.ak4JetsPreSel))    # Should I include cleaning ?
-        varsToKeep["n_presel_ak8Jet"]   = op.static_cast("UInt_t",op.rng_len(self.ak8JetsPreSel))    # Should I include cleaning ?
+        varsToKeep["n_presel_ak4Jet"]   = op.static_cast("UInt_t",op.rng_len(self.ak4Jets))    
+        varsToKeep["n_presel_ak8Jet"]   = op.static_cast("UInt_t",op.rng_len(self.ak8Jets))    
 
         # Muons #
         for i in range(1,3): # 2 leading muons
@@ -44,7 +44,7 @@ class SkimmerNanoHHtobbWW(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep["mu{}_phi".format(i)]                   = op.switch(op.rng_len(self.muonsPreSel) >= i, self.muonsPreSel[i-1].phi, op.c_float(-9999.))
             varsToKeep["mu{}_E".format(i)]                     = op.switch(op.rng_len(self.muonsPreSel) >= i, self.muonsPreSel[i-1].p4.E(), op.c_float(-9999., "float"))
             varsToKeep["mu{}_charge".format(i)]                = op.switch(op.rng_len(self.muonsPreSel) >= i, self.muonsPreSel[i-1].charge, op.c_int(-9999.))
-            varsToKeep["mu{}_conept".format(i)]                = op.switch(op.rng_len(self.muonsPreSel) >= i, self.lambda_muon_conept(self.muonsPreSel[i-1]), op.c_float(-9999.))
+            varsToKeep["mu{}_conept".format(i)]                = op.switch(op.rng_len(self.muonsPreSel) >= i, self.lambda_conept_muon(self.muonsPreSel[i-1]), op.c_float(-9999.))
             varsToKeep["mu{}_miniRelIso".format(i)]            = op.switch(op.rng_len(self.muonsPreSel) >= i, self.muonsPreSel[i-1].miniPFRelIso_all, op.c_float(-9999.))
             varsToKeep["mu{}_PFRelIso04".format(i)]            = op.switch(op.rng_len(self.muonsPreSel) >= i, self.muonsPreSel[i-1].pfRelIso04_all, op.c_float(-9999.))
             varsToKeep["mu{}_jetNDauChargedMVASel".format(i)]  = op.c_float(-9999.)
@@ -70,7 +70,7 @@ class SkimmerNanoHHtobbWW(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep["ele{}_phi".format(i)]                   = op.switch(op.rng_len(self.electronsPreSel) >= i, self.electronsPreSel[i-1].phi, op.c_float(-9999.))
             varsToKeep["ele{}_E".format(i)]                     = op.switch(op.rng_len(self.electronsPreSel) >= i, self.electronsPreSel[i-1].p4.E(), op.c_float(-9999., "float"))
             varsToKeep["ele{}_charge".format(i)]                = op.switch(op.rng_len(self.electronsPreSel) >= i, self.electronsPreSel[i-1].charge, op.c_int(-9999.))
-            varsToKeep["ele{}_conept".format(i)]                = op.switch(op.rng_len(self.electronsPreSel) >= i, self.lambda_electron_conept(self.electronsPreSel[i-1]), op.c_float(-9999.))
+            varsToKeep["ele{}_conept".format(i)]                = op.switch(op.rng_len(self.electronsPreSel) >= i, self.lambda_conept_elecron(self.electronsPreSel[i-1]), op.c_float(-9999.))
             varsToKeep["ele{}_miniRelIso".format(i)]            = op.switch(op.rng_len(self.electronsPreSel) >= i, self.electronsPreSel[i-1].miniPFRelIso_all, op.c_float(-9999.))
             varsToKeep["ele{}_PFRelIso03".format(i)]            = op.switch(op.rng_len(self.electronsPreSel) >= i, self.electronsPreSel[i-1].pfRelIso03_all, op.c_float(-9999.)) # Iso03, Iso04 not in NanoAOD
             varsToKeep["ele{}_jetNDauChargedMVASel".format(i)]  = op.c_float(-9999.)
@@ -94,29 +94,29 @@ class SkimmerNanoHHtobbWW(BaseNanoHHtobbWW,SkimmerModule):
  
         # AK4 Jets #
         for i in range(1,5): # 4 leading jets 
-            varsToKeep["ak4Jet{}_pt".format(i)]                 = op.switch(op.rng_len(self.ak4JetsPreSel) >= i, self.ak4JetsPreSel[i-1].pt, op.c_float(-9999.,"float"))
-            varsToKeep["ak4Jet{}_eta".format(i)]                = op.switch(op.rng_len(self.ak4JetsPreSel) >= i, self.ak4JetsPreSel[i-1].eta, op.c_float(-9999.))
-            varsToKeep["ak4Jet{}_phi".format(i)]                = op.switch(op.rng_len(self.ak4JetsPreSel) >= i, self.ak4JetsPreSel[i-1].phi, op.c_float(-9999.))
-            varsToKeep["ak4Jet{}_E".format(i)]                  = op.switch(op.rng_len(self.ak4JetsPreSel) >= i, self.ak4JetsPreSel[i-1].p4.E(), op.c_float(-9999., "float"))
-            varsToKeep["ak4Jet{}_CSV".format(i)]                = op.switch(op.rng_len(self.ak4JetsPreSel) >= i, self.ak4JetsPreSel[i-1].btagDeepFlavB, op.c_float(-9999.))
+            varsToKeep["ak4Jet{}_pt".format(i)]                 = op.switch(op.rng_len(self.ak4Jets) >= i, self.ak4Jets[i-1].pt, op.c_float(-9999.,"float"))
+            varsToKeep["ak4Jet{}_eta".format(i)]                = op.switch(op.rng_len(self.ak4Jets) >= i, self.ak4Jets[i-1].eta, op.c_float(-9999.))
+            varsToKeep["ak4Jet{}_phi".format(i)]                = op.switch(op.rng_len(self.ak4Jets) >= i, self.ak4Jets[i-1].phi, op.c_float(-9999.))
+            varsToKeep["ak4Jet{}_E".format(i)]                  = op.switch(op.rng_len(self.ak4Jets) >= i, self.ak4Jets[i-1].p4.E(), op.c_float(-9999., "float"))
+            varsToKeep["ak4Jet{}_CSV".format(i)]                = op.switch(op.rng_len(self.ak4Jets) >= i, self.ak4Jets[i-1].btagDeepFlavB, op.c_float(-9999.))
 
         # AK8 Jets #
         for i in range(1,5): # 2 leading fatjets 
-            varsToKeep["ak8Jet{}_pt".format(i)]                 = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].pt, op.c_float(-9999.))
-            varsToKeep["ak8Jet{}_eta".format(i)]                = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].eta, op.c_float(-9999.))
-            varsToKeep["ak8Jet{}_phi".format(i)]                = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].phi, op.c_float(-9999.))
-            varsToKeep["ak8Jet{}_E".format(i)]                  = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].p4.E(), op.c_float(-9999., "float"))
-            varsToKeep["ak8Jet{}_msoftdrop".format(i)]          = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].msoftdrop, op.c_float(-9999.))
-            varsToKeep["ak8Jet{}_tau1".format(i)]               = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].tau1, op.c_float(-9999.))
-            varsToKeep["ak8Jet{}_tau2".format(i)]               = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].tau2, op.c_float(-9999.))
-            varsToKeep["ak8Jet{}_subjet1_pt".format(i)]         = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].subJet1.pt, op.c_float(-9999.))
-            varsToKeep["ak8Jet{}_subjet1_eta".format(i)]        = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].subJet1.eta, op.c_float(-9999.))
-            varsToKeep["ak8Jet{}_subjet1_phi".format(i)]        = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].subJet1.phi, op.c_float(-9999.))
-            varsToKeep["ak8Jet{}_subjet1_CSV".format(i)]        = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].subJet1.btagDeepB, op.c_float(-9999.))
-            varsToKeep["ak8Jet{}_subjet2_pt".format(i)]         = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].subJet2.pt, op.c_float(-9999.))
-            varsToKeep["ak8Jet{}_subjet2_eta".format(i)]        = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].subJet2.eta, op.c_float(-9999.))
-            varsToKeep["ak8Jet{}_subjet2_phi".format(i)]        = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].subJet2.phi, op.c_float(-9999.))
-            varsToKeep["ak8Jet{}_subjet2_CSV".format(i)]        = op.switch(op.rng_len(self.ak8JetsPreSel) >= i, self.ak8JetsPreSel[i-1].subJet2.btagDeepB, op.c_float(-9999.))
+            varsToKeep["ak8Jet{}_pt".format(i)]                 = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].pt, op.c_float(-9999.))
+            varsToKeep["ak8Jet{}_eta".format(i)]                = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].eta, op.c_float(-9999.))
+            varsToKeep["ak8Jet{}_phi".format(i)]                = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].phi, op.c_float(-9999.))
+            varsToKeep["ak8Jet{}_E".format(i)]                  = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].p4.E(), op.c_float(-9999., "float"))
+            varsToKeep["ak8Jet{}_msoftdrop".format(i)]          = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].msoftdrop, op.c_float(-9999.))
+            varsToKeep["ak8Jet{}_tau1".format(i)]               = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].tau1, op.c_float(-9999.))
+            varsToKeep["ak8Jet{}_tau2".format(i)]               = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].tau2, op.c_float(-9999.))
+            varsToKeep["ak8Jet{}_subjet1_pt".format(i)]         = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].subJet1.pt, op.c_float(-9999.))
+            varsToKeep["ak8Jet{}_subjet1_eta".format(i)]        = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].subJet1.eta, op.c_float(-9999.))
+            varsToKeep["ak8Jet{}_subjet1_phi".format(i)]        = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].subJet1.phi, op.c_float(-9999.))
+            varsToKeep["ak8Jet{}_subjet1_CSV".format(i)]        = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].subJet1.btagDeepB, op.c_float(-9999.))
+            varsToKeep["ak8Jet{}_subjet2_pt".format(i)]         = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].subJet2.pt, op.c_float(-9999.))
+            varsToKeep["ak8Jet{}_subjet2_eta".format(i)]        = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].subJet2.eta, op.c_float(-9999.))
+            varsToKeep["ak8Jet{}_subjet2_phi".format(i)]        = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].subJet2.phi, op.c_float(-9999.))
+            varsToKeep["ak8Jet{}_subjet2_CSV".format(i)]        = op.switch(op.rng_len(self.ak8Jets) >= i, self.ak8Jets[i-1].subJet2.btagDeepB, op.c_float(-9999.))
 
         # MET #
          

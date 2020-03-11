@@ -261,6 +261,90 @@ def makeDileptonPlots(sel, dilepton, suffix, channel, isMC=False):
 #
     return plots
 
+######################  DILEPTON CHECK PLOTS #############################
+def makeDileptonCheckPlots(self,sel, dilepton, suffix, channel):
+    """
+    Make dilepton basic plots
+    sel         = refine selection 
+    dilepton    = dilepton object (ElEl, ElMu, MuMu)
+    suffix      = string identifying the selecton 
+    channel     = string identifying the channel of the dilepton (can be "NoChannel")
+    """
+    plots = []
+
+    channelLabel = channelTitleLabel(channel)
+
+    # Lepton MVA #
+    plots.append(Plot.make1D("%s_%s_firstlepton_checkMVAttH"%(channel,suffix), 
+                             dilepton[0].mvaTTH, 
+                             sel, 
+                             EquidistantBinning(50,-1.,1.),
+                             xTitle= "ttH Lepton MVA (first lepton)",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_secondlepton_checkMVAttH"%(channel,suffix), 
+                             dilepton[1].mvaTTH, 
+                             sel, 
+                             EquidistantBinning(50,-1.,1.),
+                             xTitle= "ttH Lepton MVA (second lepton)",
+                             plotopts = channelLabel))
+
+    # JetDeepJet (needs to check if associated jet) #
+    firstHasAssociatedJet = sel.refine(suffix+"firstHasAssociatedJet",cut=[self.lambda_hasAssociatedJet(dilepton[0])])
+    firstHasNotAssociatedJet = sel.refine(suffix+"firstHasNotAssociatedJet",cut=[op.NOT(self.lambda_hasAssociatedJet(dilepton[0]))])
+    secondHasAssociatedJet = sel.refine(suffix+"secondHasAssociatedJet",cut=[self.lambda_hasAssociatedJet(dilepton[1])])
+    secondHasNotAssociatedJet = sel.refine(suffix+"secondHasNotAssociatedJet",cut=[op.NOT(self.lambda_hasAssociatedJet(dilepton[1]))])
+
+    firstDeepJet_has = Plot.make1D("%s_%s_firstlepton_checkhasJetDeepFlavB"%(channel,suffix), 
+                                 dilepton[0].jet.btagDeepFlavB, 
+                                 firstHasAssociatedJet, 
+                                 EquidistantBinning(50,-1,1.),
+                                 xTitle= "jetDeepJet (first lepton)",
+                                 plotopts = channelLabel)
+    firstDeepJet_hasNot = Plot.make1D("%s_%s_firstlepton_checkhasNotJetDeepFlavB"%(channel,suffix),
+                                 op.c_float(-1.),
+                                 firstHasNotAssociatedJet, 
+                                 EquidistantBinning(50,-1.,1.),
+                                 xTitle= "jetDeepJet (first lepton)",
+                                 plotopts = channelLabel)
+    plots.append(SummedPlot("%s_%s_firstlepton_checkjetDeepJet"%(channel,suffix),
+                            [firstDeepJet_has,firstDeepJet_hasNot],
+                            xTitle="jetDeepJet (first lepton)"))
+    secondDeepJet_has = Plot.make1D("%s_%s_secondlepton_checkhasJetDeepFlavB"%(channel,suffix), 
+                                 dilepton[1].jet.btagDeepFlavB, 
+                                 secondHasAssociatedJet, 
+                                 EquidistantBinning(50,0.,1.),
+                                 xTitle= "jetDeepJet (second lepton)",
+                                 plotopts = channelLabel)
+    secondDeepJet_hasNot = Plot.make1D("%s_%s_secondlepton_checkhasNotJetDeepFlavB"%(channel,suffix),
+                                 op.c_float(-1.),
+                                 secondHasNotAssociatedJet, 
+                                 EquidistantBinning(50,0.,1.),
+                                 xTitle= "jetDeepJet (second lepton)",
+                                 plotopts = channelLabel)
+    plots.append(SummedPlot("%s_%s_secondlepton_checkjetDeepJet"%(channel,suffix),
+                            [secondDeepJet_has,secondDeepJet_hasNot],
+                            xTitle="jetDeepJet (second lepton)"))
+
+    # Conversion veto (only if electron) #
+    firstisElectron = sel.refine(suffix+"firstisElectron",cut=[op.abs(dilepton[0].pdgId)==11])
+    secondisElectron = sel.refine(suffix+"secondisElectron",cut=[op.abs(dilepton[1].pdgId)==11])
+    if channel == 'ElEl' or channel == 'ElMu':
+        plots.append(Plot.make1D("%s_%s_firstlepton_checkconvVeto"%(channel,suffix), 
+                                 op.switch(op.abs(dilepton[0].pdgId)==11, op.c_float(dilepton[0].convVeto), op.c_float(-1.)),
+                                 firstisElectron, 
+                                 EquidistantBinning(3,-1.,2.),
+                                 xTitle= "Conversion veto (first lepton)",
+                                 plotopts = channelLabel))
+    if channel == "ElEl":
+        plots.append(Plot.make1D("%s_%s_secondlepton_checkconvVeto"%(channel,suffix), 
+                                 op.switch(op.abs(dilepton[0].pdgId)==11, op.c_float(dilepton[1].convVeto), op.c_float(-1.)),
+                                 secondisElectron, 
+                                 EquidistantBinning(2,0.,2.),
+                                 xTitle= "Conversion veto (second lepton)",
+                                 plotopts = channelLabel))
+
+    return plots
+
 ########################## DELTA PLOTS #################################
 def makeDeltaRPlots(sel,cont1,cont2,suffix,channel,isMC):
     plots = [] 
@@ -565,68 +649,68 @@ def makeAllHighLevelQuantities(sel,dilepton,met,jets,resolvedjets,lightjets,boos
 def makeHighLevelQuantities(sel,met,l1,l2,j1,j2,suffix,channel):
     plots = []
 
-    channelLabel = channelTitleLabel(channel)
-
-    # Useful lambdas #
-    ll_p4 = lambda l1,l2 : l1.p4+l2.p4
-    lljj_p4 = lambda l1,l2,j1,j2 : l1.p4+l2.p4+j1.p4+j2.p4
- 
-    # dilepton-MET plots #
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepMETdeltaPhi"%(channel,suffix),
-                             op.abs(ll_p4(l1,l2).Phi()-met.phi),
-                             sel,
-                             EquidistantBinning(20,0.,3.2),
-                             title='Azimutal angle between dilepton and MET (%s channel)'%channel,
-                             xTitle="|#Delta \phi (ll,MET)|",
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepMETpt"%(channel,suffix),
-                             op.sqrt(op.pow(met.pt*op.cos(met.phi)+ll_p4(l1,l2).Px(),2)+op.pow(met.pt*op.sin(met.phi)+ll_p4(l1,l2).Py(),2)),
-                             sel,
-                             EquidistantBinning(50,0.,500.),
-                             title='Transverse momentum of dilepton and MET (%s channel)'%channel,
-                             xTitle="P_{T}(ll,MET) [GeV]",
-                             plotopts = channelLabel))
-
-    # Transverse mass plots #
-    # m_T = sqrt(2*P_T^{l1l2}*P_T^{miss} * (1-cos(\Delta\Phi(ll,P_T^{miss}))))
-    mTll = lambda l1,l2,met : op.sqrt(2*ll_p4(l1,l2).Pt()*met.pt*(1-op.cos(ll_p4(l1,l2).Phi()-met.phi)))
-    mTlljj = lambda l1,l2,j1,j2,met : op.sqrt(2*lljj_p4(l1,l2,j1,j2).Pt()*met.pt*(1-op.cos(lljj_p4(l1,l2,j1,j2).Phi()-met.phi)))
-        # mT for dilepton #
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_mTll"%(channel,suffix),
-                             mTll(l1,l2,met),
-                             sel,
-                             EquidistantBinning(50,0.,1000.),
-                             title='Transverse mass of dilepton and MET (%s channel)'%channel,
-                             xTitle="M_{T}(ll,MET) [GeV]",
-                             plotopts = channelLabel))
-        # mT for lljj #
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_mTlljj"%(channel,suffix),
-                             mTlljj(l1,l2,j1,j2,met),
-                             sel,
-                             EquidistantBinning(50,0.,1000.),
-                             title='Transverse mass of dilepton+dijet and MET (%s channel)'%channel,
-                             xTitle="M_{T}(lljj,MET) [GeV]",
-                             plotopts = channelLabel))
-
-
-    # Scalar magnitude sum #
-    HT2 = lambda met,l1,l2,j1,j2 : op.sqrt(op.pow(met.pt*op.cos(met.phi)+l1.p4.Px()+l2.p4.Px(),2)+op.pow(met.pt*op.sin(met.phi)+l1.p4.Py()+l2.p4.Py(),2)) + op.abs((j1.p4+j2.p4).Pt())
-    HT2R = lambda met,l1,l2,j1,j2 : HT2(met,l1,l2,j1,j2)/(met.pt+l1.p4.Pt()+l2.p4.Pt()+j1.p4.Pt()+j2.p4.Pt())
-
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2"%(channel,suffix),
-                             HT2(met,l1,l2,j1,j2),
-                             sel,
-                             EquidistantBinning(50,0.,1000.),
-                             title='Di-Higgs magnitude (%s channel)'%channel,
-                             xTitle="H_{T2} [GeV]",
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2R"%(channel,suffix),
-                             HT2R(met,l1,l2,j1,j2),
-                             sel,
-                             EquidistantBinning(50,0.,1.),
-                             title='Di-Higgs magnitude ratio (%s channel)'%channel,
-                             xTitle="H_{T2}^{R} [GeV]",
-                             plotopts = channelLabel))
+#    channelLabel = channelTitleLabel(channel)
+#
+#    # Useful lambdas #
+#    ll_p4 = lambda l1,l2 : l1.p4+l2.p4
+#    lljj_p4 = lambda l1,l2,j1,j2 : l1.p4+l2.p4+j1.p4+j2.p4
+# 
+#    # dilepton-MET plots #
+#    plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepMETdeltaPhi"%(channel,suffix),
+#                             op.abs(ll_p4(l1,l2).Phi()-met.phi),
+#                             sel,
+#                             EquidistantBinning(20,0.,3.2),
+#                             title='Azimutal angle between dilepton and MET (%s channel)'%channel,
+#                             xTitle="|#Delta \phi (ll,MET)|",
+#                             plotopts = channelLabel))
+#    plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepMETpt"%(channel,suffix),
+#                             op.sqrt(op.pow(met.pt*op.cos(met.phi)+ll_p4(l1,l2).Px(),2)+op.pow(met.pt*op.sin(met.phi)+ll_p4(l1,l2).Py(),2)),
+#                             sel,
+#                             EquidistantBinning(50,0.,500.),
+#                             title='Transverse momentum of dilepton and MET (%s channel)'%channel,
+#                             xTitle="P_{T}(ll,MET) [GeV]",
+#                             plotopts = channelLabel))
+#
+#    # Transverse mass plots #
+#    # m_T = sqrt(2*P_T^{l1l2}*P_T^{miss} * (1-cos(\Delta\Phi(ll,P_T^{miss}))))
+#    mTll = lambda l1,l2,met : op.sqrt(2*ll_p4(l1,l2).Pt()*met.pt*(1-op.cos(ll_p4(l1,l2).Phi()-met.phi)))
+#    mTlljj = lambda l1,l2,j1,j2,met : op.sqrt(2*lljj_p4(l1,l2,j1,j2).Pt()*met.pt*(1-op.cos(lljj_p4(l1,l2,j1,j2).Phi()-met.phi)))
+#        # mT for dilepton #
+#    plots.append(Plot.make1D("%s_%s_highlevelvariable_mTll"%(channel,suffix),
+#                             mTll(l1,l2,met),
+#                             sel,
+#                             EquidistantBinning(50,0.,1000.),
+#                             title='Transverse mass of dilepton and MET (%s channel)'%channel,
+#                             xTitle="M_{T}(ll,MET) [GeV]",
+#                             plotopts = channelLabel))
+#        # mT for lljj #
+#    plots.append(Plot.make1D("%s_%s_highlevelvariable_mTlljj"%(channel,suffix),
+#                             mTlljj(l1,l2,j1,j2,met),
+#                             sel,
+#                             EquidistantBinning(50,0.,1000.),
+#                             title='Transverse mass of dilepton+dijet and MET (%s channel)'%channel,
+#                             xTitle="M_{T}(lljj,MET) [GeV]",
+#                             plotopts = channelLabel))
+#
+#
+#    # Scalar magnitude sum #
+#    HT2 = lambda met,l1,l2,j1,j2 : op.sqrt(op.pow(met.pt*op.cos(met.phi)+l1.p4.Px()+l2.p4.Px(),2)+op.pow(met.pt*op.sin(met.phi)+l1.p4.Py()+l2.p4.Py(),2)) + op.abs((j1.p4+j2.p4).Pt())
+#    HT2R = lambda met,l1,l2,j1,j2 : HT2(met,l1,l2,j1,j2)/(met.pt+l1.p4.Pt()+l2.p4.Pt()+j1.p4.Pt()+j2.p4.Pt())
+#
+#    plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2"%(channel,suffix),
+#                             HT2(met,l1,l2,j1,j2),
+#                             sel,
+#                             EquidistantBinning(50,0.,1000.),
+#                             title='Di-Higgs magnitude (%s channel)'%channel,
+#                             xTitle="H_{T2} [GeV]",
+#                             plotopts = channelLabel))
+#    plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2R"%(channel,suffix),
+#                             HT2R(met,l1,l2,j1,j2),
+#                             sel,
+#                             EquidistantBinning(50,0.,1.),
+#                             title='Di-Higgs magnitude ratio (%s channel)'%channel,
+#                             xTitle="H_{T2}^{R} [GeV]",
+#                             plotopts = channelLabel))
 
     return plots 
 
