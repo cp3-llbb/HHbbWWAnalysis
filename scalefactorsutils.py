@@ -81,7 +81,7 @@ class MakeScaleFactorsDict():
                         l.append(self.makeFullEfficiencyPath(base_str.format(**d)))
             aTup = tuple(l)
         else:   # No formatting required
-            aTup = self.makeFullEfficiencyPath(base_str)
+            aTup = [self.makeFullEfficiencyPath(base_str)]
 
         # Check if key already present #
         if key_entry in self.full_dict.keys():

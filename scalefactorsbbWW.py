@@ -35,6 +35,7 @@ class ScaleFactorsbbWW:
         instance.addEfficiency(key_entry   = 'electron_looseeff_2016',
                                base_str    = "Electron_EGamma_SF2D_LooseEff2016.json")
 
+                                format_dict     = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
         # Muons Loose #
         instance.addEfficiency(key_entry   = 'muon_loose_2016',
                                base_str    = "Muon_EGamma_SF2D_Loose2016.json")

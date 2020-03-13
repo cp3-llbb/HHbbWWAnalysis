@@ -743,9 +743,13 @@ plotIt:
     - jer
     - jesTotal
       # on the lepton id /iso 
-    - muid
-    - muiso
-    - elid
+    - mu_loose
+    - mu_tight
+    - el_looserecoptlt20
+    - el_looserecoptgt20
+    - el_looseid
+    - el_looseeff
+    - el_tightmva
      # on the pileup
     - pileup
      # on the trigger
