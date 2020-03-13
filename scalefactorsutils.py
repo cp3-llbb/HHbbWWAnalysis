@@ -40,7 +40,7 @@ class MakeScaleFactorsDict():
 
 
 
-    def addEfficiency(self,key_entry,base_str,format_dict,sublevel=None):
+    def addEfficiency(self,key_entry,base_str,format_dict={},sublevel=None):
         """
         key_entry   : new efficiency entry of the dict 
         base_str    : string to be formatted with {keyword} (not empty, can be several)
@@ -68,7 +68,7 @@ class MakeScaleFactorsDict():
                 else:
                     aList.append(self.makeFullEfficiencyPath(base_str.format(**d)))
             aTup = tuple(aList)
-        else:
+        elif len(format_dict.keys()) == 1: # Simple case
             l = []
             for k,val in format_dict.items():
                 if not isinstance(k,tuple):
@@ -80,6 +80,8 @@ class MakeScaleFactorsDict():
                         d = dict((nk,nv) for nk,nv in zip(k,v))
                         l.append(self.makeFullEfficiencyPath(base_str.format(**d)))
             aTup = tuple(l)
+        else:   # No formatting required
+            aTup = self.makeFullEfficiencyPath(base_str)
 
         # Check if key already present #
         if key_entry in self.full_dict.keys():
@@ -89,7 +91,7 @@ class MakeScaleFactorsDict():
         else:
             self.full_dict[key_entry] = aTup
 
-    def addScaleFactor(self,key_entry,base_key,base_str,format_dict,sublevel=None,lowercase_keys=False):
+    def addScaleFactor(self,key_entry,base_key,base_str,format_dict={},sublevel=None,lowercase_keys=False):
         """
         key_entry   : new efficiency entry of the dict 
         base_key    : string to be formatted with {keyword} (not empty, can be several) and used as nested dict key
@@ -179,7 +181,7 @@ class MakeScaleFactorsDict():
                         aList.append(self.makeFullScaleFactorPath(base_str.format(**dv)))
                         
                 aDict[base_key.format(**dk)] = tuple(aList)
-        else:# Simple scalefactor
+        elif len(format_dict.keys()) == 1: # Simple scalefactor
             aDict = {}
             key = list(format_dict.keys())[0] # Can be str or tuple
             val = list(format_dict.values())[0]    # Must be a list
@@ -192,6 +194,8 @@ class MakeScaleFactorsDict():
                     aDict[base_key.format(**d).lower()] = self.makeFullScaleFactorPath(base_str.format(**d))
                 else:
                     aDict[base_key.format(**d)] = self.makeFullScaleFactorPath(base_str.format(**d))
+        else:   # No formatting required
+            aDict[base_key] = self.makeFullScaleFactorPath(base_str)
 
         # Check if key already present #
         if key_entry in self.full_dict.keys():
