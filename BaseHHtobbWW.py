@@ -361,7 +361,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                         op.abs(ele.dz) <= 0.1,
                                                         ele.miniPFRelIso_all <= 0.4, # mini PF relative isolation, total (with scaled rho*EA PU corrections)
                                                         ele.sip3d <= 8,
-                                                        ele.cutBased>=2,     # cut-based ID Fall17 V2 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)
+                                                        ele.mvaFall17V2noIso_WPL, 
                                                         ele.lostHits <=1    # number of missing inner hits
                                                         )
         self.electronsPreSelInclu = op.select(electronsByPt, self.lambda_electronPreSel) # can include a muon in cone
