@@ -39,7 +39,7 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
            # muTightIDSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, self.sfTag), "id_tight"), combine="weight", systName="muid")
            # muTightISOSF = SF.get_scalefactor("lepton", ("muon_{0}_{1}".format(era, self.sfTag), "iso_tight_id_medium"), combine="weight", systName="muiso")
             muLooseId = SF.get_scalefactor("lepton", 'muon_loose_{}'.format(era), combine="weight", systName="mu_loose")
-            muTightId = SF.get_scalefactor("lepton", 'muon_tightMVA_{}'.format(era), combine="weight", systName="mu_tight")
+            muTightMVA = SF.get_scalefactor("lepton", 'muon_tightMVA_{}'.format(era), combine="weight", systName="mu_tightmva")
             ####  Electrons ####
            # elMVA80noisoSF = SF.get_scalefactor("lepton", ("electron_{0}_{1}".format(era,self.sfTag), "id_mva80noiso"), systName="elid") # Only applied on fakeable but not tight lepton
             elLooseRecoPtLt20 = SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptgt20'), combine="weight", systName="el_looserecoptlt20")
@@ -70,23 +70,27 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
         OsElMuDilepton = op.combine((self.electronsFakeSel, self.muonsFakeSel), pred=lambdaFakeableDilepton)
 
         # Applied SF #
-        MuonSF = lambda mu : muLooseId(mu) if isMC else None
-        ElectronSF = lambda el : [elLooseId(el) , elLooseEff(el), op.switch(el.pt>20 , elLooseRecoPtGt20(el) , elLooseRecoPtLt20(el))] if isMC else None
+        MuonSF = lambda mu : [muLooseId(mu)] 
+        ElectronSF = lambda el : [elLooseId(el) , elLooseEff(el), op.switch(el.pt>20 , elLooseRecoPtGt20(el) , elLooseRecoPtLt20(el))] 
 
-        ElElTriggerSFApplied = [ttH_doubleElectron_trigSF] if isMC else None
-        MuMuTriggerSFApplied = [ttH_doubleMuon_trigSF] if isMC else None
-        ElMuTriggerSFApplied = [ttH_electronMuon_trigSF] if isMC else None
+        ElElLooseSF = [ttH_doubleElectron_trigSF]+ElectronSF(OsElElDilepton[0][0])+ElectronSF(OsElElDilepton[0][1]) if isMC else None
+        MuMuLooseSF = [ttH_doubleMuon_trigSF]+MuonSF(OsMuMuDilepton[0][0])+MuonSF(OsMuMuDilepton[0][1]) if isMC else None
+        ElMuLooseSF = [ttH_electronMuon_trigSF]+ElectronSF(OsElMuDilepton[0][0])+MuonSF(OsElMuDilepton[0][1]) if isMC else None
+
+        ElElTightSF = [elTightMVA(OsElElDilepton[0][0]),elTightMVA(OsElElDilepton[0][1])] if isMC else None
+        MuMuTightSF = [muTightMVA(OsMuMuDilepton[0][0]),muTightMVA(OsMuMuDilepton[0][1])] if isMC else None
+        ElMuTightSF = [elTightMVA(OsElMuDilepton[0][0]),muTightMVA(OsElMuDilepton[0][1])] if isMC else None
 
         # At least 2 fakeables leptons #
         ElElHasFakeableDilepton = noSel.refine("ElElHasFakeableDilepton",
                                         cut = [op.rng_len(OsElElDilepton)>0],
-                                        weight = [ElElTriggerSFApplied,ElectronSF(OsElElDilepton[0][0]),ElectronSF(OsElElDilepton[0][1])])
+                                        weight = ElElLooseSF)
         MuMuHasFakeableDilepton = noSel.refine("MuMuHasFakeableDilepton",
                                         cut = [op.rng_len(OsMuMuDilepton)>0],
-                                        weight = [MuMuTriggerSFApplied,MuonSF(OsMuMuDilepton[0][0]),MuonSF(OsMuMuDilepton[0][1])])
+                                        weight = MuMuLooseSF)
         ElMuHasFakeableDilepton = noSel.refine("ElMuHasFakeableDilepton",
                                         cut = [op.rng_len(OsElMuDilepton)>0],
-                                        weight = [ElMuTriggerSFApplied,ElectronSF(OsElMuDilepton[0][0]),MuonSF(OsElMuDilepton[0][1])])
+                                        weight = ElMuLooseSF)
 
         # Yield #
         plots.append(yieldPlots.addYield(ElElHasFakeableDilepton,"ElElHasFakeableDilepton","OS fakeable leptons (channel $e^+e^-$)"))
@@ -133,18 +137,23 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
         else:
             lambda_is_matched = lambda dilep : op.c_bool(True)
 
+
+
         ElElHasTightDileptonPreMllCutOutZTightVeto = ElElHasFakeableDileptonPreMllCutOutZTightVeto.refine("ElElHasTightDileptonPreMllCutOutZTightVeto",
                                             cut=[self.lambda_electronTightSel(OsElElDilepton[0][0]),
                                                  self.lambda_electronTightSel(OsElElDilepton[0][1]),
-                                                 lambda_is_matched(OsElElDilepton[0])])
+                                                 lambda_is_matched(OsElElDilepton[0])],
+                                            weight=ElElTightSF)
         MuMuHasTightDileptonPreMllCutOutZTightVeto = MuMuHasFakeableDileptonPreMllCutOutZTightVeto.refine("MuMuHasTightDileptonPreMllCutOutZTightVeto",
                                             cut=[self.lambda_muonTightSel(OsMuMuDilepton[0][0]),
                                                  self.lambda_muonTightSel(OsMuMuDilepton[0][1]),
-                                                 lambda_is_matched(OsMuMuDilepton[0])])
+                                                 lambda_is_matched(OsMuMuDilepton[0])],
+                                            weight=MuMuTightSF)
         ElMuHasTightDileptonPreMllCutTightVeto = ElMuHasFakeableDileptonPreMllCutTightVeto.refine("ElMuHasTightDileptonPreMllCutTightVeto",
                                             cut=[self.lambda_electronTightSel(OsElMuDilepton[0][0]),
                                                  self.lambda_muonTightSel(OsElMuDilepton[0][1]),
-                                                 lambda_is_matched(OsElMuDilepton[0])])
+                                                 lambda_is_matched(OsElMuDilepton[0])],
+                                            weight=ElMuTightSF)
 
         # Yield #
         plots.append(yieldPlots.addYield(ElElHasTightDileptonPreMllCutOutZTightVeto,"ElElHasTightDileptonPreMllCutOutZTightVeto","OS tight leptons + $M_{ll}$ cut + Two tights veto (channel $e^+e^-$)"))
@@ -187,7 +196,6 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
                                  channel    = "ElMu"))
 
 
-#    If both fakeable leptons are electrons, the event needs to pass either the single electron or the double electron trigger; if both fakeable leptons are muons, the event needs to pass either the single muon or the double muon trigger; if one fakeable lepton is an electron and the other fakeable lepton is a muon, the event needs to pass either the single electron or the single muon or the muon+electron trigger
         #############################################################################
         #                              AK4 Jets                                     #
         #############################################################################

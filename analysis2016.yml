@@ -664,24 +664,24 @@ samples:
     db: das:/GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
     files: dascache/GluGluToHHTo2B2VTo2L2Nu.dat
     generated-events: 'genEventSumw'
-    cross-section: 100
+    cross-section: 10
     era: '2016'
     split: 10
-    line-color: "#e31b1b"
+    line-color: "#0f700b"
     line-type: 1
-    legend: HH (SM) 100 pb
+    legend: HH (SM) 10 pb
     order: 1
     type: signal
   GluGluToRadionToHHTo2B2VTo2L2Nu_M-750:
     db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
     files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.dat
     generated-events: 'genEventSumw'
-    cross-section: 100
+    cross-section: 10
     era: '2016'
     split: 10
     line-color: "#f2050d"
     line-type: 1
-    legend: HH (Radion, M = 750 GeV) 100 pb
+    legend: HH (Radion, M = 750 GeV) 10 pb
     order: 12
     type: signal
 
@@ -744,7 +744,7 @@ plotIt:
     - jesTotal
       # on the lepton id /iso 
     - mu_loose
-    - mu_tight
+    - mu_tightmva
     - el_looserecoptlt20
     - el_looserecoptgt20
     - el_looseid

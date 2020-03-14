@@ -197,13 +197,13 @@ class BaseNanoHHtobbWW(NanoAODModule):
 
         # Triggers and Gen Weight #
         if self.isMC(sample):
-            pass # ONLY FOR SYNCHRO
-            #noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
+            #pass # ONLY FOR SYNCHRO
+            noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
             #noSel = noSel.refine("genWeight", weight=op.abs(tree.genWeight), cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
             #noSel = noSel.refine("negWeight", cut=[tree.genWeight<0])
         else:
-            pass # ONLY FOR SYNCHRO
-            #noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset))
+            #pass # ONLY FOR SYNCHRO
+            noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset))
 
         return tree,noSel,be,lumiArgs
 
