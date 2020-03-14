@@ -34,8 +34,6 @@ class ScaleFactorsbbWW:
                                base_str    = "Electron_EGamma_SF2D_LooseMVA2016.json")
         instance.addEfficiency(key_entry   = 'electron_looseeff_2016',
                                base_str    = "Electron_EGamma_SF2D_LooseEff2016.json")
-
-                                format_dict     = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
         # Muons Loose #
         instance.addEfficiency(key_entry   = 'muon_loose_2016',
                                base_str    = "Muon_EGamma_SF2D_Loose2016.json")
@@ -60,8 +58,8 @@ class ScaleFactorsbbWW:
         # Get full dict #
         self.all_scalefactors = instance.getScaleFactorsDict()
 
-        import pprint
-        pprint.pprint(self.all_scalefactors)
+        #import pprint
+        #pprint.pprint(self.all_scalefactors)
 
     def get_scalefactor(self,objType, key, periods=None, combine=None, additionalVariables=dict(), systName=None):
 

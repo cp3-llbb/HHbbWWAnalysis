@@ -649,68 +649,68 @@ def makeAllHighLevelQuantities(sel,dilepton,met,jets,resolvedjets,lightjets,boos
 def makeHighLevelQuantities(sel,met,l1,l2,j1,j2,suffix,channel):
     plots = []
 
-#    channelLabel = channelTitleLabel(channel)
-#
-#    # Useful lambdas #
-#    ll_p4 = lambda l1,l2 : l1.p4+l2.p4
-#    lljj_p4 = lambda l1,l2,j1,j2 : l1.p4+l2.p4+j1.p4+j2.p4
-# 
-#    # dilepton-MET plots #
-#    plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepMETdeltaPhi"%(channel,suffix),
-#                             op.abs(ll_p4(l1,l2).Phi()-met.phi),
-#                             sel,
-#                             EquidistantBinning(20,0.,3.2),
-#                             title='Azimutal angle between dilepton and MET (%s channel)'%channel,
-#                             xTitle="|#Delta \phi (ll,MET)|",
-#                             plotopts = channelLabel))
-#    plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepMETpt"%(channel,suffix),
-#                             op.sqrt(op.pow(met.pt*op.cos(met.phi)+ll_p4(l1,l2).Px(),2)+op.pow(met.pt*op.sin(met.phi)+ll_p4(l1,l2).Py(),2)),
-#                             sel,
-#                             EquidistantBinning(50,0.,500.),
-#                             title='Transverse momentum of dilepton and MET (%s channel)'%channel,
-#                             xTitle="P_{T}(ll,MET) [GeV]",
-#                             plotopts = channelLabel))
-#
-#    # Transverse mass plots #
-#    # m_T = sqrt(2*P_T^{l1l2}*P_T^{miss} * (1-cos(\Delta\Phi(ll,P_T^{miss}))))
-#    mTll = lambda l1,l2,met : op.sqrt(2*ll_p4(l1,l2).Pt()*met.pt*(1-op.cos(ll_p4(l1,l2).Phi()-met.phi)))
-#    mTlljj = lambda l1,l2,j1,j2,met : op.sqrt(2*lljj_p4(l1,l2,j1,j2).Pt()*met.pt*(1-op.cos(lljj_p4(l1,l2,j1,j2).Phi()-met.phi)))
-#        # mT for dilepton #
-#    plots.append(Plot.make1D("%s_%s_highlevelvariable_mTll"%(channel,suffix),
-#                             mTll(l1,l2,met),
-#                             sel,
-#                             EquidistantBinning(50,0.,1000.),
-#                             title='Transverse mass of dilepton and MET (%s channel)'%channel,
-#                             xTitle="M_{T}(ll,MET) [GeV]",
-#                             plotopts = channelLabel))
-#        # mT for lljj #
-#    plots.append(Plot.make1D("%s_%s_highlevelvariable_mTlljj"%(channel,suffix),
-#                             mTlljj(l1,l2,j1,j2,met),
-#                             sel,
-#                             EquidistantBinning(50,0.,1000.),
-#                             title='Transverse mass of dilepton+dijet and MET (%s channel)'%channel,
-#                             xTitle="M_{T}(lljj,MET) [GeV]",
-#                             plotopts = channelLabel))
-#
-#
-#    # Scalar magnitude sum #
-#    HT2 = lambda met,l1,l2,j1,j2 : op.sqrt(op.pow(met.pt*op.cos(met.phi)+l1.p4.Px()+l2.p4.Px(),2)+op.pow(met.pt*op.sin(met.phi)+l1.p4.Py()+l2.p4.Py(),2)) + op.abs((j1.p4+j2.p4).Pt())
-#    HT2R = lambda met,l1,l2,j1,j2 : HT2(met,l1,l2,j1,j2)/(met.pt+l1.p4.Pt()+l2.p4.Pt()+j1.p4.Pt()+j2.p4.Pt())
-#
-#    plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2"%(channel,suffix),
-#                             HT2(met,l1,l2,j1,j2),
-#                             sel,
-#                             EquidistantBinning(50,0.,1000.),
-#                             title='Di-Higgs magnitude (%s channel)'%channel,
-#                             xTitle="H_{T2} [GeV]",
-#                             plotopts = channelLabel))
-#    plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2R"%(channel,suffix),
-#                             HT2R(met,l1,l2,j1,j2),
-#                             sel,
-#                             EquidistantBinning(50,0.,1.),
-#                             title='Di-Higgs magnitude ratio (%s channel)'%channel,
-#                             xTitle="H_{T2}^{R} [GeV]",
-#                             plotopts = channelLabel))
+    channelLabel = channelTitleLabel(channel)
+
+    # Useful lambdas #
+    ll_p4 = lambda l1,l2 : l1.p4+l2.p4
+    lljj_p4 = lambda l1,l2,j1,j2 : l1.p4+l2.p4+j1.p4+j2.p4
+ 
+    # dilepton-MET plots #
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepMETdeltaPhi"%(channel,suffix),
+                             op.abs(ll_p4(l1,l2).Phi()-met.phi),
+                             sel,
+                             EquidistantBinning(20,0.,3.2),
+                             title='Azimutal angle between dilepton and MET (%s channel)'%channel,
+                             xTitle="|#Delta \phi (ll,MET)|",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepMETpt"%(channel,suffix),
+                             op.sqrt(op.pow(met.pt*op.cos(met.phi)+ll_p4(l1,l2).Px(),2)+op.pow(met.pt*op.sin(met.phi)+ll_p4(l1,l2).Py(),2)),
+                             sel,
+                             EquidistantBinning(50,0.,500.),
+                             title='Transverse momentum of dilepton and MET (%s channel)'%channel,
+                             xTitle="P_{T}(ll,MET) [GeV]",
+                             plotopts = channelLabel))
+
+    # Transverse mass plots #
+    # m_T = sqrt(2*P_T^{l1l2}*P_T^{miss} * (1-cos(\Delta\Phi(ll,P_T^{miss}))))
+    mTll = lambda l1,l2,met : op.sqrt(2*ll_p4(l1,l2).Pt()*met.pt*(1-op.cos(ll_p4(l1,l2).Phi()-met.phi)))
+    mTlljj = lambda l1,l2,j1,j2,met : op.sqrt(2*lljj_p4(l1,l2,j1,j2).Pt()*met.pt*(1-op.cos(lljj_p4(l1,l2,j1,j2).Phi()-met.phi)))
+        # mT for dilepton #
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_mTll"%(channel,suffix),
+                             mTll(l1,l2,met),
+                             sel,
+                             EquidistantBinning(50,0.,1000.),
+                             title='Transverse mass of dilepton and MET (%s channel)'%channel,
+                             xTitle="M_{T}(ll,MET) [GeV]",
+                             plotopts = channelLabel))
+        # mT for lljj #
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_mTlljj"%(channel,suffix),
+                             mTlljj(l1,l2,j1,j2,met),
+                             sel,
+                             EquidistantBinning(50,0.,1000.),
+                             title='Transverse mass of dilepton+dijet and MET (%s channel)'%channel,
+                             xTitle="M_{T}(lljj,MET) [GeV]",
+                             plotopts = channelLabel))
+
+
+    # Scalar magnitude sum #
+    HT2 = lambda met,l1,l2,j1,j2 : op.sqrt(op.pow(met.pt*op.cos(met.phi)+l1.p4.Px()+l2.p4.Px(),2)+op.pow(met.pt*op.sin(met.phi)+l1.p4.Py()+l2.p4.Py(),2)) + op.abs((j1.p4+j2.p4).Pt())
+    HT2R = lambda met,l1,l2,j1,j2 : HT2(met,l1,l2,j1,j2)/(met.pt+l1.p4.Pt()+l2.p4.Pt()+j1.p4.Pt()+j2.p4.Pt())
+
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2"%(channel,suffix),
+                             HT2(met,l1,l2,j1,j2),
+                             sel,
+                             EquidistantBinning(50,0.,1000.),
+                             title='Di-Higgs magnitude (%s channel)'%channel,
+                             xTitle="H_{T2} [GeV]",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2R"%(channel,suffix),
+                             HT2R(met,l1,l2,j1,j2),
+                             sel,
+                             EquidistantBinning(50,0.,1.),
+                             title='Di-Higgs magnitude ratio (%s channel)'%channel,
+                             xTitle="H_{T2}^{R} [GeV]",
+                             plotopts = channelLabel))
 
     return plots 
 
