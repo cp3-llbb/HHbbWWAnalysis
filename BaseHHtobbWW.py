@@ -197,13 +197,13 @@ class BaseNanoHHtobbWW(NanoAODModule):
 
         # Triggers and Gen Weight #
         if self.isMC(sample):
-            #pass # ONLY FOR SYNCHRO
-            noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
+            pass # ONLY FOR SYNCHRO
+            #noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
             #noSel = noSel.refine("genWeight", weight=op.abs(tree.genWeight), cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
             #noSel = noSel.refine("negWeight", cut=[tree.genWeight<0])
         else:
-            #pass # ONLY FOR SYNCHRO
-            noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset))
+            pass # ONLY FOR SYNCHRO
+            #noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset))
 
         return tree,noSel,be,lumiArgs
 
@@ -261,11 +261,14 @@ class BaseNanoHHtobbWW(NanoAODModule):
         #                                 MET                                       #
         #############################################################################
         # MET filter #
-        noSel = noSel.refine("passMETFlags", cut=METFilter(t.Flag, era, isMC) )
+        #noSel = noSel.refine("passMETFlags", cut=METFilter(t.Flag, era, isMC) )
 
         # MET corrections #
         MET = t.MET if era != "2017" else t.METFixEE2017
-        self.corrMET = METcorrection(MET,t.PV,sample,era,self.isMC(sample))
+        #self.corrMET = METcorrection(MET,t.PV,sample,era,self.isMC(sample))
+        self.corrMET = MET
+
+        # TODO : this is for synch, we should uncomment afterwards
 
         #############################################################################
         #                      Lepton Lambdas Variables                             #
@@ -274,19 +277,19 @@ class BaseNanoHHtobbWW(NanoAODModule):
         self.lambda_hasAssociatedJet = lambda lep : op.AND(lep.jet.idx != -1 , op.deltaR(lep.p4,lep.jet.p4) <= 0.4)
         if era == "2016": 
             self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
-                                                                        lep.jet.btagDeepFlavB < 0.3093)
+                                                                        lep.jet.btagDeepFlavB <= 0.3093)
         elif era =="2017":
             self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
-                                                                        lep.jet.btagDeepFlavB < 0.3033)
+                                                                        lep.jet.btagDeepFlavB <= 0.3033)
         elif era == "2018":
             self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
-                                                                        lep.jet.btagDeepFlavB < 0.2770)
+                                                                        lep.jet.btagDeepFlavB <= 0.2770)
 
         # Cone pt #
                     # Def conept : https://github.com/CERN-PH-CMG/cmgtools-lite/blob/f8a34c64a4489d94ff9ac4c0d8b0b06dad46e521/TTHAnalysis/python/tools/conept.py#L74
         self.lambda_conept_electron = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
                                                                   # if (abs(lep.pdgId)!=11 and abs(lep.pdgId)!=13): return lep.pt : anything that is not muon or electron
-                                                                  (op.AND(op.abs(lep.pdgId)==11 , lep.mvaTTH > 0.90) , op.static_cast("Float_t",lep.pt)),
+                                                                  (op.AND(op.abs(lep.pdgId)==11 , lep.mvaTTH > 0.80) , op.static_cast("Float_t",lep.pt)),
                                                                   # if (abs(lep.pdgId)!=13 or lep.mediumMuonId>0) and lep.mvaTTH > 0.90: return lep.pt 
                                                                     # if electron, check above MVA 
                                                                     # If muon, check that passes medium and above MVA
@@ -296,7 +299,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                     # Def conept : https://github.com/CERN-PH-CMG/cmgtools-lite/blob/f8a34c64a4489d94ff9ac4c0d8b0b06dad46e521/TTHAnalysis/python/tools/conept.py#L74
         self.lambda_conept_muon = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
                                                                # if (abs(lep.pdgId)!=11 and abs(lep.pdgId)!=13): return lep.pt : anything that is not muon or electron
-                                                              (op.AND(op.abs(lep.pdgId)==13 , lep.mediumId ,lep.mvaTTH > 0.90) , op.static_cast("Float_t",lep.pt)),
+                                                              (op.AND(op.abs(lep.pdgId)==13 , lep.mediumId ,lep.mvaTTH > 0.85) , op.static_cast("Float_t",lep.pt)),
                                                                # if (abs(lep.pdgId)!=13 or lep.mediumMuonId>0) and lep.mvaTTH > 0.90: return lep.pt 
                                                                     # if electron, check above MVA 
                                                                     # If muon, check that passes medium and above MVA
@@ -317,6 +320,12 @@ class BaseNanoHHtobbWW(NanoAODModule):
         self.lambda_muon_deepJetInterpIfMvaFailed = lambda mu : op.AND(self.lambda_hasAssociatedJet(mu),
                                                                       mu.jet.btagDeepFlavB < self.lambda_muon_btagInterpolation(mu))
 
+        # Dilepton lambdas #
+        self.lambda_leptonOS  = lambda l1,l2 : l1.charge != l2.charge
+        self.lambda_is_matched = lambda lep : lep.genPartFlav==1 if isMC else lambda dilep : op.c_bool(True)
+        lambda_dilepton_OS_matched  = lambda l1,l2 : op.AND(self.lambda_leptonOS(l1,l2),
+                                                            self.lambda_is_matched(l1),
+                                                            self.lambda_is_matched(l2))
 
         #############################################################################
         #                                 Muons                                     #
@@ -338,6 +347,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
         self.lambda_muonFakeSel = lambda mu : op.AND(
                                                     self.lambda_conept_muon(mu) >= op.c_float(10.),
                                                     self.lambda_lepton_associatedJetNoBtag(mu),
+
                                                     op.OR(mu.mvaTTH >= 0.85, op.AND(mu.jetRelIso<0.5 , self.lambda_muon_deepJetInterpIfMvaFailed(mu))), 
                                                         # If mvaTTH < 0.85 : jetRelIso <0.5 and < deepJet medium with interpolation
                                                 )
@@ -345,7 +355,8 @@ class BaseNanoHHtobbWW(NanoAODModule):
         # Tight selection #
         self.lambda_muonTightSel = lambda mu : op.AND(
                                                     mu.mvaTTH >= 0.85, # Lepton MVA id from ttH
-                                                    mu.mediumId
+                                                    mu.mediumId,
+                                                    #self.lambda_is_matched(mu), # TODO : should I ?
                                                 )
         self.muonsTightSel = op.select(self.muonsFakeSel, self.lambda_muonTightSel)
 
@@ -360,6 +371,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                         op.abs(ele.dxy) <= 0.05,
                                                         op.abs(ele.dz) <= 0.1,
                                                         ele.miniPFRelIso_all <= 0.4, # mini PF relative isolation, total (with scaled rho*EA PU corrections)
+
                                                         ele.sip3d <= 8,
                                                         ele.mvaFall17V2noIso_WPL, 
                                                         ele.lostHits <=1    # number of missing inner hits
@@ -385,9 +397,39 @@ class BaseNanoHHtobbWW(NanoAODModule):
         self.electronsFakeSel = op.select(self.electronsPreSel, self.lambda_electronFakeSel)
         # Tight selection #
         self.lambda_electronTightSel = lambda ele : op.AND(
-                                                    ele.mvaTTH >= 0.80
+                                                    ele.mvaTTH >= 0.80,
+                                                    #self.lambda_is_matched(ele), # TODO: Should I ?
                                                 )
         self.electronsTightSel = op.select(self.electronsFakeSel, self.lambda_electronTightSel)
+
+
+        #############################################################################
+        #                               Dileptons                                   #
+        #############################################################################
+        # Preseleted dilepton #
+        self.OSElElDileptonPreSel = op.combine(self.electronsPreSel, N=2, pred=self.lambda_leptonOS)
+        self.OSMuMuDileptonPreSel = op.combine(self.muonsPreSel, N=2, pred=self.lambda_leptonOS)
+        self.OSElMuDileptonPreSel = op.combine((self.electronsPreSel, self.muonsPreSel), pred=self.lambda_leptonOS)
+
+        # Fakeable dilepton #
+        self.OSElElDileptonFakeSel = op.combine(self.electronsFakeSel, N=2, pred=self.lambda_leptonOS)
+        self.OSMuMuDileptonFakeSel = op.combine(self.muonsFakeSel, N=2, pred=self.lambda_leptonOS)
+        self.OSElMuDileptonFakeSel = op.combine((self.electronsFakeSel, self.muonsFakeSel), pred=self.lambda_leptonOS)
+
+        # Tight Dilepton : must also be Gen matched if MC #
+        self.OSElElDileptonTightSel = op.combine(self.electronsTightSel, N=2, 
+                                                 pred=lambda_dilepton_OS_matched)
+        self.OSMuMuDileptonTightSel = op.combine(self.muonsTightSel, N=2, 
+                                                 pred=lambda_dilepton_OS_matched)
+        self.OSElMuDileptonTightSel = op.combine((self.electronsTightSel, self.muonsTightSel), 
+                                                 pred=lambda_dilepton_OS_matched)
+        # Fake extrapolated Dilepton : must also be Gen matched if MC #
+        self.OSElElDileptonFakeExtrapolationSel = op.combine(self.electronsFakeSel, N=2, 
+                                                 pred=lambda_dilepton_OS_matched)
+        self.OSMuMuDileptonFakeExtrapolationSel = op.combine(self.muonsFakeSel, N=2, 
+                                                 pred=lambda_dilepton_OS_matched)
+        self.OSElMuDileptonFakeExtrapolationSel = op.combine((self.electronsFakeSel, self.muonsFakeSel), 
+                                                 pred=lambda_dilepton_OS_matched)
 
         #############################################################################
         #                                AK4 Jets                                   #
