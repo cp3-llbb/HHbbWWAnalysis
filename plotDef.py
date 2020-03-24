@@ -58,6 +58,7 @@ def channelPlot(sel,DilepElEl,DilepMuMu,DilepElMu,suffix,channel):
 class makeYieldPlots:
     def __init__(self):
         self.calls = 0
+        self.plots = []
     def addYield(self, sel, name, title):
         """
         Make Yield plot and use it also in the latex yield table
@@ -65,15 +66,17 @@ class makeYieldPlots:
         name    = name of the PDF to be produced
         title   = title that will be used in the LateX yield table
         """
-        plot = Plot.make1D("Yield_"+name,   
-                           op.c_int(0),
-                           sel,
-                           EquidistantBinning(1, 0., 1.),
-                           title = title + " Yield",
-                           xTitle = title + " Yield",
-                           plotopts = {"for-yields":True, "yields-title":title, 'yields-table-order':self.calls})
+        self.plots.append(Plot.make1D("Yield_"+name,   
+                                      op.c_int(0),
+                                      sel,
+                                      EquidistantBinning(1, 0., 1.),
+                                      title = title + " Yield",
+                                      xTitle = title + " Yield",
+                                      plotopts = {"for-yields":True, "yields-title":title, 'yields-table-order':self.calls}))
         self.calls += 1
-        return plot
+
+    def returnPlots(self):
+        return self.plots
 
 ######################   TRIGGER PLOTS  ##############################
 def triggerPlots(sel,triggerDict,suffix,channel):
@@ -323,25 +326,9 @@ def makeDileptonCheckPlots(self,sel, dilepton, suffix, channel):
                                  plotopts = channelLabel)
     plots.append(SummedPlot("%s_%s_secondlepton_checkjetDeepJet"%(channel,suffix),
                             [secondDeepJet_has,secondDeepJet_hasNot],
-                            xTitle="jetDeepJet (second lepton)"))
+                            xTitle="jetDeepJet (second lepton)",
+                            plotopts = channelLabel))
 
-    # Conversion veto (only if electron) #
-    firstisElectron = sel.refine(suffix+"firstisElectron",cut=[op.abs(dilepton[0].pdgId)==11])
-    secondisElectron = sel.refine(suffix+"secondisElectron",cut=[op.abs(dilepton[1].pdgId)==11])
-    if channel == 'ElEl' or channel == 'ElMu':
-        plots.append(Plot.make1D("%s_%s_firstlepton_checkconvVeto"%(channel,suffix), 
-                                 op.switch(op.abs(dilepton[0].pdgId)==11, op.c_float(dilepton[0].convVeto), op.c_float(-1.)),
-                                 firstisElectron, 
-                                 EquidistantBinning(3,-1.,2.),
-                                 xTitle= "Conversion veto (first lepton)",
-                                 plotopts = channelLabel))
-    if channel == "ElEl":
-        plots.append(Plot.make1D("%s_%s_secondlepton_checkconvVeto"%(channel,suffix), 
-                                 op.switch(op.abs(dilepton[0].pdgId)==11, op.c_float(dilepton[1].convVeto), op.c_float(-1.)),
-                                 secondisElectron, 
-                                 EquidistantBinning(2,0.,2.),
-                                 xTitle= "Conversion veto (second lepton)",
-                                 plotopts = channelLabel))
 
     return plots
 
@@ -535,7 +522,7 @@ def makeAk4JetsPlots(sel, leadjet, subleadjet, suffix, channel, lead_is_b=False,
     return plots
 
 ##########################  JETS (AK4) PLOT #################################
-def makeAk8Plots(sel, fatjet, suffix, channel):
+def makeAk8JetsPlots(sel, fatjet, suffix, channel):
     """
     Make fatjet subjet basic plots
     sel         = refine selection 
