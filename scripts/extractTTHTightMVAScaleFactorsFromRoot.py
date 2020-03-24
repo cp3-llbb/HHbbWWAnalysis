@@ -67,12 +67,15 @@ for key in f.GetListOfKeys():
         for j in range(0, len(pt_binning) - 1):
             mean_pt = (pt_binning[j] + pt_binning[j + 1]) / 2.
             bin_SF = h.FindBin(mean_eta, mean_pt)
+            val_SF = h.GetBinContent(bin_SF)
             bin_eta = h_eta.FindBin(mean_eta)
             bin_pt = h_pt.FindBin(mean_pt)
-            error_eta = h_eta.GetBinError(bin_eta)
-            error_pt = h_pt.GetBinError(bin_pt)
-            error_tot = math.sqrt(error_eta**2+error_pt**2)
-            pt_data = {'bin': [pt_binning[j], pt_binning[j + 1]], 'value': h.GetBinContent(bin_SF), 'error_low': error_tot, 'error_high': error_tot}
+            shift_eta = abs(1-h_eta.GetBinContent(bin_eta))
+            shift_pt = abs(1-h_pt.GetBinContent(bin_pt))
+            val_SF_up = max(1+shift_eta,1+shift_pt)*val_SF
+            val_SF_down = min(1-shift_eta,1-shift_pt)*val_SF
+            #error_tot = math.sqrt(error_eta**2+error_pt**2)
+            pt_data = {'bin': [pt_binning[j], pt_binning[j + 1]], 'value': val_SF, 'error_low': val_SF-val_SF_down, 'error_high': val_SF_up-val_SF}
 
             eta_data['values'].append(pt_data)
 
