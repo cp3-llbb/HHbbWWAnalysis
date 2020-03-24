@@ -129,7 +129,7 @@ samples:
     cross-section: 3.222     
     group: VVV #ZZ
     era: '2016'
-    split: 8 # 8 files
+    split: 16 # 16 files
 
   ZZTo4L:
     db: das:/ZZTo4L_13TeV_powheg_pythia8_ext1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM

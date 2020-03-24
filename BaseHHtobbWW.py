@@ -35,7 +35,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
         metName = "METFixEE2017" if era == "2017" else "MET"
         tree,noSel,be,lumiArgs = super(BaseNanoHHtobbWW,self).prepareTree(tree, sample=sample, sampleCfg=sampleCfg, calcToAdd=["nJet", metName, "nMuon"])
         self.triggersPerPrimaryDataset = {}
-        from bamboo.analysisutils import configureJets ,configureRochesterCorrection
+        from bamboo.analysisutils import configureJets ,configureRochesterCorrection, configureType1MET 
 
         ## Check distributed option #
         isNotWorker = (self.args.distributed != "worker") 
@@ -108,6 +108,16 @@ class BaseNanoHHtobbWW(NanoAODModule):
                               backend               = be, 
                               uName                 = sample,
                               cachedir              = cachJEC_dir)
+                configureType1MET(variProxy             = tree._MET, 
+                                  jec                   = "Summer16_07Aug2017_V20_MC",
+                                  smear                 = "Summer16_25nsV1_MC",
+                                  jesUncertaintySources = ["Total"],
+                                  mayWriteCache         = isNotWorker,
+                                  isMC                  = self.isMC(sample),
+                                  backend               = be,
+                                  uName                 = sample,
+                                  cachedir              = cachJEC_dir)
+
             else:                   # If data -> extract info from config 
                 jecTag = None
                 if "2016B" in sample or "2016C" in sample or "2016D" in sample:
@@ -124,6 +134,13 @@ class BaseNanoHHtobbWW(NanoAODModule):
                               backend               = be, 
                               uName                 = sample,
                               cachedir              = cachJEC_dir)
+                configureType1MET(variProxy         = tree._MET, 
+                                  jec               = jecTag,
+                                  mayWriteCache     = isNotWorker,
+                                  isMC              = self.isMC(sample), 
+                                  backend           = be, 
+                                  uName             = sample,
+                                  cachedir          = cachJEC_dir)
 
         ############################################################################################
         # ERA 2017 #
@@ -197,13 +214,13 @@ class BaseNanoHHtobbWW(NanoAODModule):
 
         # Triggers and Gen Weight #
         if self.isMC(sample):
-            pass # ONLY FOR SYNCHRO
-            #noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
+            #pass # ONLY FOR SYNCHRO
+            noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
             #noSel = noSel.refine("genWeight", weight=op.abs(tree.genWeight), cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
             #noSel = noSel.refine("negWeight", cut=[tree.genWeight<0])
         else:
-            pass # ONLY FOR SYNCHRO
-            #noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset))
+            #pass # ONLY FOR SYNCHRO
+            noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset))
 
         return tree,noSel,be,lumiArgs
 
@@ -215,9 +232,10 @@ class BaseNanoHHtobbWW(NanoAODModule):
 
         isMC = self.isMC(sample)
 
-        # Forcedefne #
-        forceDefine(t._Muon.calcProd, noSel)
-        forceDefine(t._Jet.calcProd, noSel) # calculate once per event (for every event)
+        # Forcedefine : calculate once per event (for every event) #
+        forceDefine(t._Muon.calcProd, noSel) # Muons for Rochester corrections
+        forceDefine(t._Jet.calcProd, noSel)  # Jets for configureJets
+        forceDefine(getattr(t, "_{0}".format("MET" if era != "2017" else "METFixEE2017")).calcProd,noSel) # MET for configureMET
 
         ###########################################################################
         #                           TTbar reweighting                             #
@@ -261,7 +279,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
         #                                 MET                                       #
         #############################################################################
         # MET filter #
-        #noSel = noSel.refine("passMETFlags", cut=METFilter(t.Flag, era, isMC) )
+        noSel = noSel.refine("passMETFlags", cut=METFilter(t.Flag, era, isMC) )
 
         # MET corrections #
         MET = t.MET if era != "2017" else t.METFixEE2017
@@ -293,8 +311,8 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                                   # if (abs(lep.pdgId)!=13 or lep.mediumMuonId>0) and lep.mvaTTH > 0.90: return lep.pt 
                                                                     # if electron, check above MVA 
                                                                     # If muon, check that passes medium and above MVA
-                                                                  op.static_cast("Float_t",0.9*lep.pt/lep.jetPtRelv2))
-                                                                  # else: return 0.90 * lep.pt / lep.jetPtRatiov2
+                                                                   op.static_cast("Float_t",0.9*lep.pt*(1.+lep.jetRelIso)))
+                                                                  # else: return 0.90 * lep.pt / jetPtRatio where jetPtRatio = 1./(Electron_jetRelIso + 1.)
 
                     # Def conept : https://github.com/CERN-PH-CMG/cmgtools-lite/blob/f8a34c64a4489d94ff9ac4c0d8b0b06dad46e521/TTHAnalysis/python/tools/conept.py#L74
         self.lambda_conept_muon = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
@@ -303,7 +321,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                                # if (abs(lep.pdgId)!=13 or lep.mediumMuonId>0) and lep.mvaTTH > 0.90: return lep.pt 
                                                                     # if electron, check above MVA 
                                                                     # If muon, check that passes medium and above MVA
-                                                               op.static_cast("Float_t",0.9*lep.pt/lep.jetPtRelv2))
+                                                               op.static_cast("Float_t",0.9*lep.pt*(1.+lep.jetRelIso)))
                                                                # else: return 0.90 * lep.pt / lep.jetPtRatiov2
 
         # Btag interpolation #
@@ -322,7 +340,10 @@ class BaseNanoHHtobbWW(NanoAODModule):
 
         # Dilepton lambdas #
         self.lambda_leptonOS  = lambda l1,l2 : l1.charge != l2.charge
-        self.lambda_is_matched = lambda lep : lep.genPartFlav==1 if isMC else lambda dilep : op.c_bool(True)
+        if isMC:
+            self.lambda_is_matched = lambda lep : lep.genPartFlav==1
+        else:
+            self.lambda_is_matched = lambda lep : op.c_bool(True)
         lambda_dilepton_OS_matched  = lambda l1,l2 : op.AND(self.lambda_leptonOS(l1,l2),
                                                             self.lambda_is_matched(l1),
                                                             self.lambda_is_matched(l2))
@@ -347,8 +368,8 @@ class BaseNanoHHtobbWW(NanoAODModule):
         self.lambda_muonFakeSel = lambda mu : op.AND(
                                                     self.lambda_conept_muon(mu) >= op.c_float(10.),
                                                     self.lambda_lepton_associatedJetNoBtag(mu),
-
                                                     op.OR(mu.mvaTTH >= 0.85, op.AND(mu.jetRelIso<0.5 , self.lambda_muon_deepJetInterpIfMvaFailed(mu))), 
+                                                    #op.AND(mu.jetRelIso<0.5 , self.lambda_muon_deepJetInterpIfMvaFailed(mu)), 
                                                         # If mvaTTH < 0.85 : jetRelIso <0.5 and < deepJet medium with interpolation
                                                 )
         self.muonsFakeSel = op.select(self.muonsPreSel, self.lambda_muonFakeSel)
@@ -390,7 +411,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                         ele.hoe <= 0.10,
                                                         ele.eInvMinusPInv >= -0.04,
                                                         op.OR(ele.mvaTTH >= 0.80, op.AND(ele.jetRelIso<0.7, ele.mvaFall17V2noIso_WP80)), # Lepton MVA id from ttH
-                                                            # If mvaTTH < 0.80 : jetRelIso <0.5 (and deepJet medium ?) and Fall17V2noIso_WP80
+                                                            # If mvaTTH < 0.80 : jetRelIso <0.5 and Fall17V2noIso_WP80
                                                         ele.lostHits == 0,    # number of missing inner hits
                                                         ele.convVeto        # Passes conversion veto
                                                         )

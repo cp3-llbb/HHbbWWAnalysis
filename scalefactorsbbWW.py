@@ -40,11 +40,11 @@ class ScaleFactorsbbWW:
 
         # Electrons tight #
         instance.addEfficiency(key_entry   = 'electron_tightMVA_2016',
-                               base_str    = "Electron_EGamma_SF2D_TightMVA2016.json")
+                               base_str    = "TTHSF_EGamma_SF2D_ElectronTight2016.json")
 
         # Muons tight #
         instance.addEfficiency(key_entry   = 'muon_tightMVA_2016',
-                               base_str    = "Muon_EGamma_SF2D_TightMVA2016.json")
+                               base_str    = "TTHSF_EGamma_SF2D_MuonTight2016.json")
         # Btagging #
         instance.addScaleFactor(key_entry       = 'btag_2016_94X',
                                 base_key        = '{algo}_{wp}',

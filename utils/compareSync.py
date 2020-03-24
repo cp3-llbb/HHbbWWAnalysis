@@ -35,9 +35,9 @@ def compareSync(dict_files):
         for group,tree in dict_trees.items():
             print ("*",end='')
             if group == "UCLA group":
-                tree.Draw(branch+">>h"+group+branch+"(100)",branch+"!=-10000","norm")
+                tree.Draw(branch+">>h"+group+branch+"(100)",branch+"!=-10000")
             else:
-                tree.Draw(branch+">>h"+group+branch+"(100)",branch+"!=-9999","norm")
+                tree.Draw(branch+">>h"+group+branch+"(100)",branch+"!=-9999")
             hist = gROOT.FindObject("h"+group+branch)
             branch_dict[group] = deepcopy(hist)
             del hist
