@@ -338,6 +338,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
         elif era == "2018":
             self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
                                                                         lep.jet.btagDeepFlavB <= 0.2770)
+                     # If no associated jet, isolated lepton : cool !  
 
         # Cone pt #
                     # Def conept : https://github.com/CERN-PH-CMG/cmgtools-lite/blob/f8a34c64a4489d94ff9ac4c0d8b0b06dad46e521/TTHAnalysis/python/tools/conept.py#L74
@@ -371,7 +372,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
         elif era == "2018":
             self.lambda_muon_btagInterpolation = lambda mu : self.lambda_muon_x(mu)*0.0494 + (1-self.lambda_muon_x(mu))*0.2770
             # return x*WP_loose+(1-x)*WP_medium
-        self.lambda_muon_deepJetInterpIfMvaFailed = lambda mu : op.AND(self.lambda_hasAssociatedJet(mu),
+        self.lambda_muon_deepJetInterpIfMvaFailed = lambda mu : op.OR(op.NOT(self.lambda_hasAssociatedJet(mu)),     # If no associated jet, isolated lepton : cool !
                                                                       mu.jet.btagDeepFlavB < self.lambda_muon_btagInterpolation(mu))
 
         # Dilepton lambdas #
