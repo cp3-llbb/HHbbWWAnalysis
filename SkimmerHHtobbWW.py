@@ -8,7 +8,7 @@ sys.path.append('/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/') # Add scripts i
 from BaseHHtobbWW import BaseNanoHHtobbWW
 
 #===============================================================================================#
-#                                 PlotterHHtobbWW                                               #
+#                                 SkimmerHHtobbWW                                               #
 #===============================================================================================#
 class SkimmerNanoHHtobbWW(BaseNanoHHtobbWW,SkimmerModule):
     """ Plotter module: HH->bbW(->e/µ nu)W(->e/µ nu) histograms from NanoAOD """

@@ -26,6 +26,41 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                  "ratio-y-axis" : 'Ratio Data/MC',
                                  "sort-by-yields" : False}
 
+    #-------------------------------------------------------------------------------------------#
+    #                                       addArgs                                             #
+    #-------------------------------------------------------------------------------------------#
+    def addArgs(self,parser):
+        super(BaseNanoHHtobbWW, self).addArgs(parser)
+
+        #----- Plotter Arguments -----#
+        parser.add_argument("--Preselected", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Produce the plots for a preselected pair of leptons")
+        parser.add_argument("--Fakeable", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Produce the plots for a fakeable pair of leptons")
+        parser.add_argument("--Tight", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Produce the plots for a tight pair of leptons")
+        parser.add_argument("--FakeExtrapolation", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Produce the plots for a pair of leptons passing the fakeable selection but not the tight")
+        parser.add_argument("--OnlyYield", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Only produce the yield plots")
+        #----- Skimmer Arguments -----#
+        parser.add_argument("--Synchronization", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Produce the skims for the synchronization (without triggers, corrections of flags)")
+
+
+
     def prepareTree(self, tree, sample=None, sampleCfg=None):
         # JEC's Recommendation for Full RunII: https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC
         # JER : -----------------------------: https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
@@ -40,12 +75,16 @@ class BaseNanoHHtobbWW(NanoAODModule):
         ## Check distributed option #
         isNotWorker = (self.args.distributed != "worker") 
 
+        # Check era #
+        if era != "2016" and era != "2017" and era != "2018":
+            raise RuntimeError("Unknown era {0}".format(era))
+
         # Rochester and JEC corrections (depends on era) #     
         cachJEC_dir = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/cacheJEC'
         ############################################################################################
         # ERA 2016 #
         ############################################################################################
-        if era == "2016":
+        if era == "2016" and not self.args.Synchronization:
             # Rochester corrections #
             configureRochesterCorrection(variProxy  = tree._Muon,
                                          paramsFile = os.path.join(os.path.dirname(__file__), "data", "RoccoR2016.txt"),
@@ -96,7 +135,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                     "MuonEG":       [ tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL, 
                                       tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL]} 
 
-            # Jet treatment #
+            # JetMET treatment #
             if self.isMC(sample):   # if MC -> needs smearing
                 configureJets(variProxy             = tree._Jet, 
                               jetType               = "AK4PFchs",
@@ -145,7 +184,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
         ############################################################################################
         # ERA 2017 #
         ############################################################################################
-        #elif era == "2017":
+        #elif era == "2017" and not self.args.Synchronization:
         #    configureRochesterCorrection(tree._Muon.calc,os.path.join(os.path.dirname(__file__), "data", "RoccoR2017.txt"))
         #    self.triggersPerPrimaryDataset = {
         #        "DoubleMuon" : [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
@@ -178,7 +217,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
         ############################################################################################
         # ERA 2018 #
         ############################################################################################
-        #elif era == "2018":
+        #elif era == "2018" and not self.args.Synchronization:
         #    configureRochesterCorrection(tree._Muon.calc,os.path.join(os.path.dirname(__file__), "data", "RoccoR2018.txt"))
         #    self.triggersPerPrimaryDataset = {
         #        "DoubleMuon" : [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
@@ -209,18 +248,13 @@ class BaseNanoHHtobbWW(NanoAODModule):
         #        elif "2018D" in sample:
         #            configureJets(tree, "Jet", "AK4PFchs",
         #                jec="Autumn18_RunD_V8_DATA", mayWriteCache=isNotWorker)
-        else:
-            raise RuntimeError("Unknown era {0}".format(era))
 
         # Triggers and Gen Weight #
-        if self.isMC(sample):
-            #pass # ONLY FOR SYNCHRO
-            noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
-            #noSel = noSel.refine("genWeight", weight=op.abs(tree.genWeight), cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
-            #noSel = noSel.refine("negWeight", cut=[tree.genWeight<0])
-        else:
-            #pass # ONLY FOR SYNCHRO
-            noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset))
+        if not self.args.Synchronization:
+            if self.isMC(sample):
+                noSel = noSel.refine("genWeight", weight=tree.genWeight, cut=op.OR(*chain.from_iterable(self.triggersPerPrimaryDataset.values())))
+            else:
+                noSel = noSel.refine("withTrig", cut=makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset))
 
         return tree,noSel,be,lumiArgs
 
@@ -233,9 +267,10 @@ class BaseNanoHHtobbWW(NanoAODModule):
         isMC = self.isMC(sample)
 
         # Forcedefine : calculate once per event (for every event) #
-        forceDefine(t._Muon.calcProd, noSel) # Muons for Rochester corrections
-        forceDefine(t._Jet.calcProd, noSel)  # Jets for configureJets
-        forceDefine(getattr(t, "_{0}".format("MET" if era != "2017" else "METFixEE2017")).calcProd,noSel) # MET for configureMET
+        if not self.args.Synchronization:
+            forceDefine(t._Muon.calcProd, noSel) # Muons for Rochester corrections
+            forceDefine(t._Jet.calcProd, noSel)  # Jets for configureJets
+            forceDefine(getattr(t, "_{0}".format("MET" if era != "2017" else "METFixEE2017")).calcProd,noSel) # MET for configureMET
 
         ###########################################################################
         #                           TTbar reweighting                             #
@@ -279,14 +314,15 @@ class BaseNanoHHtobbWW(NanoAODModule):
         #                                 MET                                       #
         #############################################################################
         # MET filter #
-        noSel = noSel.refine("passMETFlags", cut=METFilter(t.Flag, era, isMC) )
+        if not self.args.Synchronization:
+            noSel = noSel.refine("passMETFlags", cut=METFilter(t.Flag, era, isMC) )
 
         # MET corrections #
         MET = t.MET if era != "2017" else t.METFixEE2017
-        #self.corrMET = METcorrection(MET,t.PV,sample,era,self.isMC(sample))
-        self.corrMET = MET
-
-        # TODO : this is for synch, we should uncomment afterwards
+        if not self.args.Synchronization:
+            self.corrMET = METcorrection(MET,t.PV,sample,era,self.isMC(sample))
+        else:
+            self.corrMET = MET
 
         #############################################################################
         #                      Lepton Lambdas Variables                             #
