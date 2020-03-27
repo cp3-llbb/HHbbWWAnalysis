@@ -1,0 +1,50 @@
+tree: Events
+eras:
+  '2016': 
+    luminosity: 35922 #36000 #3104.509131800  #pb # TODO  to compute agin with brilcal
+    luminosity-error: 0.025     #pb
+samples:
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-750:
+    files: [/nfs/scratch/fynu/fbury/NanoAOD/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_narrow_13TeV-madgraph-v2_NanoAODv6.root]
+    generated-events: 'genEventSumw'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-color: "#1F7FD1"
+    line-type: 1
+    legend: HH (Radion, M = 750)
+    order: 12
+    type: signal
+
+######################## PlotIt ##########################
+plotIt:
+  configuration:
+    width: 800
+    height: 599
+    luminosity-label: '%1$.2f fb^{-1} (13 TeV)'  #TODO
+    experiment: CMS
+    extra-label: 2016 Data -- Work in progress
+    show-overflow: true
+  legend:
+    position: [0.7, 0.6, 0.91, 0.91]
+  systematics:
+      # on the jets
+    - jer
+    - jesTotal
+      # on the lepton id /iso 
+    - muid
+    - muiso
+    - elid
+     # on the pileup
+    - pileup
+     # on the trigger
+    - eleltrig
+    - mumutrig
+    - elmutrig
+    - mueltrig
+      # on the jet btagging
+    - deepjet
+    - deepcsv
+      # on the cross section : 1+xsec_uncert(pb)/xsec(pb)
+   
+
