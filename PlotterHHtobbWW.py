@@ -53,33 +53,6 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
         super(PlotterNanoHHtobbWW, self).__init__(args)
 
     #-------------------------------------------------------------------------------------------#
-    #                                       addArgs                                             #
-    #-------------------------------------------------------------------------------------------#
-    def addArgs(self,parser):
-        super(PlotterNanoHHtobbWW, self).addArgs(parser)
-        parser.add_argument("--Preselected", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Produce the plots for a preselected pair of leptons")
-        parser.add_argument("--Fakeable", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Produce the plots for a fakeable pair of leptons")
-        parser.add_argument("--Tight", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Produce the plots for a tight pair of leptons")
-        parser.add_argument("--FakeExtrapolation", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Produce the plots for a pair of leptons passing the fakeable selection but not the tight")
-        parser.add_argument("--OnlyYield", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Only produce the yield plots")
-
-
-    #-------------------------------------------------------------------------------------------#
     #                                       Selections                                          #
     #-------------------------------------------------------------------------------------------#
     def makeLeptonSelection(self,baseSel): # We start by leptons so no need to pass selObject
