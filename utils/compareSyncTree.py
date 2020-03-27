@@ -53,7 +53,7 @@ def compareSyncTree(file1,file2):
                     print ("\tele1_isfakeablesel_diff")
                 if e1.mu1_isfakeablesel != -9999 and e2.mu1_isfakeablesel != -9999 and e1.mu1_isfakeablesel != e2.mu1_isfakeablesel:
                     mu1_isfakeablesel_diff.append([e1.event,e1.mu1_isfakeablesel,e2.mu1_isfakeablesel])
-                    saveToFile("mu1_isfakeable_diff.txt",mu1_ismvasel_diff)
+                    saveToFile("mu1_isfakeable_diff.txt",mu1_isfakeablesel_diff)
                     print ("\tmu1_isfakeablesel_diff")
 
                 # mvasel #
