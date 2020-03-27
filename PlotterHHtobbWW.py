@@ -340,8 +340,9 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
             DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
             self.DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+self.sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
             #### Ak8 Btagging ####
-            DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
-            self.DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+self.sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
+#            DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
+#            self.DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+self.sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
+                # TODO : add Boosted SF (need NanoAODv7)
 
         #############################################################################
         #                           Selection and plot                              #

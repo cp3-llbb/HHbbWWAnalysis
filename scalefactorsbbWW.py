@@ -50,10 +50,10 @@ class ScaleFactorsbbWW:
                                 base_key        = '{algo}_{wp}',
                                 base_str        = "BTagging_{wp}_{flav}_{calib}_{algo}.json",
                                 format_dict     = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "comb"), ("bjets","comb")]})
-        instance.addScaleFactor(key_entry       = 'subjet_btag_2016_94X',
-                                base_key        = '{algo}_{wp}',
-                                base_str        = "BTagging_{wp}_{flav}_{calib}_subjet_{algo}.json",
-                                format_dict     = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
+#        instance.addScaleFactor(key_entry       = 'subjet_btag_2016_94X',
+#                                base_key        = '{algo}_{wp}',
+#                                base_str        = "BTagging_{wp}_{flav}_{calib}_subjet_{algo}.json",
+#                                format_dict     = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
 
         # Get full dict #
         self.all_scalefactors = instance.getScaleFactorsDict()
