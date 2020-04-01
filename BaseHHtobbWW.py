@@ -328,16 +328,18 @@ class BaseNanoHHtobbWW(NanoAODModule):
         #                      Lepton Lambdas Variables                             #
         #############################################################################
         # Associated jet Btagging #
-        self.lambda_hasAssociatedJet = lambda lep : op.AND(lep.jet.idx != -1 , op.deltaR(lep.p4,lep.jet.p4) <= 0.4)
+        #self.lambda_hasAssociatedJet = lambda lep : op.AND(lep.jet.idx != -1 , op.deltaR(lep.p4,lep.jet.p4) <= 0.4)
+        self.lambda_hasAssociatedJet = lambda lep : lep.jet.idx != -1
         if era == "2016": 
-            self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
-                                                                        lep.jet.btagDeepFlavB <= 0.3093)
+            self.lambda_lepton_associatedJetNoBtag = lambda lep : lep.jet.btagDeepFlavB < 0.3093
+            #self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
+            #                                                            lep.jet.btagDeepFlavB <= 0.3093)
         elif era =="2017":
             self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
-                                                                        lep.jet.btagDeepFlavB <= 0.3033)
+                                                                        lep.jet.btagDeepFlavB < 0.3033)
         elif era == "2018":
             self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
-                                                                        lep.jet.btagDeepFlavB <= 0.2770)
+                                                                        lep.jet.btagDeepFlavB < 0.2770)
                      # If no associated jet, isolated lepton : cool !  
 
         # Cone pt #
@@ -372,8 +374,9 @@ class BaseNanoHHtobbWW(NanoAODModule):
         elif era == "2018":
             self.lambda_muon_btagInterpolation = lambda mu : self.lambda_muon_x(mu)*0.0494 + (1-self.lambda_muon_x(mu))*0.2770
             # return x*WP_loose+(1-x)*WP_medium
-        self.lambda_muon_deepJetInterpIfMvaFailed = lambda mu : op.OR(op.NOT(self.lambda_hasAssociatedJet(mu)),     # If no associated jet, isolated lepton : cool !
-                                                                      mu.jet.btagDeepFlavB < self.lambda_muon_btagInterpolation(mu))
+        self.lambda_muon_deepJetInterpIfMvaFailed = lambda mu : mu.jet.btagDeepFlavB < self.lambda_muon_btagInterpolation(mu)
+        #self.lambda_muon_deepJetInterpIfMvaFailed = lambda mu : op.OR(op.NOT(self.lambda_hasAssociatedJet(mu)),     # If no associated jet, isolated lepton : cool !
+        #                                                              mu.jet.btagDeepFlavB < self.lambda_muon_btagInterpolation(mu))
 
         # Dilepton lambdas #
         self.lambda_leptonOS  = lambda l1,l2 : l1.charge != l2.charge
@@ -406,7 +409,6 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                     self.lambda_conept_muon(mu) >= op.c_float(10.),
                                                     self.lambda_lepton_associatedJetNoBtag(mu),
                                                     op.OR(mu.mvaTTH >= 0.85, op.AND(mu.jetRelIso<0.5 , self.lambda_muon_deepJetInterpIfMvaFailed(mu))), 
-                                                    #op.AND(mu.jetRelIso<0.5 , self.lambda_muon_deepJetInterpIfMvaFailed(mu)), 
                                                         # If mvaTTH < 0.85 : jetRelIso <0.5 and < deepJet medium with interpolation
                                                 )
         self.muonsFakeSel = op.select(self.muonsPreSel, self.lambda_muonFakeSel)
@@ -414,7 +416,6 @@ class BaseNanoHHtobbWW(NanoAODModule):
         self.lambda_muonTightSel = lambda mu : op.AND(
                                                     mu.mvaTTH >= 0.85, # Lepton MVA id from ttH
                                                     mu.mediumId,
-                                                    #self.lambda_is_matched(mu), # TODO : should I ?
                                                 )
         self.muonsTightSel = op.select(self.muonsFakeSel, self.lambda_muonTightSel)
 
@@ -456,7 +457,6 @@ class BaseNanoHHtobbWW(NanoAODModule):
         # Tight selection #
         self.lambda_electronTightSel = lambda ele : op.AND(
                                                     ele.mvaTTH >= 0.80,
-                                                    #self.lambda_is_matched(ele), # TODO: Should I ?
                                                 )
         self.electronsTightSel = op.select(self.electronsFakeSel, self.lambda_electronTightSel)
 
@@ -509,8 +509,8 @@ class BaseNanoHHtobbWW(NanoAODModule):
         self.ak4JetsPreSel = op.select(self.ak4JetsByPt, self.lambda_ak4JetsPreSel)
         # Cleaning #
         self.lambda_cleanAk4Jets = lambda j : op.AND(
-                                                op.NOT(op.rng_any(self.electronsPreSel, lambda ele : op.deltaR(j.p4, ele.p4) < 0.4 )), 
-                                                op.NOT(op.rng_any(self.muonsPreSel, lambda mu : op.deltaR(j.p4, mu.p4) < 0.4 )))
+                                                op.NOT(op.rng_any(self.electronsFakeSel, lambda ele : op.deltaR(j.p4, ele.p4) < 0.4 )), 
+                                                op.NOT(op.rng_any(self.muonsFakeSel, lambda mu : op.deltaR(j.p4, mu.p4) < 0.4 )))
             # remove jets within cone of DR<0.4 of preselected electrons and muons
         self.ak4Jets = op.select(self.ak4JetsPreSel,self.lambda_cleanAk4Jets)
     
@@ -560,8 +560,8 @@ class BaseNanoHHtobbWW(NanoAODModule):
         self.ak8JetsPreSel = op.select(self.ak8JetsByPt, self.lambda_ak8JetsPreSel)
         # Cleaning #
         self.lambda_cleanAk8Jets = lambda j : op.AND(
-                                                op.NOT(op.rng_any(self.electronsPreSel, lambda ele : op.deltaR(j.p4, ele.p4) < 0.8 )), 
-                                                op.NOT(op.rng_any(self.muonsPreSel, lambda mu : op.deltaR(j.p4, mu.p4) < 0.8 ))
+                                                op.NOT(op.rng_any(self.electronsFakeSel, lambda ele : op.deltaR(j.p4, ele.p4) < 0.8 )), 
+                                                op.NOT(op.rng_any(self.muonsFakeSel, lambda mu : op.deltaR(j.p4, mu.p4) < 0.8 ))
                                             )
             # remove jets within cone of DR<0.8 of preselected electrons and muons
         self.ak8Jets = op.select(self.ak8JetsPreSel,self.lambda_cleanAk8Jets)
