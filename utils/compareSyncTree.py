@@ -68,7 +68,7 @@ def compareSyncTree(file1,file2):
 
 # Execution #
 compareSyncTree(file1 = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/Synchronization/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root',
-                file2 = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/sync_bbww_Tallinn_2016_v5.root')
+                file2 = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/sync_bbww_Tallinn_2016_v7.root')
 
 
 
