@@ -51,7 +51,7 @@ def channelPlot(sel,DilepElEl,DilepMuMu,DilepElMu,suffix,channel):
                                    objCont = DilepElMu,
                                    sel     = sel,
                                    Nmax    = 5,
-                                   xTitle  = "N(e^{#pm} #mu^{#mp}"))
+                                   xTitle  = "N(e^{#pm} #mu^{#mp})"))
     return plots
 
 ##########################  YIELD PLOT #################################
