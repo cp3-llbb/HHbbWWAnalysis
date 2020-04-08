@@ -1,0 +1,18 @@
+tree: Events
+eras:
+  '2016': 
+    luminosity: 35922 #36000 #3104.509131800  #pb # TODO  to compute agin with brilcal
+    luminosity-error: 0.025     #pb
+samples:
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-750:
+    files: [/nfs/scratch/fynu/fbury/NanoAOD/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_narrow_13TeV-madgraph-v2_NanoAODv6.root]
+    generated-events: 'genEventSumw'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-color: "#1F7FD1"
+    line-type: 1
+    legend: HH (Radion, M = 750)
+    order: 12
+    type: signal
+
