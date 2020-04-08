@@ -38,32 +38,68 @@ class BaseNanoHHtobbWW(NanoAODModule):
                             default="dataframe", 
                             help="Backend to use, 'dataframe' (default) or 'lazy'")
 
-        #----- Plotter Arguments -----#
-        parser.add_argument("--Preselected", 
+        #----- Lepton selection arguments -----#
+        leptonSelArgs = parser.add_argument_group('Lepton selection arguments : at least one must be used otherwise the trees and ntuples will be empty')
+        leptonSelArgs.add_argument("--Preselected", 
                             action      = "store_true",
                             default     = False,
-                            help        = "Produce the plots for a preselected pair of leptons")
-        parser.add_argument("--Fakeable", 
+                            help        = "Produce the plots/skim for a preselected pair of leptons")
+        leptonSelArgs.add_argument("--Fakeable", 
                             action      = "store_true",
                             default     = False,
-                            help        = "Produce the plots for a fakeable pair of leptons")
-        parser.add_argument("--Tight", 
+                            help        = "Produce the plots/skim for a fakeable pair of leptons")
+        leptonSelArgs.add_argument("--Tight", 
                             action      = "store_true",
                             default     = False,
-                            help        = "Produce the plots for a tight pair of leptons")
-        parser.add_argument("--FakeExtrapolation", 
+                            help        = "Produce the plots/skim for a tight pair of leptons (MC matched)")
+        leptonSelArgs.add_argument("--FakeExtrapolation", 
                             action      = "store_true",
                             default     = False,
-                            help        = "Produce the plots for a pair of leptons passing the fakeable selection but not the tight")
-        parser.add_argument("--OnlyYield", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Only produce the yield plots")
+                            help        = "Produce the plots/skim for a pair of leptons passing the fakeable selection but not the tight (MC matched)")
+        #----- Jet selection arguments -----#
+        jetSelArgs = parser.add_argument_group("""Jet selection argument\n                                                
+                                                Plotter mode : can be one or several selections for plot production, if none speficied will plot all\n
+                                                Skimmer mode : only one must be used (only one ntuple can be produced at a time)
+                                                """)
+        jetSelArgs.add_argument("--Ak4", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for two Ak4 jets passing the selection criteria")
+        jetSelArgs.add_argument("--Ak8", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for one Ak8 jet passing the selection criteria")
+        jetSelArgs.add_argument("--Resolved0Btag", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the exclusive resolved category with no btagged jet")
+        jetSelArgs.add_argument("--Resolved1Btag", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the exclusive resolved category with only one btagged jet")
+        jetSelArgs.add_argument("--Resolved2Btag", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the exclusive resolved category with two btagged jets")
+        jetSelArgs.add_argument("--Boosted", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the inclusive boosted category")
+
         #----- Skimmer Arguments -----#
-        parser.add_argument("--Synchronization", 
+        skimmerArgs = parser.add_argument_group('Arguments specific to the skimmer')
+        skimmerArgs.add_argument("--Synchronization", 
                             action      = "store_true",
                             default     = False,
                             help        = "Produce the skims for the synchronization (without triggers, corrections of flags)")
+
+        #----- Plotter arguments -----#
+        plotterArgs = parser.add_argument_group('Arguments specific to the plotter')
+        plotterArgs.add_argument("--OnlyYield", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Only produce the yield plots")
+
 
 
 
