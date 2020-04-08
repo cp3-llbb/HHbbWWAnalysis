@@ -16,35 +16,3 @@ samples:
     order: 12
     type: signal
 
-######################## PlotIt ##########################
-plotIt:
-  configuration:
-    width: 800
-    height: 599
-    luminosity-label: '%1$.2f fb^{-1} (13 TeV)'  #TODO
-    experiment: CMS
-    extra-label: 2016 Data -- Work in progress
-    show-overflow: true
-  legend:
-    position: [0.7, 0.6, 0.91, 0.91]
-  systematics:
-      # on the jets
-    - jer
-    - jesTotal
-      # on the lepton id /iso 
-    - muid
-    - muiso
-    - elid
-     # on the pileup
-    - pileup
-     # on the trigger
-    - eleltrig
-    - mumutrig
-    - elmutrig
-    - mueltrig
-      # on the jet btagging
-    - deepjet
-    - deepcsv
-      # on the cross section : 1+xsec_uncert(pb)/xsec(pb)
-   
-

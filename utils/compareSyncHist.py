@@ -32,43 +32,65 @@ def compareSyncHist(dict_files):
     for branch in branches:
         print ("... Branch : %s"%branch,end=' ')
         branch_dict = {}
+        aMax = None
+        aMin = None
+        nBins = None
         for group,tree in dict_trees.items():
             print ("*",end='')
-            if group == "UCLA group":
-                tree.Draw(branch+">>h"+group+branch+"(100)",branch+"!=-10000")
+            # Draw arguments #
+            if aMax is None and aMin is None and nBins is None:
+                branch_str = branch+">>h"+group+branch+"(100)"
             else:
-                tree.Draw(branch+">>h"+group+branch+"(100)",branch+"!=-9999")
+                branch_str = branch+">>h"+group+branch+"("+str(nBins)+","+str(aMin)+","+str(aMax)+")"
+            # Draw #
+            if group == "UCLA group":
+                tree.Draw(branch_str,branch+"!=-10000")
+            else:
+                tree.Draw(branch_str,branch+"!=-9999")
+
+            # Recover histo #
             hist = gROOT.FindObject("h"+group+branch)
+            if aMax is None and aMin is None:
+                aMax = hist.GetXaxis().GetBinUpEdge(hist.GetNbinsX())
+                aMin = hist.GetXaxis().GetBinLowEdge(1)
+                nBins = hist.GetNbinsX()
             branch_dict[group] = deepcopy(hist)
             del hist
         print()
         hist_dict[branch] = branch_dict
-
 
     print ("[INFO] Plotting the histograms")
     # Produce the PDF #
     C = TCanvas("C","C",800,600)
     outName = "compareSyncHist.pdf"
     C.Print(outName+"[")
+    # Line attributes #
+    colors = [1,634,419,601]
+    style  = [1,2,3,4]
+    width  = [1,2,2,2]
     # Loop over branches #
     for branch,gHist in hist_dict.items():
         print ("... Branch : %s"%branch,end=' ')
         C.Clear()
         # Find max value for all hist at given branch #
         hmax = 0
+        hmin = 1e20
         for hist in gHist.values():
             if hist.GetMaximum()>hmax:
                 hmax = hist.GetMaximum()
+            if hist.GetMinimum()<hmin:
+                hmin = hist.GetMinimum()
         # Loop over groups and hists #
         legend = TLegend(0.60,0.80,0.99,0.99)
         legend.SetHeader("Legend","C");
         for i,(group, hist) in enumerate(gHist.items()):
             print ("*",end='')
             hist.SetTitle(branch)
-            hist.SetLineWidth(2)
-            hist.SetLineColor(i+1)
-            hist.SetLineStyle(i+1)
+            hist.SetLineWidth(width[i])
+            hist.SetLineColor(colors[i])
+            hist.SetLineStyle(style[i])
             hist.SetMaximum(hmax*1.1)
+            hist.SetMinimum(hmin*0.9)
             legend.AddEntry(hist,group+" : %d entries"%hist.GetEntries(),"l")
             if i==0:
                 hist.Draw("hist")
@@ -85,7 +107,10 @@ def compareSyncHist(dict_files):
 
 
 compareSyncHist({'Louvain group':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/Synchronization/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root',
-             'Tallinn group':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/sync_bbww_Tallinn_2016_v5.root',
+             #'Tallinn group v5':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v5.root',
+             #'Tallinn group v7':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v7.root',
+             #'Tallinn group v8':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v8.root',
+             'Tallinn group v8':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v9.root',
              #'UCLA group':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/myNanoProdMc2016_NANO_Friend_20191003_v4.root',
             })
 

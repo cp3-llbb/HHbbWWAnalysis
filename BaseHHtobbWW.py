@@ -32,6 +32,12 @@ class BaseNanoHHtobbWW(NanoAODModule):
     def addArgs(self,parser):
         super(BaseNanoHHtobbWW, self).addArgs(parser)
 
+        #----- Technical arguments -----#
+        parser.add_argument("--backend", 
+                            type=str, 
+                            default="dataframe", 
+                            help="Backend to use, 'dataframe' (default) or 'lazy'")
+
         #----- Plotter Arguments -----#
         parser.add_argument("--Preselected", 
                             action      = "store_true",
@@ -62,13 +68,22 @@ class BaseNanoHHtobbWW(NanoAODModule):
 
 
     def prepareTree(self, tree, sample=None, sampleCfg=None):
+        from bamboo.treedecorators import NanoAODDescription, nanoRochesterCalc, nanoJetMETCalc
         # JEC's Recommendation for Full RunII: https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC
         # JER : -----------------------------: https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
         # Get base aguments #
         era = sampleCfg['era']
         isMC = self.isMC(sample)
         metName = "METFixEE2017" if era == "2017" else "MET"
-        tree,noSel,be,lumiArgs = super(BaseNanoHHtobbWW,self).prepareTree(tree, sample=sample, sampleCfg=sampleCfg, calcToAdd=["nJet", metName, "nMuon"])
+        tree,noSel,be,lumiArgs = super(BaseNanoHHtobbWW,self).prepareTree(tree          = tree, 
+                                                                          sample        = sample, 
+                                                                          sampleCfg     = sampleCfg, 
+                                                                          description   = NanoAODDescription.get("v5", year=(era if era else "2016"),
+                                                                          isMC          = isMC,
+                                                                          systVariations= [ nanoRochesterCalc, (nanoJetMETCalc_METFixEE2017 if era == "2017" else nanoJetMETCalc) ]), 
+                                                                                # will do Jet and MET variations, and the Rochester correction
+                                                                          lazyBackend   = (self.args.backend == "lazy"))
+    
         self.triggersPerPrimaryDataset = {}
         from bamboo.analysisutils import configureJets ,configureRochesterCorrection, configureType1MET 
 
@@ -295,20 +310,24 @@ class BaseNanoHHtobbWW(NanoAODModule):
         #                             Pile-up                                       #
         #############################################################################
         puWeightsFile = None
+        # Select sfTaf #
         if era == "2016":
             self.sfTag="94X"
-            puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "puweights2016.json")
         elif era == "2017":
             self.sfTag="94X"     
-            puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "puweights2017.json")
         elif era == "2018":
             self.sfTag="102X"
-            puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "puweights2018.json")
-        if self.isMC(sample) and puWeightsFile is not None:
+
+        # Get MC PU weight file #
+        if self.isMC(sample) and not self.args.Synchronization:
+            if "pufile" not in sampleCfg:
+                raise KeyError("Could not find 'pufile' entry for sample %s in the YAML file"%sampleCfg["sample"])
+            puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "pileup",sampleCfg["pufile"])
+            if not os.path.exists(puWeightsFile):
+                raise RuntimeError("Could not find pileup file %s"%puWeightsFile)
             from bamboo.analysisutils import makePileupWeight
-            self.PUWeight = makePileupWeight(puWeightsFile, t.Pileup_nTrueInt, systName="pileup")
-            #noSel = noSel.refine("puWeight", weight=makePileupWeight(puWeightsFile, t.Pileup_nTrueInt, systName="pileup"))
-            noSel = noSel.refine("puWeight", weight=self.PUWeight)
+            PUWeight = makePileupWeight(puWeightsFile, t.Pileup_nTrueInt, systName="pileup",nameHint=f"puweightFromFile{sample}".replace('-','_'))
+            noSel = noSel.refine("puWeight", weight=PUWeight)
 
         #############################################################################
         #                                 MET                                       #
@@ -319,10 +338,11 @@ class BaseNanoHHtobbWW(NanoAODModule):
 
         # MET corrections #
         MET = t.MET if era != "2017" else t.METFixEE2017
-        if not self.args.Synchronization:
-            self.corrMET = METcorrection(MET,t.PV,sample,era,self.isMC(sample))
-        else:
-            self.corrMET = MET
+        #if not self.args.Synchronization:
+        #    self.corrMET = METcorrection(MET,t.PV,sample,era,self.isMC(sample)) # Flatness correction might not be needed
+        #else:
+        #    self.corrMET = MET
+        self.corrMET = MET
 
         #############################################################################
         #                      Lepton Lambdas Variables                             #
@@ -331,9 +351,9 @@ class BaseNanoHHtobbWW(NanoAODModule):
         #self.lambda_hasAssociatedJet = lambda lep : op.AND(lep.jet.idx != -1 , op.deltaR(lep.p4,lep.jet.p4) <= 0.4)
         self.lambda_hasAssociatedJet = lambda lep : lep.jet.idx != -1
         if era == "2016": 
-            self.lambda_lepton_associatedJetNoBtag = lambda lep : lep.jet.btagDeepFlavB < 0.3093
-            #self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
-            #                                                            lep.jet.btagDeepFlavB <= 0.3093)
+            #self.lambda_lepton_associatedJetNoBtag = lambda lep : lep.jet.btagDeepFlavB < 0.3093
+            self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
+                                                                        lep.jet.btagDeepFlavB <= 0.3093)
         elif era =="2017":
             self.lambda_lepton_associatedJetNoBtag = lambda lep : op.OR(op.NOT(self.lambda_hasAssociatedJet(lep)),
                                                                         lep.jet.btagDeepFlavB < 0.3033)
@@ -374,14 +394,16 @@ class BaseNanoHHtobbWW(NanoAODModule):
         elif era == "2018":
             self.lambda_muon_btagInterpolation = lambda mu : self.lambda_muon_x(mu)*0.0494 + (1-self.lambda_muon_x(mu))*0.2770
             # return x*WP_loose+(1-x)*WP_medium
-        self.lambda_muon_deepJetInterpIfMvaFailed = lambda mu : mu.jet.btagDeepFlavB < self.lambda_muon_btagInterpolation(mu)
-        #self.lambda_muon_deepJetInterpIfMvaFailed = lambda mu : op.OR(op.NOT(self.lambda_hasAssociatedJet(mu)),     # If no associated jet, isolated lepton : cool !
-        #                                                              mu.jet.btagDeepFlavB < self.lambda_muon_btagInterpolation(mu))
+        #self.lambda_muon_deepJetInterpIfMvaFailed = lambda mu : mu.jet.btagDeepFlavB < self.lambda_muon_btagInterpolation(mu)
+        self.lambda_muon_deepJetInterpIfMvaFailed = lambda mu : op.OR(op.NOT(self.lambda_hasAssociatedJet(mu)),     # If no associated jet, isolated lepton : cool !
+                                                                      mu.jet.btagDeepFlavB < self.lambda_muon_btagInterpolation(mu))
 
         # Dilepton lambdas #
         self.lambda_leptonOS  = lambda l1,l2 : l1.charge != l2.charge
         if isMC:
-            self.lambda_is_matched = lambda lep : lep.genPartFlav==1
+            self.lambda_is_matched = lambda lep : op.OR(lep.genPartFlav==1,  # Prompt muon or electron
+                                                        lep.genPartFlav==15, # From tau decay
+                                                        lep.genPartFlav==22) # From photon conversion (only available for electrons)
         else:
             self.lambda_is_matched = lambda lep : op.c_bool(True)
         lambda_dilepton_OS_matched  = lambda l1,l2 : op.AND(self.lambda_leptonOS(l1,l2),
@@ -460,11 +482,10 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                 )
         self.electronsTightSel = op.select(self.electronsFakeSel, self.lambda_electronTightSel)
 
-
         #############################################################################
         #                               Dileptons                                   #
         #############################################################################
-        # Preseleted dilepton #
+        # Presecleted dilepton #
         self.OSElElDileptonPreSel = op.combine(self.electronsPreSel, N=2, pred=self.lambda_leptonOS)
         self.OSMuMuDileptonPreSel = op.combine(self.muonsPreSel, N=2, pred=self.lambda_leptonOS)
         self.OSElMuDileptonPreSel = op.combine((self.electronsPreSel, self.muonsPreSel), pred=self.lambda_leptonOS)
@@ -533,7 +554,6 @@ class BaseNanoHHtobbWW(NanoAODModule):
         #                                AK8 Jets                                   #
         #############################################################################
         self.ak8JetsByPt = op.sort(t.FatJet, lambda jet : -jet.p4.Pt())
-        lambda_subJet1_exists = lambda fatjet : fatjet.subJet1._idx.result != -1
         # Preselection #
         if era == "2016":
             self.lambda_ak8JetsPreSel = lambda j : op.AND(
@@ -568,9 +588,6 @@ class BaseNanoHHtobbWW(NanoAODModule):
 
         ############     Btagging     #############
         # The DeepCSV b-tagging algorithm is used on subjets 
-        # If must check that subJet exists before looking at the btag : fatjet.subJet1._idx.result != -1
-                                                        #op.AND(fatjet.subJet1._idx.result != -1,fatjet.subJet1.btagDeepB > 0.6321), 
-                                                        #op.AND(fatjet.subJet2._idx.result != -1,fatjet.subJet2.btagDeepB > 0.6321)))
         if era == "2016": 
             self.lambda_ak8Btag = lambda fatjet : op.OR(op.AND(fatjet.subJet1.pt >30, fatjet.subJet1.btagDeepB > 0.6321),
                                                         op.AND(fatjet.subJet2.pt >30, fatjet.subJet2.btagDeepB > 0.6321))
