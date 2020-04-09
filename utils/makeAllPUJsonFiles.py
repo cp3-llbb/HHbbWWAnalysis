@@ -29,7 +29,7 @@ with open(args.yaml, 'r') as stream:
 if not os.path.exists('./pileup_json'):
     os.makedirs('./pileup_json')
 
-baseCommand =  r"python ../makePUReWeightJSON.py -o %s_%s.json"
+baseCommand =  r"makePUReWeightJSON -o %s_%s.json"
 baseCommand += r" --nominal "+args.nominal
 if args.up is not None:
     baseCommand += r" --up "+args.up
