@@ -12,7 +12,13 @@
 - HHtobbWW.py : deprecated version of the code, kept for comparison
 
 ## Development rules 
-It is proposed that the different part  object definition must be done in very specific parts of the framework 
+It is proposed that the different part  object definition must be done in very specific parts of the framework :
+- Object selection (using combine and select) should only be done in BaseHHtobbWW.py so that they are all available for the dauther classes
+- All the selections should be done in selectionDef.py and encapsulated in SelectionObject class objects. This was the workflow is more easily manageable and the selection steps can be called either from the Plotter or the Skimmer
+- All plots must be defined in plotDef.py with functions that return a list of plots. This is to make sure that all the plots are easily accounted for
+- The Plotter will call the selection and plot functions in a sensible manner (aka, define the plot right after the selection and not at the end, this is to optimize the RooDataFrame workflow)
+- The Skimmer will call the selection functions and define the variables dictionnary
+- All arguments must be defined in BaseHHtobbWW.py to be available throughout the framework)
 
 ## How to run 
 
@@ -55,8 +61,9 @@ Enforced in the script to have one and only one for each
 ### Plotter 
 
 The plotter can be run with :
-
+```
 bambooRun (--distributed=driver) -m PlotterHHtobbWW.py:PlotterNanoHHtobbWW analysis2016.yml -o folderName (lepton arguments) (jet arguments) 
+```
 
 Note : If no arguments is provided, will plot all jet and lepton selection (**this means a lot of histograms** : set a high enough time and memory, each systematic variation will produce many histogram)
 One or more of each argument can be used
