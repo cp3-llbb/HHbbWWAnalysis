@@ -505,8 +505,8 @@ class BaseNanoHHtobbWW(NanoAODModule):
         self.lambda_electronFakeSel = lambda ele : op.AND(
                                                         self.lambda_conept_electron(ele) >= 10,
                                                         op.OR(
-                                                                op.AND(op.abs(ele.eta)<1.479, ele.sieie<=0.011), 
-                                                                op.AND(op.AND(op.abs(ele.eta)>=1.479,op.abs(ele.eta)<=2.5), ele.sieie<=0.030)),
+                                                                op.AND(op.abs(ele.eta+ele.deltaEtaSC)<1.479, ele.sieie<=0.011), 
+                                                                op.AND(op.AND(op.abs(ele.eta+ele.deltaEtaSC)>=1.479,op.abs(ele.eta+ele.deltaEtaSC)<=2.5), ele.sieie<=0.030)),
                                                         self.lambda_lepton_associatedJetNoBtag(ele),
                                                         ele.hoe <= 0.10,
                                                         ele.eInvMinusPInv >= -0.04,
