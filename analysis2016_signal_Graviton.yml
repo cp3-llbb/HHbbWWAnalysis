@@ -1,8 +1,8 @@
 tree: Events
 eras:
   '2016': 
-    luminosity: 35922 #36000 #3104.509131800  #pb # TODO  to compute agin with brilcal
-    luminosity-error: 0.025     #pb
+    luminosity: 35922 
+    luminosity-error: 0.025
 samples:
 ######################## SM #######################
   GluGluToHHTo2B2VTo2L2Nu:
@@ -11,6 +11,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToHHTo2B2VTo2L2Nu_2016.json'
     line-color: "#e31b1b"
     line-type: 1
     legend: HH (SM)
@@ -25,6 +26,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-260_2016.json'
     split: 10
     line-color: "#43E31B"
     line-type: 1
@@ -37,6 +39,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-270_2016.json'
     split: 10
     line-color: "#3FD92D"
     line-type: 1
@@ -49,6 +52,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-300_2016.json'
     split: 10
     line-color: "#3CCF3F"
     line-type: 1
@@ -61,6 +65,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-350_2016.json'
     split: 10
     line-color: "#38C552"
     line-type: 1
@@ -73,6 +78,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400_2016.json'
     split: 10
     line-color: "#34BB64"
     line-type: 1
@@ -85,6 +91,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450_2016.json'
     split: 10
     line-color: "#31B176"
     line-type: 1
@@ -97,6 +104,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500_2016.json'
     split: 10
     line-color: "#2DA788"
     line-type: 1
@@ -109,6 +117,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-550_2016.json'
     split: 10
     line-color: "#2A9D9A"
     line-type: 1
@@ -121,6 +130,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-600_2016.json'
     split: 10
     line-color: "#2693AC"
     line-type: 1
@@ -133,6 +143,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650_2016.json'
     split: 10
     line-color: "#2289BF"
     line-type: 1
@@ -145,6 +156,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-700_2016.json'
     split: 10
     line-color: "#1F7FD1"
     line-type: 1
@@ -157,6 +169,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-800_2016.json'
     split: 10
     line-color: "#4557E3"
     line-type: 1
@@ -169,6 +182,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900_2016.json'
     split: 10
     line-color: "#7039E3"
     line-type: 1
@@ -181,6 +195,7 @@ samples:
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
+    pufile: 'GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-1000_2016.json'
     split: 10
     line-color: "#9A1BE3"
     line-type: 1
@@ -204,9 +219,13 @@ plotIt:
     - jer
     - jesTotal
       # on the lepton id /iso 
-    - muid
-    - muiso
-    - elid
+    - mu_loose
+    - mu_tightmva
+    - el_looserecoptlt20
+    - el_looserecoptgt20
+    - el_looseid
+    - el_looseeff
+    - el_tightmva
      # on the pileup
     - pileup
      # on the trigger
@@ -216,7 +235,5 @@ plotIt:
     - mueltrig
       # on the jet btagging
     - deepjet
-    - deepcsv
-      # on the cross section : 1+xsec_uncert(pb)/xsec(pb)
-   
+    #- deepcsv
 
