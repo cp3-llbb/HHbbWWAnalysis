@@ -196,7 +196,7 @@ class TemplateLatex:
             logging.info("Log available at %s"%(os.path.join(self.dirpath,'plots_compilation.log')))
         except:
             logging.critical("Could not go to directory %s"%self.dirpath)
-            os.chdir(cwd)
+        os.chdir(cwd)
         
     def compileYield(self):
         # Load tex file adn edit content in string #
@@ -221,6 +221,7 @@ class TemplateLatex:
         with open(os.path.join(self.dirpath,"yieldsTable.tex"),"w") as f:
             f.write(text)
         # Move to directory and compile #
+        cwd = os.getcwd()
         try:
             os.chdir(self.dirpath)
             try:
@@ -234,7 +235,7 @@ class TemplateLatex:
             logging.info("Log available at %s"%(os.path.join(self.dirpath,'yields_compilation.log')))
         except:
             logging.critical("Could not go to directory %s"%self.dirpath)
-            os.chdir(cwd)
+        os.chdir(cwd)
 
 
              
