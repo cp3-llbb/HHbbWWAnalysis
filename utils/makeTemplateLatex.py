@@ -5,6 +5,7 @@ import glob
 import collections
 import logging
 import argparse
+import subprocess
 
 class TemplateLatex:
     def __init__(self,dirpath,logplot=False):
@@ -140,7 +141,6 @@ class TemplateLatex:
 }
 \usepackage{graphicx}
 \usepackage[english]{babel}
-\usepackage[absolute,overlay]{textpos}
 \begin{document}
                         """
         self.content += "\n"
@@ -157,10 +157,12 @@ class TemplateLatex:
                 frame += r"\frametitle{Selection : %s, variable : %s}"%(sel_name,var_name) 
                 frame += "\n\t"
                 frame += r"\begin{figure}"
-                for chan,chan_name in self.channels.items():
+                for i,(chan,chan_name) in enumerate(self.channels.items()):
                     frame += "\n\t\t"
                     try:
                         frame += "\includegraphics[width=0.45\linewidth]{%s}"%(self.channeldict[chan][sel][var])
+                        if i == 1:
+                            frame += r"\\" # Back to line after two first plots
                         valid_plot = True
                     except Exception as e:
                         logging.debug('Could not find plot with channel "%s", selection "%s" and variable "%s" due to Exception "%s"'%(chan,sel,var,e))
@@ -178,9 +180,66 @@ class TemplateLatex:
             f.write(self.content)
 
         logging.info("Tex file written at %s"%self.texfile)
+
+    def producePDF(self):
+        cwd = os.getcwd()
+        try:
+            os.chdir(self.dirpath)
+            try:
+                with open('plots_compilation.log', 'w') as output:
+                    process= subprocess.Popen(['pdflatex', os.path.basename(self.texfile)], # We moved to the directory
+                                              stdout=output,
+                                              stderr=output)
+            except:
+                logging.critical("Could not produce the pdf from the Tex file, try manually 'pdflatex %s'"%self.texfile)
+            logging.info("Generated pdf file %s"%(self.texfile.replace(".tex",".pdf")))
+            logging.info("Log available at %s"%(os.path.join(self.dirpath,'plots_compilation.log')))
+        except:
+            logging.critical("Could not go to directory %s"%self.dirpath)
+        os.chdir(cwd)
         
+    def compileYield(self):
+        # Load tex file adn edit content in string #
+        text = r"""
+\documentclass{report}
+    \usepackage{booktabs}
+    \usepackage{graphicx}
+    \usepackage[a4paper,bindingoffset=0.5cm,left=0cm,right=1cm,top=2cm,bottom=2cm,footskip=0.25cm]{geometry}
+                """
+        with open(os.path.join(self.dirpath,"yields.tex"),"r") as f:
+            while True: 
+                line = f.readline() 
+                if not line:
+                    break
+                if line.startswith(r"\begin{tabular}"):
+                    text += r"\begin{document}"+"\n"
+                    text += r"\resizebox{\textwidth}{!}{"+"\n"
+                text += line
+        text += "\n}\n"+r"\end{document}"
+
+        # Save new tex file #
+        with open(os.path.join(self.dirpath,"yieldsTable.tex"),"w") as f:
+            f.write(text)
+        # Move to directory and compile #
+        cwd = os.getcwd()
+        try:
+            os.chdir(self.dirpath)
+            try:
+                with open('yields_compilation.log', 'w') as output:
+                    process= subprocess.Popen(['pdflatex', "yieldsTable.tex"], # We moved to the directory
+                                              stdout=output,
+                                              stderr=output)
+            except:
+                logging.critical("Could not produce the pdf from the Tex file, try manually 'pdflatex yieldsTable.tex'")
+            logging.info("Generated pdf file %s"%(os.path.join(self.dirpath,"yieldsTable.pdf")))
+            logging.info("Log available at %s"%(os.path.join(self.dirpath,'yields_compilation.log')))
+        except:
+            logging.critical("Could not go to directory %s"%self.dirpath)
+        os.chdir(cwd)
 
 
+             
+    
 if __name__ == "__main__":
     # Start logging #
     logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(levelname)s - %(message)s',datefmt='%m/%d/%Y %H:%M:%S')
@@ -188,6 +247,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Utility to generate Latex slides on the spot for the HH->bbWW analysis')
     parser.add_argument('-d','--dirname', action='store', required=False, type=str, default='',
                         help='Path of the directory where the plots are')
+    parser.add_argument('-y','--yields', action='store_true', required=False, default=False,
+                        help='Wether to compile the yields.tex into yields.pdf')
+    parser.add_argument('--pdf', action='store_true', required=False, default=False,
+                        help='Wether to produce the PDF ')
     parser.add_argument('--log', action='store_true', required=False, default=False,
                         help='Wether to use the log plots (must be present)')
     parser.add_argument('-v','--verbose', action='store_true', required=False, default=False,
@@ -199,5 +262,9 @@ if __name__ == "__main__":
         logging.getLogger().setLevel(logging.INFO)
 
     instance = TemplateLatex(opt.dirname)
+    if opt.yields:
+        instance.compileYield()
+    if opt.pdf:
+        instance.producePDF()
 
     

@@ -1,0 +1,471 @@
+tree: Events
+eras:
+  '2016': 
+    luminosity: 35922 #pb # TODO  to compute agin with brilcal
+    luminosity-error: 0.025     #pb
+samples:
+  DYJetsToLL_M-10to50:
+    db: das:/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
+    files: dascache/DYJetsToLL_M-10to50.dat
+    generated-events: 'genEventSumw'
+    cross-section: 18810.0 #pb
+    group: DY
+    era: '2016'
+    pufile: 'DYJetsToLL_M-10to50_2016.json'
+    split: 17 # 17 files
+
+  DYToLL_0J:
+    db: das:/DYToLL_0J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
+    files: dascache/DYToLL_0J.dat
+    generated-events: 'genEventSumw'
+    cross-section: 4757.0 #pb
+    group: DY
+    era: '2016'
+    pufile: 'DYToLL_0J_2016.json'
+    split: 39 # 39 files
+    
+  DYToLL_1J:
+    db: das:/DYToLL_1J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
+    files: dascache/DYToLL_1J.dat
+    generated-events: 'genEventSumw'
+    cross-section: 859.589402 #pb 0 uncertainty 
+    group: DY
+    era: '2016'
+    pufile: 'DYToLL_1J_2016.json'
+    split: 41 # 41 files
+  
+  DYToLL_2J:
+    db: das:/DYToLL_2J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
+    files: dascache/DYToLL_2J.dat
+    generated-events: 'genEventSumw'
+    cross-section: 340.5  #pb
+    group: DY
+    era: '2016'
+    pufile: 'DYToLL_2J_2016.json'
+    split: 36 # 36 files
+
+######### ttbar
+#  TT:
+#    db: das:/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+#    files: dascache/TT.dat
+#    generated-events: 'genEventSumw'
+#    cross-section: 730.6  # pb # (new) 831.76 +/- # (old) 730.6
+#    group: ttbar
+#    era: '2016'
+#    split: 85 # 85 files
+
+  TT:  # TODO : errors -> xsec = 831.76 +19.77 -29.20 +35.06 -35.06 pb
+    db: das:/TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/TT.dat
+    generated-events: 'genEventSumw'
+    cross-section: 730.6 #831.76
+    group: ttbar
+    era: '2016'
+    pufile: 'TT_2016.json'
+    split: 55 # 55 files
+   
+  # TTTo2L2Nu: # Comment to avoid double counting
+  #   db: das:/TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+  #   files: dascache/TTTo2L2Nu.dat
+  #   generated-events: 'genEventSumw'
+  #   cross-section:   76.7       # pb
+  #   group: ttbar
+  #   era: '2016'
+  #   split: 10
+###########   single top
+  ST_tW_top_5f:
+    db: das:/ST_tW_top_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
+    files: dascache/ST_tWtop_5f.dat
+    generated-events: 'genEventSumw'
+    cross-section: 38.09      
+    group: ST
+    era: '2016'
+    pufile: 'ST_tW_top_5f_2016.json'
+    split: 4 # 4 files
+
+  ST_tW_antitop_5f:
+    db: das:/ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1/RunIISummer16NanoAODv5-Nano1June2019_102X_mcRun2_asymptotic_v7_ext2-v1/NANOAODSIM
+    files: dascache/ST_tWantitop_5f.dat
+    generated-events: 'genEventSumw'
+    cross-section: 38.06   
+    group: ST
+    era: '2016'
+    pufile: 'ST_tW_antitop_5f_2016.json'
+    split: 3 # 3 files
+
+  ST_tchannel_antitop_4f:
+    db: das:/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/ST_tchannelantitop_4f.dat
+    generated-events: 'genEventSumw'
+    cross-section: 80.95  # TODO  to check !   Opb on the xsc uncertainty for now 
+    group: ST
+    era: '2016'
+    pufile: 'ST_tchannel_antitop_4f_2016.json'
+    split: 35 # 35 files
+
+  ST_tchannel_top_4f:
+    db: das:/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/ST_tchanneltop_4f.dat
+    generated-events: 'genEventSumw'
+    cross-section: 136.02 # TODO  to check!  Opb on the xsc uncertainty for now 
+    group: ST
+    era: '2016'
+    pufile: 'ST_tchannel_top_4f_2016.json'
+    split: 51 # 51 files #
+
+  # ST_schannel_4f: # Comment to avoid double counting
+  #   db: das:/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+  #   files: dascache/ST_schannel_4f.dat
+  #   generated-events: 'genEventSumw'
+  #   cross-section: 3.365   
+  #   group: ST
+  #   era: '2016'
+        
+####### ZZ
+  ZZTo2L2Nu:
+    db: das:/ZZTo2L2Nu_13TeV_powheg_pythia8_ext1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/ZZTo2L2Nu.dat
+    generated-events: 'genEventSumw'
+    cross-section: 0.5644     
+    group: VVV # ZZ
+    era: '2016'
+    pufile: 'ZZTo2L2Nu_2016.json'
+    split : 44 # 44 files
+
+  ZZTo2L2Q:
+    db: das:/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/ZZTo2L2Q.dat
+    generated-events: 'genEventSumw'
+    cross-section: 3.222     
+    group: VVV #ZZ
+    era: '2016'
+    pufile: 'ZZTo2L2Q_2016.json'
+    split: 16 # 16 files
+
+  ZZTo4L:
+    db: das:/ZZTo4L_13TeV_powheg_pythia8_ext1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/ZZTo4L.dat
+    generated-events: 'genEventSumw'
+    cross-section: 1.256 
+    group: VVV #ZZ
+    era: '2016'
+    pufile: 'ZZTo4L_2016.json'
+    split: 90 # 90 files
+
+####### Standrd model higgs : Zh & tth  
+
+  HZJ_HToWW:
+    db: das:/HZJ_HToWW_M125_13TeV_powheg_pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/HZJ_HToWW.dat
+    generated-events: 'genEventSumw'
+    cross-section: 0.7524   
+    group: SM
+    era: '2016'
+    pufile: 'HZJ_HToWW_2016.json'
+    split: 1 # 1 file
+
+  # ZH_HToBB_ZToLL:  # Comment to avoid double counting
+  #   db: das:/ZH_HToBB_ZToLL_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+  #   files: dascache/ZH_HToBB_ZToLL.dat
+  #   generated-events: 'genEventSumw'
+  #   cross-section: 0.07814  
+  #   group: SM
+  #   era: '2016'
+
+  ggZH_HToBB_ZToLL:
+    db: das:/ggZH_HToBB_ZToLL_M125_13TeV_powheg_pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext2-v1/NANOAODSIM
+    files: dascache/ZH_HToBB_ZToLL.dat
+    generated-events: 'genEventSumw'
+    cross-section: 0.006954
+    group: SM
+    era: '2016'
+    pufile: 'ggZH_HToBB_ZToLL_2016.json'
+    split: 3 # 3 files
+
+  ggZH_HToBB_ZToNuNu:
+    db: das:/ggZH_HToBB_ZToNuNu_M125_13TeV_powheg_pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext2-v1/NANOAODSIM
+    files: dascache/ZH_HToBB_ZToNuNu.dat
+    generated-events: 'genEventSumw'
+    cross-section: 0.01373
+    group: SM
+    era: '2016'
+    pufile: 'ggZH_HToBB_ZToNuNu_2016.json'
+    split: 4 # 4 files
+
+  ttHTobb:
+    db: das:/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/ttHTobb.dat
+    generated-events: 'genEventSumw'
+    cross-section: 0.5638   
+    group: SM
+    era: '2016'
+    pufile: 'ttHTobb_2016.json'
+    split: 7 # 7 files
+
+  ttHToNonbb:
+    db: das:/ttHToNonbb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/ttHToNonbb.dat
+    generated-events: 'genEventSumw'
+    cross-section: 0.5638   
+    group: SM
+    era: '2016'
+    pufile: 'ttHToNonbb_2016.json'
+    split: 8 # 8 files
+
+########## others= VV(except the ZZ) /  VVV / W+Jets / ttbar+V
+  WWToLNuQQ:
+    db: das:/WWToLNuQQ_13TeV-powheg/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
+    files: dascache/WWToLNu2Q.dat
+    generated-events: 'genEventSumw'
+    cross-section: 43.53
+    group: VVV #others
+    era: '2016'
+    pufile: 'WWToLNuQQ_2016.json'
+    split: 7 # 7 files
+
+  WWTo2L2Nu:
+    db: das:/WWTo2L2Nu_13TeV-powheg/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/WWTo2L2Nu.dat
+    generated-events: 'genEventSumw'
+    cross-section: 10.48
+    group: VVV # others
+    era: '2016'
+    pufile: 'WWTo2L2Nu_2016.json'
+    split: 4 # 4 files
+        ##################
+  WZTo2L2Q:
+    db: das:/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM 
+    files: dascache/WZTo2L2Q.dat
+    generated-events: 'genEventSumw'
+    cross-section: 5.606    
+    group: VVV # #TODO should add the WZ samples to the others bkg
+    era: '2016'
+    pufile: 'WZTo2L2Q_2016.json'
+    split: 27 # 27 files
+
+#  WZTo1L3Nu: # Not locally 
+#   db: das:/WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+#   files: dascache/WZTo1L3Nu.dat
+#   generated-events: 'genEventSumw'
+#   cross-section: 3.054
+#   group: WZ  # To be added later
+#   era: '2016'
+#   split : 5
+#
+#  WZ1L1Nu2Q: # Not locally
+#   db: das:/WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+#   files: dascache/WZ1L1Nu2Q.dat
+#   generated-events: 'genEventSumw'
+#   cross-section: 10.73
+#   group: WZ   # To be added
+#   era: '2016'
+#   split : 5
+#
+#  WZTo3LNu: # Not locally
+#   db: das:/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
+#   files: dascache/WZTo3LNu.dat
+#   generated-events: 'genEventSumw'
+#   cross-section: 4.43 
+#   group: WZ   # To be added
+#   era: '2016'
+#   split : 5
+
+    ###################
+  WWW:
+    db: das:/WWW_4F_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/WWW.dat
+    generated-events: 'genEventSumw'
+    cross-section: 0.2086
+    group: VVV #others 
+    era: '2016'
+    pufile: 'WWW_2016.json'
+    split: 1 # 2 files
+
+  WWZ:
+    db: das:/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/WWZ.dat
+    generated-events: 'genEventSumw'
+    cross-section: 0.1651
+    group: VVV #others
+    era: '2016'
+    pufile: 'WWZ_2016.json'
+    split: 1 # 2 files
+
+  WZZ:
+    db: das:/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/WZZ.dat
+    generated-events: 'genEventSumw'
+    cross-section: 0.05565  
+    group: VVV #others
+    era: '2016'
+    pufile: 'WZZ_2016.json'
+    split: 1 # 3 files
+
+  ZZZ:
+    db: das:/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/ZZZ.dat
+    generated-events: 'genEventSumw'
+    cross-section: 0.01398  
+    group: VVV #others
+    era: '2016'
+    pufile: 'ZZZ_2016.json'
+    split: 1 # 1 file
+
+  WJetsToLNu:
+    db: das:/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext2-v1/NANOAODSIM
+    files: dascache/WJetsToLNu.dat
+    generated-events: 'genEventSumw'
+    cross-section: 60430.0
+    group: Wjets #others
+    era: '2016'
+    pufile: 'WJetsToLNu_2016.json'
+    split: 92 # 92 files 
+
+  TTWJetsToQQ:
+    db: das:/TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/TTWJetsToQQ.dat
+    generated-events: 'genEventSumw'
+    cross-section: 0.405
+    group: ttV #others
+    era: '2016'
+    pufile: 'TTWJetsToQQ_2016.json'
+    split: 3 # 3 files
+
+  TTWJetsToLNu:
+    db: das:/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext2-v1/NANOAODSIM
+    files: dascache/TTWJetsToLNu.dat
+    generated-events: 'genEventSumw'
+    cross-section: 0.2001
+    group: ttV #others
+    era: '2016'
+    pufile: 'TTWJetsToLNu_2016.json'
+    split: 7 # 7 files
+
+  TTZToQQ:
+    db: das:/TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/TTZToQQ.dat
+    generated-events: 'genEventSumw'
+    cross-section: 0.5297   
+    group: ttV #others
+    era: '2016'
+    pufile: 'TTZToQQ_2016.json'
+    split: 2 # 2 files
+
+  TTZToLLNuNu:
+    db: das:/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext2-v1/NANOAODSIM
+    files: dascache/TTZToLLNuNu.dat
+    generated-events: 'genEventSumw'
+    cross-section: 0.2529   
+    group: ttV #others
+    era: '2016'
+    pufile: 'TTZToLLNuNu_2016.json'
+    split: 11 # 11 files
+
+
+plotIt:
+  configuration:
+    width: 800
+    height: 599
+    luminosity-label: '%1$.2f fb^{-1} (13 TeV)'  #TODO
+    experiment: CMS
+    extra-label: 2016 Data -- Work in progress
+    show-overflow: true
+    margin-left: 0.15
+    margin-right: 0.03
+    margin-top: 0.05 
+    margin-bottom: 0.13
+  legend:
+    position: [0.7, 0.6, 0.91, 0.91]
+  groups:
+    data:
+      legend: data
+    ttbar:
+      fill-color: "#cc7a16"
+      legend: tt
+      order: 1
+    ST:
+      fill-color: "#99053d"
+      legend: Single Top
+      order: 2
+    DY:
+      fill-color: "#1a83a1"
+      legend: Drell-Yan
+      order: 3
+    Wjets:
+      fill-color: "#d95564"
+      legend: W+jets
+      order: 4
+    VVV: 
+      fill-color: "#ccbf45"
+      legend: VV(V)
+      order: 5
+    ttV:
+      fill-color: "#174704"
+      legend: tt+V
+      order: 6
+    SM:
+      fill-color: "#06b894"
+      legend: SM Higgs (ttH, ZH)
+      order: 7
+#    VVV:
+#      fill-color: "#593b04"
+#      legend: VVV
+#      order: 8
+  systematics:
+      # on the jets
+    - jer
+    - jesTotal
+      # on the lepton id /iso 
+    - mu_loose
+    - mu_tightmva
+    - el_looserecoptlt20
+    - el_looserecoptgt20
+    - el_looseid
+    - el_looseeff
+    - el_tightmva
+     # on the pileup
+    - pileup
+     # on the trigger
+    - eleltrig
+    - mumutrig
+    - elmutrig
+    - mueltrig
+      # on the jet btagging
+    - deepjet
+    #- deepcsv
+      # on the cross section : 1+xsec_uncert(pb)/xsec(pb)
+    - ttxsc: {type: const, value: 1.0007626608267177 , on: 'TT'}   # uncer=0.5572
+    - TTTo2L2Nuxsc: {type: const, value: 1.0007627118644067 , on: 'TTTo2L2Nu'}  # uncer= 0.0585
+    - DYJetsToLLxsc: {type: const, value: 1.0032721956406168, on: 'DYJetsToLL'}    # uncer= 61.55
+    - DYToLL_0Jxsc: {type: const, value: 1.0013216312802187, on: 'DYToLL_0J'} # uncer= 6.287
+    - DYToLL_2Jxsc: {type: const, value: 1.0032481644640234, on: 'DYToLL_2J'}   # uncer= 1.106
+    - ST_s-channel_4fxsc: {type: const, value: 1.0013622585438335, on: 'ST_schannel_4f'} # uncer= 0.004584
+    - ST_tW_top_5fxsc: {type: const, value: 1.0008007351010764, on: 'ST_tW_top_5f'}  # uncer= 0.0305
+    - ST_tW_antitop_5fxsc: {type: const, value: 1.00080204778157, on: 'ST_tW_antitop_5f'} # uncer= 0.03055
+    - ZZTo2L2Nuxsc: {type: const, value: 1.0004762579730688, on: 'ZZTo2L2Nu'} # uncer= 0.0002688
+    - ZZTo2L2Qxsc: {type: const, value: 1.0015211049037864, on: 'ZZTo2L2Q'} # uncer= 0.004901
+    - ZZTo4Lxsc: {type: const, value: 1.0018081210191083, on: 'ZZTo4L'} # uncer= 0.002271
+    - HZJ_HToWWxsc: {type: const, value: 1.0048418394471026, on: 'HZJ_HToWW'} # uncer= 0.003643
+    - ZH_HToBB_ZToLLxsc: {type: const, value: 1.0024366521627848, on: 'ZH_HToBB_ZToLL'} # uncer= 0.0001904
+    - ggZH_HToBB_ZToLLxsc: {type: const, value: 1.0011125970664365, on: 'ggZH_HToBB_ZToLL'} # uncer= 7.737e-06
+    - ggZH_HToBB_ZToNuNuxsc: {type: const, value: 1.0011136198106336, on: 'ggZH_HToBB_ZToNuNu'} # uncer= 1.529e-05
+    - ttHTobbxsc: {type: const, value: 1.050638524299397, on: 'ttHTobb'} # uncer= 0.02855
+    - ttHToNonbbxsc: {type: const, value: 1.050638524299397, on: 'ttHToNonbb'}  # uncer= 0.02855
+    - ZZZxsc: {type: const, value: 1.0010701001430615, on: 'ZZZ'} # uncer= 1.496e-05
+    - WWWxsc: {type: const, value: 1.0009702780441037, on: 'WWW'} # uncer= 0.0002024
+    - WWZxsc: {type: const, value: 1.0010442156268928, on: 'WWZ'} # uncer= 0.0001724
+    - WZZxsc: {type: const, value: 1.0009883198562444, on: 'WZZ'} # uncer= 5.5e-05
+    - WJetsToLNuxsc: {type: const, value: 1.0020519609465497, on: 'WJetsToLNu'} # uncer= 124.0
+    - TTZToLLNuNuxsc: {type: const, value: 1.0013357058125743, on: 'TTZToLLNuNu'} # uncer= 0.0003378
+    - TTZToQQxsc: {type: const, value: 1.001499150462526, on: 'TTZToQQ'} # uncer= 0.0007941
+    - TTWJetsToLNuxsc: {type: const, value: 1.0041294352823589, on: 'TTWJetsToLNu'} # uncer= 0.0008263
+    - TTWJetsToQQxsc: {type: const, value: 1.0041802469135803, on: 'TTWJetsToQQ'} #uncer= 0.001693
+    - WWTo2L2Nuxsc: {type: const, value: 1.0007983778625955, on: 'WWTo2L2Nu'} # uncer= 0.008367
+    - WWToLNuQQxsc: {type: const, value: 1.0007983000229728, on: 'WWToLNuQQ'} # uncer=0.03475
+    #- WZTo2L2Qxsc: {type: const, value: , on: 'WZTo2L2Q'} # uncer= 0.01897
+    #- WZTo1L3Nuxsc: {type: const, value:, on: 'WZTo1L3Nu'} # uncer= 0.01222
+    #- WZ1L1Nu2Qxsc: {type: const, value:, on: 'WZ1L1Nu2Q'} # uncer= 0.01824
+    #- WZTo3LNuxsc: {type: const, value: , on: 'WZTo3LNu'} # uncer= 0.05
+   
+
+
