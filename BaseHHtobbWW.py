@@ -33,81 +33,115 @@ class BaseNanoHHtobbWW(NanoAODModule):
     def addArgs(self,parser):
         super(BaseNanoHHtobbWW, self).addArgs(parser)
 
-        #----- Technical arguments -----#
+        parser.title = """
+
+Arguments for the HH->bbWW analysis on bamboo framework
+
+----- Argument groups -----
+    * Lepton arguments *
+        --Preselected
+        --Fakeable
+        --Tight
+        --FakeExtrapolation
+        --NoZVeto
+
+    * Jet arguments *
+        --Ak4
+        --Ak8
+        --Resolved0Btag
+        --Resolved1Btag
+        --Resolved2Btag
+        --Boosted
+
+    * Skimmer arguments *
+        --Synchronization
+        --Channel
+
+    * Plotter arguments *
+        --OnlyYield
+
+    * Technical *
+        --backend
+
+----- Plotter mode -----
+Every combination of lepton and jet arguments can be used, if none specified they will all be plotted
+
+----- Skimmer mode -----
+One lepton and and one jet argument must be specified in addition to the required channel
+(this is because only one selection at a time can produce a ntuple)
+
+----- Detailed explanation -----
+
+                    """
+      #----- Technical arguments -----#
         parser.add_argument("--backend", 
                             type=str, 
                             default="dataframe", 
                             help="Backend to use, 'dataframe' (default) or 'lazy'")
 
         #----- Lepton selection arguments -----#
-        leptonSelArgs = parser.add_argument_group("""Lepton selection arguments : can be one or several selections for plot production, if none specified will plot all\n
-                                                  Plotter mode : can be one or several selections for plot production, if none specified will plot all\n
-                                                  Skimmer mode : only one must be used (only one ntuple can be produced at a time)""")
-        leptonSelArgs.add_argument("--Preselected", 
+        parser.add_argument("--Preselected", 
                             action      = "store_true",
                             default     = False,
                             help        = "Produce the plots/skim for a preselected pair of leptons")
-        leptonSelArgs.add_argument("--Fakeable", 
+        parser.add_argument("--Fakeable", 
                             action      = "store_true",
                             default     = False,
                             help        = "Produce the plots/skim for a fakeable pair of leptons")
-        leptonSelArgs.add_argument("--Tight", 
+        parser.add_argument("--Tight", 
                             action      = "store_true",
                             default     = False,
                             help        = "Produce the plots/skim for a tight pair of leptons (MC matched)")
-        leptonSelArgs.add_argument("--FakeExtrapolation", 
+        parser.add_argument("--FakeExtrapolation", 
                             action      = "store_true",
                             default     = False,
                             help        = "Produce the plots/skim for a pair of leptons passing the fakeable selection but not the tight (MC matched)")
+        parser.add_argument("--NoZVeto", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Remove the cut of preselected leptons |M_ll-M_Z|<10 GeV")
+
         #----- Jet selection arguments -----#
-        jetSelArgs = parser.add_argument_group("""Jet selection argument\n                                                
-                                                Plotter mode : can be one or several selections for plot production, if none specified will plot all\n
-                                                Skimmer mode : only one must be used (only one ntuple can be produced at a time)""")
-        jetSelArgs.add_argument("--Ak4", 
+        parser.add_argument("--Ak4", 
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for two Ak4 jets passing the selection criteria")
-        jetSelArgs.add_argument("--Ak8", 
+        parser.add_argument("--Ak8", 
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for one Ak8 jet passing the selection criteria")
-        jetSelArgs.add_argument("--Resolved0Btag", 
+        parser.add_argument("--Resolved0Btag", 
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for the exclusive resolved category with no btagged jet")
-        jetSelArgs.add_argument("--Resolved1Btag", 
+        parser.add_argument("--Resolved1Btag", 
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for the exclusive resolved category with only one btagged jet")
-        jetSelArgs.add_argument("--Resolved2Btag", 
+        parser.add_argument("--Resolved2Btag", 
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for the exclusive resolved category with two btagged jets")
-        jetSelArgs.add_argument("--Boosted", 
+        parser.add_argument("--Boosted", 
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for the inclusive boosted category")
 
         #----- Skimmer Arguments -----#
-        skimmerArgs = parser.add_argument_group('Arguments specific to the skimmer')
-        skimmerArgs.add_argument("--Synchronization", 
+        parser.add_argument("--Synchronization", 
                             action      = "store_true",
                             default     = False,
                             help        = "Produce the skims for the synchronization (without triggers, corrections of flags)")
-        skimmerArgs.add_argument("--Channel", 
+        parser.add_argument("--Channel", 
                             action      = "store",
                             type        = str,
                             help        = "Specify the channel for the tuple : ElEl, ElMu, MuEl")
 
         #----- Plotter arguments -----#
-        plotterArgs = parser.add_argument_group('Arguments specific to the plotter')
-        plotterArgs.add_argument("--OnlyYield", 
+        parser.add_argument("--OnlyYield", 
                             action      = "store_true",
                             default     = False,
                             help        = "Only produce the yield plots")
-
-
-
 
     def prepareTree(self, tree, sample=None, sampleCfg=None):
         from bamboo.treedecorators import NanoAODDescription, nanoRochesterCalc, nanoJetMETCalc
@@ -475,10 +509,8 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                 )
         self.muonsFakeSel = op.select(self.muonsPreSel, self.lambda_muonFakeSel)
         # Tight selection #
-        self.lambda_muonTightSel = lambda mu : op.AND(
-                                                    mu.mvaTTH >= 0.85, # Lepton MVA id from ttH
-                                                    mu.mediumId,
-                                                )
+        self.lambda_muonTightSel = lambda mu : op.AND(mu.mvaTTH >= 0.85, # Lepton MVA id from ttH
+                                                      mu.mediumId)
         self.muonsTightSel = op.select(self.muonsFakeSel, self.lambda_muonTightSel)
 
         #############################################################################
@@ -505,8 +537,9 @@ class BaseNanoHHtobbWW(NanoAODModule):
         self.lambda_electronFakeSel = lambda ele : op.AND(
                                                         self.lambda_conept_electron(ele) >= 10,
                                                         op.OR(
-                                                                op.AND(op.abs(ele.eta)<1.479, ele.sieie<=0.011), 
-                                                                op.AND(op.AND(op.abs(ele.eta)>=1.479,op.abs(ele.eta)<=2.5), ele.sieie<=0.030)),
+                                                                op.AND(op.abs(ele.eta+ele.deltaEtaSC)<=1.479, ele.sieie<=0.011), 
+                                                                #op.AND(op.AND(op.abs(ele.eta+ele.deltaEtaSC)>=1.479,op.abs(ele.eta+ele.deltaEtaSC)<=2.5), ele.sieie<=0.030)),
+                                                                op.AND(op.abs(ele.eta+ele.deltaEtaSC)>1.479, ele.sieie<=0.030)),
                                                         self.lambda_lepton_associatedJetNoBtag(ele),
                                                         ele.hoe <= 0.10,
                                                         ele.eInvMinusPInv >= -0.04,
@@ -517,9 +550,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                                         )
         self.electronsFakeSel = op.select(self.electronsPreSel, self.lambda_electronFakeSel)
         # Tight selection #
-        self.lambda_electronTightSel = lambda ele : op.AND(
-                                                    ele.mvaTTH >= 0.80,
-                                                )
+        self.lambda_electronTightSel = lambda ele : ele.mvaTTH >= 0.80
         self.electronsTightSel = op.select(self.electronsFakeSel, self.lambda_electronTightSel)
 
         #############################################################################
