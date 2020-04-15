@@ -145,17 +145,29 @@ def makeLeptonSelection(self,baseSel,plot_yield=False):
                 ElMuFakeSelObject.makeYield(self.yieldPlots)
 
             # Selection : Mll cut + Z peak exclusion (charge already done in previous selection) in **preselected** leptons # 
-            ElElFakeSelObject.selName += "PreMllCutOutZ"
-            MuMuFakeSelObject.selName += "PreMllCutOutZ"
+            ElElFakeSelObject.selName += "PreMllCut"
+            MuMuFakeSelObject.selName += "PreMllCut"
             ElMuFakeSelObject.selName += "PreMllCut"
 
-            ElElFakeSelObject.yieldTitle += " + $M_{ll}$ cut"
-            MuMuFakeSelObject.yieldTitle += " + $M_{ll}$ cut"
-            ElMuFakeSelObject.yieldTitle += " + $M_{ll}$ cut"
+            ElElFakeSelObject.yieldTitle += " + $M_{ll}>12$"
+            MuMuFakeSelObject.yieldTitle += " + $M_{ll}>12$"
+            ElMuFakeSelObject.yieldTitle += " + $M_{ll}>12$"
 
-            ElElFakeSelObject.refine(cut = [lambda_lowMllCut(self.OSElElDileptonPreSel),lambda_outZ(self.OSElElDileptonPreSel)])
-            MuMuFakeSelObject.refine(cut = [lambda_lowMllCut(self.OSMuMuDileptonPreSel),lambda_outZ(self.OSMuMuDileptonPreSel)])
-            ElMuFakeSelObject.refine(cut = [lambda_lowMllCut(self.OSElMuDileptonPreSel)]) # No Mz cut in OF leptons
+            ElEl_MllCut = [lambda_lowMllCut(self.OSElElDileptonPreSel)]
+            MuMu_MllCut = [lambda_lowMllCut(self.OSMuMuDileptonPreSel)]
+            ElMu_MllCut = [lambda_lowMllCut(self.OSElMuDileptonPreSel)]
+
+            if not self.args.NoZVeto: # No Mz cut in OF leptons
+                ElElFakeSelObject.selName += "OutZ"
+                MuMuFakeSelObject.selName += "OutZ"
+                ElElFakeSelObject.yieldTitle += " + Z Veto $|M_{ll}-M_Z|>10$"
+                MuMuFakeSelObject.yieldTitle += " + Z Veto $|M_{ll}-M_Z|>10$"
+                ElEl_MllCut.append(lambda_outZ(self.OSElElDileptonPreSel))
+                MuMu_MllCut.append(lambda_outZ(self.OSMuMuDileptonPreSel))
+
+            ElElFakeSelObject.refine(cut = ElEl_MllCut)
+            MuMuFakeSelObject.refine(cut = MuMu_MllCut)
+            ElMuFakeSelObject.refine(cut = ElMu_MllCut)
 
             # Yield #
             if plot_yield:
