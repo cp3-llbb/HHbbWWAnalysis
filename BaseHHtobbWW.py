@@ -33,13 +33,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
     def addArgs(self,parser):
         super(BaseNanoHHtobbWW, self).addArgs(parser)
 
-        #----- Technical arguments -----#
-        parser.add_argument("--backend", 
-                            type=str, 
-                            default="dataframe", 
-                            help="Backend to use, 'dataframe' (default) or 'lazy'")
-
-        parser.title("""
+        parser.title = """
 
 Arguments for the HH->bbWW analysis on bamboo framework
 
@@ -66,6 +60,9 @@ Arguments for the HH->bbWW analysis on bamboo framework
     * Plotter arguments *
         --OnlyYield
 
+    * Technical *
+        --backend
+
 ----- Plotter mode -----
 Every combination of lepton and jet arguments can be used, if none specified they will all be plotted
 
@@ -73,7 +70,14 @@ Every combination of lepton and jet arguments can be used, if none specified the
 One lepton and and one jet argument must be specified in addition to the required channel
 (this is because only one selection at a time can produce a ntuple)
 
-                    """)
+----- Detailed explanation -----
+
+                    """
+      #----- Technical arguments -----#
+        parser.add_argument("--backend", 
+                            type=str, 
+                            default="dataframe", 
+                            help="Backend to use, 'dataframe' (default) or 'lazy'")
 
         #----- Lepton selection arguments -----#
         parser.add_argument("--Preselected", 
