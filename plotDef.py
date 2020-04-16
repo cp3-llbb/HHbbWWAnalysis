@@ -602,7 +602,7 @@ def makeHighLevelQuantities(sel,met,l1,l2,j1,j2,suffix,channel):
 
     # Invariant mass plots #
     plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepJetInvariantMass"%(channel,suffix),
-                             op.invariant_mass(lljj_p4),    
+                             op.invariant_mass(lljj_p4(l1,l2,j1,j2)),    
                              sel,
                              EquidistantBinning(50,0.,200.),
                              title='Dilepton-jets invariant mass (%s channel)'%channel,
