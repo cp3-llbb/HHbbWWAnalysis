@@ -52,6 +52,7 @@ samples:
 #    cross-section: 730.6  # pb # (new) 831.76 +/- # (old) 730.6
 #    group: ttbar
 #    era: '2016'
+#    pufile: 'TT_2016.json'
 #    split: 85 # 85 files
 
   TT:  # TODO : errors -> xsec = 831.76 +19.77 -29.20 +35.06 -35.06 pb
