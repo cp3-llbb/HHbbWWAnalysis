@@ -575,64 +575,6 @@ def makeAk8JetsPlots(sel, fatjet, suffix, channel):
     return plots
 
 #########################  High-level quantities ################################
-def makeAllHighLevelQuantities(sel,dilepton,met,jets,resolvedjets,lightjets,boostedjets,suffix,channel):
-    plots = []
-
-    # Categories spltting #
-    # Check if boosted category : make selection on number of boosted jets #
-    isBoosted = sel.refine(suffix+"highlevelBoosted",cut=[op.rng_len(boostedjets)>=1]) 
-        # If has boosted jet : goes into boosted (even if resolved jet present) -> inclusive
-    isResolved = sel.refine(suffix+"highlevelResolved",cut=[op.rng_len(boostedjets)==0]) 
-        # If not boosted : must be resolved -> exclusive
-    # Resolved subcategories 
-    # isResolved -> inclusive : pass the jet leading and sybleading
-        # bjets : pass the resolved jets 
-    isResolved_bjets = isResolved.refine(suffix+"highlevelResolvedBjets",
-                                         cut=[op.rng_len(resolvedjets)>=2])
-        # Mixed : pass leading bjet and leading lightjet
-    isResolved_mixed = isResolved.refine(suffix+"highlevelResolvedMixed",
-                                         cut=[op.rng_len(resolvedjets)==1])
-
-    # Pass to function #
-    # Boosted #
-    plots.extend(makeSeparateHighLevelQuantities(sel        = isBoosted,
-                                                 met        = met,
-                                                 l1         = dilepton[0],
-                                                 l2         = dilepton[1],
-                                                 j1         = boostedjets[0].subJet1,
-                                                 j2         = boostedjets[0].subJet2,
-                                                 suffix     = suffix,
-                                                 channel    = channel))
-    # Resolved inclusive #
-    plots.extend(makeSeparateHighLevelQuantities(sel        = isResolved,
-                                                 met        = met,
-                                                 l1         = dilepton[0],
-                                                 l2         = dilepton[1],
-                                                 j1         = jets[0],
-                                                 j2         = jets[1],
-                                                 suffix     = suffix+"inclusive",
-                                                 channel    = channel))
-    # Resolved bjets #
-    plots.extend(makeSeparateHighLevelQuantities(sel        = isResolved_bjets,
-                                                 met        = met,
-                                                 l1         = dilepton[0],
-                                                 l2         = dilepton[1],
-                                                 j1         = resolvedjets[0],
-                                                 j2         = resolvedjets[1],
-                                                 suffix     = suffix+"bjets",
-                                                 channel    = channel))
-    # Resolved bjets #
-    plots.extend(makeSeparateHighLevelQuantities(sel        = isResolved_mixed,
-                                                 met        = met,
-                                                 l1         = dilepton[0],
-                                                 l2         = dilepton[1],
-                                                 j1         = resolvedjets[0],
-                                                 j2         = lightjets[0],
-                                                 suffix     = suffix+"mixed",
-                                                 channel    = channel))
-
-    return plots
-
 def makeHighLevelQuantities(sel,met,l1,l2,j1,j2,suffix,channel):
     plots = []
 
@@ -657,6 +599,16 @@ def makeHighLevelQuantities(sel,met,l1,l2,j1,j2,suffix,channel):
                              title='Transverse momentum of dilepton and MET (%s channel)'%channel,
                              xTitle="P_{T}(ll,MET) [GeV]",
                              plotopts = channelLabel))
+
+    # Invariant mass plots #
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepJetInvariantMass"%(channel,suffix),
+                             op.invariant_mass(lljj_p4(l1,l2,j1,j2)),    
+                             sel,
+                             EquidistantBinning(50,0.,1000.),
+                             title='Dilepton-jets invariant mass (%s channel)'%channel,
+                             xTitle="M_{lljj})",
+                             plotopts = channelLabel))
+
 
     # Transverse mass plots #
     # m_T = sqrt(2*P_T^{l1l2}*P_T^{miss} * (1-cos(\Delta\Phi(ll,P_T^{miss}))))
@@ -700,151 +652,4 @@ def makeHighLevelQuantities(sel,met,l1,l2,j1,j2,suffix,channel):
                              plotopts = channelLabel))
 
     return plots 
-
-##########################  FATJETS SUBJETS (AK8) PLOT #################################
-def makeFatJetSubJetPlots(sel, fatjet, suffix, channel): # Mostly debugging 
-    """
-    Make fatjet subjet basic plots
-    sel         = refine selection 
-    fatjet      = fatjet object (AK8 jet) (can contain 0,1 or 2 subjets), where at least on subjet is btagged
-    suffix      = string identifying the selecton 
-    channel     = string identifying the channel of the dilepton (can be "NoChannel")
-    """
- 
-    plots = []
-    # Refine to check what and how many subjets were present #
-    lambda_subjet1 = lambda fatjet : fatjet.subJet1._idx.result != -1
-    lambda_subjet2 = lambda fatjet : fatjet.subJet2._idx.result != -1
-    lambda_notSubjet1 = lambda fatjet : fatjet.subJet1._idx.result == -1
-    lambda_notSubjet2 = lambda fatjet : fatjet.subJet2._idx.result == -1
-    has_subjet1 = sel.refine("has_subjet1_%s_%s"%(channel,suffix), 
-                             cut=[lambda_subjet1(fatjet)])
-    has_subjet2 = sel.refine("has_subjet2_%s_%s"%(channel,suffix), 
-                             cut=[lambda_subjet2(fatjet)])
-    has_notSubjet1 = sel.refine("has_notSubjet1_%s_%s"%(channel,suffix), 
-                             cut=[lambda_notSubjet1(fatjet)])
-    has_notSubjet2 = sel.refine("has_notSubjet2_%s_%s"%(channel,suffix), 
-                             cut=[lambda_notSubjet2(fatjet)])
-    has_bothSubjets = sel.refine("has_bothSubjets_%s_%s"%(channel,suffix), 
-                             cut=[lambda_subjet1(fatjet),lambda_subjet2(fatjet)])
-    has_notBothSubjets = sel.refine("has_notBothSubjets_%s_%s"%(channel,suffix), 
-                             cut=[op.OR(lambda_notSubjet1(fatjet),lambda_notSubjet2(fatjet))])
-    
-    # PT Plot #
-    plot_hasSubjet1_Pt = Plot.make1D("%s_fatjet_hasSubjet1PT_%s"%(channel,suffix),
-                                     fatjet.subJet1.p4.Pt(),
-                                     has_subjet1,
-                                     EquidistantBinning(100,-10,500.),
-                                     title='Transverse momentum of the first subjet',
-                                     xTitle="P_{T} (first subjet) [GeV]")
-    plot_notSubjet1_Pt = Plot.make1D("%s_fatjet_notSubjet1PT_%s"%(channel,suffix),
-                                     op.c_float(-10.),
-                                     has_notSubjet1,
-                                     EquidistantBinning(100,-10,500.),
-                                     title='Transverse momentum of the first subjet',
-                                     xTitle="P_{T} (first subjet) [GeV]")
-    plots.append(SummedPlot("%s_fatjet_subjet1PT_%s"%(channel,suffix),
-                            [plot_hasSubjet1_Pt,plot_notSubjet1_Pt],
-                            xTitle="P_{T} (first subjet) [GeV]"))
-
-    plot_hasSubjet2_Pt = Plot.make1D("%s_fatjet_hasSubjet2PT_%s"%(channel,suffix),
-                                     fatjet.subJet2.p4.Pt(),
-                                     has_subjet2,
-                                     EquidistantBinning(100,-10,500.),
-                                     title='Transverse momentum of the second subjet',
-                                     xTitle="P_{T} (second subjet) [GeV]")
-    plot_notSubjet2_Pt = Plot.make1D("%s_fatjet_notSubjet2PT_%s"%(channel,suffix),
-                                     op.c_float(-10.),
-                                     has_notSubjet2,
-                                     EquidistantBinning(100,-10,500.),
-                                     title='Transverse momentum of the second subjet',
-                                     xTitle="P_{T} (second subjet) [GeV]")
-    plots.append(SummedPlot("%s_fatjet_subjet2PT_%s"%(channel,suffix),
-                            [plot_hasSubjet2_Pt,plot_notSubjet2_Pt],
-                            xTitle="P_{T} (second subjet) [GeV]"))
-
-    # Eta plot #
-    plot_hasSubjet1_Eta = Plot.make1D("%s_fatjet_hasSubjet1Eta_%s"%(channel,suffix),
-                                      fatjet.subJet1.p4.Eta(),
-                                      has_subjet1,
-                                      EquidistantBinning(20,-3.,3.),
-                                      title='Pseudorapidity of the first subjet',
-                                      xTitle="#eta (first subjet) [GeV]")
-    plot_notSubjet1_Eta = Plot.make1D("%s_fatjet_notSubjet1Eta_%s"%(channel,suffix),
-                                      op.c_float(-3.),
-                                      has_notSubjet1,
-                                      EquidistantBinning(20,-3.,3.),
-                                      title='Pseudorapidity of the first subjet',
-                                      xTitle="#eta (first subjet) [GeV]")
-    plots.append(SummedPlot("%s_fatjet_subjet1Eta_%s"%(channel,suffix),
-                                      [plot_hasSubjet1_Eta,plot_notSubjet1_Eta],
-                                      xTitle="#eta (first subjet) [GeV]"))
-
-    plot_hasSubjet2_Eta = Plot.make1D("%s_fatjet_hasSubjet2Eta_%s"%(channel,suffix),
-                                      fatjet.subJet2.p4.Eta(),
-                                      has_subjet2,
-                                      EquidistantBinning(20,-3.,3.),
-                                      title='Pseudorapidity of the second subjet',
-                                      xTitle="#eta (second subjet) [GeV]")
-    plot_notSubjet2_Eta = Plot.make1D("%s_fatjet_notSubjet2Eta_%s"%(channel,suffix),
-                                      op.c_float(-3.),
-                                      has_notSubjet2,
-                                      EquidistantBinning(20,-3.,3.),
-                                      title='Pseudorapidity of the second subjet',
-                                      xTitle="#eta (second subjet) [GeV]")
-    plots.append(SummedPlot("%s_fatjet_subjet2Eta_%s"%(channel,suffix),
-                            [plot_hasSubjet2_Eta,plot_notSubjet2_Eta],
-                            xTitle="#eta (second subjet) [GeV]"))
-
-    # Phi Plot #
-    plot_hasSubjet1_Phi = Plot.make1D("%s_fatjet_hasSubjet1Phi_%s"%(channel,suffix),
-                                      fatjet.subJet1.p4.Phi(),
-                                      has_subjet1,
-                                      EquidistantBinning(20,-3.2,3.2),
-                                      title='Azimutal angle of the first subjet',
-                                      xTitle="#phi (first subjet) [GeV]")
-    plot_notSubjet1_Phi = Plot.make1D("%s_fatjet_notSubjet1Phi_%s"%(channel,suffix),
-                                      op.c_float(-3.2),
-                                      has_notSubjet1,
-                                      EquidistantBinning(20,-3.2,3.2),
-                                      title='Azimutal angle of the first subjet',
-                                      xTitle="#phi (first subjet) [GeV]")
-    plots.append(SummedPlot("%s_fatjet_subjet1Phi_%s"%(channel,suffix),
-                            [plot_hasSubjet1_Phi,plot_notSubjet1_Phi],
-                            xTitle="#phi (first subjet) [GeV]"))
-
-    plot_hasSubjet2_Phi = Plot.make1D("%s_fatjet_hasSubjet2Phi_%s"%(channel,suffix),
-                                      fatjet.subJet2.p4.Phi(),
-                                      has_subjet2,
-                                      EquidistantBinning(20,-3.2,3.2),
-                                      title='Azimutal angle of the second subjet',
-                                      xTitle="#phi (second subjet) [GeV]")
-    plot_notSubjet2_Phi = Plot.make1D("%s_fatjet_notSubjet2Phi_%s"%(channel,suffix),
-                                      op.c_float(-3.2),
-                                      has_notSubjet2,
-                                      EquidistantBinning(20,-3.2,3.2),
-                                      title='Azimutal angle of the second subjet',
-                                      xTitle="#phi (second subjet) [GeV]")
-    plots.append(SummedPlot("%s_fatjet_subjet2Phi_%s"%(channel,suffix),
-                            [plot_hasSubjet2_Phi,plot_notSubjet2_Phi],
-                            xTitle="#phi (second subjet) [GeV]"))
-
-    # Invariant mass #
-    plot_hasBothSubjets_invMass = Plot.make1D("%s_fatjet_hasBothSubjets_invMass_%s"%(channel,suffix),
-                                              op.invariant_mass(fatjet.subJet1.p4,fatjet.subJet2.p4), 
-                                              has_bothSubjets, EquidistantBinning(100, -10., 300.), 
-                                              title="Fatjet invariant mass (channel %s)"%channel, 
-                                              xTitle= "Invariant mass [GeV]")
-    plot_hasNotBothSubjets_invMass = Plot.make1D("%s_fatjet_notBothSubjets_invMass_%s"%(channel,suffix),
-                                                 op.c_float(-10.), 
-                                                 has_notBothSubjets, 
-                                                 EquidistantBinning(100, -10., 300.), 
-                                                 title="Fatjet invariant mass (channel %s)"%channel, 
-                                                 xTitle= "Invariant mass [GeV]")
-
-    plots.append(SummedPlot("%s_fatjet_invMass_%s"%(channel,suffix),
-                            [plot_hasBothSubjets_invMass,plot_hasNotBothSubjets_invMass],
-                            xTitle="Invariant mass [GeV]"))
-
-    return plots
 

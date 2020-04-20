@@ -80,6 +80,7 @@ class TemplateLatex:
                         ("_Ak8BJets_N" , "Number of Ak8 bjets"),
                         ("_boostedjets_N" , "Number of boosted bjets (fatjets)"),
                         # Highlevel variables 
+                        ("_highlevelvariable_DilepJetInvariantMass", "Dilepton + Jets invariant mass"),
                         ("_highlevelvariable_DilepMETdeltaPhi", "Dilepton-MET $\Delta \phi$"),
                         ("_highlevelvariable_DilepMETdeltapt", "Dilepton-MET $P_T$"),
                         ("_highlevelvariable_mTll", "Dilepton-MET tranverse mass"),
