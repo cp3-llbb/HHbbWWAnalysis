@@ -99,7 +99,11 @@ One lepton and and one jet argument must be specified in addition to the require
         parser.add_argument("--NoZVeto", 
                             action      = "store_true",
                             default     = False,
-                            help        = "Remove the cut of preselected leptons |M_ll-M_Z|<10 GeV")
+                            help        = "Remove the cut of preselected leptons |M_ll-M_Z|>10 GeV")
+        parser.add_argument("--ZPeak", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Select the Z peak at tight level |M_ll-M_Z|<10 GeV (must be used with --NoZVeto)")
 
         #----- Jet selection arguments -----#
         parser.add_argument("--Ak4", 

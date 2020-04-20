@@ -75,6 +75,8 @@ def makeLeptonSelection(self,baseSel,plot_yield=False):
         # If any dilepton preselected below 12GeV, returns False
     lambda_outZ         = lambda dileptons: op.NOT(op.rng_any(dileptons, lambda dilep : op.in_range(80.,op.invariant_mass(dilep[0].p4, dilep[1].p4),100.)))
         # If any dilepton preselected within Z peak, returns False
+    lambda_inZ          = lambda dilep : op.in_range(80.,op.invariant_mass(dilep[0].p4, dilep[1].p4),100.)
+    
 
     # Loose SF lambdas #
     MuonLooseSF = lambda mu : [self.muLooseId(mu)]
@@ -220,9 +222,23 @@ def makeLeptonSelection(self,baseSel,plot_yield=False):
                                          weight = ElMuTightSF(self.OSElMuDileptonTightSel[0]))
                 # Yield #
                 if plot_yield:
+                    ElElTightSelObject.makeYield(self.yieldPlots)
+                    MuMuTightSelObject.makeYield(self.yieldPlots)
+                    ElMuTightSelObject.makeYield(self.yieldPlots)
+
+                # Selection : Z peak for control region #
+                if self.args.ZPeak:
+                    ElElTightSelObject.selName += "ZPeak"
+                    MuMuTightSelObject.selName += "ZPeak"
+                    ElElTightSelObject.yieldTitle+= " + Z peak $|M_{ll}-M_Z| < 10 GeV$" 
+                    MuMuTightSelObject.yieldTitle+= " + Z peak $|M_{ll}-M_Z| < 10 GeV$"
+
+                    ElElTightSelObject.refine(cut = [lambda_inZ(self.OSElElDileptonTightSel[0])])
+                    MuMuTightSelObject.refine(cut = [lambda_inZ(self.OSMuMuDileptonTightSel[0])])
+
+                    if plot_yield:
                         ElElTightSelObject.makeYield(self.yieldPlots)
                         MuMuTightSelObject.makeYield(self.yieldPlots)
-                        ElMuTightSelObject.makeYield(self.yieldPlots)
                 
                 # Record if actual argument #
                 if "Tight" in save_level:
@@ -252,9 +268,9 @@ def makeLeptonSelection(self,baseSel,plot_yield=False):
 
                 # Yield #
                 if plot_yield:
-                        ElElFakeExtrapolationSelObject.makeYield(self.yieldPlots)
-                        MuMuFakeExtrapolationSelObject.makeYield(self.yieldPlots)
-                        ElMuFakeExtrapolationSelObject.makeYield(self.yieldPlots)
+                    ElElFakeExtrapolationSelObject.makeYield(self.yieldPlots)
+                    MuMuFakeExtrapolationSelObject.makeYield(self.yieldPlots)
+                    ElMuFakeExtrapolationSelObject.makeYield(self.yieldPlots)
 
                 # Record if actual argument #
                 if "FakeExtrapolation" in save_level:

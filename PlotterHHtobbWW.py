@@ -137,7 +137,7 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
                     plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
 
             ##### Ak8 jets selection #####
-            if "Ak8" in jetsel_level and self.args.Ak8:
+            if "Ak8" in jetsel_level:
                 print ("...... Processing Ak8 jet selection")
                 ElElSelObjectDileptonAk8Jets = makeAk8JetSelection(self,ElElSelObjectDilepton,copy_sel=True,plot_yield=True)
                 MuMuSelObjectDileptonAk8Jets = makeAk8JetSelection(self,MuMuSelObjectDilepton,copy_sel=True,plot_yield=True)
@@ -145,7 +145,7 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
 
                 # Fatjets plots #
                 ChannelDictList = []
-                if not self.args.OnlyYield:
+                if not self.args.OnlyYield and self.args.Ak8:
                     ChannelDictList.append({'channel':'ElEl','sel':ElElSelObjectDileptonAk8Jets.sel,'dilepton':OSElElDilepton[0],'fatjet':self.ak8Jets[0],'suffix':ElElSelObjectDileptonAk8Jets.selName})
                     ChannelDictList.append({'channel':'MuMu','sel':MuMuSelObjectDileptonAk8Jets.sel,'dilepton':OSMuMuDilepton[0],'fatjet':self.ak8Jets[0],'suffix':MuMuSelObjectDileptonAk8Jets.selName})
                     ChannelDictList.append({'channel':'ElMu','sel':ElMuSelObjectDileptonAk8Jets.sel,'dilepton':OSElMuDilepton[0],'fatjet':self.ak8Jets[0],'suffix':ElMuSelObjectDileptonAk8Jets.selName})
@@ -224,7 +224,7 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
 
                 # Lepton + jet Plots #
                 ChannelDictList = []
-                if not self.args.OnlyYield and sef.args.Boosted:
+                if not self.args.OnlyYield and self.args.Boosted:
                     ChannelDictList.append({'channel':'ElEl','sel':ElElSelObjectDileptonAk8JetsInclusiveBoosted.sel,'dilepton':OSElElDilepton[0],'fatjet':self.ak8BJets[0],'suffix':ElElSelObjectDileptonAk8JetsInclusiveBoosted.selName})
                     ChannelDictList.append({'channel':'MuMu','sel':MuMuSelObjectDileptonAk8JetsInclusiveBoosted.sel,'dilepton':OSMuMuDilepton[0],'fatjet':self.ak8BJets[0],'suffix':MuMuSelObjectDileptonAk8JetsInclusiveBoosted.selName})
                     ChannelDictList.append({'channel':'ElMu','sel':ElMuSelObjectDileptonAk8JetsInclusiveBoosted.sel,'dilepton':OSElMuDilepton[0],'fatjet':self.ak8BJets[0],'suffix':ElMuSelObjectDileptonAk8JetsInclusiveBoosted.selName})
