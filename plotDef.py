@@ -154,7 +154,7 @@ def makeMETPlots(sel, met, suffix, channel):
     return plots
 
 ##########################  DILEPTON PLOT #################################
-def makeDileptonPlots(sel, dilepton, suffix, channel, isMC=False):
+def makeDileptonPlots(sel, dilepton, suffix, channel, is_MC=False):
     """
     Make dilepton basic plots
     sel         = refine selection 
@@ -246,89 +246,20 @@ def makeDileptonPlots(sel, dilepton, suffix, channel, isMC=False):
                              plotopts = channelLabel))
 
     # GenPartFlav (if isMC) #
-#    if isMC:
-#        plots.append(Plot.make1D("%s_%s_firstlepton_genPartFlav"%(channel,suffix), 
-#                                 dilepton[0].genPartFlav,
-#                                 sel, 
-#                                 EquidistantBinning(22, 0., 22.), 
-#                                 title="Flavour of genParticle (channel %s)"%channel, 
-#                                 xTitle= "GenParticle flavour (first lepton)",
-#                                 plotopts = channelLabel))
-#        plots.append(Plot.make1D("%s_%s_secondlepton_genPartFlav"%(channel,suffix), 
-#                                 dilepton[1].genPartFlav,
-#                                 sel, 
-#                                 EquidistantBinning(22, 0., 22.), 
-#                                 title="Flavour of genParticle (channel %s)"%channel, 
-#                                 xTitle= "GenParticle flavour (second lepton)",
-#                                 plotopts = channelLabel))
-#
-    return plots
-
-######################  DILEPTON CHECK PLOTS #############################
-def makeDileptonCheckPlots(self,sel, dilepton, suffix, channel):
-    """
-    Make dilepton basic plots
-    sel         = refine selection 
-    dilepton    = dilepton object (ElEl, ElMu, MuMu)
-    suffix      = string identifying the selecton 
-    channel     = string identifying the channel of the dilepton (can be "NoChannel")
-    """
-    plots = []
-
-    channelLabel = channelTitleLabel(channel)
-
-    # Lepton MVA #
-    plots.append(Plot.make1D("%s_%s_firstlepton_checkMVAttH"%(channel,suffix), 
-                             dilepton[0].mvaTTH, 
+    plots.append(Plot.make1D("%s_%s_firstlepton_genPartFlav"%(channel,suffix), 
+                             dilepton[0].genPartFlav if is_MC else op.c_int(-1),
                              sel, 
-                             EquidistantBinning(50,-1.,1.),
-                             xTitle= "ttH Lepton MVA (first lepton)",
+                             EquidistantBinning(23, -1., 22.), 
+                             title="Flavour of genParticle (channel %s)"%channel, 
+                             xTitle= "GenParticle flavour (first lepton)",
                              plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_secondlepton_checkMVAttH"%(channel,suffix), 
-                             dilepton[1].mvaTTH, 
+    plots.append(Plot.make1D("%s_%s_secondlepton_genPartFlav"%(channel,suffix), 
+                             dilepton[1].genPartFlav if is_MC else op.c_int(-1),
                              sel, 
-                             EquidistantBinning(50,-1.,1.),
-                             xTitle= "ttH Lepton MVA (second lepton)",
+                             EquidistantBinning(23, -1., 22.), 
+                             title="Flavour of genParticle (channel %s)"%channel, 
+                             xTitle= "GenParticle flavour (second lepton)",
                              plotopts = channelLabel))
-
-    # JetDeepJet (needs to check if associated jet) #
-    firstHasAssociatedJet = sel.refine(suffix+"firstHasAssociatedJet",cut=[self.lambda_hasAssociatedJet(dilepton[0])])
-    firstHasNotAssociatedJet = sel.refine(suffix+"firstHasNotAssociatedJet",cut=[op.NOT(self.lambda_hasAssociatedJet(dilepton[0]))])
-    secondHasAssociatedJet = sel.refine(suffix+"secondHasAssociatedJet",cut=[self.lambda_hasAssociatedJet(dilepton[1])])
-    secondHasNotAssociatedJet = sel.refine(suffix+"secondHasNotAssociatedJet",cut=[op.NOT(self.lambda_hasAssociatedJet(dilepton[1]))])
-
-    firstDeepJet_has = Plot.make1D("%s_%s_firstlepton_checkhasJetDeepFlavB"%(channel,suffix), 
-                                 dilepton[0].jet.btagDeepFlavB, 
-                                 firstHasAssociatedJet, 
-                                 EquidistantBinning(50,-1,1.),
-                                 xTitle= "jetDeepJet (first lepton)",
-                                 plotopts = channelLabel)
-    firstDeepJet_hasNot = Plot.make1D("%s_%s_firstlepton_checkhasNotJetDeepFlavB"%(channel,suffix),
-                                 op.c_float(-1.),
-                                 firstHasNotAssociatedJet, 
-                                 EquidistantBinning(50,-1.,1.),
-                                 xTitle= "jetDeepJet (first lepton)",
-                                 plotopts = channelLabel)
-    plots.append(SummedPlot("%s_%s_firstlepton_checkjetDeepJet"%(channel,suffix),
-                            [firstDeepJet_has,firstDeepJet_hasNot],
-                            xTitle="jetDeepJet (first lepton)"))
-    secondDeepJet_has = Plot.make1D("%s_%s_secondlepton_checkhasJetDeepFlavB"%(channel,suffix), 
-                                 dilepton[1].jet.btagDeepFlavB, 
-                                 secondHasAssociatedJet, 
-                                 EquidistantBinning(50,0.,1.),
-                                 xTitle= "jetDeepJet (second lepton)",
-                                 plotopts = channelLabel)
-    secondDeepJet_hasNot = Plot.make1D("%s_%s_secondlepton_checkhasNotJetDeepFlavB"%(channel,suffix),
-                                 op.c_float(-1.),
-                                 secondHasNotAssociatedJet, 
-                                 EquidistantBinning(50,0.,1.),
-                                 xTitle= "jetDeepJet (second lepton)",
-                                 plotopts = channelLabel)
-    plots.append(SummedPlot("%s_%s_secondlepton_checkjetDeepJet"%(channel,suffix),
-                            [secondDeepJet_has,secondDeepJet_hasNot],
-                            xTitle="jetDeepJet (second lepton)",
-                            plotopts = channelLabel))
-
 
     return plots
 
@@ -373,46 +304,8 @@ def makeDeltaRPlots(sel,cont1,cont2,suffix,channel,isMC):
 
     return plots
 
-########################## BJETS PLOTS #################################
-def makeAk4BJetsPlots(sel,bjets,lightjets,alljets,suffix,channel):
-    plots = []
-
-    channelLabel = channelTitleLabel(channel)
-
-    # Selection for bjets and mixed categories #
-    bjetsCategory = sel.refine(channel+suffix+"bjetsCategory",cut=[op.rng_len(bjets) >= 2]) # TODO : might want to veto more than 2 bjets 
-    mixedCategory = sel.refine(channel+suffix+"mixedCategory",cut=[op.rng_len(bjets) == 1])
-
-    ## Inclusive plots (len(alljets)>=2 by definition ): leading = highest Pt jet, subleading : second highest Pt jet #
-    plots.extend(makeSeparateJetsPlots(sel           = sel,
-                                       leadjet       = alljets[0],
-                                       subleadjet    = alljets[1],
-                                       suffix        = suffix,
-                                       channel       = channel,
-                                       tag     = "inclusive"))
-
-    ## Bjets plots (if len(bjets)>=2) : leading = highest Pt bjet, subleading : second highest Pt bjet #
-    # Must check len(bjets)>=2
-    plots.extend(makeSeparateJetsPlots(sel           = bjetsCategory,
-                                       leadjet       = bjets[0],
-                                       subleadjet    = bjets[1],
-                                       suffix        = suffix,
-                                       channel       = channel,
-                                       tag     = "bjets"))
-
-    ## Mixed plots (if len(bjets)==1, >0 by definition) : leading = bjet, subleading = highest Pt non-bjet
-    # Must check len(bjets)==1
-    plots.extend(makeSeparateJetsPlots(sel           = mixedCategory,
-                                       leadjet       = bjets[0],
-                                       subleadjet    = lightjets[0],
-                                       suffix        = suffix,
-                                       channel       = channel,
-                                       tag     = "mixed"))
-
-    return plots
-
 ##########################  JETS SEPARATE PLOTS #################################
-def makeAk4JetsPlots(sel, leadjet, subleadjet, suffix, channel, lead_is_b=False, sublead_is_b=False):
+def makeAk4JetsPlots(sel, leadjet, subleadjet, suffix, channel, lead_is_b=False, sublead_is_b=False,is_MC=False):
     """
     Make basic plots
     sel         = refine selection 
@@ -443,7 +336,7 @@ def makeAk4JetsPlots(sel, leadjet, subleadjet, suffix, channel, lead_is_b=False,
 
     # leadjet plots #
     plots.append(Plot.make1D(lead_base_name.format(var="pt"),
-                             leadjet.p4.Pt(),
+                             leadjet.pt,
                              sel,
                              EquidistantBinning(50,0.,300.),
                              title='Transverse momentum of the %s'%lead_base_title,
@@ -463,6 +356,23 @@ def makeAk4JetsPlots(sel, leadjet, subleadjet, suffix, channel, lead_is_b=False,
                              title='Azimutal angle of the %s'%lead_base_title,
                              xTitle="#phi(%s)"%lead_base_title,
                              plotopts = channelLabel))
+
+    plots.append(Plot.make1D(lead_base_name.format(var="hadronflavour"),
+                             op.abs(leadjet.hadronFlavour) if is_MC else op.c_int(-1),
+                             sel,
+                             EquidistantBinning(23,-1.,22.),
+                             title='Hadron flavour of the %s'%lead_base_title,
+                             xTitle="Hadron flavour (%s) [GeV]"%lead_base_title,
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D(lead_base_name.format(var="partonflavour"),
+                             op.abs(leadjet.partonFlavour) if is_MC else op.c_int(-1),
+                             sel,
+                             EquidistantBinning(23,-1.,22.),
+                             title='Parton flavour of the %s'%lead_base_title,
+                             xTitle="Parton flavour (%s) [GeV]"%lead_base_title,
+                             plotopts = channelLabel))
+
+
     # subleadjet plots #
     plots.append(Plot.make1D(sublead_base_name.format(var="pt"),
                              subleadjet.pt,
@@ -485,6 +395,21 @@ def makeAk4JetsPlots(sel, leadjet, subleadjet, suffix, channel, lead_is_b=False,
                              title='Azimutal angle of the %s'%sublead_base_title,
                              xTitle="#phi(%s)"%sublead_base_title,
                              plotopts = channelLabel))
+    plots.append(Plot.make1D(sublead_base_name.format(var="hadronflavour"),
+                             op.abs(subleadjet.hadronFlavour) if is_MC else op.c_int(-1),
+                             sel,
+                             EquidistantBinning(23,-1.,22.),
+                             title='Hadron flavour of the %s'%sublead_base_title,
+                             xTitle="Hadron flavour (%s) [GeV]"%sublead_base_title,
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D(sublead_base_name.format(var="partonflavour"),
+                             op.abs(subleadjet.partonFlavour) if is_MC else op.c_int(-1),
+                             sel,
+                             EquidistantBinning(23,-1.,22.),
+                             title='Parton flavour of the %s'%sublead_base_title,
+                             xTitle="Parton flavour (%s) [GeV]"%sublead_base_title,
+                             plotopts = channelLabel))
+
     # Dijet Pt plot #
     plots.append(Plot.make1D("%s_%s_dijet_pt"%(channel,suffix), 
                              (leadjet.p4+subleadjet.p4).Pt(), 
