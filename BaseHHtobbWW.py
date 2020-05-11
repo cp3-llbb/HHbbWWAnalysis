@@ -176,7 +176,8 @@ One lepton and and one jet argument must be specified in addition to the require
             raise RuntimeError("Unknown era {0}".format(era))
 
         # Rochester and JEC corrections (depends on era) #     
-        cachJEC_dir = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/cacheJEC'
+        cachJEC_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),'cacheJEC')
+        
         ############################################################################################
         # ERA 2016 #
         ############################################################################################
