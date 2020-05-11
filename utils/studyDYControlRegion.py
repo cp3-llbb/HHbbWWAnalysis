@@ -10,30 +10,16 @@ ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 
 class DYControlRegion():
-    def __init__(self,variable,variable_name,output,plot_MC=False):
-        self.outname = output
+    def __init__(self,variable,variable_name,output,plot_data=False,plot_MC=False,exclude_DY=False):
+        self.outname = "DYStudy/"+output
         self.era     = '2016'
         self.variable = variable
         self.variable_name = variable_name
         self.data_hist_dict = {}
         self.MC_hist_dict = {}
+        self.plot_data = plot_data
         self.plot_MC = plot_MC
-#        self.directories = directories
-#        self.variables   = variables 
-#        self.era         = era
-#        self.outname     = outname
-
-#        print ("Directories to look at :")
-#        for d in self.directories:
-#            print ("... %s"%d)
-#        print ("variables to look at :")
-#        for v in self.variables:
-#            print ("... %s"%v)
-        # inputs : dict
-        #   -> key : dir path
-        #   -> val : dict
-        #       -> key : variable name
-        #       -> val : histogram 
+        self.exclude_DY = exclude_DY
 
         self.extractAllInformation()
         self.processHistograms()
@@ -94,7 +80,11 @@ class DYControlRegion():
         
         # Get plot options #
         opt_to_keep = ['x-axis','y-axis']
-        options_dict = {k:full_dict["plots"][histogram][k] for k in full_dict["plots"][histogram].keys() & opt_to_keep}
+        try:
+            options_dict = {k:full_dict["plots"][histogram][k] for k in full_dict["plots"][histogram].keys() & opt_to_keep}
+        except KeyError:
+            print ("Could not find hist %s in YAML %s, will proceed without"%(histogram,yaml_path))
+            options_dict = {k:'' for k in opt_to_keep}
 
         # Get data per sample #
         sample_dict = {}
@@ -106,12 +96,16 @@ class DYControlRegion():
             
     def getHistogram(self,rootfile,histname):
         f = ROOT.TFile(rootfile)
-        h = copy.deepcopy(f.Get(histname))
+        if f.GetListOfKeys().Contains(histname):
+            h = copy.deepcopy(f.Get(histname))
+        else:
+            print ("Could not find hist %s in %s"%(histname,rootfile))
+            h = None
         f.Close()
         return h
 
     def processHistograms(self):
-        colors = [601,634,418,808,402,618] # Must be extended if more required
+        colors = [601,634,418,808,402,618,874,835] # Must be extended if more required
         for i,(key, val) in enumerate(self.info_dict.items()):
             # Parse #
             data_hist = None
@@ -124,54 +118,76 @@ class DYControlRegion():
             for sample, data_dict in samp_dict.items():
                 # Get hist #
                 h = hist_dict[sample]
+                if h is None:
+                    continue
                 if data_hist is None:
                     data_hist = ROOT.TH1F(self.variable_name+"DataMinusMCDY",self.variable_name,h.GetNbinsX(),h.GetBinLowEdge(1),h.GetBinLowEdge(h.GetNbinsX())+h.GetBinWidth(h.GetNbinsX()))
                 if MC_hist is None:
                     MC_hist = ROOT.TH1F(self.variable_name+"MCDY",self.variable_name,h.GetNbinsX(),h.GetBinLowEdge(1),h.GetBinLowEdge(h.GetNbinsX())+h.GetBinWidth(h.GetNbinsX()))
 
                 # Add histograms depending on type #
-                if data_dict['type'] == 'data':
-                    data_hist.Add(h)
-                elif data_dict['type'] == 'mc':
-                    factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]
-                    if data_dict['group'] != 'DY':
-                        data_hist.Add(h,-factor)
-                    else:  
+                if self.exclude_DY:
+                    if data_dict['type'] == 'data':
+                        data_hist.Add(h)
+                    elif data_dict['type'] == 'mc':
+                        factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]
+                        if data_dict['group'] != 'DY':
+                            data_hist.Add(h,-factor)
+                        else:  
+                            MC_hist.Add(h,factor)
+                else:
+                    if data_dict['type'] == 'data':
+                        data_hist.Add(h)
+                    elif data_dict['type'] == 'mc':
+                        factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]
                         MC_hist.Add(h,factor)
+                        
 
                     
             # Esthetics #
+            if self.plot_MC and self.plot_data:
+                i *= 2
             data_hist.SetLineWidth(2)
-            data_hist.SetLineColor(colors[2*i])
-            #data_hist.SetFillColor(colors[2*i])
+            data_hist.SetLineColor(colors[i])
             data_hist.GetXaxis().SetTitle(plot_dict['x-axis'])
             data_hist.GetYaxis().SetTitle(plot_dict['y-axis'])
             data_hist.SetTitle(self.variable_name)
             MC_hist.SetLineWidth(2)
-            MC_hist.SetLineColor(colors[2*i+1])
-            #MC_hist.SetFillColor(colors[2*i+1])
+            if self.plot_MC and self.plot_data:
+                MC_hist.SetLineColor(colors[i+1])
+            else:
+                MC_hist.SetLineColor(colors[i])
             MC_hist.GetXaxis().SetTitle(plot_dict['x-axis'])
             MC_hist.GetYaxis().SetTitle(plot_dict['y-axis'])
             MC_hist.SetTitle(self.variable_name)
             # Normalize to unity #
-            data_hist.Scale(1/data_hist.Integral())
-            MC_hist.Scale(1/MC_hist.Integral())
+            if data_hist.Integral() != 0:
+                data_hist.Scale(1/data_hist.Integral())
+            if MC_hist.Integral() != 0:
+                MC_hist.Scale(1/MC_hist.Integral())
             # Save #
             self.data_hist_dict[key] = data_hist
             self.MC_hist_dict[key] = MC_hist
 
     def saveHistograms(self):
+        num_plots = len(self.data_hist_dict.keys())*self.plot_data + len(self.MC_hist_dict.keys())*self.plot_MC
+        plot_ratio = num_plots==2
         # Legend #
-        legend = ROOT.TLegend(0.5,0.6,0.87,0.87)
+        if num_plots>=4:
+            legend = ROOT.TLegend(0.2,0.8,0.89,0.89)
+            legend.SetNColumns(2)
+            legend.SetTextSize(0.012)
+        else:
+            legend = ROOT.TLegend(0.5,0.8,0.89,0.89)
+            legend.SetTextSize(0.015)
         legend.SetHeader("Legend","C")
-
-        plot_ratio = (len(self.data_hist_dict.keys()) == 2 and not self.plot_MC ) or (self.plot_MC and len(self.data_hist_dict.keys()) ==1 )
 
         # Canvas and pad #
         C = ROOT.TCanvas("c1", "c1", 600, 600)
         pad1 = ROOT.TPad("pad1", "pad1", 0, 0.0, 1, 1.0)
         pad1.SetBottomMargin(0.15)
         pad1.SetLeftMargin(0.15)
+        pad1.SetRightMargin(0.1)
         if plot_ratio:
             pad1.SetBottomMargin(0.32)
         pad1.SetGridx()
@@ -180,28 +196,54 @@ class DYControlRegion():
         pad1.cd()
 
         # Get Max values #
-        amax = max([h.GetMaximum() for h in self.data_hist_dict.values()]+[h.GetMaximum() for h in self.MC_hist_dict.values()])
+        max_data = max([h.GetMaximum() for h in self.data_hist_dict.values()])
+        max_MC = max([h.GetMaximum() for h in self.MC_hist_dict.values()])
+        if self.plot_data and self.plot_MC:
+            amax = max(max_data,max_MC)
+        elif self.plot_data:
+            amax = max_data
+        elif self.plot_MC:
+            amax = max_MC
 
         # Plot and save #
         opt = "hist"
-        for i,(key,hist) in enumerate(self.data_hist_dict.items()):
-            hist.SetMaximum(amax*1.1)
-            hist.SetMinimum(0)
-            hist.Draw(opt)
-            legend.AddEntry(hist,"#splitline{%s}{%s}"%(key,'Data - MC except DY'),'l')
-            if i == 0: opt += " same"
+        for key in self.data_hist_dict.keys():
+            if self.plot_data:
+                hist_data = self.data_hist_dict[key]
+                hist_data.SetMaximum(amax*1.2)
+                hist_data.SetMinimum(0.)
+                hist_data.Draw(opt)
+                if opt.find("same") == -1:
+                    opt += " same"
             if self.plot_MC:
-                self.MC_hist_dict[key].Draw(opt)
-                legend.AddEntry(self.MC_hist_dict[key],"#splitline{%s}{%s}"%(key,'MC DY'),'l')
+                hist_MC = self.MC_hist_dict[key]
+                hist_MC.SetMaximum(amax*1.2)
+                hist_MC.SetMinimum(0.)
+                hist_MC.Draw(opt)
+                if opt.find("same") == -1:
+                    opt += " same"
+            if self.exclude_DY:
+                if self.plot_data:
+                    legend.AddEntry(hist_data,"%s : %s"%(key,'Data - MC except DY'),'l')
+                if self.plot_MC:
+                    legend.AddEntry(hist_MC,"%s : %s"%(key,'MC DY'),'l')
+            else:
+                if self.plot_data:
+                    legend.AddEntry(hist_data,"%s : %s"%(key,'Data'),'l')
+                if self.plot_MC:
+                    legend.AddEntry(hist_MC,"%s : %s"%(key,'MC'),'l')
 
         legend.Draw()
         # Ratio #
         if plot_ratio:
             keys = list(self.data_hist_dict.keys())
-            if not self.plot_MC:
+            if self.plot_data and not self.plot_MC:
                 hist1 = self.data_hist_dict[keys[0]]
                 hist2 = self.data_hist_dict[keys[1]]
-            else: 
+            elif self.plot_MC and not self.plot_data:
+                hist1 = self.MC_hist_dict[keys[0]]
+                hist2 = self.MC_hist_dict[keys[1]]
+            elif self.plot_data and self.plot_MC:
                 hist1 = self.data_hist_dict[keys[0]]
                 hist2 = self.MC_hist_dict[keys[0]]
             ratio = hist1.Clone()
@@ -216,6 +258,7 @@ class DYControlRegion():
             pad2.SetTopMargin(0)
             pad2.SetBottomMargin(0.4)
             pad2.SetLeftMargin(0.15)
+            pad1.SetRightMargin(0.1)
             pad2.SetGridx()
             pad2.SetGridy()
             pad2.Draw()
@@ -244,6 +287,14 @@ class DYControlRegion():
             ratio.GetXaxis().SetLabelFont(43)
             ratio.GetXaxis().SetLabelSize(15)
 
+        if self.plot_data:
+            self.outname += "_data"
+        if self.plot_MC:
+            self.outname += "_MC"
+        if self.exclude_DY:
+            self.outname += "_DY"
+        else:
+            self.outname += "_All"
         C.Print(self.outname+".pdf")
             
 
@@ -260,76 +311,233 @@ if __name__ == "__main__":
     #                    help='Output name for pdf (without extension)')
     args = parser.parse_args()
 
+    path_ZVeto = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0And2Btag_ZVeto/'
+    path_noZVeto = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0And2Btag_noZVeto/'
+    path_inZpeak = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0And2Btag_inZpeak/'
 
     # ElEl Dilepton pt #
-    var_0btagZpeak_dict = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0btag_inZpeak/','Resolved 0 btag (Z peak)') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_dilepton_pt'}
-    var_0btagnoZveto_dict = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0btag_noZveto/','Resolved 0 btag (no Z veto)') : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_dilepton_pt'}
-    var_2btagZpeak_dict = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy2btag_inZpeak/','Resolved 2 btag (Zpeak)') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_dilepton_pt'}
+    var_0btagZveto_dict = {(path_ZVeto,'Resolved 0 btag (Z veto)'): 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_dilepton_pt'}
+    var_2btagZveto_dict = {(path_ZVeto,'Resolved 2 btag (Z veto)'): 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_dilepton_pt'}
+    var_0btagZpeak_dict = {(path_inZpeak,'Resolved 0 btag (Z peak)') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_dilepton_pt'}
+    var_0btagnoZveto_dict = {(path_noZVeto,'Resolved 0 btag (no Z veto)') : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_dilepton_pt'}
+    var_2btagZpeak_dict = {(path_inZpeak,'Resolved 2 btag (Zpeak)') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_dilepton_pt'}
+    var_2btagnoZveto_dict = {(path_noZVeto,'Resolved 2 btag (no Z veto)') : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_dilepton_pt'}
     variable_name = 'e^{+}e^{-} Dilepton P_{T}'
-    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"ElEl_dilepton_PT_0btagInZpeak",True)
-    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"ElEl_dilepton_PT_0btagNoZVeto",True)
-    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"ElEl_dilepton_PT_2btagInZpeak",True)
-    instance = DYControlRegion({**var_0btagZpeak_dict,**var_0btagnoZveto_dict,**var_2btagZpeak_dict},variable_name,"ElEl_dilepton_PT",False)
+    instance = DYControlRegion(var_0btagZveto_dict,variable_name,"ElEl_dilepton_PT_0btagZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagZveto_dict,variable_name,"ElEl_dilepton_PT_0btagZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagZveto_dict,variable_name,"ElEl_dilepton_PT_2btagZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagZveto_dict,variable_name,"ElEl_dilepton_PT_2btagZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"ElEl_dilepton_PT_0btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"ElEl_dilepton_PT_0btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"ElEl_dilepton_PT_0btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"ElEl_dilepton_PT_0btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"ElEl_dilepton_PT_2btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"ElEl_dilepton_PT_2btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagnoZveto_dict,variable_name,"ElEl_dilepton_PT_2btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagnoZveto_dict,variable_name,"ElEl_dilepton_PT_2btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"ElEl_dilepton_0btag_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"ElEl_dilepton_0btag_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"ElEl_dilepton_2btag_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"ElEl_dilepton_2btag_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"ElEl_dilepton_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"ElEl_dilepton_PT",plot_data=False,plot_MC=True,exclude_DY=True)
 
-    # ElEl Dilepton pt #
-    var_0btagZpeak_dict = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0btag_inZpeak/','Resolved 0 btag (Z peak)') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'}
-    var_0btagnoZveto_dict = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0btag_noZveto/','Resolved 0 btag (no Z veto)') : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'}
-    var_2btagZpeak_dict = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy2btag_inZpeak/','Resolved 2 btag (Zpeak)') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}
-    variable_name = 'e^{+}e^{-} first lepton P_{T}'
-    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"ElEl_firstlepton_PT_0btagInZpeak",True)
-    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"ElEl_firstlepton_PT_0btagNoZVeto",True)
-    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"ElEl_firstlepton_PT_2btagInZpeak",True)
-    instance = DYControlRegion({**var_0btagZpeak_dict,**var_0btagnoZveto_dict,**var_2btagZpeak_dict},variable_name,"ElEl_firstlepton_PT",False)
-
-
-    # MuMu Dilepton pt #
-    var_0btagZpeak_dict = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0btag_inZpeak/','Resolved 0 btag (Z peak)') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_dilepton_pt'}
-    var_0btagnoZveto_dict = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0btag_noZveto/','Resolved 0 btag (no Z veto)') : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_dilepton_pt'}
-    var_2btagZpeak_dict = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy2btag_inZpeak/','Resolved 2 btag (Zpeak)') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_dilepton_pt'}
-    variable_name = '#mu^{+}#mu^{-} Dilepton P_{T}'
-    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"MuMu_dilepton_PT_0btagInZpeak",True)
-    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"MuMu_dilepton_PT_0btagNoZVeto",True)
-    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"MuMu_dilepton_PT_2btagInZpeak",True)
-    instance = DYControlRegion({**var_0btagZpeak_dict,**var_0btagnoZveto_dict,**var_2btagZpeak_dict},variable_name,"MuMu_dilepton_PT",False)
-
-    # MuMu Dilepton pt #
-    var_0btagZpeak_dict = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0btag_inZpeak/','Resolved 0 btag (Z peak)') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'}
-    var_0btagnoZveto_dict = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0btag_noZveto/','Resolved 0 btag (no Z veto)') : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'}
-    var_2btagZpeak_dict = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy2btag_inZpeak/','Resolved 2 btag (Zpeak)') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}
-    variable_name = '#mu^{+}#mu^{-} first lepton P_{T}'
-    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"MuMu_firstlepton_PT_0btagInZpeak",True)
-    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"MuMu_firstlepton_PT_0btagNoZVeto",True)
-    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"MuMu_firstlepton_PT_2btagInZpeak",True)
-    instance = DYControlRegion({**var_0btagZpeak_dict,**var_0btagnoZveto_dict,**var_2btagZpeak_dict},variable_name,"MuMu_firstlepton_PT",False)
-
-
-
-
-
-
-
-
-
-
-    sys.exit()
-    # ElEl Dilepton pt #
-    variable = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0btag_inZpeak/','Resolved 0 btag') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_dilepton_pt',
-                ('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy2btag_inZpeak/','Resolved 2 btag') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_dilepton_pt'}
-    outputname = 'ElEl_dilepton_pt.pdf'
-    variable_name = 'e^{+}e^{-} Dilepton P_{T}'
-    instance = DYControlRegion(variable,variable_name,outputname)
-
-    # MuMu first lepton pt #
-    variable = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0btag_inZpeak/','Resolved 0 btag') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt',
-                ('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy2btag_inZpeak/','Resolved 2 btag') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}
-    outputname = 'MuMu_firstlepton_pt.pdf'
-    variable_name = '#mu^{+}#mu^{-} First lepton P_{T}'
-    instance = DYControlRegion(variable,variable_name,outputname)
-
-    # ElEl first lepton pt #
-    variable = {('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0btag_inZpeak/','Resolved 0 btag') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt',
-                ('../full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy2btag_inZpeak/','Resolved 2 btag') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}
-    outputname = 'ElEl_firstlepton_pt.pdf'
+    # ElEl First lepton pt #
+    var_0btagZveto_dict = {(path_ZVeto,'Resolved 0 btag (Z veto)'): 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'}
+    var_2btagZveto_dict = {(path_ZVeto,'Resolved 2 btag (Z veto)'): 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}
+    var_0btagZpeak_dict = {(path_inZpeak,'Resolved 0 btag (Z peak)') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'}
+    var_0btagnoZveto_dict = {(path_noZVeto,'Resolved 0 btag (no Z veto)') : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'}
+    var_2btagZpeak_dict = {(path_inZpeak,'Resolved 2 btag (Zpeak)') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}
+    var_2btagnoZveto_dict = {(path_noZVeto,'Resolved 2 btag (no Z veto)') : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}
     variable_name = 'e^{+}e^{-} First lepton P_{T}'
-    instance = DYControlRegion(variable,variable_name,outputname)
+    instance = DYControlRegion(var_0btagZveto_dict,variable_name,"ElEl_firstlepton_PT_0btagZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagZveto_dict,variable_name,"ElEl_firstlepton_PT_0btagZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagZveto_dict,variable_name,"ElEl_firstlepton_PT_2btagZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagZveto_dict,variable_name,"ElEl_firstlepton_PT_2btagZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"ElEl_firstlepton_PT_0btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"ElEl_firstlepton_PT_0btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"ElEl_firstlepton_PT_0btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"ElEl_firstlepton_PT_0btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"ElEl_firstlepton_PT_2btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"ElEl_firstlepton_PT_2btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagnoZveto_dict,variable_name,"ElEl_firstlepton_PT_2btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagnoZveto_dict,variable_name,"ElEl_firstlepton_PT_2btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"ElEl_firstlepton_0btag_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"ElEl_firstlepton_0btag_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"ElEl_firstlepton_2btag_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"ElEl_firstlepton_2btag_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"MuMu_dilepton_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"MuMu_dilepton_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+
+    # MuMu Dilepton pt #
+    var_0btagZveto_dict = {(path_ZVeto,'Resolved 0 btag (Z veto)'): 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_dilepton_pt'}
+    var_2btagZveto_dict = {(path_ZVeto,'Resolved 2 btag (Z veto)'): 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_dilepton_pt'}
+    var_0btagZpeak_dict = {(path_inZpeak,'Resolved 0 btag (Z peak)') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_dilepton_pt'}
+    var_0btagnoZveto_dict = {(path_noZVeto,'Resolved 0 btag (no Z veto)') : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_dilepton_pt'}
+    var_2btagZpeak_dict = {(path_inZpeak,'Resolved 2 btag (Zpeak)') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_dilepton_pt'}
+    var_2btagnoZveto_dict = {(path_noZVeto,'Resolved 2 btag (no Z veto)') : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_dilepton_pt'}
+    variable_name = '#mu^{+}#mu^{-} Dilepton P_{T}'
+    instance = DYControlRegion(var_0btagZveto_dict,variable_name,"MuMu_dilepton_PT_0btagZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagZveto_dict,variable_name,"MuMu_dilepton_PT_0btagZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagZveto_dict,variable_name,"MuMu_dilepton_PT_2btagZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagZveto_dict,variable_name,"MuMu_dilepton_PT_2btagZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"MuMu_dilepton_PT_0btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"MuMu_dilepton_PT_0btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"MuMu_dilepton_PT_0btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"MuMu_dilepton_PT_0btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"MuMu_dilepton_PT_2btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"MuMu_dilepton_PT_2btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagnoZveto_dict,variable_name,"MuMu_dilepton_PT_2btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagnoZveto_dict,variable_name,"MuMu_dilepton_PT_2btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"MuMu_dilepton_0btag_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"MuMu_dilepton_0btag_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"MuMu_dilepton_2btag_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"MuMu_dilepton_2btag_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"ElEl_firstlepton_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"ElEl_firstlepton_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+
+    # MuMu First lepton pt #
+    var_0btagZveto_dict = {(path_ZVeto,'Resolved 0 btag (Z veto)'): 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'}
+    var_2btagZveto_dict = {(path_ZVeto,'Resolved 2 btag (Z veto)'): 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}
+    var_0btagZpeak_dict = {(path_inZpeak,'Resolved 0 btag (Z peak)') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'}
+    var_0btagnoZveto_dict = {(path_noZVeto,'Resolved 0 btag (no Z veto)') : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'}
+    var_2btagZpeak_dict = {(path_inZpeak,'Resolved 2 btag (Zpeak)') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}
+    var_2btagnoZveto_dict = {(path_noZVeto,'Resolved 2 btag (no Z veto)') : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}
+    variable_name = '#mu^{+}#mu^{-} First lepton P_{T}'
+    instance = DYControlRegion(var_0btagZveto_dict,variable_name,"MuMu_firstlepton_PT_0btagZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagZveto_dict,variable_name,"MuMu_firstlepton_PT_0btagZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagZveto_dict,variable_name,"MuMu_firstlepton_PT_2btagZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagZveto_dict,variable_name,"MuMu_firstlepton_PT_2btagZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"MuMu_firstlepton_PT_0btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"MuMu_firstlepton_PT_0btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"MuMu_firstlepton_PT_0btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"MuMu_firstlepton_PT_0btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"MuMu_firstlepton_PT_2btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"MuMu_firstlepton_PT_2btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagnoZveto_dict,variable_name,"MuMu_firstlepton_PT_2btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagnoZveto_dict,variable_name,"MuMu_firstlepton_PT_2btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"MuMu_firstlepton_0btag_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"MuMu_firstlepton_0btag_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"MuMu_firstlepton_2btag_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"MuMu_firstlepton_2btag_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"MuMu_firstlepton_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"MuMu_firstlepton_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+
+    # ElEl leadjet pt #
+    var_0btagZveto_dict = {(path_ZVeto,'Resolved 0 btag (Z veto)'): 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt'}
+    var_2btagZveto_dict = {(path_ZVeto,'Resolved 2 btag (Z veto)'): 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt'}
+    var_0btagZpeak_dict = {(path_inZpeak,'Resolved 0 btag (Z peak)') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt'}
+    var_0btagnoZveto_dict = {(path_noZVeto,'Resolved 0 btag (no Z veto)') : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt'}
+    var_2btagZpeak_dict = {(path_inZpeak,'Resolved 2 btag (Zpeak)') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt'}
+    var_2btagnoZveto_dict = {(path_noZVeto,'Resolved 2 btag (no Z veto)') : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt'}
+    variable_name = 'e^{+}e^{-} Leading (b)jet P_{T}'
+    instance = DYControlRegion(var_0btagZveto_dict,variable_name,"ElEl_leadjet_PT_0btagZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagZveto_dict,variable_name,"ElEl_leadjet_PT_0btagZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagZveto_dict,variable_name,"ElEl_leadjet_PT_2btagZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagZveto_dict,variable_name,"ElEl_leadjet_PT_2btagZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"ElEl_leadjet_PT_0btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"ElEl_leadjet_PT_0btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"ElEl_leadjet_PT_0btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"ElEl_leadjet_PT_0btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"ElEl_leadjet_PT_2btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"ElEl_leadjet_PT_2btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagnoZveto_dict,variable_name,"ElEl_leadjet_PT_2btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagnoZveto_dict,variable_name,"ElEl_leadjet_PT_2btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"ElEl_leadjet_0btag_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"ElEl_leadjet_0btag_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"ElEl_leadjet_2btag_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"ElEl_leadjet_2btag_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"ElEl_leadjet_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"ElEl_leadjet_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+
+    # MuMu leadjet pt #
+    var_0btagZveto_dict = {(path_ZVeto,'Resolved 0 btag (Z veto)'): 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt'}
+    var_2btagZveto_dict = {(path_ZVeto,'Resolved 2 btag (Z veto)'): 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt'}
+    var_0btagZpeak_dict = {(path_inZpeak,'Resolved 0 btag (Z peak)') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt'}
+    var_0btagnoZveto_dict = {(path_noZVeto,'Resolved 0 btag (no Z veto)') : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt'}
+    var_2btagZpeak_dict = {(path_inZpeak,'Resolved 2 btag (Zpeak)') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt'}
+    var_2btagnoZveto_dict = {(path_noZVeto,'Resolved 2 btag (no Z veto)') : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt'}
+    variable_name = '#mu^{+}#mu^{-} Leading (b)jet P_{T}'
+    instance = DYControlRegion(var_0btagZveto_dict,variable_name,"MuMu_leadjet_PT_0btagZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagZveto_dict,variable_name,"MuMu_leadjet_PT_0btagZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagZveto_dict,variable_name,"MuMu_leadjet_PT_2btagZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagZveto_dict,variable_name,"MuMu_leadjet_PT_2btagZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"MuMu_leadjet_PT_0btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagZpeak_dict,variable_name,"MuMu_leadjet_PT_0btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"MuMu_leadjet_PT_0btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_0btagnoZveto_dict,variable_name,"MuMu_leadjet_PT_0btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"MuMu_leadjet_PT_2btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagZpeak_dict,variable_name,"MuMu_leadjet_PT_2btagInZpeak",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion(var_2btagnoZveto_dict,variable_name,"MuMu_leadjet_PT_2btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion(var_2btagnoZveto_dict,variable_name,"MuMu_leadjet_PT_2btagNoZVeto",plot_data=True,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"MuMu_leadjet_0btag_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"MuMu_leadjet_0btag_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"MuMu_leadjet_2btag_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"MuMu_leadjet_2btag_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"MuMu_leadjet_PT",plot_data=True,plot_MC=False,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"MuMu_leadjet_PT",plot_data=False,plot_MC=True,exclude_DY=True)
+
+    # ElEl hadron flavour #
+    var_0btagnoZveto_dict = {(path_noZVeto,'Resolved 0 btag (no Z veto)') : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_hadronflavour'}
+    var_2btagnoZveto_dict = {(path_noZVeto,'Resolved 2 btag (no Z veto)') : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_hadronflavour'}
+    var_0btagZveto_dict = {(path_ZVeto,'Resolved 0 btag (Z veto)'): 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_hadronflavour'}
+    var_2btagZveto_dict = {(path_ZVeto,'Resolved 2 btag (Z veto)'): 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_hadronflavour'}
+    var_0btagZpeak_dict = {(path_inZpeak,'Resolved 0 btag (Z peak)') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_hadronflavour'}
+    var_2btagZpeak_dict = {(path_inZpeak,'Resolved 2 btag (Zpeak)') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_hadronflavour'}
+
+    variable_name = 'e^{+}e^{-} Hadron flavour'
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"ElEl_leadjet_0btag_hadronflavour",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"ElEl_leadjet_0btag_hadronflavour",plot_data=False,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"ElEl_leadjet_2btag_hadronflavour",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"ElEl_leadjet_2btag_hadronflavour",plot_data=False,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"ElEl_leadjet_hadronflavour",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"ElEl_leadjet_hadronflavour",plot_data=False,plot_MC=True,exclude_DY=False)
+
+    # MuMu hadron flavour #
+    var_0btagnoZveto_dict = {(path_noZVeto,'Resolved 0 btag (no Z veto)') : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_hadronflavour'}
+    var_2btagnoZveto_dict = {(path_noZVeto,'Resolved 2 btag (no Z veto)') : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_hadronflavour'}
+    var_0btagZveto_dict = {(path_ZVeto,'Resolved 0 btag (Z veto)'): 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_hadronflavour'}
+    var_2btagZveto_dict = {(path_ZVeto,'Resolved 2 btag (Z veto)'): 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_hadronflavour'}
+    var_0btagZpeak_dict = {(path_inZpeak,'Resolved 0 btag (Z peak)') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_hadronflavour'}
+    var_2btagZpeak_dict = {(path_inZpeak,'Resolved 2 btag (Zpeak)') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_hadronflavour'}
+
+    variable_name = '#mu^{+}#mu^{-} Hadron flavour'
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"MuMu_leadjet_0btag_hadronflavour",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"MuMu_leadjet_0btag_hadronflavour",plot_data=False,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"MuMu_leadjet_2btag_hadronflavour",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"MuMu_leadjet_2btag_hadronflavour",plot_data=False,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"MuMu_leadjet_hadronflavour",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"MuMu_leadjet_hadronflavour",plot_data=False,plot_MC=True,exclude_DY=False)
+
+    # ElEl parton flavour #
+    var_0btagnoZveto_dict = {(path_noZVeto,'Resolved 0 btag (no Z veto)') : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_partonflavour'}
+    var_2btagnoZveto_dict = {(path_noZVeto,'Resolved 2 btag (no Z veto)') : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_partonflavour'}
+    var_0btagZveto_dict = {(path_ZVeto,'Resolved 0 btag (Z veto)'): 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_partonflavour'}
+    var_2btagZveto_dict = {(path_ZVeto,'Resolved 2 btag (Z veto)'): 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_partonflavour'}
+    var_0btagZpeak_dict = {(path_inZpeak,'Resolved 0 btag (Z peak)') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_partonflavour'}
+    var_2btagZpeak_dict = {(path_inZpeak,'Resolved 2 btag (Zpeak)') : 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_partonflavour'}
+
+    variable_name = 'e^{+}e^{-} Parton flavour'
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"ElEl_leadjet_0btag_partonflavour",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"ElEl_leadjet_0btag_partonflavour",plot_data=False,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"ElEl_leadjet_2btag_partonflavour",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"ElEl_leadjet_2btag_partonflavour",plot_data=False,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"ElEl_leadjet_partonflavour",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"ElEl_leadjet_partonflavour",plot_data=False,plot_MC=True,exclude_DY=False)
+
+    # MuMu parton flavour #
+    var_0btagnoZveto_dict = {(path_noZVeto,'Resolved 0 btag (no Z veto)') : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_partonflavour'}
+    var_2btagnoZveto_dict = {(path_noZVeto,'Resolved 2 btag (no Z veto)') : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_partonflavour'}
+    var_0btagZveto_dict = {(path_ZVeto,'Resolved 0 btag (Z veto)'): 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_partonflavour'}
+    var_2btagZveto_dict = {(path_ZVeto,'Resolved 2 btag (Z veto)'): 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_partonflavour'}
+    var_0btagZpeak_dict = {(path_inZpeak,'Resolved 0 btag (Z peak)') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_partonflavour'}
+    var_2btagZpeak_dict = {(path_inZpeak,'Resolved 2 btag (Zpeak)') : 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_partonflavour'}
+
+    variable_name = '#mu^{+}#mu^{-} Parton flavour'
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"MuMu_leadjet_0btag_partonflavour",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagZveto_dict,**var_0btagZpeak_dict,**var_0btagnoZveto_dict},variable_name,"MuMu_leadjet_0btag_partonflavour",plot_data=False,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"MuMu_leadjet_2btag_partonflavour",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_2btagZveto_dict,**var_2btagZpeak_dict,**var_2btagnoZveto_dict},variable_name,"MuMu_leadjet_2btag_partonflavour",plot_data=False,plot_MC=True,exclude_DY=False)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"MuMu_leadjet_partonflavour",plot_data=False,plot_MC=True,exclude_DY=True)
+    instance = DYControlRegion({**var_0btagnoZveto_dict,**var_2btagnoZveto_dict,**var_0btagZveto_dict,**var_2btagZveto_dict,**var_0btagZpeak_dict,**var_2btagZpeak_dict},variable_name,"MuMu_leadjet_partonflavour",plot_data=False,plot_MC=True,exclude_DY=False)
 

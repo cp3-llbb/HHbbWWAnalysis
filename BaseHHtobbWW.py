@@ -44,6 +44,7 @@ Arguments for the HH->bbWW analysis on bamboo framework
         --Tight
         --FakeExtrapolation
         --NoZVeto
+        --ZPeak
 
     * Jet arguments *
         --Ak4
@@ -162,7 +163,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                           isMC          = self.is_MC,
                                                                           systVariations= [ nanoRochesterCalc, (nanoJetMETCalc_METFixEE2017 if era == "2017" else nanoJetMETCalc) ]), 
                                                                                 # will do Jet and MET variations, and the Rochester correction
-                                                                          lazyBackend   = (self.args.backend == "lazy"))
+                                                                          lazyBackend   = self.args.backend == "lazy" or self.args.onlypost)
     
         self.triggersPerPrimaryDataset = {}
         from bamboo.analysisutils import configureJets ,configureRochesterCorrection, configureType1MET 
@@ -279,39 +280,88 @@ One lepton and and one jet argument must be specified in addition to the require
         ############################################################################################
         # ERA 2017 #
         ############################################################################################
-        #elif era == "2017" and not self.args.Synchronization:
-        #    configureRochesterCorrection(tree._Muon.calc,os.path.join(os.path.dirname(__file__), "data", "RoccoR2017.txt"))
-        #    self.triggersPerPrimaryDataset = {
-        #        "DoubleMuon" : [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
-        #                         tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ,
-        #                         tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8,
-        #                         tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8 ],
-        #        "DoubleEG"   : [ tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL ],
-        #        # it's recommended to not use the DZ  version  for 2017 and 2018, it would be a needless efficiency loss
-        #        #---> https://twiki.cern.ch/twiki/bin/view/CMS/EgHLTRunIISummary
-        #        "MuonEG"     : [ tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL,
-        #                         tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ,
-        #                         tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL,
-        #                         tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ ]
-        #        }
-        #    if self.is_MC:
-        #        configureJets(tree, "Jet", "AK4PFchs",
-        #            jec="Fall17_17Nov2017_V32_MC",
-        #            smear="Fall17_V3_MC",
-        #            jesUncertaintySources=["Total"], mayWriteCache=isNotWorker)
-        #    else:
-        #        if "2017B" in sample:
-        #            configureJets(tree, "Jet", "AK4PFchs", jec="Fall17_17Nov2017B_V32_DATA", mayWriteCache=isNotWorker)
-        #        elif "2017C" in sample:
-        #            configureJets(tree, "Jet", "AK4PFchs", jec="Fall17_17Nov2017C_V32_DATA", mayWriteCache=isNotWorker)
-        #        elif "2017D" in sample or "2017E" in sample:
-        #            configureJets(tree, "Jet", "AK4PFchs", jec="Fall17_17Nov2017DE_V32_DATA", mayWriteCache=isNotWorker)
-        #        elif "2017F" in sample:
-        #            configureJets(tree, "Jet", "AK4PFchs", jec="Fall17_17Nov2017F_V32_DATA", mayWriteCache=isNotWorker)
+        elif era == "2017" and not self.args.Synchronization:
+            configureRochesterCorrection(variProxy  = tree._Muon,
+                                         paramsFile = os.path.join(os.path.dirname(__file__), "data", "RoccoR2017.txt"),
+                                         isMC       = self.is_MC,
+                                         backend    = be, 
+                                         uName      = sample)
+            if self.is_MC or sample in ["2017C","2017C","2017D","2017E","2017F"]:
+                # All have both with _DZ and without
+                self.triggersPerPrimaryDataset = {
+                    "SingleMuon" :  [ tree.HLT.IsoMu24],
+                    "SingleElectron":  [ tree.HLT.Ele27_WPTight_Gsf],
+                    "DoubleMuon" :  [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
+                                      tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
+                    "DoubleEGamma": [ tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
+                    "MuonEG":       [ tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ,
+                                      tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ,
+                                      tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL,
+                                      tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL]}
+            elif sample in ["2017B"]:
+                # Only DZ for MuonEG  in 2017B
+                self.triggersPerPrimaryDataset = {
+                    "SingleMuon" :  [ tree.HLT.IsoMu24],
+                    "SingleElectron":  [ tree.HLT.Ele27_WPTight_Gsf],
+                    "DoubleMuon" :  [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
+                                      tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
+                    "DoubleEGamma": [ tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
+                    "MuonEG":       [ tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ,
+                                      tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ]}
+            
+            # JetMET treatment #
+            if self.is_MC:   # if MC -> needs smearing
+                configureJets(variProxy             = tree._Jet, 
+                              jetType               = "AK4PFchs",
+                              jec                   = "Fall17_17Nov2017_V32_MC",
+                              smear                 = "Fall17_V3_MC",
+                              jesUncertaintySources = ["Total"],
+                              mayWriteCache         = isNotWorker,
+                              isMC                  = self.is_MC,
+                              backend               = be, 
+                              uName                 = sample,
+                              cachedir              = cachJEC_dir)
+                configureType1MET(variProxy             = tree._MET, 
+                                  jec                   = "Fall17_17Nov2017_V32_MC",
+                                  smear                 = "Fall17_V3_MC",
+                                  jesUncertaintySources = ["Total"],
+                                  mayWriteCache         = isNotWorker,
+                                  isMC                  = self.is_MC,
+                                  backend               = be,
+                                  uName                 = sample,
+                                  cachedir              = cachJEC_dir)
+
+            else:                   # If data -> extract info from config 
+                jecTag = None
+                if "2017B" in sample:
+                    jecTag = "Fall17_17Nov2017B_V32_DATA"
+                elif "2017C" in sample:
+                    jecTag = "Fall17_17Nov2017C_V32_DATA"
+                elif "2017D" in sample or "2017E" in sample:
+                    jecTag = "Fall17_17Nov2017DE_V32_DATA"
+                elif "2017F" in sample:
+                    jecTag = "Fall17_17Nov2017F_V32_DATA"
+                configureJets(variProxy             = tree._Jet, 
+                              jetType               = "AK4PFchs",
+                              jec                   = jecTag,
+                              mayWriteCache         = isNotWorker,
+                              isMC                  = self.is_MC,
+                              backend               = be, 
+                              uName                 = sample,
+                              cachedir              = cachJEC_dir)
+                configureType1MET(variProxy         = tree._MET, 
+                                  jec               = jecTag,
+                                  mayWriteCache     = isNotWorker,
+                                  isMC              = self.is_MC,
+                                  backend           = be, 
+                                  uName             = sample,
+                                  cachedir          = cachJEC_dir)
 
         ############################################################################################
         # ERA 2018 #
         ############################################################################################
+        elif era == "2018" and not self.args.Synchronization:
+            raise NotImplementedError
         #elif era == "2018" and not self.args.Synchronization:
         #    configureRochesterCorrection(tree._Muon.calc,os.path.join(os.path.dirname(__file__), "data", "RoccoR2018.txt"))
         #    self.triggersPerPrimaryDataset = {
@@ -388,7 +438,7 @@ One lepton and and one jet argument must be specified in addition to the require
         #                             Pile-up                                       #
         #############################################################################
         puWeightsFile = None
-        # Select sfTaf #
+        # Select sfTag #
         if era == "2016":
             self.sfTag="94X"
         elif era == "2017":
@@ -679,31 +729,34 @@ One lepton and and one jet argument must be specified in addition to the require
         #                             Scalefactors                                  #
         #############################################################################
         if self.is_MC:
-            # Initialize scalefactors class #
-            SF = ScaleFactorsbbWW()    
-            ####  Muons ####
-            self.muLooseId = SF.get_scalefactor("lepton", 'muon_loose_{}'.format(era), combine="weight", systName="mu_loose")
-            self.muTightMVA = SF.get_scalefactor("lepton", 'muon_tightMVA_{}'.format(era), combine="weight", systName="mu_tightmva")
-   
-            ####  Electrons ####
-            self.elLooseRecoPtLt20 = SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptgt20'), combine="weight", systName="el_looserecoptlt20")
-            self.elLooseRecoPtGt20 = SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptlt20'), combine="weight", systName="el_looserecoptgt20")
-            self.elLooseId = SF.get_scalefactor("lepton", 'electron_looseid_{}'.format(era) , combine="weight", systName="el_looseid")
-            self.elLooseEff = SF.get_scalefactor("lepton", 'electron_looseeff_{}'.format(era) , combine="weight", systName="el_looseeff")
-            self.elTightMVA = SF.get_scalefactor("lepton", 'electron_tightMVA_{}'.format(era) , combine="weight", systName="el_tightmva")
- 
-            #### Triggers (from TTH) ####
-            self.ttH_doubleMuon_trigSF = op.systematic(op.c_float(1.010), name="ttH_doubleMuon_trigSF", up=op.c_float(1.020), down=op.c_float(1.000))
-            self.ttH_doubleElectron_trigSF = op.systematic(op.c_float(1.020), name="ttH_doubleElectron_trigSF", up=op.c_float(1.040), down=op.c_float(1.000))
-            self.ttH_electronMuon_trigSF = op.systematic(op.c_float(1.020), name="ttH_electronMuon_trigSF", up=op.c_float(1.030), down=op.c_float(1.010))
-            #### Ak4 Btagging ####
-            DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
-            self.DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+self.sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
-            #### Ak8 Btagging ####
- #           DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
- #           self.DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+self.sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag o    n subjet)
-                # TODO : add Boosted SF (need NanoAODv7)
-        
+            if era == "2016" or era == "2017":
+                # Initialize scalefactors class #
+                SF = ScaleFactorsbbWW()    
+                ####  Muons ####
+                self.muLooseId = SF.get_scalefactor("lepton", 'muon_loose_{}'.format(era), combine="weight", systName="mu_loose")
+                self.muTightMVA = SF.get_scalefactor("lepton", 'muon_tightMVA_{}'.format(era), combine="weight", systName="mu_tightmva")
+       
+                ####  Electrons ####
+                self.elLooseRecoPtLt20 = SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptgt20'), combine="weight", systName="el_looserecoptlt20")
+                self.elLooseRecoPtGt20 = SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptlt20'), combine="weight", systName="el_looserecoptgt20")
+                self.elLooseId = SF.get_scalefactor("lepton", 'electron_looseid_{}'.format(era) , combine="weight", systName="el_looseid")
+                self.elLooseEff = SF.get_scalefactor("lepton", 'electron_looseeff_{}'.format(era) , combine="weight", systName="el_looseeff")
+                self.elTightMVA = SF.get_scalefactor("lepton", 'electron_tightMVA_{}'.format(era) , combine="weight", systName="el_tightmva")
+     
+                #### Triggers (from TTH) ####
+                self.ttH_doubleMuon_trigSF = op.systematic(op.c_float(1.010), name="ttH_doubleMuon_trigSF", up=op.c_float(1.020), down=op.c_float(1.000))
+                self.ttH_doubleElectron_trigSF = op.systematic(op.c_float(1.020), name="ttH_doubleElectron_trigSF", up=op.c_float(1.040), down=op.c_float(1.000))
+                self.ttH_electronMuon_trigSF = op.systematic(op.c_float(1.020), name="ttH_electronMuon_trigSF", up=op.c_float(1.030), down=op.c_float(1.010))
+                #### Ak4 Btagging ####
+                DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
+                self.DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+self.sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
+                #### Ak8 Btagging ####
+                #DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
+                #self.DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+self.sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag o    n subjet)
+                    # TODO : add Boosted SF (need NanoAODv7)
+            elif era == "2018":
+                raise NotImplementedError
+            
 
 
 
