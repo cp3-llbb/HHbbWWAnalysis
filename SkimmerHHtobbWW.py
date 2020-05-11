@@ -5,7 +5,7 @@ from bamboo.analysismodules import SkimmerModule
 from bamboo import treefunctions as op
 from bamboo.analysisutils import makePileupWeight
 
-sys.path.append('/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/') # Add scripts in this directory -- TODO : make cleaner
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)))) # Add scripts in this directory
 from BaseHHtobbWW import BaseNanoHHtobbWW
 from selectionDef import *
 
