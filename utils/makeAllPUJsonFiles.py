@@ -48,7 +48,7 @@ for sample, dico in data['samples'].items():
         traceback.print_tb(err.__traceback__)
 
     try: 
-        shutil.move("%s_2016.json"%sample,'./pileup_json/%s_2016.json'%sample)
+        shutil.move("%s_%s.json"%(sample,args.era),'./pileup_json/%s_%s.json'%(sample,args.era))
     except Exception as err:
-        print ("Could not move file %s_2016.json to dir pileup_json due to '%s'"%(sample,err))
+        print ("Could not move file %s_%s.json to dir pileup_json due to '%s'"%(sample,args.era,err))
 
