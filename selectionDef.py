@@ -80,11 +80,24 @@ def makeLeptonSelection(self,baseSel,plot_yield=False):
 
     # Loose SF lambdas #
     MuonLooseSF = lambda mu : [self.muLooseId(mu)]
-    ElectronLooseSF = lambda el : [self.elLooseId(el) , self.elLooseEff(el), op.switch(el.pt>20 , self.elLooseRecoPtGt20(el) , self.elLooseRecoPtLt20(el))] 
+    if self.era == "2016" or self.era == "2017": # Electron reco eff depend on Pt for 2016 and 2017
+        ElectronLooseSF = lambda el : [self.elLooseId(el) , self.elLooseEff(el), op.switch(el.pt>20 , self.elLooseRecoPtGt20(el) , self.elLooseRecoPtLt20(el))] 
+    elif self.era == "2018": # Does not depend on pt for 2018
+        ElectronLooseSF = lambda el : [self.elLooseId(el) , self.elLooseEff(el), self.elLooseReco(el)]
 
-    ElElLooseSF = lambda dilep : [self.ttH_doubleElectron_trigSF]+ElectronLooseSF(dilep[0])+ElectronLooseSF(dilep[1]) if self.is_MC else None
-    MuMuLooseSF = lambda dilep : [self.ttH_doubleMuon_trigSF]+MuonLooseSF(dilep[0])+MuonLooseSF(dilep[1]) if self.is_MC else None
-    ElMuLooseSF = lambda dilep : [self.ttH_electronMuon_trigSF]+ElectronLooseSF(dilep[0])+MuonLooseSF(dilep[1]) if self.is_MC else None
+    # Trigger SF #
+    if self.era == "2016":
+        ElElTriggerSF = [self.ttH_doubleElectron_trigSF]
+        MuMuTriggerSF = [self.ttH_doubleMuon_trigSF]
+        ElMuTriggerSF = [self.ttH_electronMuon_trigSF]
+    elif self.era == "2017":
+        raise NotImplementedError
+    elif self.era == "2018":
+        raise NotImplementedError
+
+    ElElLooseSF = lambda dilep : ElElTriggerSF+ElectronLooseSF(dilep[0])+ElectronLooseSF(dilep[1]) if self.is_MC else None
+    MuMuLooseSF = lambda dilep : MuMuTriggerSF+MuonLooseSF(dilep[0])+MuonLooseSF(dilep[1]) if self.is_MC else None
+    ElMuLooseSF = lambda dilep : ElMuTriggerSF+ElectronLooseSF(dilep[0])+MuonLooseSF(dilep[1]) if self.is_MC else None
     
     # Tight SF lambdas #
     ElElTightSF = lambda dilep : [self.elTightMVA(dilep[0]),self.elTightMVA(dilep[1])] if self.is_MC else None

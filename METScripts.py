@@ -21,8 +21,9 @@ def METFilter(flags, era, isMC):
            flags.EcalDeadCellTriggerPrimitiveFilter,
            flags.BadPFMuonFilter
             ]
-    if "2017" in era or "2018" in era:
-        cuts.append(flags.ecalBadCalibReducedMINIAODFilter) # Only 2017-2018 : both MC and data
+#    if "2017" in era or "2018" in era:
+#        cuts.append(flags.ecalBadCalibReducedMINIAODFilter) # Only 2017-2018 : both MC and data
+        # Could not find in NanoAOD : TODO 
     if not isMC:
         cuts.append(flags.eeBadScFilter) # Only data 
 
