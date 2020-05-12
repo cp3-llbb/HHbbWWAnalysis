@@ -149,7 +149,7 @@ One lepton and and one jet argument must be specified in addition to the require
                             help        = "Only produce the yield plots")
 
     def prepareTree(self, tree, sample=None, sampleCfg=None):
-        from bamboo.treedecorators import NanoAODDescription, nanoRochesterCalc, nanoJetMETCalc
+        from bamboo.treedecorators import NanoAODDescription, nanoRochesterCalc, nanoJetMETCalc, nanoJetMETCalc_METFixEE2017
         # JEC's Recommendation for Full RunII: https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC
         # JER : -----------------------------: https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
         # Get base aguments #
@@ -244,7 +244,7 @@ One lepton and and one jet argument must be specified in addition to the require
                               backend               = be, 
                               uName                 = sample,
                               cachedir              = cachJEC_dir)
-                configureType1MET(variProxy             = tree._MET, 
+                configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                   jec                   = "Summer16_07Aug2017_V20_MC",
                                   smear                 = "Summer16_25nsV1_MC",
                                   jesUncertaintySources = ["Total"],
@@ -270,7 +270,7 @@ One lepton and and one jet argument must be specified in addition to the require
                               backend               = be, 
                               uName                 = sample,
                               cachedir              = cachJEC_dir)
-                configureType1MET(variProxy         = tree._MET, 
+                configureType1MET(variProxy         = getattr(tree, f"_{metName}"),
                                   jec               = jecTag,
                                   mayWriteCache     = isNotWorker,
                                   isMC              = self.is_MC,
@@ -322,7 +322,7 @@ One lepton and and one jet argument must be specified in addition to the require
                               backend               = be, 
                               uName                 = sample,
                               cachedir              = cachJEC_dir)
-                configureType1MET(variProxy             = tree._MET, 
+                configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                   jec                   = "Fall17_17Nov2017_V32_MC",
                                   smear                 = "Fall17_V3_MC",
                                   jesUncertaintySources = ["Total"],
@@ -350,7 +350,7 @@ One lepton and and one jet argument must be specified in addition to the require
                               backend               = be, 
                               uName                 = sample,
                               cachedir              = cachJEC_dir)
-                configureType1MET(variProxy         = tree._MET, 
+                configureType1MET(variProxy         = getattr(tree, f"_{metName}"),
                                   jec               = jecTag,
                                   mayWriteCache     = isNotWorker,
                                   isMC              = self.is_MC,
@@ -409,6 +409,7 @@ One lepton and and one jet argument must be specified in addition to the require
         from bamboo.analysisutils import forceDefine
 
         era = sampleCfg['era']
+        self.era = era
 
         # Forcedefine : calculate once per event (for every event) #
         if not self.args.Synchronization:
@@ -438,16 +439,8 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                             Pile-up                                       #
         #############################################################################
-        puWeightsFile = None
-        # Select sfTag #
-        if era == "2016":
-            self.sfTag="94X"
-        elif era == "2017":
-            self.sfTag="94X"     
-        elif era == "2018":
-            self.sfTag="102X"
-
         # Get MC PU weight file #
+        puWeightsFile = None
         if self.is_MC and not self.args.Synchronization:
             if "pufile" not in sampleCfg:
                 raise KeyError("Could not find 'pufile' entry for sample %s in the YAML file"%sampleCfg["sample"])
@@ -668,7 +661,7 @@ One lepton and and one jet argument must be specified in addition to the require
             self.lambda_ak4NoBtag = lambda jet    : jet.btagDeepFlavB <= 0.3093
         elif era =="2017":
             self.lambda_ak4Btag =   lambda jet    : jet.btagDeepFlavB > 0.3033
-            lambda_ak4NoBtag = lambda jet    : jet.btagDeepFlavB <= 0.3033
+            self.lambda_ak4NoBtag = lambda jet    : jet.btagDeepFlavB <= 0.3033
         elif era == "2018":
             self.lambda_ak4Btag =   lambda jet    : jet.btagDeepFlavB > 0.2770
             self.lambda_ak4NoBtag = lambda jet    : jet.btagDeepFlavB <= 0.2770
@@ -730,33 +723,45 @@ One lepton and and one jet argument must be specified in addition to the require
         #                             Scalefactors                                  #
         #############################################################################
         if self.is_MC:
+            # Initialize scalefactors class #
+            SF = ScaleFactorsbbWW()    
+
+            #---- Object SF -----# (Will take as argument the era)
+            ####  Muons ####
+            self.muLooseId = SF.get_scalefactor("lepton", 'muon_loose_{}'.format(era), combine="weight", systName="mu_loose")
+            self.muTightMVA = SF.get_scalefactor("lepton", 'muon_tightMVA_{}'.format(era), combine="weight", systName="mu_tightmva")
+   
+            ####  Electrons ####
             if era == "2016" or era == "2017":
-                # Initialize scalefactors class #
-                SF = ScaleFactorsbbWW()    
-                ####  Muons ####
-                self.muLooseId = SF.get_scalefactor("lepton", 'muon_loose_{}'.format(era), combine="weight", systName="mu_loose")
-                self.muTightMVA = SF.get_scalefactor("lepton", 'muon_tightMVA_{}'.format(era), combine="weight", systName="mu_tightmva")
-       
-                ####  Electrons ####
                 self.elLooseRecoPtLt20 = SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptgt20'), combine="weight", systName="el_looserecoptlt20")
                 self.elLooseRecoPtGt20 = SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptlt20'), combine="weight", systName="el_looserecoptgt20")
-                self.elLooseId = SF.get_scalefactor("lepton", 'electron_looseid_{}'.format(era) , combine="weight", systName="el_looseid")
-                self.elLooseEff = SF.get_scalefactor("lepton", 'electron_looseeff_{}'.format(era) , combine="weight", systName="el_looseeff")
-                self.elTightMVA = SF.get_scalefactor("lepton", 'electron_tightMVA_{}'.format(era) , combine="weight", systName="el_tightmva")
-     
-                #### Triggers (from TTH) ####
-                self.ttH_doubleMuon_trigSF = op.systematic(op.c_float(1.010), name="ttH_doubleMuon_trigSF", up=op.c_float(1.020), down=op.c_float(1.000))
-                self.ttH_doubleElectron_trigSF = op.systematic(op.c_float(1.020), name="ttH_doubleElectron_trigSF", up=op.c_float(1.040), down=op.c_float(1.000))
-                self.ttH_electronMuon_trigSF = op.systematic(op.c_float(1.020), name="ttH_electronMuon_trigSF", up=op.c_float(1.030), down=op.c_float(1.010))
-                #### Ak4 Btagging ####
-                DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
-                self.DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era+"_"+self.sfTag, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
-                #### Ak8 Btagging ####
-                #DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
-                #self.DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era+"_"+self.sfTag, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag o    n subjet)
-                    # TODO : add Boosted SF (need NanoAODv7)
+                # /!\ In analysis YAML file 2016 and 2017 for systematics : must use el_looserecoptlt20 and el_looserecoptgt20
             elif era == "2018":
-                raise NotImplementedError
+                self.elLooseReco = SF.get_scalefactor("lepton", 'electron_loosereco_{}'.format(era), combine="weight", systName="el_loosereco")
+                # /!\ In analysis YAML file 2018 for systematics : must use el_loosereco
+
+            self.elLooseId = SF.get_scalefactor("lepton", 'electron_looseid_{}'.format(era) , combine="weight", systName="el_looseid")
+            self.elLooseEff = SF.get_scalefactor("lepton", 'electron_looseeff_{}'.format(era) , combine="weight", systName="el_looseeff")
+            self.elTightMVA = SF.get_scalefactor("lepton", 'electron_tightMVA_{}'.format(era) , combine="weight", systName="el_tightmva")
+ 
+            #### Ak4 Btagging ####
+            DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
+            self.DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
+            #### Ak8 Btagging ####
+            #DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
+            #self.DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
+                # TODO : add Boosted SF (need NanoAODv7)
+
+            #----- Triggers -----# (Need to split according to era) 
+                # https://gitlab.cern.ch/ttH_leptons/doc/-/blob/master/Legacy/data_to_mc_corrections.md#trigger-efficiency-scale-factors
+            if era == "2016":
+                self.ttH_doubleElectron_trigSF = op.systematic(op.c_float(1.020), name="ttH_doubleElectron_trigSF", up=op.c_float(1.040), down=op.c_float(1.000))
+                self.ttH_doubleMuon_trigSF = op.systematic(op.c_float(1.010), name="ttH_doubleMuon_trigSF", up=op.c_float(1.020), down=op.c_float(1.000))
+                self.ttH_electronMuon_trigSF = op.systematic(op.c_float(1.020), name="ttH_electronMuon_trigSF", up=op.c_float(1.030), down=op.c_float(1.010))
+            elif era == "2017":
+                raise NotImplementedError # Check doc (link above)
+            elif era == "2018":
+                raise NotImplementedError # Missing in doc 
             
 
 

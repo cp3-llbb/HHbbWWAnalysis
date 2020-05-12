@@ -30,7 +30,7 @@ def plotJetReco(contName,cont,sel,partName):
                              op.map(cont,lambda m : (m.pt-m.genJet.pt)/m.pt),
                              sel,
                              EquidistantBinning(100,-2.,2.),
-                             xTitle="P_{T}(%s_{reco})-P_{T}(%s_{gen})/P_{T}(%s_{gen})"%(partName,partName,partName)))
+                             xTitle="P_{T}(%s_{reco})-P_{T}(%s_{gen})/P_{T}(%s_{reco})"%(partName,partName,partName)))
     return plots
 
 def plotMatching(contName,list_cont,list_sel,partName):
@@ -53,20 +53,20 @@ def plotMatching(contName,list_cont,list_sel,partName):
                                  xTitle="#Delta R^{2}(%s_{gen},%s_{reco})"%(partName,partName)))
 
         ptrel_plots.append(Plot.make1D(contName+str(idx)+"_deltaPtRel",
-                                 op.map(cont,lambda m : (m[1].pt-m[0].pt)/m[0].pt),
+                                 op.map(cont,lambda m : (m[1].pt-m[0].pt)/m[1].pt),
                                  sel,
                                  EquidistantBinning(100,-2.,2.),
-                                 xTitle="P_{T}(%s_{reco})-P_{T}(%s_{gen})/P_{T}(%s_{gen})"%(partName,partName,partName)))
+                                 xTitle="P_{T}(%s_{reco})-P_{T}(%s_{gen})/P_{T}(%s_{reco})"%(partName,partName,partName)))
         TF_plots.append(Plot.make2D(contName+str(idx)+"_TF",
                                  (op.map(cont,lambda m : m[0].p4.E()),op.map(cont,lambda m : m[1].p4.E()-m[0].p4.E())),
                                  sel,
                                  [EquidistantBinning(100,0.,500.),EquidistantBinning(400,-200.,200.)],
                                  xTitle="E^{parton}(e^{-})",
-                                 yTitle="#Delta E = E^{reco}(%s)-E^{patron}(%s)"%(partName,partName)))
+                                 yTitle="#Delta E = E^{reco}(%s)-E^{parton}(%s)"%(partName,partName)))
 
     plots.append(SummedPlot(contName+"_deltaR",dr_plots,xTitle="#Delta R(%s_{gen},%s_{reco})"%(partName,partName)))
     plots.append(SummedPlot(contName+"_deltaR2",dr2_plots,xTitle="#Delta R^{2}(%s_{gen},%s_{reco})"%(partName,partName)))
-    plots.append(SummedPlot(contName+"_deltaPtRel",ptrel_plots,xTitle="P_{T}(%s_{reco})-P_{T}(%s_{gen}/P_{T}(%s_{gen})"%(partName,partName,partName)))
+    plots.append(SummedPlot(contName+"_deltaPtRel",ptrel_plots,xTitle="P_{T}(%s_{reco})-P_{T}(%s_{gen}/P_{T}(%s_{reco})"%(partName,partName,partName)))
     plots.append(SummedPlot(contName+"_TF",TF_plots,xTitle="#Delta E = E^{reco}(%s)-E^{patron}(%s)"%(partName,partName)))
     
     return plots
@@ -254,28 +254,28 @@ class TransferFunction(NanoAODHistoModule):
         SelBReco = noSel.refine("SelBReco",cut=[op.rng_len(recoJet_b)>=1])
         SelBBarReco = noSel.refine("SelBBarReco",cut=[op.rng_len(recoJet_bbar)>=1])
 
-        plots.extend(plotJetReco("bjet",recoJet_b,SelBReco,"b jet"))
-        plots.extend(plotJetReco("bbarjet",recoJet_bbar,SelBBarReco,"#bar{b} jet"))
-
-
-       #----- Parton -----#
-        gen_b = op.select(t.GenPart,lambda g : op.AND( g.pdgId==5 , g.statusFlags & ( 0x1 << 13) , g.pt>10, op.abs(g.eta)<2.4))
-        gen_bbar = op.select(t.GenPart,lambda g : op.AND( g.pdgId==-5 , g.statusFlags & ( 0x1 << 13) , g.pt>10, op.abs(g.eta)<2.4))
-        plots.extend(plotNumber("N_b_gen",gen_b,noSel,5,"N(b) gen quark"))
-        plots.extend(plotNumber("N_bbar_gen",gen_bbar,noSel,5,"N(#bar{b}) gen quark"))
-
-        #----- Matching -----#
-        lambda_bjet_match = lambda b_gen,b_jet : op.deltaR(b_gen.p4,b_jet.genJet.p4)<0.2
-
-        match_b = op.combine((gen_b,recoJet_b),pred=lambda_bjet_match)
-        match_bbar = op.combine((gen_bbar,recoJet_bbar),pred=lambda_bjet_match)
-
-        plots.extend(plotNumber("N_b_match",match_b,noSel,5,"N(b) match level"))
-        plots.extend(plotNumber("N_bbar_match",match_bbar,noSel,5,"N(#bar{b}) match level"))
-
-        SelBMatch = noSel.refine("SelBMatch",cut=[op.rng_len(match_b)>=1])
-        SelBBarMatch = noSel.refine("SelBBarMatch",cut=[op.rng_len(match_bbar)>=1])
-
-        plots.extend(plotMatching("b",[match_b,match_bbar],[SelBMatch,SelBBarMatch],"b"))
+#        plots.extend(plotJetReco("bjet",recoJet_b,SelBReco,"b jet"))
+#        plots.extend(plotJetReco("bbarjet",recoJet_bbar,SelBBarReco,"#bar{b} jet"))
+#
+#
+#       #----- Parton -----#
+#        gen_b = op.select(t.GenPart,lambda g : op.AND( g.pdgId==5 , g.statusFlags & ( 0x1 << 13) , g.pt>10, op.abs(g.eta)<2.4))
+#        gen_bbar = op.select(t.GenPart,lambda g : op.AND( g.pdgId==-5 , g.statusFlags & ( 0x1 << 13) , g.pt>10, op.abs(g.eta)<2.4))
+#        plots.extend(plotNumber("N_b_gen",gen_b,noSel,5,"N(b) gen quark"))
+#        plots.extend(plotNumber("N_bbar_gen",gen_bbar,noSel,5,"N(#bar{b}) gen quark"))
+#
+#        #----- Matching -----#
+#        lambda_bjet_match = lambda b_gen,b_jet : op.deltaR(b_gen.p4,b_jet.genJet.p4)<0.2
+#
+#        match_b = op.combine((gen_b,recoJet_b),pred=lambda_bjet_match)
+#        match_bbar = op.combine((gen_bbar,recoJet_bbar),pred=lambda_bjet_match)
+#
+#        plots.extend(plotNumber("N_b_match",match_b,noSel,5,"N(b) match level"))
+#        plots.extend(plotNumber("N_bbar_match",match_bbar,noSel,5,"N(#bar{b}) match level"))
+#
+#        SelBMatch = noSel.refine("SelBMatch",cut=[op.rng_len(match_b)>=1])
+#        SelBBarMatch = noSel.refine("SelBBarMatch",cut=[op.rng_len(match_bbar)>=1])
+#
+#        plots.extend(plotMatching("b",[match_b,match_bbar],[SelBMatch,SelBBarMatch],"b"))
 
         return plots

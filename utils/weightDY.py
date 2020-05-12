@@ -130,13 +130,21 @@ class WeightDY:
         dist.GetXaxis().SetTitle(plot_dict['x-axis']) 
         dist.GetYaxis().SetTitle(plot_dict['y-axis']) 
         dist.Sumw2()
-        dist.Scale(1./dist.Integral())
         return dist
 
     def produceWeights(self,hist_dict):
         self.weights = hist_dict['ZVeto_0b'].Clone("Weights")
         self.weights.Multiply(hist_dict['ZPeak_2b'])
         self.weights.Divide(hist_dict['ZPeak_0b'])
+#        self.weights.Scale(hist_dict['ZVeto_2b'].Integral()/hist_dict['ZVeto_0b'].Integral())
+        print ("Sum weight ZVeto_0b : ",hist_dict['ZVeto_0b'].Integral())
+        print ("Sum weight ZVeto_2b : ",hist_dict['ZVeto_2b'].Integral())
+        print ("Sum weight ZPeak_0b : ",hist_dict['ZPeak_0b'].Integral())
+        print ("Sum weight ZPeak_2b : ",hist_dict['ZPeak_2b'].Integral())
+
+#        hist_dict['ZVeto_0b'].Scale(1./hist_dict['ZVeto_0b'].Integral())
+#        hist_dict['ZPeak_2b'].Scale(1./hist_dict['ZPeak_2b'].Integral())
+#        hist_dict['ZPeak_0b'].Scale(1./hist_dict['ZPeak_0b'].Integral())
 
     def plotWeights(self):
         C = ROOT.TCanvas("c1", "c1", 600, 600)
@@ -153,6 +161,7 @@ class WeightDY:
         amax = max([h.GetMaximum() for h in self.histograms.values()])
 
         self.histograms['ZVeto_0b'].SetMaximum(amax*1.1)
+        self.histograms['ZVeto_0b'].SetMinimum(0)
         self.histograms['ZVeto_0b'].GetYaxis().SetTitleSize(16)
         self.histograms['ZVeto_0b'].GetYaxis().SetTitleFont(43)
         self.histograms['ZVeto_0b'].GetYaxis().SetTitleOffset(1.8)
@@ -204,7 +213,8 @@ class WeightDY:
         self.weights.GetXaxis().SetLabelSize(0.05)
         self.weights.GetXaxis().SetTitleOffset(1.8)
 
-        self.weights.Draw("ep")
+        self.weights.Draw("ep norm")
+        self.histograms['ZVeto_2b'].Draw("hist same norm")
 
         C.Print(self.outputname+'.pdf')
 
@@ -245,6 +255,8 @@ class WeightDY:
 
 ElElChannel = {'ZVeto_0b' : {'path': '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0And2Btag_ZVeto/',
                              'histname': 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'},
+               'ZVeto_2b' : {'path': '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0And2Btag_ZVeto/',
+                             'histname': 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'},
                'ZPeak_0b' : {'path': '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0And2Btag_inZpeak/',
                              'histname': 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'},
                'ZPeak_2b' : {'path': '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0And2Btag_inZpeak/',
@@ -259,6 +271,6 @@ MuMuChannel = {'ZVeto_0b' : {'path': '/nfs/scratch/fynu/fbury/BambooOutputHHtobb
 
 
 instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_data','data','2016')
-instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_data','data','2016')
-instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_mc','mc','2016')
-instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_mc','mc','2016')
+#instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_data','data','2016')
+#instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_mc','mc','2016')
+#instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_mc','mc','2016')
