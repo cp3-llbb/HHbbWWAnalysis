@@ -23,7 +23,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                  #"normalized": True,
                                  "y-axis": "Events",
                                  "log-y"  : "both",
-                                 "ratio-y-axis-range" : [0.8,1.2],
+                                 "ratio-y-axis-range" : [0.5,1.5],
                                  "ratio-y-axis" : 'Ratio Data/MC',
                                  "sort-by-yields" : False}
 
@@ -53,6 +53,7 @@ Arguments for the HH->bbWW analysis on bamboo framework
         --Resolved1Btag
         --Resolved2Btag
         --Boosted
+        --TTBarCR
 
     * Skimmer arguments *
         --Synchronization
@@ -104,7 +105,7 @@ One lepton and and one jet argument must be specified in addition to the require
         parser.add_argument("--ZPeak", 
                             action      = "store_true",
                             default     = False,
-                            help        = "Select the Z peak at tight level |M_ll-M_Z|<10 GeV (must be used with --NoZVeto)")
+                            help        = "Select the Z peak at tight level |M_ll-M_Z|<10 GeV (must be used with --NoZVeto, only effective with --Tight)")
 
         #----- Jet selection arguments -----#
         parser.add_argument("--Ak4", 
@@ -131,6 +132,10 @@ One lepton and and one jet argument must be specified in addition to the require
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for the inclusive boosted category")
+        parser.add_argument("--TTBarCR", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Apply cut on Mbb for ttbar CR (only effective with --Resolved2Btag)")
 
         #----- Skimmer Arguments -----#
         parser.add_argument("--Synchronization", 
@@ -535,7 +540,6 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                                 Muons                                     #
         #############################################################################
-
         # Preselection #
         muonsByPt = op.sort(t.Muon, lambda mu : -self.lambda_conept_muon(mu)) # Ordering done by conept
         self.lambda_muonPreSel = lambda mu : op.AND(
@@ -632,7 +636,8 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                                AK4 Jets                                   #
         #############################################################################
-        self.ak4JetsByPt = op.sort(t.Jet, lambda jet : -jet.p4.Pt())
+        #self.ak4JetsByPt = op.sort(t.Jet, lambda jet : -jet.p4)
+        self.ak4JetsByPt = op.sort(t.Jet, lambda jet : -jet.btagDeepFlavB)
         # Preselection #
         if era == "2016":
             self.lambda_ak4JetsPreSel = lambda j : op.AND(
@@ -672,7 +677,8 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                                AK8 Jets                                   #
         #############################################################################
-        self.ak8JetsByPt = op.sort(t.FatJet, lambda jet : -jet.p4.Pt())
+        #self.ak8JetsByPt = op.sort(t.FatJet, lambda jet : -jet.pt)
+        self.ak8JetsByPt = op.sort(t.FatJet, lambda jet : -jet.btagDeepB)
         # Preselection #
         if era == "2016":
             self.lambda_ak8JetsPreSel = lambda j : op.AND(
