@@ -112,7 +112,6 @@ class WeightDY:
                 continue
             if dist is None:
                 dist = ROOT.TH1F(category,category,h.GetNbinsX(),h.GetBinLowEdge(1),h.GetBinLowEdge(h.GetNbinsX())+h.GetBinWidth(h.GetNbinsX()))
-
             # Add histograms depending on type #
             if self.mode == 'data':
                 if data_dict['type'] == 'data':
@@ -120,10 +119,14 @@ class WeightDY:
                 if data_dict['type'] == 'mc':
                     if data_dict['group'] != 'DY':
                         factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]    
+                        if data_dict['group'] == 'ttbar':
+                            factor *= 0.7
                         dist.Add(h,-factor)     
             elif self.mode == 'mc':
                 if data_dict['type'] == 'mc' and data_dict['group'] == 'DY':
                     factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]    
+                    if data_dict['group'] == 'ttbar':
+                        factor *= 0.7
                     dist.Add(h,factor)  
             else:
                 raise RuntimeError("Unknown mode")
@@ -135,7 +138,10 @@ class WeightDY:
     def produceWeights(self,hist_dict):
         N_0b = hist_dict['ZPeak_0b'].Integral()
         N_2b = hist_dict['ZPeak_2b'].Integral()
+#        N_0b = hist_dict['ZVeto_0b'].Integral()
+#        N_2b = hist_dict['ZVeto_2b'].Integral()
         self.factor = N_2b/N_0b
+        #self.factor = 0.0172
 
         print ("Sum weight ZVeto_0b : ",hist_dict['ZVeto_0b'].Integral())
         print ("Sum weight ZVeto_2b : ",hist_dict['ZVeto_2b'].Integral())
@@ -229,19 +235,21 @@ class WeightDY:
         self.weights.GetXaxis().SetLabelSize(0.05)
         self.weights.GetXaxis().SetTitleOffset(1.8)
 
-        self.weights.Draw("ep norm")
         #self.histograms['ZVeto_2b'].Scale(self.weights.Integral()/self.histograms['ZVeto_2b'].Integral())
-        self.histograms['ZVeto_2b'].Draw("hist same")
+        #self.weights.SetMaximum(max(self.weights.GetMaximum(),self.histograms['ZVeto_2b'].GetMaximum()))
+        #self.weights.SetMinimum(min(self.weights.GetMinimum(),self.histograms['ZVeto_2b'].GetMinimum()))
+        self.weights.Draw("ep norm")
+        #self.histograms['ZVeto_2b'].Draw("hist same")
 
         text = ROOT.TPaveText(0.6,0.65,0.85,0.85,"NB NDC")
         text.SetFillStyle(1001)
         text.AddText("N_{2b}/N_{0b} = %0.5f"%self.factor)
         text.Draw()
 
-        C.Print(self.outputname+'.pdf')
+        C.Print(self.outputname+'_%s.pdf'%self.era)
 
     def saveToJson(self):
-        json_dict = {'dimension': 1, 'variables': ['Pt'], 'error_type': 'absolute'}
+        json_dict = {'dimension': 2, 'variables': ['AbsEta','Pt'], 'error_type': 'absolute'}
         # Fill data #
         binning = []
         data = []
@@ -265,10 +273,10 @@ class WeightDY:
             # Save data #
             data.append({'bin':[xLow,xHigh],'value':cont,'error_low':err,'error_up':err}) 
        
-        json_dict['binning'] = {'x':binning}
-        json_dict['data'] = data
+        json_dict['binning'] = {'x':[0,2.5],'y':binning}
+        json_dict['data'] = [{'bin':[0,2.5],'values':data}]
 
-        with open(self.outputname+'.json','w') as f:
+        with open(self.outputname+'_%s.json'%self.era,'w') as f:
             json.dump(json_dict,f,indent=4)
     
         
