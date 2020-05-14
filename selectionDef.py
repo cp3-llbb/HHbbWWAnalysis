@@ -86,14 +86,19 @@ def makeLeptonSelection(self,baseSel,plot_yield=False):
         ElectronLooseSF = lambda el : [self.elLooseId(el) , self.elLooseEff(el), self.elLooseReco(el)]
 
     # Trigger SF #
-    if self.era == "2016":
-        ElElTriggerSF = [self.ttH_doubleElectron_trigSF]
-        MuMuTriggerSF = [self.ttH_doubleMuon_trigSF]
-        ElMuTriggerSF = [self.ttH_electronMuon_trigSF]
-    elif self.era == "2017":
-        raise NotImplementedError
-    elif self.era == "2018":
-        raise NotImplementedError
+    if self.is_MC:
+        if self.era == "2016":
+            ElElTriggerSF = [self.ttH_doubleElectron_trigSF]
+            MuMuTriggerSF = [self.ttH_doubleMuon_trigSF]
+            ElMuTriggerSF = [self.ttH_electronMuon_trigSF]
+        elif self.era == "2017":
+            raise NotImplementedError
+        elif self.era == "2018":
+            raise NotImplementedError
+    else:
+        ElElTriggerSF = None
+        MuMuTriggerSF = None
+        ElMuTriggerSF = None
 
     ElElLooseSF = lambda dilep : ElElTriggerSF+ElectronLooseSF(dilep[0])+ElectronLooseSF(dilep[1]) if self.is_MC else None
     MuMuLooseSF = lambda dilep : MuMuTriggerSF+MuonLooseSF(dilep[0])+MuonLooseSF(dilep[1]) if self.is_MC else None
@@ -387,6 +392,12 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yi
                      weight = AppliedSF)
     if plot_yield:
         selObject.makeYield(self.yieldPlots)
+    if self.args.TTBarCR:
+        selObject.selName += "MbbCut150"
+        selObject.yieldTitle += " + $M_{bb}>150$"
+        selObject.refine(cut = [op.invariant_mass(self.ak4BJets[0].p4,self.ak4BJets[1].p4)>150])
+        if plot_yield:
+            selObject.makeYield(self.yieldPlots)
     if copy_sel:
         return selObject
 
