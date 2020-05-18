@@ -11,7 +11,7 @@ ROOT.gStyle.SetOptStat(0)
 
 class DYControlRegion():
     def __init__(self,variable,variable_name,output,plot_data=False,plot_MC=False,exclude_DY=False):
-        self.outname = "DYStudy/"+output
+        self.outname = "DYPlots/"+output
         self.era     = '2016'
         self.variable = variable
         self.variable_name = variable_name

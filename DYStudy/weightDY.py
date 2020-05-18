@@ -22,7 +22,7 @@ class WeightDY:
             dirInfo = self.extractDirInformation(inp['path'],inp['histname'])
             self.histograms[cat] = self.produceDistribution(cat,dirInfo)
 
-        self.weight = self.produceWeights(self.histograms)
+        self.produceShape(self.histograms)
         self.plotWeights()
         self.saveToJson()
 
@@ -103,6 +103,8 @@ class WeightDY:
         plot_dict = info_dict['plot_options']
         samp_dict = info_dict['samples']
 
+        mode = "mc" if category == "ZVeto_2b" else self.mode
+
         dist = None
         # Loop over hist per sample #
         for sample, data_dict in samp_dict.items():
@@ -113,7 +115,7 @@ class WeightDY:
             if dist is None:
                 dist = ROOT.TH1F(category,category,h.GetNbinsX(),h.GetBinLowEdge(1),h.GetBinLowEdge(h.GetNbinsX())+h.GetBinWidth(h.GetNbinsX()))
             # Add histograms depending on type #
-            if self.mode == 'data':
+            if mode == 'data':
                 if data_dict['type'] == 'data':
                     dist.Add(h)
                 if data_dict['type'] == 'mc':
@@ -122,7 +124,7 @@ class WeightDY:
                         if data_dict['group'] == 'ttbar':
                             factor *= 0.7
                         dist.Add(h,-factor)     
-            elif self.mode == 'mc':
+            elif mode == 'mc':
                 if data_dict['type'] == 'mc' and data_dict['group'] == 'DY':
                     factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]    
                     if data_dict['group'] == 'ttbar':
@@ -135,56 +137,74 @@ class WeightDY:
         dist.Sumw2()
         return dist
 
-    def produceWeights(self,hist_dict):
+    def produceShape(self,hist_dict):
         N_0b = hist_dict['ZPeak_0b'].Integral()
         N_2b = hist_dict['ZPeak_2b'].Integral()
-#        N_0b = hist_dict['ZVeto_0b'].Integral()
-#        N_2b = hist_dict['ZVeto_2b'].Integral()
         self.factor = N_2b/N_0b
-        #self.factor = 0.0172
 
         print ("Sum weight ZVeto_0b : ",hist_dict['ZVeto_0b'].Integral())
         print ("Sum weight ZVeto_2b : ",hist_dict['ZVeto_2b'].Integral())
         print ("Sum weight ZPeak_0b : ",hist_dict['ZPeak_0b'].Integral())
         print ("Sum weight ZPeak_2b : ",hist_dict['ZPeak_2b'].Integral())
 
-        #hist_dict['ZVeto_0b'].Scale(1./hist_dict['ZVeto_0b'].Integral())
-        #hist_dict['ZVeto_2b'].Scale(1./hist_dict['ZVeto_2b'].Integral())
-        #hist_dict['ZPeak_2b'].Scale(1./hist_dict['ZPeak_2b'].Integral())
-        #hist_dict['ZPeak_0b'].Scale(1./hist_dict['ZPeak_0b'].Integral())
+        hist_dict['ZPeak_2b'].Scale(1./hist_dict['ZPeak_2b'].Integral())
+        hist_dict['ZPeak_0b'].Scale(1./hist_dict['ZPeak_0b'].Integral())
 
-        self.weights = hist_dict['ZVeto_0b'].Clone("Weights")
-        self.weights.Multiply(hist_dict['ZPeak_2b'])
-        self.weights.Divide(hist_dict['ZPeak_0b'])
+        self.ratio = hist_dict['ZPeak_2b'].Clone("Ratio")
+        self.ratio.Divide(hist_dict['ZPeak_0b'])
+        self.ratio.Scale(self.factor)
+            # self.ratio = ZPeak_2b / ZPeak_0b (normalized histogram ratio) * N_2b/N_0b (stats factor)
 
-        print ("Weights             : ",self.weights.Integral())
+        
+        self.shape = hist_dict['ZVeto_0b'].Clone("Weights")
+        self.shape.Multiply(self.ratio)
+            # self.shape = (ZPeak_2b / ZPeak_0b) * ZVeto_0b (unnormalized histogram) = shape of the data DY in SR
+
+        hist_dict['ZVeto_0b'].Scale(1./hist_dict['ZVeto_0b'].Integral())
+
         print ("Factor              : ",self.factor)
-        self.weights.Scale(self.factor)
-        print ("Weights             : ",self.weights.Integral())
-
+        print ("Weights             : ",self.shape.Integral())
 
     def plotWeights(self):
-        C = ROOT.TCanvas("c1", "c1", 600, 600)
-
+        C = ROOT.TCanvas("c1", "c1", 600, 900)
 
         pad1 = ROOT.TPad("pad1", "pad1", 0., 0.0, 1., 1.0)
+        pad1.SetTopMargin(0.08)
+        pad1.SetBottomMargin(0.61)
         pad1.SetLeftMargin(0.12)
         pad1.SetRightMargin(0.1)
-        pad1.SetBottomMargin(0.46)
         pad1.SetGridx()
         pad1.SetGridy()
+        
+        pad2 = ROOT.TPad("pad2", "pad2", 0, 0.00, 1, 0.6)
+        pad2.SetTopMargin(0.)
+        pad2.SetBottomMargin(0.56)
+        pad2.SetLeftMargin(0.12)
+        pad2.SetRightMargin(0.1)
+        pad2.SetGridx()
+        pad2.SetGridy()
+
+        pad3 = ROOT.TPad("pad3", "pad3", 0, 0.0, 1, 0.33)
+        pad3.SetTopMargin(0.02)
+        pad3.SetBottomMargin(0.18)
+        pad3.SetLeftMargin(0.12)
+        pad3.SetRightMargin(0.1)
+        pad3.SetGridx()
+        pad3.SetGridy()
+
         pad1.Draw()
-        pad1.SetLogy()
+        pad2.Draw()
+        pad3.Draw()
+
+        amax = max([self.histograms[k].GetMaximum() for k in ['ZVeto_0b','ZPeak_0b','ZPeak_2b']])
+
         pad1.cd()
-        #ROOT.gPad.SetLogy()
 
-        amax = max([h.GetMaximum() for h in self.histograms.values()])
-
-        self.histograms['ZVeto_0b'].SetMaximum(amax*1.5)
-        self.histograms['ZVeto_0b'].SetMinimum(1)
-        self.histograms['ZVeto_0b'].GetYaxis().SetTitleSize(16)
-        self.histograms['ZVeto_0b'].GetYaxis().SetTitleFont(43)
-        self.histograms['ZVeto_0b'].GetYaxis().SetTitleOffset(1.8)
+        self.histograms['ZVeto_0b'].SetMaximum(amax*1.1)
+        self.histograms['ZVeto_0b'].SetMinimum(0)
+        self.histograms['ZVeto_0b'].GetYaxis().SetTitle("Normalized events")
+        self.histograms['ZVeto_0b'].GetYaxis().SetTitleSize(0.035)
+        self.histograms['ZVeto_0b'].GetYaxis().SetTitleOffset(1.30)
         self.histograms['ZVeto_0b'].GetYaxis().SetLabelSize(0.02)
         self.histograms['ZVeto_0b'].GetXaxis().SetTitleSize(0.)
         self.histograms['ZVeto_0b'].GetXaxis().SetLabelSize(0.)
@@ -203,48 +223,64 @@ class WeightDY:
         self.histograms['ZPeak_0b'].Draw("same hist")
         self.histograms['ZPeak_2b'].Draw("same hist")
 
-        leg1 = ROOT.TLegend(0.65,0.75,0.89,0.89)
+        leg1 = ROOT.TLegend(0.50,0.80,0.89,0.91)
         leg1.SetHeader("Legend","C")
-        leg1.AddEntry(self.histograms['ZVeto_0b'],"Z Veto 0 btag")
-        leg1.AddEntry(self.histograms['ZPeak_0b'],"Z Peak 0 btag")
-        leg1.AddEntry(self.histograms['ZPeak_2b'],"Z Peak 2 btag")
+        leg1.SetTextSize(0.02)
+        mode = "DY data estimation" if self.mode == "data" else "DY MC"
+        leg1.AddEntry(self.histograms['ZVeto_0b'],"Z Veto 0 btag (%s)"%mode)
+        leg1.AddEntry(self.histograms['ZPeak_0b'],"Z Peak 0 btag (%s)"%mode)
+        leg1.AddEntry(self.histograms['ZPeak_2b'],"Z Peak 2 btag (%s)"%mode)
         leg1.Draw()
 
-        pad2 = ROOT.TPad("pad2", "pad2", 0, 0.0, 1, 0.45)
-        pad2.SetTopMargin(0)
-        pad2.SetBottomMargin(0.12)
-        pad2.SetLeftMargin(0.12)
-        pad1.SetRightMargin(0.1)
-        pad2.SetGridx()
-        pad2.SetGridy()
-        pad2.Draw()
         pad2.cd()
 
-        self.weights.SetLineWidth(2) 
-        self.weights.SetLineColor(1) 
-        self.weights.SetMinimum(self.weights.GetMinimum()*1.1)
-        self.weights.SetMaximum(self.weights.GetMaximum()*1.1)
-        self.weights.SetTitle("")
-        self.weights.GetYaxis().SetTitle("DY shape in SR")
-        self.weights.GetYaxis().SetTitleSize(16)
-        self.weights.GetYaxis().SetTitleFont(43)
-        self.weights.GetYaxis().SetTitleOffset(1.8)
-        self.weights.GetYaxis().SetLabelSize(0.05)
+        #self.ratio.SetMaximum(3.)
+        #self.ratio.SetMinimum(0.)
+        self.ratio.SetLineWidth(2)
+        self.ratio.SetTitle("")
 
-        self.weights.GetXaxis().SetTitleSize(16)
-        self.weights.GetXaxis().SetLabelSize(0.05)
-        self.weights.GetXaxis().SetTitleOffset(1.8)
+        self.ratio.GetYaxis().SetTitle("Weight")
+        self.ratio.GetYaxis().SetTitleSize(0.035)
+        self.ratio.GetYaxis().SetTitleOffset(1.30)
+        self.ratio.GetYaxis().SetLabelSize(0.02)
 
-        #self.histograms['ZVeto_2b'].Scale(self.weights.Integral()/self.histograms['ZVeto_2b'].Integral())
-        #self.weights.SetMaximum(max(self.weights.GetMaximum(),self.histograms['ZVeto_2b'].GetMaximum()))
-        #self.weights.SetMinimum(min(self.weights.GetMinimum(),self.histograms['ZVeto_2b'].GetMinimum()))
-        self.weights.Draw("ep norm")
-        #self.histograms['ZVeto_2b'].Draw("hist same")
+        self.ratio.GetXaxis().SetTitleSize(0.)
+        self.ratio.GetXaxis().SetLabelSize(0.)
 
-        text = ROOT.TPaveText(0.6,0.65,0.85,0.85,"NB NDC")
+        self.ratio.Draw("ep")
+
+
+        pad3.cd()
+
+        self.shape.SetLineWidth(2) 
+        self.shape.SetLineColor(1) 
+        self.shape.SetMinimum(0)
+        self.shape.SetMaximum(max(self.histograms['ZVeto_2b'].GetMaximum(),self.shape.GetMaximum())*1.1)
+        self.shape.SetTitle("")
+        self.shape.GetYaxis().SetTitle("DY shape")
+        self.shape.GetYaxis().SetTitleSize(0.08)
+        self.shape.GetYaxis().SetTitleOffset(0.7)
+        self.shape.GetYaxis().SetLabelSize(0.05)
+
+        self.shape.GetXaxis().SetTitleSize(0.08)
+        self.shape.GetXaxis().SetTitleOffset(1.15)
+        self.shape.GetXaxis().SetLabelSize(0.05)
+
+        self.shape.Draw("ep")
+        self.histograms['ZVeto_2b'].Draw("hist same")
+
+        leg3 = ROOT.TLegend(0.5,0.75,0.89,0.89)
+        leg3.SetHeader("Legend","C")
+        leg3.AddEntry(self.shape,"DY shape from data" if self.mode == 'data' else "DY shape from MC")
+        leg3.AddEntry(self.histograms['ZVeto_2b'],"Z Veto 2 btag (DY MC)")
+        leg3.Draw()
+
+        text = ROOT.TPaveText(0.6,0.65,0.85,0.70,"NB NDC")
         text.SetFillStyle(1001)
         text.AddText("N_{2b}/N_{0b} = %0.5f"%self.factor)
         text.Draw()
+
+
 
         C.Print(self.outputname+'_%s.pdf'%self.era)
 
@@ -253,14 +289,14 @@ class WeightDY:
         # Fill data #
         binning = []
         data = []
-        xAxis = self.weights.GetXaxis()
-        for i in range(1,self.weights.GetNbinsX()+1):
+        xAxis = self.ratio.GetXaxis()
+        for i in range(1,self.ratio.GetNbinsX()+1):
             # Get content #
-            cont = self.weights.GetBinContent(i)
+            cont = self.ratio.GetBinContent(i)
             if cont <= 0:
                 continue
             # Get error #
-            err = self.weights.GetBinError(i)
+            err = self.ratio.GetBinError(i)
 
             # Get binning #
             xLow  = xAxis.GetBinLowEdge(i)
