@@ -307,7 +307,7 @@ class WeightDY:
             binning.append(xHigh)
 
             # Save data #
-            data.append({'bin':[xLow,xHigh],'value':cont,'error_low':err,'error_up':err}) 
+            data.append({'bin':[xLow,xHigh],'value':cont,'error_low':err,'error_high':err}) 
        
         json_dict['binning'] = {'x':[0,2.5],'y':binning}
         json_dict['data'] = [{'bin':[0,2.5],'values':data}]
