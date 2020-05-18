@@ -89,14 +89,14 @@ def plotSlices(hist2D,title):
         # Record mean and std to graph #
         graph_mean.SetPoint(i-1,(up_lim-low_lim/2),hist.GetMean())
         graph_std.SetPoint(i-1,(up_lim-low_lim/2),hist.GetStdDev())
-        graph_res.SetPoint(i-1,(up_lim-low_lim/2),100*hist.GetStdDev()/(up_lim-low_lim/2))
+        graph_res.SetPoint(i-1,(up_lim-low_lim/2),hist.GetStdDev()/(up_lim-low_lim/2))
 
         # Add to list #
         list_hist1D.append(hist)
 
-    graph_mean.SetTitle("Evolution of #DeltaE mean;E_{gen};Mean #DeltaE")
-    graph_std.SetTitle("Evolution of #DeltaE standard deviation;E_{gen};Std dev #DeltaE")
-    graph_res.SetTitle("Evolution of Resolution;E_{gen};Resolution [%]")
+    graph_mean.SetTitle("#DeltaE mean;E_{gen} [GeV]];Mean #DeltaE")
+    graph_std.SetTitle("#DeltaE standard deviation;E_{gen} [GeV]];Std dev #DeltaE")
+    graph_res.SetTitle("Resolution;E_{gen} [GeV]];#frac{#sigma(E)}{E}")
     graph_mean.GetHistogram().GetXaxis().SetRangeUser(0.,(up_lim-low_lim/2))
     graph_mean.GetHistogram().GetYaxis().SetRangeUser(0.,hist.GetMean())
     graph_std.GetHistogram().GetXaxis().SetRangeUser(0.,(up_lim-low_lim/2))

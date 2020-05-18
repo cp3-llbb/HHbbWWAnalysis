@@ -78,36 +78,23 @@ def makeLeptonSelection(self,baseSel,plot_yield=False):
     lambda_inZ          = lambda dilep : op.in_range(80.,op.invariant_mass(dilep[0].p4, dilep[1].p4),100.)
     
 
-    # Loose SF lambdas #
-    MuonLooseSF = lambda mu : [self.muLooseId(mu)]
-    if self.era == "2016" or self.era == "2017": # Electron reco eff depend on Pt for 2016 and 2017
-        ElectronLooseSF = lambda el : [self.elLooseId(el) , self.elLooseEff(el), op.switch(el.pt>20 , self.elLooseRecoPtGt20(el) , self.elLooseRecoPtLt20(el))] 
-    elif self.era == "2018": # Does not depend on pt for 2018
-        ElectronLooseSF = lambda el : [self.elLooseId(el) , self.elLooseEff(el), self.elLooseReco(el)]
-
-    # Trigger SF #
-    if self.is_MC:
-        if self.era == "2016":
-            ElElTriggerSF = [self.ttH_doubleElectron_trigSF]
-            MuMuTriggerSF = [self.ttH_doubleMuon_trigSF]
-            ElMuTriggerSF = [self.ttH_electronMuon_trigSF]
-        elif self.era == "2017":
-            raise NotImplementedError
-        elif self.era == "2018":
-            raise NotImplementedError
-    else:
-        ElElTriggerSF = None
-        MuMuTriggerSF = None
-        ElMuTriggerSF = None
-
-    ElElLooseSF = lambda dilep : ElElTriggerSF+ElectronLooseSF(dilep[0])+ElectronLooseSF(dilep[1]) if self.is_MC else None
-    MuMuLooseSF = lambda dilep : MuMuTriggerSF+MuonLooseSF(dilep[0])+MuonLooseSF(dilep[1]) if self.is_MC else None
-    ElMuLooseSF = lambda dilep : ElMuTriggerSF+ElectronLooseSF(dilep[0])+MuonLooseSF(dilep[1]) if self.is_MC else None
+    ElElLooseSF = lambda dilep : self.lambda_ttH_doubleElectron_trigSF(dilep) + \
+                                 self.lambda_ElectronLooseSF(dilep[0]) + \
+                                 self.lambda_ElectronLooseSF(dilep[1]) \
+                                 if self.is_MC else None
+    MuMuLooseSF = lambda dilep : self.lambda_ttH_doubleMuon_trigSF(dilep) + \
+                                 self.lambda_MuonLooseSF(dilep[0]) + \
+                                 self.lambda_MuonLooseSF(dilep[1]) \
+                                 if self.is_MC else None
+    ElMuLooseSF = lambda dilep : self.lambda_ttH_electronMuon_trigSF(dilep) +\
+                                 self.lambda_ElectronLooseSF(dilep[0]) + \
+                                 self.lambda_MuonLooseSF(dilep[1]) \
+                                 if self.is_MC else None
     
     # Tight SF lambdas #
-    ElElTightSF = lambda dilep : [self.elTightMVA(dilep[0]),self.elTightMVA(dilep[1])] if self.is_MC else None
-    MuMuTightSF = lambda dilep : [self.muTightMVA(dilep[0]),self.muTightMVA(dilep[1])] if self.is_MC else None
-    ElMuTightSF = lambda dilep : [self.elTightMVA(dilep[0]),self.muTightMVA(dilep[1])] if self.is_MC else None
+    ElElTightSF = lambda dilep : self.lambda_ElectronTightSF(dilep[0])+self.lambda_ElectronTightSF(dilep[1]) if self.is_MC else None
+    MuMuTightSF = lambda dilep : self.lambda_MuonTightSF(dilep[0])+self.lambda_MuonTightSF(dilep[1]) if self.is_MC else None
+    ElMuTightSF = lambda dilep : self.lambda_ElectronTightSF(dilep[0])+self.lambda_MuonTightSF(dilep[1]) if self.is_MC else None
 
     #--- Preselection ---#
     selectionDict = {}
@@ -383,8 +370,16 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yi
     Careful : if copy_sel is False, the selObject will be modified
     Selection : no btagged Ak8 jet (aka boosted), two Ak4 btagged jets 
     """
+ #   if self.is_MC:
+ #       if "ElEl" in selObject.selName:
+ #           print ("Applied ElEl DY reweighting")
+ #           AppliedDYReweighting = self.DYReweightingElEl(self.OSElElDileptonTightSel[0][0]) # Only on highest PT electron
+ #       if "MuMu" in selObject.selName:
+ #           print ("Applied MuMu DY reweighting")
+ #           AppliedDYReweighting = self.DYReweightingMuMu(self.OSMuMuDileptonTightSel[0][0]) # Only on highest PT muon
     if copy_sel:
         selObject = copy(selObject)
+    #AppliedSF = [self.DeepJetMediumSF(self.ak4BJets[0]),self.DeepJetMediumSF(self.ak4BJets[1]),AppliedDYReweighting] if self.is_MC else None
     AppliedSF = [self.DeepJetMediumSF(self.ak4BJets[0]),self.DeepJetMediumSF(self.ak4BJets[1])] if self.is_MC else None
     selObject.selName += "ExclusiveResolvedTwoBtags"
     selObject.yieldTitle += " + Exclusive Resolved (2 bjets)"

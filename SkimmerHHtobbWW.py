@@ -135,11 +135,51 @@ class SkimmerNanoHHtobbWW(BaseNanoHHtobbWW,SkimmerModule):
 
             # HME #
 
+            # SF #
+            from operator import mul
+            from functools import reduce
+
+            if era == '2016':
+                varsToKeep["trigger_SF"] = op.multiSwitch((op.rng_len(self.OSElElDileptonTightSel)>=1, self.lambda_ttH_doubleElectron_trigSF(self.OSElElDileptonTightSel)[0].result),
+                                                          (op.rng_len(self.OSMuMuDileptonTightSel)>=1, self.lambda_ttH_doubleMuon_trigSF(self.OSMuMuDileptonTightSel)[0].result),
+                                                          (op.rng_len(self.OSElMuDileptonTightSel)>=1, self.lambda_ttH_electronMuon_trigSF(self.OSElMuDileptonTightSel)[0].result),
+                                                          op.c_float(-9999.))
+            else:
+                raise NotImplementedError
+
+            if era == '2016' or era == '2017':
+                #varsToKeep["lepton_IDSF"] = op.multiSwitch(
+                #    (op.rng_len(self.OSElElDileptonTightSel)>=1, reduce(mul,self.lambda_ElectronLooseSF(self.OSElElDileptonTightSel[0][0])+self.lambda_ElectronTightSF(self.OSElElDileptonTightSel[0][0]))),
+                #    (op.rng_len(self.OSMuMuDileptonTightSel)>=1, reduce(mul,self.lambda_MuonLooseSF(self.OSMuMuDileptonTightSel[0][0])+self.lambda_MuonTightSF(self.OSMuMuDileptonTightSel[0][0]))),
+                #    (op.rng_len(self.OSElMuDileptonTightSel)>=1, reduce(mul,self.lambda_ElectronLooseSF(self.OSElMuDileptonTightSel[0][0])+self.lambda_ElectronTightSF(self.OSElMuDileptonTightSel[0][0]))),
+                #    op.c_float(-9999.))
+                varsToKeep["lepton_IDSF"] = op.rng_product(self.electronsTightSel, lambda el : reduce(mul,self.lambda_ElectronLooseSF(el)+self.lambda_ElectronTightSF(el))) * \
+                                            op.rng_product(self.muonsTightSel, lambda mu : reduce(mul,self.lambda_MuonLooseSF(mu)+self.lambda_MuonTightSF(mu))) 
+            else:
+                raise NotImplementedError
+
+            varsToKeep["btag_SF"] = op.rng_product(self.ak4BJets, lambda jet : self.DeepJetMediumSF(jet))
+
+            # ttbar PT reweighting #
+            varsToKeep["topPt_wgt"] = self.ttbar_weight(self.genTop[0],self.genAntitop[0])
+
             # Event Weight #
             if self.is_MC:
                 varsToKeep["MC_weight"] = t.genWeight
                 puWeightsFile = os.path.join(os.path.dirname(__file__), "data" , "pileup", sampleCfg["pufile"])
                 varsToKeep["PU_weight"] = makePileupWeight(puWeightsFile, t.Pileup_nTrueInt, nameHint=f"puweightFromFile{sample}".replace('-','_'))
+
+
+            # Triggers #
+            varsToKeep['HLT_IsoMu24'] = None
+            varsToKeep['HLT_Ele27_WPTight_Gsf'] = None
+            varsToKeep['HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL'] = None
+            varsToKeep['HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ'] = None
+            varsToKeep['HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ'] = None
+            varsToKeep['HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ'] = None
+            varsToKeep['HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ'] = None
+            varsToKeep['HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL'] = None
+            varsToKeep['HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL'] = None
 
             return noSel, varsToKeep
 
