@@ -67,6 +67,13 @@ class ScaleFactorsbbWW:
                                                 base_str    = "BTagging_{wp}_{flav}_{calib}_subjet_{algo}_2016.json",
                                                 format_dict = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
 
+        #-----  DY weight for 1 and 2 btag -----#
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+                                                entry_key   = 'DY_2016',
+                                                base_key    = '{channel}_{type}_{btag}',
+                                                base_str    = 'weight_{channel}_{type}_weight_{btag}_2016.json',
+                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b']})
+
         #----- 2017 -----#
         # Check links of 2016 #
         # Electrons Loose #
@@ -150,6 +157,7 @@ class ScaleFactorsbbWW:
                                                 base_key    = '{algo}_{wp}',
                                                 base_str    = "BTagging_{wp}_{flav}_{calib}_subjet_{algo}_2018.json",
                                                 format_dict = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
+
 
 
 

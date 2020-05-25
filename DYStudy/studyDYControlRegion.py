@@ -11,7 +11,7 @@ ROOT.gStyle.SetOptStat(0)
 
 class DYControlRegion():
     def __init__(self,variable,variable_name,output,plot_data=False,plot_MC=False,exclude_DY=False):
-        self.outname = "DYStudy/"+output
+        self.outname = "DYPlots/"+output
         self.era     = '2016'
         self.variable = variable
         self.variable_name = variable_name
@@ -162,9 +162,9 @@ class DYControlRegion():
             MC_hist.SetTitle(self.variable_name)
             # Normalize to unity #
             if data_hist.Integral() != 0:
-                data_hist.Scale(1/data_hist.Integral())
+                data_hist.Scale(1/abs(data_hist.Integral()))
             if MC_hist.Integral() != 0:
-                MC_hist.Scale(1/MC_hist.Integral())
+                MC_hist.Scale(1/abs(MC_hist.Integral()))
             # Save #
             self.data_hist_dict[key] = data_hist
             self.MC_hist_dict[key] = MC_hist
@@ -198,12 +198,17 @@ class DYControlRegion():
         # Get Max values #
         max_data = max([h.GetMaximum() for h in self.data_hist_dict.values()])
         max_MC = max([h.GetMaximum() for h in self.MC_hist_dict.values()])
+        min_data = min([0]+[h.GetMinimum() for h in self.data_hist_dict.values()])
+        min_MC = min([0]+[h.GetMinimum() for h in self.MC_hist_dict.values()])
         if self.plot_data and self.plot_MC:
             amax = max(max_data,max_MC)
+            amin = min(min_data,min_MC)
         elif self.plot_data:
             amax = max_data
+            amin = min_data
         elif self.plot_MC:
             amax = max_MC
+            amin = min_MC
 
         # Plot and save #
         opt = "hist"
@@ -211,14 +216,14 @@ class DYControlRegion():
             if self.plot_data:
                 hist_data = self.data_hist_dict[key]
                 hist_data.SetMaximum(amax*1.2)
-                hist_data.SetMinimum(0.)
+                hist_data.SetMinimum(amin*1.1)
                 hist_data.Draw(opt)
                 if opt.find("same") == -1:
                     opt += " same"
             if self.plot_MC:
                 hist_MC = self.MC_hist_dict[key]
                 hist_MC.SetMaximum(amax*1.2)
-                hist_MC.SetMinimum(0.)
+                hist_MC.SetMinimum(amin*1.1)
                 hist_MC.Draw(opt)
                 if opt.find("same") == -1:
                     opt += " same"

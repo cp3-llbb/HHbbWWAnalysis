@@ -9,7 +9,7 @@ import subprocess
 
 class TemplateLatex:
     def __init__(self,dirpath,logplot=False):
-        self.dirpath = dirpath
+        self.dirpath = os.path.abspath(dirpath)
         self.texfile = os.path.join(self.dirpath,"plots.tex")
         self.filesdict = {}
         self.logplot = logplot
@@ -24,10 +24,10 @@ class TemplateLatex:
         self.selections = collections.OrderedDict([
                         ('TwoAk4Jets_' , "At least two Ak4 Jets (before Btagging)"),
                         ('OneAk8Jet_' , "At least one Ak8 Jet (before Btagging)"),
-                        ('ExclusiveResolvedNoBtag_' , "Exclusive Resolved Jets (no Btag)"),
-                        ('ExclusiveResolvedOneBtag_' , "Exclusive Resolved Jets (1 Btag)"),
-                        ('ExclusiveResolvedTwoBtags_' , "Exclusive Resolved Jets (2 Btags)"),
-                        ('InclusiveBoosted_' , "Inclusive Boosted Jets"),
+                        ('TwoAk4JetsExclusiveResolvedNoBtag' , "Exclusive Resolved Jets (no Btag)"),
+                        ('TwoAk4JetsExclusiveResolvedOneBtag' , "Exclusive Resolved Jets (1 Btag)"),
+                        ('TwoAk4JetsExclusiveResolvedTwoBtags' , "Exclusive Resolved Jets (2 Btags)"),
+                        ('OneAk8JetInclusiveBoosted' , "Inclusive Boosted Jets"),
                         ])
         self.variables = collections.OrderedDict([
                         # Triggers #
@@ -81,8 +81,8 @@ class TemplateLatex:
                         ("_boostedjets_N" , "Number of boosted bjets (fatjets)"),
                         # Highlevel variables 
                         ("_highlevelvariable_DilepJetInvariantMass", "Dilepton + Jets invariant mass"),
-                        ("_highlevelvariable_DilepMETdeltaPhi", "Dilepton-MET $\Delta \phi$"),
-                        ("_highlevelvariable_DilepMETdeltapt", "Dilepton-MET $P_T$"),
+                        ("_highlevelvariable_DilepMETpt", "Dilepton-MET $P_T$"),
+                        ("_highlevelvariable_DilepMETdeltaPhi", "Dilepton-MET $|\Delta \phi|$"),
                         ("_highlevelvariable_mTll", "Dilepton-MET tranverse mass"),
                         ("_highlevelvariable_mTlljj", "Dilepton-Dijet-MET tranverse mass"),
                         ("_highlevelvariable_HT2.", "$H_{T2}$ (scalar sum of the magnitudes of the HH decay momentas)"),

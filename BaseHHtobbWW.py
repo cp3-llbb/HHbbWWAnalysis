@@ -23,7 +23,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                  #"normalized": True,
                                  "y-axis": "Events",
                                  "log-y"  : "both",
-                                 "ratio-y-axis-range" : [0.8,1.2],
+                                 "ratio-y-axis-range" : [0.5,1.5],
                                  "ratio-y-axis" : 'Ratio Data/MC',
                                  "sort-by-yields" : False}
 
@@ -53,6 +53,7 @@ Arguments for the HH->bbWW analysis on bamboo framework
         --Resolved1Btag
         --Resolved2Btag
         --Boosted
+        --TTBarCR
 
     * Skimmer arguments *
         --Synchronization
@@ -60,6 +61,10 @@ Arguments for the HH->bbWW analysis on bamboo framework
 
     * Plotter arguments *
         --OnlyYield
+
+    * DY correction *
+        --DYDataEstimation1Btag
+        --DYDataEstimation2Btag
 
     * Technical *
         --backend
@@ -74,7 +79,7 @@ One lepton and and one jet argument must be specified in addition to the require
 ----- Detailed explanation -----
 
                     """
-      #----- Technical arguments -----#
+        #----- Technical arguments -----#
         parser.add_argument("--backend", 
                             type=str, 
                             default="dataframe", 
@@ -104,7 +109,7 @@ One lepton and and one jet argument must be specified in addition to the require
         parser.add_argument("--ZPeak", 
                             action      = "store_true",
                             default     = False,
-                            help        = "Select the Z peak at tight level |M_ll-M_Z|<10 GeV (must be used with --NoZVeto)")
+                            help        = "Select the Z peak at tight level |M_ll-M_Z|<10 GeV (must be used with --NoZVeto, only effective with --Tight)")
 
         #----- Jet selection arguments -----#
         parser.add_argument("--Ak4", 
@@ -131,8 +136,12 @@ One lepton and and one jet argument must be specified in addition to the require
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for the inclusive boosted category")
+        parser.add_argument("--TTBarCR", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Apply cut on Mbb for ttbar CR (only effective with --Resolved2Btag)")
 
-        #----- Skimmer Arguments -----#
+        #----- Skimmer arguments -----#
         parser.add_argument("--Synchronization", 
                             action      = "store_true",
                             default     = False,
@@ -147,6 +156,17 @@ One lepton and and one jet argument must be specified in addition to the require
                             action      = "store_true",
                             default     = False,
                             help        = "Only produce the yield plots")
+
+        #----- DY arguments -----#
+        parser.add_argument("--DYDataEstimation1Btag", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Compute data-driven estimate in the 1 btag region from data (no effect on MC), must be used with --Tight and --Resolved0Btag only")
+        parser.add_argument("--DYDataEstimation2Btag", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Compute data-driven estimate in the 2 btag region from data (no effect on MC), must be used with --Tight and --Resolved0Btag only")
+
 
     def prepareTree(self, tree, sample=None, sampleCfg=None):
         from bamboo.treedecorators import NanoAODDescription, nanoRochesterCalc, nanoJetMETCalc, nanoJetMETCalc_METFixEE2017
@@ -420,21 +440,32 @@ One lepton and and one jet argument must be specified in addition to the require
         ###########################################################################
         #                           TTbar reweighting                             #
         ###########################################################################
-        #if self.is_MC and sample.startswith("TT"):
-        #    # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting#Use_case_3_ttbar_MC_is_used_to_m
-        #    # Get tops #
-        #    genTop_all = op.select(t.GenPart,lambda g : g.pdgId==6)
-        #    genTop = op.select(genTop_all,lambda g : g.statusFlags & ( 0x1 << 13))
-        #    genAntitop_all = op.select(t.GenPart,lambda g : g.pdgId==-6)
-        #    genAntitop = op.select(genAntitop_all,lambda g : g.statusFlags & ( 0x1 << 13))
-        #        # statusFlags==13 : isLastCopy
-        #        # Pdgid == 6 : top
-        #    #hasttbar = noSel.refine("hasttbar",cut=[op.rng_len(genTop)>=1,op.rng_len(genAntitop)>=1])
-        #    # Lambda to compute weight if there is a ttbar #
-        #    ttbar_SF = lambda t : op.exp(0.0615-0.0005*t.pt)
-        #    ttbar_weight = lambda t,tbar : op.sqrt(ttbar_SF(t)*ttbar_SF(tbar))
-        #   # Apply correction to TT #
-        #    noSel = noSel.refine("ttbarWeight",weight=ttbar_weight(genTop[0],genAntitop[0]))
+        if self.is_MC and sample.startswith("TT"):
+            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting#Use_case_3_ttbar_MC_is_used_to_m -> do not use when ttbar is background
+            # Correct : https://indico.cern.ch/event/904971/contributions/3857701/attachments/2036949/3410728/TopPt_20.05.12.pdf
+            #       -> Weight formula : slide 2
+            #       -> top/antitop SF : slide 12 bottom left 
+            # Get tops #
+            self.genTop = op.select(t.GenPart,lambda g : op.AND(g.pdgId==6, g.statusFlags & ( 0x1 << 13)))
+            self.genAntitop = op.select(t.GenPart,lambda g : op.AND(g.pdgId==-6, g.statusFlags & ( 0x1 << 13)))
+                # statusFlags==13 : isLastCopy
+                # Pdgid == 6 : top
+            # Lambda to compute weight if there is a ttbar #
+            self.t_SF = lambda t : op.exp(-2.02274e-01 + 1.09734e-04*t.pt + -1.30088e-07*t.pt**2 + (5.83494e+01/(t.pt+1.96252e+02)))
+            self.ttbar_weight = lambda t,tbar : op.sqrt(self.t_SF(t)*self.t_SF(tbar))
+            # Apply correction to TT #
+            noSel = noSel.refine("ttbarWeight",weight=self.ttbar_weight(self.genTop[0],self.genAntitop[0]))
+
+        #############################################################################
+        #                            Pre-firing rates                               #
+        #############################################################################
+        if era in ["2016","2017"]:
+            L1Prefiring = op.systematic(t.L1PreFiringWeight_Nom,
+                                        name = "L1PreFiring",
+                                        up   = t.L1PreFiringWeight_Up,
+                                        down = t.L1PreFiringWeight_Dn)
+            
+            noSel = noSel.refine("L1PreFiringRate", weight = L1Prefiring)
 
         #############################################################################
         #                             Pile-up                                       #
@@ -449,7 +480,7 @@ One lepton and and one jet argument must be specified in addition to the require
                 raise RuntimeError("Could not find pileup file %s"%puWeightsFile)
             from bamboo.analysisutils import makePileupWeight
             PUWeight = makePileupWeight(puWeightsFile, t.Pileup_nTrueInt, systName="pileup",nameHint=f"puweightFromFile{sample}".replace('-','_'))
-            noSel = noSel.refine("puWeight", weight=PUWeight)
+            noSel = noSel.refine("puWeight", weight = PUWeight)
 
         #############################################################################
         #                                 MET                                       #
@@ -535,7 +566,6 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                                 Muons                                     #
         #############################################################################
-
         # Preselection #
         muonsByPt = op.sort(t.Muon, lambda mu : -self.lambda_conept_muon(mu)) # Ordering done by conept
         self.lambda_muonPreSel = lambda mu : op.AND(
@@ -632,7 +662,8 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                                AK4 Jets                                   #
         #############################################################################
-        self.ak4JetsByPt = op.sort(t.Jet, lambda jet : -jet.p4.Pt())
+        self.ak4JetsByPt = op.sort(t.Jet, lambda jet : -jet.pt)
+        #self.ak4JetsByPt = op.sort(t.Jet, lambda jet : -jet.btagDeepFlavB)
         # Preselection #
         if era == "2016":
             self.lambda_ak4JetsPreSel = lambda j : op.AND(
@@ -672,7 +703,8 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                                AK8 Jets                                   #
         #############################################################################
-        self.ak8JetsByPt = op.sort(t.FatJet, lambda jet : -jet.p4.Pt())
+        self.ak8JetsByPt = op.sort(t.FatJet, lambda jet : -jet.pt)
+        #self.ak8JetsByPt = op.sort(t.FatJet, lambda jet : -jet.btagDeepB)
         # Preselection #
         if era == "2016":
             self.lambda_ak8JetsPreSel = lambda j : op.AND(
@@ -722,27 +754,38 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                             Scalefactors                                  #
         #############################################################################
+        SF = ScaleFactorsbbWW()    
         if self.is_MC:
-            # Initialize scalefactors class #
-            SF = ScaleFactorsbbWW()    
-
             #---- Object SF -----# (Will take as argument the era)
             ####  Muons ####
             self.muLooseId = SF.get_scalefactor("lepton", 'muon_loose_{}'.format(era), combine="weight", systName="mu_loose")
+            self.lambda_MuonLooseSF = lambda mu : [self.muLooseId(mu)]
+                # Need to be defined here to be accessible to Skimmer (check on self.is_MC must be applied there)
             self.muTightMVA = SF.get_scalefactor("lepton", 'muon_tightMVA_{}'.format(era), combine="weight", systName="mu_tightmva")
-   
+            self.lambda_MuonTightSF = lambda mu : [self.muTightMVA(mu)] 
+
             ####  Electrons ####
-            if era == "2016" or era == "2017":
+            if era == "2016" or era == "2017": # Electron reco eff depend on Pt for 2016 and 2017
                 self.elLooseRecoPtLt20 = SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptgt20'), combine="weight", systName="el_looserecoptlt20")
                 self.elLooseRecoPtGt20 = SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptlt20'), combine="weight", systName="el_looserecoptgt20")
                 # /!\ In analysis YAML file 2016 and 2017 for systematics : must use el_looserecoptlt20 and el_looserecoptgt20
-            elif era == "2018":
+
+            elif era == "2018": # Does not depend on pt for 2018
                 self.elLooseReco = SF.get_scalefactor("lepton", 'electron_loosereco_{}'.format(era), combine="weight", systName="el_loosereco")
                 # /!\ In analysis YAML file 2018 for systematics : must use el_loosereco
 
             self.elLooseId = SF.get_scalefactor("lepton", 'electron_looseid_{}'.format(era) , combine="weight", systName="el_looseid")
             self.elLooseEff = SF.get_scalefactor("lepton", 'electron_looseeff_{}'.format(era) , combine="weight", systName="el_looseeff")
+
+            if era == "2016" or era == "2017":
+                # Need to be defined here to be accessible to Skimmer (check on self.is_MC must be applied there)
+                self.lambda_ElectronLooseSF = lambda el : [self.elLooseId(el) , self.elLooseEff(el), op.switch(el.pt>20 , self.elLooseRecoPtGt20(el) , self.elLooseRecoPtLt20(el))]
+            elif era == "2018": 
+                # Need to be defined here to be accessible to Skimmer (check on self.is_MC must be applied there)
+                self.lambda_ElectronLooseSF = lambda el : [self.elLooseId(el) , self.elLooseEff(el), self.elLooseReco(el)] 
+
             self.elTightMVA = SF.get_scalefactor("lepton", 'electron_tightMVA_{}'.format(era) , combine="weight", systName="el_tightmva")
+            self.lambda_ElectronTightSF = lambda el : [self.elTightMVA(el)] 
  
             #### Ak4 Btagging ####
             DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
@@ -754,17 +797,69 @@ One lepton and and one jet argument must be specified in addition to the require
 
             #----- Triggers -----# (Need to split according to era) 
                 # https://gitlab.cern.ch/ttH_leptons/doc/-/blob/master/Legacy/data_to_mc_corrections.md#trigger-efficiency-scale-factors
+                # New ref (more up to date) : https://cernbox.cern.ch/index.php/s/lW2BiTli5tJR0MN
+                # -> Based on conept, use lambda 
             if era == "2016":
-                self.ttH_doubleElectron_trigSF = op.systematic(op.c_float(1.020), name="ttH_doubleElectron_trigSF", up=op.c_float(1.040), down=op.c_float(1.000))
-                self.ttH_doubleMuon_trigSF = op.systematic(op.c_float(1.010), name="ttH_doubleMuon_trigSF", up=op.c_float(1.020), down=op.c_float(1.000))
-                self.ttH_electronMuon_trigSF = op.systematic(op.c_float(1.020), name="ttH_electronMuon_trigSF", up=op.c_float(1.030), down=op.c_float(1.010))
+                # Lambdas return list to be easily concatenated with other SF in lists as well (the weight argument of op.refine requires a list)
+                #self.lambda_ttH_doubleElectron_trigSF = lambda dilep : [op.systematic(op.c_float(1.020), name="ttH_doubleElectron_trigSF", up=op.c_float(1.040), down=op.c_float(1.000))]
+                #self.lambda_ttH_doubleMuon_trigSF = lambda dilep : [op.systematic(op.c_float(1.010), name="ttH_doubleMuon_trigSF", up=op.c_float(1.020), down=op.c_float(1.000))]
+                #self.lambda_ttH_electronMuon_trigSF = lambda dilep : [op.systematic(op.c_float(1.020), name="ttH_electronMuon_trigSF", up=op.c_float(1.030), down=op.c_float(1.010))]
+                # Double Electron #
+
+                self.lambda_ttH_doubleElectron_trigSF = lambda dilep : op.multiSwitch(
+                    (self.lambda_conept_electron(dilep[1])<25 , op.systematic(op.c_float(0.98), name="ttH_doubleElectron_trigSF", up=op.c_float(0.98*1.02), down=op.c_float(0.98*0.98))), 
+                    op.systematic(op.c_float(1.), name="ttH_doubleElectron_trigSF", up=op.c_float(1.02), down=op.c_float(0.98)))
+                # Double Muon #
+                self.lambda_ttH_doubleMuon_trigSF = lambda dilep : op.systematic(op.c_float(0.99), name="ttH_doubleMuon_trigSF", up=op.c_float(0.99*1.01), down=op.c_float(0.99*0.99))
+                # Electron Muon #
+                self.lambda_ttH_electronMuon_trigSF = lambda dilep : op.systematic(op.c_float(1.00), name="ttH_electronMuon_trigSF", up=op.c_float(1.01), down=op.c_float(0.99))
             elif era == "2017":
-                raise NotImplementedError # Check doc (link above)
+                # Double Electron #
+                self.lambda_ttH_doubleElectron_trigSF = lambda dilep : op.multiSwitch(
+                    (self.lambda_conept_electron(dilep[1])<40 , op.systematic(op.c_float(0.98), name="ttH_doubleElectron_trigSF", up=op.c_float(0.98*1.01), down=op.c_float(0.98*0.99))), 
+                    op.systematic(op.c_float(1.), name="ttH_doubleElectron_trigSF", up=op.c_float(1.01), down=op.c_float(0.99)))
+                # Double Muon #
+                self.lambda_ttH_doubleMuon_trigSF = lambda dilep : op.multiSwitch(
+                    (self.lambda_conept_muon(dilep[1])<40 , op.systematic(op.c_float(0.97), name="ttH_doubleMuon_trigSF", up=op.c_float(0.97*1.02), down=op.c_float(0.97*0.98))),
+                    (self.lambda_conept_muon(dilep[1])<55 , op.systematic(op.c_float(0.995), name="ttH_doubleMuon_trigSF", up=op.c_float(0.995*1.02), down=op.c_float(0.995*0.98))),
+                    (self.lambda_conept_muon(dilep[1])<70 , op.systematic(op.c_float(0.96), name="ttH_doubleMuon_trigSF", up=op.c_float(0.96*1.02), down=op.c_float(0.96*0.98))),
+                    op.systematic(op.c_float(0.94), name="ttH_doubleMuon_trigSF", up=op.c_float(0.94*1.02), down=op.c_float(0.94*0.98)))
+                # Electron Muon #
+                self.lambda_ttH_electronMuon_trigSF = lambda dilep : op.multiSwitch(
+                    (op.min(self.lambda_conept_electron(dilep[0]),self.lambda_conept_muon(dilep[1]))<40, op.systematic(op.c_float(0.98), name="ttH_electronMuon_trigSF", up=op.c_float(0.98*1.01), down=op.c_float(0.98*0.99))),
+                    op.systematic(op.c_float(0.99), name="ttH_electronMuon_trigSF", up=op.c_float(0.99*1.01), down=op.c_float(0.99*0.99)))
             elif era == "2018":
-                raise NotImplementedError # Missing in doc 
-            
-
-
+                # Double Electron #
+                self.lambda_ttH_doubleElectron_trigSF = lambda dilep : op.multiSwitch(
+                    (self.lambda_conept_electron(dilep[1])<25 , op.systematic(op.c_float(0.98), name="ttH_doubleElectron_trigSF", up=op.c_float(0.98*1.01), down=op.c_float(0.98*0.99))), 
+                    op.systematic(op.c_float(1.), name="ttH_doubleElectron_trigSF", up=op.c_float(1.01), down=op.c_float(0.99)))
+                # Double Muon #
+                self.lambda_ttH_doubleMuon_trigSF = lambda dilep : op.multiSwitch(
+                    (self.lambda_conept_muon(dilep[0])<40 , op.systematic(op.c_float(1.01), name="ttH_doubleMuon_trigSF", up=op.c_float(1.01*1.01), down=op.c_float(1.01*0.99))),
+                    (self.lambda_conept_muon(dilep[0])<70 , op.systematic(op.c_float(0.995), name="ttH_doubleMuon_trigSF", up=op.c_float(0.995*1.01), down=op.c_float(0.995*0.99))),
+                    op.systematic(op.c_float(0.98), name="ttH_doubleMuon_trigSF", up=op.c_float(0.98*1.01), down=op.c_float(0.98*0.99)))
+                # Electron Muon #
+                self.lambda_ttH_electronMuon_trigSF = lambda dilep : op.multiSwitch(
+                    (op.min(self.lambda_conept_electron(dilep[0]),self.lambda_conept_muon(dilep[1]))<25, op.systematic(op.c_float(0.98), name="ttH_electronMuon_trigSF", up=op.c_float(0.98*1.01), down=op.c_float(0.98*0.99))),
+                    op.systematic(op.c_float(1.00), name="ttH_electronMuon_trigSF", up=op.c_float(1.01), down=op.c_float(0.99)))
+        else: # reweighting the data for data-driven estimation
+            #----- DY reweighting -----#
+            if era == "2016":
+                if self.args.DYDataEstimation1Btag:
+                    self.DYReweightingElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_1b'), combine="weight", systName="dy_reweighting_elel")
+                    self.DYReweightingMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_1b'), combine="weight", systName="dy_reweighting_mumu")
+                elif self.args.DYDataEstimation2Btag:
+                    self.DYReweightingElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_2b'), combine="weight", systName="dy_reweighting_elel")
+                    self.DYReweightingMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_2b'), combine="weight", systName="dy_reweighting_mumu")
+                else:
+                    self.DYReweightingElEl = None
+                    self.DYReweightingMuMu = None
+            elif era == "2017":
+                self.DYReweightingElEl = None
+                self.DYReweightingMuMu = None
+            elif era == "2018":
+                self.DYReweightingElEl = None
+                self.DYReweightingMuMu = None
 
         # Return #
         return noSel

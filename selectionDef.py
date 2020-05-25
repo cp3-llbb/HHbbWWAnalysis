@@ -77,32 +77,23 @@ def makeLeptonSelection(self,baseSel,plot_yield=False):
         # If any dilepton preselected within Z peak, returns False
     lambda_inZ          = lambda dilep : op.in_range(80.,op.invariant_mass(dilep[0].p4, dilep[1].p4),100.)
     
-
-    # Loose SF lambdas #
-    MuonLooseSF = lambda mu : [self.muLooseId(mu)]
-    if self.era == "2016" or self.era == "2017": # Electron reco eff depend on Pt for 2016 and 2017
-        ElectronLooseSF = lambda el : [self.elLooseId(el) , self.elLooseEff(el), op.switch(el.pt>20 , self.elLooseRecoPtGt20(el) , self.elLooseRecoPtLt20(el))] 
-    elif self.era == "2018": # Does not depend on pt for 2018
-        ElectronLooseSF = lambda el : [self.elLooseId(el) , self.elLooseEff(el), self.elLooseReco(el)]
-
-    # Trigger SF #
-    if self.era == "2016":
-        ElElTriggerSF = [self.ttH_doubleElectron_trigSF]
-        MuMuTriggerSF = [self.ttH_doubleMuon_trigSF]
-        ElMuTriggerSF = [self.ttH_electronMuon_trigSF]
-    elif self.era == "2017":
-        raise NotImplementedError
-    elif self.era == "2018":
-        raise NotImplementedError
-
-    ElElLooseSF = lambda dilep : ElElTriggerSF+ElectronLooseSF(dilep[0])+ElectronLooseSF(dilep[1]) if self.is_MC else None
-    MuMuLooseSF = lambda dilep : MuMuTriggerSF+MuonLooseSF(dilep[0])+MuonLooseSF(dilep[1]) if self.is_MC else None
-    ElMuLooseSF = lambda dilep : ElMuTriggerSF+ElectronLooseSF(dilep[0])+MuonLooseSF(dilep[1]) if self.is_MC else None
+    ElElLooseSF = lambda dilep : [self.lambda_ttH_doubleElectron_trigSF(dilep)] + \
+                                 self.lambda_ElectronLooseSF(dilep[0]) + \
+                                 self.lambda_ElectronLooseSF(dilep[1]) \
+                                 if self.is_MC else None
+    MuMuLooseSF = lambda dilep : [self.lambda_ttH_doubleMuon_trigSF(dilep)] + \
+                                 self.lambda_MuonLooseSF(dilep[0]) + \
+                                 self.lambda_MuonLooseSF(dilep[1]) \
+                                 if self.is_MC else None
+    ElMuLooseSF = lambda dilep : [self.lambda_ttH_electronMuon_trigSF(dilep)] +\
+                                 self.lambda_ElectronLooseSF(dilep[0]) + \
+                                 self.lambda_MuonLooseSF(dilep[1]) \
+                                 if self.is_MC else None
     
     # Tight SF lambdas #
-    ElElTightSF = lambda dilep : [self.elTightMVA(dilep[0]),self.elTightMVA(dilep[1])] if self.is_MC else None
-    MuMuTightSF = lambda dilep : [self.muTightMVA(dilep[0]),self.muTightMVA(dilep[1])] if self.is_MC else None
-    ElMuTightSF = lambda dilep : [self.elTightMVA(dilep[0]),self.muTightMVA(dilep[1])] if self.is_MC else None
+    ElElTightSF = lambda dilep : self.lambda_ElectronTightSF(dilep[0])+self.lambda_ElectronTightSF(dilep[1]) if self.is_MC else None
+    MuMuTightSF = lambda dilep : self.lambda_MuonTightSF(dilep[0])+self.lambda_MuonTightSF(dilep[1]) if self.is_MC else None
+    ElMuTightSF = lambda dilep : self.lambda_ElectronTightSF(dilep[0])+self.lambda_MuonTightSF(dilep[1]) if self.is_MC else None
 
     #--- Preselection ---#
     selectionDict = {}
@@ -338,11 +329,29 @@ def makeExclusiveResolvedNoBtagSelection(self,selObject,copy_sel=False,plot_yiel
     Careful : if copy_sel is False, the selObject will be modified
     Selection : no btagged Ak8 jet (aka boosted), all Ak4 jets are non btagged
     """
+    AppliedSF = None
+    #----- DY estimation from data -----#
+    if self.args.DYDataEstimation1Btag or self.args.DYDataEstimation2Btag:
+        if self.is_MC:
+            print ("Warning : the DY reweighting is not applied on MC, will ignore that step")
+        else:
+            if "ElEl" in selObject.selName:
+                if self.DYReweightingElEl is None:
+                    raise RuntimeError('DY reweighting for ElEl is not initialized')
+                AppliedDYReweighting = self.DYReweightingElEl(self.OSElElDileptonTightSel[0][0]) # Only on highest PT electron
+            elif "MuMu" in selObject.selName:
+                if self.DYReweightingMuMu is None:
+                    raise RuntimeError('DY reweighting for MuMu is not initialized')
+                AppliedDYReweighting = self.DYReweightingMuMu(self.OSMuMuDileptonTightSel[0][0]) # Only on highest PT muon
+            else: # No DY reweighting in ElMu (marginal contribution)
+                AppliedDYReweighting = None
+            AppliedSF = [AppliedDYReweighting] if AppliedDYReweighting is not None else None
+                # weight = None works, but not weight = [None]
     if copy_sel:
         selObject = copy(selObject)
     selObject.selName += "ExclusiveResolvedNoBtag"
     selObject.yieldTitle += " + Exclusive Resolved (0 bjet)"
-    selObject.refine(cut=[op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0])
+    selObject.refine(cut=[op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],weight=AppliedSF)
     if plot_yield:
         selObject.makeYield(self.yieldPlots)
     if copy_sel:
@@ -378,15 +387,22 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yi
     Careful : if copy_sel is False, the selObject will be modified
     Selection : no btagged Ak8 jet (aka boosted), two Ak4 btagged jets 
     """
+    AppliedSF = [self.DeepJetMediumSF(self.ak4BJets[0]),self.DeepJetMediumSF(self.ak4BJets[1])] if self.is_MC else None
+    #AppliedSF = None # TODO : remove
     if copy_sel:
         selObject = copy(selObject)
-    AppliedSF = [self.DeepJetMediumSF(self.ak4BJets[0]),self.DeepJetMediumSF(self.ak4BJets[1])] if self.is_MC else None
     selObject.selName += "ExclusiveResolvedTwoBtags"
     selObject.yieldTitle += " + Exclusive Resolved (2 bjets)"
     selObject.refine(cut    = [op.rng_len(self.ak4BJets)==2,op.rng_len(self.ak8BJets)==0],
                      weight = AppliedSF)
     if plot_yield:
         selObject.makeYield(self.yieldPlots)
+    if self.args.TTBarCR:
+        selObject.selName += "MbbCut150"
+        selObject.yieldTitle += " + $M_{bb}>150$"
+        selObject.refine(cut = [op.invariant_mass(self.ak4BJets[0].p4,self.ak4BJets[1].p4)>150])
+        if plot_yield:
+            selObject.makeYield(self.yieldPlots)
     if copy_sel:
         return selObject
 
