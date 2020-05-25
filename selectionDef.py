@@ -77,16 +77,15 @@ def makeLeptonSelection(self,baseSel,plot_yield=False):
         # If any dilepton preselected within Z peak, returns False
     lambda_inZ          = lambda dilep : op.in_range(80.,op.invariant_mass(dilep[0].p4, dilep[1].p4),100.)
     
-
-    ElElLooseSF = lambda dilep : self.lambda_ttH_doubleElectron_trigSF(dilep) + \
+    ElElLooseSF = lambda dilep : [self.lambda_ttH_doubleElectron_trigSF(dilep)] + \
                                  self.lambda_ElectronLooseSF(dilep[0]) + \
                                  self.lambda_ElectronLooseSF(dilep[1]) \
                                  if self.is_MC else None
-    MuMuLooseSF = lambda dilep : self.lambda_ttH_doubleMuon_trigSF(dilep) + \
+    MuMuLooseSF = lambda dilep : [self.lambda_ttH_doubleMuon_trigSF(dilep)] + \
                                  self.lambda_MuonLooseSF(dilep[0]) + \
                                  self.lambda_MuonLooseSF(dilep[1]) \
                                  if self.is_MC else None
-    ElMuLooseSF = lambda dilep : self.lambda_ttH_electronMuon_trigSF(dilep) +\
+    ElMuLooseSF = lambda dilep : [self.lambda_ttH_electronMuon_trigSF(dilep)] +\
                                  self.lambda_ElectronLooseSF(dilep[0]) + \
                                  self.lambda_MuonLooseSF(dilep[1]) \
                                  if self.is_MC else None
@@ -330,11 +329,29 @@ def makeExclusiveResolvedNoBtagSelection(self,selObject,copy_sel=False,plot_yiel
     Careful : if copy_sel is False, the selObject will be modified
     Selection : no btagged Ak8 jet (aka boosted), all Ak4 jets are non btagged
     """
+    AppliedSF = None
+    #----- DY estimation from data -----#
+    if self.args.DYDataEstimation1Btag or self.args.DYDataEstimation2Btag:
+        if self.is_MC:
+            print ("Warning : the DY reweighting is not applied on MC, will ignore that step")
+        else:
+            if "ElEl" in selObject.selName:
+                if self.DYReweightingElEl is None:
+                    raise RuntimeError('DY reweighting for ElEl is not initialized')
+                AppliedDYReweighting = self.DYReweightingElEl(self.OSElElDileptonTightSel[0][0]) # Only on highest PT electron
+            elif "MuMu" in selObject.selName:
+                if self.DYReweightingMuMu is None:
+                    raise RuntimeError('DY reweighting for MuMu is not initialized')
+                AppliedDYReweighting = self.DYReweightingMuMu(self.OSMuMuDileptonTightSel[0][0]) # Only on highest PT muon
+            else: # No DY reweighting in ElMu (marginal contribution)
+                AppliedDYReweighting = None
+            AppliedSF = [AppliedDYReweighting] if AppliedDYReweighting is not None else None
+                # weight = None works, but not weight = [None]
     if copy_sel:
         selObject = copy(selObject)
     selObject.selName += "ExclusiveResolvedNoBtag"
     selObject.yieldTitle += " + Exclusive Resolved (0 bjet)"
-    selObject.refine(cut=[op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0])
+    selObject.refine(cut=[op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],weight=AppliedSF)
     if plot_yield:
         selObject.makeYield(self.yieldPlots)
     if copy_sel:
@@ -370,17 +387,10 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yi
     Careful : if copy_sel is False, the selObject will be modified
     Selection : no btagged Ak8 jet (aka boosted), two Ak4 btagged jets 
     """
- #   if self.is_MC:
- #       if "ElEl" in selObject.selName:
- #           print ("Applied ElEl DY reweighting")
- #           AppliedDYReweighting = self.DYReweightingElEl(self.OSElElDileptonTightSel[0][0]) # Only on highest PT electron
- #       if "MuMu" in selObject.selName:
- #           print ("Applied MuMu DY reweighting")
- #           AppliedDYReweighting = self.DYReweightingMuMu(self.OSMuMuDileptonTightSel[0][0]) # Only on highest PT muon
+    AppliedSF = [self.DeepJetMediumSF(self.ak4BJets[0]),self.DeepJetMediumSF(self.ak4BJets[1])] if self.is_MC else None
+    #AppliedSF = None # TODO : remove
     if copy_sel:
         selObject = copy(selObject)
-    #AppliedSF = [self.DeepJetMediumSF(self.ak4BJets[0]),self.DeepJetMediumSF(self.ak4BJets[1]),AppliedDYReweighting] if self.is_MC else None
-    AppliedSF = [self.DeepJetMediumSF(self.ak4BJets[0]),self.DeepJetMediumSF(self.ak4BJets[1])] if self.is_MC else None
     selObject.selName += "ExclusiveResolvedTwoBtags"
     selObject.yieldTitle += " + Exclusive Resolved (2 bjets)"
     selObject.refine(cut    = [op.rng_len(self.ak4BJets)==2,op.rng_len(self.ak8BJets)==0],
