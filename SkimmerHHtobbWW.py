@@ -140,25 +140,28 @@ class SkimmerNanoHHtobbWW(BaseNanoHHtobbWW,SkimmerModule):
             from functools import reduce
 
             if era == '2016':
-                varsToKeep["trigger_SF"] = op.multiSwitch((op.rng_len(self.OSElElDileptonTightSel)>=1, self.lambda_ttH_doubleElectron_trigSF(self.OSElElDileptonTightSel)[0].result),
-                                                          (op.rng_len(self.OSMuMuDileptonTightSel)>=1, self.lambda_ttH_doubleMuon_trigSF(self.OSMuMuDileptonTightSel)[0].result),
-                                                          (op.rng_len(self.OSElMuDileptonTightSel)>=1, self.lambda_ttH_electronMuon_trigSF(self.OSElMuDileptonTightSel)[0].result),
-                                                          op.c_float(-9999.))
+                varsToKeep["trigger_SF"] = op.multiSwitch((op.rng_len(self.OSElElDileptonTightSel)>=1, self.lambda_ttH_doubleElectron_trigSF(self.OSElElDileptonTightSel[0])),
+                                                          (op.rng_len(self.OSMuMuDileptonTightSel)>=1, self.lambda_ttH_doubleMuon_trigSF(self.OSMuMuDileptonTightSel[0])),
+                                                          (op.rng_len(self.OSElMuDileptonTightSel)>=1, self.lambda_ttH_electronMuon_trigSF(self.OSElMuDileptonTightSel[0])),
+                                                          op.c_float(1.))
             else:
                 raise NotImplementedError
 
             if era == '2016' or era == '2017':
-                #varsToKeep["lepton_IDSF"] = op.multiSwitch(
-                #    (op.rng_len(self.OSElElDileptonTightSel)>=1, reduce(mul,self.lambda_ElectronLooseSF(self.OSElElDileptonTightSel[0][0])+self.lambda_ElectronTightSF(self.OSElElDileptonTightSel[0][0]))),
-                #    (op.rng_len(self.OSMuMuDileptonTightSel)>=1, reduce(mul,self.lambda_MuonLooseSF(self.OSMuMuDileptonTightSel[0][0])+self.lambda_MuonTightSF(self.OSMuMuDileptonTightSel[0][0]))),
-                #    (op.rng_len(self.OSElMuDileptonTightSel)>=1, reduce(mul,self.lambda_ElectronLooseSF(self.OSElMuDileptonTightSel[0][0])+self.lambda_ElectronTightSF(self.OSElMuDileptonTightSel[0][0]))),
-                #    op.c_float(-9999.))
                 varsToKeep["lepton_IDSF"] = op.rng_product(self.electronsTightSel, lambda el : reduce(mul,self.lambda_ElectronLooseSF(el)+self.lambda_ElectronTightSF(el))) * \
                                             op.rng_product(self.muonsTightSel, lambda mu : reduce(mul,self.lambda_MuonLooseSF(mu)+self.lambda_MuonTightSF(mu))) 
             else:
                 raise NotImplementedError
 
             varsToKeep["btag_SF"] = op.rng_product(self.ak4BJets, lambda jet : self.DeepJetMediumSF(jet))
+
+            # Check : TODO #
+            varsToKeep["ak4BJet1_pt"] = op.switch(op.rng_len(self.ak4BJets) >= 1, self.ak4BJets[0].pt, op.c_float(-9999.,"float"))
+            varsToKeep["ak4BJet2_pt"] = op.switch(op.rng_len(self.ak4BJets) >= 2, self.ak4BJets[1].pt, op.c_float(-9999.,"float"))
+            varsToKeep["ak4BJet1_btag"] = op.switch(op.rng_len(self.ak4BJets) >= 1, self.ak4BJets[0].btagDeepFlavB, op.c_float(-9999.,"float"))
+            varsToKeep["ak4BJet2_btag"] = op.switch(op.rng_len(self.ak4BJets) >= 2, self.ak4BJets[1].btagDeepFlavB, op.c_float(-9999.,"float"))
+            varsToKeep["ak4BJet1_btagSF"] = op.switch(op.rng_len(self.ak4BJets) >= 1, self.DeepJetMediumSF(self.ak4BJets[0]), op.c_float(-9999.,"float"))
+            varsToKeep["ak4BJet2_btagSF"] = op.switch(op.rng_len(self.ak4BJets) >= 2, self.DeepJetMediumSF(self.ak4BJets[1]), op.c_float(-9999.,"float"))
 
             # ttbar PT reweighting #
             varsToKeep["topPt_wgt"] = self.ttbar_weight(self.genTop[0],self.genAntitop[0])
