@@ -179,7 +179,7 @@ class MakeScaleFactorsDict():
                     else:
                         aList.append(self._makeFullSFPath(base_str.format(**dv),path_key))
                         
-                aDict[base_key.format(**dk)] = tuple(aList)
+                aDict[base_key.format(**dk)] = tuple(aList) if len(aList)>1 else aList[0]
         elif len(format_dict.keys()) == 1: # Simple scalefactor
             aDict = {}
             key = list(format_dict.keys())[0] # Can be str or tuple
