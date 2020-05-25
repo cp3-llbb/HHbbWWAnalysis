@@ -35,15 +35,22 @@ if args.up is not None:
     baseCommand += r" --up "+args.up
 if args.down is not None:
     baseCommand += r" --down "+args.down
-baseCommand += r" $(dasgoclient -query 'file dataset=%s' | sed 's=^\(.*\)$=/storage/data/cms\1=g')"
+dasCommand = r" $(dasgoclient -query 'file dataset=%s' | sed 's=^\(.*\)$=/storage/data/cms\1=g')"
 
 for sample, dico in data['samples'].items():
+    command  = baseCommand%(sample,args.era)
     if 'group' in dico: # Signal samples do not have group
         if dico['group'] == "data":
             continue
-    daspath = dico['db'].replace('das:','')
+    if 'db' in dico: # Need to do a DAS query to get files path
+        daspath = dico['db'].replace('das:','')
+        command += dasCommand%(daspath)
+    elif 'files' in dico:
+        command += ' '+' '.join(dico['files'])
+    else:
+        raise RuntimeError("Could not find any files on which to compute PU weights for sample %s"%sample)
     try:
-        os.system(baseCommand%(sample,args.era,daspath))
+        os.system(command)
     except Exception as err:
         traceback.print_tb(err.__traceback__)
 

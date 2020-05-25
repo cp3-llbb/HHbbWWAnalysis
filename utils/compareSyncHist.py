@@ -106,12 +106,15 @@ def compareSyncHist(dict_files):
         rootfile.Close()
 
 
-compareSyncHist({'Louvain group':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/Synchronization/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root',
-             #'Tallinn group v5':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v5.root',
-             #'Tallinn group v7':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v7.root',
-             #'Tallinn group v8':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v8.root',
-             'Tallinn group v9':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v9.root',
-             #'UCLA group':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/myNanoProdMc2016_NANO_Friend_20191003_v4.root',
+compareSyncHist({
+            #'Louvain group (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/Synchronization/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root',
+            #'Tallinn group v5 (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v5.root',
+            #'Tallinn group v7 (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v7.root',
+            #'Tallinn group v8 (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v8.root',
+            #'Tallinn group v9 (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v9.root',
+            #'UCLA group (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/myNanoProdMc2016_NANO_Friend_20191003_v4.root',
+            'Louvain group (TT sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/Synchronization/results/TTTo2L2Nu.root',
+            'Tallinn group (TT sample)':'/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_ttbar_Tallinn_2016_v1.root',
             })
 
 
