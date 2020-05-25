@@ -27,7 +27,7 @@ class TemplateLatex:
                         ('TwoAk4JetsExclusiveResolvedNoBtag' , "Exclusive Resolved Jets (no Btag)"),
                         ('TwoAk4JetsExclusiveResolvedOneBtag' , "Exclusive Resolved Jets (1 Btag)"),
                         ('TwoAk4JetsExclusiveResolvedTwoBtags' , "Exclusive Resolved Jets (2 Btags)"),
-                        ('OneAk8Jet_InclusiveBoosted' , "Inclusive Boosted Jets"),
+                        ('OneAk8JetInclusiveBoosted' , "Inclusive Boosted Jets"),
                         ])
         self.variables = collections.OrderedDict([
                         # Triggers #

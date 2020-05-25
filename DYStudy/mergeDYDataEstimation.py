@@ -9,11 +9,14 @@ import ROOT
 import time
 
 class Merge:
-    def __init__(self,path_base,path_estimation,era,force=False):
-        self.path_base  = path_base#os.path.abspath(path_base)
-        self.path_estimation = path_estimation# os.path.abspath(path_estimation)
-        self.era = era
-        self.force = force
+    def __init__(self,path_base,path_estimation,btag,era,force=False):
+        self.path_base          = path_base
+        self.path_estimation    = path_estimation
+        self.btag               = btag 
+        self.era                = era
+        self.force              = force
+
+        assert self.btag == "1b" or self.btag == "2b"
 
         self.copyBase()
         self.renameHist()
@@ -23,7 +26,7 @@ class Merge:
     def copyBase(self):
         if self.path_base.endswith('/'):
             self.path_base = self.path_base[:-1]
-        self.path_copy = self.path_base + '_withDYEstimation'
+        self.path_copy = self.path_base + '_DataDY' + self.btag 
         self.sample_dataDY = []
         self.sample_MCDY = []
 
@@ -51,18 +54,6 @@ class Merge:
             list_files = glob.glob(os.path.join(self.path_estimation,'results','*root'))
             subprocess.call("hadd -f "+os.path.join(self.path_copy,'results','DataDY.root')+' '+' '.join([l for l in list_files if '__' not in l]),shell=True)
             self.sample_dataDY.append('DataDY.root')
-            #print ("hadd -f {} {}".format(os.path.join(self.path_copy,'results','DataDY.root'),os.path.join(self.path_estimation,'results','*root')))
-                        #subprocess.call(cmd,shell=True)
-            #for f in glob.glob(os.path.join(self.path_estimation,'results','*root')): 
-            #    if '__' in os.path.basename(f):
-            #        continue # Skeleton
-            #    try:
-            #        shutil.copyfile(f,os.path.join(self.path_copy,'results','DataDY_'+os.path.basename(f)))
-            #        self.sample_dataDY.append('DataDY_'+os.path.basename(f))
-            #    except IOError:
-            #        print ("\t[WARNING] Could not copy file %s to directory %s"%(f,os.path.join(self.path_copy,'results','DataDY_'+os.path.basename(f))))
-            #    print ('\t%s -> %s'%(f,os.path.join(self.path_copy,'results','DataDY_'+os.path.basename(f))))
-
             # Copy other useful stuff #
             try:
                 shutil.copyfile(os.path.join(self.path_base,'plots.yml'),os.path.join(self.path_copy,'plots.yml'))
@@ -130,16 +121,28 @@ class Merge:
         for sample in self.sample_dataDY:
             path = os.path.join(self.path_copy,'results',sample)
             for hname in hist_name:
-                if 'ResolvedNoBtag' in hname:
-                    cmd = 'rootmv {0}:{1} {0}:{2}'.format(path,hname,hname.replace('ResolvedNoBtag','ResolvedTwoBtags')) 
-                    subprocess.call(cmd,shell=True)
-                    print ("Renamed {} -> {}".format(hname,hname.replace('ResolvedNoBtag','ResolvedTwoBtags')))
-                    hname = hname.replace('ResolvedNoBtag','ResolvedTwoBtags')
-                if 'leadjet' in hname:
-                    cmd = 'rootmv {0}:{1} {0}:{2}'.format(path,hname,hname.replace('leadjet','leadbjet')) 
-                    subprocess.call(cmd,shell=True)
-                    print ("Renamed {} -> {}".format(hname,hname.replace('leadjet','leadbjet')))
-                    hname = hname.replace('leadjet','leadbjet')
+                if self.btag == '1b':
+                    if 'ResolvedNoBtag' in hname:
+                        cmd = 'rootmv {0}:{1} {0}:{2}'.format(path,hname,hname.replace('ResolvedNoBtag','ResolvedOneBtag')) 
+                        subprocess.call(cmd,shell=True)
+                        print ("Renamed {} -> {}".format(hname,hname.replace('ResolvedNoBtag','ResolvedOneBtag')))
+                        hname = hname.replace('ResolvedNoBtag','ResolvedOneBtag')
+                    if '_leadjet_' in hname: # Only _leadjet_ -> _leadbjet_  (other _subleadjet can remain the same)
+                        cmd = 'rootmv {0}:{1} {0}:{2}'.format(path,hname,hname.replace('leadjet','leadbjet')) 
+                        subprocess.call(cmd,shell=True)
+                        print ("Renamed {} -> {}".format(hname,hname.replace('leadjet','leadbjet')))
+                        hname = hname.replace('leadjet','leadbjet')
+                if self.btag == '2b':
+                    if 'ResolvedNoBtag' in hname:
+                        cmd = 'rootmv {0}:{1} {0}:{2}'.format(path,hname,hname.replace('ResolvedNoBtag','ResolvedTwoBtags')) 
+                        subprocess.call(cmd,shell=True)
+                        print ("Renamed {} -> {}".format(hname,hname.replace('ResolvedNoBtag','ResolvedTwoBtags')))
+                        hname = hname.replace('ResolvedNoBtag','ResolvedTwoBtags')
+                    if 'leadjet' in hname: # _leadjet_ -> _leadbjet_ + _subleadjet -> _subleadbjet_
+                        cmd = 'rootmv {0}:{1} {0}:{2}'.format(path,hname,hname.replace('leadjet','leadbjet')) 
+                        subprocess.call(cmd,shell=True)
+                        print ("Renamed {} -> {}".format(hname,hname.replace('leadjet','leadbjet')))
+                        hname = hname.replace('leadjet','leadbjet')
 
     def modifyYAML(self,mode):
         assert mode in ['compare','replace']
@@ -236,11 +239,23 @@ parser.add_argument('--path_estimation', action='store', required=True, type=str
                     help='Path containing DY estimation from data')
 parser.add_argument('--era', action='store', required=True, type=str,
                     help='Era : 2016, 2017, 2018')
+parser.add_argument('--b1', action='store_true', required=False, default=False,
+                    help='1 btag region')
+parser.add_argument('--b2', action='store_true', required=False, default=False,
+                    help='2 btag region')
 parser.add_argument('--force', action='store_true', required=False, default=False,
                     help='Force the recreation of the merged directory even if it already exists')
 
 args = parser.parse_args()
 
-instance = Merge(args.path_base,args.path_estimation,args.era,args.force)
+if args.b1 and not args.b2:
+    btag = '1b'    
+if args.b2 and not args.b1:
+    btag = '2b'
+
+instance = Merge(args.path_base,
+                 args.path_estimation,
+                 btag,
+                 args.era,args.force)
 
  

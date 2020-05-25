@@ -18,6 +18,7 @@ parser.add_argument('-l','--loop', action='store', required=False, type=int,
 args = parser.parse_args()
 
 def report_progress(stdscr,printout):
+    stdscr.clear()
     for i,line in enumerate(printout.splitlines()):
         stdscr.addstr(i,0,line)
     stdscr.refresh()
@@ -44,6 +45,8 @@ def parse_sacct(args):
 
     df_jobs = pd.DataFrame.from_dict(dict_jobs)
 
+    status_list = ['PENDING','RUNNING','COMPLETED']
+
     printout = ""
     for jobid in pd.unique(df_jobs['jobid']):
         printout += "Job ID : %s\n"%jobid
@@ -51,9 +54,9 @@ def parse_sacct(args):
         for partition in pd.unique(jobdf['partition']):
             printout += "\t %s\n"%partition
             partdf = df_jobs[df_jobs['jobid']==jobid]
-            statuses = pd.unique(partdf['status'])
+            statuses = [l for l in pd.unique(partdf['status']) if l in status_list]+sorted([l for l in pd.unique(partdf['status']) if l not in status_list])
             N = partdf.shape[0]
-            for status in sorted(statuses):
+            for status in statuses:
                 num = partdf[partdf['status']==status].shape[0]
                 if status == "PENDING": # Need to develop array line
                     statdf = partdf[partdf['status']==status]
@@ -83,10 +86,6 @@ def main(args):
             curses.noecho()
             curses.cbreak()
             stdscr.keypad(True)
-
-            # Clear screen #
-            stdscr.clear()
-
             # Loop #
             while True:
                 printout = parse_sacct(args)

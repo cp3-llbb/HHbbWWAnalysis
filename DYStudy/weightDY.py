@@ -336,23 +336,6 @@ class WeightDY:
         self.weight_1b.Draw("ep")
         self.weight_2b.Draw("ep same")
 
-#        rightmax = 1.1*self.weight_2b.GetMaximum()
-#        scale = pad2.GetUymax()/rightmax;
-#        print (pad2.GetUxmax(),pad2.GetUymin(),pad2.GetUxmax(),pad2.GetUymax())
-#        print (ROOT.gPad.GetUxmax(),ROOT.gPad.GetUymin(),ROOT.gPad.GetUxmax(),ROOT.gPad.GetUymax())
-#        #axis = ROOT.TGaxis(pad2.GetUxmax(),
-#        #                   pad2.GetUymin(),
-#        #                   pad2.GetUxmax(), 
-#        #                   pad2.GetUymax(),
-#        #                   0,rightmax,510,"+L")
-#
-#        axis = ROOT.TGaxis(0.8,0,1.,0.6,0,rightmax,510,"+L")
-#
-#
-#        axis.SetLineColor(600)
-#        axis.SetLabelColor(600)
-#        axis.Draw()
-
         leg2 = ROOT.TLegend(0.65,0.85,0.89,0.98)
         leg2.SetHeader("Legend","C")
         leg2.SetTextSize(0.03)
@@ -396,8 +379,8 @@ class WeightDY:
         leg3.SetHeader("Legend","C")
         leg3.SetTextSize(0.04)
         leg3.AddEntry(self.shape_1b,"#splitline{DY shape from data (1b)}{Integral = %0.2f}"%self.shape_1b.Integral() if self.mode == 'data' else "#splitline{DY shape from MC (1b)}{Integral = %0.2f}"%self.shape_1b.Integral())
-        leg3.AddEntry(self.shape_2b,"#splitline{DY shape from data (2b)}{Integral = %0.2f}"%self.shape_2b.Integral() if self.mode == 'data' else "#splitline{DY shape from MC (2b)}{Integral = %0.2f}"%self.shape_2b.Integral())
         leg3.AddEntry(self.histograms['ZVeto_1b'],"#splitline{Z Veto (1b) (DY MC)}{Integral = %0.2f}"%self.N_ZVeto1b)
+        leg3.AddEntry(self.shape_2b,"#splitline{DY shape from data (2b)}{Integral = %0.2f}"%self.shape_2b.Integral() if self.mode == 'data' else "#splitline{DY shape from MC (2b)}{Integral = %0.2f}"%self.shape_2b.Integral())
         leg3.AddEntry(self.histograms['ZVeto_2b'],"#splitline{Z Veto (2b) (DY MC)}{Integral = %0.2f}"%self.N_ZVeto2b)
         leg3.Draw()
 
