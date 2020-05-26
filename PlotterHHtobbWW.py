@@ -108,6 +108,9 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
                                          channel    = "ElMu"))
         
             #----- Ak4 jets selection -----#
+            LeptonKeys = ['channel','sel','dilepton','suffix','is_MC']
+            JetKeys    = ['channel','sel','leadjet','subleadjet','lead_is_b','sublead_is_b','suffix','is_MC']
+            commonItems = ['channel','sel','suffix']
             if "Ak4" in jetsel_level:
                 print ("...... Processing Ak4 jet selection")
                 ElElSelObjectDileptonAk4Jets = makeAk4JetSelection(self,ElElSelObjectDilepton,copy_sel=True,plot_yield=True)
@@ -121,9 +124,6 @@ class PlotterNanoHHtobbWW(BaseNanoHHtobbWW,HistogramsModule):
                     ChannelDictList.append({'channel':'MuMu','sel':MuMuSelObjectDileptonAk4Jets.sel,'dilepton':OSMuMuDilepton[0],'leadjet':self.ak4Jets[0],'subleadjet':self.ak4Jets[1],'lead_is_b':False,'sublead_is_b':False,'suffix':MuMuSelObjectDileptonAk4Jets.selName,'is_MC':self.is_MC})
                     ChannelDictList.append({'channel':'ElMu','sel':ElMuSelObjectDileptonAk4Jets.sel,'dilepton':OSElMuDilepton[0],'leadjet':self.ak4Jets[0],'subleadjet':self.ak4Jets[1],'lead_is_b':False,'sublead_is_b':False,'suffix':ElMuSelObjectDileptonAk4Jets.selName,'is_MC':self.is_MC})
 
-                LeptonKeys = ['channel','sel','dilepton','suffix','is_MC']
-                JetKeys    = ['channel','sel','leadjet','subleadjet','lead_is_b','sublead_is_b','suffix','is_MC']
-                commonItems = ['channel','sel','suffix']
                 JetsN = {'objName':'Ak4Jets','objCont':self.ak4Jets,'Nmax':10,'xTitle':'N(Ak4 jets)'}
                                                             
                 for channelDict in ChannelDictList:
