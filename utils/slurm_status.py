@@ -53,8 +53,8 @@ def parse_sacct(args):
         jobdf = df_jobs[df_jobs['jobid']==jobid]
         for partition in pd.unique(jobdf['partition']):
             printout += "\t %s\n"%partition
-            partdf = df_jobs[df_jobs['jobid']==jobid]
-            statuses = [l for l in pd.unique(partdf['status']) if l in status_list]+sorted([l for l in pd.unique(partdf['status']) if l not in status_list])
+            partdf = jobdf[jobdf['partition']==partition]
+            statuses = [l for l in status_list if l in pd.unique(partdf['status'])]+sorted([l for l in pd.unique(partdf['status']) if l not in status_list])
             N = partdf.shape[0]
             for status in statuses:
                 num = partdf[partdf['status']==status].shape[0]
@@ -65,7 +65,8 @@ def parse_sacct(args):
                         if "[" in array: 
                             ps = subprocess.Popen(['squeue','-j',jobid,'-r','--noheader','--long'], stdout=subprocess.PIPE)
                             outs,_ = ps.communicate()
-                            sup = len([o for o in outs.decode("utf-8").splitlines() if 'PENDING' in o])
+                            print (outs)
+                            sup = len([o for o in outs.decode("utf-8").splitlines() if 'PENDING' in o and partition in o])
                             num += sup -1
                             N += sup -1
                 printout += "\t\t"+status.ljust(20,' ')+"{:5d}  [{:6.2f}%]\n".format(num,num/N*100)
