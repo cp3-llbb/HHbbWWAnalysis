@@ -795,6 +795,13 @@ One lepton and and one jet argument must be specified in addition to the require
             #self.DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
                 # TODO : add Boosted SF (need NanoAODv7)
 
+
+            #### Ak4 Btagging CHECK #### TODO : remove
+            self.DeepJetMediumSF_lightjets = SF.get_scalefactor("jet", ("btag_lightjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_lightjets")
+            self.DeepJetMediumSF_cjets = SF.get_scalefactor("jet", ("btag_cjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_cjets")
+            self.DeepJetMediumSF_bjets = SF.get_scalefactor("jet", ("btag_bjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_bjets")
+
+
             #----- Triggers -----# (Need to split according to era) 
                 # https://gitlab.cern.ch/ttH_leptons/doc/-/blob/master/Legacy/data_to_mc_corrections.md#trigger-efficiency-scale-factors
                 # New ref (more up to date) : https://cernbox.cern.ch/index.php/s/lW2BiTli5tJR0MN
