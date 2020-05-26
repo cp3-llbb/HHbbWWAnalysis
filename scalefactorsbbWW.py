@@ -67,6 +67,23 @@ class ScaleFactorsbbWW:
                                                 base_str    = "BTagging_{wp}_{flav}_{calib}_subjet_{algo}_2016.json",
                                                 format_dict = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
 
+        # Btagging cross check #
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
+                                                entry_key   = 'btag_lightjets_2016',
+                                                base_key    = '{algo}_{wp}',
+                                                base_str    = "BTagging_{wp}_lightjets_incl_{algo}_2016.json",
+                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"]})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
+                                                entry_key   = 'btag_cjets_2016',
+                                                base_key    = '{algo}_{wp}',
+                                                base_str    = "BTagging_{wp}_cjets_comb_{algo}_2016.json",
+                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"]})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
+                                                entry_key   = 'btag_bjets_2016',
+                                                base_key    = '{algo}_{wp}',
+                                                base_str    = "BTagging_{wp}_bjets_comb_{algo}_2016.json",
+                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"]})
+
         #-----  DY weight for 1 and 2 btag -----#
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
                                                 entry_key   = 'DY_2016',
@@ -164,9 +181,6 @@ class ScaleFactorsbbWW:
         # Get full dict #
         self.all_scalefactors = instance.GetScaleFactorsDict()
 
-        #import pprint
-        #pprint.pprint(self.all_scalefactors)
-
     def get_scalefactor(self,objType, key, periods=None, combine=None, additionalVariables=dict(), systName=None):
 
         return scalefactors.get_scalefactor(objType             = objType, 
@@ -179,3 +193,8 @@ class ScaleFactorsbbWW:
                                             getFlavour          = (lambda j : j.hadronFlavour), 
                                             systName            = systName)
     
+if __name__ == "__main__":
+    instance = ScaleFactorsbbWW()
+    import pprint
+    pprint.pprint(instance.all_scalefactors)
+
