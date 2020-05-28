@@ -4,7 +4,7 @@ import json
 
 from bamboo.analysismodules import HistogramsModule
 from bamboo import treefunctions as op
-from bamboo.plots import Plot, EquidistantBinning, SummedPlot
+from bamboo.plots import Plot, EquidistantBinning, VariableBinning
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)))) # Add scripts in this directory
 from BaseHHtobbWW import BaseNanoHHtobbWW
@@ -57,7 +57,6 @@ class BtagEffAndMistagNano(BaseNanoHHtobbWW,HistogramsModule):
                 if v == 'AbsEta':
                     continue
                 b = bins[bn]
-                print (v,b)
                 if not v in opt_binning.keys():
                     opt_binning[v] = b
                 else:
@@ -71,6 +70,87 @@ class BtagEffAndMistagNano(BaseNanoHHtobbWW,HistogramsModule):
         for var,bins in opt_binning.items():
             print (('... Variable : %s'%var).ljust(30,' ')+'Binning :',bins)
 
-        print (opt_binning)
+
+        # Truth MC object hadron flavour #
+        ak4_truth_lightjets = op.select(self.ak4Jets, lambda j : op.abs(j.hadronFlavour) == 0)
+        ak4_truth_cjets = op.select(self.ak4Jets, lambda j : op.abs(j.hadronFlavour) == 4)
+        ak4_truth_bjets = op.select(self.ak4Jets, lambda j : op.abs(j.hadronFlavour) == 5)
+
+        plots.append(Plot.make3D('N_total_lightjets',
+                                 [op.map(ak4_truth_lightjets, lambda j : j.eta),
+                                  op.map(ak4_truth_lightjets, lambda j : j.pt),
+                                  op.map(ak4_truth_lightjets, lambda j : j.btagDeepFlavB)],
+                                 noSel,
+                                 [VariableBinning(opt_binning['Eta']),
+                                  VariableBinning(opt_binning['Pt']),
+                                  VariableBinning(opt_binning['BTagDiscri'])],
+                                 xTitle = 'lightjet #eta',
+                                 yTitle = 'lightjet P_{T}',
+                                 zTitle = 'lightjet Btagging score'))
+        plots.append(Plot.make3D('N_total_cjets',
+                                 [op.map(ak4_truth_cjets, lambda j : j.eta),
+                                  op.map(ak4_truth_cjets, lambda j : j.pt),
+                                  op.map(ak4_truth_cjets, lambda j : j.btagDeepFlavB)],
+                                 noSel,
+                                 [VariableBinning(opt_binning['Eta']),
+                                  VariableBinning(opt_binning['Pt']),
+                                  VariableBinning(opt_binning['BTagDiscri'])],
+                                 xTitle = 'cjet #eta',
+                                 yTitle = 'cjet P_{T}',
+                                 zTitle = 'cjet Btagging score'))
+        plots.append(Plot.make3D('N_total_bjets',
+                                 [op.map(ak4_truth_bjets, lambda j : j.eta),
+                                  op.map(ak4_truth_bjets, lambda j : j.pt),
+                                  op.map(ak4_truth_bjets, lambda j : j.btagDeepFlavB)],
+                                 noSel,
+                                 [VariableBinning(opt_binning['Eta']),
+                                  VariableBinning(opt_binning['Pt']),
+                                  VariableBinning(opt_binning['BTagDiscri'])],
+                                 xTitle = 'bjet #eta',
+                                 yTitle = 'bjet P_{T}',
+                                 zTitle = 'bjet Btagging score'))
+
+                                    
+        # Btagged objects per flavour #
+        ak4_btagged_lightjets = op.select(ak4_truth_lightjets, self.lambda_ak4Btag)
+        ak4_btagged_cjets = op.select(ak4_truth_cjets, self.lambda_ak4Btag) 
+        ak4_btagged_bjets = op.select(ak4_truth_bjets, self.lambda_ak4Btag) 
+
+        plots.append(Plot.make3D('N_btagged_lightjets',
+                                 [op.map(ak4_btagged_lightjets, lambda j : j.eta),
+                                  op.map(ak4_btagged_lightjets, lambda j : j.pt),
+                                  op.map(ak4_btagged_lightjets, lambda j : j.btagDeepFlavB)],
+                                 noSel,
+                                 [VariableBinning(opt_binning['Eta']),
+                                  VariableBinning(opt_binning['Pt']),
+                                  VariableBinning(opt_binning['BTagDiscri'])],
+                                 xTitle = 'lightjet #eta',
+                                 yTitle = 'lightjet P_{T}',
+                                 zTitle = 'lightjet Btagging score'))
+        plots.append(Plot.make3D('N_btagged_cjets',
+                                 [op.map(ak4_btagged_cjets, lambda j : j.eta),
+                                  op.map(ak4_btagged_cjets, lambda j : j.pt),
+                                  op.map(ak4_btagged_cjets, lambda j : j.btagDeepFlavB)],
+                                 noSel,
+                                 [VariableBinning(opt_binning['Eta']),
+                                  VariableBinning(opt_binning['Pt']),
+                                  VariableBinning(opt_binning['BTagDiscri'])],
+                                 xTitle = 'cjet #eta',
+                                 yTitle = 'cjet P_{T}',
+                                 zTitle = 'cjet Btagging score'))
+        plots.append(Plot.make3D('N_btagged_bjets',
+                                 [op.map(ak4_btagged_bjets, lambda j : j.eta),
+                                  op.map(ak4_btagged_bjets, lambda j : j.pt),
+                                  op.map(ak4_btagged_bjets, lambda j : j.btagDeepFlavB)],
+                                 noSel,
+                                 [VariableBinning(opt_binning['Eta']),
+                                  VariableBinning(opt_binning['Pt']),
+                                  VariableBinning(opt_binning['BTagDiscri'])],
+                                 xTitle = 'bjet #eta',
+                                 yTitle = 'bjet P_{T}',
+                                 zTitle = 'bjet Btagging score'))
+
+
+
         return plots
 

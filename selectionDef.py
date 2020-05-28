@@ -388,7 +388,6 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yi
     Selection : no btagged Ak8 jet (aka boosted), two Ak4 btagged jets 
     """
     AppliedSF = [self.DeepJetMediumSF(self.ak4BJets[0]),self.DeepJetMediumSF(self.ak4BJets[1])] if self.is_MC else None
-    #AppliedSF = None # TODO : remove
     if copy_sel:
         selObject = copy(selObject)
     selObject.selName += "ExclusiveResolvedTwoBtags"
