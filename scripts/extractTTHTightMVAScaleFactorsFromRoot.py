@@ -17,7 +17,7 @@ parser.add_argument('-s', '--suffix', help='Suffix to append at the end of the o
 args = parser.parse_args()
 
 # Moriond17: last pt bin is the same as the previous one, but with 100% error and should be ignored
-IGNORE_LAST_PT_BIN = True
+IGNORE_LAST_PT_BIN = False # Not needed for ttH
 
 f = ROOT.TFile.Open(args.SF_file)
 
