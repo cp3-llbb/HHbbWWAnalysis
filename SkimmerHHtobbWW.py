@@ -153,15 +153,32 @@ class SkimmerNanoHHtobbWW(BaseNanoHHtobbWW,SkimmerModule):
             else:
                 raise NotImplementedError
 
+            # Check : TODO remove #
+            varsToKeep["mu_looseSF"] = op.switch(op.rng_len(self.muonsTightSel) >= 1, self.muLooseId(self.muonsTightSel[0]) , op.c_float(1.,"float"))
+            varsToKeep["mu_tightSF"] = op.switch(op.rng_len(self.muonsTightSel) >= 1, self.muTightMVA(self.muonsTightSel[0]) , op.c_float(1.,"float"))
+
+            #varsToKeep["el_looseSF"] = op.switch(op.rng_len(self.electronsTightSel) >= 1, reduce(mul,self.lambda_ElectronLooseSF(self.electronsTightSel[0])) , op.c_float(1.,"float"))
+            varsToKeep["el_looseRecoSF"] = op.switch(op.rng_len(self.electronsTightSel) >= 1, 
+                                                     op.switch(self.electronsTightSel[0].pt>20, self.elLooseRecoPtGt20(self.electronsTightSel[0]) , self.elLooseRecoPtLt20(self.electronsTightSel[0])), 
+                                                     op.c_float(1.,"float"))
+            varsToKeep["el_looseEffSF"] = op.switch(op.rng_len(self.electronsTightSel) >= 1, self.elLooseEff(self.electronsTightSel[0]) , op.c_float(1.,"float"))
+            varsToKeep["el_looseIDSF"] = op.switch(op.rng_len(self.electronsTightSel) >= 1, self.elLooseId(self.electronsTightSel[0]) , op.c_float(1.,"float"))
+            varsToKeep["el_tightIDSF"] = op.switch(op.rng_len(self.electronsTightSel) >= 1, self.elTightMVA(self.electronsTightSel[0]) , op.c_float(1.,"float"))
+
             varsToKeep["btag_SF"] = op.rng_product(self.ak4BJets, lambda jet : self.DeepJetMediumSF(jet))
 
-            # Check : TODO #
-            varsToKeep["ak4BJet1_pt"] = op.switch(op.rng_len(self.ak4BJets) >= 1, self.ak4BJets[0].pt, op.c_float(-9999.,"float"))
-            varsToKeep["ak4BJet2_pt"] = op.switch(op.rng_len(self.ak4BJets) >= 2, self.ak4BJets[1].pt, op.c_float(-9999.,"float"))
-            varsToKeep["ak4BJet1_btag"] = op.switch(op.rng_len(self.ak4BJets) >= 1, self.ak4BJets[0].btagDeepFlavB, op.c_float(-9999.,"float"))
-            varsToKeep["ak4BJet2_btag"] = op.switch(op.rng_len(self.ak4BJets) >= 2, self.ak4BJets[1].btagDeepFlavB, op.c_float(-9999.,"float"))
-            varsToKeep["ak4BJet1_btagSF"] = op.switch(op.rng_len(self.ak4BJets) >= 1, self.DeepJetMediumSF(self.ak4BJets[0]), op.c_float(-9999.,"float"))
-            varsToKeep["ak4BJet2_btagSF"] = op.switch(op.rng_len(self.ak4BJets) >= 2, self.DeepJetMediumSF(self.ak4BJets[1]), op.c_float(-9999.,"float"))
+#            # Check : TODO remove #
+#            varsToKeep["ak4BJet1_pt"] = op.switch(op.rng_len(self.ak4BJets) >= 1, self.ak4BJets[0].pt, op.c_float(-9999.,"float"))
+#            varsToKeep["ak4BJet1_hadronflavour"] = op.switch(op.rng_len(self.ak4BJets) >= 1, self.ak4BJets[0].hadronFlavour, op.c_float(-9999.,"float"))
+#            varsToKeep["ak4BJet1_btag"] = op.switch(op.rng_len(self.ak4BJets) >= 1, self.ak4BJets[0].btagDeepFlavB, op.c_float(-9999.,"float"))
+#            varsToKeep["ak4BJet1_btagSF"] = op.switch(op.rng_len(self.ak4BJets) >= 1, self.DeepJetMediumSF(self.ak4BJets[0]), op.c_float(-9999.,"float"))
+#            varsToKeep["ak4BJet1_btag_hadronSplit_SF"] = op.switch(op.rng_len(self.ak4BJets) >= 1, self.lambda_hadronflavour_DeepJetMediumSF(self.ak4BJets[0]), op.c_float(-9999.,"float"))
+#
+#            varsToKeep["ak4BJet2_pt"] = op.switch(op.rng_len(self.ak4BJets) >= 2, self.ak4BJets[1].pt, op.c_float(-9999.,"float"))
+#            varsToKeep["ak4BJet2_hadronflavour"] = op.switch(op.rng_len(self.ak4BJets) >= 2, self.ak4BJets[1].hadronFlavour, op.c_float(-9999.,"float"))
+#            varsToKeep["ak4BJet2_btag"] = op.switch(op.rng_len(self.ak4BJets) >= 2, self.ak4BJets[1].btagDeepFlavB, op.c_float(-9999.,"float"))
+#            varsToKeep["ak4BJet2_btagSF"] = op.switch(op.rng_len(self.ak4BJets) >= 2, self.DeepJetMediumSF(self.ak4BJets[1]), op.c_float(-9999.,"float"))
+#            varsToKeep["ak4BJet2_btag_hadronSplit_SF"] = op.switch(op.rng_len(self.ak4BJets) >= 2, self.lambda_hadronflavour_DeepJetMediumSF(self.ak4BJets[1]), op.c_float(-9999.,"float"))
 
             # ttbar PT reweighting #
             varsToKeep["topPt_wgt"] = self.ttbar_weight(self.genTop[0],self.genAntitop[0])
