@@ -14,6 +14,8 @@ parser.add_argument('-j','--jobid', action='store', required=False, type=str,
                     help='Job ID')
 parser.add_argument('-l','--loop', action='store', required=False, type=int, 
                     help='Looping time in seconds')
+parser.add_argument('--active', action='store_true', required=False, default=False,
+                    help='Wether to only display active jobs (with RUNNING or PENDING jobs)')
 
 args = parser.parse_args()
 
@@ -49,12 +51,14 @@ def parse_sacct(args):
 
     printout = ""
     for jobid in pd.unique(df_jobs['jobid']):
+        jobiddf = df_jobs[df_jobs['jobid']==jobid]
+        if args.active and 'PENDING' not in pd.unique(jobiddf['status']) and 'RUNNING' not in pd.unique(jobiddf['status']):
+            continue
         printout += "Job ID : %s\n"%jobid
-        jobdf = df_jobs[df_jobs['jobid']==jobid]
-        for partition in pd.unique(jobdf['partition']):
-            printout += "\t %s\n"%partition
-            partdf = jobdf[jobdf['partition']==partition]
+        for partition in pd.unique(jobiddf['partition']):
+            partdf = jobiddf[jobiddf['partition']==partition]
             statuses = [l for l in status_list if l in pd.unique(partdf['status'])]+sorted([l for l in pd.unique(partdf['status']) if l not in status_list])
+            printout += "\t %s\n"%partition
             N = partdf.shape[0]
             for status in statuses:
                 num = partdf[partdf['status']==status].shape[0]
@@ -65,7 +69,6 @@ def parse_sacct(args):
                         if "[" in array: 
                             ps = subprocess.Popen(['squeue','-j',jobid,'-r','--noheader','--long'], stdout=subprocess.PIPE)
                             outs,_ = ps.communicate()
-                            print (outs)
                             sup = len([o for o in outs.decode("utf-8").splitlines() if 'PENDING' in o and partition in o])
                             num += sup -1
                             N += sup -1
