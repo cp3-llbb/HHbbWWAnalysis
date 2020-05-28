@@ -67,23 +67,6 @@ class ScaleFactorsbbWW:
                                                 base_str    = "BTagging_{wp}_{flav}_{calib}_subjet_{algo}_2016.json",
                                                 format_dict = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
 
-        # Btagging cross check #
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
-                                                entry_key   = 'btag_lightjets_2016',
-                                                base_key    = '{algo}_{wp}',
-                                                base_str    = "BTagging_{wp}_lightjets_incl_{algo}_2016.json",
-                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"]})
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
-                                                entry_key   = 'btag_cjets_2016',
-                                                base_key    = '{algo}_{wp}',
-                                                base_str    = "BTagging_{wp}_cjets_comb_{algo}_2016.json",
-                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"]})
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
-                                                entry_key   = 'btag_bjets_2016',
-                                                base_key    = '{algo}_{wp}',
-                                                base_str    = "BTagging_{wp}_bjets_comb_{algo}_2016.json",
-                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"]})
-
         #-----  DY weight for 1 and 2 btag -----#
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
                                                 entry_key   = 'DY_2016',
