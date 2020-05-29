@@ -110,12 +110,9 @@ def makeLeptonSelection(self,baseSel,plot_yield=False):
                                            yieldTitle   = "OS preselected lepton pair (channel $e^{\pm}\mu^{\mp}$)")
 
         # Selection #
-        ElElPreSelObject.refine(cut     = [op.rng_len(self.OSElElDileptonPreSel)>=1],
-                                weight  = ElElLooseSF(self.OSElElDileptonPreSel[0]))
-        MuMuPreSelObject.refine(cut     = [op.rng_len(self.OSMuMuDileptonPreSel)>=1],
-                                weight  = MuMuLooseSF(self.OSMuMuDileptonPreSel[0]))
-        ElMuPreSelObject.refine(cut     = [op.rng_len(self.OSElMuDileptonPreSel)>=1],
-                                weight  = ElMuLooseSF(self.OSElMuDileptonPreSel[0]))
+        ElElPreSelObject.refine(cut     = [op.rng_len(self.OSElElDileptonPreSel)>=1])
+        MuMuPreSelObject.refine(cut     = [op.rng_len(self.OSMuMuDileptonPreSel)>=1])
+        ElMuPreSelObject.refine(cut     = [op.rng_len(self.OSElMuDileptonPreSel)>=1])
 
         # Yield #
         if plot_yield:
@@ -140,9 +137,12 @@ def makeLeptonSelection(self,baseSel,plot_yield=False):
                                                yieldTitle   = "OS fakeable lepton pair (channel $e^{\pm}\mu^{\mp}$)")
 
             # Selection : at least one fakeable dilepton #
-            ElElFakeSelObject.refine(cut = [op.rng_len(self.OSElElDileptonFakeSel)>=1,lambdaLowPtCut(self.OSElElDileptonFakeSel[0]),lambdaLeadingPtCut(self.OSElElDileptonFakeSel[0])])
-            MuMuFakeSelObject.refine(cut = [op.rng_len(self.OSMuMuDileptonFakeSel)>=1,lambdaLowPtCut(self.OSMuMuDileptonFakeSel[0]),lambdaLeadingPtCut(self.OSMuMuDileptonFakeSel[0])])
-            ElMuFakeSelObject.refine(cut = [op.rng_len(self.OSElMuDileptonFakeSel)>=1,lambdaLowPtCut(self.OSElMuDileptonFakeSel[0]),lambdaLeadingPtCut(self.OSElMuDileptonFakeSel[0])])
+            ElElFakeSelObject.refine(cut = [op.rng_len(self.OSElElDileptonFakeSel)>=1,lambdaLowPtCut(self.OSElElDileptonFakeSel[0]),lambdaLeadingPtCut(self.OSElElDileptonFakeSel[0])],
+                                     weight = ElElLooseSF(self.OSElElDileptonFakeSel[0]))
+            MuMuFakeSelObject.refine(cut = [op.rng_len(self.OSMuMuDileptonFakeSel)>=1,lambdaLowPtCut(self.OSMuMuDileptonFakeSel[0]),lambdaLeadingPtCut(self.OSMuMuDileptonFakeSel[0])],
+                                     weight = MuMuLooseSF(self.OSMuMuDileptonFakeSel[0]))
+            ElMuFakeSelObject.refine(cut = [op.rng_len(self.OSElMuDileptonFakeSel)>=1,lambdaLowPtCut(self.OSElMuDileptonFakeSel[0]),lambdaLeadingPtCut(self.OSElMuDileptonFakeSel[0])],
+                                     weight = ElMuLooseSF(self.OSElMuDileptonFakeSel[0]))
 
             # Yield #
             if plot_yield:
@@ -369,6 +369,7 @@ def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,plot_yie
     if copy_sel:
         selObject = copy(selObject)
     AppliedSF = [self.DeepJetMediumSF(self.ak4BJets[0])] if self.is_MC else None
+    #AppliedSF = None
     selObject.selName += "ExclusiveResolvedOneBtag"
     selObject.yieldTitle += " + Exclusive Resolved (1 bjet)"
     selObject.refine(cut    = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
@@ -388,6 +389,7 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yi
     Selection : no btagged Ak8 jet (aka boosted), two Ak4 btagged jets 
     """
     AppliedSF = [self.DeepJetMediumSF(self.ak4BJets[0]),self.DeepJetMediumSF(self.ak4BJets[1])] if self.is_MC else None
+    #AppliedSF = None
     if copy_sel:
         selObject = copy(selObject)
     selObject.selName += "ExclusiveResolvedTwoBtags"
