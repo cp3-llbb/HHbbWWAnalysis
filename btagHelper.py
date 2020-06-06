@@ -25,12 +25,13 @@ def makeBTagCalibrationReader(taggerName, csvFileName, wp=None, sysType="central
     elif isinstance(measurementType, str): ## if string, use it for all
         measurementType = {fl: measurementType for fl in ("B", "C", "UDSG")}
     calibName = sel._fbe.symbol(f'const BTagCalibration <<name>>{{"{taggerName}", "{csvFileName}"}};', nameHint=f"bTagCalib_{taggerName}")
+    uName ="bTagReader_{0}".format("".join(c for c in uName if c.isalnum()))
     readerName = sel._fbe.symbol('BTagCalibrationReader <<name>>{{BTagEntry::OP_{0}, "{1}", {{ {2} }} }}; // for {3}'.format(wp.upper(), sysType, ", ".join(f'"{sv}"' for sv in otherSysTypes), uName), nameHint=f"bTagReader_{uName}")
     from bamboo.root import gbl
     calibHandle = getattr(gbl, calibName)
     readerHandle = getattr(gbl, readerName)
     for flav,measType in measurementType.items():
-        readerHandle.load(calibHandle, getattr(gbl.BTagEntry, f"FLAV_{flav}"), meas)
+        readerHandle.load(calibHandle, getattr(gbl.BTagEntry, f"FLAV_{flav}"), measType)
     import bamboo.treefunctions as op
     return op.extVar("BTagCalibrationReader", readerName)
 
