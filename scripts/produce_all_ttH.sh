@@ -37,3 +37,12 @@ mv Electron_EGamma_SF2D_Loose2018.json Muon_EGamma_SF2D_Loose2018.json  &&
 python extractTTHTightMVAScaleFactorsFromRoot.py --SF_file ../data/ScaleFactors_ttH/2018/MuonTightMVASF/egammaEffi.txt_EGM2D.root --err_eta ../data/ScaleFactors_ttH/2018/MuonTightMVASF/SFttbar_2018_muon_eta.root --err_pt ../data/ScaleFactors_ttH/2018/MuonTightMVASF/SFttbar_2018_muon_pt.root  --suffix MuonTight2018  &&
 python extractTTHTightMVAScaleFactorsFromRoot.py --SF_file ../data/ScaleFactors_ttH/2017/MuonTightMVASF/egammaEffi.txt_EGM2D.root --err_eta ../data/ScaleFactors_ttH/2017/MuonTightMVASF/SFttbar_2017_muon_eta.root --err_pt ../data/ScaleFactors_ttH/2017/MuonTightMVASF/SFttbar_2017_muon_pt.root  --suffix MuonTight2017  &&
 python extractTTHTightMVAScaleFactorsFromRoot.py --SF_file ../data/ScaleFactors_ttH/2016/MuonTightMVASF/egammaEffi.txt_EGM2D.root --err_eta ../data/ScaleFactors_ttH/2016/MuonTightMVASF/SFttbar_2016_muon_eta.root --err_pt ../data/ScaleFactors_ttH/2016/MuonTightMVASF/SFttbar_2016_muon_pt.root  --suffix MuonTight2016  
+
+# Single trigger SF #
+python extractTTHSingleLeptonTriggerScaleFactorsFromRoot.py -s SingleElectron_2016 --SF_file ../data/ScaleFactors_ttH/2016/SingleElectronTriggerSF/Electron_Ele25WPTight_eff.root
+python extractTTHSingleLeptonTriggerScaleFactorsFromRoot.py -s SingleElectron_2017 --SF_file ../data/ScaleFactors_ttH/2017/SingleElectronTriggerSF/Electron_Ele32orEle35_eff.root
+python extractTTHSingleLeptonTriggerScaleFactorsFromRoot.py -s SingleElectron_2018 --SF_file ../data/ScaleFactors_ttH/2018/SingleElectronTriggerSF/Electron_Run2018_Ele32orEle35.root
+
+python extractTTHSingleLeptonTriggerScaleFactorsFromRoot.py -s SingleMuon_2016 --SF_file ../data/ScaleFactors_ttH/2016/SingleMuonTriggerSF/Muon_Mu22OR_eta2p1_eff.root
+python extractTTHSingleLeptonTriggerScaleFactorsFromRoot.py -s SingleMuon_2017 --SF_file ../data/ScaleFactors_ttH/2017/SingleMuonTriggerSF/Muon_IsoMu24orIsoMu27_eff.root
+python extractTTHSingleLeptonTriggerScaleFactorsFromRoot.py -s SingleMuon_2018 --SF_file ../data/ScaleFactors_ttH/2018/SingleMuonTriggerSF/Muon_Run2018_IsoMu24orIsoMu27.root
