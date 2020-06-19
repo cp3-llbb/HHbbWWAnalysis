@@ -1,0 +1,38 @@
+MC :
+found all 
+
+Run2016B_ver1 : missing for some files
+... HLT_IsoMu22_eta2p1
+... HLT_IsoTkMu22_eta2p1
+... HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ
+... HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ
+
+Run2016B_ver2 : missing
+... HLT_IsoMu22_eta2p1
+... HLT_IsoTkMu22_eta2p1
+... HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ
+... HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ
+
+Run2016C : missing 
+... HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ
+... HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ
+
+Run2016D : missing 
+... HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ
+... HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ
+
+Run2016E : missing 
+... HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ
+... HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ
+
+Run2016F : missing 
+... HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ
+
+Run2016G : missing 
+... HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ
+
+Run2016H : missing 
+... HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL
+... HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL
+
+
