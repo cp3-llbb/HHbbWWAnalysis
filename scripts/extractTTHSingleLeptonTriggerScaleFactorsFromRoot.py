@@ -46,18 +46,30 @@ for key in f.GetListOfKeys():
 
     eta_dict = {'bin':eta_val,'values':[]}
     
+    minx = min([x-obj_MC.GetErrorXlow(i) for i,x in enumerate(obj_MC.GetX())])
+    maxx = max([x+obj_MC.GetErrorXhigh(i) for i,x in enumerate(obj_MC.GetX())])
     x = obj_MC.GetX()
-    eff_MC = obj_MC.GetY()
-    eff_Data = obj_Data.GetY()
+    print (name)
+    print (eta_val)
+    split = 1000
     for i in range(0,obj_MC.GetN()):
-        pt_center = x[i]
         pt_bin = [x[i]-obj_MC.GetErrorXlow(i),x[i]+obj_MC.GetErrorXhigh(i)]
-        if pt_bin[0] not in pt_binning:
-            pt_binning.append(pt_bin[0]) 
-        if pt_bin[1] not in pt_binning:
-            pt_binning.append(pt_bin[1]) 
-        value = min(eff_Data[i]/max(1.e-6,eff_MC[i]),1.)
-        eta_dict['values'].append({'bin':pt_bin,'value':value,'error_low':0.,'error_high':0})
+        # The curves are interpolation but we are using binned SF, needs a really fine binning #
+        split_bins = [pt_bin[0]+i*(pt_bin[1]-pt_bin[0])/split for i in range(split+1)]
+        sub_bins = [[a,b] for a,b in zip(split_bins[:-1],split_bins[1:])]
+        print (pt_bin)
+        print (len(sub_bins))
+        for sub_bin in sub_bins:
+            if sub_bin[0] not in pt_binning:
+                pt_binning.append(sub_bin[0]) 
+            if sub_bin[1] not in pt_binning:
+                pt_binning.append(sub_bin[1]) 
+            pt_center = sub_bin[0]+(sub_bin[1]-sub_bin[0])/2
+            value = min(obj_Data.Eval(pt_center)/max(1.e-6,obj_MC.Eval(pt_center)),10.)
+            if value == 0.:
+                continue
+            #print ('\t',sub_bin,value)
+            eta_dict['values'].append({'bin':sub_bin,'value':value,'error_low':0.02*value,'error_high':0.02*value})
 
     json_content['data'].append(eta_dict)
 
