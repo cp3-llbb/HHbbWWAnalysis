@@ -7,7 +7,7 @@ samples:
 ######################## SM #######################
   GluGluToHHTo2B2VTo2L2Nu:
     db: das:/GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToHHTo2B2VTo2L2Nu.dat
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
@@ -22,7 +22,7 @@ samples:
 ######################## Graviton #######################
   GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-260:
     db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-260_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-260.dat
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-260_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
@@ -35,7 +35,7 @@ samples:
     type: signal
   GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-270:
     db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-270_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-270.dat
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-270_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
@@ -48,7 +48,7 @@ samples:
     type: signal
   GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-300:
     db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-300_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-300.dat
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-300_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
@@ -61,7 +61,7 @@ samples:
     type: signal
   GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-350:
     db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-350_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-350.dat
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-350_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
@@ -74,7 +74,7 @@ samples:
     type: signal
   GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400:
     db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400.dat
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
@@ -87,7 +87,7 @@ samples:
     type: signal
   GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450:
     db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.dat
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
@@ -100,7 +100,7 @@ samples:
     type: signal
   GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500:
     db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.dat
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
@@ -113,7 +113,7 @@ samples:
     type: signal
   GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-550:
     db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-550_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-550.dat
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-550_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
@@ -126,7 +126,7 @@ samples:
     type: signal
   GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-600:
     db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-600_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-600.dat
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-600_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
@@ -139,7 +139,7 @@ samples:
     type: signal
   GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650:
     db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650.dat
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
@@ -152,7 +152,7 @@ samples:
     type: signal
   GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-700:
     db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-700_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-700.dat
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-700_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
@@ -165,7 +165,7 @@ samples:
     type: signal
   GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-800:
     db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-800_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-800.dat
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-800_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
@@ -178,7 +178,7 @@ samples:
     type: signal
   GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900:
     db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900.dat
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'
@@ -191,7 +191,7 @@ samples:
     type: signal
   GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-1000:
     db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-1000_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-1000.dat
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-1000_2016.dat
     generated-events: 'genEventSumw'
     cross-section: 1
     era: '2016'

@@ -1,13 +1,14 @@
 import math
 from bamboo.plots import Plot, EquidistantBinning, SummedPlot
 from bamboo import treefunctions as op
+from bamboo.plots import CutFlowReport
 
 from highlevelLambdas import *
 
 # TODO : remove the self
 
 ########################   Channel title   #############################
-def channelTitleLabel(channel):
+def DoubleLeptonChannelTitleLabel(channel):
     if (channel == "ElEl"):
         channel = "e^{+}e^{-}"
     elif (channel == "MuMu"):
@@ -19,7 +20,7 @@ def channelTitleLabel(channel):
 
 ######################  Plot Objects Number  ###########################
 def objectsNumberPlot(channel,objName,suffix,objCont,sel,Nmax,xTitle):
-    channelLabel = channelTitleLabel(channel)
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
     return Plot.make1D(channel+"_"+suffix+"_"+objName+"_N",
                        op.rng_len(objCont),
                        sel,
@@ -28,7 +29,7 @@ def objectsNumberPlot(channel,objName,suffix,objCont,sel,Nmax,xTitle):
                        plotopts = channelLabel)
 
 #######################   Channel Plot   ###############################
-def channelPlot(sel,DilepElEl,DilepMuMu,DilepElMu,suffix,channel):
+def doubleLeptonChannelPlot(sel,DilepElEl,DilepMuMu,DilepElMu,suffix,channel):
     """
     Plots the number of events in each channel
     """
@@ -58,9 +59,10 @@ def channelPlot(sel,DilepElEl,DilepMuMu,DilepElMu,suffix,channel):
 
 ##########################  YIELD PLOT #################################
 class makeYieldPlots:
-    def __init__(self):
+    def __init__(self,unitYield=False):
         self.calls = 0
         self.plots = []
+        self.unitYield = unitYield
     def addYield(self, sel, name, title):
         """
         Make Yield plot and use it also in the latex yield table
@@ -68,22 +70,24 @@ class makeYieldPlots:
         name    = name of the PDF to be produced
         title   = title that will be used in the LateX yield table
         """
+        if self.unitYield:
+            sel = sel.refine("Yield_"+name,weight=op.c_float(1.)/sel.weight)
         self.plots.append(Plot.make1D("Yield_"+name,   
                                       op.c_int(0),
                                       sel,
                                       EquidistantBinning(1, 0., 1.),
-                                      title = title + " Yield",
-                                      xTitle = title + " Yield",
+                                      title = "Yield_"+name,
+                                      xTitle = "Yield_"+name,
                                       plotopts = {"for-yields":True, "yields-title":title, 'yields-table-order':self.calls}))
         self.calls += 1
 
     def returnPlots(self):
-        return self.plots
+        return self.plots 
 
 ######################   TRIGGER PLOTS  ##############################
 def triggerPlots(sel,triggerDict,suffix,channel):
     plots = []
-    channelLabel = channelTitleLabel(channel)
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
     
     # Single Electron #
     plots.append(Plot.make1D("%s_%s_trigger_singleElectron"%(channel,suffix), 
@@ -134,7 +138,7 @@ def makeMETPlots(sel, met, suffix, channel):
 
     plots = []
 
-    channelLabel = channelTitleLabel(channel)
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
 
     # PT plot #
     plots.append(Plot.make1D("%s_%s_met_pt"%(channel,suffix), 
@@ -166,7 +170,7 @@ def makeDileptonPlots(sel, dilepton, suffix, channel, is_MC=False):
     """
     plots = []
 
-    channelLabel = channelTitleLabel(channel)
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
 
     # PT plot #
     plots.append(Plot.make1D("%s_%s_firstlepton_pt"%(channel,suffix), 
@@ -278,7 +282,7 @@ def makeDileptonPlots(sel, dilepton, suffix, channel, is_MC=False):
 def makeDeltaRPlots(sel,cont1,cont2,suffix,channel,isMC):
     plots = [] 
 
-    channelLabel = channelTitleLabel(channel)
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
 
     mixedCont = op.combine((cont1,cont2))
     plots.append(Plot.make1D("%s_%s_DeltaR"%(channel,suffix), 
@@ -289,34 +293,10 @@ def makeDeltaRPlots(sel,cont1,cont2,suffix,channel,isMC):
                              xTitle= "#Delta R",
                              plotopts = channelLabel))
 
-#    mixedCont_inDeltaR_0p4 = op.combine((cont1,cont2),pred=lambda c1,c2 : op.deltaR(c1.p4,c2.p4)<0.4)
-#    mixedCont_outDeltaR_0p4 = op.combine((cont1,cont2),pred=lambda c1,c2 : op.deltaR(c1.p4,c2.p4)>=0.4)
-#    if isMC: # We don't have gen level info on data
-#        plots.append(Plot.make1D("%s_%s_ID_DeltaRCut_Below0p4"%(channel,suffix), 
-#                                 op.map(mixedCont_inDeltaR_0p4,lambda c : c[0].genPartFlav), # Print gen flavour of first cont (aka lepton)
-#                                 sel, 
-#                                 EquidistantBinning(22,0.,22.), 
-#                                 title="%s genFlavour ID : #Delta R < 0.4"%channel, 
-#                                 xTitle= "ID"))
-#        plots.append(Plot.make1D("%s_%s_ID_DeltaRCut_Above0p4"%(channel,suffix), 
-#                                 op.map(mixedCont_outDeltaR_0p4,lambda c : c[0].genPartFlav), # Print gen flavour of first cont (aka lepton)
-#                                 sel, 
-#                                 EquidistantBinning(22,0.,22.), 
-#                                 title="%s genFlavour ID : #Delta R > 0.4"%channel, 
-#                                 xTitle= "#ID"))
- 
-        # Electron/Muon  genPartFlav :    1       -> prompt electron
-        #                                 3,4,5   -> light quark, c quark, b quark
-        #                                 15      -> tau 
-        #                                 22      -> photon conversion (only electron)
-        # script : https://github.com/cms-nanoAOD/cmssw/blob/6f76b77b43c852475cff452a97203441a9c962d1/PhysicsTools/NanoAOD/plugins/CandMCMatchTableProducer.cc#L99-L138
-
-
-
     return plots
 
 ##########################  JETS SEPARATE PLOTS #################################
-def makeAk4JetsPlots(sel, leadjet, subleadjet, suffix, channel, lead_is_b=False, sublead_is_b=False,is_MC=False):
+def makeTwoAk4JetsPlots(sel, leadjet, subleadjet, suffix, channel, lead_is_b=False, sublead_is_b=False,is_MC=False):
     """
     Make basic plots
     sel         = refine selection 
@@ -330,7 +310,7 @@ def makeAk4JetsPlots(sel, leadjet, subleadjet, suffix, channel, lead_is_b=False,
  
     plots = []
 
-    channelLabel = channelTitleLabel(channel)
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
 
     if lead_is_b:
         lead_base_name      = "%s_%s_leadbjet_{var}"%(channel,suffix)
@@ -469,7 +449,7 @@ def makeAk8JetsPlots(sel, fatjet, suffix, channel):
  
     plots = []
 
-    channelLabel = channelTitleLabel(channel)
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
 
     # fatjet plots (always present by selection) #
     plots.append(Plot.make1D("%s_%s_fatjet_pt"%(channel,suffix),
@@ -514,7 +494,7 @@ def makeAk8JetsPlots(sel, fatjet, suffix, channel):
 def makeHighLevelQuantities(sel,met,l1,l2,j1,j2,suffix,channel):
     plots = []
 
-    channelLabel = channelTitleLabel(channel)
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
 
     # dilepton-MET plots #
     plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepMETdeltaPhi"%(channel,suffix),

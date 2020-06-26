@@ -10,9 +10,9 @@ import curses
 parser = argparse.ArgumentParser(description='Utility to monirot jobs')
 parser.add_argument('-u','--user', action='store', required=True, type=str, 
                     help='User name')
-parser.add_argument('-j','--jobid', action='store', required=False, type=str, 
-                    help='Job ID')
-parser.add_argument('-l','--loop', action='store', required=False, type=int, 
+parser.add_argument('-j','--jobid', action='store', required=False, nargs='+', type=str,
+                    help='Job ID (can be several)')
+parser.add_argument('-l','--loop', action='store', required=False, type=int,
                     help='Looping time in seconds')
 parser.add_argument('--active', action='store_true', required=False, default=False,
                     help='Wether to only display active jobs (with RUNNING or PENDING jobs)')
@@ -22,13 +22,16 @@ args = parser.parse_args()
 def report_progress(stdscr,printout):
     stdscr.clear()
     for i,line in enumerate(printout.splitlines()):
-        stdscr.addstr(i,0,line)
+        try:
+            stdscr.addstr(i,0,line)
+        except curses.error:
+            pass
     stdscr.refresh()
 
 def parse_sacct(args):
     cmd = ['sacct', '-u', args.user, '--format=jobid%25,State,Partition', '-X', '--noheader'] 
     if args.jobid:
-        cmd += ['-j',args.jobid]
+        cmd += ['-j',','.join(args.jobid)]
 
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     out, _ = p.communicate()
@@ -36,7 +39,10 @@ def parse_sacct(args):
     dict_jobs = None
     for line in out.decode("utf-8").splitlines():
         j, s, p = line.split()
-        j, a = j.split('_')
+        if '_' in j:
+            j, a = j.split('_')
+        else:
+            a = 1
         if dict_jobs is None:
             dict_jobs = {'jobid':[j],'array':[a],'status':[s],'partition':[p]}
         else:
@@ -72,7 +78,10 @@ def parse_sacct(args):
                             sup = len([o for o in outs.decode("utf-8").splitlines() if 'PENDING' in o and partition in o])
                             num += sup -1
                             N += sup -1
-                printout += "\t\t"+status.ljust(20,' ')+"{:5d}  [{:6.2f}%]\n".format(num,num/N*100)
+                try:
+                    printout += "\t\t"+status.ljust(20,' ')+"{:5d}  [{:6.2f}%]\n".format(num,num/N*100)
+                except ZeroDivisionError:
+                    printout += "\t\t"+status.ljust(20,' ')+"{:5d}\n".format(num)
             printout += "\t\t"+'TOTAL'.ljust(20,' ')+"%5d\n"%N
     return printout
 
@@ -93,8 +102,12 @@ def main(args):
             # Loop #
             while True:
                 printout = parse_sacct(args)
-                report_progress(stdscr,printout)
+                if len(printout) != 0:
+                    report_progress(stdscr,printout)
                 time.sleep(args.loop)
+            else:
+                stdscr.clear()
+                stdscr.refresh()
         except KeyboardInterrupt:
             print ("User stop")
             curses.nocbreak()
