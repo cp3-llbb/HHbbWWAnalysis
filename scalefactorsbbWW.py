@@ -8,20 +8,29 @@ from scalefactorsutils import MakeScaleFactorsDict
 class ScaleFactorsbbWW:
     def __init__(self):
         self.binningVariables = {
-        "Eta"       : lambda obj : obj.p4.Eta(),
-        "ClusEta"   : lambda obj : obj.p4.Eta() + obj.deltaEtaSC,
-        "AbsEta"    : lambda obj : op.abs(obj.p4.Eta()),
+        "Eta"       : lambda obj : obj.eta,
+        "ClusEta"   : lambda obj : obj.eta + obj.deltaEtaSC,
+        "AbsEta"    : lambda obj : op.abs(obj.eta),
         "AbsClusEta": lambda obj : op.abs(obj.clusterEta) +op.abs(obj.deltaEtaSC),
-        "Pt"        : lambda obj : obj.p4.Pt(),
+        "Pt"        : lambda obj : obj.pt,
         }
 
          # Scale factors dictionary construction #
          # (better to do that here so that it is not buil everytime we ask for scalefactors #
         instance = MakeScaleFactorsDict(paths       = {'ttH_SF' : os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_ttH'),
                                                        'DY_SF'  : os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_DY'),
-                                                       'POG_SF' : os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_POG')},
+                                                       'POG_SF' : os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_POG'),
+                                                       'Btag_SF' : os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag')},
                                         check_path  = True)
         #----- 2016 -----#
+        # Single Trigger SF # (Double triggers are single numbers and are in Base)
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'singleTrigger_electron_2016',
+                                base_str    = "TTH_trigger_SingleElectron_2016.json")
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'singleTrigger_muon_2016',
+                                base_str    = "TTH_trigger_SingleMuon_2016.json")
+
         # Electrons Loose #
            # https://gitlab.cern.ch/ttH_leptons/doc/blob/master/Legacy/data_to_mc_corrections.md#electron-id-efficiency-scale-factors-for-loose-lepton-id 
         instance.AddScaleFactorWithWorkingPoint(path_key        = 'ttH_SF',
@@ -53,6 +62,7 @@ class ScaleFactorsbbWW:
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'muon_tightMVA_2016',
                                 base_str    = "TTHSF_EGamma_SF2D_MuonTight2016.json")
+        
         # Btagging #
             # https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation2016Legacy#Supported_Algorithms_and_Operati
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
@@ -66,16 +76,40 @@ class ScaleFactorsbbWW:
                                                 base_key    = '{algo}_{wp}',
                                                 base_str    = "BTagging_{wp}_{flav}_{calib}_subjet_{algo}_2016.json",
                                                 format_dict = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
+        # Btagging  split #
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
+                                                entry_key   = 'btag_lightjets_2016',
+                                                base_key    = '{algo}_{wp}',
+                                                base_str    = "BTagging_{wp}_lightjets_incl_{algo}_2016.json",
+                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"]})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
+                                                entry_key   = 'btag_cjets_2016',
+                                                base_key    = '{algo}_{wp}',
+                                                base_str    = "BTagging_{wp}_cjets_comb_{algo}_2016.json",
+                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"]})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
+                                                entry_key   = 'btag_bjets_2016',
+                                                base_key    = '{algo}_{wp}',
+                                                base_str    = "BTagging_{wp}_bjets_comb_{algo}_2016.json",
+                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"]})
 
-        #-----  DY weight for 1 and 2 btag -----#
+              #-----  DY weight for 1 and 2 btag -----#
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
                                                 entry_key   = 'DY_2016',
                                                 base_key    = '{channel}_{type}_{btag}',
                                                 base_str    = 'weight_{channel}_{type}_weight_{btag}_2016.json',
                                                 format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b']})
 
+
         #----- 2017 -----#
         # Check links of 2016 #
+        # Single Trigger SF # (Double triggers are single numbers and are in Base)
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'singleTrigger_electron_2017',
+                                base_str    = "TTH_trigger_SingleElectron_2017.json")
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'singleTrigger_muon_2017',
+                                base_str    = "TTH_trigger_SingleMuon_2017.json")
         # Electrons Loose #
         instance.AddScaleFactorWithWorkingPoint(path_key        = 'ttH_SF',
                                                 entry_key       = 'electron_loosereco_2017',
@@ -120,6 +154,13 @@ class ScaleFactorsbbWW:
 
         #----- 2018 -----#
         # Check links of 2016 #
+        # Single Trigger SF # (Double triggers are single numbers and are in Base)
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'singleTrigger_electron_2018',
+                                base_str    = "TTH_trigger_SingleElectron_2018.json")
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'singleTrigger_muon_2018',
+                                base_str    = "TTH_trigger_SingleMuon_2018.json")
         # Electrons Loose #
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'electron_loosereco_2018',

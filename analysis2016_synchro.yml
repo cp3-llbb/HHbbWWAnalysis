@@ -4,24 +4,18 @@ eras:
     luminosity: 35922 
     luminosity-error: 0.025     #pb
 samples:
-#  GluGluToRadionToHHTo2B2VTo2L2Nu_M-750:
-#    files: [/nfs/scratch/fynu/fbury/NanoAOD/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_narrow_13TeV-madgraph-v2_NanoAODv6.root]
-#    generated-events: 'genEventSumw'
-#    cross-section: 1
-#    era: '2016'
-#    pufile: 'Synchronization_GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.json'
-#    split: 10
-#    line-color: "#1F7FD1"
-#    line-type: 1
-#    legend: HH (Radion, M = 750)
-#    order: 12
-#    type: signal
-
-  TTTo2L2Nu: 
-    files: [/nfs/scratch/fynu/fbury/NanoAOD/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_NanoAODv6.root]
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-750:
+    files: [/nfs/scratch/fynu/fbury/NanoAOD/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_narrow_13TeV-madgraph-v2_NanoAODv6.root]
     generated-events: 'genEventSumw'
-    cross-section: 88.40
-    group: ttbar
+    cross-section: 1
     era: '2016'
-    pufile: 'Synchronization_TTTo2L2Nu_2016.json'
+    pufile: 'Synchronization_GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.json'
+
+#  TTTo2L2Nu: 
+#    files: [/nfs/scratch/fynu/fbury/NanoAOD/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_NanoAODv6.root]
+#    generated-events: 'genEventSumw'
+#    cross-section: 88.40
+#    group: ttbar
+#    era: '2016'
+#    pufile: 'Synchronization_TTTo2L2Nu_2016.json'
 
