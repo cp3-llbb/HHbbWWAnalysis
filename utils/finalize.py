@@ -28,7 +28,10 @@ def finalize(path,force=True,verbose=False):
         if not os.path.exists(p):
             content[p] = None
         else:
-            content[p] = os.listdir(p)[0] if len(os.listdir(p))!=0 else ''
+            #content[p] = os.listdir(p)[0] if len(os.listdir(p))!=0 else ''
+            content[p] = os.listdir(p)[0] if len(os.listdir(p))!=0 else None
+    #import pprint
+    #pprint.pprint(content)
 
     if None in content.values() and not force:
         print ("Some outputs are missing")

@@ -692,7 +692,7 @@ class WeightDY:
 
                 # Save to json #
                 with open(self.outputname+'_%s_%s.json'%(name,self.era),'w') as f:
-                    json.dump(json_dict,f,indent=4)
+                    json.dump(json_dict,f,indent=2)
                 print ("Saved json to",self.outputname+'_%s_%s.json'%(name,self.era))
                     
 

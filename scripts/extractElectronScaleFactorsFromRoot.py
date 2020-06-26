@@ -14,7 +14,7 @@ parser.add_argument('-s', '--suffix', help='Suffix to append at the end of the o
 args = parser.parse_args()
 
 # Moriond17: last pt bin is the same as the previous one, but with 100% error and should be ignored
-IGNORE_LAST_PT_BIN = True
+IGNORE_LAST_PT_BIN = False # Keep for ttH
 
 f = ROOT.TFile.Open(args.file)
 
@@ -45,6 +45,7 @@ for key in f.GetListOfKeys():
             pt_binning.append(h.GetYaxis().GetBinUpEdge(i))
         else:
             pt_binning.append(h.GetYaxis().GetBinUpEdge(i))
+
 
     if IGNORE_LAST_PT_BIN and len(pt_binning) > 2:
         pt_binning.pop()

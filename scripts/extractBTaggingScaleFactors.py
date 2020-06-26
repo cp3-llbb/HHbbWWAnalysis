@@ -81,9 +81,9 @@ with open(args.file, 'r') as f:
 
         eta_bin = [float(row[4]), float(row[5])]
         pt_bin = [float(row[6]), float(row[7])]
-        # discr_bin = [float(row[8]), float(row[9])]
+        discr_bin = [float(row[8]), float(row[9])]
         # Hardcode the range: it's not correct inside the CSV file
-        discr_bin = [-100, 100]
+        #discr_bin = [-100, 100]
         formula = row[10].strip()
 
         def get_bin(bin, data, syst_type):
