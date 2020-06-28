@@ -1040,13 +1040,13 @@ One lepton and and one jet argument must be specified in addition to the require
             self.lambda_ElectronTightSF = lambda el : [self.elTightMVA(el)] 
  
             #### Ak4 Btagging ####
-            DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
-            self.DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
+            #DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
+            #self.DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
 
-            # Split by flavour #
-            self.DeepJetMediumSF_lightjets = SF.get_scalefactor("lepton", ("btag_lightjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_lightjets")
-            self.DeepJetMediumSF_cjets = SF.get_scalefactor("lepton", ("btag_cjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_cjets")
-            self.DeepJetMediumSF_bjets = SF.get_scalefactor("lepton", ("btag_bjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_bjets")
+            ## Split by flavour #
+            #self.DeepJetMediumSF_lightjets = SF.get_scalefactor("lepton", ("btag_lightjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_lightjets")
+            #self.DeepJetMediumSF_cjets = SF.get_scalefactor("lepton", ("btag_cjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_cjets")
+            #self.DeepJetMediumSF_bjets = SF.get_scalefactor("lepton", ("btag_bjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_bjets")
 
             #### Ak8 Btagging ####
             #DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
@@ -1085,9 +1085,9 @@ One lepton and and one jet argument must be specified in addition to the require
                     (self.muon_conept[dilep[1].idx]<55 , op.systematic(op.c_float(0.995), name="ttH_doubleMuon_trigSF", up=op.c_float(0.995*1.02), down=op.c_float(0.995*0.98))),
                     (self.muon_conept[dilep[1].idx]<70 , op.systematic(op.c_float(0.96), name="ttH_doubleMuon_trigSF", up=op.c_float(0.96*1.02), down=op.c_float(0.96*0.98))),
                     op.systematic(op.c_float(0.94), name="ttH_doubleMuon_trigSF", up=op.c_float(0.94*1.02), down=op.c_float(0.94*0.98)))
-                # Electron Muon #
+                # Electron Muon : /!\ While ElEl and MuMu is conept ordered, ElMu is not #
                 self.lambda_ttH_electronMuon_trigSF = lambda dilep : op.multiSwitch(
-                    (op.min(self.electron_conept[dilep[1].idx],self.muon_conept[dilep[1].idx])<40, op.systematic(op.c_float(0.98), name="ttH_electronMuon_trigSF", up=op.c_float(0.98*1.01), down=op.c_float(0.98*0.99))),
+                    (op.min(self.electron_conept[dilep[0].idx],self.muon_conept[dilep[1].idx])<40, op.systematic(op.c_float(0.98), name="ttH_electronMuon_trigSF", up=op.c_float(0.98*1.01), down=op.c_float(0.98*0.99))),
                     op.systematic(op.c_float(0.99), name="ttH_electronMuon_trigSF", up=op.c_float(0.99*1.01), down=op.c_float(0.99*0.99)))
             elif era == "2018":
                 # Double Electron #
@@ -1099,9 +1099,9 @@ One lepton and and one jet argument must be specified in addition to the require
                     (self.muon_conept[dilep[0].idx]<40 , op.systematic(op.c_float(1.01), name="ttH_doubleMuon_trigSF", up=op.c_float(1.01*1.01), down=op.c_float(1.01*0.99))),
                     (self.muon_conept[dilep[0].idx]<70 , op.systematic(op.c_float(0.995), name="ttH_doubleMuon_trigSF", up=op.c_float(0.995*1.01), down=op.c_float(0.995*0.99))),
                     op.systematic(op.c_float(0.98), name="ttH_doubleMuon_trigSF", up=op.c_float(0.98*1.01), down=op.c_float(0.98*0.99)))
-                # Electron Muon #
+                # Electron Muon : /!\ While ElEl and MuMu is conept ordered, ElMu is not #
                 self.lambda_ttH_electronMuon_trigSF = lambda dilep : op.multiSwitch(
-                    (op.min(self.electron_conept[dilep[1].idx],self.muon_conept[dilep[1].idx])<25, op.systematic(op.c_float(0.98), name="ttH_electronMuon_trigSF", up=op.c_float(0.98*1.01), down=op.c_float(0.98*0.99))),
+                    (op.min(self.electron_conept[dilep[0].idx],self.muon_conept[dilep[1].idx])<25, op.systematic(op.c_float(0.98), name="ttH_electronMuon_trigSF", up=op.c_float(0.98*1.01), down=op.c_float(0.98*0.99))),
                     op.systematic(op.c_float(1.00), name="ttH_electronMuon_trigSF", up=op.c_float(1.01), down=op.c_float(0.99)))
         else: # reweighting the data for data-driven estimation
             #----- DY reweighting -----#
@@ -1131,10 +1131,17 @@ One lepton and and one jet argument must be specified in addition to the require
             # See https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagShapeCalibration
             # W_btag = Π_i(all jets) SD(jet_i)  which must be multiplied by r = Σ w(before)/Σ w(after) (before/after using the btag weight, no btag selection for both)
                 
-            if ('db' in sampleCfg.keys() and 'TuneCP5' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['TuneCP5' in f for f in sampleCfg['files']])):
-                csvFileName = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_%sLegacySF_V1_TuneCP5.csv"%era)
-            else: # With CUETP8M1
-                csvFileName = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_%sLegacySF_V1.csv"%era)
+            if era == '2016':
+                if ('db' in sampleCfg.keys() and 'TuneCP5' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['TuneCP5' in f for f in sampleCfg['files']])):
+                    csvFileName = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_2016LegacySF_V1_TuneCP5.csv")
+                else: # With CUETP8M1
+                    csvFileName = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_2016LegacySF_V1.csv")
+            if era == '2017':
+                csvFileName = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepFlavour_94XSF_V4_B_F.csv")
+            if era == '2018':
+                csvFileName = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_102XSF_V2.csv")
+                
+
             print ('Btag CSV file',csvFileName)
     
             systTypes = ["jes", "lf", "hf", "hfstats1", "hfstats2","lfstats1", "lfstats2", "cferr1", "cferr2"]
@@ -1158,17 +1165,17 @@ One lepton and and one jet argument must be specified in addition to the require
             elif self.args.BtagReweightingOff:
                 pass # Do not apply any SF
             else:
-                ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(sample,era))
-                if not os.path.exists(ReweightingFileName):
-                    raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
-                print ('Reweighting file',ReweightingFileName)
+                #ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(sample,era))
+                #if not os.path.exists(ReweightingFileName):
+                #    raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
+                #print ('Reweighting file',ReweightingFileName)
 
-                self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
-                                                                numJets  = op.rng_len(self.ak4Jets),
-                                                                systName = 'btag_ratio',
-                                                                nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
-                noSel = noSel.refine("BtagSF" , weight = [self.btagSF,self.BtagRatioWeight])
-                #noSel = noSel.refine("BtagSF" , weight = self.btagSF)
+                #self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
+                #                                                numJets  = op.rng_len(self.ak4Jets),
+                #                                                systName = 'btag_ratio',
+                #                                                nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
+                #noSel = noSel.refine("BtagSF" , weight = [self.btagSF,self.BtagRatioWeight])
+                noSel = noSel.refine("BtagSF" , weight = self.btagSF)
 
         # Return #
         return noSel

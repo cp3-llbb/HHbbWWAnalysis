@@ -13,13 +13,13 @@ from highlevelLambdas import *
 #===============================================================================================#
 #                                 SkimmerHHtobbWW                                               #
 #===============================================================================================#
-class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
+class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
     """ Plotter module: HH->bbW(->e/µ nu)W(->e/µ nu) histograms from NanoAOD """
     def __init__(self, args):
-        super(SkimmerNanoHHtobbWWSL, self).__init__(args)
+        super(SkimmerNanoHHtobbWWDL, self).__init__(args)
 
     def defineSkimSelection(self, t, noSel, sample=None, sampleCfg=None): 
-        noSel = super(SkimmerNanoHHtobbWWSL,self).prepareObjects(t, noSel, sample, sampleCfg, "DL")
+        noSel = super(SkimmerNanoHHtobbWWDL,self).prepareObjects(t, noSel, sample, sampleCfg, "DL")
 
         era = sampleCfg['era'] 
 
@@ -43,8 +43,8 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
 
             #----- Lepton selection -----#
             # Args are passed within the self #
-            selLeptonDict = makeLeptonSelection(self,noSel)
-                # makeLeptonSelection returns dict -> value is list of three selections for 3 channels 
+            selLeptonDict = makeDoubleLeptonSelection(self,noSel)
+                # makeDoubleLeptonSelection returns dict -> value is list of three selections for 3 channels 
                 # [0] -> we take the first and only key and value because restricted to one lepton selection
             selLeptonList = list(selLeptonDict.values())[0]
             if self.args.Channel == "ElEl":
@@ -57,9 +57,9 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
             #----- Jet selection -----#
             # Since the selections in one line, we can use the non copy option of the selection to modify the selection object internally
             if any([self.args.__dict__[item] for item in ["Ak4","Resolved0Btag","Resolved1Btag","Resolved2Btag"]]):
-                makeAk4JetSelection(self,selObj) 
+                makeAtLeastTwoAk4JetSelection(self,selObj) 
             if any([self.args.__dict__[item] for item in ["Ak8","Boosted"]]):
-                makeAk8JetSelection(self,selObj) 
+               makeAtLeastOneAk8JetSelection(self,selObj) 
             if self.args.Resolved0Btag:
                 makeExclusiveResolvedNoBtagSelection(self,selObj)
             if self.args.Resolved1Btag:
@@ -319,10 +319,6 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
 #                varsToKeep["ElMuOSPreSelPair{}_lep2_pdgId".format(i)]      = op.switch(op.rng_len(self.OSElMuDileptonPreSel) >= i, self.OSElMuDileptonPreSel[i-1][1].pdgId, op.c_float(-9999.))
 #                varsToKeep["ElMuOSPreSelPair{}_invMass".format(i)]         = op.switch(op.rng_len(self.OSElMuDileptonPreSel) >= i, op.invariant_mass(self.OSElMuDileptonPreSel[i-1][0].p4,self.OSElMuDileptonPreSel[i-1][1].p4), op.c_float(-9999.))
 
-
-
-
-
             # MET #
              
             varsToKeep["PFMET"]    = self.corrMET.pt
@@ -334,28 +330,22 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
             from operator import mul
             from functools import reduce
 
-#            if era == '2016':
-#                electronMuon_cont = op.combine((self.electronsFakeSel, self.muonsFakeSel), pred=self.lambda_leptonOS)
-#                varsToKeep["trigger_SF"] = op.multiSwitch(
-#                        (op.AND(op.rng_len(self.electronsTightSel)==1,op.rng_len(self.muonsTightSel)==0) , self.ttH_singleElectron_trigSF(self.electronsTightSel[0])),
-#                        (op.AND(op.rng_len(self.electronsTightSel)==0,op.rng_len(self.muonsTightSel)==1) , self.ttH_singleMuon_trigSF(self.muonsTightSel[0])),
-#                        (op.AND(op.rng_len(self.electronsTightSel)>=2,op.rng_len(self.muonsTightSel)==0) , self.lambda_ttH_doubleElectron_trigSF(self.electronsTightSel)),
-#                        (op.AND(op.rng_len(self.electronsTightSel)==0,op.rng_len(self.muonsTightSel)>=2) , self.lambda_ttH_doubleMuon_trigSF(self.muonsTightSel)),
-#                        (op.AND(op.rng_len(self.electronsTightSel)>=1,op.rng_len(self.muonsTightSel)>=1) , self.lambda_ttH_electronMuon_trigSF(electronMuon_cont)),
-#                         op.c_float(1.))
-#            else:
-#                raise NotImplementedError
+            electronMuon_cont = op.combine((self.electronsFakeSel, self.muonsFakeSel))
+            varsToKeep["trigger_SF"] = op.multiSwitch(
+                    (op.AND(op.rng_len(self.electronsTightSel)==1,op.rng_len(self.muonsTightSel)==0) , self.ttH_singleElectron_trigSF(self.electronsTightSel[0])),
+                    (op.AND(op.rng_len(self.electronsTightSel)==0,op.rng_len(self.muonsTightSel)==1) , self.ttH_singleMuon_trigSF(self.muonsTightSel[0])),
+                    (op.AND(op.rng_len(self.electronsTightSel)>=2,op.rng_len(self.muonsTightSel)==0) , self.lambda_ttH_doubleElectron_trigSF(self.electronsTightSel)),
+                    (op.AND(op.rng_len(self.electronsTightSel)==0,op.rng_len(self.muonsTightSel)>=2) , self.lambda_ttH_doubleMuon_trigSF(self.muonsTightSel)),
+                    (op.AND(op.rng_len(self.electronsTightSel)>=1,op.rng_len(self.muonsTightSel)>=1) , self.lambda_ttH_electronMuon_trigSF(electronMuon_cont[0])),
+                     op.c_float(1.))
 
-            if era == '2016' or era == '2017':
-                varsToKeep["lepton_IDSF"] = op.rng_product(self.electronsTightSel, lambda el : reduce(mul,self.lambda_ElectronLooseSF(el)+self.lambda_ElectronTightSF(el))) * \
-                                            op.rng_product(self.muonsTightSel, lambda mu : reduce(mul,self.lambda_MuonLooseSF(mu)+self.lambda_MuonTightSF(mu))) 
-            else:
-                raise NotImplementedError
+            varsToKeep["lepton_IDSF"] = op.rng_product(self.electronsTightSel, lambda el : reduce(mul,self.lambda_ElectronLooseSF(el)+self.lambda_ElectronTightSF(el))) * \
+                                        op.rng_product(self.muonsTightSel, lambda mu : reduce(mul,self.lambda_MuonLooseSF(mu)+self.lambda_MuonTightSF(mu))) 
 
             # Btagging SF #
             varsToKeep["btag_SF"] = self.btagSF
-            varsToKeep["btag_reweighting"] = self.BtagRatioWeight
-            varsToKeep["btag_reweighting_SF"] = self.btagSF * self.BtagRatioWeight
+            #varsToKeep["btag_reweighting"] = self.BtagRatioWeight
+            #varsToKeep["btag_reweighting_SF"] = self.btagSF * self.BtagRatioWeight
 
             # ttbar PT reweighting #
             if "group" in sampleCfg and sampleCfg["group"] == 'ttbar':
