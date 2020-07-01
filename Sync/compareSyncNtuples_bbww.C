@@ -118,11 +118,19 @@ NtupleMetaData
 /* *************************** EDIT THIS ***************************************/
 
 const std::string inputbase_dir = ".";
-const std::string base_dir = "./sync_Tallinn_Louvain";
+//const std::string base_dir = "./sync_Tallinn_Louvain_2016";
+const std::string base_dir = "./sync_Tallinn_Louvain_2017";
+//const std::string base_dir = "./sync_Tallinn_Louvain_2018";
 
 const std::vector<NtupleMetaData> ntupleMetadataMap = {
-  { { "sync_bbww_ttbar_Tallinn_2016_v2.root", }, "Tallinn",  "", inputbase_dir },
-  { { "sync_bbww_ttbar_Louvain_2016.root", }, "Louvain", "", inputbase_dir },
+//  { { "sync_bbww_Tallinn_2016_v11.root" }, "Tallinn",  "", inputbase_dir },
+//  { { "sync_bbww_Louvain_2016_v9.root" }, "Louvain", "", inputbase_dir },
+
+  { { "sync_bbww_Tallinn_2017_v9.root" }, "Tallinn",  "", inputbase_dir },
+  { { "sync_bbww_Louvain_2017_v1.root" }, "Louvain", "", inputbase_dir },
+
+//  { { "sync_bbww_Tallinn_2018_v8.root" }, "Tallinn",  "", inputbase_dir },
+//  { { "sync_bbww_Louvain_2018_v3.root" }, "Louvain", "", inputbase_dir },
 };
 
 //-------------------------------------------------------------------------------

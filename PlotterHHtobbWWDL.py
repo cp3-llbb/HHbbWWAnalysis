@@ -217,6 +217,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,HistogramsModule):
                     plots.extend(makeDileptonPlots(**{k:channelDict[k] for k in LeptonKeys}))
                     # Number of jets #
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**ResolvedJetsN))
+                    plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**JetsN))
                     # Ak4 Jets #
                     plots.extend(makeTwoAk4JetsPlots(**{k:channelDict[k] for k in JetKeys}))
                     # MET #
@@ -248,6 +249,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,HistogramsModule):
                     plots.extend(makeDileptonPlots(**{k:channelDict[k] for k in LeptonKeys}))
                     # Number of jets #
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**BoostedJetsN))
+                    plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**FatJetsN))
                     # Ak8 Jets #
                     plots.extend(makeAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys}))
                     # MET #
@@ -283,7 +285,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,HistogramsModule):
 
         #----- Add the Yield plots -----#
         plots.extend(self.yieldPlots.returnPlots())
-
 
         #----- Return -----#
         return plots
