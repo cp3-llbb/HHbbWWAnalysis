@@ -152,7 +152,7 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False):
                                             lambdaOSDilepton(self.ElElDileptonFakeSel[0]),
                                             lambdaLowPtCutElEl(self.ElElDileptonFakeSel[0]),
                                             lambdaLeadingPtCutElEl(self.ElElDileptonFakeSel[0])],
-                                     weight = ElElLooseSF(self.ElElDileptonFakeSel[0]))
+                                     weight = ElElLooseSF(self.ElElDileptonFakeSel[0])) 
             MuMuFakeSelObject.refine(cut = [op.rng_len(self.MuMuDileptonFakeSel)>=1,
                                             lambdaOSDilepton(self.MuMuDileptonFakeSel[0]),
                                             lambdaLowPtCutMuMu(self.MuMuDileptonFakeSel[0]),
@@ -163,6 +163,34 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False):
                                             lambdaLowPtCutElMu(self.ElMuDileptonFakeSel[0]),
                                             lambdaLeadingPtCutElMu(self.ElMuDileptonFakeSel[0])],
                                      weight = ElMuLooseSF(self.ElMuDileptonFakeSel[0]))
+#            ElElFakeSelObject.refine(cut = [op.rng_len(self.ElElDileptonFakeSel)>=1,
+#                                            lambdaOSDilepton(self.ElElDileptonFakeSel[0]),
+#                                            lambdaLowPtCutElEl(self.ElElDileptonFakeSel[0]),
+#                                            lambdaLeadingPtCutElEl(self.ElElDileptonFakeSel[0])])
+#            MuMuFakeSelObject.refine(cut = [op.rng_len(self.MuMuDileptonFakeSel)>=1,
+#                                            lambdaOSDilepton(self.MuMuDileptonFakeSel[0]),
+#                                            lambdaLowPtCutMuMu(self.MuMuDileptonFakeSel[0]),
+#                                            lambdaLeadingPtCutMuMu(self.MuMuDileptonFakeSel[0])])
+#            ElMuFakeSelObject.refine(cut = [op.rng_len(self.ElMuDileptonFakeSel)>=1,
+#                                            lambdaOSDilepton(self.ElMuDileptonFakeSel[0]),
+#                                            lambdaLowPtCutElMu(self.ElMuDileptonFakeSel[0]),
+#                                            lambdaLeadingPtCutElMu(self.ElMuDileptonFakeSel[0])])
+#            ElEl_wSF = ElElLooseSF(self.ElElDileptonFakeSel[0])
+#            MuMu_wSF = MuMuLooseSF(self.MuMuDileptonFakeSel[0])
+#            ElMu_wSF = ElMuLooseSF(self.ElMuDileptonFakeSel[0]) 
+#
+#            from bamboo.analysisutils import forceDefine 
+#            forceDefine(ElEl_wSF,ElElFakeSelObject.sel)
+#            forceDefine(MuMu_wSF,MuMuFakeSelObject.sel)
+#            forceDefine(ElMu_wSF,ElMuFakeSelObject.sel)
+#
+#            ElElFakeSelObject.selName += 'wgt'
+#            MuMuFakeSelObject.selName += 'wgt'
+#            ElMuFakeSelObject.selName += 'wgt'
+#
+#            ElElFakeSelObject.refine(weight = ElEl_wSF)
+#            MuMuFakeSelObject.refine(weight = MuMu_wSF)
+#            ElMuFakeSelObject.refine(weight = ElMu_wSF)
 
             # Yield #
             if plot_yield:
@@ -323,7 +351,7 @@ def makeAtLeastTwoAk4JetSelection(self,selObject,copy_sel=False,plot_yield=False
         selObject = copy(selObject)
     selObject.selName += "TwoAk4Jets"
     selObject.yieldTitle += " + Ak4 Jets $\geq 2$"
-    selObject.sel = selObject.sel.refine(selObject.selName,cut=[op.rng_len(self.ak4Jets)>=2])
+    selObject.refine(cut=[op.rng_len(self.ak4Jets)>=2])
     if plot_yield:
         selObject.makeYield(self.yieldPlots)
     if copy_sel :

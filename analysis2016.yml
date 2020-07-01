@@ -805,6 +805,15 @@ plotIt:
       # on the jet btagging
     - deepjet
     #- deepcsv
+    # Btag SF #
+    - btagSF_lf
+    - btagSF_hf
+    - btagSF_hfstats1
+    - btagSF_hfstats2
+    - btagSF_lfstats1
+    - btagSF_lfstats2
+    - btagSF_cferr1
+    - btagSF_cferr2
     # Top pt reweighting #
     - topPtReweighting
     # Split by flavour
