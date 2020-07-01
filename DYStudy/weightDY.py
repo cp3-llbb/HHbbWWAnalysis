@@ -463,19 +463,19 @@ class WeightDY:
 
         mode = "DY data estimation" if self.mode == "data" else "DY MC"
 
-        print ('-'*80)
-        print ("Examining ZVeto_0b")
-        self.findNegativeBinsInTh2(self.histograms['ZVeto_0b'])
-        print ('-'*80)
-        print ("Examining ZPeak_0b")
-        self.findNegativeBinsInTh2(self.histograms['ZPeak_0b'])
-        print ('-'*80)
-        print ("Examining ZPeak_2b")
-        self.findNegativeBinsInTh2(self.histograms['ZPeak_2b'])
-        print ('-'*80)
-        print ("Examining ZVeto_0b")
-        self.findNegativeBinsInTh2(self.histograms['ZPeak_1b'])
-        print ('-'*80)
+#        print ('-'*80)
+#        print ("Examining ZVeto_0b")
+#        self.findNegativeBinsInTh2(self.histograms['ZVeto_0b'])
+#        print ('-'*80)
+#        print ("Examining ZPeak_0b")
+#        self.findNegativeBinsInTh2(self.histograms['ZPeak_0b'])
+#        print ('-'*80)
+#        print ("Examining ZPeak_2b")
+#        self.findNegativeBinsInTh2(self.histograms['ZPeak_2b'])
+#        print ('-'*80)
+#        print ("Examining ZVeto_0b")
+#        self.findNegativeBinsInTh2(self.histograms['ZPeak_1b'])
+#        print ('-'*80)
 
 
 
@@ -708,8 +708,8 @@ class WeightDY:
         
 if __name__ == "__main__":
     #----- Path -----#
-    path_ZPeak = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy_ZPeak_v2/'
-    path_ZVeto = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_tight_v3'
+    path_ZVeto = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_tight_withRatio_noSyst_v2'
+    path_ZPeak = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_tight_withRatio_ZPeak_noSyst_v2'
 
     #----- 1D weight -----#
     ElElChannel = {'ZVeto_0b' : {'path': path_ZVeto,
@@ -739,10 +739,10 @@ if __name__ == "__main__":
                                  'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}}
 
 
-#    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_data_1D','data','2016')
-#    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_data_1D','data','2016')
-#    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_mc_1D','mc','2016')
-#    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_mc_1D','mc','2016')
+    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_data_1D','data','2016')
+    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_data_1D','data','2016')
+    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_mc_1D','mc','2016')
+    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_mc_1D','mc','2016')
 
     #----- 2D weight -----#
     ElElChannel = {'ZVeto_0b' : {'path': path_ZVeto,
@@ -770,7 +770,7 @@ if __name__ == "__main__":
                    'ZPeak_2b' : {'path': path_ZPeak,
                                  'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_ptVSeta'}}
 
-    #instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_data_2D','data','2016')
+    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_data_2D','data','2016')
     instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_data_2D','data','2016')
-    #instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_mc_2D','mc','2016')
-    #instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_mc_2D','mc','2016')
+    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_mc_2D','mc','2016')
+    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_mc_2D','mc','2016')
