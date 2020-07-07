@@ -191,9 +191,24 @@ class BtagReweightingRatio:
         
         
 if __name__ == "__main__":
-    #----- Path -----#
-    path_reweighting_on = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_BtagReweighting_On/'
-    path_reweighting_off = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_BtagReweighting_Off/'
-    list_hists = ['NoChannel_NoSelection_Ak4Jets_N']
-
-    instance = BtagReweightingRatio(path_reweighting_on,path_reweighting_off,list_hists,'','BtagReweightingRatio_jetN','2016')
+    #---- 2016 ----#
+    instance = BtagReweightingRatio('/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_BtagReweighting_On/',
+                                    '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_BtagReweighting_Off/',
+                                    ['NoChannel_NoSelection_Ak4Jets_N'],
+                                    '',
+                                    'BtagReweightingRatio_jetN',
+                                    '2016')
+    #---- 2017 ----#
+    instance = BtagReweightingRatio('/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017_BtagReweighting_On/',
+                                    '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017_BtagReweighting_Off/',
+                                    ['NoChannel_NoSelection_Ak4Jets_N'],
+                                    '',
+                                    'BtagReweightingRatio_jetN',
+                                    '2017')
+    #---- 2018 ----#
+    instance = BtagReweightingRatio('/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018_BtagReweighting_On/',
+                                    '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018_BtagReweighting_Off/',
+                                    ['NoChannel_NoSelection_Ak4Jets_N'],
+                                    '',
+                                    'BtagReweightingRatio_jetN',
+                                    '2018')
