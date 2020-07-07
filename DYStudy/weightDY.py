@@ -129,7 +129,7 @@ class WeightDY:
             # Get hist #
             h = hist_dict[sample]
             if self.hist_type == 'TH2':
-                h.Rebin2D(2,1)
+                h.Rebin2D(2,3)
             if h is None:
                 continue
             if dist is None:
@@ -149,8 +149,8 @@ class WeightDY:
                 if data_dict['type'] == 'mc':
                     if data_dict['group'] != 'DY':
                         factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]    
-                        if data_dict['group'] == 'ttbar':
-                            factor *= 0.7
+                        #if data_dict['group'] == 'ttbar':
+                        #    factor *= 0.7
                         dist.Add(h,-factor)     
             elif mode == 'mc':
                 if data_dict['type'] == 'mc' and data_dict['group'] == 'DY':
@@ -484,23 +484,23 @@ class WeightDY:
         #----- Zpeak and Zveto 0b -----#
         C1.cd(1)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZPeak_1b'].SetTitle('Z Peak 1 btag (%s) : Integral = %0.2f;Lead lepton P_{T};Lead lepton #eta'%(mode,self.N_ZPeak1b))
+        self.histograms['ZPeak_1b'].SetTitle('Z Peak 1 btag (%s) : Integral = %0.2f;Lead lepton #eta;Lead lepton P_{T}'%(mode,self.N_ZPeak1b))
         self.histograms['ZPeak_1b'].SetTitleSize(0.9,"t")
         #self.histograms['ZPeak_1b'].GetZaxis().SetRangeUser(0,amax)
         self.histograms['ZPeak_1b'].Draw("colz")
         C1.cd(7)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZPeak_2b'].SetTitle('Z Peak 2 btag (%s) : Integral = %0.2f;Lead lepton P_{T};Lead lepton #eta'%(mode,self.N_ZPeak2b))
+        self.histograms['ZPeak_2b'].SetTitle('Z Peak 2 btag (%s) : Integral = %0.2f;Lead lepton #eta;Lead lepton P_{T}'%(mode,self.N_ZPeak2b))
         #self.histograms['ZPeak_2b'].GetZaxis().SetRangeUser(0,amax)
         self.histograms['ZPeak_2b'].Draw("colz")
         C1.cd(5)
         ROOT.gPad.SetRightMargin(0.15)
         self.histograms['ZVeto_0b'].Draw("colz")
         #self.histograms['ZVeto_0b'].GetZaxis().SetRangeUser(0,amax)
-        self.histograms['ZVeto_0b'].SetTitle('Z Veto 0 btag (%s) : Integral = %0.2f;Lead lepton P_{T};Lead lepton #eta'%(mode,self.N_ZVeto0b))
+        self.histograms['ZVeto_0b'].SetTitle('Z Veto 0 btag (%s) : Integral = %0.2f;Lead lepton #eta;Lead lepton P_{T}'%(mode,self.N_ZVeto0b))
         C1.cd(4)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZPeak_0b'].SetTitle('Z Peak 0 btag (%s) : Integral = %0.2f;Lead lepton P_{T};Lead lepton #eta'%(mode,self.N_ZPeak0b))
+        self.histograms['ZPeak_0b'].SetTitle('Z Peak 0 btag (%s) : Integral = %0.2fLead lepton #eta;Lead lepton P_{T};'%(mode,self.N_ZPeak0b))
         #self.histograms['ZPeak_0b'].GetZaxis().SetRangeUser(0,amax)
         self.histograms['ZPeak_0b'].Draw("colz")
 
@@ -508,14 +508,14 @@ class WeightDY:
         C1.cd(2)
         ROOT.gPad.SetRightMargin(0.15)
         #ROOT.gPad.SetLogz()
-        self.weight_1b.SetTitle('Weight (1b);Lead lepton P_{T};Lead lepton #eta')
-        #self.weight_1b.GetZaxis().SetRangeUser(0,1)
+        self.weight_1b.SetTitle('Weight (1b);Lead lepton #eta;Lead lepton P_{T}')
+        self.weight_1b.GetZaxis().SetRangeUser(0,0.3)
         self.weight_1b.Draw("colz")
         C1.cd(8)
         ROOT.gPad.SetRightMargin(0.15)
         #ROOT.gPad.SetLogz()
-        self.weight_2b.SetTitle('Weight (2b);Lead lepton P_{T};Lead lepton #eta')
-        #self.weight_2b.GetZaxis().SetRangeUser(0,1)
+        self.weight_2b.SetTitle('Weight (2b)Lead lepton #eta;Lead lepton P_{T};')
+        self.weight_2b.GetZaxis().SetRangeUser(0,0.1)
         self.weight_2b.Draw("colz")
 
         #----- DY shape and MC DY in Zveto -----#
@@ -536,7 +536,7 @@ class WeightDY:
         C1.cd(6)
         pt = ROOT.TPaveText(.1,.1,.9,.9)
         pt.AddText("Weight_{1b/2b} = #frac{N_{1b/2b}^{Z Peak}}{N_{0b}^{Z Peak}} x #frac{h(Z Peak)_{1b/2b}^{norm}}{h(Z Peak)_{0b}^{norm}}")
-        pt.AddText("DY shape_{1b/2b} = Weight_{1b/2b} x h(Z Veto)_{0}")
+        pt.AddText("DY shape_{1b/2b} = Weight_{1b/2b} x h(Z Veto)_{0b}")
         pt.AddText("#frac{N_{1b}^{Z Peak}}{N_{0b}^{Z Peak}} = %0.5f"%self.factor_1b)
         pt.AddText("#frac{N_{2b}^{Z Peak}}{N_{0b}^{Z Peak}} = %0.5f"%self.factor_2b)
         pt.Draw()
@@ -739,10 +739,10 @@ if __name__ == "__main__":
                                  'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}}
 
 
-    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_data_1D','data','2016')
-    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_data_1D','data','2016')
-    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_mc_1D','mc','2016')
-    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_mc_1D','mc','2016')
+#    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_data_1D','data','2016')
+#    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_data_1D','data','2016')
+#    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_mc_1D','mc','2016')
+#    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_mc_1D','mc','2016')
 
     #----- 2D weight -----#
     ElElChannel = {'ZVeto_0b' : {'path': path_ZVeto,
