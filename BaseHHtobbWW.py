@@ -422,7 +422,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   cachedir              = cachJEC_dir)
                     configureType1MET(variProxy         = getattr(tree, f"_{metName}"),
                                       jec               = jecTag,
-                                      mayWriteCache     = isNotWorke,
+                                      mayWriteCache     = isNotWorker,
                                       isMC              = self.is_MC,
                                       backend           = be, 
                                       uName             = sample,
@@ -497,7 +497,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   cachedir              = cachJEC_dir)
                     configureType1MET(variProxy         = getattr(tree, f"_{metName}"),
                                       jec               = jecTag,
-                                      mayWriteCache     = isNotWorke,
+                                      mayWriteCache     = isNotWorker,
                                       isMC              = self.is_MC,
                                       backend           = be, 
                                       uName             = sample,
@@ -1020,7 +1020,12 @@ One lepton and and one jet argument must be specified in addition to the require
             if self.is_MC:
                 noSel = noSel.refine("withTrig", cut=self.triggers)
             else:
-                noSel = noSel.refine("withTrig", cut=[makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset), self.triggers])
+                if era == "2018": # For 2018 the electron samples are merged, need to build according dict for primary dataset
+                    trigger_per_pd = { pd : trig for pd, trig in self.triggersPerPrimaryDataset.items() if pd not in ("SingleElectron", "DoubleEGamma") } 
+                    trigger_per_pd["EGamma"] = self.triggersPerPrimaryDataset["SingleElectron"] + self.triggersPerPrimaryDataset["DoubleEGamma"]
+                    noSel = noSel.refine("withTrig", cut=[makeMultiPrimaryDatasetTriggerSelection(sample, trigger_per_pd), self.triggers])
+                else:
+                    noSel = noSel.refine("withTrig", cut=[makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset), self.triggers])
                 # makeMultiPrimaryDatasetTriggerSelection must be done first, to make sure an event is not passed several times from several datasets
                 # Then the trigger selection is based on fakeable leptons
 
@@ -1185,17 +1190,17 @@ One lepton and and one jet argument must be specified in addition to the require
             elif self.args.BtagReweightingOff:
                 pass # Do not apply any SF
             else:
-                ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(sample,era))
-                if not os.path.exists(ReweightingFileName):
-                    raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
-                print ('Reweighting file',ReweightingFileName)
+                #ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(sample,era))
+                #if not os.path.exists(ReweightingFileName):
+                #    raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
+                #print ('Reweighting file',ReweightingFileName)
 
-                self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
-                                                                numJets  = op.rng_len(self.ak4Jets),
-                                                                systName = 'btag_ratio',
-                                                                nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
-                noSel = noSel.refine("BtagSF" , weight = [self.btagSF,self.BtagRatioWeight])
-                #noSel = noSel.refine("BtagSF" , weight = self.btagSF)
+                #self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
+                #                                                numJets  = op.rng_len(self.ak4Jets),
+                #                                                systName = 'btag_ratio',
+                #                                                nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
+                #noSel = noSel.refine("BtagSF" , weight = [self.btagSF,self.BtagRatioWeight])
+                noSel = noSel.refine("BtagSF" , weight = self.btagSF)
 
         # Return #
         return noSel
