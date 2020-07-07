@@ -1190,17 +1190,16 @@ One lepton and and one jet argument must be specified in addition to the require
             elif self.args.BtagReweightingOff:
                 pass # Do not apply any SF
             else:
-                #ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(sample,era))
-                #if not os.path.exists(ReweightingFileName):
-                #    raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
-                #print ('Reweighting file',ReweightingFileName)
+                ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(sample,era))
+                if not os.path.exists(ReweightingFileName):
+                    raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
+                print ('Reweighting file',ReweightingFileName)
 
-                #self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
-                #                                                numJets  = op.rng_len(self.ak4Jets),
-                #                                                systName = 'btag_ratio',
-                #                                                nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
-                #noSel = noSel.refine("BtagSF" , weight = [self.btagSF,self.BtagRatioWeight])
-                noSel = noSel.refine("BtagSF" , weight = self.btagSF)
+                self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
+                                                                numJets  = op.rng_len(self.ak4Jets),
+                                                                systName = 'btag_ratio',
+                                                                nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
+                noSel = noSel.refine("BtagSF" , weight = [self.btagSF,self.BtagRatioWeight])
 
         # Return #
         return noSel
