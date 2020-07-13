@@ -6,11 +6,13 @@ import collections
 import logging
 import argparse
 import subprocess
+from functools import reduce
+import operator
 
 class TemplateLatex:
-    def __init__(self,dirpath,logplot=False):
-        self.dirpath = os.path.abspath(dirpath)
-        self.texfile = os.path.join(self.dirpath,"plots.tex")
+    def __init__(self,dirpaths,logplot=False):
+        self.dirpaths = [os.path.abspath(dirpath) for dirpath in dirpaths]
+        self.texfile = os.path.join(os.path.dirname(self.dirpaths[0]),"plots.tex")
         self.filesdict = {}
         self.logplot = logplot
 
@@ -22,9 +24,9 @@ class TemplateLatex:
                         ])
             
         self.selections = collections.OrderedDict([
-                        ('TwoAk4Jets_' , "At least two Ak4 Jets (before Btagging)"),
-                        ('OneAk8Jet_' , "At least one Ak8 Jet (before Btagging)"),
-                        ('TwoAk4JetsExclusiveResolvedNoBtag' , "Exclusive Resolved Jets (no Btag)"),
+          #              ('TwoAk4Jets_' , "At least two Ak4 Jets (before Btagging)"),
+          #              ('OneAk8Jet_' , "At least one Ak8 Jet (before Btagging)"),
+          #              ('TwoAk4JetsExclusiveResolvedNoBtag' , "Exclusive Resolved Jets (no Btag)"),
                         ('TwoAk4JetsExclusiveResolvedOneBtag' , "Exclusive Resolved Jets (1 Btag)"),
                         ('TwoAk4JetsExclusiveResolvedTwoBtags' , "Exclusive Resolved Jets (2 Btags)"),
                         ('OneAk8JetInclusiveBoosted' , "Inclusive Boosted Jets"),
@@ -113,7 +115,9 @@ class TemplateLatex:
                 logging.info("... "+"-"*40)
                 logging.info("... Selection : "+selection)
                 variabledict = {}
-                for pdf in glob.glob(os.path.join(self.dirpath,channel+"*"+selection+"*.pdf")):
+                pdfs = [glob.glob(os.path.join(dirpath,channel+"*"+selection+"*.pdf")) for dirpath in self.dirpaths]
+                pdfs = reduce(operator.concat, pdfs)
+                for pdf in pdfs:
                     pdf = os.path.basename(pdf)
                     log = "logy" in pdf
                     if self.logplot ^ log: # xor
@@ -142,6 +146,12 @@ class TemplateLatex:
 }
 \usepackage{graphicx}
 \usepackage[english]{babel}
+\graphicspath{
+                        """
+        for dirpath in self.dirpaths:
+            self.content += "{%s/},"%os.path.basename(dirpath)
+        self.content += "}"
+        self.content += r"""
 \begin{document}
                         """
         self.content += "\n"
@@ -184,58 +194,65 @@ class TemplateLatex:
 
     def producePDF(self):
         cwd = os.getcwd()
+        wd = os.path.dirname(self.texfile)
         try:
-            os.chdir(self.dirpath)
-            try:
-                with open('plots_compilation.log', 'w') as output:
-                    process= subprocess.Popen(['pdflatex', os.path.basename(self.texfile)], # We moved to the directory
-                                              stdout=output,
-                                              stderr=output)
-            except:
-                logging.critical("Could not produce the pdf from the Tex file, try manually 'pdflatex %s'"%self.texfile)
-            logging.info("Generated pdf file %s"%(self.texfile.replace(".tex",".pdf")))
-            logging.info("Log available at %s"%(os.path.join(self.dirpath,'plots_compilation.log')))
+            os.chdir(wd)
         except:
-            logging.critical("Could not go to directory %s"%self.dirpath)
+            logging.critical("Could not go to directory %s, will abort"%wd)
+            sys.exit()
+        try:
+            with open('plots_compilation.log', 'w') as output:
+                process= subprocess.Popen(['pdflatex', os.path.basename(self.texfile)], # We moved to the directory
+                                          stdout=output,
+                                          stderr=output)
+        except:
+            logging.critical("Could not produce the pdf from the Tex file, try manually 'pdflatex %s'"%self.texfile)
+        logging.info("Generated pdf file %s"%(self.texfile.replace(".tex",".pdf")))
+        logging.info("Log available at %s"%(os.path.join(wd,'plots_compilation.log')))
         os.chdir(cwd)
         
     def compileYield(self):
-        # Load tex file adn edit content in string #
+        # Load tex file and edit content in string #
         text = r"""
 \documentclass{report}
     \usepackage{booktabs}
     \usepackage{graphicx}
     \usepackage[a4paper,bindingoffset=0.5cm,left=0cm,right=1cm,top=2cm,bottom=2cm,footskip=0.25cm]{geometry}
+
+\begin{document}
                 """
-        with open(os.path.join(self.dirpath,"yields.tex"),"r") as f:
-            while True: 
-                line = f.readline() 
-                if not line:
-                    break
-                if line.startswith(r"\begin{tabular}"):
-                    text += r"\begin{document}"+"\n"
-                    text += r"\resizebox{\textwidth}{!}{"+"\n"
-                text += line
+        wd = os.path.dirname(self.texfile)
+        for dirpath in self.dirpaths:
+            with open(os.path.join(dirpath,"yields.tex"),"r") as f:
+                while True: 
+                    line = f.readline() 
+                    if not line:
+                        break
+                    if line.startswith(r"\begin{document}"):
+                        continue
+                    if line.startswith(r"\begin{tabular}"):
+                        text += r"\resizebox{\textwidth}{!}{"+"\n"
+                    text += line
         text += "\n}\n"+r"\end{document}"
 
         # Save new tex file #
-        with open(os.path.join(self.dirpath,"yieldsTable.tex"),"w") as f:
+        with open(os.path.join(wd,"yieldsTable.tex"),"w") as f:
             f.write(text)
         # Move to directory and compile #
         cwd = os.getcwd()
         try:
-            os.chdir(self.dirpath)
-            try:
-                with open('yields_compilation.log', 'w') as output:
-                    process= subprocess.Popen(['pdflatex', "yieldsTable.tex"], # We moved to the directory
-                                              stdout=output,
-                                              stderr=output)
-            except:
-                logging.critical("Could not produce the pdf from the Tex file, try manually 'pdflatex yieldsTable.tex'")
-            logging.info("Generated pdf file %s"%(os.path.join(self.dirpath,"yieldsTable.pdf")))
-            logging.info("Log available at %s"%(os.path.join(self.dirpath,'yields_compilation.log')))
+            os.chdir(wd)
         except:
-            logging.critical("Could not go to directory %s"%self.dirpath)
+            logging.critical("Could not go to directory %s"%wd)
+        try:
+            with open('yields_compilation.log', 'w') as output:
+                process= subprocess.Popen(['pdflatex', "yieldsTable.tex"], # We moved to the directory
+                                          stdout=output,
+                                          stderr=output)
+        except:
+            logging.critical("Could not produce the pdf from the Tex file, try manually 'pdflatex yieldsTable.tex'")
+        logging.info("Generated pdf file %s"%(os.path.join(wd,"yieldsTable.pdf")))
+        logging.info("Log available at %s"%(os.path.join(wd,'yields_compilation.log')))
         os.chdir(cwd)
 
 
@@ -246,8 +263,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(levelname)s - %(message)s',datefmt='%m/%d/%Y %H:%M:%S')
     # Argparse #
     parser = argparse.ArgumentParser(description='Utility to generate Latex slides on the spot for the HH->bbWW analysis')
-    parser.add_argument('-d','--dirname', action='store', required=False, type=str, default='',
-                        help='Path of the directory where the plots are')
+    parser.add_argument('-d','--dirnames', action='store', required=False, type=str, default='', nargs='+',
+                        help='Path of the directory where the plots are (can be several separated by spaces')
     parser.add_argument('-y','--yields', action='store_true', required=False, default=False,
                         help='Wether to compile the yields.tex into yields.pdf')
     parser.add_argument('--pdf', action='store_true', required=False, default=False,
@@ -262,7 +279,7 @@ if __name__ == "__main__":
     if not opt.verbose:
         logging.getLogger().setLevel(logging.INFO)
 
-    instance = TemplateLatex(opt.dirname)
+    instance = TemplateLatex(opt.dirnames)
     if opt.yields:
         instance.compileYield()
     if opt.pdf:
