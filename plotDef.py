@@ -199,7 +199,7 @@ def makeDileptonPlots(sel, dilepton, suffix, channel, is_MC=False):
     plots.append(Plot.make2D("%s_%s_firstlepton_ptVSeta"%(channel,suffix), 
                              [dilepton[0].eta, dilepton[0].pt],
                              sel, 
-                             [EquidistantBinning(25, -2.5, 2.5),EquidistantBinning(60,0.,300.)],
+                             [EquidistantBinning(22, -3., 3.),EquidistantBinning(60,0.,300.)],
                              xTitle= "P_{T} (first lepton) [GeV]",
                              yTitle= "#eta (second lepton)",
                              plotopts = channelLabel))
@@ -208,14 +208,14 @@ def makeDileptonPlots(sel, dilepton, suffix, channel, is_MC=False):
     plots.append(Plot.make1D("%s_%s_firstlepton_eta"%(channel,suffix), 
                              dilepton[0].eta, 
                              sel, 
-                             EquidistantBinning(25, -2.5, 2.5), 
+                             EquidistantBinning(22, -3., 3.), 
                              title="Pseudorapidity of the first lepton (channel %s)"%channel, 
                              xTitle= "#eta (first lepton)",
                              plotopts = channelLabel))
     plots.append(Plot.make1D("%s_%s_secondlepton_eta"%(channel,suffix), 
                              dilepton[1].eta, 
                              sel, 
-                             EquidistantBinning(25, -2.5, 2.5), 
+                             EquidistantBinning(22, -3., 3.), 
                              title="Pseudorapidity of the second lepton (channel %s)"%channel, 
                              xTitle= "#eta (second lepton)",
                              plotopts = channelLabel))
@@ -329,14 +329,14 @@ def makeTwoAk4JetsPlots(sel, leadjet, subleadjet, suffix, channel, lead_is_b=Fal
     plots.append(Plot.make1D(lead_base_name.format(var="pt"),
                              leadjet.pt,
                              sel,
-                             EquidistantBinning(80,0.,400.),
+                             EquidistantBinning(40,0.,200.),
                              title='Transverse momentum of the %s'%lead_base_title,
                              xTitle="P_{T}(%s) [GeV]"%lead_base_title,
                              plotopts = channelLabel))
     plots.append(Plot.make1D(lead_base_name.format(var="eta"),
                              leadjet.eta,
                              sel,
-                             EquidistantBinning(24,-2.4,2.4),
+                             EquidistantBinning(22,-3.,3.),
                              title='Pseudorapidity of the %s'%lead_base_title,
                              xTitle="#eta(%s)"%lead_base_title,
                              plotopts = channelLabel))
@@ -375,7 +375,7 @@ def makeTwoAk4JetsPlots(sel, leadjet, subleadjet, suffix, channel, lead_is_b=Fal
     plots.append(Plot.make1D(sublead_base_name.format(var="eta"),
                              subleadjet.eta,
                              sel,
-                             EquidistantBinning(24,-2.4,2.4),
+                             EquidistantBinning(22,-3.,3.),
                              title='Pseudorapidity of the %s'%sublead_base_title,
                              xTitle="#eta(%s)"%sublead_base_title,
                              plotopts = channelLabel))

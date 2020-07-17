@@ -46,3 +46,9 @@ python extractTTHSingleLeptonTriggerScaleFactorsFromRoot.py -s SingleElectron_20
 python extractTTHSingleLeptonTriggerScaleFactorsFromRoot.py -s SingleMuon_2016 --SF_file ../data/ScaleFactors_ttH/2016/SingleMuonTriggerSF/Muon_Mu22OR_eta2p1_eff.root
 python extractTTHSingleLeptonTriggerScaleFactorsFromRoot.py -s SingleMuon_2017 --SF_file ../data/ScaleFactors_ttH/2017/SingleMuonTriggerSF/Muon_IsoMu24orIsoMu27_eff.root
 python extractTTHSingleLeptonTriggerScaleFactorsFromRoot.py -s SingleMuon_2018 --SF_file ../data/ScaleFactors_ttH/2018/SingleMuonTriggerSF/Muon_Run2018_IsoMu24orIsoMu27.root
+
+# Fake Rates
+python extractTTHFakeRates.py --era 2016 --file ../data/FakeRates/2016/FR_lep_ttH_mva_2016_CERN_2019Jul08.root 
+python extractTTHFakeRates.py --era 2017 --file ../data/FakeRates/2017/FR_lep_ttH_mva_2017_CERN_2019Jul08.root 
+python extractTTHFakeRates.py --era 2018 --file ../data/FakeRates/2018/FR_lep_ttH_mva_2018_CERN_2019Jul08.root 
+

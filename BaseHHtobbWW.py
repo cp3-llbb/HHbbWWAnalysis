@@ -224,13 +224,18 @@ One lepton and and one jet argument must be specified in addition to the require
         cachJEC_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),'cacheJEC')
 
         # Check if basic synchronization is required (no corrections and triggers) #
-        self.basic_sync = self.args.Synchronization and not any([self.args.__dict__[key] for key in['Preselected', 'Fakeable', 'Tight', 'FakeExtrapolation']]) \
-                                               and not any([self.args.__dict__[key] for key in['Ak4', 'Ak8', 'Resolved0Btag', 'Resolved1Btag', 'Resolved2Btag', 'Boosted']]) \
-                                               and (self.args.Channel is None or self.args.Channel=='None') # No channel selection
-                                                    # None is local mode, "None" in distributed mode
+        self.inclusive_sel = ((self.args.Synchronization 
+                                  and not any([self.args.__dict__[key] for key in['Preselected', 'Fakeable', 'Tight', 'FakeExtrapolation']]) \
+                                  and not any([self.args.__dict__[key] for key in['Ak4', 'Ak8', 'Resolved0Btag', 'Resolved1Btag', 'Resolved2Btag', 'Boosted']]) \
+                                  and (self.args.Channel is None or self.args.Channel=='None')) \
+                                  # No channel selection
+                                  # None is local mode, "None" in distributed mode
+                              or self.args.BtagReweightingOn 
+                              or self.args.BtagReweightingOff)
+                                # Inclusive plots
             # If no lepton, jet and channel selection : basic object selection (no trigger nor corrections)
-        if self.basic_sync:
-            print ("No jet corrections nor triggers applied")
+        if self.inclusive_sel:
+            print ("Inclusive analysis, no selections applied")
 
         #----- Theory uncertainties -----#
 #        if self.is_MC:
@@ -505,7 +510,7 @@ One lepton and and one jet argument must be specified in addition to the require
 
         return tree,noSel,be,lumiArgs
 
-    def prepareObjects(self, t, noSel, sample, sampleCfg, channel):
+    def prepareObjects(self, t, noSel, sample, sampleCfg, channel, forSkimmer=False):
         # Some imports #
         from bamboo.analysisutils import forceDefine
 
@@ -520,6 +525,8 @@ One lepton and and one jet argument must be specified in addition to the require
             #forceDefine(t._Muon.calcProd, noSel) # Muons for Rochester corrections
             forceDefine(t._Jet.calcProd, noSel)  # Jets for configureJets
             forceDefine(getattr(t, "_{0}".format("MET" if era != "2017" else "METFixEE2017")).calcProd,noSel) # MET for configureMET
+        else:
+            print ("No jet corrections applied")
 
         ###########################################################################
         #                           TTbar reweighting                             #
@@ -560,7 +567,7 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         # Get MC PU weight file #
         puWeightsFile = None
-        if self.is_MC and not self.basic_sync:
+        if self.is_MC:
             if "pufile" not in sampleCfg:
                 raise KeyError("Could not find 'pufile' entry for sample %s in the YAML file"%sampleCfg["sample"])
             puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "pileup",sampleCfg["pufile"])
@@ -574,12 +581,12 @@ One lepton and and one jet argument must be specified in addition to the require
         #                                 MET                                       #
         #############################################################################
         # MET filter #
-        if not self.basic_sync:
+        if not self.inclusive_sel:
             noSel = noSel.refine("passMETFlags", cut=METFilter(t.Flag, era, self.is_MC) )
 
         # MET corrections #
         MET = t.MET if era != "2017" else t.METFixEE2017
-        #if not self.basic_sync:
+        #if not self.inclusive_sel:
         #    self.corrMET = METcorrection(MET,t.PV,sample,era,self.is_MC) # Flatness correction might not be needed
         #else:
         #    self.corrMET = MET
@@ -877,7 +884,7 @@ One lepton and and one jet argument must be specified in addition to the require
                 #           (can be 0 for MC where the lepton is not genMatched)
                 # SR : len(self.lead*TightSel) == 1
                 # Fake CR : len(self.lead*FakeExtrapolationSel) == 1 
-          
+
         #############################################################################
         #                                AK4 Jets                                   #
         #############################################################################
@@ -978,8 +985,13 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
 
         #----- Genweight -----#
+        
+        #def sign(sth):
+        #    return op.switch(sth != 0., sth/op.abs(sth), op.c_float(0.))
+
         if self.is_MC:
             noSel = noSel.refine("genWeight", weight=t.genWeight)
+            #noSel = noSel.refine("genWeight", weight=sign(t.genWeight))
 
         #----- Select triggers -----#
         def returnTriggers(keys):
@@ -1008,7 +1020,7 @@ One lepton and and one jet argument must be specified in addition to the require
                              # If both ... I made a mistake
 
         #----- Apply triggers -----#
-        if not self.basic_sync:
+        if not self.inclusive_sel:
             # Fakeable cut #
             if channel == "DL":
                 # Make sure to have at least two fakeable leptons #
@@ -1036,24 +1048,24 @@ One lepton and and one jet argument must be specified in addition to the require
         if self.is_MC:
             #---- Object SF -----# (Will take as argument the era)
             ####  Muons ####
-            self.muLooseId = SF.get_scalefactor("lepton", 'muon_loose_{}'.format(era), combine="weight", systName="mu_loose")
+            self.muLooseId = SF.get_scalefactor("lepton", 'muon_loose_{}'.format(era), combine="weight", systName="mu_loose", defineOnFirstUse=(not forSkimmer))
             self.lambda_MuonLooseSF = lambda mu : [self.muLooseId(mu)]
                 # Need to be defined here to be accessible to Skimmer (check on self.is_MC must be applied there)
-            self.muTightMVA = SF.get_scalefactor("lepton", 'muon_tightMVA_{}'.format(era), combine="weight", systName="mu_tightmva")
+            self.muTightMVA = SF.get_scalefactor("lepton", 'muon_tightMVA_{}'.format(era), combine="weight", systName="mu_tightmva", defineOnFirstUse=(not forSkimmer))
             self.lambda_MuonTightSF = lambda mu : [self.muTightMVA(mu)] 
 
             ####  Electrons ####
             if era == "2016" or era == "2017": # Electron reco eff depend on Pt for 2016 and 2017
-                self.elLooseRecoPtLt20 = SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptlt20'), combine="weight", systName="el_looserecoptlt20")
-                self.elLooseRecoPtGt20 = SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptgt20'), combine="weight", systName="el_looserecoptgt20")
+                self.elLooseRecoPtLt20 = SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptlt20'), combine="weight", systName="el_looserecoptlt20", defineOnFirstUse=(not forSkimmer))
+                self.elLooseRecoPtGt20 = SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptgt20'), combine="weight", systName="el_looserecoptgt20", defineOnFirstUse=(not forSkimmer))
                 # /!\ In analysis YAML file 2016 and 2017 for systematics : must use el_looserecoptlt20 and el_looserecoptgt20
 
             elif era == "2018": # Does not depend on pt for 2018
-                self.elLooseReco = SF.get_scalefactor("lepton", 'electron_loosereco_{}'.format(era), combine="weight", systName="el_loosereco")
+                self.elLooseReco = SF.get_scalefactor("lepton", 'electron_loosereco_{}'.format(era), combine="weight", systName="el_loosereco", defineOnFirstUse=(not forSkimmer))
                 # /!\ In analysis YAML file 2018 for systematics : must use el_loosereco
 
-            self.elLooseId = SF.get_scalefactor("lepton", 'electron_looseid_{}'.format(era) , combine="weight", systName="el_looseid")
-            self.elLooseEff = SF.get_scalefactor("lepton", 'electron_looseeff_{}'.format(era) , combine="weight", systName="el_looseeff")
+            self.elLooseId = SF.get_scalefactor("lepton", 'electron_looseid_{}'.format(era) , combine="weight", systName="el_looseid", defineOnFirstUse=(not forSkimmer))
+            self.elLooseEff = SF.get_scalefactor("lepton", 'electron_looseeff_{}'.format(era) , combine="weight", systName="el_looseeff", defineOnFirstUse=(not forSkimmer))
 
             if era == "2016" or era == "2017":
                 # Need to be defined here to be accessible to Skimmer (check on self.is_MC must be applied there)
@@ -1062,28 +1074,28 @@ One lepton and and one jet argument must be specified in addition to the require
                 # Need to be defined here to be accessible to Skimmer (check on self.is_MC must be applied there)
                 self.lambda_ElectronLooseSF = lambda el : [self.elLooseId(el) , self.elLooseEff(el), self.elLooseReco(el)] 
 
-            self.elTightMVA = SF.get_scalefactor("lepton", 'electron_tightMVA_{}'.format(era) , combine="weight", systName="el_tightmva")
+            self.elTightMVA = SF.get_scalefactor("lepton", 'electron_tightMVA_{}'.format(era) , combine="weight", systName="el_tightmva", defineOnFirstUse=(not forSkimmer))
             self.lambda_ElectronTightSF = lambda el : [self.elTightMVA(el)] 
  
             #### Ak4 Btagging ####
             #DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
-            #self.DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet") # For RESOLVED
+            #self.DeepJetMediumSF = SF.get_scalefactor("jet", ("btag_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet", defineOnFirstUse=(not forSkimmer)) # For RESOLVED
 
             ## Split by flavour #
-            #self.DeepJetMediumSF_lightjets = SF.get_scalefactor("lepton", ("btag_lightjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_lightjets")
-            #self.DeepJetMediumSF_cjets = SF.get_scalefactor("lepton", ("btag_cjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_cjets")
-            #self.DeepJetMediumSF_bjets = SF.get_scalefactor("lepton", ("btag_bjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_bjets")
+            #self.DeepJetMediumSF_lightjets = SF.get_scalefactor("lepton", ("btag_lightjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_lightjets", defineOnFirstUse=(not forSkimmer))
+            #self.DeepJetMediumSF_cjets = SF.get_scalefactor("lepton", ("btag_cjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_cjets", defineOnFirstUse=(not forSkimmer))
+            #self.DeepJetMediumSF_bjets = SF.get_scalefactor("lepton", ("btag_bjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_bjets", defineOnFirstUse=(not forSkimmer))
 
             #### Ak8 Btagging ####
             #DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
-            #self.DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv") # For BOOSTED (btag on subjet)
+            #self.DeepCSVMediumSF = SF.get_scalefactor("jet", ("subjet_btag_"+era, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv", defineOnFirstUse=(not forSkimmer)) # For BOOSTED (btag on subjet)
                 # TODO : add Boosted SF (need NanoAODv7)
 
             #----- Triggers -----# 
             
             #### Single lepton triggers ####
-            self.ttH_singleElectron_trigSF = SF.get_scalefactor("lepton", 'singleTrigger_electron_{}'.format(era) , combine="weight", systName="ttH_singleElectron_trigSF")
-            self.ttH_singleMuon_trigSF = SF.get_scalefactor("lepton", 'singleTrigger_muon_{}'.format(era) , combine="weight", systName="ttH_singleMuon_trigSF")
+            self.ttH_singleElectron_trigSF = SF.get_scalefactor("lepton", 'singleTrigger_electron_{}'.format(era) , combine="weight", systName="ttH_singleElectron_trigSF", defineOnFirstUse=(not forSkimmer))
+            self.ttH_singleMuon_trigSF = SF.get_scalefactor("lepton", 'singleTrigger_muon_{}'.format(era) , combine="weight", systName="ttH_singleMuon_trigSF", defineOnFirstUse=(not forSkimmer))
             
             #### Double lepton triggers #### (Need to split according to era) 
                 # https://gitlab.cern.ch/ttH_leptons/doc/-/blob/master/Legacy/data_to_mc_corrections.md#trigger-efficiency-scale-factors -> deprecated
@@ -1129,24 +1141,68 @@ One lepton and and one jet argument must be specified in addition to the require
                 self.lambda_ttH_electronMuon_trigSF = lambda dilep : op.multiSwitch(
                     (op.min(self.electron_conept[dilep[0].idx],self.muon_conept[dilep[1].idx])<25, op.systematic(op.c_float(0.98), name="ttH_electronMuon_trigSF", up=op.c_float(0.98*1.01), down=op.c_float(0.98*0.99))),
                     op.systematic(op.c_float(1.00), name="ttH_electronMuon_trigSF", up=op.c_float(1.01), down=op.c_float(0.99)))
-        else: # reweighting the data for data-driven estimation
-            #----- DY reweighting -----#
-            if era == "2016":
-                if self.args.DYDataEstimation1Btag:
-                    self.DYReweightingElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_1b'), combine="weight", systName="dy_reweighting_elel")
-                    self.DYReweightingMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_1b'), combine="weight", systName="dy_reweighting_mumu")
-                elif self.args.DYDataEstimation2Btag:
-                    self.DYReweightingElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_2b'), combine="weight", systName="dy_reweighting_elel")
-                    self.DYReweightingMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_2b'), combine="weight", systName="dy_reweighting_mumu")
-                else:
-                    self.DYReweightingElEl = None
-                    self.DYReweightingMuMu = None
-            elif era == "2017":
-                self.DYReweightingElEl = None
-                self.DYReweightingMuMu = None
-            elif era == "2018":
-                self.DYReweightingElEl = None
-                self.DYReweightingMuMu = None
+        #----- DY reweighting -----#
+        if era == "2016":
+            self.DYReweighting1bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_1b'), combine="weight", systName="dy_reweighting_1b_elel", defineOnFirstUse=(not forSkimmer))
+            self.DYReweighting1bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_1b'), combine="weight", systName="dy_reweighting_1b_mumu", defineOnFirstUse=(not forSkimmer))
+            self.DYReweighting2bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_2b'), combine="weight", systName="dy_reweighting_2b_elel", defineOnFirstUse=(not forSkimmer))
+            self.DYReweighting2bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_2b'), combine="weight", systName="dy_reweighting_2b_mumu", defineOnFirstUse=(not forSkimmer))
+
+        #----- Fake rates -----#
+        self.electronFR = SF.get_scalefactor("lepton", 'electron_fakerates_'+era, combine="weight", systName="el_FR", defineOnFirstUse=(not forSkimmer),
+                                             additionalVariables={'Pt' : lambda obj : self.electron_conept[obj.idx]})
+        self.muonFR = SF.get_scalefactor("lepton", 'muon_fakerates_'+era, combine="weight", systName="mu_FR", defineOnFirstUse=(not forSkimmer),
+                                         additionalVariables={'Pt' : lambda obj : self.muon_conept[obj.idx]})
+        
+        #############################################################################
+        #                             Fake Factors                                  #
+        #############################################################################
+        # Non closure between ttbar and QCD correction #
+        # https://gitlab.cern.ch/cms-hh-bbww/cms-hh-to-bbww/-/blob/master/Legacy/backgroundEstimation.md
+        if era == '2016':
+            self.electronCorrFR = op.systematic(op.c_float(1.376), name="electronCorrFR",up=op.c_float(1.376*1.376),down=op.c_float(1.))
+            self.muonCorrFR     = op.systematic(op.c_float(1.050), name="muonCorrFR",up=op.c_float(1.050*1.050),down=op.c_float(1.))
+        elif era == '2017':
+            self.electronCorrFR = op.systematic(op.c_float(1.252), name="electronCorrFR",up=op.c_float(1.252*1.252),down=op.c_float(1.))
+            self.muonCorrFR     = op.systematic(op.c_float(1.157), name="muonCorrFR",up=op.c_float(1.157*1.157),down=op.c_float(1.))
+        elif era == '2018':
+            self.electronCorrFR = op.systematic(op.c_float(1.325), name="electronCorrFR",up=op.c_float(1.325*1.325),down=op.c_float(1.))
+            self.muonCorrFR     = op.systematic(op.c_float(1.067), name="muonCorrFR",up=op.c_float(1.067*1.067),down=op.c_float(1.))
+
+        self.lambda_FF_el = lambda el : self.electronCorrFR*self.electronFR(el)/(1-self.electronCorrFR*self.electronFR(el))
+        self.lambda_FF_mu = lambda mu : self.muonCorrFR*self.muonFR(mu)/(1-self.muonCorrFR*self.muonFR(mu))
+
+        if channel == "DL":
+            self.ElElFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),op.NOT(self.lambda_electronTightSel(dilep[1]))),
+                                                                 # Both electrons fail tight -> -F1*F2
+                                                                 -self.lambda_FF_el(dilep[0])*self.lambda_FF_el(dilep[1])),
+                                                                (op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),self.lambda_electronTightSel(dilep[1])),
+                                                                 # Only leading electron fails tight -> F1
+                                                                 self.lambda_FF_el(dilep[0])),
+                                                                (op.AND(self.lambda_electronTightSel(dilep[0]),op.NOT(self.lambda_electronTightSel(dilep[1]))),
+                                                                 # Only subleading electron fails tight -> F2
+                                                                 self.lambda_FF_el(dilep[1])),
+                                                                 op.c_float(1.)) # Should not happen
+            self.MuMuFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_muonTightSel(dilep[0])),op.NOT(self.lambda_muonTightSel(dilep[1]))),
+                                                                 # Both muons fail tight -> -F1*F2
+                                                                 -self.lambda_FF_mu(dilep[0])*self.lambda_FF_mu(dilep[1])),
+                                                                (op.AND(op.NOT(self.lambda_muonTightSel(dilep[0])),self.lambda_muonTightSel(dilep[1])),
+                                                                 # Only leading muon fails tight -> F1
+                                                                 self.lambda_FF_mu(dilep[0])),
+                                                                (op.AND(self.lambda_muonTightSel(dilep[0]),op.NOT(self.lambda_muonTightSel(dilep[1]))),
+                                                                 # Only subleading muon fails tight -> F2
+                                                                 self.lambda_FF_mu(dilep[1])),
+                                                                 op.c_float(1.)) # Should not happen
+            self.ElMuFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),op.NOT(self.lambda_muonTightSel(dilep[1]))),
+                                                                 # Both electron and muon fail tight -> -F1*F2
+                                                                 -self.lambda_FF_el(dilep[0])*self.lambda_FF_mu(dilep[1])),
+                                                                (op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),self.lambda_muonTightSel(dilep[1])),
+                                                                 # Only electron fails tight -> F1
+                                                                 self.lambda_FF_el(dilep[0])),
+                                                                (op.AND(self.lambda_electronTightSel(dilep[0]),op.NOT(self.lambda_muonTightSel(dilep[1]))),
+                                                                 # Only subleading electron fails tight -> F2
+                                                                 self.lambda_FF_mu(dilep[1])),
+                                                                 op.c_float(1.)) # Should not happen
 
 
         ###########################################################################
