@@ -58,7 +58,7 @@ class CompareDY:
         print ("Saved new YAML in %s"%(path_yaml))
 
         # Print plotIt command #
-        out_path = os.path.join(path,'plots_DYComparison')
+        out_path = os.path.join(path,'plots_DYComparison_%s'%era)
         if not os.path.exists(out_path):
             os.makedirs(out_path)
         cmd = "plotIt -i {input} -o {output} -y -e {era} {yaml}".format(**{'input': path,

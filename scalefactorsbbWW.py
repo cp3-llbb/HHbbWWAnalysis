@@ -11,7 +11,7 @@ class ScaleFactorsbbWW:
         "Eta"       : lambda obj : obj.eta,
         "ClusEta"   : lambda obj : obj.eta + obj.deltaEtaSC,
         "AbsEta"    : lambda obj : op.abs(obj.eta),
-        "AbsClusEta": lambda obj : op.abs(obj.clusterEta) +op.abs(obj.deltaEtaSC),
+        "AbsClusEta": lambda obj : op.abs(obj.clusterEta+obj.deltaEtaSC),
         "Pt"        : lambda obj : obj.pt,
         }
 
@@ -20,7 +20,8 @@ class ScaleFactorsbbWW:
         instance = MakeScaleFactorsDict(paths       = {'ttH_SF' : os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_ttH'),
                                                        'DY_SF'  : os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_DY'),
                                                        'POG_SF' : os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_POG'),
-                                                       'Btag_SF' : os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag')},
+                                                       'Btag_SF': os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag'),
+                                                       'FR'     : os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','FakeRates')},
                                         check_path  = True)
         #----- 2016 -----#
         # Single Trigger SF # (Double triggers are single numbers and are in Base)
@@ -93,13 +94,20 @@ class ScaleFactorsbbWW:
                                                 base_str    = "BTagging_{wp}_bjets_comb_{algo}_2016.json",
                                                 format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"]})
 
-              #-----  DY weight for 1 and 2 btag -----#
+        # DY weight for 1 and 2 btag # 
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
                                                 entry_key   = 'DY_2016',
                                                 base_key    = '{channel}_{type}_{btag}',
                                                 base_str    = 'weight_{channel}_{type}_weight_{btag}_2016.json',
                                                 format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b']})
 
+        #  Fake rates #
+        instance.AddScaleFactor(path_key    = 'FR',
+                                entry_key   = 'electron_fakerates_2016',
+                                base_str    = 'TTHFakeRates_Electron_2016.json')
+        instance.AddScaleFactor(path_key    = 'FR',
+                                entry_key   = 'muon_fakerates_2016',
+                                base_str    = 'TTHFakeRates_Muon_2016.json')
 
         #----- 2017 -----#
         # Check links of 2016 #
@@ -150,6 +158,13 @@ class ScaleFactorsbbWW:
                                                 base_key    = '{algo}_{wp}',
                                                 base_str    = "BTagging_{wp}_{flav}_{calib}_subjet_{algo}_2017.json",
                                                 format_dict = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
+        #  Fake rates #
+        instance.AddScaleFactor(path_key    = 'FR',
+                                entry_key   = 'electron_fakerates_2017',
+                                base_str    = 'TTHFakeRates_Electron_2017.json')
+        instance.AddScaleFactor(path_key    = 'FR',
+                                entry_key   = 'muon_fakerates_2017',
+                                base_str    = 'TTHFakeRates_Muon_2017.json')
 
 
         #----- 2018 -----#
@@ -199,23 +214,32 @@ class ScaleFactorsbbWW:
                                                 base_str    = "BTagging_{wp}_{flav}_{calib}_subjet_{algo}_2018.json",
                                                 format_dict = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
 
-
+        #  Fake rates #
+        instance.AddScaleFactor(path_key    = 'FR',
+                                entry_key   = 'electron_fakerates_2018',
+                                base_str    = 'TTHFakeRates_Electron_2018.json')
+        instance.AddScaleFactor(path_key    = 'FR',
+                                entry_key   = 'muon_fakerates_2018',
+                                base_str    = 'TTHFakeRates_Muon_2018.json')
 
 
         # Get full dict #
         self.all_scalefactors = instance.GetScaleFactorsDict()
 
-    def get_scalefactor(self,objType, key, periods=None, combine=None, additionalVariables=dict(), systName=None):
+    def get_scalefactor(self,objType, key, periods=None, combine=None, additionalVariables=dict(), systName=None, defineOnFirstUse=True):
+        paramDefs = self.binningVariables
+        if additionalVariables is not None:
+            paramDefs.update(additionalVariables)
 
         return scalefactors.get_scalefactor(objType             = objType, 
                                             key                 = key, 
                                             periods             = periods, 
                                             combine             = combine, 
-                                            additionalVariables = additionalVariables, 
                                             sfLib               = self.all_scalefactors, 
-                                            paramDefs           = self.binningVariables, 
+                                            paramDefs           = paramDefs,
                                             getFlavour          = (lambda j : j.hadronFlavour), 
-                                            systName            = systName)
+                                            systName            = systName,
+                                            defineOnFirstUse    = defineOnFirstUse)
     
 if __name__ == "__main__":
     instance = ScaleFactorsbbWW()
