@@ -19,9 +19,12 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         super(SkimmerNanoHHtobbWWDL, self).__init__(args)
 
     def defineSkimSelection(self, t, noSel, sample=None, sampleCfg=None): 
-        noSel = super(SkimmerNanoHHtobbWWDL,self).prepareObjects(t, noSel, sample, sampleCfg, "DL")
+        noSel = super(SkimmerNanoHHtobbWWDL,self).prepareObjects(t, noSel, sample, sampleCfg, "DL", forSkimmer=True)
+            # For the Skimmer, SF must not use defineOnFirstUse -> segmentation fault
 
         era = sampleCfg['era'] 
+
+        #self.datadrivenContributions = {} # Avoid all data-driven estimates
 
         # Initialize varsToKeep dict #
         varsToKeep = dict()  
@@ -29,7 +32,7 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         #---------------------------------------------------------------------------------------# 
         #                                     Selections                                        #
         #---------------------------------------------------------------------------------------#
-        if not self.basic_sync:
+        if not self.inclusive_sel:
             #----- Check arguments -----#
             lepton_level = ["Preselected","Fakeable","Tight","FakeExtrapolation"]               # Only one must be in args
             jet_level = ["Ak4","Ak8","Resolved0Btag","Resolved1Btag","Resolved2Btag","Boosted"] # Only one must be in args
@@ -43,7 +46,7 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
 
             #----- Lepton selection -----#
             # Args are passed within the self #
-            selLeptonDict = makeDoubleLeptonSelection(self,noSel)
+            selLeptonDict = makeDoubleLeptonSelection(self,noSel,use_dd=False)
                 # makeDoubleLeptonSelection returns dict -> value is list of three selections for 3 channels 
                 # [0] -> we take the first and only key and value because restricted to one lepton selection
             selLeptonList = list(selLeptonDict.values())[0]
@@ -57,17 +60,17 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             #----- Jet selection -----#
             # Since the selections in one line, we can use the non copy option of the selection to modify the selection object internally
             if any([self.args.__dict__[item] for item in ["Ak4","Resolved0Btag","Resolved1Btag","Resolved2Btag"]]):
-                makeAtLeastTwoAk4JetSelection(self,selObj) 
+                makeAtLeastTwoAk4JetSelection(self,selObj,use_dd=False) 
             if any([self.args.__dict__[item] for item in ["Ak8","Boosted"]]):
-               makeAtLeastOneAk8JetSelection(self,selObj) 
+               makeAtLeastOneAk8JetSelection(self,selObj,use_dd=False) 
             if self.args.Resolved0Btag:
-                makeExclusiveResolvedNoBtagSelection(self,selObj)
+                makeExclusiveResolvedNoBtagSelection(self,selObj,use_dd=False)
             if self.args.Resolved1Btag:
-                makeExclusiveResolvedOneBtagSelection(self,selObj)
+                makeExclusiveResolvedOneBtagSelection(self,selObj,use_dd=False)
             if self.args.Resolved2Btag:
-                makeExclusiveResolvedTwoBtagsSelection(self,selObj)
+                makeExclusiveResolvedTwoBtagsSelection(self,selObj,use_dd=False)
             if self.args.Boosted:
-                makeInclusiveBoostedSelection(self,selObj)
+                makeInclusiveBoostedSelection(self,selObj,use_dd=False)
 
 
         #---------------------------------------------------------------------------------------# 
@@ -136,10 +139,9 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep["mu{}_ismvasel".format(i)]              = op.switch(op.rng_len(self.muonsPreSel) >= i, op.switch(op.AND(self.lambda_muonTightSel(self.muonsPreSel[i-1]), self.lambda_muonFakeSel(self.muonsPreSel[i-1])), op.c_int(1), op.c_int(0)), op.c_int(-9999)) # mvasel encompasses fakeablesel
                 varsToKeep["mu{}_isGenMatched".format(i)]          = op.switch(op.rng_len(self.muonsPreSel) >= i, op.switch(self.lambda_is_matched(self.muonsPreSel[i-1]), op.c_int(1), op.c_int(0)), op.c_int(-9999))
                 varsToKeep["mu{}_genPartFlav".format(i)]           = op.switch(op.rng_len(self.muonsPreSel) >= i, self.muonsPreSel[i-1].genPartFlav, op.c_int(-9999))
+                varsToKeep["mu{}_FR".format(i)]                    = op.switch(op.rng_len(self.muonsPreSel) >= i, self.muonFR(self.muonsPreSel[i-1]), op.c_int(-9999))
+                varsToKeep["mu{}_FRCorr".format(i)]                = op.switch(op.rng_len(self.muonsPreSel) >= i, self.lambda_FF_mu(self.muonsPreSel[i-1]), op.c_int(-9999))
 
-                varsToKeep["muTight{}_pt".format(i)]               = op.switch(op.rng_len(self.muonsTightSel) >= i, self.muonsTightSel[i-1].pt, op.c_float(-9999., "float"))
-                varsToKeep["muTight{}_eta".format(i)]              = op.switch(op.rng_len(self.muonsTightSel) >= i, self.muonsTightSel[i-1].eta, op.c_float(-9999.))
-                varsToKeep["muTight{}_phi".format(i)]              = op.switch(op.rng_len(self.muonsTightSel) >= i, self.muonsTightSel[i-1].phi, op.c_float(-9999.))
             
             # Electrons #
             for i in range(1,3): # 2 leading electrons 
@@ -172,11 +174,9 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep["ele{}_isGenMatched".format(i)]          = op.switch(op.rng_len(self.electronsPreSel) >= i, op.switch(self.lambda_is_matched(self.electronsPreSel[i-1]), op.c_int(1), op.c_int(0)), op.c_int(-9999))
                 varsToKeep["ele{}_genPartFlav".format(i)]           = op.switch(op.rng_len(self.electronsPreSel) >= i, self.electronsPreSel[i-1].genPartFlav, op.c_int(-9999))
                 varsToKeep["ele{}_deltaEtaSC".format(i)]            = op.switch(op.rng_len(self.electronsPreSel) >= i, self.electronsPreSel[i-1].deltaEtaSC, op.c_int(-9999))
+                varsToKeep["ele{}_FR".format(i)]                    = op.switch(op.rng_len(self.electronsPreSel) >= i, self.electronFR(self.electronsPreSel[i-1]), op.c_int(-9999))
+                varsToKeep["ele{}_FF".format(i)]                = op.switch(op.rng_len(self.electronsPreSel) >= i, self.lambda_FF_el(self.electronsPreSel[i-1]), op.c_int(-9999))
 
-                varsToKeep["eleTight{}_pt".format(i)]               = op.switch(op.rng_len(self.electronsTightSel) >= i, self.electronsTightSel[i-1].pt, op.c_float(-9999., "float"))
-                varsToKeep["eleTight{}_eta".format(i)]              = op.switch(op.rng_len(self.electronsTightSel) >= i, self.electronsTightSel[i-1].eta, op.c_float(-9999.))
-                varsToKeep["eleTight{}_phi".format(i)]              = op.switch(op.rng_len(self.electronsTightSel) >= i, self.electronsTightSel[i-1].phi, op.c_float(-9999.))
-     
             # AK4 Jets #
             for i in range(1,5): # 4 leading jets 
                 varsToKeep["ak4Jet{}_pt".format(i)]                 = op.switch(op.rng_len(self.ak4Jets) >= i, self.ak4Jets[i-1].pt, op.c_float(-9999.,"float"))
@@ -240,27 +240,34 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep["L1prefire"] = op.c_float(-9999.)
 
             # Fake rate #
-            varsToKeep["fakeRate"] = op.c_float(-9999.)
+            if self.args.FakeExtrapolation:
+                varsToKeep["fakeRate"] = op.multiSwitch((op.rng_len(self.ElElDileptonFakeExtrapolationSel)>=1,self.ElElFakeFactor(self.ElElDileptonFakeExtrapolationSel[0])),
+                                                        (op.rng_len(self.MuMuDileptonFakeExtrapolationSel)>=1,self.MuMuFakeFactor(self.MuMuDileptonFakeExtrapolationSel[0])),
+                                                        (op.rng_len(self.ElMuDileptonFakeExtrapolationSel)>=1,self.ElMuFakeFactor(self.ElMuDileptonFakeExtrapolationSel[0])),
+                                                        op.c_float(0.))
+            else:
+                varsToKeep["fakeRate"] = op.c_float(-9999.)
 
             # Btagging SF #
             varsToKeep["btag_SF"] = self.btagSF
-            varsToKeep["btag_reweighting"] = self.BtagRatioWeight
-            varsToKeep["btag_reweighting_SF"] = self.btagSF * self.BtagRatioWeight
+            if "BtagRatioWeight" in self.__dict__.keys():
+                varsToKeep["btag_reweighting"] = self.BtagRatioWeight
+                varsToKeep["btag_reweighting_SF"] = self.btagSF * self.BtagRatioWeight
 
             # ttbar PT reweighting #
             if "group" in sampleCfg and sampleCfg["group"] == 'ttbar':
                 varsToKeep["topPt_wgt"] = self.ttbar_weight(self.genTop[0],self.genAntitop[0])
 
-            # Event Weight #
+           # Event Weight #
             if self.is_MC:
                 #varsToKeep["MC_weight"] = op.sign(t.genWeight)
                 varsToKeep["MC_weight"] = t.genWeight
                 puWeightsFile = os.path.join(os.path.dirname(__file__), "data" , "pileup", sampleCfg["pufile"])
                 varsToKeep["PU_weight"] = makePileupWeight(puWeightsFile, t.Pileup_nTrueInt, nameHint=f"puweightFromFile{sample}".replace('-','_'))
-                varsToKeep["eventWeight"] = noSel.weight if self.basic_sync else selObj.sel.weight
+                varsToKeep["eventWeight"] = noSel.weight if self.inclusive_sel else selObj.sel.weight
 
            
-            if self.basic_sync:
+            if self.inclusive_sel:
                 return noSel, varsToKeep
             else:
                 return selObj.sel, varsToKeep

@@ -68,14 +68,14 @@ samples:
     pufile: 'TTToSemiLeptonic_2017.json'
     split: 50
 
-  TTHadronic:
+  TTToHadronic:
     db: das:/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17NanoAODv5-PU2017_12Apr2018_Nano1June2019_new_pmx_102X_mc2017_realistic_v7-v1/NANOAODSIM
-    files: dascache/TTHadronic_2017.dat
+    files: dascache/TTToHadronic_2017.dat
     generated-events: 'genEventSumw'
     cross-section: 377.85  # pb  # uncer= 0.5174 pb
     group: ttbar
     era: '2017'
-    pufile: 'TTHadronic_2017.json'
+    pufile: 'TTToHadronic_2017.json'
     split: 50
    
 ###########   single top
@@ -319,7 +319,7 @@ samples:
     group: Wjets
     era: '2017'
     pufile: 'WJetsToLNu_2017.json'
-    split: 4
+    split: 20
 
   TTWJetsToQQ:
     db: das:/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIFall17NanoAODv5-PU2017_12Apr2018_Nano1June2019_102X_mc2017_realistic_v7-v1/NANOAODSIM

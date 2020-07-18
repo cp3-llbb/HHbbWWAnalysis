@@ -49,16 +49,12 @@ for key in f.GetListOfKeys():
     minx = min([x-obj_MC.GetErrorXlow(i) for i,x in enumerate(obj_MC.GetX())])
     maxx = max([x+obj_MC.GetErrorXhigh(i) for i,x in enumerate(obj_MC.GetX())])
     x = obj_MC.GetX()
-    print (name)
-    print (eta_val)
     split = 1000
     for i in range(0,obj_MC.GetN()):
         pt_bin = [x[i]-obj_MC.GetErrorXlow(i),x[i]+obj_MC.GetErrorXhigh(i)]
         # The curves are interpolation but we are using binned SF, needs a really fine binning #
         split_bins = [pt_bin[0]+i*(pt_bin[1]-pt_bin[0])/split for i in range(split+1)]
         sub_bins = [[a,b] for a,b in zip(split_bins[:-1],split_bins[1:])]
-        print (pt_bin)
-        print (len(sub_bins))
         for sub_bin in sub_bins:
             if sub_bin[0] not in pt_binning:
                 pt_binning.append(sub_bin[0]) 
