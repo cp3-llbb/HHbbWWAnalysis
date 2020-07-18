@@ -151,7 +151,7 @@ def makeSinleptonPlots(sel, sinlepton, suffix, channel, is_MC=False):
     plots.append(Plot.make1D("%s_%s_lepton_eta"%(channel,suffix), 
                              sinlepton.eta, 
                              sel, 
-                             EquidistantBinning(20, -3., 3.), 
+                             EquidistantBinning(22, -3., 3.), 
                              title="Pseudorapidity of the lepton (channel %s)"%channel, 
                              xTitle= "#eta (lepton)",
                              plotopts = channelLabel))
@@ -160,7 +160,7 @@ def makeSinleptonPlots(sel, sinlepton, suffix, channel, is_MC=False):
     plots.append(Plot.make2D("%s_%s_lepton_ptVSeta"%(channel,suffix), 
                              [sinlepton.pt, sinlepton.eta],
                              sel, 
-                             [EquidistantBinning(60,0.,300.),EquidistantBinning(20, -3., 3.)],
+                             [EquidistantBinning(60,0.,300.),EquidistantBinning(22, -3., 3.)],
                              xTitle= "P_{T} (lepton) [GeV]",
                              yTitle= "#eta (lepton)",
                              plotopts = channelLabel))
@@ -278,7 +278,7 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,is_MC=False):
     plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j1_name),
                              j1.pt,
                              sel,
-                             EquidistantBinning(80,0.,400.),
+                             EquidistantBinning(40,0.,200.),
                              title='Transverse momentum of the %s'%j1_name,
                              xTitle="P_{T}(%s) [GeV]"%j1_name,
                              plotopts = channelLabel))
@@ -286,7 +286,7 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,is_MC=False):
     plots.append(Plot.make1D("%s_%s_eta_%s"%(channel,suffix,j1_name),
                              j1.eta,
                              sel,
-                             EquidistantBinning(20,-3.,3.),
+                             EquidistantBinning(22,-3.,3.),
                              title='Pseudorapidity of the %s'%j1_name,
                              xTitle="#eta(%s)"%j1_name,
                              plotopts = channelLabel))
@@ -318,14 +318,14 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,is_MC=False):
     plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j2_name),
                              j2.pt,
                              sel,
-                             EquidistantBinning(80,0.,400.),
+                             EquidistantBinning(40,0.,200.),
                              title='Transverse momentum of the %s'%j2_name,
                              xTitle="P_{T}(%s) [GeV]"%j2_name,
                              plotopts = channelLabel))
     plots.append(Plot.make1D("%s_%s_eta_%s"%(channel,suffix,j2_name),
                              j2.eta,
                              sel,
-                             EquidistantBinning(20,-3.,3.),
+                             EquidistantBinning(22,-3.,3.),
                              title='Pseudorapidity of the %s'%j2_name,
                              xTitle="#eta(%s)"%j2_name,
                              plotopts = channelLabel))
@@ -356,14 +356,14 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,is_MC=False):
     plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j3_name),
                              j3.pt,
                              sel,
-                             EquidistantBinning(80,0.,400.),
+                             EquidistantBinning(40,0.,200.),
                              title='Transverse momentum of the %s'%j3_name,
                              xTitle="P_{T}(%s) [GeV]"%j3_name,
                              plotopts = channelLabel))
     plots.append(Plot.make1D("%s_%s_eta_%s"%(channel,suffix,j3_name),
                              j3.eta,
                              sel,
-                             EquidistantBinning(20,-3.,3.),
+                             EquidistantBinning(22,-3.,3.),
                              title='Pseudorapidity of the %s'%j3_name,
                              xTitle="#eta(%s)"%j3_name,
                              plotopts = channelLabel))
@@ -443,6 +443,7 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,is_MC=False):
                              title="DeltaR of the dijet_[%s_%s] (channel %s)"%(j2_name,j3_name,channel),
                              xTitle= "DeltaR [%s_%s]"%(j2_name, j3_name),
                              plotopts = channelLabel))
+    
     # minDR
     plots.append(Plot.make1D("%s_%s_minDeltaR_DiJet"%(channel,suffix), 
                              MinDiJetDRLoose(j1,j2,j3), 
@@ -451,6 +452,7 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,is_MC=False):
                              title="MinDeltaR between dijet (channel %s)"%channel,
                              xTitle= "MinDeltaR [Di-Jet]",
                              plotopts = channelLabel))
+    
     # invariant mass plot #
     plots.append(Plot.make1D("%s_%s_InvariantMass_%s_%s"%(channel,suffix,j1_name,j2_name),
                              op.invariant_mass(j1.p4,j2.p4),
@@ -465,14 +467,14 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,is_MC=False):
         plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j4_name),
                                  j4.pt,
                                  sel,
-                                 EquidistantBinning(80,0.,400.),
+                                 EquidistantBinning(40,0.,200.),
                                  title='Transverse momentum of the %s'%j4_name,
                                  xTitle="P_{T}(%s) [GeV]"%j4_name,
                                  plotopts = channelLabel))
         plots.append(Plot.make1D("%s_%s_eta_%s"%(channel,suffix,j4_name),
                                  j4.eta,
                                  sel,
-                                 EquidistantBinning(20,-3.,3.),
+                                 EquidistantBinning(22,-3.,3.),
                                  title='Pseudorapidity of the %s'%j4_name,
                                  xTitle="#eta(%s)"%j4_name,
                                  plotopts = channelLabel))
@@ -574,21 +576,21 @@ def makeAk8JetsPlots(sel,j1,j2,suffix,channel,has1fat=False,has2fat=False,has1fa
     plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j1_name),
                              j1.p4.pt(),
                              sel,
-                             EquidistantBinning(60,0.,600.),
+                             EquidistantBinning(40,0.,200.),
                              title='Transverse momentum of the %s'%j1_name,
                              xTitle="P_{T} %s[GeV]"%j1_name,
                              plotopts = channelLabel))
     plots.append(Plot.make1D("%s_%s_eta_%s"%(channel,suffix,j1_name),
                              j1.p4.eta(),
                              sel,
-                             EquidistantBinning(10,-3.,3.),
+                             EquidistantBinning(22,-3.,3.),
                              title='Pseudorapidity of the %s'%j1_name,
                              xTitle="#eta %s"%j1_name,
                              plotopts = channelLabel))
     plots.append(Plot.make1D("%s_%s_phi_%s"%(channel,suffix,j1_name),
                              j1.p4.phi(),
                              sel,
-                             EquidistantBinning(10,-3.2,3.2),
+                             EquidistantBinning(20,-3.2,3.2),
                              title='Azimutal angle of the %s'%j1_name,
                              xTitle="#phi %s"%j1_name,
                              plotopts = channelLabel))
@@ -612,21 +614,21 @@ def makeAk8JetsPlots(sel,j1,j2,suffix,channel,has1fat=False,has2fat=False,has1fa
         plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j2_name),
                                  j2.p4.pt(),
                                  sel,
-                                 EquidistantBinning(60,0.,600.),
+                                 EquidistantBinning(40,0.,200.),
                                  title='Transverse momentum of the %s'%j2_name,
                                  xTitle="P_{T} %s[GeV]"%j2_name,
                                  plotopts = channelLabel))
         plots.append(Plot.make1D("%s_%s_eta_%s"%(channel,suffix,j2_name),
                                  j2.p4.eta(),
                                  sel,
-                                 EquidistantBinning(10,-3.,3.),
+                                 EquidistantBinning(22,-3.,3.),
                                  title='Pseudorapidity of the %s'%j2_name,
                                  xTitle="#eta %s"%j2_name,
                                  plotopts = channelLabel))
         plots.append(Plot.make1D("%s_%s_phi_%s"%(channel,suffix,j2_name),
                                  j2.p4.phi(),
                                  sel,
-                                 EquidistantBinning(10,-3.2,3.2),
+                                 EquidistantBinning(20,-3.2,3.2),
                                  title='Azimutal angle of the %s'%j2_name,
                                  xTitle="#phi %s"%j2_name,
                                  plotopts = channelLabel))
@@ -745,6 +747,7 @@ def makeHighLevelPlotsResolved(sel,met,lep,j1,j2,j3,j4,channel,suffix,nJet,nbJet
                              title='Azimutal angle between lepton and MET (%s channel)'%channel,
                              xTitle="|#Delta \phi (lep,MET)|",
                              plotopts = channelLabel))
+    
     # jet-MET plots
     plots.append(Plot.make1D("%s_%s_highlevelvariable_%s_METdeltaPhi"%(channel,suffix,j1_name),
                              op.abs(SinglepMet_dPhi(j1, met)),
@@ -767,7 +770,7 @@ def makeHighLevelPlotsResolved(sel,met,lep,j1,j2,j3,j4,channel,suffix,nJet,nbJet
                              title='Azimutal angle between %s and MET (%s channel)'%(j3_name,channel),
                              xTitle="|#Delta \phi (%s,MET)|"%j3_name,
                              plotopts = channelLabel))
-
+    
 
     # lepton_Jet DeltaR plots #
     plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaR_lep_%s"%(channel,suffix,j1_name),
@@ -791,6 +794,7 @@ def makeHighLevelPlotsResolved(sel,met,lep,j1,j2,j3,j4,channel,suffix,nJet,nbJet
                              title="DeltaR_%s_%s (channel %s)"%(channel,j3_name,channel),
                              xTitle="DeltaR [%s_%s]"%(channel,j3_name),
                              plotopts = channelLabel))
+    
     # min-DR
     plots.append(Plot.make1D("%s_%s_highlevelvariable_minDeltaR_lep_jet"%(channel,suffix),
                              MinDR_lep3j(lep,j1,j2,j3),
@@ -799,7 +803,7 @@ def makeHighLevelPlotsResolved(sel,met,lep,j1,j2,j3,j4,channel,suffix,nJet,nbJet
                              title="minDeltaR_lep_jet (channel %s)"%channel,
                              xTitle="minDeltaR [%s_Jet]"%channel,
                              plotopts = channelLabel))
-
+    
     # lepton_Jet DeltaPhi plots #
     plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaPhi_lep_%s"%(channel,suffix,j1_name),
                              op.abs(op.deltaPhi(lep.p4,j1.p4)),
@@ -840,7 +844,7 @@ def makeHighLevelPlotsResolved(sel,met,lep,j1,j2,j3,j4,channel,suffix,nJet,nbJet
     plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2R_l3jmet"%(channel,suffix),
                              HT2R_l3jmet(lep,j1,j2,j3,met),
                              sel,
-                             EquidistantBinning(20,0.,20.),
+                             EquidistantBinning(40,0.,1.),
                              title='Di-Higgs magnitude_Ratio_l3jmet (%s channel)'%channel,
                              xTitle="H_{T2}_Ratio [GeV]",
                              plotopts = channelLabel))
@@ -877,7 +881,7 @@ def makeHighLevelPlotsResolved(sel,met,lep,j1,j2,j3,j4,channel,suffix,nJet,nbJet
         plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2R_l4jmet"%(channel,suffix),
                                  HT2R_l4jmet(lep,j1,j2,j3,j4,met),
                                  sel,
-                                 EquidistantBinning(20,0.,20.),
+                                 EquidistantBinning(40,0.,1.),
                                  title='Di-Higgs magnitude_Ratio_l4jmet (%s channel)'%channel,
                                  xTitle="H_{T2}_Ratio [GeV]",
                                  plotopts = channelLabel))

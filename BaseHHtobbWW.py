@@ -926,8 +926,8 @@ One lepton and and one jet argument must be specified in addition to the require
         ##############################################################################
         #                                  Tau                                       #
         ##############################################################################
-        self.lambda_tauSel = lambda ta : op.AND(ta.p4.Pt() >= 20.,
-                                                op.abs(ta.p4.Eta()) <= 2.3,
+        self.lambda_tauSel = lambda ta : op.AND(ta.p4.Pt() > 20.,
+                                                op.abs(ta.p4.Eta()) < 2.3,
                                                 op.abs(ta.dxy) <= 1000.0,
                                                 op.abs(ta.dz) <= 0.2,
                                                 ta.idDecayModeNewDMs,
@@ -936,7 +936,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                                       ta.decayMode == 2,
                                                       ta.decayMode == 10,
                                                       ta.decayMode == 11)
-                                               #ta.idDeepTau2017v2p1VSjet == 16
+                                                #ta.idDeepTau2017v2p1VSjet >= 5
                                                )
         self.tauSel = op.select (t.Tau, self.lambda_tauSel)
         # Cleaning #
@@ -1047,7 +1047,20 @@ One lepton and and one jet argument must be specified in addition to the require
         self.ak8BJets = op.select(self.ak8Jets, self.lambda_ak8Btag)
         self.ak8nonBJets = op.select(self.ak8Jets, self.lambda_ak8noBtag)
         # Ak4 Jet Collection cleaned from Ak8b #
-        self.lambda_cleanAk4FromAk8b = lambda ak4j : op.NOT(op.rng_any(self.ak8BJets, lambda ak8bj : op.deltaR(ak4j.p4, ak8bj.p4) <= 1.2))
+#        self.ak8BJetsOne = self.ak8BJets[:op.static_cast("std::size_t", op.c_int(1))]
+#        self.lambda_cleanAk4FromAk8b = lambda ak4j : op.NOT(op.rng_any(self.ak8BJets, lambda ak8bj : op.deltaR(ak4j.p4, ak8bj.p4) <= 1.2))
+        '''
+        self.lambda_cleanAk4FromAk8b = lambda ak4j : op.multiSwitch((op.rng_len(self.ak8BJets) > 0, op.NOT(op.rng_any(self.ak8BJets[:op.static_cast("std::size_t", op.c_int(1))],
+                                                                                                                      lambda ak8bj : op.deltaR(ak4j.p4, ak8bj.p4) <= 1.2))),
+                                                                    (op.rng_len(self.ak8BJets) == 0, op.c_bool(True)),
+                                                                    op.c_bool(True))
+        '''
+        '''
+        self.lambda_cleanAk4FromAk8b = lambda ak4j : op.switch(op.rng_len(self.ak8BJets) > 0, 
+                                                               op.NOT(op.rng_any(self.ak8BJets[:op.static_cast("std::size_t", op.c_int(1))], lambda ak8bj : op.deltaR(ak4j.p4, ak8bj.p4) <= 1.2)),
+                                                               op.c_bool(True))
+        '''
+        self.lambda_cleanAk4FromAk8b = lambda ak4j : op.NOT(op.AND(op.rng_len(self.ak8BJets) > 0, op.deltaR(ak4j.p4,self.ak8BJets[0].p4) <= 1.2))
         self.ak4JetsCleanedFromAk8b  = op.select(self.ak4LightJetsByPt, self.lambda_cleanAk4FromAk8b)
 
         #############################################################################

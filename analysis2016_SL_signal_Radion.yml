@@ -5,56 +5,60 @@ eras:
     luminosity-error: 0.025     
 samples:
 ######################## Radion #######################
-  GluGluToRadionToHHTo2B2WToLNu2J_M-260:
-    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-260_narrow_13TeV-madgraph/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-260_2016.dat
-    generated-events: 'genEventSumw'
-    cross-section: 650.0
-    era: '2016'
-    pufile: 'GluGluToRadionToHHTo2B2WToLNu2J_M-260_2016.json'
-    split: 10
-    line-color: "#43E31B"
-    line-type: 1
-    legend: HH (Radion, M = 260)
-    order: 2
-    type: signal
+#  GluGluToRadionToHHTo2B2WToLNu2J_M-260:
+#    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-260_narrow_13TeV-madgraph/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+#    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-260_2016.dat
+#    generated-events: 'genEventSumw'
+##    cross-section: 657.7
+#    cross-section: 1
+#    era: '2016'
+#    pufile: 'GluGluToRadionToHHTo2B2WToLNu2J_M-260_2016.json'
+#    split: -1
+#    line-color: "#43E31B"
+#    line-type: 1
+#    legend: HH (Radion, M = 260)
+#    order: 2
+#    type: signal
 
   GluGluToRadionToHHTo2B2WToLNu2J_M-400:
     db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-400_narrow_13TeV-madgraph/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
     files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-400_2016.dat
     generated-events: 'genEventSumw'
-    cross-section: 1500.0
+#    cross-section: 1500.0
+    cross-section: 1
     era: '2016'
     pufile: 'GluGluToRadionToHHTo2B2WToLNu2J_M-400_2016.json'
-    split: 10
+    split: -1
     line-color: "#3FD92D"
     line-type: 1
     legend: HH (Radion, M = 400)
     order: 3
     type: signal
 
-  GluGluToRadionToHHTo2B2WToLNu2J_M-600:
-    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-600_narrow_13TeV-madgraph/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-600_2016.dat
-    generated-events: 'genEventSumw'
-    cross-section: 1503.0
-    era: '2016'
-    pufile: 'GluGluToRadionToHHTo2B2WToLNu2J_M-600_2016.json'
-    split: 10
-    line-color: "#2693AC"
-    line-type: 1
-    legend: HH (Radion, M = 600)
-    order: 10
-    type: signal
+#  GluGluToRadionToHHTo2B2WToLNu2J_M-600:
+#    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-600_narrow_13TeV-madgraph/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+#    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-600_2016.dat
+#    generated-events: 'genEventSumw'
+##    cross-section: 1503.0
+#    cross-section: 1
+#    era: '2016'
+#    pufile: 'GluGluToRadionToHHTo2B2WToLNu2J_M-600_2016.json'
+#    split: -1
+#    line-color: "#2693AC"
+#    line-type: 1
+#    legend: HH (Radion, M = 600)
+#    order: 10
+#   type: signal
 
   GluGluToRadionToHHTo2B2WToLNu2J_M-900:
     db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-900_narrow_13TeV-madgraph/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
     files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-900_2016.dat
     generated-events: 'genEventSumw'
-    cross-section: 1266.0
+#    cross-section: 1266.0
+    cross-section: 1
     era: '2016'
     pufile: 'GluGluToRadionToHHTo2B2WToLNu2J_M-900_2016.json'
-    split: 10
+    split: -1
     line-color: "#7039E3"
     line-type: 1
     legend: HH (Radion, M = 900)

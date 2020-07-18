@@ -67,8 +67,8 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False):
             # TODO : find cleaner-> if args.Tight And args.FakeExtrapolation : will be redundancies (not a problem though)
     #--- Lambdas ---#
     # Fakeable lambdas #
-    lambdaLowPtCut = lambda lepColl: lepColl[0].pt > 15 # leading above 15 GeV
-    lambdaLeadingPtCut = lambda lepColl: lepColl[0].pt > 25 # leading above 25 GeV
+    lambdaLowPtCut  = lambda lepColl: lepColl[0].pt > 25 # leading above 15 GeV
+    lambdaHighPtCut = lambda lepColl: lepColl[0].pt > 32 # leading above 25 GeV
 
     #Z-nominal mass
     Zmass = 91.1876
@@ -83,8 +83,6 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False):
     # Loose SF #
     ElLooseSF = lambda lepColl : [self.ttH_singleElectron_trigSF(lepColl[0])] + self.lambda_ElectronLooseSF(lepColl[0]) if self.is_MC else None
     MuLooseSF = lambda lepColl : [self.ttH_singleMuon_trigSF(lepColl[0])] + self.lambda_MuonLooseSF(lepColl[0]) if self.is_MC else None
-#    ElLooseSF = lambda lepColl : self.lambda_ElectronLooseSF(lepColl[0]) if self.is_MC else None
-#    MuLooseSF = lambda lepColl : self.lambda_MuonLooseSF(lepColl[0]) if self.is_MC else None    
     # Tight SF #
     ElTightSF = lambda lepColl : self.lambda_ElectronTightSF(lepColl[0]) if self.is_MC else None
     MuTightSF = lambda lepColl : self.lambda_MuonTightSF(lepColl[0]) if self.is_MC else None
@@ -121,11 +119,11 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False):
                                               yieldTitle  = "Fakeable lepton (channel $\mu^+/\mu^-$)")
 
             # Selection : at least one fakeable dilepton #
-            ElFakeSelObject.refine(cut    = [op.rng_len(self.leadElectronFakeSel) >= 1, 
-                                             lambdaLeadingPtCut(self.leadElectronFakeSel)],
+            ElFakeSelObject.refine(cut    = [op.rng_len(self.leadElectronFakeSel) > 0, 
+                                             lambdaHighPtCut(self.leadElectronFakeSel)],
                                    weight = ElLooseSF(self.leadElectronFakeSel))
-            MuFakeSelObject.refine(cut    = [op.rng_len(self.leadMuonFakeSel) >= 1,
-                                             lambdaLeadingPtCut(self.leadMuonFakeSel)],
+            MuFakeSelObject.refine(cut    = [op.rng_len(self.leadMuonFakeSel) > 0,
+                                             lambdaLowPtCut(self.leadMuonFakeSel)],
                                    weight = MuLooseSF(self.leadMuonFakeSel))
             
             # Yield #
@@ -203,9 +201,9 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False):
                                                    yieldTitle   = "Tight lepton (channel $\mu^+/\mu^-$)")
                 
                 # Selection : at least one tight dilepton #
-                ElTightSelObject.refine(cut    = [op.rng_len(self.leadElectronTightSel) == 1],
+                ElTightSelObject.refine(cut    = [op.rng_len(self.leadElectronTightSel) > 0],
                                         weight = ElTightSF(self.leadElectronTightSel))
-                MuTightSelObject.refine(cut    = [op.rng_len(self.leadMuonTightSel) == 1],
+                MuTightSelObject.refine(cut    = [op.rng_len(self.leadMuonTightSel) > 0],
                                         weight = MuTightSF(self.leadMuonTightSel))
 
                 # Yield #
