@@ -11,13 +11,12 @@ ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 
 class BtagReweightingRatio:
-    def __init__(self, path_on, path_off, list_hists, title, outputname, era):
+    def __init__(self, path_on, path_off, list_hists, outputname, era):
         self.path_on    = path_on
         self.path_off   = path_off
         self.path_off   = path_off
         self.list_hists = list_hists
         self.era        = era
-        self.title      = title
         self.outputname = 'Reweighting_plots/'+outputname
 
         self.histograms_off = self.getAllHistograms(self.path_off,self.list_hists)
@@ -130,7 +129,7 @@ class BtagReweightingRatio:
         #bincontent = [ratio.GetBinContent(i) for i in range(1,ratio.GetNbinsX()+1) if ratio.GetBinContent(i)!=0]
         #if len(bincontent)!=0:
         #    ratio.GetYaxis().SetRangeUser(min(bincontent)*0.9,max(bincontent)*1.1)
-        ratio.GetYaxis().SetRangeUser(0.5,1.5)
+        ratio.GetYaxis().SetRangeUser(0.0,1.5)
 
 
         ratio.GetYaxis().SetTitle("#frac{#sum w(before)}{#sum w(after)}")
@@ -191,9 +190,22 @@ class BtagReweightingRatio:
         
         
 if __name__ == "__main__":
-    #----- Path -----#
-    path_reweighting_on = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_BtagReweighting_On/'
-    path_reweighting_off = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_BtagReweighting_Off/'
-    list_hists = ['NoChannel_NoSelection_Ak4Jets_N']
-
-    instance = BtagReweightingRatio(path_reweighting_on,path_reweighting_off,list_hists,'','BtagReweightingRatio_jetN','2016')
+    #---- 2016 ----#
+    ath_on, path_off, list_hists, outputname, era
+    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_BtagReweighting_On_v3/',
+                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_BtagReweighting_Off_v3/',
+                                    list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
+                                    outputname  = 'BtagReweightingRatio_jetN',
+                                    era         = '2016')
+    #---- 2017 ----#
+    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017_BtagReweighting_On_v2/',
+                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017_BtagReweighting_Off_v2/',
+                                    list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
+                                    outputname  = 'BtagReweightingRatio_jetN',
+                                    era         = '2017')
+    #---- 2018 ----#
+    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018_BtagReweighting_On_v2/',
+                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018_BtagReweighting_Off_v2/',
+                                    list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
+                                    outputname  = 'BtagReweightingRatio_jetN',
+                                    era         = '2018')

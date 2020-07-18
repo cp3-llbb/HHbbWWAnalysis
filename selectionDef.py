@@ -2,6 +2,7 @@ import os
 import sys
 from copy import copy, deepcopy
 from bamboo import treefunctions as op
+from bamboo.plots import SelectionWithDataDriven
 
 #===============================================================================================#
 #                                  SelectionObject class                                        #
@@ -27,6 +28,21 @@ class SelectionObject:
                                    cut     = cut,
                                    weight  = weight,
                                    autoSyst= autoSyst)
+
+    def create(self, ddSuffix, cut=None, weight=None, ddCut=None, ddWeight=None, autoSyst=None, enable=True):
+        """
+        Overload the create function for data-driven estimation to avoid repeating the sel and selName arg 
+        """
+        self.sel = SelectionWithDataDriven.create(parent   = self.sel,
+                                                  name     = self.selName,
+                                                  ddSuffix = ddSuffix,
+                                                  cut      = cut,
+                                                  weight   = weight,
+                                                  ddCut    = ddCut,
+                                                  ddWeight = ddWeight,
+                                                  autoSyst = autoSyst,
+                                                  enable   = enable)
+
     def makeYield(self,yieldObject):
         """
         Record an entry in the yield table 
@@ -39,7 +55,7 @@ class SelectionObject:
 #                                        Selections                                             #
 #===============================================================================================#
 
-def makeDoubleLeptonSelection(self,baseSel,plot_yield=False): 
+def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True): 
     """
     Produces the requested lepton selection (encapsulated in SelectionObject class objects)
     Will produce a dict :
@@ -87,9 +103,11 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False):
     
     # SF #
     if self.is_MC:
-        ElElLooseSF = lambda dilep : [self.lambda_ttH_doubleElectron_trigSF(dilep)] + self.lambda_ElectronLooseSF(dilep[0]) + self.lambda_ElectronLooseSF(dilep[1])
-        MuMuLooseSF = lambda dilep : [self.lambda_ttH_doubleMuon_trigSF(dilep)] + self.lambda_MuonLooseSF(dilep[0]) + self.lambda_MuonLooseSF(dilep[1])
-        ElMuLooseSF = lambda dilep : [self.lambda_ttH_electronMuon_trigSF(dilep)] + self.lambda_ElectronLooseSF(dilep[0]) + self.lambda_MuonLooseSF(dilep[1])
+        ElElLooseSF = lambda dilep : [op.defineOnFirstUse(self.lambda_ttH_doubleElectron_trigSF(dilep))] + self.lambda_ElectronLooseSF(dilep[0]) + self.lambda_ElectronLooseSF(dilep[1])
+        MuMuLooseSF = lambda dilep : [op.defineOnFirstUse(self.lambda_ttH_doubleMuon_trigSF(dilep))] + self.lambda_MuonLooseSF(dilep[0]) + self.lambda_MuonLooseSF(dilep[1])
+        ElMuLooseSF = lambda dilep : [op.defineOnFirstUse(self.lambda_ttH_electronMuon_trigSF(dilep))] + self.lambda_ElectronLooseSF(dilep[0]) + self.lambda_MuonLooseSF(dilep[1])
+            # lepton SF are defined with get_scalefactors so by default op.defineOnFirstUse is used
+            # DL trigger SF are using op.systematics so op.defineOnFirstUse must be expicitly used
 
         ElElTightSF = lambda dilep : self.lambda_ElectronTightSF(dilep[0]) + self.lambda_ElectronTightSF(dilep[1]) 
         MuMuTightSF = lambda dilep : self.lambda_MuonTightSF(dilep[0]) + self.lambda_MuonTightSF(dilep[1])
@@ -163,34 +181,6 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False):
                                             lambdaLowPtCutElMu(self.ElMuDileptonFakeSel[0]),
                                             lambdaLeadingPtCutElMu(self.ElMuDileptonFakeSel[0])],
                                      weight = ElMuLooseSF(self.ElMuDileptonFakeSel[0]))
-#            ElElFakeSelObject.refine(cut = [op.rng_len(self.ElElDileptonFakeSel)>=1,
-#                                            lambdaOSDilepton(self.ElElDileptonFakeSel[0]),
-#                                            lambdaLowPtCutElEl(self.ElElDileptonFakeSel[0]),
-#                                            lambdaLeadingPtCutElEl(self.ElElDileptonFakeSel[0])])
-#            MuMuFakeSelObject.refine(cut = [op.rng_len(self.MuMuDileptonFakeSel)>=1,
-#                                            lambdaOSDilepton(self.MuMuDileptonFakeSel[0]),
-#                                            lambdaLowPtCutMuMu(self.MuMuDileptonFakeSel[0]),
-#                                            lambdaLeadingPtCutMuMu(self.MuMuDileptonFakeSel[0])])
-#            ElMuFakeSelObject.refine(cut = [op.rng_len(self.ElMuDileptonFakeSel)>=1,
-#                                            lambdaOSDilepton(self.ElMuDileptonFakeSel[0]),
-#                                            lambdaLowPtCutElMu(self.ElMuDileptonFakeSel[0]),
-#                                            lambdaLeadingPtCutElMu(self.ElMuDileptonFakeSel[0])])
-#            ElEl_wSF = ElElLooseSF(self.ElElDileptonFakeSel[0])
-#            MuMu_wSF = MuMuLooseSF(self.MuMuDileptonFakeSel[0])
-#            ElMu_wSF = ElMuLooseSF(self.ElMuDileptonFakeSel[0]) 
-#
-#            from bamboo.analysisutils import forceDefine 
-#            forceDefine(ElEl_wSF,ElElFakeSelObject.sel)
-#            forceDefine(MuMu_wSF,MuMuFakeSelObject.sel)
-#            forceDefine(ElMu_wSF,ElMuFakeSelObject.sel)
-#
-#            ElElFakeSelObject.selName += 'wgt'
-#            MuMuFakeSelObject.selName += 'wgt'
-#            ElMuFakeSelObject.selName += 'wgt'
-#
-#            ElElFakeSelObject.refine(weight = ElEl_wSF)
-#            MuMuFakeSelObject.refine(weight = MuMu_wSF)
-#            ElMuFakeSelObject.refine(weight = ElMu_wSF)
 
             # Yield #
             if plot_yield:
@@ -280,12 +270,33 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False):
                                                     yieldTitle   = "OS tight lepton pair (channel $e^{\pm}\mu^{\mp}$)")
 
                 # Selection : at least one tight dilepton #
-                ElElTightSelObject.refine(cut    = [op.rng_len(self.ElElDileptonTightSel) >= 1],
-                                          weight = ElElTightSF(self.ElElDileptonTightSel[0]))
-                MuMuTightSelObject.refine(cut    = [op.rng_len(self.MuMuDileptonTightSel) >= 1],
-                                          weight = MuMuTightSF(self.MuMuDileptonTightSel[0]))
-                ElMuTightSelObject.refine(cut    = [op.rng_len(self.ElMuDileptonTightSel) >= 1],
-                                          weight = ElMuTightSF(self.ElMuDileptonTightSel[0]))
+                if use_dd:
+                    ElElTightSelObject.create(ddSuffix  = "FakeExtrapolation",
+                                              cut       = [op.rng_len(self.ElElDileptonTightSel) >= 1],
+                                              weight    = ElElTightSF(self.ElElDileptonTightSel[0]),
+                                              ddCut     = [op.rng_len(self.ElElDileptonFakeExtrapolationSel) >= 1],
+                                              ddWeight  = self.ElElFakeFactor(self.ElElDileptonFakeExtrapolationSel[0]),
+                                              enable    = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg))
+                    MuMuTightSelObject.create(ddSuffix  = "FakeExtrapolation",
+                                              cut       = [op.rng_len(self.MuMuDileptonTightSel) >= 1],
+                                              weight    = MuMuTightSF(self.MuMuDileptonTightSel[0]),
+                                              ddCut     = [op.rng_len(self.MuMuDileptonFakeExtrapolationSel) >= 1],
+                                              ddWeight  = self.MuMuFakeFactor(self.MuMuDileptonFakeExtrapolationSel[0]),
+                                              enable    = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg))
+                    ElMuTightSelObject.create(ddSuffix  = "FakeExtrapolation",
+                                              cut       = [op.rng_len(self.ElMuDileptonTightSel) >= 1],
+                                              weight    = ElMuTightSF(self.ElMuDileptonTightSel[0]),
+                                              ddCut     = [op.rng_len(self.ElMuDileptonFakeExtrapolationSel) >= 1],
+                                              ddWeight  = self.ElMuFakeFactor(self.ElMuDileptonFakeExtrapolationSel[0]),
+                                              enable    = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg))
+                else:
+                    ElElTightSelObject.refine(cut    = [op.rng_len(self.ElElDileptonTightSel) >= 1],
+                                              weight = ElElTightSF(self.ElElDileptonTightSel[0]))
+                    MuMuTightSelObject.refine(cut    = [op.rng_len(self.MuMuDileptonTightSel) >= 1],
+                                              weight = MuMuTightSF(self.MuMuDileptonTightSel[0]))
+                    ElMuTightSelObject.refine(cut    = [op.rng_len(self.ElMuDileptonTightSel) >= 1],
+                                              weight = ElMuTightSF(self.ElMuDileptonTightSel[0]))
+
                 # Yield #
                 if plot_yield:
                     ElElTightSelObject.makeYield(self.yieldPlots)
@@ -338,7 +349,7 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False):
     # Return # 
     return selectionDict
 
-def makeAtLeastTwoAk4JetSelection(self,selObject,copy_sel=False,plot_yield=False):
+def makeAtLeastTwoAk4JetSelection(self,selObject,copy_sel=False,plot_yield=False,use_dd=True):
     """
     Produces the Ak4 jet selection
     inputs :
@@ -357,7 +368,7 @@ def makeAtLeastTwoAk4JetSelection(self,selObject,copy_sel=False,plot_yield=False
     if copy_sel :
         return selObject 
 
-def makeAtLeastOneAk8JetSelection(self,selObject,copy_sel=False,plot_yield=False):
+def makeAtLeastOneAk8JetSelection(self,selObject,copy_sel=False,plot_yield=False,use_dd=True):
     """
     Produces the Ak8 jet selection
     inputs :
@@ -376,7 +387,7 @@ def makeAtLeastOneAk8JetSelection(self,selObject,copy_sel=False,plot_yield=False
     if copy_sel:
         return selObject
     
-def makeExclusiveResolvedNoBtagSelection(self,selObject,copy_sel=False,plot_yield=False):
+def makeExclusiveResolvedNoBtagSelection(self,selObject,copy_sel=False,plot_yield=False,use_dd=True):
     """
     Produces the exclusive resolved selection with no btagging
     inputs :
@@ -386,23 +397,6 @@ def makeExclusiveResolvedNoBtagSelection(self,selObject,copy_sel=False,plot_yiel
     Selection : no btagged Ak8 jet (aka boosted), all Ak4 jets are non btagged
     """
     AppliedSF = None
-    #----- DY estimation from data -----#
-    if self.args.DYDataEstimation1Btag or self.args.DYDataEstimation2Btag:
-        if self.is_MC:
-            print ("Warning : the DY reweighting is not applied on MC, will ignore that step")
-        else:
-            if "ElEl" in selObject.selName:
-                if self.DYReweightingElEl is None:
-                    raise RuntimeError('DY reweighting for ElEl is not initialized')
-                AppliedDYReweighting = self.DYReweightingElEl(self.OSElElDileptonTightSel[0][0]) # Only on highest PT electron
-            elif "MuMu" in selObject.selName:
-                if self.DYReweightingMuMu is None:
-                    raise RuntimeError('DY reweighting for MuMu is not initialized')
-                AppliedDYReweighting = self.DYReweightingMuMu(self.OSMuMuDileptonTightSel[0][0]) # Only on highest PT muon
-            else: # No DY reweighting in ElMu (marginal contribution)
-                AppliedDYReweighting = None
-            AppliedSF = [AppliedDYReweighting] if AppliedDYReweighting is not None else None
-                # weight = None works, but not weight = [None]
     if copy_sel:
         selObject = copy(selObject)
     selObject.selName += "ExclusiveResolvedNoBtag"
@@ -413,7 +407,7 @@ def makeExclusiveResolvedNoBtagSelection(self,selObject,copy_sel=False,plot_yiel
     if copy_sel:
         return selObject
 
-def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,plot_yield=False):
+def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,plot_yield=False,use_dd=True):
     """
     Produces the exclusive resolved selection with only one btagging
     inputs :
@@ -425,16 +419,40 @@ def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,plot_yie
     if copy_sel:
         selObject = copy(selObject)
     AppliedSF = None
+
     selObject.selName += "ExclusiveResolvedOneBtag"
     selObject.yieldTitle += " + Exclusive Resolved (1 bjet)"
-    selObject.refine(cut    = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
-                     weight = AppliedSF)
+    if use_dd:
+        if "ElEl" in selObject.selName:
+            selObject.create(ddSuffix  = "DYEstimation",
+                             cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
+                             weight    = AppliedSF,
+                             ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
+                             ddWeight  = self.DYReweighting1bElEl(self.ElElDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
+                             enable    = "DYEstimation" in self.datadrivenContributions and self.datadrivenContributions["DYEstimation"].usesSample(self.sample, self.sampleCfg))
+        elif "MuMu" in selObject.selName:
+            selObject.create(ddSuffix  = "DYEstimation",
+                             cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
+                             weight    = AppliedSF,
+                             ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
+                             ddWeight  = self.DYReweighting1bMuMu(self.MuMuDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
+                             enable    = "DYEstimation" in self.datadrivenContributions and self.datadrivenContributions["DYEstimation"].usesSample(self.sample, self.sampleCfg))
+        elif "ElMu" in selObject.selName:
+            selObject.refine(cut    = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
+                             weight = AppliedSF)
+        else:
+            raise RuntimeError("Could not find the channel in selection name")
+    else:
+        selObject.refine(cut    = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
+                         weight = AppliedSF)
+
+
     if plot_yield:
         selObject.makeYield(self.yieldPlots)
     if copy_sel:
         return selObject
 
-def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yield=False):
+def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yield=False,use_dd=True):
     """
     Produces the exclusive resolved selection with no btagging
     inputs :
@@ -446,10 +464,34 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yi
     AppliedSF = None
     if copy_sel:
         selObject = copy(selObject)
+
     selObject.selName += "ExclusiveResolvedTwoBtags"
     selObject.yieldTitle += " + Exclusive Resolved (2 bjets)"
-    selObject.refine(cut    = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
-                     weight = AppliedSF)
+
+    if use_dd:
+        if "ElEl" in selObject.selName:
+            selObject.create(ddSuffix  = "DYEstimation",
+                             cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
+                             weight    = AppliedSF,
+                             ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
+                             ddWeight  = self.DYReweighting2bElEl(self.ElElDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
+                             enable    = use_dd and "DYEstimation" in self.datadrivenContributions and self.datadrivenContributions["DYEstimation"].usesSample(self.sample, self.sampleCfg))
+        elif "MuMu" in selObject.selName:
+            selObject.create(ddSuffix  = "DYEstimation",
+                             cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
+                             weight    = AppliedSF,
+                             ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
+                             ddWeight  = self.DYReweighting2bMuMu(self.MuMuDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
+                             enable    = use_dd and "DYEstimation" in self.datadrivenContributions and self.datadrivenContributions["DYEstimation"].usesSample(self.sample, self.sampleCfg))
+        elif "ElMu" in selObject.selName:
+            selObject.refine(cut    = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
+                             weight = AppliedSF)
+        else:
+            raise RuntimeError("Could not find the channel in selection name")
+    else:
+        selObject.refine(cut    = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
+                         weight = AppliedSF)
+
     if plot_yield:
         selObject.makeYield(self.yieldPlots)
     if self.args.TTBarCR:
@@ -461,7 +503,7 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yi
     if copy_sel:
         return selObject
 
-def makeInclusiveBoostedSelection(self,selObject,copy_sel=False,plot_yield=False):
+def makeInclusiveBoostedSelection(self,selObject,copy_sel=False,plot_yield=False,use_dd=True):
     """
     Produces the inclusive boosted selection
     inputs :

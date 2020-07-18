@@ -13,7 +13,7 @@ samples:
     group: DY
     era: '2016'
     pufile: 'DYJetsToLL_M-10to50_2016.json'
-    split: 17 # 17 files
+    split: 50
 
   DYToLL_0J:
     db: das:/DYToLL_0J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
@@ -23,7 +23,7 @@ samples:
     group: DY
     era: '2016'
     pufile: 'DYToLL_0J_2016.json'
-    split: 39 # 39 files
+    split: 50
     
   DYToLL_1J:
     db: das:/DYToLL_1J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
@@ -33,7 +33,7 @@ samples:
     group: DY
     era: '2016'
     pufile: 'DYToLL_1J_2016.json'
-    split: 41 # 41 files
+    split: 50
   
   DYToLL_2J:
     db: das:/DYToLL_2J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
@@ -43,7 +43,7 @@ samples:
     group: DY
     era: '2016'
     pufile: 'DYToLL_2J_2016.json'
-    split: 36 # 36 files
+    split: 50
 
 
 ######### ttbar
@@ -66,7 +66,7 @@ samples:
     group: ttbar
     era: '2016'
     pufile: 'TTTo2L2Nu_2016.json'
-    split: 73 # 73 files
+    split: 73
   
   TTToSemiLeptonic: 
     db: das:/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -76,7 +76,7 @@ samples:
     group: ttbar
     era: '2016'
     pufile: 'TTToSemiLeptonic_2016.json'
-    split: 126 # 126 files
+    split: 126
   
   TTToHadronic: 
     db: das:/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -86,7 +86,7 @@ samples:
     group: ttbar
     era: '2016'
     pufile: 'TTToHadronic_2016.json'
-    split: 88 # 88 files
+    split: 88
 
 ###########   single top
   ST_tW_top_5f:
@@ -97,7 +97,7 @@ samples:
     group: ST
     era: '2016'
     pufile: 'ST_tW_top_5f_2016.json'
-    split: 4 # 4 files
+    split: 20
 
   ST_tW_antitop_5f:
     db: das:/ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1/RunIISummer16NanoAODv5-Nano1June2019_102X_mcRun2_asymptotic_v7_ext2-v1/NANOAODSIM
@@ -107,7 +107,7 @@ samples:
     group: ST
     era: '2016'
     pufile: 'ST_tW_antitop_5f_2016.json'
-    split: 3 # 3 files
+    split: 20
 
   ST_tchannel_antitop_4f:
     db: das:/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -117,7 +117,7 @@ samples:
     group: ST
     era: '2016'
     pufile: 'ST_tchannel_antitop_4f_2016.json'
-    split: 35 # 35 files
+    split: 50
 
   ST_tchannel_top_4f:
     db: das:/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -127,7 +127,7 @@ samples:
     group: ST
     era: '2016'
     pufile: 'ST_tchannel_top_4f_2016.json'
-    split: 51 # 51 files #
+    split: 50
 
   # ST_schannel_4f: # Comment to avoid double counting
   #   db: das:/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -146,7 +146,7 @@ samples:
     group: VVV # ZZ
     era: '2016'
     pufile: 'ZZTo2L2Nu_2016.json'
-    split : 44 # 44 files
+    split : 50
 
   ZZTo2L2Q:
     db: das:/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -156,7 +156,7 @@ samples:
     group: VVV #ZZ
     era: '2016'
     pufile: 'ZZTo2L2Q_2016.json'
-    split: 16 # 16 files
+    split: 50
 
   ZZTo4L:
     db: das:/ZZTo4L_13TeV_powheg_pythia8_ext1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -166,7 +166,7 @@ samples:
     group: VVV #ZZ
     era: '2016'
     pufile: 'ZZTo4L_2016.json'
-    split: 90 # 90 files
+    split: 50
 
 ####### Standrd model higgs : Zh & tth  
 
@@ -178,7 +178,7 @@ samples:
     group: SM
     era: '2016'
     pufile: 'HZJ_HToWW_2016.json'
-    split: 1 # 1 file
+    split: 10
 
   # ZH_HToBB_ZToLL:  # Comment to avoid double counting
   #   db: das:/ZH_HToBB_ZToLL_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -196,7 +196,7 @@ samples:
     group: SM
     era: '2016'
     pufile: 'ggZH_HToBB_ZToLL_2016.json'
-    split: 3 # 3 files
+    split: 10
 
   ggZH_HToBB_ZToNuNu:
     db: das:/ggZH_HToBB_ZToNuNu_M125_13TeV_powheg_pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext2-v1/NANOAODSIM
@@ -206,7 +206,7 @@ samples:
     group: SM
     era: '2016'
     pufile: 'ggZH_HToBB_ZToNuNu_2016.json'
-    split: 4 # 4 files
+    split: 10
 
   ttHTobb:
     db: das:/ttHTobb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -216,7 +216,7 @@ samples:
     group: SM
     era: '2016'
     pufile: 'ttHTobb_2016.json'
-    split: 7 # 7 files
+    split: 10
 
   ttHToNonbb:
     db: das:/ttHToNonbb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -226,7 +226,7 @@ samples:
     group: SM
     era: '2016'
     pufile: 'ttHToNonbb_2016.json'
-    split: 8 # 8 files
+    split: 10
 
 ########## others= VV(except the ZZ) /  VVV / W+Jets / ttbar+V
   WWToLNuQQ:
@@ -237,7 +237,7 @@ samples:
     group: VVV 
     era: '2016'
     pufile: 'WWToLNuQQ_2016.json'
-    split: 7 # 7 files
+    split: 10
 
   WWTo2L2Nu:
     db: das:/WWTo2L2Nu_13TeV-powheg/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -247,7 +247,7 @@ samples:
     group: VVV 
     era: '2016'
     pufile: 'WWTo2L2Nu_2016.json'
-    split: 4 # 4 files
+    split: 10
 
   WZTo2L2Q:
     db: das:/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM 
@@ -257,7 +257,7 @@ samples:
     group: VVV 
     era: '2016'
     pufile: 'WZTo2L2Q_2016.json'
-    split: 27 # 27 files
+    split: 10
 
   WZTo1L3Nu: 
    db: das:/WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -267,7 +267,7 @@ samples:
    group: VVV
    era: '2016'
    pufile: 'WZTo1L3Nu_2016.json'
-   split : 5
+   split : 10
 
   WZ1L1Nu2Q: 
    db: das:/WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -277,7 +277,7 @@ samples:
    group: VVV
    era: '2016'
    pufile: 'WZ1L1Nu2Q_2016.json'
-   split : 5
+   split : 10
 
   WZTo3LNu: 
    db: das:/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
@@ -287,7 +287,7 @@ samples:
    group: VVV
    era: '2016'
    pufile: 'WZTo3LNu_2016.json'
-   split : 5
+   split : 10
 
     ###################
   WWW:
@@ -298,7 +298,7 @@ samples:
     group: VVV 
     era: '2016'
     pufile: 'WWW_2016.json'
-    split: 1 # 2 files
+    split: 10
 
   WWZ:
     db: das:/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -308,7 +308,7 @@ samples:
     group: VVV 
     era: '2016'
     pufile: 'WWZ_2016.json'
-    split: 1 # 2 files
+    split: 10
 
   WZZ:
     db: das:/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -318,7 +318,7 @@ samples:
     group: VVV 
     era: '2016'
     pufile: 'WZZ_2016.json'
-    split: 1 # 3 files
+    split: 10
 
   ZZZ:
     db: das:/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -328,7 +328,7 @@ samples:
     group: VVV 
     era: '2016'
     pufile: 'ZZZ_2016.json'
-    split: 1 # 1 file
+    split: 10
 
   WJetsToLNu:
     db: das:/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext2-v1/NANOAODSIM
@@ -338,7 +338,7 @@ samples:
     group: Wjets
     era: '2016'
     pufile: 'WJetsToLNu_2016.json'
-    split: 92 # 92 files 
+    split: 30
 
   TTWJetsToQQ:
     db: das:/TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -348,7 +348,7 @@ samples:
     group: ttV 
     era: '2016'
     pufile: 'TTWJetsToQQ_2016.json'
-    split: 3 # 3 files
+    split: 10
 
   TTWJetsToLNu:
     db: das:/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext2-v1/NANOAODSIM
@@ -358,7 +358,7 @@ samples:
     group: ttV
     era: '2016'
     pufile: 'TTWJetsToLNu_2016.json'
-    split: 7 # 7 files
+    split: 10
 
   TTZToQQ:
     db: das:/TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -368,7 +368,7 @@ samples:
     group: ttV
     era: '2016'
     pufile: 'TTZToQQ_2016.json'
-    split: 2 # 2 files
+    split: 10
 
   TTZToLLNuNu:
     db: das:/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext2-v1/NANOAODSIM
@@ -378,7 +378,7 @@ samples:
     group: ttV 
     era: '2016'
     pufile: 'TTZToLLNuNu_2016.json'
-    split: 11 # 11 files
+    split: 10
 
 ##### era B
   SingleMuon_2016B:
@@ -389,7 +389,7 @@ samples:
     era: '2016'
     run_range: [272007, 275376]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   SingleElectron_2016B:
     #db: ["das:/SingleElectron/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD", "das:/SingleElectron/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD"]
@@ -399,7 +399,7 @@ samples:
     era: '2016'
     run_range: [272007, 275376]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   DoubleMuon_2016B:
     #db: ["das:/DoubleMuon/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD", "das:/DoubleMuon/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD"]
@@ -409,7 +409,7 @@ samples:
     era: '2016'
     run_range: [272007, 275376]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   DoubleEGamma_2016B:
     #db: ["das:/DoubleEG/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD", "das:/DoubleEG/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD"]
@@ -419,7 +419,7 @@ samples:
     era: '2016'
     run_range: [272007, 275376]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   MuonEG_2016B:
     #db: ["das:/MuonEG/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD", "das:/MuonEG/Run2016B_ver1-Nano1June2019_ver1-v1/NANOAOD"]
@@ -429,7 +429,7 @@ samples:
     era: '2016'
     run_range: [272007, 275376]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
 ###### era C
   SingleMuon_2016C:
@@ -439,7 +439,7 @@ samples:
     era: '2016'
     run_range: [275657, 276283]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   SingleElectron_2016C:
     db: das:/SingleElectron/Run2016C-Nano1June2019-v1/NANOAOD
@@ -448,7 +448,7 @@ samples:
     era: '2016'
     run_range: [275657, 276283]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   DoubleMuon_2016C:
     db: das:/DoubleMuon/Run2016C-Nano1June2019-v1/NANOAOD
@@ -457,7 +457,7 @@ samples:
     era: '2016'
     run_range: [275657, 276283]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
   DoubleEGamma_2016C:
     db: das:/DoubleEG/Run2016C-Nano1June2019-v1/NANOAOD
@@ -466,7 +466,7 @@ samples:
     era: '2016'
     run_range: [275657, 276283]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
   MuonEG_2016C:
     db: das:/MuonEG/Run2016C-Nano1June2019-v1/NANOAOD
@@ -475,7 +475,7 @@ samples:
     era: '2016'
     run_range: [275657, 276283]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
 ########### era D
   SingleMuon_2016D:
@@ -485,7 +485,7 @@ samples:
     era: '2016'
     run_range: [276315, 276811]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   SingleElectron_2016D:
     db: das:/SingleElectron/Run2016D-Nano1June2019-v1/NANOAOD
@@ -494,7 +494,7 @@ samples:
     era: '2016'
     run_range: [276315, 276811]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   DoubleMuon_2016D:
     db: das:/DoubleMuon/Run2016D-Nano1June2019-v1/NANOAOD
@@ -503,7 +503,7 @@ samples:
     era: '2016'
     run_range: [276315, 276811]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
   DoubleEGamma_2016D:
     db: das:/DoubleEG/Run2016D-Nano1June2019-v1/NANOAOD
@@ -512,7 +512,7 @@ samples:
     era: '2016'
     run_range: [276315, 276811]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
   MuonEG_2016D:
     db: das:/MuonEG/Run2016D-Nano1June2019-v1/NANOAOD
@@ -521,7 +521,7 @@ samples:
     era: '2016'
     run_range: [276315, 276811]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
 ######### era E
   SingleMuon_2016E:
@@ -531,7 +531,7 @@ samples:
     era: '2016'
     run_range: [276831, 277420]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   SingleElectron_2016E:
     db: das:/SingleElectron/Run2016E-Nano1June2019-v1/NANOAOD
@@ -540,7 +540,7 @@ samples:
     era: '2016'
     run_range: [276831, 277420]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   DoubleMuon_2016E:
     db: das:/DoubleMuon/Run2016E-Nano1June2019-v1/NANOAOD
@@ -549,7 +549,7 @@ samples:
     era: '2016'
     run_range: [276831, 277420]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
   DoubleEGamma_2016E:
     db: das:/DoubleEG/Run2016E-Nano1June2019-v1/NANOAOD
@@ -558,7 +558,7 @@ samples:
     era: '2016'
     run_range: [276831, 277420]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
   MuonEG_2016E:
     db: das:/MuonEG/Run2016E-Nano1June2019-v2/NANOAOD
@@ -567,7 +567,7 @@ samples:
     era: '2016'
     run_range: [276831, 277420]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
 ######  era F
   SingleMuon_2016F:
@@ -577,7 +577,7 @@ samples:
     era: '2016'
     run_range: [277772, 278808]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   SingleElectron_2016F:
     db: das:/SingleElectron/Run2016F-Nano1June2019-v1/NANOAOD
@@ -586,7 +586,7 @@ samples:
     era: '2016'
     run_range: [277772, 278808]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   DoubleMuon_2016F:
     db: das:/DoubleMuon/Run2016F-Nano1June2019-v1/NANOAOD
@@ -595,7 +595,7 @@ samples:
     era: '2016'
     run_range: [277772, 278808]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
   DoubleEGamma_2016F:
     db: das:/DoubleEG/Run2016F-Nano1June2019-v1/NANOAOD
@@ -604,7 +604,7 @@ samples:
     era: '2016'
     run_range: [277772, 278808]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
   MuonEG_2016F:
     db: das:/MuonEG/Run2016F-Nano1June2019-v1/NANOAOD
@@ -613,7 +613,7 @@ samples:
     era: '2016'
     run_range: [277772, 278808]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
 ###### era G
   SingleMuon_2016G:
@@ -623,7 +623,7 @@ samples:
     era: '2016'
     run_range: [278820, 280385]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   SingleElectron_2016G:
     db: das:/SingleElectron/Run2016G-Nano1June2019-v1/NANOAOD
@@ -632,7 +632,7 @@ samples:
     era: '2016'
     run_range: [278820, 280385]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   DoubleMuon_2016G:
     db: das:/DoubleMuon/Run2016G-Nano1June2019-v1/NANOAOD
@@ -641,7 +641,7 @@ samples:
     era: '2016'
     run_range: [278820, 280385]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
   DoubleEGamma_2016G:
     db: das:/DoubleEG/Run2016G-Nano1June2019-v1/NANOAOD
@@ -650,7 +650,7 @@ samples:
     era: '2016'
     run_range: [278820, 280385]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
   MuonEG_2016G:
     db: das:/MuonEG/Run2016G-Nano1June2019-v1/NANOAOD
@@ -659,7 +659,7 @@ samples:
     era: '2016'
     run_range: [278820, 280385]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
 ###### era H
   SingleMuon_2016H:
@@ -669,7 +669,7 @@ samples:
     era: '2016'
     run_range: [280919, 284044]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   SingleElectron_2016H:
     db: das:/SingleElectron/Run2016H-Nano1June2019-v1/NANOAOD
@@ -678,7 +678,7 @@ samples:
     era: '2016'
     run_range: [280919, 284044]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 20
+    split: 50
 
   DoubleMuon_2016H:
     db: das:/DoubleMuon/Run2016H-Nano1June2019-v1/NANOAOD
@@ -687,7 +687,7 @@ samples:
     era: '2016'
     run_range: [280919, 284044]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
   DoubleEGamma_2016H:
     db: das:/DoubleEG/Run2016H-Nano1June2019-v1/NANOAOD
@@ -696,7 +696,7 @@ samples:
     era: '2016'
     run_range: [280919, 284044]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
   MuonEG_2016H:
     db: das:/MuonEG/Run2016H-Nano1June2019-v1/NANOAOD
@@ -705,38 +705,48 @@ samples:
     era: '2016'
     run_range: [280919, 284044]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-    split: 10
+    split: 50
 
 ###### Signal
-  GluGluToHHTo2B2VTo2L2Nu:
-    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToHHTo2B2VTo2L2Nu_2016.dat
-    generated-events: 'genEventSumw'
-    cross-section: 1
-    era: '2016'
-    pufile: 'GluGluToHHTo2B2VTo2L2Nu_2016.json'
-    split: 10
-    line-color: "#0f700b"
-    line-type: 1
-    legend: HH (SM) 1 pb
-    order: 1
-    type: signal
-  GluGluToRadionToHHTo2B2VTo2L2Nu_M-750:
-    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_2016.dat
-    generated-events: 'genEventSumw'
-    cross-section: 1
-    era: '2016'
-    pufile: 'GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_2016.json'
-    split: 10
-    line-color: "#f2050d"
-    line-type: 1
-    legend: HH (Radion, M = 750 GeV) 1 pb
-    order: 12
-    type: signal
+#  GluGluToHHTo2B2VTo2L2Nu:
+#    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+#    files: dascache/GluGluToHHTo2B2VTo2L2Nu_2016.dat
+#    generated-events: 'genEventSumw'
+#    cross-section: 1
+#    era: '2016'
+#    pufile: 'GluGluToHHTo2B2VTo2L2Nu_2016.json'
+#    split: 10
+#    line-color: "#0f700b"
+#    line-type: 1
+#    legend: HH (SM) 1 pb
+#    order: 1
+#    type: signal
+#  GluGluToRadionToHHTo2B2VTo2L2Nu_M-750:
+#    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+#    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_2016.dat
+#    generated-events: 'genEventSumw'
+#    cross-section: 1
+#    era: '2016'
+#    pufile: 'GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_2016.json'
+#    split: 10
+#    line-color: "#f2050d"
+#    line-type: 1
+#    legend: HH (Radion, M = 750 GeV) 1 pb
+#    order: 12
+#    type: signal
+#
+
+#### Data Driven 
+datadriven:
+  DYEstimation:
+    uses: [ data ]
+    replaces: [ DY ]
+  FakeExtrapolation:
+    uses : [all]
+    replaces : [all]
 
 
-
+#### plotIt
 plotIt:
   configuration:
     width: 800
@@ -782,6 +792,16 @@ plotIt:
       fill-color: "#06b894"
       legend: SM Higgs (ttH, ZH)
       order: 7
+    DYEstimation:
+      fill-color: "#1a83a1"
+      legend: Drell-Yan (from data)
+      order: 8
+    Fake:
+      fill-color: "#6e3303"
+      legend: Fake
+      order: 9
+
+
   systematics:
       # on the jets
     - jer
@@ -825,6 +845,11 @@ plotIt:
     # DY weight #
     - dy_reweighting_elel
     - dy_reweighting_mumu
+    # Fake factor
+    - el_FR
+    - mu_FR
+    - electronCorrFR
+    - muonCorrFR
       # on the cross section : 1+xsec_uncert(pb)/xsec(pb)
     - TTTo2L2Nuxsc: {type: const, value: 1.061, on: 'TTTo2L2Nu'}  # uncer=+4.8%,-6.1%
     - TTToSemiLeptonicxsc: {type: const, value: 1.061, on: 'TTToSemiLeptonic'}   # uncer=+4.8%,-6.1% 
