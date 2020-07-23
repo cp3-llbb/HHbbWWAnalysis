@@ -43,8 +43,11 @@ for sample, dico in data['samples'].items():
         if dico['group'] == "data":
             continue
     if 'db' in dico: # Need to do a DAS query to get files path
-        daspath = dico['db'].replace('das:','')
-        command += dasCommand%(daspath)
+        if isinstance(dico['db'],list):
+            for daspath in dico['db']: 
+                command += dasCommand%(daspath.replace('das:',''))
+        else:
+            command += dasCommand%(dico['db'].replace('das:',''))
     elif 'files' in dico:
         command += ' '+' '.join(dico['files'])
     else:
