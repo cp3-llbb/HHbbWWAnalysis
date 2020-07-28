@@ -24,9 +24,9 @@ class TemplateLatex:
                         ])
             
         self.selections = collections.OrderedDict([
-          #              ('TwoAk4Jets_' , "At least two Ak4 Jets (before Btagging)"),
-          #              ('OneAk8Jet_' , "At least one Ak8 Jet (before Btagging)"),
-          #              ('TwoAk4JetsExclusiveResolvedNoBtag' , "Exclusive Resolved Jets (no Btag)"),
+                        ('TwoAk4Jets_' , "At least two Ak4 Jets (before Btagging)"),
+                        ('OneAk8Jet_' , "At least one Ak8 Jet (before Btagging)"),
+                        ('TwoAk4JetsExclusiveResolvedNoBtag' , "Exclusive Resolved Jets (no Btag)"),
                         ('TwoAk4JetsExclusiveResolvedOneBtag' , "Exclusive Resolved Jets (1 Btag)"),
                         ('TwoAk4JetsExclusiveResolvedTwoBtags' , "Exclusive Resolved Jets (2 Btags)"),
                         ('OneAk8JetInclusiveBoosted' , "Inclusive Boosted Jets"),
