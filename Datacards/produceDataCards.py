@@ -7,25 +7,29 @@ import root_numpy
 import math
 import numpy as np
 from pprint import pprint
-
 import ROOT
+
+from datasetConfig import * 
 
 
 class DataCard:
-    def __init__(self,path,groups,hist_conv,era):
+    def __init__(self,path,yamlName,groups,hist_conv,era,use_syst=False):
         self.path = path
         self.groups = groups
         self.hist_conv = hist_conv
         self.era = era
+        self.use_syst = use_syst
         self.content = {k:{g:None for g in self.groups.keys()} for k in self.hist_conv.keys()}
 
-        self.yaml_dict = self.loadYaml(os.path.join(self.path,'plots.yml'))
+        self.yaml_dict = self.loadYaml(os.path.join(self.path,yamlName))
         self.loopOverFiles()
-        pprint (self.content)
+        #pprint (self.content)
         self.saveDatacard()
 
     def loopOverFiles(self):
         for f in glob.glob(os.path.join(self.path,'results','*.root')):
+            if '__skeleton__' in f:
+                continue
             sample = os.path.basename(f)
             # Check if in the group list #
             group = self.findGroup(sample)
@@ -62,6 +66,7 @@ class DataCard:
         if sample_type == "mc" or sample_type == "signal":
             xsec = self.yaml_dict["samples"][sample]['cross-section']
             sumweight = self.yaml_dict["samples"][sample]['generated-events']
+            br = self.yaml_dict["samples"][sample]["branching-ratio"] if "branching-ratio" in self.yaml_dict["samples"][sample].keys() else 1
 
         # Get list of hist names #
         list_histnames = self.getHistList(f)
@@ -73,11 +78,11 @@ class DataCard:
             if not histname in list_histnames:
                 print ("Could not find hist %s in %s"%(histname,rootfile))
                 continue
-            listsyst = [hn for hn in list_histnames if histname in hn and '__' in hn]
+            listsyst = [hn for hn in list_histnames if histname in hn and '__' in hn] if self.use_syst else []
             h = self.getHistogram(f,histname,listsyst)
             # Normalize hist to data #
             if sample_type == "mc" or sample_type == "signal":
-                h.Scale(lumi*xsec/sumweight)
+                h.Scale(lumi*xsec*br/sumweight)
             # Save in dict #
             hist_dict[datacardname] = h
         f.Close()
@@ -134,7 +139,7 @@ class DataCard:
 
 
     def saveDatacard(self):
-        path_datacard = os.path.join(os.path.abspath(os.path.dirname(__file__)),'datacards')
+        path_datacard = os.path.join(os.path.abspath(os.path.dirname(__file__)),'datacards_%s'%self.era)
         if not os.path.exists(path_datacard):
             os.makedirs(path_datacard)
         for key, gdict in self.content.items():
@@ -157,104 +162,7 @@ class DataCard:
 
 
 if __name__=="__main__":
-    path = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/BambooOutputHHtobbWW/full2016_tight_noSyst/'
-    groups = {'TTZ':   ['TTZToQQ.root','TTZToLLNuNu.root'],
-              'TH' :   [],
-              'VH' :   ['HZJ_HToWW.root',
-                        'ggZH_HToBB_ZToLL.root',
-                        'ggZH_HToBB_ZToNuNu.root'],
-              'TT' :   ['TTTo2L2Nu.root',
-                        'TTToSemiLeptonic.root',
-                        'TTToHadronic.root'],
-              'TTW':   ['TTWJetsToQQ.root',
-                        'TTWJetsToLNu.root'],
-              'WW' :   ['WWToLNuQQ.root',
-                        'WWTo2L2Nu.root',
-                        'WJetsToLNu.root'],
-              'TTH':   ['ttHTobb.root',
-                        'ttHToNonbb.root'],
-              'ZZ' :   ['ZZTo2L2Nu.root',
-                        'ZZTo2L2Q.root',
-                        'ZZTo4L.root'],
-              'DY' :   ['DYJetsToLL_M-10to50.root',
-                        'DYToLL_0J.root',
-                        'DYToLL_1J.root',
-                        'DYToLL_2J.root'],
-              'Other': ['ST_tW_top_5f.root',
-                        'ST_tW_antitop_5f.root',
-                        'ST_tchannel_antitop_4f.root',
-                        'ST_tchannel_top_4f.root',
-                        'WWW.root',
-                        'WWZ.root',
-                        'WZZ.root',
-                        'ZZZ.root'],
-              'WZ' :   ['WZTo2L2Q.root',
-                        'WZTo1L3Nu.root',
-                        'WZ1L1Nu2Q.root',
-                        'WZ1L1Nu2Q.root',
-                        'WZTo3LNu.root'],
-              'TTWW' : [],
-              'data_fake': [],
-              'data_obs' : ['DoubleEGamma_2016B.root',
-                            'DoubleEGamma_2016C.root',
-                            'DoubleEGamma_2016D.root',
-                            'DoubleEGamma_2016E.root',
-                            'DoubleEGamma_2016F.root',
-                            'DoubleEGamma_2016G.root',
-                            'DoubleEGamma_2016H.root',
-                            'DoubleMuon_2016B.root',
-                            'DoubleMuon_2016C.root',
-                            'DoubleMuon_2016D.root',
-                            'DoubleMuon_2016E.root',
-                            'DoubleMuon_2016F.root',
-                            'DoubleMuon_2016G.root',
-                            'DoubleMuon_2016H.root',
-                            'MuonEG_2016B.root',
-                            'MuonEG_2016C.root',
-                            'MuonEG_2016D.root',
-                            'MuonEG_2016E.root',
-                            'MuonEG_2016F.root',
-                            'MuonEG_2016G.root',
-                            'MuonEG_2016H.root',
-                            'SingleElectron_2016B.root',
-                            'SingleElectron_2016C.root',
-                            'SingleElectron_2016D.root',
-                            'SingleElectron_2016E.root',
-                            'SingleElectron_2016F.root',
-                            'SingleElectron_2016G.root',
-                            'SingleElectron_2016H.root',
-                            'SingleMuon_2016B.root',
-                            'SingleMuon_2016C.root',
-                            'SingleMuon_2016D.root',
-                            'SingleMuon_2016E.root',
-                            'SingleMuon_2016F.root',
-                            'SingleMuon_2016G.root',
-                            'SingleMuon_2016H.root']}    
-
-    hists = {'HH_cat_ee_1b_jet1_pt' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt',
-             'HH_cat_mm_1b_jet1_pt' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt',
-             'HH_cat_em_1b_jet1_pt' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt',
-             'HH_cat_ee_2b_jet1_pt' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt',
-             'HH_cat_mm_2b_jet1_pt' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt',
-             'HH_cat_em_2b_jet1_pt' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt',
-             'HH_cat_ee_1b_lep1_pt' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_pt',
-             'HH_cat_mm_1b_lep1_pt' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_pt',
-             'HH_cat_em_1b_lep1_pt' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_pt',
-             'HH_cat_ee_2b_lep1_pt' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt',
-             'HH_cat_mm_2b_lep1_pt' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt',
-             'HH_cat_em_2b_lep1_pt' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt',
-             'HH_cat_ee_1b_jet1_eta' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_eta',
-             'HH_cat_mm_1b_jet1_eta' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_eta',
-             'HH_cat_em_1b_jet1_eta' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_eta',
-             'HH_cat_ee_2b_jet1_eta' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_eta',
-             'HH_cat_mm_2b_jet1_eta' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_eta',
-             'HH_cat_em_2b_jet1_eta' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_eta',
-             'HH_cat_ee_1b_lep1_eta' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_eta',
-             'HH_cat_mm_1b_lep1_eta' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_eta',
-             'HH_cat_em_1b_lep1_eta' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_eta',
-             'HH_cat_ee_2b_lep1_eta' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_eta',
-             'HH_cat_mm_2b_lep1_eta' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_eta',
-             'HH_cat_em_2b_lep1_eta' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_eta',
-            }
-
-    instance = DataCard(path,groups,hists,'2016')
+    #instance = DataCard(*returnConfig('2016'),'2016')
+    #instance = DataCard(*returnConfig('2017'),'2017')
+    #instance = DataCard(*returnConfig('2018'),'2018')
+    instance = DataCard(*returnZPeakConfig('2016'),'2016')
