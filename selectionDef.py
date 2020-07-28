@@ -310,8 +310,8 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                     ElElTightSelObject.yieldTitle+= " + Z peak $|M_{ll}-M_Z| < 10 GeV$" 
                     MuMuTightSelObject.yieldTitle+= " + Z peak $|M_{ll}-M_Z| < 10 GeV$"
 
-                    ElElTightSelObject.refine(cut = [lambda_inZ(self.ElElDileptonTightSel[0])])
-                    MuMuTightSelObject.refine(cut = [lambda_inZ(self.MuMuDileptonTightSel[0])])
+                    ElElTightSelObject.refine(cut = [op.switch(op.rng_len(self.ElElDileptonTightSel)>=1,lambda_inZ(self.ElElDileptonTightSel[0]),lambda_inZ(self.ElElDileptonFakeExtrapolationSel[0]))])
+                    MuMuTightSelObject.refine(cut = [op.switch(op.rng_len(self.MuMuDileptonTightSel)>=1,lambda_inZ(self.MuMuDileptonTightSel[0]),lambda_inZ(self.MuMuDileptonFakeExtrapolationSel[0]))])
 
                     if plot_yield:
                         ElElTightSelObject.makeYield(self.yieldPlots)

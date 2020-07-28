@@ -496,6 +496,15 @@ def makeHighLevelQuantities(sel,met,l1,l2,j1,j2,suffix,channel):
 
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
 
+    # Lepton PT versus Jet Pt #
+    plots.append(Plot.make2D("%s_%s_highlevelvariable_firstLeptonPtVSLeadjetPt"%(channel,suffix),
+                             [l1.pt,j1.pt],
+                             sel,
+                             [EquidistantBinning(60,0.,300.),EquidistantBinning(60,0.,300.)],
+                             xTitle="First lepton P_{T}",
+                             yTitle="Leading jet P_{T}",
+                             plotopts = channelLabel))
+
     # dilepton-MET plots #
     plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepMETdeltaPhi"%(channel,suffix),
                              op.abs(DilepMET_deltaPhi(l1,l2,met)),
