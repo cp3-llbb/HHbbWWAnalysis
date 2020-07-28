@@ -191,21 +191,20 @@ class BtagReweightingRatio:
         
 if __name__ == "__main__":
     #---- 2016 ----#
-    ath_on, path_off, list_hists, outputname, era
-    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_BtagReweighting_On_v3/',
-                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_BtagReweighting_Off_v3/',
+    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_BtagReweighting_On/',
+                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_BtagReweighting_Off/',
                                     list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
                                     outputname  = 'BtagReweightingRatio_jetN',
                                     era         = '2016')
     #---- 2017 ----#
-    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017_BtagReweighting_On_v2/',
-                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017_BtagReweighting_Off_v2/',
+    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV6_BtagReweighting_On/',
+                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV6_BtagReweighting_Off/',
                                     list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
                                     outputname  = 'BtagReweightingRatio_jetN',
                                     era         = '2017')
-    #---- 2018 ----#
-    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018_BtagReweighting_On_v2/',
-                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018_BtagReweighting_Off_v2/',
-                                    list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
-                                    outputname  = 'BtagReweightingRatio_jetN',
-                                    era         = '2018')
+#    #---- 2018 ----#
+#    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018_BtagReweighting_On_v2/',
+#                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018_BtagReweighting_Off_v2/',
+#                                    list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
+#                                    outputname  = 'BtagReweightingRatio_jetN',
+#                                    era         = '2018')

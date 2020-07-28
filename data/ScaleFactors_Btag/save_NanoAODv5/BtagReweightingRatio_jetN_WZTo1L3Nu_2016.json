@@ -1,0 +1,64 @@
+{
+    "dimension": 1,
+    "variables": [
+        "NumJets"
+    ],
+    "error_type": "absolute",
+    "binning": {
+        "x": [
+            0.0,
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0
+        ]
+    },
+    "data": [
+        {
+            "bin": [
+                0.0,
+                1.0
+            ],
+            "value": 1.0,
+            "error_low": 0.0,
+            "error_high": 0.0
+        },
+        {
+            "bin": [
+                1.0,
+                2.0
+            ],
+            "value": 1.0186517436877744,
+            "error_low": 0.0,
+            "error_high": 0.0
+        },
+        {
+            "bin": [
+                2.0,
+                3.0
+            ],
+            "value": 0.9596546740897172,
+            "error_low": 0.0,
+            "error_high": 0.0
+        },
+        {
+            "bin": [
+                3.0,
+                4.0
+            ],
+            "value": 1.0411610863984992,
+            "error_low": 0.0,
+            "error_high": 0.0
+        },
+        {
+            "bin": [
+                4.0,
+                5.0
+            ],
+            "value": 0.966978606237417,
+            "error_low": 0.0,
+            "error_high": 0.0
+        }
+    ]
+}

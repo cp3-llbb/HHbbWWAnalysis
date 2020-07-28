@@ -9,7 +9,7 @@ import numpy as np
 from pprint import pprint
 import ROOT
 
-from datasetConfig import returnConfig
+from datasetConfig import * 
 
 
 class DataCard:
@@ -162,6 +162,7 @@ class DataCard:
 
 
 if __name__=="__main__":
-    instance = DataCard(*returnConfig('2016'),'2016')
-    instance = DataCard(*returnConfig('2017'),'2017')
-    instance = DataCard(*returnConfig('2018'),'2018')
+    #instance = DataCard(*returnConfig('2016'),'2016')
+    #instance = DataCard(*returnConfig('2017'),'2017')
+    #instance = DataCard(*returnConfig('2018'),'2018')
+    instance = DataCard(*returnZPeakConfig('2016'),'2016')
