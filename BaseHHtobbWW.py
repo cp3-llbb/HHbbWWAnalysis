@@ -1331,7 +1331,7 @@ One lepton and and one jet argument must be specified in addition to the require
                 #                                                systName = 'btag_ratio',
                 #                                                nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
                 #noSel = noSel.refine("BtagSF" , weight = [self.btagSF,self.BtagRatioWeight])
-                self.btagSF = op.rng_product(self.ak4Jets , lambda j : self.DeepJetDiscReshapingSF(j))
+                noSel = noSel.refine("BtagSF" , weight = self.btagSF)
 
         # Return #
         return noSel
