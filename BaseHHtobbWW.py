@@ -162,6 +162,11 @@ One lepton and and one jet argument must be specified in addition to the require
                                 action      = "store_true",
                                 default     = False,
                                 help        = "DY stitching studies : only produce LHE jet multiplicities (inclusive analysis, only on DY events, rest of plots ignored)")
+        parser.add_argument("--WJetsStitching", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "W+jets stitching studies : only produce LHE jet multiplicities (inclusive analysis, only on W+jets events, rest of plots ignored)")
+
 
 
         #----- Skimmer arguments -----#
@@ -228,7 +233,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                   # None is local mode, "None" in distributed mode
                               or self.args.BtagReweightingOn 
                               or self.args.BtagReweightingOff
-                              or self.args.DYStitching)
+                              or self.args.DYStitching
+                              or self.args.WJetsStitching)
                                 # Inclusive plots
             # If no lepton, jet and channel selection : basic object selection (no trigger nor corrections)
         if self.inclusive_sel:
@@ -552,7 +558,6 @@ One lepton and and one jet argument must be specified in addition to the require
         ###########################################################################
         #                            DY stitching                                 #
         ###########################################################################
-#       Still experimental
 #        if "group" in sampleCfg and sampleCfg["group"] == 'DY':
 #            if sample == "DYJetsToLL_M-50":
 #                if era == "2016":
@@ -595,8 +600,11 @@ One lepton and and one jet argument must be specified in addition to the require
         #                               tH samples                                #
         ###########################################################################
         if sample.startswith('TH'):
+            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/SingleTopHiggsGeneration13TeV
+            # https://twiki.cern.ch/twiki/pub/CMS/SingleTopHiggsGeneration13TeV/reweight_encondig.txt
+            # 
             print ('Applied tH LHE weights')
-            noSel = noSel.refine("tHWeight",weight=t.LHEReweightingWeight[12])
+            noSel = noSel.refine("tHWeight",weight=t.LHEReweightingWeight[11])
 
         #############################################################################
         #                            Pre-firing rates                               #
@@ -1035,28 +1043,24 @@ One lepton and and one jet argument must be specified in addition to the require
             #noSel = noSel.refine("genWeight", weight=sign(t.genWeight))
 
         triggerRanges = returnTriggerRanges(era)
-#        #----- Select triggers -----#
-#       Still experimental 
-#        def returnTriggers(keys):
-#            # MC : just OR the different paths 
-#            if self.is_MC:
-#                return op.OR(*[trig for k in keys for trig in self.triggersPerPrimaryDataset[k]])
-#            # Data : due to bug in NanoAOD production, check that the event run number is inside the ranges computed by bricalc
-#            else:
-#                conversion = {'SingleElectron':'1e','SingleMuon':'1mu','MuonEG':'1e1mu','DoubleEGamma':'2e','DoubleMuon':'2mu'}
-#                list_cond = []
-#                for trigKey in keys:
-#                    rangekey = conversion[trigKey]
-#                    rangeDict = {triggerRanges[rangekey][i]['name']:triggerRanges[rangekey][i]['runs'] for i in range(len(triggerRanges[rangekey]))}
-#                    listTrig = self.triggersPerPrimaryDataset[trigKey]
-#                    trigNames = [trig._parent.name for trig in listTrig]
-#                    for trig,trigName in zip(listTrig,trigNames):
-#                        trigRanges = rangeDict[trigName]
-#                        list_cond.append(op.AND(trig,op.OR(*[op.in_range(r[0],t.run,r[1]) for r in trigRanges])))
-#                return op.OR(*list_cond)
-
+        #----- Select triggers -----#
         def returnTriggers(keys):
-            return op.OR(*[trig for k in keys for trig in self.triggersPerPrimaryDataset[k]])
+            # MC : just OR the different paths 
+            if self.is_MC:
+                return op.OR(*[trig for k in keys for trig in self.triggersPerPrimaryDataset[k]])
+            # Data : due to bug in NanoAOD production, check that the event run number is inside the ranges computed by bricalc
+            else:
+                conversion = {'SingleElectron':'1e','SingleMuon':'1mu','MuonEG':'1e1mu','DoubleEGamma':'2e','DoubleMuon':'2mu'}
+                list_cond = []
+                for trigKey in keys:
+                    rangekey = conversion[trigKey]
+                    rangeDict = {triggerRanges[rangekey][i]['name']:triggerRanges[rangekey][i]['runs'] for i in range(len(triggerRanges[rangekey]))}
+                    listTrig = self.triggersPerPrimaryDataset[trigKey]
+                    trigNames = [trig._parent.name for trig in listTrig]
+                    for trig,trigName in zip(listTrig,trigNames):
+                        trigRanges = rangeDict[trigName]
+                        list_cond.append(op.AND(trig,op.OR(*[op.in_range(r[0],t.run,r[1]) for r in trigRanges])))
+                return op.OR(*list_cond)
 
         # NOTE 
         # For DL the naming convention is self.leadElectronsFakeSel and self.leadMuonsFakeSel (with an "s")
@@ -1283,7 +1287,7 @@ One lepton and and one jet argument must be specified in addition to the require
         ###########################################################################
         #                    b-tagging efficiency scale factors                   #
         ###########################################################################
-        if self.is_MC and not self.args.DYStitching:
+        if self.is_MC and not self.args.DYStitching and not self.args.WJetsStitching:
             #----- Method 1.d -----#
             # See https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagShapeCalibration
             # W_btag = Π_i(all jets) SD(jet_i)  which must be multiplied by r = Σ w(before)/Σ w(after) (before/after using the btag weight, no btag selection for both)
@@ -1321,17 +1325,16 @@ One lepton and and one jet argument must be specified in addition to the require
             elif self.args.BtagReweightingOff:
                 pass # Do not apply any SF
             else:
-                #ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(sample,era))
-                #if not os.path.exists(ReweightingFileName):
-                #    raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
-                #print ('Reweighting file',ReweightingFileName)
+                ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(sample,era))
+                if not os.path.exists(ReweightingFileName):
+                    raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
+                print ('Reweighting file',ReweightingFileName)
 
-                #self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
-                #                                                numJets  = op.rng_len(self.ak4Jets),
-                #                                                systName = 'btag_ratio',
-                #                                                nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
-                #noSel = noSel.refine("BtagSF" , weight = [self.btagSF,self.BtagRatioWeight])
-                noSel = noSel.refine("BtagSF" , weight = self.btagSF)
+                self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
+                                                                numJets  = op.rng_len(self.ak4Jets),
+                                                                systName = 'btag_ratio',
+                                                                nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
+                noSel = noSel.refine("BtagSF" , weight = [self.btagSF,self.BtagRatioWeight])
 
         # Return #
         return noSel

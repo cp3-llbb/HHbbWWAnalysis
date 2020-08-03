@@ -10,6 +10,7 @@ def getNanoAODList(daspaths,version):
             results = subprocess.check_output(cmd).decode().split()
         except subprocess.CalledProcessError:
             print ("Error in DAS for sample %s"%daspath)
+            return []
         if len(results)==0:
             print ("No NanoAOD child of sample %s"%daspath)
         addnano = [result for result in results if version in result]
@@ -34,14 +35,14 @@ def readTextFile(path):
 
 def checkSample(sample):
     cmd = ['dasgoclient', '-query', 'file dataset=%s'%sample]
-    n_total = len(subprocess.check_output(cmd).decode().split())
-    cmd = ['dasgoclient', '-query', 'file dataset=%s site=T2_BE_UCL'%sample]
-    n_local = len(subprocess.check_output(cmd).decode().split())
+    files = subprocess.check_output(cmd).decode().split()
+    missing_files = [f for f in files if not os.path.exists('/storage/data/cms'+f)]
     print ("Sample : %s"%sample)
-    print ("... Local : %d / %d"%(n_local,n_total))
-    if n_total<n_local:
-        raise RuntimeError("More files locally than globally, how is that possible ?!")
-    return n_total == n_local
+    print ("... Local : %d / %d"%(len(files)-len(missing_files),len(files)))
+    if len(missing_files)>0:
+        for f in missing_files:
+            print ('... Missing file :',f)
+    return len(missing_files) == 0
 
 def saveToText(list_samples,filename):
     with open(filename,'w') as f:
@@ -53,15 +54,31 @@ def processAndSave(txtfile,filename,version):
     list_mini = readTextFile(txtfile)
     list_nano = getNanoAODList(list_mini,version)
     list_missing_nano = [nano for nano in list_nano if not checkSample(nano)]
+    rucio_list = ['cms:'+nano for nano in list_nano if nano not in list_missing_nano]
+    rucio_cmd = 'rucio add-rule '+' '.join(rucio_list) + ' 1 T2_BE_UCL'
+    print ('\nRucio command below')
+    print ('Note that you should do the commands before :')
+    print ('source /cvmfs/cms.cern.ch/cmsset_default.sh')
+    print ('source /cvmfs/cms.cern.ch/rucio/setup.sh')
+    print ('export RUCIO_ACCOUNT=your_username')
+    print ()
+    print (rucio_cmd)
+    print ()
     saveToText(list_nano,filename)
     saveToText(list_missing_nano,filename.replace('.txt','_missing.txt'))
 
-processAndSave('signal_miniaod_samples_2016.txt','signal_nanoaod_samples_2016.txt','NanoAODv6')
-processAndSave('signal_miniaod_samples_2017.txt','signal_nanoaod_samples_2017.txt','NanoAODv6')
-processAndSave('signal_miniaod_samples_2018.txt','signal_nanoaod_samples_2018.txt','NanoAODv6')
-processAndSave('background_miniaod_samples_2016.txt','background_nanoaod_samples_2016.txt','NanoAODv6')
-processAndSave('background_miniaod_samples_2017.txt','background_nanoaod_samples_2017.txt','NanoAODv6')
-processAndSave('background_miniaod_samples_2018.txt','background_nanoaod_samples_2018.txt','NanoAODv6')
-processAndSave('data_miniaod_samples_2016.txt','data_nanoaod_samples_2016.txt','Nano25Oct2019')
-processAndSave('data_miniaod_samples_2017.txt','data_nanoaod_samples_2017.txt','Nano25Oct2019')
-processAndSave('data_miniaod_samples_2018.txt','data_nanoaod_samples_2018.txt','Nano25Oct2019')
+processAndSave('signal_miniaod_samples_2016.txt','signal_nanoaod_samples_2016_v6.txt','NanoAODv6')
+processAndSave('signal_miniaod_samples_2017.txt','signal_nanoaod_samples_2017_v6.txt','NanoAODv6')
+processAndSave('signal_miniaod_samples_2018.txt','signal_nanoaod_samples_2018_v6.txt','NanoAODv6')
+processAndSave('background_miniaod_samples_2016.txt','background_nanoaod_samples_2016_v6.txt','NanoAODv6')
+processAndSave('background_miniaod_samples_2017.txt','background_nanoaod_samples_2017_v6.txt','NanoAODv6')
+processAndSave('background_miniaod_samples_2018.txt','background_nanoaod_samples_2018_v6.txt','NanoAODv6')
+processAndSave('data_miniaod_samples_2016.txt','data_nanoaod_samples_2016_Nano25Oct2019.txt','Nano25Oct2019')
+processAndSave('data_miniaod_samples_2017.txt','data_nanoaod_samples_2017_Nano25Oct2019.txt','Nano25Oct2019')
+processAndSave('data_miniaod_samples_2018.txt','data_nanoaod_samples_2018_Nano25Oct2019.txt','Nano25Oct2019')
+processAndSave('signal_miniaod_samples_2016.txt','signal_nanoaod_samples_2016_v7.txt','NanoAODv7')
+processAndSave('signal_miniaod_samples_2017.txt','signal_nanoaod_samples_2017_v7.txt','NanoAODv7')
+processAndSave('signal_miniaod_samples_2018.txt','signal_nanoaod_samples_2018_v7.txt','NanoAODv7')
+processAndSave('background_miniaod_samples_2016.txt','background_nanoaod_samples_2016_v7.txt','NanoAODv7')
+processAndSave('background_miniaod_samples_2017.txt','background_nanoaod_samples_2017_v7.txt','NanoAODv7')
+processAndSave('background_miniaod_samples_2018.txt','background_nanoaod_samples_2018_v7.txt','NanoAODv7')

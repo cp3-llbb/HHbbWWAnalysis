@@ -8,6 +8,9 @@ class DataDrivenFake(DataDrivenContribution):
     def modifiedSampleConfig(self, sampleName, sampleConfig, lumi=None):
         # Fake contribution = reweighted data - reweighted MC (in Fake CR)
         modCfg = dict(sampleConfig)
+        print (modCfg)
+        if 'type' in sampleConfig.keys() and sampleConfig["type"]=="signal":
+            return {}
         if sampleConfig["group"]=="data":
             # Data : add as MC with correct normalization so that lumi*Xsec/generated-events = 1
             modCfg.update({"type": "mc",
