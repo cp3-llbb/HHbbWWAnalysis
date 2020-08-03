@@ -59,19 +59,18 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         #----- Ratio reweighting variables (before lepton and jet selection) -----#
         if self.args.BtagReweightingOff or self.args.BtagReweightingOn:
             plots.append(objectsNumberPlot(channel="NoChannel",suffix='NoSelection',sel=noSel,objCont=self.ak4Jets,objName='Ak4Jets',Nmax=15,xTitle='N(Ak4 jets)'))
-            #plots.append(CutFlowReport("BtagReweightingCutFlowReport",noSel))
+            plots.append(CutFlowReport("BtagReweightingCutFlowReport",noSel))
             return plots
 
-        #----- DY stitching study -----#
-        if self.args.DYStitching:
-            if sampleCfg['group'] != 'DY':
+        #----- Stitching study -----#
+        if self.args.DYStitching or self.args.WJetsStitching:
+            if self.args.DYStitching and sampleCfg['group'] != 'DY':
                 raise RuntimeError("Stitching is only done on DY MC samples")
-            plots.append(Plot.make1D("LHE_Njets",
-                                     t.LHE.Njets,
-                                     noSel,
-                                     EquidistantBinning(5,0.,5),
-                                     xTitle='LHE Njets'))
-            #plots.append(CutFlowReport("DYStitchingCutFlowReport",noSel))
+            if self.args.WJetsStitching and sampleCfg['group'] != 'Wjets':
+                raise RuntimeError("Stitching is only done on WJets MC samples")
+            plots.extend(makeLHEPlots(noSel,t.LHE))
+            plots.append(objectsNumberPlot(channel="NoChannel",suffix='NoSelection',sel=noSel,objCont=self.ak4Jets,objName='Ak4Jets',Nmax=15,xTitle='N(Ak4 jets)'))
+            plots.append(CutFlowReport("DYStitchingCutFlowReport",noSel))
             return plots
 
 

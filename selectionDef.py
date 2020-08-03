@@ -271,24 +271,27 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
 
                 # Selection : at least one tight dilepton #
                 if use_dd:
+                    enable = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg) \
+                                                                                 and not ('type' in sampleConfig.keys() and sampleConfig["type"]=="signal")
+                                                            
                     ElElTightSelObject.create(ddSuffix  = "FakeExtrapolation",
                                               cut       = [op.rng_len(self.ElElDileptonTightSel) >= 1],
                                               weight    = ElElTightSF(self.ElElDileptonTightSel[0]),
                                               ddCut     = [op.rng_len(self.ElElDileptonFakeExtrapolationSel) >= 1],
                                               ddWeight  = self.ElElFakeFactor(self.ElElDileptonFakeExtrapolationSel[0]),
-                                              enable    = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg))
+                                              enable    = enable)
                     MuMuTightSelObject.create(ddSuffix  = "FakeExtrapolation",
                                               cut       = [op.rng_len(self.MuMuDileptonTightSel) >= 1],
                                               weight    = MuMuTightSF(self.MuMuDileptonTightSel[0]),
                                               ddCut     = [op.rng_len(self.MuMuDileptonFakeExtrapolationSel) >= 1],
                                               ddWeight  = self.MuMuFakeFactor(self.MuMuDileptonFakeExtrapolationSel[0]),
-                                              enable    = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg))
+                                              enable    = enable)
                     ElMuTightSelObject.create(ddSuffix  = "FakeExtrapolation",
                                               cut       = [op.rng_len(self.ElMuDileptonTightSel) >= 1],
                                               weight    = ElMuTightSF(self.ElMuDileptonTightSel[0]),
                                               ddCut     = [op.rng_len(self.ElMuDileptonFakeExtrapolationSel) >= 1],
                                               ddWeight  = self.ElMuFakeFactor(self.ElMuDileptonFakeExtrapolationSel[0]),
-                                              enable    = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg))
+                                              enable    = enable)
                 else:
                     ElElTightSelObject.refine(cut    = [op.rng_len(self.ElElDileptonTightSel) >= 1],
                                               weight = ElElTightSF(self.ElElDileptonTightSel[0]))

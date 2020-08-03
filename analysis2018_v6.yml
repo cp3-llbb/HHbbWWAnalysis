@@ -220,7 +220,7 @@ samples:
 ####### Standard model higgs : VBF
 
   VBFHToTauTau:
-    db: das:VBFHToTauTau_M125_13TeV_powheg_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/NANOAODSIM
+    db: das:/VBFHToTauTau_M125_13TeV_powheg_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/NANOAODSIM
     files: dascache/VBFHToTauTau_2018.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.2372
@@ -229,7 +229,7 @@ samples:
     split: 10
 
   VBF_HToZZTo4L:
-    db: /VBF_HToZZTo4L_M125_13TeV_powheg2_JHUGenV7011_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    db: das:/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUGenV7011_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
     files: dascache/VBF_HToZZTo4L_2018.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.0010099
@@ -274,7 +274,7 @@ samples:
     split: 10
 
   VBFHToGG:
-    db: /VBFHToGG_M125_13TeV_amcatnlo_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    db: das:/VBFHToGG_M125_13TeV_amcatnlo_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
     files: dascache/VBFHToGG_2018.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.0085851
@@ -367,7 +367,7 @@ samples:
     split: 10
 
   WplusH_HToBB_WToLNu:
-    db: ["das:/WplusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM","/WplusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/NANOAODSIM"]
+    db: ["das:/WplusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM","das:/WplusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/NANOAODSIM"]
     files: dascache/WplusH_HToBB_WToLNu_2018.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.1595
@@ -508,6 +508,116 @@ samples:
     group: Wjets
     era: '2018'
     split: 50
+
+  W1JetsToLNu:
+    db: das:/W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/W1JetsToLNu_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 9442.49
+    group: Wjets
+    era: '2018'
+    split: 20
+
+  W2JetsToLNu:
+    db: das:/W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/W2JetsToLNu_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 3252.49
+    group: Wjets
+    era: '2018'
+    split: 20
+
+  W3JetsToLNu:
+    db: das:/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/W3JetsToLNu_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1153.42
+    group: Wjets
+    era: '2018'
+    split: 20
+
+  W4JetsToLNu:
+    db: das:/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/W4JetsToLNu_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 634.05
+    group: Wjets
+    era: '2018'
+    split: 20
+
+  WJetsToLNu_HT-70To100:
+    db: das:/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/WJetsToLNu_HT-70To100_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1504.92
+    group: Wjets
+    era: '2018'
+    split: 20
+
+  WJetsToLNu_HT-100To200:
+    db: das:/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/WJetsToLNu_HT-100To200_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1625.08
+    group: Wjets
+    era: '2018'
+    split: 20
+
+  WJetsToLNu_HT-200To400:
+    db: das:/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/WJetsToLNu_HT-200To400_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 477.96
+    group: Wjets
+    era: '2018'
+    split: 20
+
+  WJetsToLNu_HT-400To600:
+    db: das:/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/WJetsToLNu_HT-400To600_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 67.441
+    group: Wjets
+    era: '2018'
+    split: 20
+
+  WJetsToLNu_HT-600To800:
+    db: das:/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/WJetsToLNu_HT-600To800_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 15.096
+    group: Wjets
+    era: '2018'
+    split: 20
+
+  WJetsToLNu_HT-800To1200:
+    db: das:/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/WJetsToLNu_HT-800To1200_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 6.3626
+    group: Wjets
+    era: '2018'
+    split: 20
+
+  WJetsToLNu_HT-1200To2500:
+    db: das:/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/WJetsToLNu_HT-1200To2500_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1.2658
+    group: Wjets
+    era: '2018'
+    split: 20
+
+  WJetsToLNu_HT-2500ToInf:
+    db: das:/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/WJetsToLNu_HT-2500ToInf_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 0.009405
+    group: Wjets
+    era: '2018'
+    split: 20
+
+
 
 ####### TTV(V) : TTZ + TTW + TTWW
 
