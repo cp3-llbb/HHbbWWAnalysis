@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 from itertools import chain
 
 from bamboo import treefunctions as op
@@ -556,45 +557,27 @@ One lepton and and one jet argument must be specified in addition to the require
             noSel = noSel.refine("ttbarWeight",weight=self.ttbar_sys)
 
         ###########################################################################
-        #                            DY stitching                                 #
+        #                               Stitching                                 #
         ###########################################################################
-#        if "group" in sampleCfg and sampleCfg["group"] == 'DY':
-#            if sample == "DYJetsToLL_M-50":
-#                if era == "2016":
-#                    stitching_weights = [0.739,0.434,0.329,0.338]
-#                if era == "2017":
-#                    stitching_weights = [0.815,0.685,0.604,0.582]
-#                if era == "2018":
-#                    stitching_weights = [0.801,0.655,0.542,0.533]
-#            elif sample == "DYToLL_0J":
-#                if era == "2016":
-#                    stitching_weights = [0.261,0.153,0.116,0.119]
-#                if era == "2017":
-#                    stitching_weights = [0.146,0.123,0.109,0.105]
-#                if era == "2018":
-#                    stitching_weights = [0.165,0.135,0.111,0.110]
-#            elif sample == "DYToLL_1J":
-#                if era == "2016":
-#                    stitching_weights = [1.083,0.635,0.481,0.495]
-#                if era == "2017":
-#                    stitching_weights = [0.652,0.548,0.483,0.465] 
-#                if era == "2018":
-#                    stitching_weights = [0.697,0.570,0.471,0.464]
-#            elif sample == "DYToLL_2J":
-#                if era == "2016":
-#                    stitching_weights = [1.480,0.868,0.658,0.676]
-#                if era == "2017":
-#                    stitching_weights = [0.547,0.460,0.406,0.391]
-#                if era == "2018":
-#                    stitching_weights = [0.682,0.557,0.461,0.454]
-#            else:
-#                stitching_weights = [1.,1.,1.,1.]
-#            print ('Stitching weights :',stitching_weights)
-#            noSel = noSel.refine("DYStitching",weight = op.multiSwitch((t.LHE.Njets==0,op.c_float(stitching_weights[0])),
-#                                                                       (t.LHE.Njets==1,op.c_float(stitching_weights[1])),
-#                                                                       (t.LHE.Njets==2,op.c_float(stitching_weights[2])),
-#                                                                       (t.LHE.Njets==3,op.c_float(stitching_weights[3])),
-#                                                                       op.c_float(1.)))
+        if "group" in sampleCfg and (sampleCfg["group"] == 'DY' or sampleCfg["group"] == 'Wjets'):
+            stitch_file = os.path.abspath(os.path.join(os.path.dirname(__file__),'data','Stitching','stitching_weights_{}_{}.json'.format(sampleCfg["group"],era)))
+            if not os.path.exists(stitch_file):
+                raise RuntimeError("Could not find stitching file %s"%stitch_file)
+            with open(stitch_file) as handle:
+                dict_weights = json.load(handle)[sample]
+
+            if isinstance(dict_weights[list(dict_weights.keys())[0]],float): # Only binned in jet multiplicity
+                stitch_op = op.multiSwitch(*[(t.LHE.Njets==int(njets),op.c_float(weight)) for njets,weight in dict_weights.items()], op.c_float(1.))
+            elif isinstance(dict_weights[list(dict_weights.keys())[0]],list): # Binned in jet mult + HT bins
+                stitch_op = op.multiSwitch(*[(op.AND(t.LHE.Njets==int(njets),op.in_range(weights['low'],t.LHE.HT,weights['up'])),op.c_float(weights['value'])) 
+                                              for njets,listBin in dict_weights.items() for weights in listBin], op.c_float(1.))
+            else:
+                raise RuntimeError("Stitching weight format not understood")
+                
+
+            print ('Stitching weights :',dict_weights)
+            noSel = noSel.refine("DYStitching",weight = stitch_op)
+            sys.exit()
                 
         ###########################################################################
         #                               tH samples                                #

@@ -2,6 +2,7 @@ import os
 import sys
 import ROOT
 import pandas as pd
+import json
 from pprint import pprint
 
 path = sys.argv[1]
@@ -130,6 +131,20 @@ dict_content = {'Inclusive' : returnContent(h_inc),
                 'Exclusive HT [1200,2500]' : returnContent(h_1200HT),
                 'Exclusive HT [2500,inf[' : returnContent(h_2500HT)}
 
+dict_samples = {'Inclusive' : 'WJetsToLNu',
+                'Exclusive 1J' : 'W1JetsToLNu',
+                'Exclusive 2J' : 'W2JetsToLNu',
+                'Exclusive 3J' : 'W3JetsToLNu',
+                'Exclusive 4J' : 'W4JetsToLNu',
+                'Exclusive HT [70,100]' : 'WJetsToLNu_HT-70To100',
+                'Exclusive HT [100,200]' : 'WJetsToLNu_HT-100To200',
+                'Exclusive HT [200,400]' : 'WJetsToLNu_HT-200To400',
+                'Exclusive HT [400,600]' : 'WJetsToLNu_HT-400To600',
+                'Exclusive HT [600,800]' : 'WJetsToLNu_HT-600To800',
+                'Exclusive HT [800,1200]' : 'WJetsToLNu_HT-800To1200',
+                'Exclusive HT [1200,2500]' : 'WJetsToLNu_HT-1200To2500',
+                'Exclusive HT [2500,inf[' : 'WJetsToLNu_HT-2500ToInf'}
+
 dict_xsec = {'Inclusive' : 61526.7,
              'Exclusive 1J' : 9442.49,
              'Exclusive 2J' : 3252.49,
@@ -144,6 +159,8 @@ dict_xsec = {'Inclusive' : 61526.7,
              'Exclusive HT [1200,2500]' : 1.2658,
              'Exclusive HT [2500,inf[' : 0.009405}
 
+samples = dict_xsec.keys()
+
 df = pd.DataFrame() 
 for name, content in dict_content.items():
     df = df.append(pd.DataFrame([list(content.values())+[dict_xsec[name]]],columns=list(content.keys())+['xsec'],index=[name]))
@@ -155,24 +172,34 @@ for block in blocks:
     print (df[block+['xsec','total']])
 
 print ('N per p parameter')
-sums_params = {col:df[col].sum() for col in params}
-pprint (sums_params)
+sums_params = {col:df[col].sum(axis=0) for col in params}
 
-print ('Xsec per p parameter')
+print ('Xsec per parameter')
 xsec_params = {p:(df[p]*df['xsec']/df['total']).sum() for p in params}
 for p in xsec_params.keys():
     if ('0j' in p and not '0HT' in p) or (not '0j' in p and '0HT' in p):
         xsec_params[p] /= 2
     elif not '0j' in p and not '0HT' in p:
         xsec_params[p] /= 3
-pprint (xsec_params)
+for p in params:
+    print ("Parameter %s, xsec = %0.3f"%(p,xsec_params[p]))
 
+print ('Xsec per exclusif parameter')
+xsec_test = {}
 exclusiveParams = ['0j','1j','2j','3j','4j','0HT','70HT','100HT','200HT','400HT','600HT','800HT','1200HT','2500HT']
-xsecExclu = {exp:sum([x for p,x in xsec_params.items() if exp in p]) for exp in exclusiveParams}
-for p,x in xsecExclu.items():
-    df_inc = df[[col for col in df.columns if p in col]].loc['Inclusive']
-    correct_xsec = dict_xsec['Inclusive'] * df[[col for col in df.columns if p in col]].loc['Inclusive'].sum() / df['total']['Inclusive']
-    print ("Exclusive sample %s, Xsec %0.3f - Correct %0.3f"%(p,x,correct_xsec))
+for p in exclusiveParams:
+    col = [c for c in df.columns if p in c]
+    xsec_test[p] = df[col].loc['Inclusive'].sum()/df['total'].loc['Inclusive']*dict_xsec['Inclusive']
+pprint (xsec_test)
+print ("Xsec sum over jet bins :",sum([v for k,v in xsec_test.items() if 'j' in k]))
+print ("Xsec sum over HT  bins :",sum([v for k,v in xsec_test.items() if 'HT' in k]))
+print ("Inclusive xsec",dict_xsec['Inclusive'])
+#xsecExclu = {exp:sum([x for p,x in xsec_params.items() if exp in p]) for exp in exclusiveParams}
+#for p,x in xsecExclu.items():
+#    df_inc = df[[col for col in df.columns if p in col]].loc['Inclusive']
+#    #correct_xsec = dict_xsec['Inclusive'] * df[[col for col in df.columns if p in col]].loc['Inclusive'].sum() / df['total']['Inclusive']
+#    #print ("Exclusive sample %s, Xsec %0.3f - Correct %0.3f"%(p,x,correct_xsec))
+#    print ("Exclusive sample %s xsec = %0.3f"%(p,x))
     
 print ('Total Xsec per param %0.3f - Inclusive Xsec %0.3f'%(sum(xsec_params.values()),dict_xsec['Inclusive']))
 
@@ -188,11 +215,45 @@ df_w_params = pd.DataFrame(list(w_params.values()), columns=['weight_per_paramet
 print (df_w_params)
 
 print ("Stitching weights")
-df_w_stitching = pd.DataFrame([[0]*df_w_sample.shape[0]]*df_w_params.shape[0],index=df_w_params.index,columns=df_w_sample.index)
+df_w_stitching = pd.DataFrame([[0.]*df_w_sample.shape[0]]*df_w_params.shape[0],index=df_w_params.index,columns=df_w_sample.index)
 for col in df_w_stitching.columns:
     for row in df_w_stitching.index:
         wp = df_w_params.loc[row]
         ws = df_w_sample.loc[col]
-        df_w_stitching[col][row] = wp/ws if ws != 0 else 0
+        df_w_stitching[col][row] = float(wp.values[0])/ws if ws != 0 else 0
 print (df_w_stitching)
-print (df_w_sample.sum(),df_w_params.sum())
+conv_jet = {'0j':0,'1j':1,'2j':2,'3j':3,'4j':4,'5j':5}
+conv_HT  = {'0HT':(0,70),'70HT':(70,100),'100HT':(100,200),'200HT':(200,400),'400HT':(400,600),'600HT':(600,800),'800HT':(800,1200),'1200HT':(1200,2500),'2500HT':(2500,1000000)}
+dict_weights = {}
+for col in df_w_stitching.columns:
+    sample = dict_samples[col]
+    dict_weights[sample] = {}
+    for index in df_w_stitching.index:
+        jetBin = conv_jet[index[:2]]
+        HTBin = conv_HT[index[2:]]
+        if not jetBin in dict_weights[sample].keys():
+            dict_weights[sample][jetBin] = []
+        dict_weights[sample][jetBin].append({'low':HTBin[0],'up':HTBin[1] if len(HTBin)>1 else HTBin[0],'value':df_w_stitching[col].loc[index]})
+pprint (dict_weights) 
+if len(sys.argv)>2:
+    with open(sys.argv[2],'w') as f:
+        json.dump(dict_weights,f,indent=4)
+df_w_stitching.to_excel('WJets_stitching_weights.xls',float_format='%0.10f')
+
+
+print ('Fractions inclusive')
+f_inc = {p:df.loc['Inclusive'][p]/df.loc['Inclusive']['total'] for p in params}
+pprint (f_inc)
+print ('Fractions exclusive')
+rows = [s for s in samples if s != 'Inclusive']
+f_exc = {p:(df.loc[rows]['xsec']*df.loc[rows][p]*df.loc[rows]['total']).sum()/dict_xsec['Inclusive'] for p in params}
+pprint (f_exc)
+f_stitch = {p:xsec_params[p]/dict_xsec['Inclusive'] for p in params}
+print ('Fractions stitching')
+pprint (f_stitch)
+for p in params:
+    print ('Param %s fractions : Incl = %0.5f, Excl = %0.5f -> Mean = %0.5f VS Stitch = %0.5f'
+            %(p,f_inc[p],f_exc[p],abs((f_inc[p]-f_exc[p])/2),f_stitch[p]))
+
+    
+    
