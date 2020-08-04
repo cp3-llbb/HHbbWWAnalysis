@@ -138,6 +138,20 @@ w0_2j = w0/w_2j
 w1_2j = w1/w_2j
 w2_2j = w2/w_2j
 w3_2j = w3/w_2j
+f_inc = ROOT.TFile(os.path.join(path,'DYJetsToLL_M-50.root'))
+f_0j  = ROOT.TFile(os.path.join(path,'DYToLL_0J.root'))
+f_1j  = ROOT.TFile(os.path.join(path,'DYToLL_1J.root'))
+f_2j  = ROOT.TFile(os.path.join(path,'DYToLL_2J.root'))
+
+if len(sys.argv)>2:
+    import json
+    dict_weights = {'DYJetsToLL_M-50':{0:w0_inc,1:w1_inc,2:w2_inc,3:w3_inc},
+                    'DYToLL_0J':{0:w0_0j,1:w1_0j,2:w2_0j,3:w3_0j},
+                    'DYToLL_1J':{0:w0_1j,1:w1_1j,2:w2_1j,3:w3_1j},
+                    'DYToLL_2J':{0:w0_2j,1:w1_2j,2:w2_2j,3:w3_2j}}
+    with open(sys.argv[2],'w') as f:
+        json.dump(dict_weights,f,indent=4)
+
 
 print ('Stitching weights')
 print ('...','weight on inclusive sample      in bin 0 (w^0/w_inc) = %0.3f'%w0_inc)
