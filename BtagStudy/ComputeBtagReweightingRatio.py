@@ -191,12 +191,13 @@ class BtagReweightingRatio:
         
 if __name__ == "__main__":
     #---- 2016 ----#
-    ath_on, path_off, list_hists, outputname, era
-    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_BtagReweighting_On_v3/',
-                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_BtagReweighting_Off_v3/',
+    #path_on, path_off, list_hists, outputname, era
+    instance = BtagReweightingRatio(path_on     = '/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/testON/',
+                                    path_off    = '/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/testOFF/',
                                     list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
                                     outputname  = 'BtagReweightingRatio_jetN',
                                     era         = '2016')
+    '''
     #---- 2017 ----#
     instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017_BtagReweighting_On_v2/',
                                     path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017_BtagReweighting_Off_v2/',
@@ -209,3 +210,4 @@ if __name__ == "__main__":
                                     list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
                                     outputname  = 'BtagReweightingRatio_jetN',
                                     era         = '2018')
+    '''
