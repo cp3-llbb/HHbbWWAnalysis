@@ -2,34 +2,72 @@ import os
 import sys
 from copy import copy
 
-from bamboo.analysismodules import HistogramsModule
+from itertools import chain
+
+import logging
+logger = logging.getLogger(__name__) 
+
+import bamboo
+from bamboo.analysismodules import HistogramsModule, DataDrivenBackgroundHistogramsModule
+
 from bamboo import treefunctions as op
-from bamboo.plots import Plot, EquidistantBinning, SummedPlot
+from bamboo.plots import CutFlowReport
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)))) # Add scripts in this directory
-from BaseHHtobbWW import BaseNanoHHtobbWW
+from BaseHHtobbWWSL import BaseNanoHHtobbWW
 from plotDefSL import *
 from selectionDefSL import *
+from fakeHelper import DataDrivenFake
+
+
+def switch_getitem(index, condition, contA, contB,comb=False):
+    ## use as switch_getitem(0, has_good_jets, good_jets, bad_jets)
+    if contA._base != contB._base:
+        raise RuntimeError("The containers do not derive from the same base, this won't work")
+    base = contA._base
+    #print (isinstance(contA[index],bamboo.treeproxies.CombinationProxy))
+    if comb:
+        return op.switch(condition, base[contA[index].index], base[contB[index].index])
+    else:
+        return op.switch(condition, base[contA[index].idx], base[contB[index].idx])
 
 
 #===============================================================================================#
 #                                       PlotterHHtobbWW                                         #
 #===============================================================================================#
-class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
+class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModule):
     """ Plotter module: HH->bbW(->e/µ nu)W(->e/µ nu) histograms from NanoAOD """
     def __init__(self, args):
         super(PlotterNanoHHtobbWWSL, self).__init__(args)
 
+    def initialize(self):
+        super(PlotterNanoHHtobbWWSL, self).initialize()
+        # Change the way the FakeExtrapolation is postProcesses (avoids overriding the `postProcess` method) 
+        if "FakeExtrapolation" in self.datadrivenContributions:
+            contrib = self.datadrivenContributions["FakeExtrapolation"]
+            self.datadrivenContributions["FakeExtrapolation"] = DataDrivenFake(contrib.name, contrib.config)
+
+
     def definePlots(self, t, noSel, sample=None, sampleCfg=None): 
         noSel = super(PlotterNanoHHtobbWWSL,self).prepareObjects(t, noSel, sample, sampleCfg, 'SL')
+
         plots = []
+
+        cutFlowPlots = []
+
         era = sampleCfg['era']
-        self.yieldPlots = makeYieldPlots()
+
+        self.sample = sample
+        self.sampleCfg = sampleCfg
+        self.era = era
+
+        self.yieldPlots = makeYieldPlots(self.args.Synchronization)
 
         #----- Ratio reweighting variables (before lepton and jet selection) -----#
         if self.args.BtagReweightingOff or self.args.BtagReweightingOn:
             plots.append(objectsNumberPlot(channel="NoChannel",suffix='NoSelection',sel=noSel,objCont=self.ak4Jets,objName='Ak4Jets',Nmax=15,xTitle='N(Ak4 jets)'))
             return plots
+
 
         #----- Singleleptons -----#
         selObjectDict = makeSingleLeptonSelection(self,noSel,plot_yield=True)
@@ -62,8 +100,12 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
                 ElColl = self.leadElectronFakeSel
                 MuColl = self.leadMuonFakeSel
             elif selectionType == "Tight":
-                ElColl = self.leadElectronTightSel
-                MuColl = self.leadMuonTightSel
+                ElColl = [t.Electron[op.switch(op.rng_len(self.leadElectronTightSel) == 1, self.leadElectronTightSel[0].idx, 
+                                                         self.leadElectronFakeExtrapolationSel[0].idx)]]
+                MuColl = [t.Muon[op.switch(op.rng_len(self.leadMuonTightSel) == 1, self.leadMuonTightSel[0].idx, 
+                                                     self.leadMuonFakeExtrapolationSel[0].idx)]]
+#                ElColl = self.leadElectronTightSel
+#                MuColl = self.leadMuonTightSel
             elif selectionType == "FakeExtrapolation":
                 ElColl = self.leadElectronFakeExtrapolationSel
                 MuColl = self.leadMuonFakeExtrapolationSel
@@ -73,14 +115,16 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
             MuSelObj = selectionList[1]
 
             if not self.args.OnlyYield:
-                #----- Trigger plots -----#
-                plots.extend(triggerPlots(sel=ElSelObj.sel, triggerDict=self.triggersPerPrimaryDataset, suffix=ElSelObj.selName, channel="El"))
-                plots.extend(triggerPlots(sel=MuSelObj.sel, triggerDict=self.triggersPerPrimaryDataset, suffix=MuSelObj.selName, channel="Mu"))
-
-                #----- Lepton plots -----#
-                # Singlelepton channel plots #
-                plots.extend(channelPlot(sel=ElSelObj.sel, SinlepEl=ElColl, SinlepMu=MuColl, suffix=ElSelObj.selName, channel = "El"))
-                plots.extend(channelPlot(sel=MuSelObj.sel, SinlepEl=ElColl, SinlepMu=MuColl, suffix=MuSelObj.selName, channel = "Mu"))
+                ChannelDictList = []
+                ChannelDictList.append({'channel':'El','sel':ElSelObj.sel,'suffix':ElSelObj.selName})
+                ChannelDictList.append({'channel':'Mu','sel':MuSelObj.sel,'suffix':MuSelObj.selName})
+                
+                for channelDict in ChannelDictList:
+                    #----- Trigger plots -----#
+                    plots.extend(triggerPlots(**channelDict, triggerDict=self.triggersPerPrimaryDataset))
+                    #----- Lepton plots -----#
+                    # Singlelepton channel plots #
+                    #plots.extend(channelPlot(**channelDict, SinlepEl=ElColl, SinlepMu=MuColl, suffix=ElSelObj.selName))
         
 
             #----- Ak4 jets selection -----#
@@ -95,13 +139,13 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
                 FatJetsN = {'objName':'Ak8Jets','objCont':self.ak8Jets,'Nmax':5,'xTitle':'N(Ak8 jets)'}
 
                 if any("LooseResolved" in key for key in jetsel_level):
-                    print ("...... Processing Ak4 jet selection Loose (nAk4Jets >= 3)")
-                    ElSelObjAk4JetsLoose = makeAk4JetSelection(self,ElSelObj,nJet=3,copy_sel=True,plot_yield=True)
-                    MuSelObjAk4JetsLoose = makeAk4JetSelection(self,MuSelObj,nJet=3,copy_sel=True,plot_yield=True)
+                    print ("...... Processing Ak4 jet selection Loose (nAk4Jets = 3)")
+                    ElSelObjAk4JetsLoose = makeCoarseResolvedSelection(self,ElSelObj,nJet=3,copy_sel=True,plot_yield=True)
+                    MuSelObjAk4JetsLoose = makeCoarseResolvedSelection(self,MuSelObj,nJet=3,copy_sel=True,plot_yield=True)
                     if not self.args.OnlyYield:
                         # cutFlow Report #
-                        plots.append(CutFlowReport(ElSelObjAk4JetsLoose.selName, ElSelObjAk4JetsLoose.sel))
-                        plots.append(CutFlowReport(MuSelObjAk4JetsLoose.selName, MuSelObjAk4JetsLoose.sel))
+                        cutFlowPlots.append(CutFlowReport(ElSelObjAk4JetsLoose.selName, ElSelObjAk4JetsLoose.sel))
+                        cutFlowPlots.append(CutFlowReport(MuSelObjAk4JetsLoose.selName, MuSelObjAk4JetsLoose.sel))
 
                         if "Ak4" in jetplot_level and any("LooseResolved" in key for key in jetplot_level):
                             ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsLoose.sel,'sinlepton':ElColl[0],
@@ -117,14 +161,14 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
 
                 if any("TightResolved" in key for key in jetsel_level):        
                     print ("...... Processing Ak4 jet selection Tight (nAk4Jets >= 4)")
-                    ElSelObjAk4JetsTight = makeAk4JetSelection(self,ElSelObj,nJet=4,copy_sel=True,plot_yield=True)
-                    MuSelObjAk4JetsTight = makeAk4JetSelection(self,MuSelObj,nJet=4,copy_sel=True,plot_yield=True)
+                    ElSelObjAk4JetsTight = makeCoarseResolvedSelection(self,ElSelObj,nJet=4,copy_sel=True,plot_yield=True)
+                    MuSelObjAk4JetsTight = makeCoarseResolvedSelection(self,MuSelObj,nJet=4,copy_sel=True,plot_yield=True)
 
                     # Jet and lepton plots #
                     if not self.args.OnlyYield:
                         # cutFlow Report #
-                        plots.append(CutFlowReport(ElSelObjAk4JetsTight.selName, ElSelObjAk4JetsTight.sel))
-                        plots.append(CutFlowReport(MuSelObjAk4JetsTight.selName, MuSelObjAk4JetsTight.sel))
+                        cutFlowPlots.append(CutFlowReport(ElSelObjAk4JetsTight.selName, ElSelObjAk4JetsTight.sel))
+                        cutFlowPlots.append(CutFlowReport(MuSelObjAk4JetsTight.selName, MuSelObjAk4JetsTight.sel))
                         if "Ak4" in jetplot_level and any("TightResolved" in key for key in jetplot_level):
                             ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsTight.sel,'sinlepton':ElColl[0],
                                                     'j1':self.ak4Jets[0],'j2':self.ak4Jets[1],'j3':self.ak4Jets[2],'j4':self.ak4Jets[3],
@@ -148,13 +192,13 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
                     # MET #
                     plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
 
-            ##### Ak8 jets selection #####
+            ##### Ak8-b jets selection #####
             if "Ak8" in jetsel_level:
-                print ("...... Processing Ak8 jet selection for SemiBoosted & Boosted Category")
-                ElSelObjAk8Jets = makeAk8JetSelection(self,ElSelObj,copy_sel=True,plot_yield=True)
-                MuSelObjAk8Jets = makeAk8JetSelection(self,MuSelObj,copy_sel=True,plot_yield=True)
+                print ("...... Processing Ak8b jet selection for SemiBoosted & Boosted Category")
+                ElSelObjAk8bJets = makeCoarseBoostedSelection(self,ElSelObj,copy_sel=True,plot_yield=True)
+                MuSelObjAk8bJets = makeCoarseBoostedSelection(self,MuSelObj,copy_sel=True,plot_yield=True)
 
-                FatJetKeys = ['channel','sel','j1','j2','has1fat','suffix']
+                FatJetKeys = ['channel','sel','j1','j2','j3','has1fat','suffix']
                 FatJetsN   = {'objName':'Ak8Jets','objCont':self.ak8Jets,'Nmax':5,'xTitle':'N(Ak8 jets)'}
                 SlimJetsN  = {'objName':'Ak4Jets','objCont':self.ak4Jets,'Nmax':10,'xTitle':'N(Ak4 jets)'}
 
@@ -162,15 +206,15 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
                 ChannelDictList = []
                 if not self.args.OnlyYield:
                     # cutFlow Report #
-                    plots.append(CutFlowReport(ElSelObjAk8Jets.selName, ElSelObjAk8Jets.sel))
-                    plots.append(CutFlowReport(MuSelObjAk8Jets.selName, MuSelObjAk8Jets.sel))
+                    cutFlowPlots.append(CutFlowReport(ElSelObjAk8bJets.selName, ElSelObjAk8bJets.sel))
+                    cutFlowPlots.append(CutFlowReport(MuSelObjAk8bJets.selName, MuSelObjAk8bJets.sel))
                     if "Ak8" in jetplot_level:
-                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk8Jets.sel,'sinlepton':ElColl[0],
-                                                'j1':self.ak8Jets[0],'j2':self.ak8Jets[0],'has1fat':True,
-                                                'suffix':ElSelObjAk8Jets.selName,'is_MC':self.is_MC})
-                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk8Jets.sel,'sinlepton':MuColl[0],
-                                                'fatjet':self.ak8Jets[0],'j2':self.ak8Jets[0],'has1fat':True,
-                                                'suffix':MuSelObjAk8Jets.selName,'is_MC':self.is_MC})
+                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk8bJets.sel,'sinlepton':ElColl[0],
+                                                'j1':self.ak8BJets[0],'j2':None,'j3':None,'has1fat':True,
+                                                'suffix':ElSelObjAk8bJets.selName,'is_MC':self.is_MC})
+                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk8bJets.sel,'sinlepton':MuColl[0],
+                                                'j1':self.ak8BJets[0],'j2':None,'j3':None,'has1fat':True,
+                                                'suffix':MuSelObjAk8bJets.selName,'is_MC':self.is_MC})
 
                 for channelDict in ChannelDictList:
                     # Dilepton #
@@ -186,18 +230,19 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
                          
             #-----------------------------|||||||||||||||| Resolved selection ||||||||||||||-----------------------------------#
             if any("Resolved" in item for item in jetsel_level):
+                #ak4JetsByBtagScore = op.sort(self.ak4Jets, lambda jet : -jet.btagDeepFlavB)
                 ChannelDictList = []
                 # Resolved Selection (Loose) #
                 #----- Resolved selection : 0 Btag -----#
                 if "LooseResolved0b3j" in jetsel_level:
-                    print ("......... Processing Loose Resolved jet (0 btag i.e. bTaggedJets = 0 & nLightJets >= 3) selection")
+                    print ("......... Processing Loose Resolved jet (0 btag i.e. bTaggedJets = 0 & nLightJets = 3) selection")
                     ElSelObjAk4JetsLooseExclusiveResolved0b3j = makeExclusiveLooseResolvedJetComboSelection(self,ElSelObjAk4JetsLoose,nbJet=0,copy_sel=True,plot_yield=True)
                     MuSelObjAk4JetsLooseExclusiveResolved0b3j = makeExclusiveLooseResolvedJetComboSelection(self,MuSelObjAk4JetsLoose,nbJet=0,copy_sel=True,plot_yield=True)
 
                     if not self.args.OnlyYield:
                         # Cut flow report #
-                        plots.append(CutFlowReport(ElSelObjAk4JetsLooseExclusiveResolved0b3j.selName,ElSelObjAk4JetsLooseExclusiveResolved0b3j.sel))
-                        plots.append(CutFlowReport(MuSelObjAk4JetsLooseExclusiveResolved0b3j.selName,MuSelObjAk4JetsLooseExclusiveResolved0b3j.sel))
+                        cutFlowPlots.append(CutFlowReport(ElSelObjAk4JetsLooseExclusiveResolved0b3j.selName,ElSelObjAk4JetsLooseExclusiveResolved0b3j.sel))
+                        cutFlowPlots.append(CutFlowReport(MuSelObjAk4JetsLooseExclusiveResolved0b3j.selName,MuSelObjAk4JetsLooseExclusiveResolved0b3j.sel))
                         if "LooseResolved0b3j" in jetplot_level:
                             ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsLooseExclusiveResolved0b3j.sel,'sinlepton':ElColl[0],
                                                     'j1':self.ak4LightJetsByPt[0],'j2':self.ak4LightJetsByPt[1],'j3':self.ak4LightJetsByPt[2],'j4':None,
@@ -213,37 +258,53 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
 
                 #----  Resolved selection : 1 Btag  -----#
                 if "LooseResolved1b2j" in jetsel_level:
-                    print ("......... Processing Resolved jet (1 btag i.e. bTaggedJets = 1 & nLightJets >= 2) selection")
+                    print ("......... Processing Resolved jet (1 btag i.e. bTaggedJets = 1 & nLightJets = 2) selection")
                     ElSelObjAk4JetsLooseExclusiveResolved1b2j = makeExclusiveLooseResolvedJetComboSelection(self,ElSelObjAk4JetsLoose,nbJet=1,copy_sel=True,plot_yield=True)
                     MuSelObjAk4JetsLooseExclusiveResolved1b2j = makeExclusiveLooseResolvedJetComboSelection(self,MuSelObjAk4JetsLoose,nbJet=1,copy_sel=True,plot_yield=True)
 
                     if not self.args.OnlyYield:
                         # Cut flow report #
-                        plots.append(CutFlowReport(ElSelObjAk4JetsLooseExclusiveResolved1b2j.selName,ElSelObjAk4JetsLooseExclusiveResolved1b2j.sel))
-                        plots.append(CutFlowReport(MuSelObjAk4JetsLooseExclusiveResolved1b2j.selName,MuSelObjAk4JetsLooseExclusiveResolved1b2j.sel))
+                        cutFlowPlots.append(CutFlowReport(ElSelObjAk4JetsLooseExclusiveResolved1b2j.selName,ElSelObjAk4JetsLooseExclusiveResolved1b2j.sel))
+                        cutFlowPlots.append(CutFlowReport(MuSelObjAk4JetsLooseExclusiveResolved1b2j.selName,MuSelObjAk4JetsLooseExclusiveResolved1b2j.sel))
                         if "LooseResolved1b2j" in jetplot_level:
+                            '''
+                            Box1b2j = [ t.Jet[op.switch(op.rng_len(self.ak4BJets) == 1, self.ak4BJets[0].idx,  ak4JetsByBtagScore[0].idx)] ,
+                                        t.Jet[op.switch(op.rng_len(self.ak4BJets) == 1, self.ak4LightJets[0].idx,  ak4JetsByBtagScore[1].idx)],
+                                        t.Jet[op.switch(op.AND(op.rng_len(self.ak4BJets) == 1, self.ak4LightJetsByPt[0].idx != self.ak4LightJets[0].idx), 
+                                                        self.ak4LightJetsByPt[0].idx, self.ak4LightJetsByPt[1].idx)]]
+
                             ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsLooseExclusiveResolved1b2j.sel,'sinlepton':ElColl[0],
-                                                    'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.ak4LightJets[1],'j4':None,
+                                                    'j1':Box1b2j[0],'j2':Box1b2j[1],'j3':Box1b2j[2],'j4':None,
                                                     'nJet':3,'nbJet':1,
                                                     'suffix':ElSelObjAk4JetsLooseExclusiveResolved1b2j.selName,
                                                     'is_MC':self.is_MC})
                             ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsLooseExclusiveResolved1b2j.sel,'sinlepton':MuColl[0],
-                                                    'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.ak4LightJets[1],'j4':None,
+                                                    'j1':Box1b2j[0],'j2':Box1b2j[1],'j3':Box1b2j[2],'j4':None,
+                                                    'nJet':3,'nbJet':1,
+                                                    'suffix':MuSelObjAk4JetsLooseExclusiveResolved1b2j.selName,
+                                                    'is_MC':self.is_MC})
+                            '''
+                            ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsLooseExclusiveResolved1b2j.sel,'sinlepton':ElColl[0],
+                                                    'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.remainingJets[0],'j4':None,
+                                                    'nJet':3,'nbJet':1,
+                                                    'suffix':ElSelObjAk4JetsLooseExclusiveResolved1b2j.selName,
+                                                    'is_MC':self.is_MC})
+                            ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsLooseExclusiveResolved1b2j.sel,'sinlepton':MuColl[0],
+                                                    'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.remainingJets[0],'j4':None,
                                                     'nJet':3,'nbJet':1,
                                                     'suffix':MuSelObjAk4JetsLooseExclusiveResolved1b2j.selName,
                                                     'is_MC':self.is_MC})
 
-
                 #----- Resolved selection : 2 Btags -----#
                 if "LooseResolved2b1j" in jetsel_level:
-                    print ("......... Processing Resolved jet (2 btag i.e. bTaggedJets = 2 & nLightJets >= 1) selection")
+                    print ("......... Processing Resolved jet (2 btag i.e. bTaggedJets = 2 & nLightJets = 1) selection")
                     ElSelObjAk4JetsLooseExclusiveResolved2b1j = makeExclusiveLooseResolvedJetComboSelection(self,ElSelObjAk4JetsLoose,nbJet=2,copy_sel=True,plot_yield=True)
                     MuSelObjAk4JetsLooseExclusiveResolved2b1j = makeExclusiveLooseResolvedJetComboSelection(self,MuSelObjAk4JetsLoose,nbJet=2,copy_sel=True,plot_yield=True)
 
                     if not self.args.OnlyYield:
                         # Cut flow report #
-                        plots.append(CutFlowReport(ElSelObjAk4JetsLooseExclusiveResolved2b1j.selName,ElSelObjAk4JetsLooseExclusiveResolved2b1j.sel))
-                        plots.append(CutFlowReport(MuSelObjAk4JetsLooseExclusiveResolved2b1j.selName,MuSelObjAk4JetsLooseExclusiveResolved2b1j.sel))
+                        cutFlowPlots.append(CutFlowReport(ElSelObjAk4JetsLooseExclusiveResolved2b1j.selName,ElSelObjAk4JetsLooseExclusiveResolved2b1j.sel))
+                        cutFlowPlots.append(CutFlowReport(MuSelObjAk4JetsLooseExclusiveResolved2b1j.selName,MuSelObjAk4JetsLooseExclusiveResolved2b1j.sel))
                         if "LooseResolved2b1j" in jetplot_level:
                             ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsLooseExclusiveResolved2b1j.sel,'sinlepton':ElColl[0],
                                                     'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.ak4LightJetsByPt[0],'j4':None,
@@ -285,29 +346,68 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
                     MuSelObjAk4JetsTightExclusiveResolved1b3j = makeExclusiveTightResolvedJetComboSelection(self,MuSelObjAk4JetsTight,nbJet=1,copy_sel=True,plot_yield=True)
 
                     if not self.args.OnlyYield and "TightResolved1b3j" in jetplot_level:
+                        
+                        self.remainingJetPairs_mu1b3j = op.combine(self.remainingJets, N=2)
+                        self.lambda_chooseWjj_mu1b3j  = lambda dijet: op.abs((dijet[0].p4+dijet[1].p4+MuColl[0].p4+self.corrMET.p4).M() - (self.ak4BJets[0].p4 + self.ak4LightJets[0].p4).M()) 
+                        self.WjjPairs_mu1b3j = op.sort(self.remainingJetPairs_mu1b3j, self.lambda_chooseWjj_mu1b3j)
+                        
+                        self.remainingJetPairs_el1b3j = op.combine(self.remainingJets, N=2)
+                        self.lambda_chooseWjj_el1b3j  = lambda dijet: op.abs((dijet[0].p4+dijet[1].p4+ElColl[0].p4+self.corrMET.p4).M() - (self.ak4BJets[0].p4 + self.ak4LightJets[0].p4).M()) 
+                        self.WjjPairs_el1b3j = op.sort(self.remainingJetPairs_el1b3j, self.lambda_chooseWjj_el1b3j)
+                        
                         ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsTightExclusiveResolved1b3j.sel,'sinlepton':ElColl[0],
-                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.ak4LightJets[1],'j4':self.ak4LightJets[2],
+                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.WjjPairs_el1b3j[0][0],'j4':self.WjjPairs_el1b3j[0][1],
                                                 'nJet':4,'nbJet':1,
                                                 'suffix':ElSelObjAk4JetsTightExclusiveResolved1b3j.selName,
                                                 'is_MC':self.is_MC})
                         ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsTightExclusiveResolved1b3j.sel,'sinlepton':MuColl[0],
-                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.ak4LightJets[1],'j4':self.ak4LightJets[2],
+                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.WjjPairs_mu1b3j[0][0],'j4':self.WjjPairs_mu1b3j[0][1],
                                                 'nJet':4,'nbJet':1,
                                                 'suffix':MuSelObjAk4JetsTightExclusiveResolved1b3j.selName,
                                                 'is_MC':self.is_MC})
-
-
+                        '''
+                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsTightExclusiveResolved1b3j.sel,'sinlepton':ElColl[0],
+                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.remainingJets[0],'j4':self.remainingJets[1],
+                                                'nJet':4,'nbJet':1,
+                                                'suffix':ElSelObjAk4JetsTightExclusiveResolved1b3j.selName,
+                                                'is_MC':self.is_MC})
+                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsTightExclusiveResolved1b3j.sel,'sinlepton':MuColl[0],
+                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.remainingJets[0],'j4':self.remainingJets[1],
+                                                'nJet':4,'nbJet':1,
+                                                'suffix':MuSelObjAk4JetsTightExclusiveResolved1b3j.selName,
+                                                'is_MC':self.is_MC})
+                        '''
                 #----- Resolved selection : 2 Btags -----#
                 if "TightResolved2b2j" in jetsel_level:
-                    print ("......... Processing Resolved jet (2 btag i.e. bTaggedJets = 2 & nLightJets >= 2) selection")    
+                    print ("......... Processing Resolved jet (2 btag i.e. bTaggedJets >= 2 & nLightJets >= 2) selection")    
                     ElSelObjAk4JetsTightExclusiveResolved2b2j = makeExclusiveTightResolvedJetComboSelection(self,ElSelObjAk4JetsTight,nbJet=2,copy_sel=True,plot_yield=True)
                     MuSelObjAk4JetsTightExclusiveResolved2b2j = makeExclusiveTightResolvedJetComboSelection(self,MuSelObjAk4JetsTight,nbJet=2,copy_sel=True,plot_yield=True)
 
                     if not self.args.OnlyYield:
+                        self.lightJetPairs_mu2b2j     = op.combine(self.ak4LightJetsByPt, N=2)
+                        self.lambda_chooseWjj_mu2b2j  = lambda dijet: op.abs((dijet[0].p4+dijet[1].p4+MuColl[0].p4+self.corrMET.p4).M() - (self.ak4BJets[0].p4 + self.ak4LightJets[0].p4).M()) 
+                        self.WjjPairs_mu2b2j          = op.sort(self.lightJetPairs_mu2b2j, self.lambda_chooseWjj_mu2b2j)
+
+                        self.lightJetPairs_el2b2j     = op.combine(self.ak4LightJetsByPt, N=2)
+                        self.lambda_chooseWjj_el2b2j  = lambda dijet: op.abs((dijet[0].p4+dijet[1].p4+ElColl[0].p4+self.corrMET.p4).M() - (self.ak4BJets[0].p4 + self.ak4LightJets[0].p4).M())
+                        self.WjjPairs_el2b2j          = op.sort(self.lightJetPairs_el2b2j, self.lambda_chooseWjj_el2b2j)
+
                         # Cut flow report #
-                        plots.append(CutFlowReport(ElSelObjAk4JetsTightExclusiveResolved2b2j.selName,ElSelObjAk4JetsTightExclusiveResolved2b2j.sel))
-                        plots.append(CutFlowReport(MuSelObjAk4JetsTightExclusiveResolved2b2j.selName,MuSelObjAk4JetsTightExclusiveResolved2b2j.sel))
+                        cutFlowPlots.append(CutFlowReport(ElSelObjAk4JetsTightExclusiveResolved2b2j.selName,ElSelObjAk4JetsTightExclusiveResolved2b2j.sel))
+                        cutFlowPlots.append(CutFlowReport(MuSelObjAk4JetsTightExclusiveResolved2b2j.selName,MuSelObjAk4JetsTightExclusiveResolved2b2j.sel))
                         if "TightResolved2b2j" in jetplot_level:
+                            ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsTightExclusiveResolved2b2j.sel,'sinlepton':ElColl[0],
+                                                    'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.WjjPairs_el2b2j[0][0],'j4':self.WjjPairs_el2b2j[0][1],
+                                                    'nJet':4,'nbJet':2,
+                                                    'suffix':ElSelObjAk4JetsTightExclusiveResolved2b2j.selName,
+                                                    'is_MC':self.is_MC})
+                            ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsTightExclusiveResolved2b2j.sel,'sinlepton':MuColl[0],
+                                                    'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.WjjPairs_mu2b2j[0][0],'j4':self.WjjPairs_mu2b2j[0][1],
+                                                    'nJet':4,'nbJet':2,
+                                                    'suffix':MuSelObjAk4JetsTightExclusiveResolved2b2j.selName,
+                                                    'is_MC':self.is_MC})
+
+                            '''
                             ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsTightExclusiveResolved2b2j.sel,'sinlepton':ElColl[0],
                                                     'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.ak4LightJetsByPt[0],'j4':self.ak4LightJetsByPt[1],
                                                     'nJet':4,'nbJet':2,
@@ -318,7 +418,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
                                                     'nJet':4,'nbJet':2,
                                                     'suffix':MuSelObjAk4JetsTightExclusiveResolved2b2j.selName,
                                                     'is_MC':self.is_MC})
-
+                            '''
                 # Lepton + jet Plots #
                 ResolvedBTaggedJetsN = {'objName':'Ak4BJets','objCont':self.ak4BJets,'Nmax':5,'xTitle':'N(Ak4 Bjets)'}
                 ResolvedLightJetsN   = {'objName':'Ak4LightJets','objCont':self.ak4LightJets,'Nmax':10,'xTitle':'N(Ak4 Lightjets)'}
@@ -338,25 +438,62 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
             if any("SemiBoosted" in key for key in jetsel_level):
                 print ("......... processing Semi-Boosted Category")
                 ChannelDictList= []
-                FatJetKeys     = ['channel','sel','j1','j2','has1fat1slim','suffix']
+                FatJetKeys     = ['channel','sel','j1','j2','j3','has1fat1slim','has1fat2slim','suffix']
                 FatJetsN       = {'objName':'Ak8Jets','objCont':self.ak8Jets,'Nmax':5,'xTitle':'N(Ak8 jets)'}
                 FatBJetsN      = {'objName':'Ak8BJets','objCont':self.ak8BJets,'Nmax':5,'xTitle':'N(Ak8 b-jets)'}
                 if "SemiBoostedHbb" in jetsel_level:
-                    print ("............ Processing Semi-Boosted category (Htobb:Ak8 + Wtojj:Ak4 >= 1)")
-                    ElSelObjAk8JetsHbbBoosted = makeSemiBoostedHbbSelection(self,ElSelObjAk8Jets,copy_sel=True,plot_yield=True)
-                    MuSelObjAk8JetsHbbBoosted = makeSemiBoostedHbbSelection(self,MuSelObjAk8Jets,copy_sel=True,plot_yield=True)
+                    print ("............ Processing Semi-Boosted category (Htobb:Ak8 + WtoJ)")
+                    ElSelObjAk8bJetsHbbBoostedWtoJ = makeSemiBoostedHbbSelection(self,ElSelObjAk8bJets,nNonb=1,copy_sel=True,plot_yield=True)
+                    MuSelObjAk8bJetsHbbBoostedWtoJ = makeSemiBoostedHbbSelection(self,MuSelObjAk8bJets,nNonb=1,copy_sel=True,plot_yield=True)
+                    print ("............ Processing Semi-Boosted category (Htobb:Ak8 + WtoJJ)")
+                    ElSelObjAk8bJetsHbbBoostedWtoJJ = makeSemiBoostedHbbSelection(self,ElSelObjAk8bJets,nNonb=2,copy_sel=True,plot_yield=True)
+                    MuSelObjAk8bJetsHbbBoostedWtoJJ = makeSemiBoostedHbbSelection(self,MuSelObjAk8bJets,nNonb=2,copy_sel=True,plot_yield=True)
                     if not self.args.OnlyYield:
                         # Cut flow report #
-                        plots.append(CutFlowReport(ElSelObjAk8JetsHbbBoosted.selName,ElSelObjAk8JetsHbbBoosted.sel))
-                        plots.append(CutFlowReport(MuSelObjAk8JetsHbbBoosted.selName,MuSelObjAk8JetsHbbBoosted.sel))
+                        cutFlowPlots.append(CutFlowReport(ElSelObjAk8bJetsHbbBoostedWtoJ.selName,ElSelObjAk8bJetsHbbBoostedWtoJ.sel))
+                        cutFlowPlots.append(CutFlowReport(MuSelObjAk8bJetsHbbBoostedWtoJ.selName,MuSelObjAk8bJetsHbbBoostedWtoJ.sel))
+                        cutFlowPlots.append(CutFlowReport(ElSelObjAk8bJetsHbbBoostedWtoJJ.selName,ElSelObjAk8bJetsHbbBoostedWtoJJ.sel))
+                        cutFlowPlots.append(CutFlowReport(MuSelObjAk8bJetsHbbBoostedWtoJJ.selName,MuSelObjAk8bJetsHbbBoostedWtoJJ.sel))
+ 
+                        self.nonbJetPairs_muSB        = op.combine(self.ak4JetsCleanedFromAk8b, N=2)
+                        self.lambda_chooseWjj_muSB    = lambda dijet: op.abs((dijet[0].p4+dijet[1].p4+MuColl[0].p4+self.corrMET.p4).M() - self.ak8BJets[0].p4.M()) 
+                        self.WjjPairs_muSB            = op.sort(self.nonbJetPairs_muSB, self.lambda_chooseWjj_muSB)
+                        self.nonbJetPairs_elSB        = op.combine(self.ak4JetsCleanedFromAk8b, N=2)
+                        self.lambda_chooseWjj_elSB    = lambda dijet: op.abs((dijet[0].p4+dijet[1].p4+MuColl[0].p4+self.corrMET.p4).M() - self.ak8BJets[0].p4.M()) 
+                        self.WjjPairs_elSB            = op.sort(self.nonbJetPairs_elSB, self.lambda_chooseWjj_elSB)
+                        
                         if"SemiBoostedHbb" in jetplot_level:
-                            ChannelDictList.append({'channel':'El','sel':ElSelObjAk8JetsHbbBoosted.sel,'sinlepton':ElColl[0],
-                                                    'j1':self.ak8BJets[0],'j2':self.ak4JetsCleanedFromAk8b[0],'has1fat1slim':True,
-                                                    'suffix':ElSelObjAk8JetsHbbBoosted.selName,
+                            ChannelDictList.append({'channel':'El','sel':ElSelObjAk8bJetsHbbBoostedWtoJ.sel,'sinlepton':ElColl[0],
+                                                    'j1':self.ak8BJets[0],'j2':self.ak4JetsCleanedFromAk8b[0],'j3':None,
+                                                    'has1fat1slim':True,'has1fat2slim':False,
+                                                    'suffix':ElSelObjAk8bJetsHbbBoostedWtoJ.selName,
                                                     'is_MC':self.is_MC})
-                            ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk8JetsHbbBoosted.sel,'sinlepton':MuColl[0],
-                                                    'j1':self.ak8Jets[0],'j2':self.ak4JetsCleanedFromAk8b[0],'has1fat1slim':True,
-                                                    'suffix':MuSelObjAk8JetsHbbBoosted.selName,
+                            ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk8bJetsHbbBoostedWtoJ.sel,'sinlepton':MuColl[0],
+                                                    'j1':self.ak8BJets[0],'j2':self.ak4JetsCleanedFromAk8b[0],'j3':None,
+                                                    'has1fat1slim':True,'has1fat2slim':False,
+                                                    'suffix':MuSelObjAk8bJetsHbbBoostedWtoJ.selName,
+                                                    'is_MC':self.is_MC})
+                            '''
+                            ChannelDictList.append({'channel':'El','sel':ElSelObjAk8bJetsHbbBoostedWtoJJ.sel,'sinlepton':ElColl[0],
+                                                    'j1':self.ak8BJets[0],'j2':self.ak4JetsCleanedFromAk8b[0],'j3':self.ak4JetsCleanedFromAk8b[1],
+                                                    'has1fat1slim':False,'has1fat2slim':True,
+                                                    'suffix':ElSelObjAk8bJetsHbbBoostedWtoJJ.selName,
+                                                    'is_MC':self.is_MC})
+                            ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk8bJetsHbbBoostedWtoJJ.sel,'sinlepton':MuColl[0],
+                                                    'j1':self.ak8BJets[0],'j2':self.ak4JetsCleanedFromAk8b[0],'j3':self.ak4JetsCleanedFromAk8b[1],
+                                                    'has1fat1slim':False,'has1fat2slim':True,
+                                                    'suffix':MuSelObjAk8bJetsHbbBoostedWtoJJ.selName,
+                                                    'is_MC':self.is_MC})
+                            '''
+                            ChannelDictList.append({'channel':'El','sel':ElSelObjAk8bJetsHbbBoostedWtoJJ.sel,'sinlepton':ElColl[0],
+                                                    'j1':self.ak8BJets[0],'j2':self.WjjPairs_elSB[0][0],'j3':self.WjjPairs_elSB[0][1],
+                                                    'has1fat1slim':False,'has1fat2slim':True,
+                                                    'suffix':ElSelObjAk8bJetsHbbBoostedWtoJJ.selName,
+                                                    'is_MC':self.is_MC})
+                            ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk8bJetsHbbBoostedWtoJJ.sel,'sinlepton':MuColl[0],
+                                                    'j1':self.ak8BJets[0],'j2':self.WjjPairs_muSB[0][0],'j3':self.WjjPairs_muSB[0][1],
+                                                    'has1fat1slim':False,'has1fat2slim':True,
+                                                    'suffix':MuSelObjAk8bJetsHbbBoostedWtoJJ.selName,
                                                     'is_MC':self.is_MC})
 
                 for channelDict in ChannelDictList:
@@ -381,8 +518,8 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
                 MuSelObjAk8JetsInclusiveBoosted = makeInclusiveBoostedSelection(self,MuSelObjAk8Jets,copy_sel=True,plot_yield=True)
                 if not self.args.OnlyYield:
                     # Cut flow report #
-                    plots.append(CutFlowReport(ElSelObjAk8JetsInclusiveBoosted.selName,ElSelObjAk8JetsInclusiveBoosted.sel))
-                    plots.append(CutFlowReport(MuSelObjAk8JetsInclusiveBoosted.selName,MuSelObjAk8JetsInclusiveBoosted.sel))
+                    cutFlowlots.append(CutFlowReport(ElSelObjAk8JetsInclusiveBoosted.selName,ElSelObjAk8JetsInclusiveBoosted.sel))
+                    cutFlowlots.append(CutFlowReport(MuSelObjAk8JetsInclusiveBoosted.selName,MuSelObjAk8JetsInclusiveBoosted.sel))
                     if "Boosted" in jetplot_level:
                         ChannelDictList.append({'channel':'El','sel':ElSelObjAk8JetsInclusiveBoosted.sel,'sinlepton':ElColl[0],
                                                 'j1':self.ak8BJets[0],'j2':self.ak8nonBJets[0],'has2fat':True,
@@ -467,19 +604,19 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
 
                 # To plot the highlevel distributions for both of the semiBoosted & boosted scenario #    
                 if any("Boosted" in item for item in jetplot_level):
-                    hasEle  = True if op.rng_len(ElColl) > 0 else False 
-                    hasMuon = True if op.rng_len(MuColl) > 0 else False
+#                    hasEle  = True if op.rng_len(ElColl) > 0 else False 
+#                    hasMuon = True if op.rng_len(MuColl) > 0 else False
                     ChannelDictList=[]
                     # SemiBoosted #
                     if "SemiBoostedHbb" in jetplot_level:
                         ChannelDictList.append({'channel': 'El','met': self.corrMET,'lep':ElColl[0],
                                                 'j1':self.ak8BJets[0],'j2':self.ak4JetsCleanedFromAk8b[0],
-                                                'bothAreFat':False,'sel':ElSelObjAk8JetsHbbBoosted.sel,
-                                                'suffix':ElSelObjAk8JetsHbbBoosted.selName})
+                                                'bothAreFat':False,'sel':ElSelObjAk8bJetsHbbBoostedWtoJJ.sel,
+                                                'suffix':ElSelObjAk8bJetsHbbBoostedWtoJJ.selName})
                         ChannelDictList.append({'channel': 'Mu','met': self.corrMET,'lep':MuColl[0],
                                                 'j1':self.ak8BJets[0],'j2':self.ak4JetsCleanedFromAk8b[0],
-                                                'bothAreFat':False,'sel':MuSelObjAk8JetsHbbBoosted.sel,
-                                                'suffix':MuSelObjAk8JetsHbbBoosted.selName})                 
+                                                'bothAreFat':False,'sel':MuSelObjAk8bJetsHbbBoostedWtoJJ.sel,
+                                                'suffix':MuSelObjAk8bJetsHbbBoostedWtoJJ.selName})                 
                     # Boosted #
                     if "Boosted" in jetplot_level:
                         ChannelDictList.append({'channel': 'El','met': self.corrMET,'lep':ElColl[0],
@@ -496,6 +633,6 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,HistogramsModule):
 
         #----- Add the Yield plots -----#
         plots.extend(self.yieldPlots.returnPlots())
-
+        #plots.extend(cutFlowPlots)
         return plots
 

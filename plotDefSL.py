@@ -50,9 +50,10 @@ def channelPlot(sel,SinlepEl,SinlepMu,suffix,channel):
 
 ##########################  YIELD PLOT #################################
 class makeYieldPlots:
-    def __init__(self):
+    def __init__(self,unitYield=False):
         self.calls = 0
         self.plots = []
+        self.unitYield = unitYield
     def addYield(self, sel, name, title):
         """
         Make Yield plot and use it also in the latex yield table
@@ -60,6 +61,8 @@ class makeYieldPlots:
         name    = name of the PDF to be produced
         title   = title that will be used in the LateX yield table
         """
+        if self.unitYield:
+            sel = sel.refine("Yield_"+name,weight=op.c_float(1.)/sel.weight)
         self.plots.append(Plot.make1D("Yield_"+name,   
                                       op.c_int(0),
                                       sel,
@@ -234,27 +237,6 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,is_MC=False):
     plots = []
 
     channelLabel = channelTitleLabel(channel)
-    '''
-    #    if nbJet == 0:
-    j1_name = "leadingAk4Jet"
-    j2_name = "subleadingAk4Jet"
-    j3_name = "thirdAk4Jet"
-    j4_name = "fourthAk4Jet"
-
-    elif nbJet == 1:
-        j1_name = "leadingAk4-bJet"
-        j2_name = "leadingAk4Jet"
-        j3_name = "subleadingAk4Jet"
-        j4_name = "thirdAk4Jet"
-
-    elif nbJet == 2:
-        j1_name = "leadingAk4-bJet"
-        j2_name = "subleadingAk4-bJet"
-        j3_name = "leadingAk4Jet"
-        j4_name = "subleadingAk4Jet"
-            
-    else: raise RuntimeError ("Error in makeAk4JetsPlots args!!!")
-    '''
     if nbJet == 0:
         j1_name = "leadAk4"
         j2_name = "subLeadAk4"
@@ -266,13 +248,6 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,is_MC=False):
         j3_name = "subLeadAk4" if nbJet == 1 else "leadAk4"
         j4_name = "thirdAk4" if nbJet == 1 else "subLeadAk4"
 
-    '''
-    print ("nJet :%s , nbJet :%s"%(nJet,nbJet))
-    print (type(j1),"__%s"%j1_name)
-    print (type(j2),"__%s"%j2_name)
-    print (type(j3),"__%s"%j3_name)
-    print (type(j4),"__%s"%j4_name)
-    '''
 
     # leadjet plots #
     plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j1_name),
@@ -523,6 +498,13 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,is_MC=False):
                                  title="Azimutal angle difference of the dijet_[%s_%s] (channel %s)"%(j3_name,j4_name,channel),
                                  xTitle= "DeltaPhi [%s_%s]"%(j3_name, j4_name),
                                  plotopts = channelLabel))
+        plots.append(Plot.make1D("%s_%s_DeltaPhi_%s_%s"%(channel,suffix,'Hbb','Wjj'), 
+                                 op.abs(op.deltaPhi((j1.p4+j2.p4),(j3.p4+j4.p4))), 
+                                 sel, 
+                                 EquidistantBinning(20,0, 3.2),
+                                 title="Azimutal angle difference_[%s_%s] (channel %s)"%('Hbb','Wjj',channel),
+                                 xTitle= "DeltaPhi [%s_%s]"%('Hbb', 'Wjj'),
+                                 plotopts = channelLabel))
     
         # DeltaR plots #
         plots.append(Plot.make1D("%s_%s_DeltaR_%s_%s"%(channel,suffix,j1_name,j4_name), 
@@ -539,6 +521,14 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,is_MC=False):
                                  title="DeltaR of the dijet_[%s_%s] (channel %s)"%(j3_name,j4_name,channel),
                                  xTitle= "DeltaR [%s_%s]"%(j3_name, j4_name),
                                  plotopts = channelLabel))        
+        plots.append(Plot.make1D("%s_%s_DeltaR_%s_%s"%(channel,suffix,'Hbb','Wjj'), 
+                                 op.deltaR((j1.p4+j2.p4),(j3.p4+j4.p4)), 
+                                 sel, 
+                                 EquidistantBinning(50,0, 5.0),
+                                 title="DeltaR_[%s_%s] (channel %s)"%('Hbb','Wjj',channel),
+                                 xTitle= "DeltaR [%s_%s]"%('Hbb', 'Wjj'),
+                                 plotopts = channelLabel))
+
         # invariant mass plot #
         plots.append(Plot.make1D("%s_%s_InvariantMass_%s_%s"%(channel,suffix,j3_name,j4_name),
                                  op.invariant_mass(j3.p4,j4.p4),
@@ -552,7 +542,7 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,is_MC=False):
     return plots
 
 ##########################  JETS (AK8) PLOT #################################
-def makeAk8JetsPlots(sel,j1,j2,suffix,channel,has1fat=False,has2fat=False,has1fat1slim=False):
+def makeAk8JetsPlots(sel,j1,j2,j3,suffix,channel,has1fat=False,has2fat=False,has1fat1slim=False,has1fat2slim=False):
     """
     Make fatjet subjet basic plots
     sel         = refine selection 
@@ -569,8 +559,11 @@ def makeAk8JetsPlots(sel,j1,j2,suffix,channel,has1fat=False,has2fat=False,has1fa
 
     channelLabel = channelTitleLabel(channel)
 
-    j1_name = "Ak8Jet" if has1fat else "Ak8bJet"
-    j2_name = "Ak8Jet" if has2fat else "Ak4Jet"
+    #j1_name = "Ak8Jet" if has1fat else "Ak8bJet"
+    #j2_name = "Ak8Jet" if has2fat else "Ak4Jet"
+    j1_name = "Ak8BJet"
+    j2_name = "Ak8LSJet" if has2fat else "LeadAk4NonBJet"
+    j3_name = "SubLeadAk4NonBJet"
 
     # 1st-jet : FatJet #
     plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j1_name),
@@ -609,7 +602,7 @@ def makeAk8JetsPlots(sel,j1,j2,suffix,channel,has1fat=False,has2fat=False,has1fa
                              xTitle="M_{Soft Drop} %s[GeV]"%j1_name,
                              plotopts = channelLabel))        
 
-    if has2fat or has1fat1slim:
+    if has2fat or has1fat1slim or has1fat2slim:
         # 2nd-jet : Fat or Slim Jet #
         plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j2_name),
                                  j2.p4.pt(),
@@ -684,6 +677,58 @@ def makeAk8JetsPlots(sel,j1,j2,suffix,channel,has1fat=False,has2fat=False,has1fa
                                  xTitle= "InvariantMass [%s_%s] [GeV]"%(j1_name,j2_name),
                                  plotopts = channelLabel))
 
+        if has1fat2slim:
+            # Di-Jet Plots #
+            # pT Sum #
+            plots.append(Plot.make1D("%s_%s_DijetPT_%s_%s"%(channel,suffix,j2_name,j3_name), 
+                                     (j2.p4+j3.p4).Pt(), 
+                                     sel, 
+                                     EquidistantBinning(80,0.,400.),
+                                     title="Transverse momentum of the dijet_%s_%s (channel %s)"%(j2_name,j3_name,channel), 
+                                     xTitle= "DiJetPT [%s_%s] [GeV]"%(j2_name,j3_name),
+                                     plotopts = channelLabel))
+            
+            # DeltaR #
+            plots.append(Plot.make1D("%s_%s_DeltaR_%s_%s"%(channel,suffix,j2_name,j3_name), 
+                                     op.deltaR(j2.p4,j3.p4), 
+                                     sel, 
+                                     EquidistantBinning(50, 0., 5.), 
+                                     title="Dijet DeltaR_%s_%s (channel %s)"%(j2_name,j3_name,channel), 
+                                     xTitle= "DeltaR [%s_%s]"%(j2_name,j3_name),
+                                     plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_DeltaR_%s_%s"%(channel,suffix,'Hbb','Wjj'), 
+                                     op.deltaR(j1.p4,(j2.p4+j3.p4)), 
+                                     sel, 
+                                     EquidistantBinning(50, 0., 5.), 
+                                     title="DeltaR_%s_%s (channel %s)"%('Hbb','Wjj',channel), 
+                                     xTitle= "DeltaR [%s_%s]"%('Hbb','Wjj'),
+                                     plotopts = channelLabel))
+            # DeltaPhi #
+            plots.append(Plot.make1D("%s_%s_DeltaPhi_%s_%s"%(channel,suffix,j2_name,j3_name), 
+                                     op.abs(op.deltaPhi(j2.p4,j3.p4)), 
+                                     sel, 
+                                     EquidistantBinning(20, 0., 3.2), 
+                                     title="Dijet DeltaPhi_%s_%s (channel %s)"%(j2_name,j3_name,channel), 
+                                     xTitle= "DeltaPhi [%s_%s]"%(j2_name,j3_name),
+                                     plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_DeltaPhi_%s_%s"%(channel,suffix,'Hbb','Wjj'), 
+                                     op.abs(op.deltaPhi(j1.p4,(j2.p4+j3.p4))), 
+                                     sel, 
+                                     EquidistantBinning(20, 0., 3.2), 
+                                     title="DeltaPhi_%s_%s (channel %s)"%('Hbb','Wjj',channel), 
+                                     xTitle= "DeltaPhi [%s_%s]"%('Hbb','Wjj'),
+                                     plotopts = channelLabel))
+
+            # Invariant Mass #
+            plots.append(Plot.make1D("%s_%s_InvariantMass_%s_%s"%(channel,suffix,j2_name,j3_name),
+                                     op.invariant_mass(j2.p4,j3.p4),
+                                     sel,
+                                     EquidistantBinning(50, 0., 500.), 
+                                     title="Dijet invariant mass_%s_%s (channel %s)"%(j2_name,j3_name,channel), 
+                                     xTitle= "InvariantMass [%s_%s] [GeV]"%(j2_name,j3_name),
+                                     plotopts = channelLabel))
+            
+
     return plots
 
 #########################  High-level quantities ################################
@@ -693,25 +738,6 @@ def makeHighLevelPlotsResolved(sel,met,lep,j1,j2,j3,j4,channel,suffix,nJet,nbJet
     plots = []
 
     channelLabel = channelTitleLabel(channel)
-    '''
-    #if nbJet == 0:
-    j1_name = "leadingAk4Jet"
-    j2_name = "subleadingAk4Jet"
-    j3_name = "thirdAk4Jet"
-    j4_name = "fourthAk4Jet"
-    
-    elif nbJet == 1:
-        j1_name = "leadingAk4-bJet"
-        j2_name = "leadingAk4Jet"
-        j3_name = "subleadingAk4Jet"
-        j4_name = "thirdAk4Jet"
-    elif nbJet == 2:
-        j1_name = "leadingAk4-bJet"
-        j2_name = "subleadingAk4-bJet"
-        j3_name = "leadingAk4Jet"
-        j4_name = "subleadingAk4Jet"
-    else: raise RuntimeError ("Please correct the values of nbJet!!!")
-    '''
 
     if nbJet == 0:
         j1_name = "leadAk4"
@@ -906,7 +932,7 @@ def makeHighLevelPlotsBoosted(sel,met,lep,j1,j2,channel,suffix,bothAreFat=False)
         
     else:
         j1_name   = "Ak8BJet"
-        j2_name   = "Ak4Jet"
+        j2_name   = "Ak4NonbJet"
     
     plots = []
     channelLabel = channelTitleLabel(channel)
