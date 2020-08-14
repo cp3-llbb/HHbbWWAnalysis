@@ -163,7 +163,11 @@ One lepton and and one jet argument must be specified in addition to the require
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for the exclusive tight resolved category with 2 btagged jet")
-        parser.add_argument("--SemiBoostedHbb", 
+        parser.add_argument("--SemiBoostedHbbWtoJ", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the semi boosted category (Hbb boosted, Wjj resolved)")
+        parser.add_argument("--SemiBoostedHbbWtoJJ", 
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for the semi boosted category (Hbb boosted, Wjj resolved)")
