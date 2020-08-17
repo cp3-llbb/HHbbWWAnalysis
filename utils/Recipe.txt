@@ -1,0 +1,17 @@
+To produce pileup json files -> use the makePUReWeightJSON script from bamboo
+Utility to produce all the json files for samples in a yaml file -> makeAllPUJsonFiles.py (in utils) 
+
+NOTES :
+- You need your voms activated
+- The commands below need to be used in a bamboo venv
+- The script uses das but there is no interaction with the dascache
+
+Commands (per era):
+```
+python makeAllPUJsonFiles.py --yaml path_to_yaml --era 2016 --nominal ../data/pileup/2016/PileupHistogram-goldenJSON-13tev-2016-69200ub.root --up ../data/pileup/2016/PileupHistogram-goldenJSON-13tev-2016-72400ub.root  --down ../data/pileup/2016/PileupHistogram-goldenJSON-13tev-2016-66000ub.root
+python makeAllPUJsonFiles.py --yaml path_to_yaml --era 2017 --nominal ../data/pileup/2017/PileupHistogram-goldenJSON-13tev-2017-69200ub.root --up ../data/pileup/2017/PileupHistogram-goldenJSON-13tev-2017-72400ub.root  --down ../data/pileup/2017/PileupHistogram-goldenJSON-13tev-2017-66000ub.root
+python makeAllPUJsonFiles.py --yaml path_to_yaml --era 2018 --nominal ../data/pileup/2018/PileupHistogram-goldenJSON-13tev-2018-69200ub.root --up ../data/pileup/2018/PileupHistogram-goldenJSON-13tev-2018-72400ub.root  --down ../data/pileup/2018/PileupHistogram-goldenJSON-13tev-2018-66000ub.root
+``` 
+
+The json will be produced in `pileup_json`. You can then copy it in `../data/pileup/`.
+The Base class will fetch the json that matches the sample name and era.
