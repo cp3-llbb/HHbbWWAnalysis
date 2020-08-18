@@ -51,7 +51,7 @@ class DYControlRegion():
 
     def extractDirInformation(self,directory,histogram):
         # Get YAML info #
-        yaml_dict = self.loadYaml(os.path.join(directory,'plots.yml'),histogram)
+        yaml_dict = self.loadYaml(os.path.join(directory,'plots_FakeExtrapolation.yml'),histogram)
 
         # Loop over file to recover histograms #
         hist_dict = {}
@@ -101,6 +101,9 @@ class DYControlRegion():
         else:
             print ("Could not find hist %s in %s"%(histname,rootfile))
             h = None
+        # Overbins #
+        h.SetBinContent(1,h.GetBinContent(0)+h.GetBinContent(1))
+        h.SetBinContent(h.GetNbinsX(),h.GetBinContent(h.GetNbinsX())+h.GetBinContent(h.GetNbinsX()+1))
         f.Close()
         return h
 
@@ -126,11 +129,17 @@ class DYControlRegion():
                     MC_hist = ROOT.TH1F(self.variable_name+"MCDY",self.variable_name,h.GetNbinsX(),h.GetBinLowEdge(1),h.GetBinLowEdge(h.GetNbinsX())+h.GetBinWidth(h.GetNbinsX()))
 
                 # Add histograms depending on type #
+                if 'cross-section' in data_dict.keys():
+                    factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]
+                else:
+                    factor = 1.
+                if 'branching-ratio' in data_dict.keys():
+                    factor *= data_dict["branching-ratio"]
+                    
                 if self.exclude_DY:
                     if data_dict['type'] == 'data':
                         data_hist.Add(h)
                     elif data_dict['type'] == 'mc':
-                        factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]
                         if data_dict['group'] != 'DY':
                             data_hist.Add(h,-factor)
                         else:  
@@ -139,7 +148,6 @@ class DYControlRegion():
                     if data_dict['type'] == 'data':
                         data_hist.Add(h)
                     elif data_dict['type'] == 'mc':
-                        factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]
                         MC_hist.Add(h,factor)
                         
 
@@ -162,9 +170,9 @@ class DYControlRegion():
             MC_hist.SetTitle(self.variable_name)
             # Normalize to unity #
             if data_hist.Integral() != 0:
-                data_hist.Scale(1/abs(data_hist.Integral()))
+                data_hist.Scale(1/data_hist.Integral())
             if MC_hist.Integral() != 0:
-                MC_hist.Scale(1/abs(MC_hist.Integral()))
+                MC_hist.Scale(1/MC_hist.Integral())
             # Save #
             self.data_hist_dict[key] = data_hist
             self.MC_hist_dict[key] = MC_hist
@@ -305,20 +313,8 @@ class DYControlRegion():
 
 
 if __name__ == "__main__":
-    #parser = argparse.ArgumentParser(description='')
-    #parser.add_argument('--directories', nargs='+',action='store', required=True, type=str,
-    #                    help='Directory from bamboo')
-    #parser.add_argument('--variables', nargs='+', action='store', required=True, type=str,
-    #                    help='Variables (histograms) names')
-    #parser.add_argument('--era', action='store', required=True, type=str,
-    #                    help='Era : 2016, 2017, 2018')
-    #parser.add_argument('--output', action='store', required=True, type=str, 
-    #                    help='Output name for pdf (without extension)')
-    #args = parser.parse_args()
-
-    path_Zveto = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_tight_withRatio_noSyst_v2'
-    #path_noZVeto = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_DYStudy0And2Btag_noZVeto/'
-    path_Zpeak = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_tight_withRatio_ZPeak_noSyst_v2/'
+    path_Zveto = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_Tight_Fake/'
+    path_Zpeak = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_Tight_ZPeak_Fake/'
 
     # ElEl First lepton pt #
     var_0btagZveto_dict = {(path_Zveto,'Z Veto 0 btag'): 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'}
