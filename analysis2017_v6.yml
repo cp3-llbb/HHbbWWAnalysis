@@ -218,9 +218,9 @@ samples:
     era: '2017'
     split: 10
 
-  VBF_HToZZTo4L:
+  VBFHToZZTo4L:
     db: ["das:/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUGenV7011_pythia8/RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7_ext2-v1/NANOAODSIM","das:/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUGenV7011_pythia8/RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7_ext1-v1/NANOAODSIM"]
-    files: dascache/VBF_HToZZTo4L_2017.dat
+    files: dascache/VBFHToZZTo4L_2017.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.0010099
     group: SM
@@ -1031,11 +1031,11 @@ plotIt:
     DYEstimation:
       fill-color: "#1a83a1"
       legend: Drell-Yan (from data)
-      order: 9
+      order: 3
     Fake:
       fill-color: "#6e3303"
       legend: Fake
-      order: 10
+      order: 9
 
 
   systematics:

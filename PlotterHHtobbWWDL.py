@@ -17,7 +17,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)))) # Add 
 from BaseHHtobbWW import BaseNanoHHtobbWW
 from plotDef import *
 from selectionDef import *
-from fakeHelper import DataDrivenFake
+from DDHelper import DataDrivenFake, DataDrivenDY
 
 def switch_on_index(indexes, condition, contA, contB):
     if contA._base != contB._base:
@@ -39,6 +39,10 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         if "FakeExtrapolation" in self.datadrivenContributions:
             contrib = self.datadrivenContributions["FakeExtrapolation"]
             self.datadrivenContributions["FakeExtrapolation"] = DataDrivenFake(contrib.name, contrib.config)
+        if "DYEstimation" in self.datadrivenContributions: 
+            contrib = self.datadrivenContributions["DYEstimation"]
+            self.datadrivenContributions["DYEstimation"] = DataDrivenDY(contrib.name, contrib.config)
+            
 
 
     def definePlots(self, t, noSel, sample=None, sampleCfg=None): 
@@ -63,10 +67,10 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             return plots
 
         #----- Stitching study -----#
-        if self.args.DYStitching or self.args.WJetsStitching:
-            if self.args.DYStitching and sampleCfg['group'] != 'DY':
+        if self.args.DYStitchingPlots or self.args.WJetsStitchingPlots:
+            if self.args.DYStitchingPlots and sampleCfg['group'] != 'DY':
                 raise RuntimeError("Stitching is only done on DY MC samples")
-            if self.args.WJetsStitching and sampleCfg['group'] != 'Wjets':
+            if self.args.WJetsStitchingPlots and sampleCfg['group'] != 'Wjets':
                 raise RuntimeError("Stitching is only done on WJets MC samples")
             plots.extend(makeLHEPlots(noSel,t.LHE))
             plots.append(objectsNumberPlot(channel="NoChannel",suffix='NoSelection',sel=noSel,objCont=self.ak4Jets,objName='Ak4Jets',Nmax=15,xTitle='N(Ak4 jets)'))

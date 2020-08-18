@@ -6,6 +6,8 @@ import glob
 import json
 import ROOT
 import numpy as np
+from IPython import embed
+from root_numpy import hist2array   
 
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
@@ -16,7 +18,10 @@ class WeightDY:
         self.mode       = mode
         self.era        = era
         self.title      = title
-        self.outputname = outputname
+        path_out = os.path.join(os.path.abspath(os.path.dirname(__file__)),'weights')
+        if not os.path.exists(path_out):
+            os.makedirs(path_out)
+        self.outputname = os.path.join(path_out,outputname)
         self.hist_type  = None # TH1 or TH2
 
         self.histograms = {}
@@ -55,7 +60,7 @@ class WeightDY:
         """
 
         # Get YAML info #
-        yaml_dict = self.loadYaml(os.path.join(directory,'plots.yml'),histogram)
+        yaml_dict = self.loadYaml(os.path.join(directory,'plots_FakeExtrapolation.yml'),histogram)
 
         # Loop over file to recover histograms #
         hist_dict = {}
@@ -143,20 +148,21 @@ class WeightDY:
                 else:
                     raise RuntimeError('Hist type not initialized')
             # Add histograms depending on type #
+            if 'cross-section' in data_dict.keys():
+                factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]
+            else:
+                factor = 1.
+            if 'branching-ratio' in data_dict.keys():
+                factor *= data_dict["branching-ratio"]
+
             if mode == 'data':
                 if data_dict['type'] == 'data':
                     dist.Add(h)
                 if data_dict['type'] == 'mc':
                     if data_dict['group'] != 'DY':
-                        factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]    
-                        #if data_dict['group'] == 'ttbar':
-                        #    factor *= 0.7
                         dist.Add(h,-factor)     
             elif mode == 'mc':
                 if data_dict['type'] == 'mc' and data_dict['group'] == 'DY':
-                    factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]    
-                    if data_dict['group'] == 'ttbar':
-                        factor *= 0.7
                     dist.Add(h,factor)  
             else:
                 raise RuntimeError("Unknown mode")
@@ -167,12 +173,12 @@ class WeightDY:
 
     def produceShape(self,hist_dict):
 
-        hist_dict['ZPeak_0b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_0b'])
-        hist_dict['ZPeak_1b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_1b'])
-        hist_dict['ZPeak_2b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_2b'])
-        hist_dict['ZVeto_0b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_0b'])
-        hist_dict['ZVeto_1b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_1b'])
-        hist_dict['ZVeto_2b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_2b'])
+        #hist_dict['ZPeak_0b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_0b'])
+        #hist_dict['ZPeak_1b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_1b'])
+        #hist_dict['ZPeak_2b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_2b'])
+        #hist_dict['ZVeto_0b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_0b'])
+        #hist_dict['ZVeto_1b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_1b'])
+        #hist_dict['ZVeto_2b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_2b'])
 
 
         self.N_ZPeak0b = hist_dict['ZPeak_0b'].Integral()
@@ -382,7 +388,7 @@ class WeightDY:
         pad2.cd()
 
         #self.weight_1b.SetMaximum(max(self.weight_1b.GetMaximum(),self.weight_2b.GetMaximum())*1.1)
-        self.weight_1b.SetMaximum(0.2)
+        #self.weight_1b.SetMaximum(0.2)
         self.weight_1b.SetMinimum(0.)
         self.weight_1b.SetLineWidth(2)
         self.weight_2b.SetLineWidth(2)
@@ -484,23 +490,23 @@ class WeightDY:
         #----- Zpeak and Zveto 0b -----#
         C1.cd(1)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZPeak_1b'].SetTitle('Z Peak 1 btag (%s) : Integral = %0.2f;Lead lepton #eta;Lead lepton P_{T}'%(mode,self.N_ZPeak1b))
+        self.histograms['ZPeak_1b'].SetTitle('Z Peak 1 btag (%s) : Integral = %0.2f'%(mode,self.N_ZPeak1b))
         self.histograms['ZPeak_1b'].SetTitleSize(0.9,"t")
         #self.histograms['ZPeak_1b'].GetZaxis().SetRangeUser(0,amax)
         self.histograms['ZPeak_1b'].Draw("colz")
         C1.cd(7)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZPeak_2b'].SetTitle('Z Peak 2 btag (%s) : Integral = %0.2f;Lead lepton #eta;Lead lepton P_{T}'%(mode,self.N_ZPeak2b))
+        self.histograms['ZPeak_2b'].SetTitle('Z Peak 2 btag (%s) : Integral = %0.2f'%(mode,self.N_ZPeak2b))
         #self.histograms['ZPeak_2b'].GetZaxis().SetRangeUser(0,amax)
         self.histograms['ZPeak_2b'].Draw("colz")
         C1.cd(5)
         ROOT.gPad.SetRightMargin(0.15)
         self.histograms['ZVeto_0b'].Draw("colz")
         #self.histograms['ZVeto_0b'].GetZaxis().SetRangeUser(0,amax)
-        self.histograms['ZVeto_0b'].SetTitle('Z Veto 0 btag (%s) : Integral = %0.2f;Lead lepton #eta;Lead lepton P_{T}'%(mode,self.N_ZVeto0b))
+        self.histograms['ZVeto_0b'].SetTitle('Z Veto 0 btag (%s) : Integral = %0.2f'%(mode,self.N_ZVeto0b))
         C1.cd(4)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZPeak_0b'].SetTitle('Z Peak 0 btag (%s) : Integral = %0.2fLead lepton #eta;Lead lepton P_{T};'%(mode,self.N_ZPeak0b))
+        self.histograms['ZPeak_0b'].SetTitle('Z Peak 0 btag (%s) : Integral = %0.2f'%(mode,self.N_ZPeak0b))
         #self.histograms['ZPeak_0b'].GetZaxis().SetRangeUser(0,amax)
         self.histograms['ZPeak_0b'].Draw("colz")
 
@@ -509,13 +515,17 @@ class WeightDY:
         ROOT.gPad.SetRightMargin(0.15)
         #ROOT.gPad.SetLogz()
         self.weight_1b.SetTitle('Weight (1b);Lead lepton #eta;Lead lepton P_{T}')
-        self.weight_1b.GetZaxis().SetRangeUser(0,0.3)
+        content_w1b = np.ravel(hist2array(self.weight_1b))
+        self.weight_1b.GetZaxis().SetRangeUser(0,np.percentile(content_w1b,95))
         self.weight_1b.Draw("colz")
+        #self.weight_1b.Smooth()
         C1.cd(8)
         ROOT.gPad.SetRightMargin(0.15)
         #ROOT.gPad.SetLogz()
-        self.weight_2b.SetTitle('Weight (2b)Lead lepton #eta;Lead lepton P_{T};')
-        self.weight_2b.GetZaxis().SetRangeUser(0,0.1)
+        self.weight_2b.SetTitle('Weight (2b);Lead lepton #eta;Lead lepton P_{T};')
+        content_w2b = np.ravel(hist2array(self.weight_2b))
+        self.weight_2b.GetZaxis().SetRangeUser(0,np.percentile(content_w2b,95))
+        #self.weight_2b.Smooth()
         self.weight_2b.Draw("colz")
 
         #----- DY shape and MC DY in Zveto -----#
@@ -524,11 +534,11 @@ class WeightDY:
 
         C1.cd(3)
         ROOT.gPad.SetRightMargin(0.15)
-        self.shape_1b.SetTitle(mode+' (Z Veto 1b) : Integral = %0.2f'%self.shape_1b.Integral()+';Lead lepton P_{T};Lead lepton #eta')
+        self.shape_1b.SetTitle(mode+' (Z Veto 1b) : Integral = %0.2f'%self.shape_1b.Integral())
         self.shape_1b.Draw("colz")
         C1.cd(9)
         ROOT.gPad.SetRightMargin(0.15)
-        self.shape_2b.SetTitle(mode+' (Z Veto 2b) : Integral = %0.2f'%self.shape_2b.Integral()+';Lead lepton P_{T};Lead lepton #eta')
+        self.shape_2b.SetTitle(mode+' (Z Veto 2b) : Integral = %0.2f'%self.shape_2b.Integral())
         self.shape_2b.Draw("colz")
 
 
@@ -662,22 +672,22 @@ class WeightDY:
                 xAxis = weight.GetXaxis()
                 yAxis = weight.GetYaxis()
                 # Loop over eta bins in Y #
-                for j in range(1,weight.GetNbinsY()+1):
+                for j in range(1,weight.GetNbinsX()+1):
                     bin_dict = {'values':[]}
-                    etaLow = yAxis.GetBinLowEdge(j)
-                    etaHigh = yAxis.GetBinUpEdge(j)
+                    etaLow = xAxis.GetBinLowEdge(j)
+                    etaHigh = xAxis.GetBinUpEdge(j)
                     bin_dict['bin'] = [etaLow,etaHigh]
                     if len(eta_binning) == 0:
                         eta_binning.append(etaLow)
                     eta_binning.append(etaHigh)
-                    # Loop over PT bins in X #
-                    for i in range(1,weight.GetNbinsX()+1):
-                        if weight.GetBinContent(i,j) == 0:
-                            continue
-                        PtLow  = xAxis.GetBinLowEdge(i)
-                        PtHigh = xAxis.GetBinUpEdge(i)
+                    # Loop over PT bins in Y #
+                    for i in range(1,weight.GetNbinsY()+1):
+                        #if weight.GetBinContent(i,j) == 0:
+                        #    continue
+                        PtLow  = yAxis.GetBinLowEdge(i)
+                        PtHigh = yAxis.GetBinUpEdge(i)
                         bin_dict['values'].append({'bin' : [PtLow,PtHigh],
-                                                   'value' : weight.GetBinContent(i,j),
+                                                   'value' : max(0.,weight.GetBinContent(i,j)),
                                                    'error_low' : weight.GetBinError(i,j),
                                                    'error_high' : weight.GetBinError(i,j)})
                         if len(pt_binning) == 0:
@@ -708,8 +718,8 @@ class WeightDY:
         
 if __name__ == "__main__":
     #----- Path -----#
-    path_ZVeto = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_tight_withRatio_noSyst_v2'
-    path_ZPeak = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_tight_withRatio_ZPeak_noSyst_v2'
+    path_ZVeto = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_Tight_Fake/'
+    path_ZPeak = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_Tight_ZPeak_Fake/'
 
     #----- 1D weight -----#
     ElElChannel = {'ZVeto_0b' : {'path': path_ZVeto,
@@ -739,10 +749,42 @@ if __name__ == "__main__":
                                  'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}}
 
 
-#    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_data_1D','data','2016')
-#    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_data_1D','data','2016')
-#    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_mc_1D','mc','2016')
-#    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_mc_1D','mc','2016')
+    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_firstleptonPt_ElEl_data_1D','data','2016')
+    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_firstleptonPt_MuMu_data_1D','data','2016')
+    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_firstleptonPt_ElEl_mc_1D','mc','2016')
+    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_firstleptonPt_MuMu_mc_1D','mc','2016')
+
+    ElElChannel = {'ZVeto_0b' : {'path': path_ZVeto,
+                                 'histname': 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt'},
+                   'ZVeto_1b' : {'path': path_ZVeto,
+                                 'histname': 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt'},
+                   'ZVeto_2b' : {'path': path_ZVeto,
+                                 'histname': 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt'},
+                   'ZPeak_0b' : {'path': path_ZPeak,
+                                 'histname': 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt'},
+                   'ZPeak_1b' : {'path': path_ZPeak,
+                                 'histname': 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt'},
+                   'ZPeak_2b' : {'path': path_ZPeak,
+                                 'histname': 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt'}}
+
+    MuMuChannel = {'ZVeto_0b' : {'path': path_ZVeto,
+                                 'histname': 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt'},
+                   'ZVeto_1b' : {'path': path_ZVeto,
+                                 'histname': 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt'},
+                   'ZVeto_2b' : {'path': path_ZVeto,
+                                 'histname': 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt'},
+                   'ZPeak_0b' : {'path': path_ZPeak,
+                                 'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt'},
+                   'ZPeak_1b' : {'path': path_ZPeak,
+                                 'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt'},
+                   'ZPeak_2b' : {'path': path_ZPeak,
+                                 'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt'}}
+
+
+    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_leadjetPt_ElEl_data_1D','data','2016')
+    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_leadjetPt_MuMu_data_1D','data','2016')
+    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_leadjetPt_ElEl_mc_1D','mc','2016')
+    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_leadjetPt_MuMu_mc_1D','mc','2016')
 
     #----- 2D weight -----#
     ElElChannel = {'ZVeto_0b' : {'path': path_ZVeto,
@@ -770,7 +812,37 @@ if __name__ == "__main__":
                    'ZPeak_2b' : {'path': path_ZPeak,
                                  'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_ptVSeta'}}
 
-    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_data_2D','data','2016')
-    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_data_2D','data','2016')
-    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_mc_2D','mc','2016')
-    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_mc_2D','mc','2016')
+    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_firstleptonPtVsEta_ElEl_data_2D','data','2016')
+    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_firstleptonPtVsEta_MuMu_data_2D','data','2016')
+    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_firstleptonPtVsEta_ElEl_mc_2D','mc','2016')
+    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_firstleptonPtVsEta_MuMu_mc_2D','mc','2016')
+
+    ElElChannel = {'ZVeto_0b' : {'path': path_ZVeto,
+                                 'histname': 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_highlevelvariable_firstLeptonPtVSLeadjetPt'},
+                   'ZVeto_1b' : {'path': path_ZVeto,
+                                 'histname': 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_highlevelvariable_firstLeptonPtVSLeadjetPt'},
+                   'ZVeto_2b' : {'path': path_ZVeto,
+                                 'histname': 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_highlevelvariable_firstLeptonPtVSLeadjetPt'},
+                   'ZPeak_0b' : {'path': path_ZPeak,
+                                 'histname': 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_highlevelvariable_firstLeptonPtVSLeadjetPt'},
+                   'ZPeak_1b' : {'path': path_ZPeak,
+                                 'histname': 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedOneBtag_highlevelvariable_firstLeptonPtVSLeadjetPt'},
+                   'ZPeak_2b' : {'path': path_ZPeak,
+                                 'histname': 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_highlevelvariable_firstLeptonPtVSLeadjetPt'}}
+    MuMuChannel = {'ZVeto_0b' : {'path': path_ZVeto,
+                                 'histname': 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_highlevelvariable_firstLeptonPtVSLeadjetPt'},
+                   'ZVeto_1b' : {'path': path_ZVeto,
+                                 'histname': 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_highlevelvariable_firstLeptonPtVSLeadjetPt'},
+                   'ZVeto_2b' : {'path': path_ZVeto,
+                                 'histname': 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_highlevelvariable_firstLeptonPtVSLeadjetPt'},
+                   'ZPeak_0b' : {'path': path_ZPeak,
+                                 'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_highlevelvariable_firstLeptonPtVSLeadjetPt'},
+                   'ZPeak_1b' : {'path': path_ZPeak,
+                                 'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedOneBtag_highlevelvariable_firstLeptonPtVSLeadjetPt'},
+                   'ZPeak_2b' : {'path': path_ZPeak,
+                                 'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_highlevelvariable_firstLeptonPtVSLeadjetPt'}}
+
+    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_firstLeptonPtVSLeadjetPt_ElEl_data_2D','data','2016')
+    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_firstLeptonPtVSLeadjetPt_MuMu_data_2D','data','2016')
+    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_firstLeptonPtVSLeadjetPt_ElEl_mc_2D','mc','2016')
+    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_firstLeptonPtVSLeadjetPt_MuMu_mc_2D','mc','2016')
