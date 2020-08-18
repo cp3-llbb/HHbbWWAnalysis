@@ -9,21 +9,20 @@ import numpy as np
 from pprint import pprint
 import ROOT
 
-from datasetConfig import * 
-
 
 class DataCard:
-    def __init__(self,path,yamlName,groups,hist_conv,era,use_syst=False):
+    def __init__(self,datacardName,path,yamlName,groups,hist_conv,era,use_syst=False,root_subdir=None):
+        self.datacardName = datacardName
         self.path = path
         self.groups = groups
         self.hist_conv = hist_conv
-        self.era = era
+        self.era = str(era)
         self.use_syst = use_syst
+        self.root_subdir = root_subdir
         self.content = {k:{g:None for g in self.groups.keys()} for k in self.hist_conv.keys()}
 
         self.yaml_dict = self.loadYaml(os.path.join(self.path,yamlName))
         self.loopOverFiles()
-        #pprint (self.content)
         self.saveDatacard()
 
     def loopOverFiles(self):
@@ -34,8 +33,7 @@ class DataCard:
             # Check if in the group list #
             group = self.findGroup(sample)
             if group is None:
-                print ("[WARNING] Could not find sample %s in group list"%sample)
-                continue
+                raise RuntimeError("[WARNING] Could not find sample %s in group list"%sample)
 
             hist_dict = self.getHistograms(f)
             self.addSampleToGroup(hist_dict,group)
@@ -51,7 +49,7 @@ class DataCard:
         gr = None
         for key,val in self.groups.items():
             if not isinstance(val,list):
-                raise RuntimeError("Unvalid group dict")
+                raise RuntimeError("Group %s does not consist in a lost"%key)
             if sample in val:
                 gr = key
                 break
@@ -67,6 +65,10 @@ class DataCard:
             xsec = self.yaml_dict["samples"][sample]['cross-section']
             sumweight = self.yaml_dict["samples"][sample]['generated-events']
             br = self.yaml_dict["samples"][sample]["branching-ratio"] if "branching-ratio" in self.yaml_dict["samples"][sample].keys() else 1
+        else:
+            xsec = None
+            sumweight = None
+            br = None
 
         # Get list of hist names #
         list_histnames = self.getHistList(f)
@@ -79,36 +81,27 @@ class DataCard:
                 print ("Could not find hist %s in %s"%(histname,rootfile))
                 continue
             listsyst = [hn for hn in list_histnames if histname in hn and '__' in hn] if self.use_syst else []
-            h = self.getHistogram(f,histname,listsyst)
-            # Normalize hist to data #
-            if sample_type == "mc" or sample_type == "signal":
-                h.Scale(lumi*xsec*br/sumweight)
-            # Save in dict #
+            # Nominal histogram #
+            h = self.getHistogram(f,histname,lumi,br,xsec,sumweight)
             hist_dict[datacardname] = h
+            # Systematic histograms #
+            for syst in listsyst:
+                systName = syst.split('__')[-1]
+                systName.replace('up','Up')
+                systName.replace('down','Down')
+                h = self.getHistogram(f,syst,lumi,br,xsec,sumweight)
+                hist_dict[datacardname+'_'+systName] = h
+            # Save in dict #
         f.Close()
         return hist_dict
 
     @staticmethod
-    def getHistogram(f,histnom,listsyst):
+    def getHistogram(f,histnom,lumi=None,xsec=None,br=None,sumweight=None):
         # Get hist #
         h = copy.deepcopy(f.Get(histnom))
-        if len(listsyst) != 0:
-            dict_syst = {}
-            nom_cont = root_numpy.hist2array(h,include_overflow=True,copy=True)
-            for syst in listsyst:
-                s = syst.replace(histnom,'').replace('__','')
-                hs = f.Get(syst)
-                dict_syst[s] = np.abs(root_numpy.hist2array(hs,include_overflow=True,copy=True)-nom_cont)
-            # Get maximum var for each sys and add quadraticaly #
-            syst_names = [n[:-2] for n in dict_syst.keys() if n.endswith('up')]
-            syst_tot_squared = np.zeros(nom_cont.shape[0])
-            for syst_name in syst_names:
-                maxvar = np.maximum(dict_syst[syst_name+'down'],dict_syst[syst_name+'up'])
-                syst_tot_squared += np.power(maxvar,2)
-            for i in range(h.GetNbinsX()):
-                err = h.GetBinError(i)
-                new_err = math.sqrt(err**2+syst_tot_squared[i])
-                h.SetBinError(i,new_err)
+        # Normalize hist to data #
+        if lumi is not None and xsec is not None and br is not None and sumweight is not None:
+            h.Scale(lumi*xsec*br/sumweight)
         return h
              
     
@@ -139,15 +132,16 @@ class DataCard:
 
 
     def saveDatacard(self):
-        path_datacard = os.path.join(os.path.abspath(os.path.dirname(__file__)),'datacards_%s'%self.era)
+        path_datacard = os.path.join(os.path.abspath(os.path.dirname(__file__)),self.datacardName)
         if not os.path.exists(path_datacard):
             os.makedirs(path_datacard)
         for key, gdict in self.content.items():
             # Create file #
             filename = os.path.join(path_datacard,key+'_'+self.era+'.root')
             f = ROOT.TFile(filename,'recreate')
-            d = f.mkdir("HH_2l_0tau","HH_2l_0tau")
-            d.cd()
+            if self.root_subdir is not None:
+                d = f.mkdir(self.root_subdir,self.root_subdir)
+                d.cd()
             for group,hist in gdict.items():
                 if hist is None:
                     continue
@@ -162,7 +156,8 @@ class DataCard:
 
 
 if __name__=="__main__":
-    #instance = DataCard(*returnConfig('2016'),'2016')
-    #instance = DataCard(*returnConfig('2017'),'2017')
-    #instance = DataCard(*returnConfig('2018'),'2018')
-    instance = DataCard(*returnZPeakConfig('2016'),'2016')
+    if len(sys.argv) !=2:
+        raise RuntimeError("Must provide the YAML file")
+    with open(sys.argv[1],'r') as handle:
+        f = yaml.load(handle)
+    instance = DataCard(datacardName=sys.argv[1].replace('.yml',''),**f)

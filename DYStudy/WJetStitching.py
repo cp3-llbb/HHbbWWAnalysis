@@ -167,6 +167,9 @@ for name, content in dict_content.items():
 
 df['total'] = df[params].sum(axis=1)
 
+if len(sys.argv)>2:
+    df.to_excel(sys.argv[2]+'_N.xls',float_format='%0.10f')
+
 print ('Event weight sum per sample per bins')
 for block in blocks:
     print (df[block+['xsec','total']])
@@ -181,8 +184,10 @@ for p in xsec_params.keys():
         xsec_params[p] /= 2
     elif not '0j' in p and not '0HT' in p:
         xsec_params[p] /= 3
+df_xsec_params = pd.DataFrame(list(xsec_params.values()), index=xsec_params.keys(), columns=['Xsec per parameter'])
 for p in params:
     print ("Parameter %s, xsec = %0.3f"%(p,xsec_params[p]))
+df_xsec_params.to_excel(sys.argv[2]+'_xsec.xls',float_format='%0.10f')
 
 print ('Xsec per exclusif parameter')
 xsec_test = {}
@@ -234,26 +239,32 @@ for col in df_w_stitching.columns:
         if not jetBin in dict_weights[sample].keys():
             dict_weights[sample][jetBin] = []
         dict_weights[sample][jetBin].append({'low':HTBin[0],'up':HTBin[1] if len(HTBin)>1 else HTBin[0],'value':df_w_stitching[col].loc[index]})
-pprint (dict_weights) 
+#pprint (dict_weights) 
 if len(sys.argv)>2:
-    with open(sys.argv[2],'w') as f:
+    with open(sys.argv[2]+'.json','w') as f:
         json.dump(dict_weights,f,indent=4)
-df_w_stitching.to_excel('WJets_stitching_weights.xls',float_format='%0.10f')
+    df_w_sample.to_excel(sys.argv[2]+'_weight_sample.xls',float_format='%0.10f')
+    df_w_params.to_excel(sys.argv[2]+'_weight_param.xls',float_format='%0.10f')
+    df_w_stitching.to_excel(sys.argv[2]+'_weight_stitch.xls',float_format='%0.10f')
 
 
 print ('Fractions inclusive')
 f_inc = {p:df.loc['Inclusive'][p]/df.loc['Inclusive']['total'] for p in params}
 pprint (f_inc)
+print ("Sum %0.5f"%(sum(f_inc.values())))
 print ('Fractions exclusive')
 rows = [s for s in samples if s != 'Inclusive']
-f_exc = {p:(df.loc[rows]['xsec']*df.loc[rows][p]*df.loc[rows]['total']).sum()/dict_xsec['Inclusive'] for p in params}
-pprint (f_exc)
-f_stitch = {p:xsec_params[p]/dict_xsec['Inclusive'] for p in params}
+f_exc = {p:(df[p].loc[rows]*df['xsec'].loc[rows]/df['total'].loc[rows]/dict_xsec['Inclusive']).sum() for p in params}
+print ("Sum %0.5f"%(sum(f_exc.values())))
 print ('Fractions stitching')
+f_stitch = {p:xsec_params[p]/dict_xsec['Inclusive'] for p in params}
 pprint (f_stitch)
+print ("Sum %0.5f"%(sum(f_stitch.values())))
 for p in params:
-    print ('Param %s fractions : Incl = %0.5f, Excl = %0.5f -> Mean = %0.5f VS Stitch = %0.5f'
-            %(p,f_inc[p],f_exc[p],abs((f_inc[p]-f_exc[p])/2),f_stitch[p]))
+    print ('Param %10s fractions : Incl = %10.10f, Excl = %10.10f -> Mean = %10.10f VS Stitch = %10.10f'
+            %(p,f_inc[p],f_exc[p],abs((f_inc[p]+f_exc[p])/2),f_stitch[p]))
 
-    
-    
+df_fractions = pd.DataFrame([[a,b,c] for a,b,c in zip(list(f_inc.values()),list(f_exc.values()),list(f_stitch.values()))], columns=['Inclusive fraction','Exclusive fraction','Stitch fraction'],index=list(f_inc.keys()))
+df_fractions['Mean(inc,exc)'] = (df_fractions['Inclusive fraction']+df_fractions['Exclusive fraction'])/2
+if len(sys.argv)>2:
+    df_fractions.to_excel(sys.argv[2]+'_fraction.xls',float_format='%0.10f')
