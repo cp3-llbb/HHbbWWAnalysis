@@ -24,11 +24,11 @@ class CompareDY:
         # Mix `files` part #
         config['files'] = {}
         for key,val in config_mc["files"].items():
-            if "DY" in key:
+            if "DY" == val['group']:
                 config['files'][key] = val
                 config['files'][key]['stack-index'] = 0
         for key,val in config_dd["files"].items():
-            if "DYEstimation" in key:
+            if "DYEstimation" == val['group']:
                 config['files'][key] = val
                 config['files'][key]['stack-index'] = 1
 

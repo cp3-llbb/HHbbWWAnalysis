@@ -8,7 +8,7 @@ def finalize(path,force=True,verbose=False,onlyFailed=False):
     path = os.path.abspath(path)
 
     with open(os.path.join(path,'batch','input','cluster_id'),'r') as f:
-        cluster_id = f.readline()
+        cluster_id = str(int(f.readline()))
 
     p = subprocess.Popen(['sacct', '-j', cluster_id, '--format=jobid%25,State', '-X', '--noheader'], stdout=subprocess.PIPE)
     out, _ = p.communicate()

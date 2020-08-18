@@ -233,7 +233,8 @@ class TemplateLatex:
                     if line.startswith(r"\begin{tabular}"):
                         text += r"\resizebox{\textwidth}{!}{"+"\n"
                     text += line
-        text += "\n}\n"+r"\end{document}"
+            text += "\n}\n"
+        text += r"\end{document}"
 
         # Save new tex file #
         with open(os.path.join(wd,"yieldsTable.tex"),"w") as f:
