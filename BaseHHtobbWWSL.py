@@ -919,18 +919,27 @@ One lepton and and one jet argument must be specified in addition to the require
             self.leadElectronTightSel = op.select(self.leadElectronFakeSel, pred=lambda_tight_ele)
             self.leadMuonTightSel     = op.select(self.leadMuonFakeSel, pred=lambda_tight_mu)
 
-            # Fake Extrapolation selection #
+            # Fake Extrapolation selection [prompt]#
             lambda_fake_ele = lambda ele : op.AND(self.lambda_is_matched(ele) , op.NOT(self.lambda_electronTightSel(ele)))
             lambda_fake_mu  = lambda mu  : op.AND(self.lambda_is_matched(mu)  , op.NOT(self.lambda_muonTightSel(mu)))
 
-            self.leadElectronFakeExtrapolationSel = op.select(self.leadElectronFakeSel, pred=lambda_tight_ele)
-            self.leadMuonFakeExtrapolationSel     = op.select(self.leadMuonFakeSel, pred=lambda_tight_mu)
+            #self.leadElectronFakeExtrapolationSel = op.select(self.leadElectronFakeSel, pred=lambda_tight_ele)
+            #self.leadMuonFakeExtrapolationSel     = op.select(self.leadMuonFakeSel, pred=lambda_tight_mu)
+            self.leadElectronFakeExtrapolationSel = op.select(self.leadElectronFakeSel, pred=lambda_fake_ele)
+            self.leadMuonFakeExtrapolationSel     = op.select(self.leadMuonFakeSel, pred=lambda_fake_mu)
                 # NOTE 
                 # Given that self.lead*FakeSel has len of 0 or 1, by definition we have :
                 #       len(self.lead*TightSel) + len(self.lead*FakeExtrapolationSel) <= 1
                 #           (can be 0 for MC where the lepton is not genMatched)
                 # SR : len(self.lead*TightSel) == 1
                 # Fake CR : len(self.lead*FakeExtrapolationSel) == 1 
+
+            # Fake Extrapolation selection [non-prompt]#
+            lambda_fake_ele_nonPrompt = lambda ele : op.AND(op.NOT(self.lambda_is_matched(ele)) , op.NOT(self.lambda_electronTightSel(ele)))
+            lambda_fake_mu_nonPrompt  = lambda mu  : op.AND(op.NOT(self.lambda_is_matched(mu))  , op.NOT(self.lambda_muonTightSel(mu)))
+
+            self.leadElectronFakeExtrapolationSel_nonPrompt = op.select(self.leadElectronFakeSel, pred=lambda_fake_ele_nonPrompt)
+            self.leadMuonFakeExtrapolationSel_nonPrompt     = op.select(self.leadMuonFakeSel, pred=lambda_fake_mu_nonPrompt)
 
         ##############################################################################
         #                                  Tau                                       #

@@ -21,12 +21,21 @@ class TemplateLatex:
                         ])
             
         self.selections = collections.OrderedDict([
+<<<<<<< HEAD
                         ('Ak4JetsLooseExclusiveResolved1b2j' , "At least three Ak4 Jets (One is b-jet)"),
                         ('Ak4JetsLooseExclusiveResolved2b1j' , "At least three Ak4 Jets (Two is b-jet)"),
                         ('Ak4JetsTightExclusiveResolved1b3j' , "At least four Ak4 Jets (one is b-jet)"),
                         ('Ak4JetsTightExclusiveResolved2b2j' , "At least four Ak4 Jets (Two is b-jet)"),
                         ('Ak8BJetsHbbBoostedWtoJ' , "At least one Ak8 Jet with b-tag and another Ak4 Jet"),
                         ('Ak8BJetsHbbBoostedWtoJJ' , "At least one Ak8 Jet with b-tag and another 2 Ak4 Jets"),
+=======
+                        ('TwoAk4Jets_' , "At least two Ak4 Jets (before Btagging)"),
+                        ('OneAk8Jet_' , "At least one Ak8 Jet (before Btagging)"),
+                        ('TwoAk4JetsExclusiveResolvedNoBtag' , "Exclusive Resolved Jets (no Btag)"),
+                        ('TwoAk4JetsExclusiveResolvedOneBtag' , "Exclusive Resolved Jets (1 Btag)"),
+                        ('TwoAk4JetsExclusiveResolvedTwoBtags' , "Exclusive Resolved Jets (2 Btags)"),
+                        ('OneAk8JetInclusiveBoosted' , "Inclusive Boosted Jets"),
+>>>>>>> 351efd47214d22a9f931b61cf7c288851194d8c8
                         ])
         self.variables = collections.OrderedDict([
                         # Triggers #
@@ -213,6 +222,7 @@ class TemplateLatex:
     \usepackage{graphicx}
     \usepackage[a4paper,bindingoffset=0.5cm,left=0cm,right=1cm,top=2cm,bottom=2cm,footskip=0.25cm]{geometry}
                 """
+<<<<<<< HEAD
         with open(os.path.join(self.dirpath,"yields.tex"),"r") as f:
             while True: 
                 line = f.readline() 
@@ -223,6 +233,22 @@ class TemplateLatex:
                     text += r"\resizebox{\textwidth}{!}{"+"\n"
                 text += line
         text += "\n}\n"+r"\end{document}"
+=======
+        wd = os.path.dirname(self.texfile)
+        for dirpath in self.dirpaths:
+            with open(os.path.join(dirpath,"yields.tex"),"r") as f:
+                while True: 
+                    line = f.readline() 
+                    if not line:
+                        break
+                    if line.startswith(r"\begin{document}"):
+                        continue
+                    if line.startswith(r"\begin{tabular}"):
+                        text += r"\resizebox{\textwidth}{!}{"+"\n"
+                    text += line
+            text += "\n}\n"
+        text += r"\end{document}"
+>>>>>>> 351efd47214d22a9f931b61cf7c288851194d8c8
 
         # Save new tex file #
         with open(os.path.join(self.dirpath,"yieldsTable.tex"),"w") as f:

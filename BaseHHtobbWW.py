@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 from itertools import chain
 
 from bamboo import treefunctions as op
@@ -9,7 +10,8 @@ from bamboo.scalefactors import binningVariables_nano, BtagSF
 
 from METScripts import METFilter, METcorrection
 from scalefactorsbbWW import ScaleFactorsbbWW
-from btagHelper import makeBtagRatioReweighting#, makeBTagCalibrationReader, BtagSF
+from btagHelper import makeBtagRatioReweighting
+from triggers import returnTriggerRanges
 
 #===============================================================================================#
 #                                  BaseHHtobbWW                                                 #
@@ -157,6 +159,21 @@ One lepton and and one jet argument must be specified in addition to the require
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Btag ratio study : Btag Sf not applied (without the ratio), will only do the plots for reweighting (jets and leptons args are ignored)")
+        parser.add_argument("--DYStitchingPlots", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "DY stitching studies : only produce LHE jet multiplicities (inclusive analysis, only on DY events, rest of plots ignored)")
+        parser.add_argument("--WJetsStitchingPlots", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "W+jets stitching studies : only produce LHE jet multiplicities (inclusive analysis, only on W+jets events, rest of plots ignored)")
+        parser.add_argument("--NoStitching", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "To not apply the stitching weights to DY and WJets samples")
+
+
+
 
         #----- Skimmer arguments -----#
         parser.add_argument("--Synchronization", 
@@ -173,16 +190,6 @@ One lepton and and one jet argument must be specified in addition to the require
                             action      = "store_true",
                             default     = False,
                             help        = "Only produce the yield plots")
-
-        #----- DY arguments -----#
-        parser.add_argument("--DYDataEstimation1Btag", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Compute data-driven estimate in the 1 btag region from data (no effect on MC), must be used with --Tight and --Resolved0Btag only")
-        parser.add_argument("--DYDataEstimation2Btag", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Compute data-driven estimate in the 2 btag region from data (no effect on MC), must be used with --Tight and --Resolved0Btag only")
 
 
     def prepareTree(self, tree, sample=None, sampleCfg=None):
@@ -231,7 +238,9 @@ One lepton and and one jet argument must be specified in addition to the require
                                   # No channel selection
                                   # None is local mode, "None" in distributed mode
                               or self.args.BtagReweightingOn 
-                              or self.args.BtagReweightingOff)
+                              or self.args.BtagReweightingOff
+                              or self.args.DYStitchingPlots
+                              or self.args.WJetsStitchingPlots)
                                 # Inclusive plots
             # If no lepton, jet and channel selection : basic object selection (no trigger nor corrections)
         if self.inclusive_sel:
@@ -532,6 +541,7 @@ One lepton and and one jet argument must be specified in addition to the require
         #                           TTbar reweighting                             #
         ###########################################################################
         if "group" in sampleCfg and sampleCfg["group"] == 'ttbar': 
+            print ('Applied TT top reweighting')
             # https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting#Use_case_3_ttbar_MC_is_used_to_m -> do not use when ttbar is background
             # Correct : https://indico.cern.ch/event/904971/contributions/3857701/attachments/2036949/3410728/TopPt_20.05.12.pdf
             #       -> Weight formula : slide 2
@@ -551,6 +561,36 @@ One lepton and and one jet argument must be specified in addition to the require
             # Apply correction to TT #
             noSel = noSel.refine("ttbarWeight",weight=self.ttbar_sys)
 
+        ###########################################################################
+        #                               Stitching                                 #
+        ###########################################################################
+        if "group" in sampleCfg and (sampleCfg["group"] == 'DY' or sampleCfg["group"] == 'Wjets') and not self.args.NoStitching:
+            stitch_file = os.path.abspath(os.path.join(os.path.dirname(__file__),'data','Stitching','stitching_weights_{}_{}.json'.format(sampleCfg["group"],era)))
+            if not os.path.exists(stitch_file):
+                raise RuntimeError("Could not find stitching file %s"%stitch_file)
+            with open(stitch_file) as handle:
+                dict_weights = json.load(handle)
+            if sample in dict_weights.keys():
+                dict_weights = dict_weights[sample]
+                if isinstance(dict_weights[list(dict_weights.keys())[0]],float): # Only binned in jet multiplicity
+                    stitch_op = op.multiSwitch(*[(t.LHE.Njets==int(njets),op.c_float(weight)) for njets,weight in dict_weights.items()], op.c_float(1.))
+                elif isinstance(dict_weights[list(dict_weights.keys())[0]],list): # Binned in jet mult + HT bins
+                    stitch_op = op.multiSwitch(*[(op.AND(t.LHE.Njets==int(njets),op.in_range(weights['low'],t.LHE.HT,weights['up'])),op.c_float(weights['value'])) 
+                                                  for njets,listBin in dict_weights.items() for weights in listBin], op.c_float(1.))
+                else:
+                    raise RuntimeError("Stitching weight format not understood")
+                noSel = noSel.refine("DYStitching",weight = stitch_op)
+                
+        ###########################################################################
+        #                               tH samples                                #
+        ###########################################################################
+        if sample.startswith('TH'):
+            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/SingleTopHiggsGeneration13TeV
+            # https://twiki.cern.ch/twiki/pub/CMS/SingleTopHiggsGeneration13TeV/reweight_encondig.txt
+            # 
+            print ('Applied tH LHE weights')
+            noSel = noSel.refine("tHWeight",weight=t.LHEReweightingWeight[11])
+
         #############################################################################
         #                            Pre-firing rates                               #
         #############################################################################
@@ -568,9 +608,7 @@ One lepton and and one jet argument must be specified in addition to the require
         # Get MC PU weight file #
         puWeightsFile = None
         if self.is_MC:
-            if "pufile" not in sampleCfg:
-                raise KeyError("Could not find 'pufile' entry for sample %s in the YAML file"%sampleCfg["sample"])
-            puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "pileup",sampleCfg["pufile"])
+            puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "pileup",sample+'_%s.json'%era)
             if not os.path.exists(puWeightsFile):
                 raise RuntimeError("Could not find pileup file %s"%puWeightsFile)
             from bamboo.analysisutils import makePileupWeight
@@ -876,8 +914,8 @@ One lepton and and one jet argument must be specified in addition to the require
             lambda_fake_ele = lambda ele : op.AND(self.lambda_is_matched(ele) , op.NOT(self.lambda_electronTightSel(ele)))
             lambda_fake_mu  = lambda mu  : op.AND(self.lambda_is_matched(mu)  , op.NOT(self.lambda_muonTightSel(mu)))
 
-            self.leadElectronFakeExtrapolationSel = op.select(self.leadElectronFakeSel, pred=lambda_tight_ele)
-            self.leadMuonFakeExtrapolationSel     = op.select(self.leadMuonFakeSel, pred=lambda_tight_mu)
+            self.leadElectronFakeExtrapolationSel = op.select(self.leadElectronFakeSel, pred=lambda_fake_ele)
+            self.leadMuonFakeExtrapolationSel     = op.select(self.leadMuonFakeSel, pred=lambda_fake_mu)
                 # NOTE 
                 # Given that self.lead*FakeSel has len of 0 or 1, by definition we have :
                 #       len(self.lead*TightSel) + len(self.lead*FakeExtrapolationSel) <= 1
@@ -983,19 +1021,30 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                               Triggers                                    #
         #############################################################################
-
         #----- Genweight -----#
-        
-        #def sign(sth):
-        #    return op.switch(sth != 0., sth/op.abs(sth), op.c_float(0.))
-
         if self.is_MC:
             noSel = noSel.refine("genWeight", weight=t.genWeight)
-            #noSel = noSel.refine("genWeight", weight=sign(t.genWeight))
 
+        triggerRanges = returnTriggerRanges(era)
         #----- Select triggers -----#
         def returnTriggers(keys):
-            return op.OR(*[trig for k in keys for trig in self.triggersPerPrimaryDataset[k]])
+            # MC : just OR the different paths 
+            if self.is_MC:
+                return op.OR(*[trig for k in keys for trig in self.triggersPerPrimaryDataset[k]])
+            # Data : due to bug in NanoAOD production, check that the event run number is inside the ranges computed by bricalc
+            else:
+                conversion = {'SingleElectron':'1e','SingleMuon':'1mu','MuonEG':'1e1mu','DoubleEGamma':'2e','DoubleMuon':'2mu'}
+                list_cond = []
+                for trigKey in keys:
+                    rangekey = conversion[trigKey]
+                    rangeDict = {triggerRanges[rangekey][i]['name']:triggerRanges[rangekey][i]['runs'] for i in range(len(triggerRanges[rangekey]))}
+                    listTrig = self.triggersPerPrimaryDataset[trigKey]
+                    trigNames = [trig._parent.name for trig in listTrig]
+                    for trig,trigName in zip(listTrig,trigNames):
+                        trigRanges = rangeDict[trigName]
+                        list_cond.append(op.AND(trig,op.OR(*[op.in_range(r[0]-1,t.run,r[1]+1) for r in trigRanges])))
+                            # BEWARE : op.in_range is boundaries excluded !!! (hence extension via -1 and +1)
+                return op.OR(*list_cond)
 
         # NOTE 
         # For DL the naming convention is self.leadElectronsFakeSel and self.leadMuonsFakeSel (with an "s")
@@ -1143,16 +1192,37 @@ One lepton and and one jet argument must be specified in addition to the require
                     op.systematic(op.c_float(1.00), name="ttH_electronMuon_trigSF", up=op.c_float(1.01), down=op.c_float(0.99)))
         #----- DY reweighting -----#
         if era == "2016":
-            self.DYReweighting1bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_1b'), combine="weight", systName="dy_reweighting_1b_elel", defineOnFirstUse=(not forSkimmer))
-            self.DYReweighting1bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_1b'), combine="weight", systName="dy_reweighting_1b_mumu", defineOnFirstUse=(not forSkimmer))
-            self.DYReweighting2bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_2b'), combine="weight", systName="dy_reweighting_2b_elel", defineOnFirstUse=(not forSkimmer))
-            self.DYReweighting2bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_2b'), combine="weight", systName="dy_reweighting_2b_mumu", defineOnFirstUse=(not forSkimmer))
+            self.DYReweighting1bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_1b'), combine="weight", systName="dy_reweighting_1b_elel", defineOnFirstUse=(not forSkimmer),
+                                                          additionalVariables={'Eta': lambda lepjet : lepjet[0].pt, 'Pt': lambda lepjet : lepjet[1].pt})
+            self.DYReweighting1bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_1b'), combine="weight", systName="dy_reweighting_1b_mumu", defineOnFirstUse=(not forSkimmer),
+                                                          additionalVariables={'Eta': lambda lepjet : lepjet[0].pt, 'Pt': lambda lepjet : lepjet[1].pt})
+            self.DYReweighting2bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_2b'), combine="weight", systName="dy_reweighting_2b_elel", defineOnFirstUse=(not forSkimmer),
+                                                          additionalVariables={'Eta': lambda lepjet : lepjet[0].pt, 'Pt': lambda lepjet : lepjet[1].pt})
+            self.DYReweighting2bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_2b'), combine="weight", systName="dy_reweighting_2b_mumu", defineOnFirstUse=(not forSkimmer),
+                                                          additionalVariables={'Eta': lambda lepjet : lepjet[0].pt, 'Pt': lambda lepjet : lepjet[1].pt})
+
+
+
+        else:
+            self.DYReweighting1bElEl = lambda dilep : None
+            self.DYReweighting1bMuMu = lambda dilep : None
+            self.DYReweighting2bElEl = lambda dilep : None
+            self.DYReweighting2bMuMu = lambda dilep : None
 
         #----- Fake rates -----#
-        self.electronFR = SF.get_scalefactor("lepton", 'electron_fakerates_'+era, combine="weight", systName="el_FR", defineOnFirstUse=(not forSkimmer),
-                                             additionalVariables={'Pt' : lambda obj : self.electron_conept[obj.idx]})
-        self.muonFR = SF.get_scalefactor("lepton", 'muon_fakerates_'+era, combine="weight", systName="mu_FR", defineOnFirstUse=(not forSkimmer),
-                                         additionalVariables={'Pt' : lambda obj : self.muon_conept[obj.idx]})
+        FRSysts = ['pt_syst','barrel_syst','norm_syst']
+        self.electronFRList = [SF.get_scalefactor("lepton", ('electron_fakerates_'+era, syst), combine="weight", systName="el_FR_"+syst, defineOnFirstUse=(not forSkimmer),
+                                             additionalVariables={'Pt' : lambda obj : self.electron_conept[obj.idx]}) for syst in FRSysts]
+        self.muonFRList = [SF.get_scalefactor("lepton", ('muon_fakerates_'+era, syst), combine="weight", systName="mu_FR_"+syst, defineOnFirstUse=(not forSkimmer),
+                                         additionalVariables={'Pt' : lambda obj : self.muon_conept[obj.idx]}) for syst in FRSysts ] 
+
+        def returnFFSF(obj,list_SF,systName):
+            """ Helper when several systematics are present  """
+            args = [ a(obj) for a in list_SF[0]._args ] ## get the things the SF depends on
+            systArgs = {'nominal':list_SF[0].sfOp.get(*(args+[op.extVar("int", "Nominal")])),'name':systName}
+            systArgs.update({SF._systName+'up':SF.sfOp.get(*(args+[op.extVar("int", "Up")])) for SF in list_SF})
+            systArgs.update({SF._systName+'down':SF.sfOp.get(*(args+[op.extVar("int", "Down")])) for SF in list_SF})
+            return op.systematic(**systArgs)
         
         #############################################################################
         #                             Fake Factors                                  #
@@ -1169,8 +1239,8 @@ One lepton and and one jet argument must be specified in addition to the require
             self.electronCorrFR = op.systematic(op.c_float(1.325), name="electronCorrFR",up=op.c_float(1.325*1.325),down=op.c_float(1.))
             self.muonCorrFR     = op.systematic(op.c_float(1.067), name="muonCorrFR",up=op.c_float(1.067*1.067),down=op.c_float(1.))
 
-        self.lambda_FF_el = lambda el : self.electronCorrFR*self.electronFR(el)/(1-self.electronCorrFR*self.electronFR(el))
-        self.lambda_FF_mu = lambda mu : self.muonCorrFR*self.muonFR(mu)/(1-self.muonCorrFR*self.muonFR(mu))
+        self.lambda_FF_el = lambda el : self.electronCorrFR*returnFFSF(el,self.electronFRList,"el_FR")/(1-self.electronCorrFR*returnFFSF(el,self.electronFRList,"el_FR"))
+        self.lambda_FF_mu = lambda mu : self.muonCorrFR*returnFFSF(mu,self.muonFRList,"mu_FR")/(1-self.muonCorrFR*returnFFSF(mu,self.muonFRList,"mu_FR"))
 
         if channel == "DL":
             self.ElElFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),op.NOT(self.lambda_electronTightSel(dilep[1]))),
@@ -1208,7 +1278,7 @@ One lepton and and one jet argument must be specified in addition to the require
         ###########################################################################
         #                    b-tagging efficiency scale factors                   #
         ###########################################################################
-        if self.is_MC:
+        if self.is_MC and not self.args.DYStitchingPlots and not self.args.WJetsStitchingPlots:
             #----- Method 1.d -----#
             # See https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagShapeCalibration
             # W_btag = Π_i(all jets) SD(jet_i)  which must be multiplied by r = Σ w(before)/Σ w(after) (before/after using the btag weight, no btag selection for both)

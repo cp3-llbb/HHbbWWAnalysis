@@ -6,6 +6,9 @@ lep2j_p4 = lambda lep,j1,j2 : lep.p4+j1.p4+j2.p4
 lep3j_p4 = lambda lep,j1,j2,j3 : lep.p4+j1.p4+j2.p4+j3.p4
 lep4j_p4 = lambda lep,j1,j2,j3,j4 : lep.p4+j1.p4+j2.p4+j3.p4+j4.p4
 
+# bReg corr 4 momenta of ak4-bTagged jet #
+bJetCorrP4 = lambda j : op._to.Construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >", (j.pt*j.bRegCorr, j.eta, j.phi, j.mass)).result
+
 # SingleLep-Met variables
 SinglepMet_dPhi = lambda lep, met : lep.p4.Phi()-met.phi
 

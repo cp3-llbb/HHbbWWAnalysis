@@ -1,5 +1,5 @@
 import math
-from bamboo.plots import Plot, EquidistantBinning, SummedPlot
+from bamboo.plots import Plot, EquidistantBinning, SummedPlot, VariableBinning
 from bamboo import treefunctions as op
 from bamboo.plots import CutFlowReport
 
@@ -126,6 +126,31 @@ def triggerPlots(sel,triggerDict,suffix,channel):
                              plotopts = channelLabel))
 
     return plots
+
+
+##########################  LHE PLOT #################################
+def makeLHEPlots(sel, LHE):
+    plots = []
+    plots.append(Plot.make1D("LHE_Njets",
+                             LHE.Njets,
+                             sel,
+                             EquidistantBinning(5,0.,5),
+                             xTitle='LHE Njets'))
+    plots.append(Plot.make1D("LHE_HT",
+                             LHE.HT,
+                             sel,
+                             VariableBinning([70,100,200,400,600,800,1200,2500]),
+                             xTitle='LHE HT'))
+    plots.append(Plot.make2D("LHE_HTVSNjets",
+                             [LHE.HT,LHE.Njets],
+                             sel,
+                             [VariableBinning([0,70,100,200,400,600,800,1200,2500]),EquidistantBinning(5,0.,5)],
+                             yTitle='LHE Njets',
+                             xTitle='LHE HT'))
+    return plots
+
+
+
 ##########################  MET PLOT #################################
 def makeMETPlots(sel, met, suffix, channel):
     """
@@ -495,6 +520,15 @@ def makeHighLevelQuantities(sel,met,l1,l2,j1,j2,suffix,channel):
     plots = []
 
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
+
+    # Lepton PT versus Jet Pt #
+    plots.append(Plot.make2D("%s_%s_highlevelvariable_firstLeptonPtVSLeadjetPt"%(channel,suffix),
+                             [l1.pt,j1.pt],
+                             sel,
+                             [EquidistantBinning(60,0.,300.),EquidistantBinning(60,0.,300.)],
+                             xTitle="First lepton P_{T}",
+                             yTitle="Leading jet P_{T}",
+                             plotopts = channelLabel))
 
     # dilepton-MET plots #
     plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepMETdeltaPhi"%(channel,suffix),

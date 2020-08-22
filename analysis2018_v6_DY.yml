@@ -1,0 +1,153 @@
+tree: Events
+eras:
+    # brilcalc lumi -u /pb --normtag /cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags/normtag_PHYSICS.json -i /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+    #Summary: 
+    #+-------+------+--------+--------+-------------------+------------------+
+    #| nfill | nrun | nls    | ncms   | totdelivered(/pb) | totrecorded(/pb) |
+    #+-------+------+--------+--------+-------------------+------------------+
+    #| 196   | 478  | 234186 | 233794 | 62223.541021631   | 59740.565201546  |
+    #+-------+------+--------+--------+-------------------+------------------+
+  '2018':
+    luminosity: 1.
+    luminosity-error: 0.
+samples:
+######### DY
+  DYJetsToLL_M-50:
+    db: ["das:/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM","das:/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20_ext2-v1/NANOAODSIM"]
+    files: dascache/DYJetsToLL_M-50_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1.
+    group: DY
+    era: '2018'
+    split: 200
+
+  DYToLL_0J:
+    db: das:/DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/DYToLL_0J_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1.
+    group: DY
+    era: '2018'
+    split: 200
+    
+  DYToLL_1J:
+    db: das:/DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/DYToLL_1J_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1.
+    group: DY
+    era: '2018'
+    split: 200
+  
+  DYToLL_2J:
+    db: das:/DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/DYToLL_2J_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1.
+    group: DY
+    era: '2018'
+    split: 200
+
+plotIt:
+  configuration:
+    width: 800
+    height: 600
+    luminosity-label: '%1$.2f fb^{-1} (13 TeV)'
+    experiment: CMS
+    extra-label: 2018Data --Work in progress
+    show-overflow: true
+  legend:
+    position: [0.7, 0.6, 0.91, 0.91]
+  groups:
+    data:
+      legend: data
+    ttbar:
+      fill-color: "#cc7a16"
+      legend: tt
+    ST: 
+      fill-color: "#99053d"
+      legend: Single Top 
+      order: 2
+    DY: 
+      fill-color: "#1a83a1"
+      legend: Drell-Yan
+      order: 3
+    Wjets:
+      fill-color: "#d95564"
+      legend: W+jets
+      order: 4
+    VVV: 
+      fill-color: "#ccbf45"
+      legend: VV(V)
+      order: 5
+    ttV:
+      fill-color: "#174704"
+      legend: tt+V
+      order: 6
+    SM: 
+      fill-color: "#06b894"
+      legend: SM Higgs (ttH, ZH) 
+      order: 7
+    Rares:
+      fill-color: "#610596"
+      legend: Rares
+      order: 8
+    DYEstimation:
+      fill-color: "#1a83a1"
+      legend: Drell-Yan (from data)
+      order: 9
+    Fake:
+      fill-color: "#6e3303"
+      legend: Fake
+      order: 10
+
+  systematics:
+      # on the jets
+    - jer
+    - jesTotal
+      # on the lepton id
+    - mu_loose
+    - mu_tightmva
+    - el_looserecoptlt20
+    - el_looserecoptgt20
+    - el_looseid
+    - el_looseeff
+    - el_tightmva
+     # on the lepton trigger 
+    - ttH_singleElectron_trigSF
+    - ttH_singleMuon_trigSF
+    - ttH_doubleElectron_trigSF 
+    - ttH_doubleMuon_trigSF
+    - ttH_electronMuon_trigSF
+     # on the pileup
+    - pileup
+      # on the jet btagging
+    - deepjet
+    #- deepcsv
+    # Btag SF #
+    - btagSF_lf
+    - btagSF_hf
+    - btagSF_hfstats1
+    - btagSF_hfstats2
+    - btagSF_lfstats1
+    - btagSF_lfstats2
+    - btagSF_cferr1
+    - btagSF_cferr2
+    # Top pt reweighting #
+    - topPtReweighting
+    # Btag reweighting
+    - btag_ratio
+    # DY weight #
+    - dy_reweighting_elel
+    - dy_reweighting_mumu
+    # Fake factor
+    - el_FR_pt_syst
+    - el_FR_barrel_syst
+    - el_FR_norm_syst
+    - electronCorrFR
+    - mu_FR_pt_syst
+    - mu_FR_barrel_syst
+    - mu_FR_norm_syst
+    - muonCorrFR
+      # on the cross section : 1+xsec_uncert(pb)/xsec(pb)
+

@@ -98,16 +98,21 @@ class ScaleFactorsbbWW:
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
                                                 entry_key   = 'DY_2016',
                                                 base_key    = '{channel}_{type}_{btag}',
-                                                base_str    = 'weight_{channel}_{type}_weight_{btag}_2016.json',
+                                                base_str    = 'weight_firstLeptonPtVSLeadjetPt_{channel}_{type}_2D_weight_{btag}_2016.json',
+                                                #base_str    = 'weight_firstleptonPtVsEta_{channel}_{type}_2D_weight_{btag}_2016.json',
                                                 format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b']})
 
         #  Fake rates #
-        instance.AddScaleFactor(path_key    = 'FR',
-                                entry_key   = 'electron_fakerates_2016',
-                                base_str    = 'TTHFakeRates_Electron_2016.json')
-        instance.AddScaleFactor(path_key    = 'FR',
-                                entry_key   = 'muon_fakerates_2016',
-                                base_str    = 'TTHFakeRates_Muon_2016.json')
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
+                                                entry_key   = 'electron_fakerates_2016',
+                                                base_key    = '{syst}_syst',
+                                                base_str    = 'TTHFakeRates_Electron_2016_{syst}Syst.json',
+                                                format_dict = {'syst':['pt','barrel','norm']})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
+                                                entry_key   = 'muon_fakerates_2016',
+                                                base_key    = '{syst}_syst',
+                                                base_str    = 'TTHFakeRates_Muon_2016_{syst}Syst.json',
+                                                format_dict = {'syst':['pt','barrel','norm']})
 
         #----- 2017 -----#
         # Check links of 2016 #
@@ -159,12 +164,17 @@ class ScaleFactorsbbWW:
                                                 base_str    = "BTagging_{wp}_{flav}_{calib}_subjet_{algo}_2017.json",
                                                 format_dict = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
         #  Fake rates #
-        instance.AddScaleFactor(path_key    = 'FR',
-                                entry_key   = 'electron_fakerates_2017',
-                                base_str    = 'TTHFakeRates_Electron_2017.json')
-        instance.AddScaleFactor(path_key    = 'FR',
-                                entry_key   = 'muon_fakerates_2017',
-                                base_str    = 'TTHFakeRates_Muon_2017.json')
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
+                                                entry_key   = 'electron_fakerates_2017',
+                                                base_key    = '{syst}_syst',
+                                                base_str    = 'TTHFakeRates_Electron_2017_{syst}Syst.json',
+                                                format_dict = {'syst':['pt','barrel','norm']})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
+                                                entry_key   = 'muon_fakerates_2017',
+                                                base_key    = '{syst}_syst',
+                                                base_str    = 'TTHFakeRates_Muon_2017_{syst}Syst.json',
+                                                format_dict = {'syst':['pt','barrel','norm']})
+
 
 
         #----- 2018 -----#
@@ -215,12 +225,17 @@ class ScaleFactorsbbWW:
                                                 format_dict = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
 
         #  Fake rates #
-        instance.AddScaleFactor(path_key    = 'FR',
-                                entry_key   = 'electron_fakerates_2018',
-                                base_str    = 'TTHFakeRates_Electron_2018.json')
-        instance.AddScaleFactor(path_key    = 'FR',
-                                entry_key   = 'muon_fakerates_2018',
-                                base_str    = 'TTHFakeRates_Muon_2018.json')
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
+                                                entry_key   = 'electron_fakerates_2018',
+                                                base_key    = '{syst}_syst',
+                                                base_str    = 'TTHFakeRates_Electron_2018_{syst}Syst.json',
+                                                format_dict = {'syst':['pt','barrel','norm']})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
+                                                entry_key   = 'muon_fakerates_2018',
+                                                base_key    = '{syst}_syst',
+                                                base_str    = 'TTHFakeRates_Muon_2018_{syst}Syst.json',
+                                                format_dict = {'syst':['pt','barrel','norm']})
+
 
 
         # Get full dict #
