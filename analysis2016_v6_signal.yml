@@ -1,0 +1,1498 @@
+tree: Events
+eras:
+  '2016': 
+    luminosity: 35922 
+    luminosity-error: 0.025     
+samples:
+
+######################## Radion 2B2VTo2L2Nu #######################
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-260:
+    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2V, M = 260)
+    type: signal
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-270:
+    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-270_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-270_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2V, M = 270)
+    type: signal
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-300:
+    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-300_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-300_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion2B2V, M = 300)
+    type: signal
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-350:
+    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-350_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-350_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion2B2V, M = 350)
+    type: signal
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-400:
+    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-400_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-400_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion2B2V, M = 400)
+    type: signal
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-450:
+    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion2B2V, M = 450)
+    type: signal
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-500:
+    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion2B2V, M = 500)
+    type: signal
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-550:
+    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-550_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-550_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion2B2V, M = 550)
+    type: signal
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-600:
+    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-600_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-600_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion2B2V, M = 600)
+    type: signal
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-650:
+    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-650_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-650_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion2B2V, M = 650)
+    type: signal
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-750:
+    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion2B2V, M = 750)
+    type: signal
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-800:
+    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-800_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-800_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion2B2V, M = 800)
+    type: signal
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-900:
+    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion2B2V, M = 900)
+    type: signal
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-1000:
+    db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-1000_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2VTo2L2Nu_M-1000_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2V, M = 1000)
+    type: signal
+
+######################## Radion 2B2Tau #######################
+
+  GluGluToRadionToHHTo2B2Tau_M-250:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-250_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-250_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 250)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-260:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-260_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-260_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 260)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-270:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-270_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-270_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 270)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-280:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-280_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-280_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 280)
+    type: signal
+
+  GluGluToRadionToHHTo2B2Tau_M-300:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-300_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-300_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 300)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-320:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-320_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-320_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 320)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-340:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-340_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-340_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 340)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-350:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-350_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-350_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 350)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-400:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-400_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-400_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 400)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-450:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-450_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-450_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 450)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-500:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-500_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-500_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 500)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-550:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-550_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-550_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 550)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-600:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-600_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-600_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 600)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-800:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-800_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-800_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 800)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-900:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-900_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-900_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 900)
+    type: signal
+
+######################## Graviton 2B2VTo2L2Nu #######################
+
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-260:
+    db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-260_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-260_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2V, M = 260)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-270:
+    db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-270_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-270_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2V, M = 270)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-300:
+    db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-300_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-300_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2V, M = 300)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-350:
+    db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-350_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-350_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2V, M = 350)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400:
+    db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2V, M = 400)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450:
+    db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2V, M = 450)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500:
+    db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2V, M = 500)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-550:
+    db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-550_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-550_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2V, M = 550)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-600:
+    db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-600_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-600_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2V, M = 600)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650:
+    db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2V, M = 650)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-700:
+    db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-700_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-700_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2V, M = 700)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-800:
+    db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-800_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-800_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2V, M = 800)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900:
+    db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2V, M = 900)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-1000:
+    db: das:/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-1000_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-1000_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2V, M = 1000)
+    type: signal
+
+######################## Graviton 2B2Tau #######################
+
+  GluGluToBulkGravitonToHHTo2B2Tau_M-250:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-250_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-250_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 250)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-260:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-260_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-260_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 260)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-270:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-270_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-270_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 270)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-280:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-280_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-280_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 280)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-300:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-300_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-300_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 300)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-320:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-320_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-320_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 320)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-340:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-340_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-340_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 340)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-350:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-350_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-350_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 350)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-400:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-400_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-400_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 400)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-450:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-450_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-450_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 450)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-500:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-500_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-500_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 500)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-550:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-550_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-550_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 550)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-600:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-600_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-600_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 600)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-650:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-650_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-650_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 650)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-750:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-750_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-750_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 750)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-800:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-800_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-800_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2Tau, M = 800)
+    type: signal
+
+######################## VBF 2B2VTo2L2Nu #######################
+
+  VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1:
+    db: das:/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2V, CV = 1, C2V = 1, C3 = 1)
+    type: signal
+  VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2:
+    db: das:/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2V, CV = 1, C2V = 1, C3 = 2)
+    type: signal
+  VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1:
+    db: das:/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2V, CV = 1, C2V = 2, C3 = 1)
+    type: signal
+  VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0:
+    db: das:/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2V, CV = 1, C2V = 1, C3 = 0)
+    type: signal
+  VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1:
+    db: das:/VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2V, CV = 1.5, C2V = 1, C3 = 1)
+    type: signal
+  VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1:
+    db: das:/VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2V, CV = 0.5, C2V = 1, C3 = 1)
+    type: signal
+
+######################## VBF 2B2Tau #######################
+
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_0:
+    db: das:/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2Tau, CV = 1, C2V = 1, C3 = 0)
+    type: signal
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_1:
+    db: das:/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2Tau, CV = 1, C2V = 1, C3 = 1)
+    type: signal
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_2:
+    db: das:/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2Tau, CV = 1, C2V = 1, C3 = 2)
+    type: signal
+  VBFHHTo2B2Tau_CV_1_C2V_2_C3_1:
+    db: das:/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2Tau, CV = 1, C2V = 2, C3 = 1)
+    type: signal
+  VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1:
+    db: das:/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2Tau, CV = 1.5, C2V = 1, C3 = 1)
+    type: signal
+  VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1:
+    db: das:/VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2Tau, CV = 0.5, C2V = 1, C3 = 1)
+    type: signal
+
+######################## GluGlu nodes 2B2VTo2L2Nu #######################
+
+  GluGluToHHTo2B2VTo2L2Nu_node_SM:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_SM_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_SM_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2V, node SM)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_box:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_box_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_box_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2V, node box)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_1:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_1_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_1_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2V, node 1)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_3:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_3_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_3_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2V, node 3)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_4:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_4_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_4_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2V, node 4)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_5:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_5_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_5_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2V, node 5)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_6:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_6_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_6_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2V, node 6)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_7:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_7_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_7_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2V, node 7)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_8:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_8_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_8_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2V, node 8)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_9:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_9_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_9_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2V, node 9)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_10:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_10_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_10_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2V, node 10)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_11:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_11_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_11_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2V, node 11)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_12:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_12_13TeV-madgraph-v2/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_12_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2V, node 12)
+    type: signal
+
+######################## GluGlu nodes 2B2Tau #######################
+
+  GluGluToHHTo2B2Tau_node_SM:
+    db: das:/GluGluToHHTo2B2Tau_node_SM_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_SM_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node SM)
+    type: signal
+  GluGluToHHTo2B2Tau_node_box:
+    db: das:/GluGluToHHTo2B2Tau_node_box_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_box_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node box)
+    type: signal
+  GluGluToHHTo2B2Tau_node_2:
+    db: das:/GluGluToHHTo2B2Tau_node_2_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_2_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 2)
+    type: signal
+  GluGluToHHTo2B2Tau_node_9:
+    db: das:/GluGluToHHTo2B2Tau_node_9_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_9_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 9)
+    type: signal
+  GluGluToHHTo2B2Tau_node_10:
+    db: das:/GluGluToHHTo2B2Tau_node_10_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_10_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 10)
+    type: signal
+  GluGluToHHTo2B2Tau_node_11:
+    db: das:/GluGluToHHTo2B2Tau_node_11_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_11_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 11)
+    type: signal
+  GluGluToHHTo2B2Tau_node_12:
+    db: das:/GluGluToHHTo2B2Tau_node_12_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_12_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 12)
+    type: signal
+  GluGluToHHTo2B2Tau_node_13:
+    db: das:/GluGluToHHTo2B2Tau_node_13_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_13_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 13)
+    type: signal
+
+######################## Radion 2B2WToLNu2J #######################
+  GluGluToRadionToHHTo2B2WToLNu2J_M-250:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-250_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-250_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, M = 250)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_M-260:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-260_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-260_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2W, M = 260)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_M-270:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-270_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-270_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2W, M = 270)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_M-300:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-300_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-300_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2W, M = 300)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_M-350:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-350_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-350_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH ()
+    legend: HH (2B2W, M = 350)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_M-400:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-400_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-400_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2W, M = 400)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_M-450:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-450_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-450_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2W, M = 450)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_M-500:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-500_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-500_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2W, M = 500)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_M-550:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-550_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-550_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2W, M = 550)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_M-600:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-600_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-600_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2W, M = 600)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_M-700:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-700_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-700_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2W, M = 700)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_M-800:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-800_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-800_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2W, M = 800)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_M-900:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-900_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-900_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (2B2W, M = 900)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_M-1000:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-1000_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_M-1000_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, M = 1000)
+    type: signal
+
+######################## Graviton 2B2WToLNu2J #######################
+
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-250:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-250_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-250_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 250)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-260:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-260_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-260_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 260)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-270:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-270_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-270_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 270)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-300:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-300_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-300_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 300)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-350:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-350_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-350_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 350)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-400:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-400_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-400_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 400)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-450:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-450_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-450_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 450)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-500:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-500_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-500_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 500)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-550:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-550_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-550_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 550)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-600:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-600_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-600_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 600)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-650:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-650_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-650_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 650)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-700:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-700_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-700_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 700)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-800:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-800_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-800_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 800)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-900:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-900_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-900_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 900)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1000:
+    db: das:/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1000_narrow_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1000_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Graviton 2B2W, M = 1000)
+    type: signal
+
+
+######################## Radion 2B2WToLNu2J node #######################
+  GluGluToRadionToHHTo2B2WToLNu2J_node_SM:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_node_SM_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_node_SM_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, node SM)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_node_box:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_node_box_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_node_box_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, node box)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_node-1:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_node-1_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_node-1_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, node 1)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_node-2:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_node-2_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_node-2_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, node 2)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_node-3:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_node-3_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_node-3_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, node 3)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_node-4:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_node-4_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_node-4_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, node 4)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_node-5:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_node-5_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_node-5_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, node 5)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_node-6:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_node-6_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_node-6_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, node 6)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_node-7:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_node-7_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_node-7_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, node 7)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_node-8:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_node-8_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_node-8_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, node 8)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_node-9:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_node-9_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_node-9_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, node 9)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_node-10:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_node-10_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_node-10_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, node 10)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_node-11:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_node-11_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_node-11_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, node 11)
+    type: signal
+  GluGluToRadionToHHTo2B2WToLNu2J_node-12:
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_node-12_13TeV-madgraph/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2WToLNu2J_node-12_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2016'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2W, node 12)
+    type: signal
+
+######################## PlotIt ##########################
+
+plotIt:
+  configuration:
+    width: 800
+    height: 599
+    luminosity-label: '%1$.2f fb^{-1} (13 TeV)'  #TODO
+    experiment: CMS
+    extra-label: 2016 Data -- Work in progress
+    show-overflow: true
+    margin-left: 0.15
+    margin-right: 0.03
+    margin-top: 0.05 
+    margin-bottom: 0.13
+  legend:
+    position: [0.7, 0.6, 0.91, 0.91]
+  groups:
+    data:
+      legend: data
+    ttbar:
+      fill-color: "#cc7a16"
+      legend: tt
+      order: 1
+    ST:
+      fill-color: "#99053d"
+      legend: Single Top
+      order: 2
+    DY:
+      fill-color: "#1a83a1"
+      legend: Drell-Yan
+      order: 3
+    Wjets:
+      fill-color: "#d95564"
+      legend: W+jets
+      order: 4
+    VVV: 
+      fill-color: "#ccbf45"
+      legend: VV(V)
+      order: 5
+    ttVV:
+      fill-color: "#174704"
+      legend: tt+V(V)
+      order: 6
+    SM:
+      fill-color: "#06b894"
+      legend: SM Higgs (ggH, qqH, ttH, ZH)
+      order: 7
+    Rares:
+      fill-color: "#610596"
+      legend: Rares
+      order: 8
+    DYEstimation:
+      fill-color: "#1a83a1"
+      legend: Drell-Yan (from data)
+      order: 3
+    Fake:
+      fill-color: "#6e3303"
+      legend: Fake
+      order: 9
+  systematics:
+      # on the jets
+    - jer
+    - jesTotal
+      # on the lepton id
+    - mu_loose
+    - mu_tightmva
+    - el_looserecoptlt20
+    - el_looserecoptgt20
+    - el_looseid
+    - el_looseeff
+    - el_tightmva
+     # on the lepton trigger 
+    - ttH_singleElectron_trigSF
+    - ttH_singleMuon_trigSF
+    - ttH_doubleElectron_trigSF 
+    - ttH_doubleMuon_trigSF
+    - ttH_electronMuon_trigSF
+     # on the pileup
+    - pileup
+      # on the jet btagging
+    - deepjet
+    #- deepcsv
+    # Btag SF #
+    - btagSF_lf
+    - btagSF_hf
+    - btagSF_hfstats1
+    - btagSF_hfstats2
+    - btagSF_lfstats1
+    - btagSF_lfstats2
+    - btagSF_cferr1
+    - btagSF_cferr2
+    # Top pt reweighting #
+    - topPtReweighting
+    # Btag reweighting
+    - btag_ratio
+    # DY weight #
+    - dy_reweighting_elel
+    - dy_reweighting_mumu
+    # Fake factor
+    - el_FR_pt_syst
+    - el_FR_barrel_syst
+    - el_FR_norm_syst
+    - electronCorrFR
+    - mu_FR_pt_syst
+    - mu_FR_barrel_syst
+    - mu_FR_norm_syst
+    - muonCorrFR
+

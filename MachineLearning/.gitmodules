@@ -1,0 +1,6 @@
+[submodule "ml-models"]
+	path = ml-models
+	url = https://gitlab.cern.ch/cms-hh-bbww/ml-models.git
+[submodule "MoMEMtaNeuralNet"]
+	path = MoMEMtaNeuralNet
+	url = git@github.com:FlorianBury/MoMEMtaNeuralNet.git

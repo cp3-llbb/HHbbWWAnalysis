@@ -4,7 +4,7 @@ import subprocess
 import argparse
 
 
-def finalize(path,force=True,verbose=False,onlyFailed=False):
+def finalize(path,force=False,verbose=False,onlyFailed=False):
     path = os.path.abspath(path)
 
     with open(os.path.join(path,'batch','input','cluster_id'),'r') as f:
@@ -51,13 +51,14 @@ def finalize(path,force=True,verbose=False,onlyFailed=False):
                     sbatch_cmd += "--qos=%s "%line.split()[-1]
                 if line.startswith('sbatch_time'):
                     sbatch_cmd += "--time=%s "%line.split()[-1]
+                if line.startswith('sbatch_additionalOptions'):
+                    sbatch_cmd += ' '.join(line.replace('sbatch_additionalOptions =','').split(', ')).replace('\n','')+' '
                 if line.startswith('sbatch_mem'):
                     sbatch_cmd += "--mem-per-cpu=%s "%line.split()[-1]
-                if line.startswith('sbatch_additionalOptions'):
-                    sbatch_cmd += ' '.join(line.split()[2:]).replace(',','')+" "
         sbatch_cmd += " "+os.path.join(path,'batch','slurmSubmission.sh')
         print ("Command to resubmit them is below")
         print (sbatch_cmd)
+        return sbatch_cmd
     else:
         print ("All the outputs are present, will hadd them now") 
         if force:
@@ -74,17 +75,19 @@ def finalize(path,force=True,verbose=False,onlyFailed=False):
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
             out, _ = p.communicate()
             print ("   Produced file %s"%os.path.join(path,'results',sample))
+        return 0
 
 
-parser = argparse.ArgumentParser(description='Utility finalize bamboo')
-parser.add_argument('--path', action='store', required=True, type=str, 
-                    help='Path to bamboo output')
-parser.add_argument('--failed', action='store_true', required=False, default=False,
-                    help='Will only resubmit the jobs that have failed (script, time out or memory exhaustion)')
-parser.add_argument('--force', action='store_true', required=False, default=False,
-                    help='Force hadding, dangerous')
-parser.add_argument('--verbose', action='store_true', required=False, default=False,
-                    help='Verbose mode')
-args = parser.parse_args()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Utility finalize bamboo')
+    parser.add_argument('--path', action='store', required=True, type=str, 
+                        help='Path to bamboo output')
+    parser.add_argument('--failed', action='store_true', required=False, default=False,
+                        help='Will only resubmit the jobs that have failed (script, time out or memory exhaustion)')
+    parser.add_argument('--force', action='store_true', required=False, default=False,
+                        help='Force hadding, dangerous')
+    parser.add_argument('--verbose', action='store_true', required=False, default=False,
+                        help='Verbose mode')
+    args = parser.parse_args()
 
-finalize(args.path,args.force,args.verbose,args.failed)
+    finalize(args.path,args.force,args.verbose,args.failed)
