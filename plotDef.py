@@ -594,3 +594,52 @@ def makeHighLevelQuantities(sel,met,l1,l2,j1,j2,suffix,channel):
 
     return plots 
 
+#########################  Machine Learning  ################################
+def makeMachineLearningPlots(sel,l1,l2,jets,suffix,channel,model):
+    plots = []
+
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
+
+    output = model(l1.p4.E(),
+                   l1.p4.Px(),
+                   l1.p4.Py(),
+                   l1.p4.Pz(),
+                   l1.charge,
+                   l1.pdgId,
+                   l2.p4.E(),
+                   l2.p4.Px(),
+                   l2.p4.Py(),
+                   l2.p4.Pz(),
+                   l2.charge,
+                   l2.pdgId,
+                   jets[0].p4.E(),
+                   jets[0].p4.Px(),
+                   jets[0].p4.Py(),
+                   jets[0].p4.Pz(),
+                   jets[0].btagDeepFlavB,
+                   jets[1].p4.E(),
+                   jets[1].p4.Px(),
+                   jets[1].p4.Py(),
+                   jets[1].p4.Pz(),
+                   jets[1].btagDeepFlavB,
+                   op.switch(op.rng_len(jets)>2,jets[2].p4.E(),op.c_float(0.)),
+                   op.switch(op.rng_len(jets)>2,jets[2].p4.Px(),op.c_float(0.)),
+                   op.switch(op.rng_len(jets)>2,jets[2].p4.Py(),op.c_float(0.)),
+                   op.switch(op.rng_len(jets)>2,jets[2].p4.Pz(),op.c_float(0.)),
+                   op.switch(op.rng_len(jets)>2,jets[2].btagDeepFlavB,op.c_float(0.)),
+                   op.switch(op.rng_len(jets)>3,jets[3].p4.E(),op.c_float(0.)),
+                   op.switch(op.rng_len(jets)>3,jets[3].p4.Px(),op.c_float(0.)),
+                   op.switch(op.rng_len(jets)>3,jets[3].p4.Py(),op.c_float(0.)),
+                   op.switch(op.rng_len(jets)>3,jets[3].p4.Pz(),op.c_float(0.)),
+                   op.switch(op.rng_len(jets)>3,jets[3].btagDeepFlavB,op.c_float(0.)))
+
+    for i,node in enumerate(['HH', 'H', 'DY', 'ST', 'ttbar', 'ttVX', 'VVV', 'Rare']):
+        plots.append(Plot.make1D("%s_%s_DNNOutput_%s"%(channel,suffix,node),
+                                 output[i],
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 xTitle = 'DNN output %s'%node,
+                                 plotopts = channelLabel))
+
+    return plots    
+

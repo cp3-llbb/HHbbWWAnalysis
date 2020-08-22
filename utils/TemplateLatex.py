@@ -92,6 +92,7 @@ class TemplateLatex:
                         ("_DijetPT_Ak8bJet_Ak4Jet" , "Dijet $P_T$ of Ak8 and Ak4 jet"),
                         ("_DeltaR_Ak8bJet_Ak4Jet" , "$\Delta$R between Ak8 and Ak4 jet"),
                         # Highlevel variables 
+<<<<<<< HEAD
                         ("_highlevelvariable_DeltaPhi_lep_leadAk4B" , "$\Delta\phi$ of lepton and lead Ak4 b-jet"),
                         ("_highlevelvariable_DeltaPhi_lep_leadAk4" , "$\Delta\phi$ of lepton and lead Ak4 jet"),
                         ("_highlevelvariable_DeltaPhi_lep_subLeadAk4" , "$\Delta\phi$ of lepton and sublead Ak4 jet"),
@@ -107,6 +108,24 @@ class TemplateLatex:
                      #   ("_ElectronJet_DeltaR" , "\Delta R(Electron, Jet)"),
                      #   ("_MuonFatjet_DeltaR" , "\Delta R(Muon, Fatjet)"),
                      #   ("_MuonJet_DeltaR" , "\Delta R(Muon, Fatjet)"),
+=======
+                        ("_highlevelvariable_DilepJetInvariantMass", "Dilepton + Jets invariant mass"),
+                        ("_highlevelvariable_DilepMETpt", "Dilepton-MET $P_T$"),
+                        ("_highlevelvariable_DilepMETdeltaPhi", "Dilepton-MET $|\Delta \phi|$"),
+                        ("_highlevelvariable_mTll", "Dilepton-MET tranverse mass"),
+                        ("_highlevelvariable_mTlljj", "Dilepton-Dijet-MET tranverse mass"),
+                        ("_highlevelvariable_HT2.", "$H_{T2}$ (scalar sum of the magnitudes of the HH decay momentas)"),
+                        ("_highlevelvariable_HT2R.", "$H_{T2}^R$ (ratio of $H_{T2}$ and scalar sum of the transverse momenta HH decay products"),
+                        # Machine Learning
+                        ("_DNNOutput_DY", "DNN Output DY"),
+                        ("_DNNOutput_ttbar", "DNN Output ttbar"),
+                        ("_DNNOutput_H", "DNN Output H"),
+                        ("_DNNOutput_HH", "DNN Output HH"),
+                        ("_DNNOutput_ST", "DNN Output ST"),
+                        ("_DNNOutput_ttVX", "DNN Output ttVX"),
+                        ("_DNNOutput_VVV", "DNN Output VV(V)"),
+                        ("_DNNOutput_Rare", "DNN Output Rare"),
+>>>>>>> f8f424e2b52b6e026e37c69a6ad5ad1b07785e29
                         ])
                 # "_" at beginning is useful to distinguish leading and subleading
                 # "." at end is useful to distinguish "HT2" and "HT2R"

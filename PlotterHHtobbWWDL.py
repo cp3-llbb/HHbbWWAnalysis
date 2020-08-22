@@ -47,6 +47,16 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
     def definePlots(self, t, noSel, sample=None, sampleCfg=None): 
         noSel = super(PlotterNanoHHtobbWWDL,self).prepareObjects(t, noSel, sample, sampleCfg, 'DL')
+        #----- Machine Learning Model -----#                
+        path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','model.pb')
+        if not os.path.exists(path_model):
+            raise RuntimeError('Could not find model file %s'%path_model)
+        try:
+            LBN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(["input_1", "input_2"], "model/output/Softmax"))
+        except:
+            raise RuntimeError('Could not load model %s'%path_model)
+
+        #---- Parameters -----#
 
         plots = []
 
@@ -110,9 +120,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 OSElElDilepton = switch_on_index([0],op.rng_len(self.ElElDileptonTightSel)>=1,self.ElElDileptonTightSel,self.ElElDileptonFakeExtrapolationSel)
                 OSMuMuDilepton = switch_on_index([0],op.rng_len(self.MuMuDileptonTightSel)>=1,self.MuMuDileptonTightSel,self.MuMuDileptonFakeExtrapolationSel)
                 OSElMuDilepton = switch_on_index([0],op.rng_len(self.ElMuDileptonTightSel)>=1,self.ElMuDileptonTightSel,self.ElMuDileptonFakeExtrapolationSel)
-#                OSElElDilepton = [self.ElElDileptonFakeSel[op.switch(op.rng_len(self.ElElDileptonTightSel)>=1,self.ElElDileptonTightSel[0].index,self.ElElDileptonFakeExtrapolationSel[0].index)]]
-#                OSMuMuDilepton = [self.MuMuDileptonFakeSel[op.switch(op.rng_len(self.MuMuDileptonTightSel)>=1,self.MuMuDileptonTightSel[0].index,self.MuMuDileptonFakeExtrapolationSel[0].index)]]
-#                OSElMuDilepton = [self.ElMuDileptonFakeSel[op.switch(op.rng_len(self.ElMuDileptonTightSel)>=1,self.ElMuDileptonTightSel[0].index,self.ElMuDileptonFakeExtrapolationSel[0].index)]]
             elif selectionType == "FakeExtrapolation":
                 OSElElDilepton = self.ElElDileptonFakeExtrapolationSel
                 OSMuMuDilepton = self.MuMuDileptonFakeExtrapolationSel
@@ -210,9 +217,9 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 #----- select the jets -----#
                 aka4JetsByBtagScore = op.sort(self.ak4Jets, lambda jet : -jet.btagDeepFlavB)
 
-                container0b2j = [ t.Jet[self.ak4LightJets[i].idx] for i in range(2) ]
+                container0b2j = [ t.Jet[self.ak4LightJetsByBtagScore[i].idx] for i in range(2) ]
                 container1b1j = [ t.Jet[op.switch(op.rng_len(self.ak4BJets) == 1, self.ak4BJets[0].idx,  aka4JetsByBtagScore[0].idx)] ,
-                                  t.Jet[op.switch(op.rng_len(self.ak4BJets) == 1, self.ak4LightJets[0].idx,  aka4JetsByBtagScore[1].idx)]]
+                                  t.Jet[op.switch(op.rng_len(self.ak4BJets) == 1, self.ak4LightJetsByBtagScore[0].idx,  aka4JetsByBtagScore[1].idx)]]
                 container2b0j = [ t.Jet[op.switch(op.rng_len(self.ak4BJets) >= 2, self.ak4BJets[i].idx, aka4JetsByBtagScore[i].idx)] for i in range(2) ]
 
                 ChannelDictList = []
@@ -340,6 +347,39 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             for channelDict in ChannelDictList:
                 plots.extend(makeHighLevelQuantities(**channelDict))
 
+            #----- Machine Learning plots -----#
+            selObjectDictList = []
+            if not self.args.OnlyYield:
+                if "Ak4" in jetplot_level:
+                    selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjectDileptonAk4Jets})
+                    selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjectDileptonAk4Jets})
+                    selObjectDictList.append({'channel':'ElMu','selObject':ElMuSelObjectDileptonAk4Jets})
+#                if "Ak8" in jetplot_level:
+#                    selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjectDileptonAk8Jets})
+#                    selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjectDileptonAk8Jets})
+#                    selObjectDictList.append({'channel':'ElMu','selObject':ElMuSelObjectDileptonAk8Jets})
+                if "Resolved0Btag" in jetplot_level:
+                    selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjectDileptonAk4JetsExclusiveResolvedNoBtag})
+                    selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjectDileptonAk4JetsExclusiveResolvedNoBtag})
+                    selObjectDictList.append({'channel':'ElMu','selObject':ElMuSelObjectDileptonAk4JetsExclusiveResolvedNoBtag})
+                if "Resolved1Btag" in jetplot_level:
+                    selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjectDileptonAk4JetsExclusiveResolvedOneBtag})
+                    selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjectDileptonAk4JetsExclusiveResolvedOneBtag})
+                    selObjectDictList.append({'channel':'ElMu','selObject':ElMuSelObjectDileptonAk4JetsExclusiveResolvedOneBtag})
+                if "Resolved2Btag" in jetplot_level:
+                    selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjectDileptonAk4JetsExclusiveResolvedTwoBtags})
+                    selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjectDileptonAk4JetsExclusiveResolvedTwoBtags})
+                    selObjectDictList.append({'channel':'ElMu','selObject':ElMuSelObjectDileptonAk4JetsExclusiveResolvedTwoBtags})
+#                if "Boosted" in jetplot_level:
+#                    selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjectDileptonAk8JetsInclusiveBoosted})
+#                    selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjectDileptonAk8JetsInclusiveBoosted})
+#                    selObjectDictList.append({'channel':'ElMu','selObject':ElMuSelObjectDileptonAk8JetsInclusiveBoosted})
+
+            dileptons = {'ElEl':OSElElDilepton[0],'MuMu':OSMuMuDilepton[0],'ElMu':OSElMuDilepton[0]}
+            for selObjectDict in selObjectDictList:
+                dilepton = dileptons[selObjectDict['channel']]
+                plots.extend(makeMachineLearningPlots(channel=selObjectDict['channel'],l1=dilepton[0],l2=dilepton[1],jets=self.ak4Jets,sel=selObjectDict['selObject'].sel,suffix=selObjectDict['selObject'].selName,model=LBN))
+    
         #----- Add the Yield plots -----#
         plots.extend(self.yieldPlots.returnPlots())
 

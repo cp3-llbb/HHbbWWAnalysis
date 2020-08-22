@@ -11,26 +11,21 @@ import bamboo
 from bamboo.analysismodules import HistogramsModule, DataDrivenBackgroundHistogramsModule
 
 from bamboo import treefunctions as op
-from bamboo.plots import CutFlowReport
+from bamboo.plots import CutFlowReport, Plot, EquidistantBinning, SummedPlot
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)))) # Add scripts in this directory
 from BaseHHtobbWWSL import BaseNanoHHtobbWW
 from plotDefSL import *
 from selectionDefSL import *
 from highlevelLambdasSL import *
-from fakeHelper import DataDrivenFake
+#from fakeHelper import DataDrivenFake
+from DDHelper import DataDrivenFake, DataDrivenDY
 
-
-def switch_getitem(index, condition, contA, contB,comb=False):
-    ## use as switch_getitem(0, has_good_jets, good_jets, bad_jets)
+def switch_on_index(indexes, condition, contA, contB):
     if contA._base != contB._base:
         raise RuntimeError("The containers do not derive from the same base, this won't work")
     base = contA._base
-    #print (isinstance(contA[index],bamboo.treeproxies.CombinationProxy))
-    if comb:
-        return op.switch(condition, base[contA[index].index], base[contB[index].index])
-    else:
-        return op.switch(condition, base[contA[index].idx], base[contB[index].idx])
+    return [base[op.switch(condition, contA[index].idx, contB[index].idx)] for index in indexes]       
 
 
 #===============================================================================================#
@@ -47,6 +42,9 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         if "FakeExtrapolation" in self.datadrivenContributions:
             contrib = self.datadrivenContributions["FakeExtrapolation"]
             self.datadrivenContributions["FakeExtrapolation"] = DataDrivenFake(contrib.name, contrib.config)
+        if "DYEstimation" in self.datadrivenContributions: 
+            contrib = self.datadrivenContributions["DYEstimation"]
+            self.datadrivenContributions["DYEstimation"] = DataDrivenDY(contrib.name, contrib.config)
 
 
     def definePlots(self, t, noSel, sample=None, sampleCfg=None): 
@@ -67,6 +65,18 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         #----- Ratio reweighting variables (before lepton and jet selection) -----#
         if self.args.BtagReweightingOff or self.args.BtagReweightingOn:
             plots.append(objectsNumberPlot(channel="NoChannel",suffix='NoSelection',sel=noSel,objCont=self.ak4Jets,objName='Ak4Jets',Nmax=15,xTitle='N(Ak4 jets)'))
+            plots.append(CutFlowReport("BtagReweightingCutFlowReport",noSel))
+            return plots
+
+        #----- Stitching study -----#
+        if self.args.DYStitchingPlots or self.args.WJetsStitchingPlots:
+            if self.args.DYStitchingPlots and sampleCfg['group'] != 'DY':
+                raise RuntimeError("Stitching is only done on DY MC samples")
+            if self.args.WJetsStitchingPlots and sampleCfg['group'] != 'Wjets':
+                raise RuntimeError("Stitching is only done on WJets MC samples")
+            plots.extend(makeLHEPlots(noSel,t.LHE))
+            plots.append(objectsNumberPlot(channel="NoChannel",suffix='NoSelection',sel=noSel,objCont=self.ak4Jets,objName='Ak4Jets',Nmax=15,xTitle='N(Ak4 jets)'))
+            plots.append(CutFlowReport("DYStitchingCutFlowReport",noSel))
             return plots
 
 

@@ -98,8 +98,9 @@ class ScaleFactorsbbWW:
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
                                                 entry_key   = 'DY_2016',
                                                 base_key    = '{channel}_{type}_{btag}',
-                                                base_str    = 'weight_firstLeptonPtVSLeadjetPt_{channel}_{type}_2D_weight_{btag}_2016.json',
+                                                #base_str    = 'weight_firstLeptonPtVSLeadjetPt_{channel}_{type}_2D_weight_{btag}_2016.json',
                                                 #base_str    = 'weight_firstleptonPtVsEta_{channel}_{type}_2D_weight_{btag}_2016.json',
+                                                base_str    = 'weight_leadjetPt_{channel}_{type}_1D_weight_{btag}_2016.json',
                                                 format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b']})
 
         #  Fake rates #

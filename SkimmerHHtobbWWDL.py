@@ -288,39 +288,47 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             raise RuntimeError("You need to specify --Channel")
         dilepton = None
         if self.args.Preselected:
-            if self.args.Channel == "ElEl": dilepton = self.OSElElDileptonPreSel[0] 
-            if self.args.Channel == "MuMu": dilepton = self.OSMuMuDileptonPreSel[0]
-            if self.args.Channel == "ElMu": dilepton = self.OSElMuDileptonPreSel[0]
+            if self.args.Channel == "ElEl": dilepton = self.ElElDileptonPreSel[0] 
+            if self.args.Channel == "MuMu": dilepton = self.MuMuDileptonPreSel[0]
+            if self.args.Channel == "ElMu": dilepton = self.ElMuDileptonPreSel[0]
         if self.args.Fakeable:
-            if self.args.Channel == "ElEl": dilepton = self.OSElElDileptonFakeSel[0]
-            if self.args.Channel == "MuMu": dilepton = self.OSMuMuDileptonFakeSel[0]
-            if self.args.Channel == "ElMu": dilepton = self.OSElMuDileptonFakeSel[0]
+            if self.args.Channel == "ElEl": dilepton = self.ElElDileptonFakeSel[0]
+            if self.args.Channel == "MuMu": dilepton = self.MuMuDileptonFakeSel[0]
+            if self.args.Channel == "ElMu": dilepton = self.ElMuDileptonFakeSel[0]
         if self.args.Tight:
-            if self.args.Channel == "ElEl": dilepton = self.OSElElDileptonTightSel[0]
-            if self.args.Channel == "MuMu": dilepton = self.OSMuMuDileptonTightSel[0]
-            if self.args.Channel == "ElMu": dilepton = self.OSElMuDileptonTightSel[0]
+            if self.args.Channel == "ElEl": dilepton = self.ElElDileptonTightSel[0]
+            if self.args.Channel == "MuMu": dilepton = self.MuMuDileptonTightSel[0]
+            if self.args.Channel == "ElMu": dilepton = self.ElMuDileptonTightSel[0]
         if self.args.FakeExtrapolation:
-            if self.args.Channel == "ElEl": dilepton = self.OSElElDileptonFakeExtrapolationSel[0]
-            if self.args.Channel == "MuMu": dilepton = self.OSMuMuDileptonFakeExtrapolationSel[0]
-            if self.args.Channel == "ElMu": dilepton = self.OSElMuDileptonFakeExtrapolationSel[0]
+            if self.args.Channel == "ElEl": dilepton = self.ElElDileptonFakeExtrapolationSel[0]
+            if self.args.Channel == "MuMu": dilepton = self.MuMuDileptonFakeExtrapolationSel[0]
+            if self.args.Channel == "ElMu": dilepton = self.ElMuDileptonFakeExtrapolationSel[0]
 
+        varsToKeep['l1_Px']  = dilepton[0].p4.Px()
+        varsToKeep['l1_Py']  = dilepton[0].p4.Py()
+        varsToKeep['l1_Pz']  = dilepton[0].p4.Pz()
+        varsToKeep['l1_E']   = dilepton[0].p4.E()
         varsToKeep['l1_pt']  = dilepton[0].pt
         varsToKeep['l1_eta'] = dilepton[0].eta
         varsToKeep['l1_phi'] = dilepton[0].phi
 
+        varsToKeep['l2_Px']  = dilepton[1].p4.Px()
+        varsToKeep['l2_Py']  = dilepton[1].p4.Py()
+        varsToKeep['l2_Pz']  = dilepton[1].p4.Pz()
+        varsToKeep['l2_E']   = dilepton[1].p4.E()
         varsToKeep['l2_pt']  = dilepton[1].pt
         varsToKeep['l2_eta'] = dilepton[1].eta
         varsToKeep['l2_phi'] = dilepton[1].phi
 
-        varsToKeep['PT_ll'] = (dilepton[0].p4+dilepton[1].p4).Pt()
-        varsToKeep['DR_ll'] = op.deltaR(dilepton[0].p4,dilepton[1].p4)
-        varsToKeep['DPhi_ll'] = op.deltaPhi(dilepton[0].p4,dilepton[1].p4) # Might need abs
+        varsToKeep['ll_pt'] = (dilepton[0].p4+dilepton[1].p4).Pt()
+        varsToKeep['ll_DR'] = op.deltaR(dilepton[0].p4,dilepton[1].p4)
+        varsToKeep['ll_DPhi'] = op.deltaPhi(dilepton[0].p4,dilepton[1].p4) # Might need abs
 
-        varsToKeep['DPhi_llmet'] = DilepMET_deltaPhi(dilepton[0],dilepton[1],MET)
-        varsToKeep['PT_llmet'] = DilepMET_Pt(dilepton[0],dilepton[1],MET)
+        varsToKeep['llmet_DPhi'] = DilepMET_deltaPhi(dilepton[0],dilepton[1],MET)
+        varsToKeep['llmet_pt'] = DilepMET_Pt(dilepton[0],dilepton[1],MET)
 
-        varsToKeep['M_ll'] = op.invariant_mass(dilepton[0].p4,dilepton[1].p4) 
-        varsToKeep['MT_ll'] = MT_ll(dilepton[0],dilepton[1],MET)
+        varsToKeep['ll_M'] = op.invariant_mass(dilepton[0].p4,dilepton[1].p4) 
+        varsToKeep['ll_MT'] = MT_ll(dilepton[0],dilepton[1],MET)
 
         #----- Jet variables -----#
         if any([self.args.__dict__[item] for item in ["Ak4","Resolved0Btag","Resolved1Btag","Resolved2Btag"]]):
@@ -328,31 +336,39 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                 leadjet = self.ak4Jets[0]
                 subleadjet = self.ak4Jets[1]
             if self.args.Resolved0Btag:
-                leadjet = self.ak4LightJets[0]
-                subleadjet = self.ak4LightJets[1]
+                leadjet = self.ak4LightJetsByBtagScore[0]
+                subleadjet = self.ak4LightJetsByBtagScore[1]
             if self.args.Resolved1Btag:
                 leadjet = self.ak4BJets[0]
-                subleadjet = self.ak4LightJets[1]
+                subleadjet = self.ak4LightJetsByBtagScore[1]
             if self.args.Resolved2Btag:
                 leadjet = self.ak4BJets[0]
                 subleadjet = self.ak4BJets[1]
 
+            varsToKeep['j1_Px']  = leadjet.p4.Px()
+            varsToKeep['j1_Py']  = leadjet.p4.Py()
+            varsToKeep['j1_Pz']  = leadjet.p4.Pz()
+            varsToKeep['j1_E']   = leadjet.p4.E()
             varsToKeep['j1_pt']  = leadjet.pt
             varsToKeep['j1_eta'] = leadjet.eta
             varsToKeep['j1_phi'] = leadjet.phi
 
+            varsToKeep['j2_Px']  = leadjet.p4.Px()
+            varsToKeep['j2_Py']  = leadjet.p4.Py()
+            varsToKeep['j2_Pz']  = leadjet.p4.Pz()
+            varsToKeep['j2_E']   = leadjet.p4.E()
             varsToKeep['j2_pt']  = subleadjet.pt
             varsToKeep['j2_eta'] = subleadjet.eta
             varsToKeep['j2_phi'] = subleadjet.phi
 
-            varsToKeep['PT_jj'] = (leadjet.p4+subleadjet.p4).Pt()
-            varsToKeep['DR_jj'] = op.deltaR(leadjet.p4,subleadjet.p4)
-            varsToKeep['DPhi_jj'] = op.deltaPhi(leadjet.p4,subleadjet.p4) # Might need abs
-            varsToKeep['M_jj'] = op.invariant_mass(leadjet.p4,subleadjet.p4) 
+            varsToKeep['jj_pt'] = (leadjet.p4+subleadjet.p4).Pt()
+            varsToKeep['jj_DR'] = op.deltaR(leadjet.p4,subleadjet.p4)
+            varsToKeep['jj_DPhi'] = op.deltaPhi(leadjet.p4,subleadjet.p4) # Might need abs
+            varsToKeep['jj_M'] = op.invariant_mass(leadjet.p4,subleadjet.p4) 
 
-            varsToKeep['M_lljj'] = M_lljj(dilepton[0],dilepton[1],leadjet,subleadjet)
-            varsToKeep['MT_lljj'] = MT_lljj(dilepton[0],dilepton[1],leadjet,subleadjet,MET)
-            varsToKeep['MinDR_lj'] = MinDR_lj(dilepton[0],dilepton[1],leadjet,subleadjet)
+            varsToKeep['lljj_M'] = M_lljj(dilepton[0],dilepton[1],leadjet,subleadjet)
+            varsToKeep['lljj_MT'] = MT_lljj(dilepton[0],dilepton[1],leadjet,subleadjet,MET)
+            varsToKeep['lj_MinDR'] = MinDR_lj(dilepton[0],dilepton[1],leadjet,subleadjet)
             varsToKeep['HT2'] = HT2(dilepton[0],dilepton[1],leadjet,subleadjet,MET)
             varsToKeep['HT2R'] = HT2R(dilepton[0],dilepton[1],leadjet,subleadjet,MET)
 
@@ -363,18 +379,23 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             if self.args.Boosted:
                 fatjet = self.ak8BJets[0]
 
+            varsToKeep['fatjet_Px']  = fatjet.p4.Px()
+            varsToKeep['fatjet_Py']  = fatjet.p4.Py()
+            varsToKeep['fatjet_Pz']  = fatjet.p4.Pz()
+            varsToKeep['fatjet_E']   = fatjet.p4.E()
             varsToKeep['fatjet_pt']  = fatjet.pt
             varsToKeep['fatjet_eta'] = fatjet.eta
             varsToKeep['fatjet_phi'] = fatjet.phi
             varsToKeep['fatjet_softdropMass'] = fatjet.msoftdrop
 
-            varsToKeep['M_lljj'] = op.invariant_mass(dilepton[0],dilepton[1],fatjet.subJet1,fatjet.subJet2)
-            varsToKeep['MT_lljj'] = MT_lljj(dilepton[0],dilepton[1],fatjet.subJet1,fatjet.subJet2,MET)
-            varsToKeep['MinDR_lj'] = MinDR_lj(dilepton[0],dilepton[1],fatjet.subJet1,fatjet.subJet2)
+            varsToKeep['lljj_M'] = op.invariant_mass(dilepton[0],dilepton[1],fatjet.subJet1,fatjet.subJet2)
+            varsToKeep['lljj_MT'] = MT_lljj(dilepton[0],dilepton[1],fatjet.subJet1,fatjet.subJet2,MET)
+            varsToKeep['lj_MinDR'] = MinDR_lj(dilepton[0],dilepton[1],fatjet.subJet1,fatjet.subJet2)
             varsToKeep['HT2'] = HT2(dilepton[0],dilepton[1],fatjet.subJet1,fatjet.subJet2,MET)
             varsToKeep['HT2R'] = HT2R(dilepton[0],dilepton[1],fatjet.subJet1,fatjet.subJet2,MET)
 
         #----- Additional variables -----#
+        varsToKeep["MC_weight"] = t.genWeight
         varsToKeep['total_weight'] = selObj.sel.weight
 
         #return leptonSel.sel, varsToKeep
