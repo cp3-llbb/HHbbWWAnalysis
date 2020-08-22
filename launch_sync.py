@@ -140,7 +140,7 @@ def selectEra(args,era):
     
 
 
-parser = argparse.ArgumentParser(description='Integration with Cuba')
+parser = argparse.ArgumentParser(description='Launch sync trees')
 parser.add_argument('--remove', action='store_true', required=False, default=False,
                     help='Clears the sync directories')
 parser.add_argument('--send', action='store_true', required=False, default=False,
