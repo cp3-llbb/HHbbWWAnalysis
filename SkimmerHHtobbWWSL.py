@@ -6,9 +6,9 @@ from bamboo import treefunctions as op
 from bamboo.analysisutils import makePileupWeight
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)))) # Add scripts in this directory
-from BaseHHtobbWW import BaseNanoHHtobbWW
-from selectionDef import *
-from highlevelLambdas import *
+from BaseHHtobbWWSL import BaseNanoHHtobbWW
+from selectionDefSL import *
+from highlevelLambdasSL import *
 
 #===============================================================================================#
 #                                 SkimmerHHtobbWW                                               #
@@ -20,7 +20,7 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
 
     def defineSkimSelection(self, t, noSel, sample=None, sampleCfg=None): 
         noSel = super(SkimmerNanoHHtobbWWSL,self).prepareObjects(t, noSel, sample, sampleCfg, "SL", forSkimmer=True)
-            # For the Skimmer, SF must not use defineOnFirstUse -> segmentation fault
+        # For the Skimmer, SF must not use defineOnFirstUse -> segmentation fault
 
         era = sampleCfg['era'] 
 
