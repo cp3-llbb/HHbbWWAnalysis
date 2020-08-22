@@ -7,31 +7,33 @@ import root_numpy
 import math
 import numpy as np
 from pprint import pprint
-
 import ROOT
 
 
 class DataCard:
-    def __init__(self,path,groups,hist_conv,era):
+    def __init__(self,datacardName,path,yamlName,groups,hist_conv,era,use_syst=False,root_subdir=None):
+        self.datacardName = datacardName
         self.path = path
         self.groups = groups
         self.hist_conv = hist_conv
-        self.era = era
+        self.era = str(era)
+        self.use_syst = use_syst
+        self.root_subdir = root_subdir
         self.content = {k:{g:None for g in self.groups.keys()} for k in self.hist_conv.keys()}
 
-        self.yaml_dict = self.loadYaml(os.path.join(self.path,'plots.yml'))
+        self.yaml_dict = self.loadYaml(os.path.join(self.path,yamlName))
         self.loopOverFiles()
-        pprint (self.content)
         self.saveDatacard()
 
     def loopOverFiles(self):
         for f in glob.glob(os.path.join(self.path,'results','*.root')):
+            if '__skeleton__' in f:
+                continue
             sample = os.path.basename(f)
             # Check if in the group list #
             group = self.findGroup(sample)
             if group is None:
-                print ("[WARNING] Could not find sample %s in group list"%sample)
-                continue
+                raise RuntimeError("[WARNING] Could not find sample %s in group list"%sample)
 
             hist_dict = self.getHistograms(f)
             self.addSampleToGroup(hist_dict,group)
@@ -47,7 +49,7 @@ class DataCard:
         gr = None
         for key,val in self.groups.items():
             if not isinstance(val,list):
-                raise RuntimeError("Unvalid group dict")
+                raise RuntimeError("Group %s does not consist in a lost"%key)
             if sample in val:
                 gr = key
                 break
@@ -62,6 +64,11 @@ class DataCard:
         if sample_type == "mc" or sample_type == "signal":
             xsec = self.yaml_dict["samples"][sample]['cross-section']
             sumweight = self.yaml_dict["samples"][sample]['generated-events']
+            br = self.yaml_dict["samples"][sample]["branching-ratio"] if "branching-ratio" in self.yaml_dict["samples"][sample].keys() else 1
+        else:
+            xsec = None
+            sumweight = None
+            br = None
 
         # Get list of hist names #
         list_histnames = self.getHistList(f)
@@ -73,37 +80,28 @@ class DataCard:
             if not histname in list_histnames:
                 print ("Could not find hist %s in %s"%(histname,rootfile))
                 continue
-            listsyst = [hn for hn in list_histnames if histname in hn and '__' in hn]
-            h = self.getHistogram(f,histname,listsyst)
-            # Normalize hist to data #
-            if sample_type == "mc" or sample_type == "signal":
-                h.Scale(lumi*xsec/sumweight)
-            # Save in dict #
+            listsyst = [hn for hn in list_histnames if histname in hn and '__' in hn] if self.use_syst else []
+            # Nominal histogram #
+            h = self.getHistogram(f,histname,lumi,br,xsec,sumweight)
             hist_dict[datacardname] = h
+            # Systematic histograms #
+            for syst in listsyst:
+                systName = syst.split('__')[-1]
+                systName.replace('up','Up')
+                systName.replace('down','Down')
+                h = self.getHistogram(f,syst,lumi,br,xsec,sumweight)
+                hist_dict[datacardname+'_'+systName] = h
+            # Save in dict #
         f.Close()
         return hist_dict
 
     @staticmethod
-    def getHistogram(f,histnom,listsyst):
+    def getHistogram(f,histnom,lumi=None,xsec=None,br=None,sumweight=None):
         # Get hist #
         h = copy.deepcopy(f.Get(histnom))
-        if len(listsyst) != 0:
-            dict_syst = {}
-            nom_cont = root_numpy.hist2array(h,include_overflow=True,copy=True)
-            for syst in listsyst:
-                s = syst.replace(histnom,'').replace('__','')
-                hs = f.Get(syst)
-                dict_syst[s] = np.abs(root_numpy.hist2array(hs,include_overflow=True,copy=True)-nom_cont)
-            # Get maximum var for each sys and add quadraticaly #
-            syst_names = [n[:-2] for n in dict_syst.keys() if n.endswith('up')]
-            syst_tot_squared = np.zeros(nom_cont.shape[0])
-            for syst_name in syst_names:
-                maxvar = np.maximum(dict_syst[syst_name+'down'],dict_syst[syst_name+'up'])
-                syst_tot_squared += np.power(maxvar,2)
-            for i in range(h.GetNbinsX()):
-                err = h.GetBinError(i)
-                new_err = math.sqrt(err**2+syst_tot_squared[i])
-                h.SetBinError(i,new_err)
+        # Normalize hist to data #
+        if lumi is not None and xsec is not None and br is not None and sumweight is not None:
+            h.Scale(lumi*xsec*br/sumweight)
         return h
              
     
@@ -134,15 +132,16 @@ class DataCard:
 
 
     def saveDatacard(self):
-        path_datacard = os.path.join(os.path.abspath(os.path.dirname(__file__)),'datacards')
+        path_datacard = os.path.join(os.path.abspath(os.path.dirname(__file__)),self.datacardName)
         if not os.path.exists(path_datacard):
             os.makedirs(path_datacard)
         for key, gdict in self.content.items():
             # Create file #
             filename = os.path.join(path_datacard,key+'_'+self.era+'.root')
             f = ROOT.TFile(filename,'recreate')
-            d = f.mkdir("HH_2l_0tau","HH_2l_0tau")
-            d.cd()
+            if self.root_subdir is not None:
+                d = f.mkdir(self.root_subdir,self.root_subdir)
+                d.cd()
             for group,hist in gdict.items():
                 if hist is None:
                     continue
@@ -157,104 +156,8 @@ class DataCard:
 
 
 if __name__=="__main__":
-    path = '/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/BambooOutputHHtobbWW/full2016_tight_noSyst/'
-    groups = {'TTZ':   ['TTZToQQ.root','TTZToLLNuNu.root'],
-              'TH' :   [],
-              'VH' :   ['HZJ_HToWW.root',
-                        'ggZH_HToBB_ZToLL.root',
-                        'ggZH_HToBB_ZToNuNu.root'],
-              'TT' :   ['TTTo2L2Nu.root',
-                        'TTToSemiLeptonic.root',
-                        'TTToHadronic.root'],
-              'TTW':   ['TTWJetsToQQ.root',
-                        'TTWJetsToLNu.root'],
-              'WW' :   ['WWToLNuQQ.root',
-                        'WWTo2L2Nu.root',
-                        'WJetsToLNu.root'],
-              'TTH':   ['ttHTobb.root',
-                        'ttHToNonbb.root'],
-              'ZZ' :   ['ZZTo2L2Nu.root',
-                        'ZZTo2L2Q.root',
-                        'ZZTo4L.root'],
-              'DY' :   ['DYJetsToLL_M-10to50.root',
-                        'DYToLL_0J.root',
-                        'DYToLL_1J.root',
-                        'DYToLL_2J.root'],
-              'Other': ['ST_tW_top_5f.root',
-                        'ST_tW_antitop_5f.root',
-                        'ST_tchannel_antitop_4f.root',
-                        'ST_tchannel_top_4f.root',
-                        'WWW.root',
-                        'WWZ.root',
-                        'WZZ.root',
-                        'ZZZ.root'],
-              'WZ' :   ['WZTo2L2Q.root',
-                        'WZTo1L3Nu.root',
-                        'WZ1L1Nu2Q.root',
-                        'WZ1L1Nu2Q.root',
-                        'WZTo3LNu.root'],
-              'TTWW' : [],
-              'data_fake': [],
-              'data_obs' : ['DoubleEGamma_2016B.root',
-                            'DoubleEGamma_2016C.root',
-                            'DoubleEGamma_2016D.root',
-                            'DoubleEGamma_2016E.root',
-                            'DoubleEGamma_2016F.root',
-                            'DoubleEGamma_2016G.root',
-                            'DoubleEGamma_2016H.root',
-                            'DoubleMuon_2016B.root',
-                            'DoubleMuon_2016C.root',
-                            'DoubleMuon_2016D.root',
-                            'DoubleMuon_2016E.root',
-                            'DoubleMuon_2016F.root',
-                            'DoubleMuon_2016G.root',
-                            'DoubleMuon_2016H.root',
-                            'MuonEG_2016B.root',
-                            'MuonEG_2016C.root',
-                            'MuonEG_2016D.root',
-                            'MuonEG_2016E.root',
-                            'MuonEG_2016F.root',
-                            'MuonEG_2016G.root',
-                            'MuonEG_2016H.root',
-                            'SingleElectron_2016B.root',
-                            'SingleElectron_2016C.root',
-                            'SingleElectron_2016D.root',
-                            'SingleElectron_2016E.root',
-                            'SingleElectron_2016F.root',
-                            'SingleElectron_2016G.root',
-                            'SingleElectron_2016H.root',
-                            'SingleMuon_2016B.root',
-                            'SingleMuon_2016C.root',
-                            'SingleMuon_2016D.root',
-                            'SingleMuon_2016E.root',
-                            'SingleMuon_2016F.root',
-                            'SingleMuon_2016G.root',
-                            'SingleMuon_2016H.root']}    
-
-    hists = {'HH_cat_ee_1b_jet1_pt' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt',
-             'HH_cat_mm_1b_jet1_pt' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt',
-             'HH_cat_em_1b_jet1_pt' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt',
-             'HH_cat_ee_2b_jet1_pt' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt',
-             'HH_cat_mm_2b_jet1_pt' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt',
-             'HH_cat_em_2b_jet1_pt' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt',
-             'HH_cat_ee_1b_lep1_pt' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_pt',
-             'HH_cat_mm_1b_lep1_pt' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_pt',
-             'HH_cat_em_1b_lep1_pt' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_pt',
-             'HH_cat_ee_2b_lep1_pt' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt',
-             'HH_cat_mm_2b_lep1_pt' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt',
-             'HH_cat_em_2b_lep1_pt' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt',
-             'HH_cat_ee_1b_jet1_eta' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_eta',
-             'HH_cat_mm_1b_jet1_eta' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_eta',
-             'HH_cat_em_1b_jet1_eta' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_eta',
-             'HH_cat_ee_2b_jet1_eta' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_eta',
-             'HH_cat_mm_2b_jet1_eta' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_eta',
-             'HH_cat_em_2b_jet1_eta' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_eta',
-             'HH_cat_ee_1b_lep1_eta' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_eta',
-             'HH_cat_mm_1b_lep1_eta' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_eta',
-             'HH_cat_em_1b_lep1_eta' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_eta',
-             'HH_cat_ee_2b_lep1_eta' : 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_eta',
-             'HH_cat_mm_2b_lep1_eta' : 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_eta',
-             'HH_cat_em_2b_lep1_eta' : 'ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_eta',
-            }
-
-    instance = DataCard(path,groups,hists,'2016')
+    if len(sys.argv) !=2:
+        raise RuntimeError("Must provide the YAML file")
+    with open(sys.argv[1],'r') as handle:
+        f = yaml.load(handle)
+    instance = DataCard(datacardName=sys.argv[1].replace('.yml',''),**f)

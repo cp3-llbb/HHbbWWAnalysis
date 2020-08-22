@@ -114,6 +114,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
     selectionDict = {}
 
     if "Preselected" in sel_level:
+        print('... PreSelected Lepton Selection ===>')
         ElPreSelObject = SelectionObject(sel          = baseSel,
                                          selName      = "HasElPreselected",
                                          yieldTitle   = "Preselected lepton (channel $e^+/e^-$)")
@@ -134,6 +135,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
 
         #--- Fakeable ---#
         if "Fakeable" in sel_level:
+            print('... Fakeable Lepton Selection ===>')
             ElFakeSelObject = SelectionObject(sel         = ElPreSelObject.sel,
                                               selName     = "HasElFakeable",
                                               yieldTitle  = "Fakeable lepton (channel $e^+/e^-$)")
@@ -162,12 +164,14 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
             
             mllCut = [lambda_lowMllCut(self.ElElDileptonPreSel),lambda_lowMllCut(self.MuMuDileptonPreSel),lambda_lowMllCut(self.ElMuDileptonPreSel)]
 
+            print ('...... LowMass resonance veto')
             ElEl_MllCut = copy(mllCut)
             MuMu_MllCut = copy(mllCut)
             ElMu_MllCut = copy(mllCut)
 
             if not self.args.NoZVeto: # No Mz cut in OS leptons
                 # All the preselected leptons outside Z peak region within 10 GeV
+                print ('...... Z veto')
                 ElFakeSelObject.selName += "OutZ"
                 MuFakeSelObject.selName += "OutZ"
 
@@ -191,6 +195,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                 
             if not self.args.NoTauVeto: # nTau (isolated from fakeable leptons) = 0
                 # All the preselected leptons outside Z peak region within 10 GeV
+                print ('...... Tau veto')
                 ElFakeSelObject.selName += "noTau"
                 MuFakeSelObject.selName += "noTau"
 
@@ -204,13 +209,14 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                 if plot_yield:
                     ElFakeSelObject.makeYield(self.yieldPlots)
                     MuFakeSelObject.makeYield(self.yieldPlots)
-            
+
             # Record if actual argument #
             if "Fakeable" in save_level:
                 selectionDict["Fakeable"] = [ElFakeSelObject,MuFakeSelObject]
                 
             #--- Tight ---#
             if "Tight" in sel_level:
+                print ('... Tight Lepton Selection===>')
                 ElTightSelObject = SelectionObject(sel          = ElFakeSelObject.sel,
                                                    selName      = "HasElTight",
                                                    yieldTitle   = "Tight lepton (channel $e^+/e^-$)")
@@ -220,6 +226,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                 
                 # Selection : at least one tight dilepton #
                 if use_dd:
+                    print ('...... Estimating fake contribution (DataDriven)')
                     ElTightSelObject.create(ddSuffix  = "FakeExtrapolation",
                                             cut       = [op.rng_len(self.leadElectronTightSel) == 1],
                                             weight    = ElTightSF(self.leadElectronTightSel),
@@ -253,6 +260,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
 
             #--- Fake extrapolated ---#
             if "FakeExtrapolation" in sel_level:
+                print ('... FakeExtrapolated Lepton Selection===>')
                 ElFakeExtrapolationSelObject = SelectionObject(sel          = ElFakeSelObject.sel,
                                                                selName      = "HasElFakeExtrapolation",
                                                                yieldTitle   = "Fake extrapolated lepton (channel $e^+/e^-$)")
@@ -262,7 +270,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                 
                 # Selection : at least one tight dilepton #
                 ElFakeExtrapolationSelObject.refine(cut    = [op.rng_len(self.leadElectronFakeExtrapolationSel) == 1])
-                MuFakeExtrapolationSelObject.refine(cut    = [op.rng_len(self.leadMuonFakeExrapolationSel) == 1])
+                MuFakeExtrapolationSelObject.refine(cut    = [op.rng_len(self.leadMuonFakeExtrapolationSel) == 1])
                 
                 # Yield #
                 if plot_yield:
