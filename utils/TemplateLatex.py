@@ -89,11 +89,15 @@ class TemplateLatex:
                         ("_highlevelvariable_mTlljj", "Dilepton-Dijet-MET tranverse mass"),
                         ("_highlevelvariable_HT2.", "$H_{T2}$ (scalar sum of the magnitudes of the HH decay momentas)"),
                         ("_highlevelvariable_HT2R.", "$H_{T2}^R$ (ratio of $H_{T2}$ and scalar sum of the transverse momenta HH decay products"),
-
-                     #   ("_ElectronFatjet_DeltaR" , "\Delta R(Electron, Fatjet)"),
-                     #   ("_ElectronJet_DeltaR" , "\Delta R(Electron, Jet)"),
-                     #   ("_MuonFatjet_DeltaR" , "\Delta R(Muon, Fatjet)"),
-                     #   ("_MuonJet_DeltaR" , "\Delta R(Muon, Fatjet)"),
+                        # Machine Learning
+                        ("_DNNOutput_DY", "DNN Output DY"),
+                        ("_DNNOutput_ttbar", "DNN Output ttbar"),
+                        ("_DNNOutput_H", "DNN Output H"),
+                        ("_DNNOutput_HH", "DNN Output HH"),
+                        ("_DNNOutput_ST", "DNN Output ST"),
+                        ("_DNNOutput_ttVX", "DNN Output ttVX"),
+                        ("_DNNOutput_VVV", "DNN Output VV(V)"),
+                        ("_DNNOutput_Rare", "DNN Output Rare"),
                         ])
                 # "_" at beginning is useful to distinguish leading and subleading
                 # "." at end is useful to distinguish "HT2" and "HT2R"

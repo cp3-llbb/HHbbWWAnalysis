@@ -430,7 +430,8 @@ def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,plot_yie
                          cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
                          weight    = AppliedSF,
                          ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-                         ddWeight  = self.DYReweighting1bElEl([self.ElElDileptonTightSel[0][0],self.ak4LightJets[0]]), # FIXME : might trigger segfault if not used with --Tight 
+                         ddWeight  = self.DYReweighting1bElEl(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
+                         #ddWeight  = self.DYReweighting1bElEl([self.ElElDileptonTightSel[0][0],self.ak4LightJetsByBtagScore[0]]), # FIXME : might trigger segfault if not used with --Tight 
                          #ddWeight  = self.DYReweighting2bElEl(self.ElElDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
                          enable    = enable)
     elif "MuMu" in selObject.selName:
@@ -438,7 +439,8 @@ def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,plot_yie
                          cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
                          weight    = AppliedSF,
                          ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-                         ddWeight  = self.DYReweighting1bMuMu([self.MuMuDileptonTightSel[0][0],self.ak4LightJets[0]]), # FIXME : might trigger segfault if not used with --Tight 
+                         ddWeight  = self.DYReweighting1bMuMu(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
+                         #ddWeight  = self.DYReweighting1bMuMu([self.MuMuDileptonTightSel[0][0],self.ak4LightJetsByBtagScore[0]]), # FIXME : might trigger segfault if not used with --Tight 
                          #ddWeight  = self.DYReweighting2bMuMu(self.MuMuDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
                          enable    = enable)
     elif "ElMu" in selObject.selName:
@@ -477,7 +479,8 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yi
                          cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
                          weight    = AppliedSF,
                          ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-                         ddWeight  = self.DYReweighting2bElEl([self.ElElDileptonTightSel[0][0],self.ak4LightJets[0]]), # FIXME : might trigger segfault if not used with --Tight 
+                         ddWeight  = self.DYReweighting2bElEl(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
+                         #ddWeight  = self.DYReweighting2bElEl([self.ElElDileptonTightSel[0][0],self.ak4LightJetsByBtagScore[0]]), # FIXME : might trigger segfault if not used with --Tight 
                          #ddWeight  = self.DYReweighting2bElEl(self.ElElDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
                          enable    = enable)
     elif "MuMu" in selObject.selName:
@@ -485,7 +488,8 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yi
                          cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
                          weight    = AppliedSF,
                          ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-                         ddWeight  = self.DYReweighting2bMuMu([self.MuMuDileptonTightSel[0][0],self.ak4LightJets[0]]), # FIXME : might trigger segfault if not used with --Tight 
+                         ddWeight  = self.DYReweighting2bMuMu(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
+                         #ddWeight  = self.DYReweighting2bMuMu([self.MuMuDileptonTightSel[0][0],self.ak4LightJetsByBtagScore[0]]), # FIXME : might trigger segfault if not used with --Tight 
                          #ddWeight  = self.DYReweighting2bMuMu(self.MuMuDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
                          enable    = enable)
     elif "ElMu" in selObject.selName:
