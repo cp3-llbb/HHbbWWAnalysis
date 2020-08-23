@@ -129,7 +129,7 @@ def makeMETPlots(sel, met, suffix, channel):
     return plots
 
 ##########################  DILEPTON PLOT #################################
-def makeSinleptonPlots(sel, sinlepton, suffix, channel, is_MC=False):
+def makeSinleptonPlots(sel, lep, suffix, channel, is_MC=False):
     """
     Make dilepton basic plots
     sel         = refine selection 
@@ -143,7 +143,7 @@ def makeSinleptonPlots(sel, sinlepton, suffix, channel, is_MC=False):
 
     # PT plot #
     plots.append(Plot.make1D("%s_%s_lepton_pt"%(channel,suffix), 
-                             sinlepton.pt, 
+                             lep.pt, 
                              sel, 
                              EquidistantBinning(60,0.,300.),
                              title="Transverse momentum of the lepton (channel %s)"%channel, 
@@ -152,7 +152,7 @@ def makeSinleptonPlots(sel, sinlepton, suffix, channel, is_MC=False):
 
     # Eta plot #
     plots.append(Plot.make1D("%s_%s_lepton_eta"%(channel,suffix), 
-                             sinlepton.eta, 
+                             lep.eta, 
                              sel, 
                              EquidistantBinning(22, -3., 3.), 
                              title="Pseudorapidity of the lepton (channel %s)"%channel, 
@@ -161,7 +161,7 @@ def makeSinleptonPlots(sel, sinlepton, suffix, channel, is_MC=False):
 
     # PT-eta plots #
     plots.append(Plot.make2D("%s_%s_lepton_ptVSeta"%(channel,suffix), 
-                             [sinlepton.pt, sinlepton.eta],
+                             [lep.pt, lep.eta],
                              sel, 
                              [EquidistantBinning(60,0.,300.),EquidistantBinning(22, -3., 3.)],
                              xTitle= "P_{T} (lepton) [GeV]",
@@ -170,7 +170,7 @@ def makeSinleptonPlots(sel, sinlepton, suffix, channel, is_MC=False):
 
     # Phi plot #
     plots.append(Plot.make1D("%s_%s_lepton_phi"%(channel,suffix), 
-                             sinlepton.phi, 
+                             lep.phi, 
                              sel, 
                              EquidistantBinning(20, -3.2, 3.2), 
                              title="Azimutal angle of the lepton (channel %s)"%channel, 
@@ -179,9 +179,8 @@ def makeSinleptonPlots(sel, sinlepton, suffix, channel, is_MC=False):
 
     # GenPartFlav (if isMC) #
     plots.append(Plot.make1D("%s_%s_lepton_genPartFlav"%(channel,suffix), 
-                             sinlepton.genPartFlav if is_MC else op.c_int(-1),
+                             lep.genPartFlav if is_MC else op.c_int(-1),
                              sel, 
-
                              EquidistantBinning(23, -1., 22.), 
                              title="Flavour of genParticle (channel %s)"%channel, 
                              xTitle= "GenParticle flavour (lepton)",
