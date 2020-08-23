@@ -18,7 +18,6 @@ from BaseHHtobbWWSL import BaseNanoHHtobbWW
 from plotDefSL import *
 from selectionDefSL import *
 from highlevelLambdasSL import *
-#from fakeHelper import DataDrivenFake
 from DDHelper import DataDrivenFake, DataDrivenDY
 
 def switch_on_index(indexes, condition, contA, contB):
@@ -49,7 +48,28 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
     def definePlots(self, t, noSel, sample=None, sampleCfg=None): 
         noSel = super(PlotterNanoHHtobbWWSL,self).prepareObjects(t, noSel, sample, sampleCfg, 'SL')
-
+        
+        #----- Machine Learning Model -----#
+        # SM
+        path_fullRecoSM_BDT_model      = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','hh_bb1l_SM_Wjj_BDT_full_reco_only_even.xml')
+        path_fullRecoSM_simple_model   = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','hh_bb1l_SM_Wjj_simple_full_reco_only_noIndPt_even.xml')
+        path_missRecoSM_simple_model   = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','hh_bb1l_SM_Wj1_even.xml')
+        # 900_Radion
+        path_fullReco900R_BDT_model    = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','hh_bb1l_X900GeV_Wjj_BDT_full_reco_even.xml')
+        path_fullReco900R_simple_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','hh_bb1l_X900GeV_Wjj_simple_full_reco_even.xml')
+        path_missReco900R_simple_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','hh_bb1l_X900GeV_Wj1_even.xml')
+        #if not os.path.exists(path_model):
+            #raise RuntimeError('Could not find model file %s'%path_model)
+        try:
+            BDT_fullRecoSM_Whad     = op.mvaEvaluator(path_fullRecoSM_BDT_model, mvaType='TMVA')
+            BDT_fullRecoSM_simple   = op.mvaEvaluator(path_fullRecoSM_simple_model, mvaType='TMVA')
+            BDT_missRecoSM_simple   = op.mvaEvaluator(path_missRecoSM_simple_model, mvaType='TMVA')
+            BDT_fullReco900R_Whad   = op.mvaEvaluator(path_fullReco900R_BDT_model, mvaType='TMVA')
+            BDT_fullReco900R_simple = op.mvaEvaluator(path_fullReco900R_simple_model, mvaType='TMVA')
+            BDT_missReco900R_simple = op.mvaEvaluator(path_missReco900R_simple_model, mvaType='TMVA')
+        except:
+            raise RuntimeError('Could not load model %s'%path_model)
+        
         plots = []
 
         cutFlowPlots = []
@@ -259,6 +279,8 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 ResolvedKeys = ['channel','sel','met','lep','j1','j2','j3','j4','suffix','nJet','nbJet']
                 ChannelDictList = []
                 ChannelDictListHL = []
+                ChannelDictListML = []
+
 
                 # Resolved Selection (Loose) #
                 #----- Resolved selection : 0 Btag -----#
@@ -329,7 +351,8 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         cutFlowPlots.append(CutFlowReport(ElSelObjAk4JetsLooseExclusiveResolved2b1j.selName,ElSelObjAk4JetsLooseExclusiveResolved2b1j.sel))
                         cutFlowPlots.append(CutFlowReport(MuSelObjAk4JetsLooseExclusiveResolved2b1j.selName,MuSelObjAk4JetsLooseExclusiveResolved2b1j.sel))
 
-                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsLooseExclusiveResolved2b1j.sel,'sinlepton':ElColl[0],
+                        ChannelDictList.append({'channel':'El',
+                                                'sel':ElSelObjAk4JetsLooseExclusiveResolved2b1j.sel,'sinlepton':ElColl[0],
                                                 'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.ak4LightJetsByPt[0],'j4':None,
                                                 'nJet':3,'nbJet':2,
                                                 'suffix':ElSelObjAk4JetsLooseExclusiveResolved2b1j.selName,
@@ -352,6 +375,26 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                                                 'sel':MuSelObjAk4JetsLooseExclusiveResolved2b1j.sel,
                                                 'suffix':MuSelObjAk4JetsLooseExclusiveResolved2b1j.selName})
 
+                        '''
+                        # for ML
+                        if self.args.Classifier == 'BDT-SM':
+                            ChannelDictListML.append({'channel':'El','lep':ElColl[0],'met':self.corrMET,
+                                                      'jets':self.ak4Jets,'bJets':self.ak4BJets,'lJets':self.ak4LightJetsByPt,
+                                                      'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.ak4LightJetsByPt[0],'j4':None,
+                                                      'sel':ElSelObjAk4JetsLooseExclusiveResolved2b1j.sel,
+                                                      'suffix':ElSelObjAk4JetsLooseExclusiveResolved2b1j.selName+'_simple_SMBDT',
+                                                      'model': BDT_missRecoSM_simple})
+                        elif self.args.Classifier == 'BDT-Rad900':
+                            ChannelDictListML.append({'channel':'El','lep':ElColl[0],'met':self.corrMET,
+                                                      'jets':self.ak4Jets,'bJets':self.ak4BJets,'lJets':self.ak4LightJetsByPt,
+                                                      'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.ak4LightJetsByPt[0],'j4':None,
+                                                      'sel':ElSelObjAk4JetsLooseExclusiveResolved2b1j.sel,
+                                                      'suffix':ElSelObjAk4JetsLooseExclusiveResolved2b1j.selName+'_simple_900RBDT',
+                                                      'model': BDT_missReco900R_simple})
+
+                        '''
+                    #for channelDict in ChannelDictListML:
+                        #plots.extend(makeMachineLearningPlotsBDTmissReco(**channelDict))
 
 
                 #------------------ Resolved selection (Tight) ---------------------#
@@ -465,6 +508,24 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                                                 'sel':MuSelObjAk4JetsTightExclusiveResolved2b2j.sel,
                                                 'suffix':MuSelObjAk4JetsTightExclusiveResolved2b2j.selName})                 
 
+                        if self.args.Classifier == 'BDT-SM':
+                            ChannelDictListML.append({'channel':'El','lep':ElColl[0],'met':self.corrMET,
+                                                      'jets':self.ak4Jets,'bJets':self.ak4BJets,'lJets':self.ak4LightJetsByPt,
+                                                      'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.WjjPairs_el2b2j[0][0],'j4':self.WjjPairs_el2b2j[0][1],
+                                                      'sel':ElSelObjAk4JetsTightExclusiveResolved2b2j.sel,
+                                                      'suffix':ElSelObjAk4JetsTightExclusiveResolved2b2j.selName+'_simple_SMBDT',
+                                                      'model':BDT_fullRecoSM_simple})
+                        elif self.args.Classifier == 'BDT-Rad900':
+                            ChannelDictListML.append({'channel':'Mu','lep':MuColl[0],'met':self.corrMET,
+                                                      'jets':self.ak4Jets,'bJets':self.ak4BJets,'lJets':self.ak4LightJetsByPt,
+                                                      'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.WjjPairs_mu2b2j[0][0],'j4':self.WjjPairs_mu2b2j[0][1],
+                                                      'sel':MuSelObjAk4JetsTightExclusiveResolved2b2j.sel,
+                                                      'suffix':MuSelObjAk4JetsTightExclusiveResolved2b2j.selName+'_simple_900RBDT',
+                                                      'model':BDT_fullReco900R_simple})
+
+                    #for channelDict in ChannelDictListML:
+                        #plots.extend(makeMachineLearningPlotsBDTfullReco(**channelDict))
+
                 # Lepton + jet Plots #
                 ResolvedBTaggedJetsN = {'objName':'Ak4BJets','objCont':self.ak4BJets,'Nmax':5,'xTitle':'N(Ak4 Bjets)'}
                 ResolvedLightJetsN   = {'objName':'Ak4LightJets','objCont':self.ak4LightJets,'Nmax':10,'xTitle':'N(Ak4 Lightjets)'}
@@ -479,10 +540,13 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     plots.extend(makeAk4JetsPlots(**{k:channelDict[k] for k in JetKeys}))
                     # MET #
                     plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
-                    # High level #
+                # High level #
                 for channelDict in ChannelDictListHL:
                     plots.extend(makeHighLevelPlotsResolved(**{k:channelDict[k] for k in ResolvedKeys}))
-
+                # ML #
+                for channelDict in ChannelDictListML:
+                    plots.extend(makeMachineLearningPlotsBDT(**channelDict))
+                    
 
 
             if any("SemiBoosted" in key for key in jetsel_level):
@@ -607,6 +671,47 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     # MET #
                     plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
 
+            '''
+            #----- Machine Learning plots -----#
+            channelDictList = []
+            if not self.args.OnlyYield:
+                if "LooseResolved2b1j" in jetplot_level:
+                    if self.args.Classifier == 'BDT':
+                        if self.args.BDTtype == 'NonRes':
+                            channelDictList.append({'channel':'El','lep':ElColl[0],
+                                                    'jets':self.ak4Jets,'bJets':self.ak4BJets,'lJets':self.ak4LightJetsByPt,
+                                                    'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.ak4LightJetsByPt[0],'j4':None,
+                                                    'sel':ElSelObjAk4JetsLooseExclusiveResolved2b1j.sel,
+                                                    'suffix':ElSelObjAk4JetsLooseExclusiveResolved2b1j.selName+'_simple_SMBDT',
+                                                    'model': BDT_missRecoSM_simple})
+                        if self.args.BDTtype == 'Rad900':
+                            channelDictList.append({'channel':'El','lep':ElColl[0],
+                                                    'jets':self.ak4Jets,'bJets':self.ak4BJets,'lJets':self.ak4LightJetsByPt,
+                                                    'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.ak4LightJetsByPt[0],'j4':None,
+                                                    'sel':ElSelObjAk4JetsLooseExclusiveResolved2b1j.sel,
+                                                    'suffix':ElSelObjAk4JetsLooseExclusiveResolved2b1j.selName+'_simple_900RBDT',
+                                                    'model': BDT_missReco900R_simple})
+                            
+                if "TightResolved2b2j" in jetplot_level:
+                    if self.args.Classifier == 'BDT':
+                        if self.args.BDTtype == 'NonRes':
+                            channelDictList.append({'channel':'El','lep':ElColl[0],
+                                                    'jets':self.ak4Jets,'bJets':self.ak4BJets,'lJets':self.ak4LightJetsByPt,
+                                                    'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.WjjPairs_el1b3j[0][0],'j4':self.WjjPairs_el1b3j[0][1],
+                                                    'sel':ElSelObjAk4JetsTightExclusiveResolved2b2j.sel,
+                                                    'suffix':ElSelObjAk4JetsTightExclusiveResolved2b2j.selName+'_simple_SMBDT',
+                                                    'model':BDT_fullRecoSM_simple})
+                        if self.args.BDTtype == 'Rad900':
+                            channelDictList.append({'channel':'Mu','lep':MuColl[0],
+                                                    'jets':self.ak4Jets,'bJets':self.ak4BJets,'lJets':self.ak4LightJetsByPt,
+                                                    'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.WjjPairs_mu1b3j[0][0],'j4':self.WjjPairs_mu1b3j[0][1],
+                                                    'sel':MuSelObjAk4JetsTightExclusiveResolved2b2j.sel,
+                                                    'suffix':MuSelObjAk4JetsTightExclusiveResolved2b2j.selName+'_simple_900RBDT',
+                                                    'model':BDT_fullReco900R_simple})
+
+            for channelDict in channelDictList:
+                plots.extend(makeMachineLearningPlotsBDT(**channelDict))
+            '''
         #----- Add the Yield plots -----#
         plots.extend(self.yieldPlots.returnPlots())
         #plots.extend(cutFlowPlots)

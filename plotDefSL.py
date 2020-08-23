@@ -1157,3 +1157,69 @@ def makeBtagDDplots(sel,jet,channel,suffix):
                              plotopts = channelLabel))        
 
     return plots
+
+#########################  Machine Learning  ################################
+def makeMachineLearningPlotsBDT(sel,lep,met,jets,bJets,lJets,j1,j2,j3,j4,suffix,channel,model):
+    plots = []
+    channelLabel = channelTitleLabel(channel)
+
+    output = model(
+        op.switch(op.rng_len(lJets) >= 2, op.deltaR(op.sort(jets, lambda j : op.deltaR(lep.p4, j.p4))[0].p4,lep.p4), op.c_float(0.)),    # mindr_lep1_jet || mT_top_3particle
+        op.switch(op.rng_len(lJets) >= 2, op.invariant_mass(bJetCorrP4(j1), bJetCorrP4(j2)),MT(lep, met)),    # m_Hbb_regCorr || mT_W
+        op.switch(op.rng_len(lJets) >= 2, op.invariant_mass(j1.p4, j2.p4), op.deltaR(op.sort(jets, lambda j : op.deltaR(lep.p4, j.p4))[0].p4,lep.p4)),     # m_HH || mindr_lep1_jet
+        op.switch(op.rng_len(lJets) >= 2, op.invariant_mass(lep.p4, met.p4), op.deltaR(j1.p4, lep.p4)),     # mWlep_met_simple || dR_b1lep
+        op.switch(op.rng_len(lJets) >= 2, op.deltaR((lep.p4+met.p4), (j3.p4+j4.p4)), op.deltaR(j2.p4, lep.p4)),     # dR_Hww || dR_b2lep
+        op.switch(op.rng_len(lJets) >= 2, op.invariant_mass(j3.p4,j4.p4), op.invariant_mass(bJetCorrP4(j1),bJetCorrP4(j2))), # m_Wjj || m_Hbb_regCorr 
+        op.switch(op.rng_len(lJets) >= 2, op.abs(op.cos((j1.p4+j2.p4).Phi())), bJetCorrP4(j1).Pt()), # cosThetaS_Hbb || selJet1_Hbb_pT
+        op.switch(op.rng_len(lJets) >= 2, op.abs(op.cos((j3.p4+j4.p4).Phi())), bJetCorrP4(j2).Pt()), # cosThetaS_Wjj || selJet2_Hbb_pT
+        op.switch(op.rng_len(lJets) >= 2, op.abs(op.cos((j3.p4+j4.p4).Phi())), op.rng_len(bJets)), # cosThetaS_WW || nBJetMedium
+        op.switch(op.rng_len(lJets) >= 2, op.c_float(0.), lep.p4.Pt()), # cosThetaS_HH || lep_conePt
+        op.switch(op.rng_len(lJets) >= 2, op.rng_len(jets), met.pt), # nJet || met_LD
+        op.switch(op.rng_len(lJets) >= 4, op.rng_len(bJets), op.rng_sum(jets, lambda j : j.p4.Pt())), # nBJetMedium || HT
+        op.switch(op.rng_len(lJets) >= 2, op.deltaR(j1.p4, lep.p4), op.c_float(0.)), # dR_b1lep
+        op.switch(op.rng_len(lJets) >= 2, op.deltaR(j2.p4, lep.p4), op.c_float(0.)), # dR_b2lep
+        op.switch(op.rng_len(lJets) >= 2, bJetCorrP4(j1).Pt(), op.c_float(0.)), # selJet1_Hbb_pT
+        op.switch(op.rng_len(lJets) >= 2, bJetCorrP4(j2).Pt(), op.c_float(0.)), # selJet2_Hbb_pT 
+        op.switch(op.rng_len(lJets) >= 2, lep.p4.Pt(), op.c_float(0.)), # lep_conePt
+        op.switch(op.rng_len(lJets) >= 2, met.pt, op.c_float(0.)), # met_LD
+        op.switch(op.rng_len(lJets) >= 4, op.rng_sum(jets, lambda j : j.p4.Pt()), op.c_float(0.)) # HT
+    )
+
+    for i,node in enumerate(['HH', 'H', 'DY', 'ST', 'ttbar', 'ttVX', 'VVV', 'Rare']):
+        plots.append(Plot.make1D("%s_%s_BDTOutput_%s"%(channel,suffix,node),
+                                 output[i],
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 xTitle = 'BDT output %s'%node,
+                                 plotopts = channelLabel))
+
+    return plots
+
+'''
+def makeMachineLearningPlotsBDTmissReco(sel,lep,met,jets,bJets,lJets,j1,j2,j3,j4,suffix,channel,model):
+    plots = []
+    channelLabel = channelTitleLabel(channel)
+    output = model(op.c_float(0.),
+                   MT(lep, met),
+                   op.sort(jets, lambda j : op.deltaR(lep.p4, j.p4))[0],
+                   op.deltaR(j1.p4, lep.p4),
+                   op.deltaR(j2.p4, lep.p4),
+                   op.invariant_mass(bJetCorrP4(j1),bJetCorrP4(j2)),
+                   bJetCorrP4(j1).Pt(),
+                   bJetCorrP4(j2).Pt(),
+                   op.deltaR(lep.p4, j3.p4),
+                   op.rng_len(bJets),
+                   lep.p4.Pt(),
+                   met.pt,
+                   op.rng_sum(jets, lambda j : j.p4.Pt()))
+
+    for i,node in enumerate(['HH', 'H', 'DY', 'ST', 'ttbar', 'ttVX', 'VVV', 'Rare']):
+        plots.append(Plot.make1D("%s_%s_BDTOutput_%s"%(channel,suffix,node),
+                                 output[i],
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 xTitle = 'BDT output %s'%node,
+                                 plotopts = channelLabel))
+
+    return plots
+    '''
