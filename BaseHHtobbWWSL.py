@@ -221,7 +221,14 @@ One lepton and and one jet argument must be specified in addition to the require
                             action      = "store_true",
                             default     = False,
                             help        = "Only produce the yield plots")
-
+        parser.add_argument("--Classifier", 
+                            action      = "store",
+                            type        = str,
+                            help        = "BDT-SM | BDT-Rad900 | DNN | LBN")
+        parser.add_argument("--WhadTagger", 
+                            action      = "store",
+                            type        = str,
+                            help        = "BDT | simple")
 
 
     def prepareTree(self, tree, sample=None, sampleCfg=None):
