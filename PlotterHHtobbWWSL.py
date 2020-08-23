@@ -174,7 +174,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             #--------------------------------- #
 
             #----- Ak4 jets selection -----#
-            LeptonKeys  = ['channel','sel','sinlepton','suffix','is_MC']
+            LeptonKeys  = ['channel','sel','lep','suffix','is_MC']
             JetKeys     = ['channel','sel','j1','j2','j3','j4','suffix','nJet','nbJet','is_MC']
             commonItems = ['channel','sel','suffix']
             
@@ -278,9 +278,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             if any("Resolved" in item for item in jetsel_level):
                 ResolvedKeys = ['channel','sel','met','lep','j1','j2','j3','j4','suffix','nJet','nbJet']
                 ChannelDictList = []
-                ChannelDictListHL = []
                 ChannelDictListML = []
-
 
                 # Resolved Selection (Loose) #
                 #----- Resolved selection : 0 Btag -----#
@@ -294,12 +292,12 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         cutFlowPlots.append(CutFlowReport(ElSelObjAk4JetsLooseExclusiveResolved0b3j.selName,ElSelObjAk4JetsLooseExclusiveResolved0b3j.sel))
                         cutFlowPlots.append(CutFlowReport(MuSelObjAk4JetsLooseExclusiveResolved0b3j.selName,MuSelObjAk4JetsLooseExclusiveResolved0b3j.sel))
 
-                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsLooseExclusiveResolved0b3j.sel,'sinlepton':ElColl[0],
+                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsLooseExclusiveResolved0b3j.sel,'lep':ElColl[0],'met':self.corrMET,
                                                 'j1':self.ak4LightJetsByPt[0],'j2':self.ak4LightJetsByPt[1],'j3':self.ak4LightJetsByPt[2],'j4':None,
                                                 'nJet':3,'nbJet':0,
                                                 'suffix':ElSelObjAk4JetsLooseExclusiveResolved0b3j.selName,
                                                 'is_MC':self.is_MC})
-                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsLooseExclusiveResolved0b3j.sel,'sinlepton':MuColl[0],
+                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsLooseExclusiveResolved0b3j.sel,'lep':MuColl[0],'met':self.corrMET,
                                                 'j1':self.ak4LightJetsByPt[0],'j2':self.ak4LightJetsByPt[1],'j3':self.ak4LightJetsByPt[2],'j4':None,
                                                 'nJet':3,'nbJet':0,
                                                 'suffix':MuSelObjAk4JetsLooseExclusiveResolved0b3j.selName,
@@ -317,28 +315,16 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         cutFlowPlots.append(CutFlowReport(ElSelObjAk4JetsLooseExclusiveResolved1b2j.selName,ElSelObjAk4JetsLooseExclusiveResolved1b2j.sel))
                         cutFlowPlots.append(CutFlowReport(MuSelObjAk4JetsLooseExclusiveResolved1b2j.selName,MuSelObjAk4JetsLooseExclusiveResolved1b2j.sel))
 
-                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsLooseExclusiveResolved1b2j.sel,'sinlepton':ElColl[0],
+                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsLooseExclusiveResolved1b2j.sel,'lep':ElColl[0],'met':self.corrMET,
                                                 'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.remainingJets[0],'j4':None,
                                                 'nJet':3,'nbJet':1,
                                                 'suffix':ElSelObjAk4JetsLooseExclusiveResolved1b2j.selName,
                                                 'is_MC':self.is_MC})
-                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsLooseExclusiveResolved1b2j.sel,'sinlepton':MuColl[0],
+                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsLooseExclusiveResolved1b2j.sel,'lep':MuColl[0],'met':self.corrMET,
                                                 'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.remainingJets[0],'j4':None,
                                                 'nJet':3,'nbJet':1,
                                                 'suffix':MuSelObjAk4JetsLooseExclusiveResolved1b2j.selName,
                                                 'is_MC':self.is_MC})
-                        # for High level plots #
-                        ChannelDictListHL.append({'channel': 'El','met': self.corrMET,'lep':ElColl[0],
-                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.remainingJets[0],'j4':None,
-                                                'nJet':3,'nbJet':1,
-                                                'sel':ElSelObjAk4JetsLooseExclusiveResolved1b2j.sel,
-                                                'suffix':ElSelObjAk4JetsLooseExclusiveResolved1b2j.selName})
-                        ChannelDictListHL.append({'channel': 'Mu','met': self.corrMET,'lep':MuColl[0],
-                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.remainingJets[0],'j4':None,
-                                                'nJet':3,'nbJet':1,
-                                                'sel':MuSelObjAk4JetsLooseExclusiveResolved1b2j.sel,
-                                                'suffix':MuSelObjAk4JetsLooseExclusiveResolved1b2j.selName})
-                        
 
                 #----- Resolved selection : 2 Btags -----#
                 if "LooseResolved2b1j" in jetsel_level:
@@ -352,29 +338,16 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         cutFlowPlots.append(CutFlowReport(MuSelObjAk4JetsLooseExclusiveResolved2b1j.selName,MuSelObjAk4JetsLooseExclusiveResolved2b1j.sel))
 
                         ChannelDictList.append({'channel':'El',
-                                                'sel':ElSelObjAk4JetsLooseExclusiveResolved2b1j.sel,'sinlepton':ElColl[0],
+                                                'sel':ElSelObjAk4JetsLooseExclusiveResolved2b1j.sel,'lep':ElColl[0],'met':self.corrMET,
                                                 'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.ak4LightJetsByPt[0],'j4':None,
                                                 'nJet':3,'nbJet':2,
                                                 'suffix':ElSelObjAk4JetsLooseExclusiveResolved2b1j.selName,
                                                 'is_MC':self.is_MC})
-                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsLooseExclusiveResolved2b1j.sel,'sinlepton':MuColl[0],
+                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsLooseExclusiveResolved2b1j.sel,'lep':MuColl[0],'met':self.corrMET,
                                                 'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.ak4LightJetsByPt[0],'j4':None,
                                                 'nJet':3,'nbJet':2,
                                                 'suffix':MuSelObjAk4JetsLooseExclusiveResolved2b1j.selName,
                                                 'is_MC':self.is_MC})
-                        
-                        # for High level plots #
-                        ChannelDictListHL.append({'channel': 'El','met': self.corrMET,'lep':ElColl[0],
-                                                'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.ak4LightJetsByPt[0],'j4':None,
-                                                'nJet':3,'nbJet':2,
-                                                'sel':ElSelObjAk4JetsLooseExclusiveResolved2b1j.sel,
-                                                'suffix':ElSelObjAk4JetsLooseExclusiveResolved2b1j.selName})
-                        ChannelDictListHL.append({'channel': 'Mu','met': self.corrMET,'lep':MuColl[0],
-                                                'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.ak4LightJetsByPt[0],'j4':None,
-                                                'nJet':3,'nbJet':2,
-                                                'sel':MuSelObjAk4JetsLooseExclusiveResolved2b1j.sel,
-                                                'suffix':MuSelObjAk4JetsLooseExclusiveResolved2b1j.selName})
-
                         '''
                         # for ML
                         if self.args.Classifier == 'BDT-SM':
@@ -405,12 +378,12 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     MuSelObjAk4JetsTightExclusiveResolved0b4j = makeExclusiveTightResolvedJetComboSelection(self,MuSelObjAk4JetsTight,nbJet=0,copy_sel=True,plot_yield=True)
 
                     if not self.args.OnlyYield and "TightResolved0b4j" in jetplot_level:
-                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsTightExclusiveResolved0b4j.sel,'sinlepton':ElColl[0],
+                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsTightExclusiveResolved0b4j.sel,'lep':ElColl[0],'met':self.corrMET,
                                                 'j1':self.ak4LightJetsByPt[0],'j2':self.ak4LightJetsByPt[1],'j3':self.ak4LightJetsByPt[2],'j4':self.ak4LightJetsByPt[3],
                                                 'nJet':4,'nbJet':0,
                                                 'suffix':ElSelObjAk4JetsTightExclusiveResolved0b4j.selName,
                                                 'is_MC':self.is_MC})
-                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsTightExclusiveResolved0b4j.sel,'sinlepton':MuColl[0],
+                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsTightExclusiveResolved0b4j.sel,'lep':MuColl[0],'met':self.corrMET,
                                                 'j1':self.ak4LightJetsByPt[0],'j2':self.ak4LightJetsByPt[1],'j3':self.ak4LightJetsByPt[2],'j4':self.ak4LightJetsByPt[3],
                                                 'nJet':4,'nbJet':0,
                                                 'suffix':MuSelObjAk4JetsTightExclusiveResolved0b4j.selName,
@@ -441,28 +414,16 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         self.WjjPairs_el1b3j = op.sort(self.remainingJetPairs_el1b3j, self.lambda_chooseWjj_el1b3j)
 
                         
-                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsTightExclusiveResolved1b3j.sel,'sinlepton':ElColl[0],
+                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsTightExclusiveResolved1b3j.sel,'lep':ElColl[0],'met':self.corrMET,
                                                 'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.WjjPairs_el1b3j[0][0],'j4':self.WjjPairs_el1b3j[0][1],
                                                 'nJet':4,'nbJet':1,
                                                 'suffix':ElSelObjAk4JetsTightExclusiveResolved1b3j.selName,
                                                 'is_MC':self.is_MC})
-                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsTightExclusiveResolved1b3j.sel,'sinlepton':MuColl[0],
+                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsTightExclusiveResolved1b3j.sel,'lep':MuColl[0],'met':self.corrMET,
                                                 'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.WjjPairs_mu1b3j[0][0],'j4':self.WjjPairs_mu1b3j[0][1],
                                                 'nJet':4,'nbJet':1,
                                                 'suffix':MuSelObjAk4JetsTightExclusiveResolved1b3j.selName,
                                                 'is_MC':self.is_MC})
-                        # for High level plots #
-                        ChannelDictListHL.append({'channel': 'El','met': self.corrMET,'lep':ElColl[0],
-                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.WjjPairs_el1b3j[0][0],'j4':self.WjjPairs_el1b3j[0][1],
-                                                'nJet':4,'nbJet':1,
-                                                'sel':ElSelObjAk4JetsTightExclusiveResolved1b3j.sel,
-                                                'suffix':ElSelObjAk4JetsTightExclusiveResolved1b3j.selName})
-                        ChannelDictListHL.append({'channel': 'Mu','met': self.corrMET,'lep':MuColl[0],
-                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.WjjPairs_mu1b3j[0][0],'j4':self.WjjPairs_mu1b3j[0][1],
-                                                'nJet':4,'nbJet':1,
-                                                'sel':MuSelObjAk4JetsTightExclusiveResolved1b3j.sel,
-                                                'suffix':MuSelObjAk4JetsTightExclusiveResolved1b3j.selName})                 
-
 
                 #----- Resolved selection : 2 Btags -----#
                 if "TightResolved2b2j" in jetsel_level:
@@ -486,27 +447,16 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         cutFlowPlots.append(CutFlowReport(ElSelObjAk4JetsTightExclusiveResolved2b2j.selName,ElSelObjAk4JetsTightExclusiveResolved2b2j.sel))
                         cutFlowPlots.append(CutFlowReport(MuSelObjAk4JetsTightExclusiveResolved2b2j.selName,MuSelObjAk4JetsTightExclusiveResolved2b2j.sel))
 
-                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsTightExclusiveResolved2b2j.sel,'sinlepton':ElColl[0],
+                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsTightExclusiveResolved2b2j.sel,'lep':ElColl[0],'met':self.corrMET,
                                                 'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.WjjPairs_el2b2j[0][0],'j4':self.WjjPairs_el2b2j[0][1],
                                                 'nJet':4,'nbJet':2,
                                                 'suffix':ElSelObjAk4JetsTightExclusiveResolved2b2j.selName,
                                                 'is_MC':self.is_MC})
-                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsTightExclusiveResolved2b2j.sel,'sinlepton':MuColl[0],
+                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsTightExclusiveResolved2b2j.sel,'lep':MuColl[0],'met':self.corrMET,
                                                 'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.WjjPairs_mu2b2j[0][0],'j4':self.WjjPairs_mu2b2j[0][1],
                                                 'nJet':4,'nbJet':2,
                                                 'suffix':MuSelObjAk4JetsTightExclusiveResolved2b2j.selName,
                                                 'is_MC':self.is_MC})
-                        # for High level plots #
-                        ChannelDictListHL.append({'channel': 'El','met': self.corrMET,'lep':ElColl[0],
-                                                'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.WjjPairs_el2b2j[0][0],'j4':self.WjjPairs_el2b2j[0][1],
-                                                'nJet':4,'nbJet':2,
-                                                'sel':ElSelObjAk4JetsTightExclusiveResolved2b2j.sel,
-                                                'suffix':ElSelObjAk4JetsTightExclusiveResolved2b2j.selName})
-                        ChannelDictListHL.append({'channel': 'Mu','met': self.corrMET,'lep':MuColl[0],
-                                                'j1':self.ak4BJets[0],'j2':self.ak4BJets[1],'j3':self.WjjPairs_mu2b2j[0][0],'j4':self.WjjPairs_mu2b2j[0][1],
-                                                'nJet':4,'nbJet':2,
-                                                'sel':MuSelObjAk4JetsTightExclusiveResolved2b2j.sel,
-                                                'suffix':MuSelObjAk4JetsTightExclusiveResolved2b2j.selName})                 
 
                         if self.args.Classifier == 'BDT-SM':
                             ChannelDictListML.append({'channel':'El','lep':ElColl[0],'met':self.corrMET,
@@ -540,8 +490,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     plots.extend(makeAk4JetsPlots(**{k:channelDict[k] for k in JetKeys}))
                     # MET #
                     plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
-                # High level #
-                for channelDict in ChannelDictListHL:
+                    # High level #
                     plots.extend(makeHighLevelPlotsResolved(**{k:channelDict[k] for k in ResolvedKeys}))
                 # ML #
                 for channelDict in ChannelDictListML:
@@ -552,7 +501,6 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             if any("SemiBoosted" in key for key in jetsel_level):
                 print ("......... processing Semi-Boosted Category")
                 ChannelDictList   = []
-                ChannelDictListHL = []
                 FatJetKeys     = ['channel','sel','j1','j2','j3','has1fat1slim','has1fat2slim','suffix']
                 FatJetsN       = {'objName':'Ak8Jets','objCont':self.ak8Jets,'Nmax':5,'xTitle':'N(Ak8 jets)'}
                 FatBJetsN      = {'objName':'Ak8BJets','objCont':self.ak8BJets,'Nmax':5,'xTitle':'N(Ak8 b-jets)'}
@@ -566,25 +514,16 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         cutFlowPlots.append(CutFlowReport(ElSelObjAk8bJetsHbbBoostedWtoJ.selName,ElSelObjAk8bJetsHbbBoostedWtoJ.sel))
                         cutFlowPlots.append(CutFlowReport(MuSelObjAk8bJetsHbbBoostedWtoJ.selName,MuSelObjAk8bJetsHbbBoostedWtoJ.sel))
  
-                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk8bJetsHbbBoostedWtoJ.sel,'sinlepton':ElColl[0],
+                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk8bJetsHbbBoostedWtoJ.sel,'lep':ElColl[0],'met':self.corrMET,
                                                 'j1':self.ak8BJets[0],'j2':self.ak4JetsCleanedFromAk8b[0],'j3':None,
-                                                'has1fat1slim':True,'has1fat2slim':False,
+                                                'has1fat1slim':True,'has1fat2slim':False,'bothAreFat':False,
                                                 'suffix':ElSelObjAk8bJetsHbbBoostedWtoJ.selName,
                                                 'is_MC':self.is_MC})
-                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk8bJetsHbbBoostedWtoJ.sel,'sinlepton':MuColl[0],
+                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk8bJetsHbbBoostedWtoJ.sel,'lep':MuColl[0],'met':self.corrMET,
                                                 'j1':self.ak8BJets[0],'j2':self.ak4JetsCleanedFromAk8b[0],'j3':None,
-                                                'has1fat1slim':True,'has1fat2slim':False,
+                                                'has1fat1slim':True,'has1fat2slim':False,'bothAreFat':False,
                                                 'suffix':MuSelObjAk8bJetsHbbBoostedWtoJ.selName,
                                                 'is_MC':self.is_MC})
-
-                        ChannelDictListHL.append({'channel': 'El','met': self.corrMET,'lep':ElColl[0],
-                                                'j1':self.ak8BJets[0],'j2':self.ak4JetsCleanedFromAk8b[0],
-                                                'bothAreFat':False,'sel':ElSelObjAk8bJetsHbbBoostedWtoJ.sel,
-                                                'suffix':ElSelObjAk8bJetsHbbBoostedWtoJ.selName})
-                        ChannelDictListHL.append({'channel': 'Mu','met': self.corrMET,'lep':MuColl[0],
-                                                'j1':self.ak8BJets[0],'j2':self.ak4JetsCleanedFromAk8b[0],
-                                                'bothAreFat':False,'sel':MuSelObjAk8bJetsHbbBoostedWtoJ.sel,
-                                                'suffix':MuSelObjAk8bJetsHbbBoostedWtoJ.selName})                 
 
                 if "SemiBoostedHbbWtoJJ" in jetsel_level:
                     print ("............ Processing Semi-Boosted category (Htobb:Ak8 + WtoJJ)")
@@ -605,26 +544,16 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         cutFlowPlots.append(CutFlowReport(MuSelObjAk8bJetsHbbBoostedWtoJJ.selName,MuSelObjAk8bJetsHbbBoostedWtoJJ.sel))
 
 
-                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk8bJetsHbbBoostedWtoJJ.sel,'sinlepton':ElColl[0],
+                        ChannelDictList.append({'channel':'El','sel':ElSelObjAk8bJetsHbbBoostedWtoJJ.sel,'lep':ElColl[0],'met':self.corrMET,
                                                 'j1':self.ak8BJets[0],'j2':self.WjjPairs_elSB[0][0],'j3':self.WjjPairs_elSB[0][1],
-                                                'has1fat1slim':False,'has1fat2slim':True,
+                                                'has1fat1slim':False,'has1fat2slim':True,'bothAreFat':False,
                                                 'suffix':ElSelObjAk8bJetsHbbBoostedWtoJJ.selName,
                                                 'is_MC':self.is_MC})
-                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk8bJetsHbbBoostedWtoJJ.sel,'sinlepton':MuColl[0],
+                        ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk8bJetsHbbBoostedWtoJJ.sel,'lep':MuColl[0],'met':self.corrMET,
                                                 'j1':self.ak8BJets[0],'j2':self.WjjPairs_muSB[0][0],'j3':self.WjjPairs_muSB[0][1],
-                                                'has1fat1slim':False,'has1fat2slim':True,
+                                                'has1fat1slim':False,'has1fat2slim':True,'bothAreFat':False,
                                                 'suffix':MuSelObjAk8bJetsHbbBoostedWtoJJ.selName,
                                                 'is_MC':self.is_MC})
-
-                        ChannelDictListHL.append({'channel': 'El','met': self.corrMET,'lep':ElColl[0],
-                                                'j1':self.ak8BJets[0],'j2':self.WjjPairs_elSB[0][0],
-                                                'bothAreFat':False,'sel':ElSelObjAk8bJetsHbbBoostedWtoJJ.sel,
-                                                'suffix':ElSelObjAk8bJetsHbbBoostedWtoJJ.selName})
-                        ChannelDictListHL.append({'channel': 'Mu','met': self.corrMET,'lep':MuColl[0],
-                                                'j1':self.ak8BJets[0],'j2':self.WjjPairs_muSB[0][0],
-                                                'bothAreFat':False,'sel':MuSelObjAk8bJetsHbbBoostedWtoJJ.sel,
-                                                'suffix':MuSelObjAk8bJetsHbbBoostedWtoJJ.selName})                 
-
                 for channelDict in ChannelDictList:
                     # Dilepton #
                     plots.extend(makeSinleptonPlots(**{k:channelDict[k] for k in LeptonKeys}))
@@ -635,7 +564,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     plots.extend(makeAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys}))
                     # MET #
                     plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
-                for channelDict in ChannelDictListHL:
+                    # HighLevel #
                     plots.extend(makeHighLevelPlotsBoosted(**{k:channelDict[k] for k in BoostedKeys}))
             
             if "Boosted" in jetsel_level:
