@@ -12,6 +12,7 @@ from METScripts import METFilter, METcorrection
 from scalefactorsbbWW import ScaleFactorsbbWW
 from btagHelper import makeBtagRatioReweighting
 from triggers import returnTriggerRanges
+from highlevelLambdas import highlevelLambdas
 
 #===============================================================================================#
 #                                  BaseHHtobbWW                                                 #
@@ -26,7 +27,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                  #"normalized": True,
                                  "y-axis": "Events",
                                  "log-y"  : "both",
-                                 "ratio-y-axis-range" : [0.5,1.5],
+                                 "ratio-y-axis-range" : [0.8,1.2],
                                  "ratio-y-axis" : 'Ratio Data/MC',
                                  "sort-by-yields" : False}
 
@@ -48,6 +49,7 @@ Arguments for the HH->bbWW analysis on bamboo framework
         --FakeExtrapolation
         --NoZVeto
         --ZPeak
+        --NoTauVeto
 
     * Jet arguments *
         --Ak4
@@ -55,6 +57,11 @@ Arguments for the HH->bbWW analysis on bamboo framework
         --Resolved0Btag
         --Resolved1Btag
         --Resolved2Btag
+        --TightResolved0b4j
+        --TightResolved1b3j
+        --TightResolved2b2j
+        --SemiBoostedHbb
+        --SemiBoostedWjj
         --Boosted
         --TTBarCR
         --BtagReweightingOn
@@ -121,6 +128,10 @@ One lepton and and one jet argument must be specified in addition to the require
                             action      = "store_true",
                             default     = False,
                             help        = "Select the Z peak at tight level |M_ll-M_Z|<10 GeV (must be used with --NoZVeto, only effective with --Tight)")
+        parser.add_argument("--NoTauVeto", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Select the events do not have any tau overlapped with fakeable leptons")
 
         #----- Jet selection arguments -----#
         parser.add_argument("--Ak4", 
@@ -143,6 +154,42 @@ One lepton and and one jet argument must be specified in addition to the require
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for the exclusive resolved category with two btagged jets")
+        parser.add_argument("--LooseResolved0b3j", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the exclusive loose resolved category with no btagged jet")
+        parser.add_argument("--LooseResolved1b2j", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the exclusive loose resolved category with 1 btagged jet")
+        parser.add_argument("--LooseResolved2b1j", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the exclusive loose resolved category with 2 btagged jet")
+        parser.add_argument("--TightResolved0b4j", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the exclusive tight resolved category with no btagged jet")
+        parser.add_argument("--TightResolved1b3j", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the exclusive tight resolved category with 1 btagged jet")
+        parser.add_argument("--TightResolved2b2j", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the exclusive tight resolved category with 2 btagged jet")
+        parser.add_argument("--SemiBoostedHbbWtoJ", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the semi boosted category (Hbb boosted, Wjj resolved)")
+        parser.add_argument("--SemiBoostedHbbWtoJJ", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the semi boosted category (Hbb boosted, Wjj resolved)")
+        parser.add_argument("--SemiBoostedWjj", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the semi boosted category (Hbb resolved, Wjj boosted)")
         parser.add_argument("--Boosted", 
                                 action      = "store_true",
                                 default     = False,
@@ -172,9 +219,6 @@ One lepton and and one jet argument must be specified in addition to the require
                                 default     = False,
                                 help        = "To not apply the stitching weights to DY and WJets samples")
 
-
-
-
         #----- Skimmer arguments -----#
         parser.add_argument("--Synchronization", 
                             action      = "store_true",
@@ -190,6 +234,14 @@ One lepton and and one jet argument must be specified in addition to the require
                             action      = "store_true",
                             default     = False,
                             help        = "Only produce the yield plots")
+        parser.add_argument("--Classifier", 
+                            action      = "store",
+                            type        = str,
+                            help        = "BDT-SM | BDT-Rad900 | DNN | LBN")
+        parser.add_argument("--WhadTagger", 
+                            action      = "store",
+                            type        = str,
+                            help        = "BDT | simple")
 
 
     def prepareTree(self, tree, sample=None, sampleCfg=None):
@@ -207,10 +259,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                                             tag             = "v5", 
                                                                                             year            = (era if era else "2016"),
                                                                                             isMC            = self.is_MC,
-                                                                                            #systVariations  = [ nanoRochesterCalc, (nanoJetMETCalc_METFixEE2017 if era == "2017" else nanoJetMETCalc) ]), 
                                                                                             systVariations  = [ (nanoJetMETCalc_METFixEE2017 if era == "2017" else nanoJetMETCalc)]),
-                                                                                            #systVariations = None ),
-                                                                                            # will do Jet and MET variations, and the Rochester correction
+                                                                                            # will do Jet and MET variations, and not the Rochester correction
                                                                           lazyBackend   = (self.args.backend == "lazy" or self.args.onlypost))
     
         self.triggersPerPrimaryDataset = {}
@@ -909,7 +959,7 @@ One lepton and and one jet argument must be specified in addition to the require
             self.leadElectronTightSel = op.select(self.leadElectronFakeSel, pred=lambda_tight_ele)
             self.leadMuonTightSel     = op.select(self.leadMuonFakeSel, pred=lambda_tight_mu)
 
-            # Fake Extrapolation selection #
+            # Fake Extrapolation selection [prompt]#
 
             lambda_fake_ele = lambda ele : op.AND(self.lambda_is_matched(ele) , op.NOT(self.lambda_electronTightSel(ele)))
             lambda_fake_mu  = lambda mu  : op.AND(self.lambda_is_matched(mu)  , op.NOT(self.lambda_muonTightSel(mu)))
@@ -922,6 +972,35 @@ One lepton and and one jet argument must be specified in addition to the require
                 #           (can be 0 for MC where the lepton is not genMatched)
                 # SR : len(self.lead*TightSel) == 1
                 # Fake CR : len(self.lead*FakeExtrapolationSel) == 1 
+            # Fake Extrapolation selection [non-prompt]#
+            lambda_fake_ele_nonPrompt = lambda ele : op.AND(op.NOT(self.lambda_is_matched(ele)) , op.NOT(self.lambda_electronTightSel(ele)))
+            lambda_fake_mu_nonPrompt  = lambda mu  : op.AND(op.NOT(self.lambda_is_matched(mu))  , op.NOT(self.lambda_muonTightSel(mu)))
+
+            self.leadElectronFakeExtrapolationSel_nonPrompt = op.select(self.leadElectronFakeSel, pred=lambda_fake_ele_nonPrompt)
+            self.leadMuonFakeExtrapolationSel_nonPrompt     = op.select(self.leadMuonFakeSel, pred=lambda_fake_mu_nonPrompt)
+
+        ##############################################################################
+        #                                  Tau                                       #
+        ##############################################################################
+        self.lambda_tauSel = lambda ta : op.AND(ta.p4.Pt() > 20.,
+                                                op.abs(ta.p4.Eta()) < 2.3,
+                                                op.abs(ta.dxy) <= 1000.0,
+                                                op.abs(ta.dz) <= 0.2,
+                                                ta.idDecayModeNewDMs,
+                                                op.OR(ta.decayMode == 0,
+                                                      ta.decayMode == 1,
+                                                      ta.decayMode == 2,
+                                                      ta.decayMode == 10,
+                                                      ta.decayMode == 11),
+                                                (ta.idDeepTau2017v2p1VSjet >> 4 & 0x1) == 1
+                                               )
+        self.tauSel = op.select (t.Tau, self.lambda_tauSel)
+        # Cleaning #
+        self.lambda_tauClean = lambda ta : op.AND(op.NOT(op.rng_any(self.electronsFakeSel, lambda el : op.deltaR(ta.p4, el.p4) <= 0.3)), 
+                                                  op.NOT(op.rng_any(self.muonsFakeSel, lambda mu : op.deltaR(ta.p4, mu.p4) <= 0.3)))
+        self.tauCleanSel = op.select(self.tauSel, self.lambda_tauClean)
+
+          
 
         #############################################################################
         #                                AK4 Jets                                   #
@@ -965,6 +1044,9 @@ One lepton and and one jet argument must be specified in addition to the require
         self.ak4LightJetsByBtagScore = op.sort(self.ak4LightJetsByPt, lambda jet : -jet.btagDeepFlavB)
             # Sorted by btag score because for 0 and 1 btag categories, 
 
+        # Doesn't contain the leading bTag scored Light Jet
+        self.remainingJets = op.select(self.ak4LightJetsByPt, lambda jet : jet.idx != self.ak4LightJetsByBtagScore[0].idx)
+        # Wjj selection for resolved2b2j
 
         #############################################################################
         #                                AK8 Jets                                   #
@@ -1000,7 +1082,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                                 op.NOT(op.rng_any(self.electronsFakeSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.8 )), 
                                                 op.NOT(op.rng_any(self.muonsFakeSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.8 ))
                                             )
-            # remove jets within cone of DR<0.8 of preselected electrons and muons
+        # remove jets within cone of DR<0.8 of preselected electrons and muons
         self.ak8Jets = op.select(self.ak8JetsPreSel,self.lambda_cleanAk8Jets)
 
         ############     Btagging     #############
@@ -1008,14 +1090,24 @@ One lepton and and one jet argument must be specified in addition to the require
         if era == "2016": 
             self.lambda_ak8Btag = lambda fatjet : op.OR(op.AND(fatjet.subJet1.pt >= 30, fatjet.subJet1.btagDeepB > 0.6321),
                                                         op.AND(fatjet.subJet2.pt >= 30, fatjet.subJet2.btagDeepB > 0.6321))
+            self.lambda_ak8noBtag = lambda fatjet : op.NOT(op.OR(op.AND(fatjet.subJet1.pt >= 30, fatjet.subJet1.btagDeepB > 0.6321),
+                                                        op.AND(fatjet.subJet2.pt >= 30, fatjet.subJet2.btagDeepB > 0.6321)))
         elif era =="2017":
             self.lambda_ak8Btag = lambda fatjet : op.OR(op.AND(fatjet.subJet1.pt >= 30, fatjet.subJet1.btagDeepB > 0.4941),
                                                         op.AND(fatjet.subJet2.pt >= 30, fatjet.subJet2.btagDeepB > 0.4941))
+            self.lambda_ak8noBtag = lambda fatjet : op.NOT(op.OR(op.AND(fatjet.subJet1.pt >= 30, fatjet.subJet1.btagDeepB > 0.4941),
+                                                        op.AND(fatjet.subJet2.pt >= 30, fatjet.subJet2.btagDeepB > 0.4941)))
         elif era == "2018":
             self.lambda_ak8Btag = lambda fatjet : op.OR(op.AND(fatjet.subJet1.pt >= 30, fatjet.subJet1.btagDeepB > 0.4184),
                                                         op.AND(fatjet.subJet2.pt >= 30, fatjet.subJet2.btagDeepB > 0.4184))
+            self.lambda_ak8noBtag = lambda fatjet : op.NOT(op.OR(op.AND(fatjet.subJet1.pt >= 30, fatjet.subJet1.btagDeepB > 0.4184),
+                                                        op.AND(fatjet.subJet2.pt >= 30, fatjet.subJet2.btagDeepB > 0.4184)))
 
         self.ak8BJets = op.select(self.ak8Jets, self.lambda_ak8Btag)
+        self.ak8nonBJets = op.select(self.ak8Jets, self.lambda_ak8noBtag)
+        # Ak4 Jet Collection cleaned from Ak8b #
+        self.lambda_cleanAk4FromAk8b = lambda ak4j : op.NOT(op.AND(op.rng_len(self.ak8BJets) > 0, op.deltaR(ak4j.p4,self.ak8BJets[0].p4) <= 0.8))
+        self.ak4JetsCleanedFromAk8b  = op.select(self.ak4LightJetsByPt, self.lambda_cleanAk4FromAk8b)
 
         #############################################################################
         #                               Triggers                                    #
@@ -1199,14 +1291,14 @@ One lepton and and one jet argument must be specified in addition to the require
             #                                              additionalVariables={'Eta': lambda lepjet : lepjet[0].pt, 'Pt': lambda lepjet : lepjet[1].pt})
             #self.DYReweighting2bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_2b'), combine="weight", systName="dy_reweighting_2b_mumu", defineOnFirstUse=(not forSkimmer),
             #                                              additionalVariables={'Eta': lambda lepjet : lepjet[0].pt, 'Pt': lambda lepjet : lepjet[1].pt})
-            self.DYReweighting1bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_1b'), combine="weight", systName="dy_reweighting_1b_elel", defineOnFirstUse=(not forSkimmer))
-            self.DYReweighting1bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_1b'), combine="weight", systName="dy_reweighting_1b_mumu", defineOnFirstUse=(not forSkimmer))
-            self.DYReweighting2bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_2b'), combine="weight", systName="dy_reweighting_2b_elel", defineOnFirstUse=(not forSkimmer))
-            self.DYReweighting2bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_2b'), combine="weight", systName="dy_reweighting_2b_mumu", defineOnFirstUse=(not forSkimmer))
-
-
-
-
+            #self.DYReweighting1bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_1b'), combine="weight", systName="dy_reweighting_1b_elel", defineOnFirstUse=(not forSkimmer))
+            #self.DYReweighting1bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_1b'), combine="weight", systName="dy_reweighting_1b_mumu", defineOnFirstUse=(not forSkimmer))
+            #self.DYReweighting2bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_2b'), combine="weight", systName="dy_reweighting_2b_elel", defineOnFirstUse=(not forSkimmer))
+            #self.DYReweighting2bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_2b'), combine="weight", systName="dy_reweighting_2b_mumu", defineOnFirstUse=(not forSkimmer))
+            self.DYReweighting1bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_mc_1b'), combine="weight", systName="dy_reweighting_1b_elel", defineOnFirstUse=(not forSkimmer))
+            self.DYReweighting1bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_mc_1b'), combine="weight", systName="dy_reweighting_1b_mumu", defineOnFirstUse=(not forSkimmer))
+            self.DYReweighting2bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_mc_2b'), combine="weight", systName="dy_reweighting_2b_elel", defineOnFirstUse=(not forSkimmer))
+            self.DYReweighting2bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_mc_2b'), combine="weight", systName="dy_reweighting_2b_mumu", defineOnFirstUse=(not forSkimmer))
         else:
             self.DYReweighting1bElEl = lambda dilep : None
             self.DYReweighting1bMuMu = lambda dilep : None
@@ -1227,6 +1319,12 @@ One lepton and and one jet argument must be specified in addition to the require
             systArgs.update({SF._systName+'up':SF.sfOp.get(*(args+[op.extVar("int", "Up")])) for SF in list_SF})
             systArgs.update({SF._systName+'down':SF.sfOp.get(*(args+[op.extVar("int", "Down")])) for SF in list_SF})
             return op.systematic(**systArgs)
+
+
+        #############################################################################
+        #                             High level lambdas                            #
+        #############################################################################
+        self.HLL = highlevelLambdas(self)
         
         #############################################################################
         #                             Fake Factors                                  #
@@ -1246,6 +1344,9 @@ One lepton and and one jet argument must be specified in addition to the require
         self.lambda_FF_el = lambda el : self.electronCorrFR*returnFFSF(el,self.electronFRList,"el_FR")/(1-self.electronCorrFR*returnFFSF(el,self.electronFRList,"el_FR"))
         self.lambda_FF_mu = lambda mu : self.muonCorrFR*returnFFSF(mu,self.muonFRList,"mu_FR")/(1-self.muonCorrFR*returnFFSF(mu,self.muonFRList,"mu_FR"))
 
+        if channel == "SL":
+            self.ElFakeFactor = lambda el : self.lambda_FF_el(el)
+            self.MuFakeFactor = lambda mu : self.lambda_FF_mu(mu)
         if channel == "DL":
             self.ElElFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),op.NOT(self.lambda_electronTightSel(dilep[1]))),
                                                                  # Both electrons fail tight -> -F1*F2
@@ -1330,8 +1431,6 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                 systName = 'btag_ratio',
                                                                 nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
                 noSel = noSel.refine("BtagSF" , weight = [self.btagSF,self.BtagRatioWeight])
-
-
 
 
         # Return #
