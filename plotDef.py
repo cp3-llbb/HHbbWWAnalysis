@@ -1608,12 +1608,14 @@ def makeDoubleLeptonHighLevelQuantities (sel,met,l1,l2,j1,j2,suffix,channel,HLL)
     return plots 
 
 #########################  Machine Learning  ################################
-def makeSingleLeptonMachineLearningPlotsBDT(sel,fakeLepColl,lep,met,jets,bJets,lJets,j1,j2,j3,j4,suffix,channel,model_even,model_odd):
+def makeSingleLeptonMachineLearningPlotsBDT(sel,fakeLepColl,lep,met,jets,bJets,lJets,j1,j2,j3,j4,suffix,channel,model_even,model_odd,event,HLL):
     plots = []
     channelLabel = SingleLeptonChannelTitleLabel(channel)
 
-    output_odd = model_even(op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.))
-    output_even = model_odd(op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.))
+    #output_odd = model_even(op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.))
+    #output_even = model_odd(op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.))
+    inputs = [op.c_float(0.)]*21
+    output = op.switch(event%2,model_odd(*inputs),model_even(*inputs))
 
     '''
     output_odd = model_even(
@@ -1667,12 +1669,13 @@ def makeSingleLeptonMachineLearningPlotsBDT(sel,fakeLepColl,lep,met,jets,bJets,l
         MT(lep,met)               # mT_W
     )
     '''
-    plots.append(Plot.make1D("%s_%s_BDTOutput"%(channel,suffix),
-                             output_odd[0],
-                             sel,
-                             EquidistantBinning(50,0.,1.),
-                             xTitle = 'BDT output',
-                             plotopts = channelLabel))
+    for i in range(10):
+        plots.append(Plot.make1D("%s_%s_BDTOutput_%d"%(channel,suffix,i),
+                                 output[i],
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 xTitle = 'BDT output %d'%i,
+                                 plotopts = channelLabel))
     
     return plots
 
