@@ -15,6 +15,8 @@ class TemplateLatex:
         self.texfile = os.path.join(os.path.dirname(self.dirpaths[0]),"plots.tex")
         self.filesdict = {}
         self.logplot = logplot
+        if self.logplot:
+            self.texfile = self.texfile.replace('.tex','_log.tex')
 
         # Ordered dicts so that plots keep that order #
         self.channels = collections.OrderedDict([
@@ -92,8 +94,8 @@ class TemplateLatex:
                         # Machine Learning
                         ("_DNNOutput_DY", "DNN Output DY"),
                         ("_DNNOutput_ttbar", "DNN Output ttbar"),
-                        ("_DNNOutput_H", "DNN Output H"),
-                        ("_DNNOutput_HH", "DNN Output HH"),
+                        ("_DNNOutput_H.", "DNN Output H"),
+                        ("_DNNOutput_HH.", "DNN Output HH"),
                         ("_DNNOutput_ST", "DNN Output ST"),
                         ("_DNNOutput_ttVX", "DNN Output ttVX"),
                         ("_DNNOutput_VVV", "DNN Output VV(V)"),
@@ -119,7 +121,11 @@ class TemplateLatex:
                 logging.info("... "+"-"*40)
                 logging.info("... Selection : "+selection)
                 variabledict = {}
-                pdfs = [glob.glob(os.path.join(dirpath,channel+"*"+selection+"*.pdf")) for dirpath in self.dirpaths]
+                #if self.logplot:
+                base_pdf = channel+"*"+selection+"*.pdf"
+                if self.logplot:
+                    base_pdf = base_pdf.replace('.pdf','_logy.pdf')
+                pdfs = [glob.glob(os.path.join(dirpath,base_pdf)) for dirpath in self.dirpaths]
                 pdfs = reduce(operator.concat, pdfs)
                 for pdf in pdfs:
                     pdf = os.path.basename(pdf)
@@ -284,7 +290,7 @@ if __name__ == "__main__":
     if not opt.verbose:
         logging.getLogger().setLevel(logging.INFO)
 
-    instance = TemplateLatex(opt.dirnames)
+    instance = TemplateLatex(opt.dirnames,opt.log)
     if opt.yields:
         instance.compileYield()
     if opt.pdf:

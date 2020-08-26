@@ -140,7 +140,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
                 for channelDict in ChannelDictList:
                     #----- Trigger plots -----#
-                    plots.extend(triggerPlots(**channelDict,triggerDict=self.triggersPerPrimaryDataset))
+                    plots.extend(doubleLeptonTriggerPlots(**channelDict,triggerDict=self.triggersPerPrimaryDataset))
                     #----- Dilepton plots -----#
                     #plots.extend(doubleLeptonChannelPlot(**channelDict,DilepElEl=OSElElDilepton,DilepMuMu=OSMuMuDilepton,DilepElMu=OSElMuDilepton))
 
@@ -207,7 +207,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     # Number of jets #
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**FatJetsN))
                     # Ak8 Jets #
-                    plots.extend(makeAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys}))
+                    plots.extend(makeDoubleLeptonAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys}))
                     # MET #
                     plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
 
@@ -315,7 +315,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**BoostedJetsN))
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**FatJetsN))
                     # Ak8 Jets #
-                    plots.extend(makeAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys}))
+                    plots.extend(makeDoubleLeptonAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys}))
                     # MET #
                     plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
             
@@ -345,7 +345,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     ChannelDictList.append({'channel': 'ElMu','met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'j1':self.ak8BJets[0].subJet1,'j2':self.ak8BJets[0].subJet2,'sel':ElMuSelObjectDileptonAk8JetsInclusiveBoosted.sel,'suffix':ElMuSelObjectDileptonAk8JetsInclusiveBoosted.selName})
 
             for channelDict in ChannelDictList:
-                plots.extend(makeHighLevelQuantities(**channelDict))
+                plots.extend(makeDoubleLeptonHighLevelQuantities(**channelDict,HLL=self.HLL))
 
             #----- Machine Learning plots -----#
             selObjectDictList = []
@@ -378,7 +378,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             dileptons = {'ElEl':OSElElDilepton[0],'MuMu':OSMuMuDilepton[0],'ElMu':OSElMuDilepton[0]}
             for selObjectDict in selObjectDictList:
                 dilepton = dileptons[selObjectDict['channel']]
-                plots.extend(makeMachineLearningPlots(channel=selObjectDict['channel'],l1=dilepton[0],l2=dilepton[1],jets=self.ak4Jets,sel=selObjectDict['selObject'].sel,suffix=selObjectDict['selObject'].selName,model=LBN))
+                plots.extend(makeDoubleLeptonMachineLearningPlots(channel=selObjectDict['channel'],l1=dilepton[0],l2=dilepton[1],jets=self.ak4Jets,sel=selObjectDict['selObject'].sel,suffix=selObjectDict['selObject'].selName,model=LBN))
     
         #----- Add the Yield plots -----#
         plots.extend(self.yieldPlots.returnPlots())
