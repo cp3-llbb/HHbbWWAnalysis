@@ -14,10 +14,9 @@ from bamboo import treefunctions as op
 from bamboo.plots import CutFlowReport, Plot, EquidistantBinning, SummedPlot
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)))) # Add scripts in this directory
-from BaseHHtobbWWSL import BaseNanoHHtobbWW
-from plotDefSL import *
-from selectionDefSL import *
-from highlevelLambdasSL import *
+from BaseHHtobbWW import BaseNanoHHtobbWW
+from plotDef import *
+from selectionDef import *
 from DDHelper import DataDrivenFake, DataDrivenDY
 
 def switch_on_index(indexes, condition, contA, contB):
@@ -157,10 +156,10 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 
                 for channelDict in ChannelDictList:
                     #----- Trigger plots -----#
-                    plots.extend(triggerPlots(**channelDict, triggerDict=self.triggersPerPrimaryDataset))
+                    plots.extend(singleLeptonTriggerPlots(**channelDict, triggerDict=self.triggersPerPrimaryDataset))
                     #----- Lepton plots -----#
                     # Singlelepton channel plots #
-                    #plots.extend(channelPlot(**channelDict, SinlepEl=ElColl, SinlepMu=MuColl, suffix=ElSelObj.selName))
+                    #plots.extend(singleLeptonChannelPlot(**channelDict, SinlepEl=ElColl, SinlepMu=MuColl, suffix=ElSelObj.selName))
         
 
             # ------------- test ------------- #
@@ -241,7 +240,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**JetsN))
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**FatJetsN))
                     # Ak4 Jets #
-                    plots.extend(makeAk4JetsPlots(**{k:channelDict[k] for k in JetKeys}))
+                    plots.extend(makeAk4JetsPlots(**{k:channelDict[k] for k in JetKeys},HLL=self.HLL))
                     # MET #
                     plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
 
@@ -276,7 +275,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**FatJetsN))
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**SlimJetsN))
                     # Ak8 Jets #
-                    plots.extend(makeAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys}))
+                    plots.extend(makeSingleLeptonAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys}))
                     # MET #
                     plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
 
@@ -323,12 +322,12 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         cutFlowPlots.append(CutFlowReport(MuSelObjAk4JetsLooseExclusiveResolved1b2j.selName,MuSelObjAk4JetsLooseExclusiveResolved1b2j.sel))
 
                         ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsLooseExclusiveResolved1b2j.sel,'lep':ElColl[0],'met':self.corrMET,
-                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.remainingJets[0],'j4':None,
+                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJetsByBtagScore[0],'j3':self.remainingJets[0],'j4':None,
                                                 'nJet':3,'nbJet':1,
                                                 'suffix':ElSelObjAk4JetsLooseExclusiveResolved1b2j.selName,
                                                 'is_MC':self.is_MC})
                         ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsLooseExclusiveResolved1b2j.sel,'lep':MuColl[0],'met':self.corrMET,
-                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.remainingJets[0],'j4':None,
+                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJetsByBtagScore[0],'j3':self.remainingJets[0],'j4':None,
                                                 'nJet':3,'nbJet':1,
                                                 'suffix':MuSelObjAk4JetsLooseExclusiveResolved1b2j.selName,
                                                 'is_MC':self.is_MC})
@@ -391,22 +390,22 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         # https://gitlab.cern.ch/cms-hh-bbww/cms-hh-to-bbww/-/blob/master/Legacy/signal_extraction.md
                         self.remainingJetPairs_mu1b3j = op.combine(self.remainingJets, N=2)
                         self.lambda_chooseWjj_mu1b3j  = lambda dijet: op.abs((dijet[0].p4+dijet[1].p4+MuColl[0].p4+self.corrMET.p4).M() - 
-                                                                             (bJetCorrP4(self.ak4BJets[0]) + bJetCorrP4(self.ak4LightJets[0])).M()) 
+                                                                             (bJetCorrP4(self.ak4BJets[0]) + bJetCorrP4(self.ak4LightJetsByBtagScore[0])).M()) 
                         self.WjjPairs_mu1b3j = op.sort(self.remainingJetPairs_mu1b3j, self.lambda_chooseWjj_mu1b3j)
                         
                         self.remainingJetPairs_el1b3j = op.combine(self.remainingJets, N=2)
                         self.lambda_chooseWjj_el1b3j  = lambda dijet: op.abs((dijet[0].p4+dijet[1].p4+ElColl[0].p4+self.corrMET.p4).M() - 
-                                                                             (bJetCorrP4(self.ak4BJets[0]) + bJetCorrP4(self.ak4LightJets[0])).M()) 
+                                                                             (bJetCorrP4(self.ak4BJets[0]) + bJetCorrP4(self.ak4LightJetsByBtagScore[0])).M()) 
                         self.WjjPairs_el1b3j = op.sort(self.remainingJetPairs_el1b3j, self.lambda_chooseWjj_el1b3j)
 
                         
                         ChannelDictList.append({'channel':'El','sel':ElSelObjAk4JetsTightExclusiveResolved1b3j.sel,'lep':ElColl[0],'met':self.corrMET,
-                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.WjjPairs_el1b3j[0][0],'j4':self.WjjPairs_el1b3j[0][1],
+                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJetsByBtagScore[0],'j3':self.WjjPairs_el1b3j[0][0],'j4':self.WjjPairs_el1b3j[0][1],
                                                 'nJet':4,'nbJet':1,
                                                 'suffix':ElSelObjAk4JetsTightExclusiveResolved1b3j.selName,
                                                 'is_MC':self.is_MC})
                         ChannelDictList.append({'channel':'Mu','sel':MuSelObjAk4JetsTightExclusiveResolved1b3j.sel,'lep':MuColl[0],'met':self.corrMET,
-                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJets[0],'j3':self.WjjPairs_mu1b3j[0][0],'j4':self.WjjPairs_mu1b3j[0][1],
+                                                'j1':self.ak4BJets[0],'j2':self.ak4LightJetsByBtagScore[0],'j3':self.WjjPairs_mu1b3j[0][0],'j4':self.WjjPairs_mu1b3j[0][1],
                                                 'nJet':4,'nbJet':1,
                                                 'suffix':MuSelObjAk4JetsTightExclusiveResolved1b3j.selName,
                                                 'is_MC':self.is_MC})
@@ -426,12 +425,12 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         # https://gitlab.cern.ch/cms-hh-bbww/cms-hh-to-bbww/-/blob/master/Legacy/signal_extraction.md
                         self.lightJetPairs_mu2b2j     = op.combine(self.ak4LightJetsByPt, N=2)
                         self.lambda_chooseWjj_mu2b2j  = lambda dijet: op.abs((dijet[0].p4+dijet[1].p4+MuColl[0].p4+self.corrMET.p4).M() - 
-                                                                             (bJetCorrP4(self.ak4BJets[0]) + bJetCorrP4(self.ak4LightJets[0])).M()) 
+                                                                             (bJetCorrP4(self.ak4BJets[0]) + bJetCorrP4(self.ak4LightJetsByBtagScore[0])).M()) 
                         self.WjjPairs_mu2b2j          = op.sort(self.lightJetPairs_mu2b2j, self.lambda_chooseWjj_mu2b2j)
                         
                         self.lightJetPairs_el2b2j     = op.combine(self.ak4LightJetsByPt, N=2)
                         self.lambda_chooseWjj_el2b2j  = lambda dijet: op.abs((dijet[0].p4+dijet[1].p4+ElColl[0].p4+self.corrMET.p4).M() - 
-                                                                             (bJetCorrP4(self.ak4BJets[0]) + bJetCorrP4(self.ak4LightJets[0])).M())
+                                                                             (bJetCorrP4(self.ak4BJets[0]) + bJetCorrP4(self.ak4LightJetsByBtagScore[0])).M())
                         self.WjjPairs_el2b2j          = op.sort(self.lightJetPairs_el2b2j, self.lambda_chooseWjj_el2b2j)
                         
 
@@ -448,7 +447,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
                 # Lepton + jet Plots #
                 ResolvedBTaggedJetsN = {'objName':'Ak4BJets','objCont':self.ak4BJets,'Nmax':5,'xTitle':'N(Ak4 Bjets)'}
-                ResolvedLightJetsN   = {'objName':'Ak4LightJets','objCont':self.ak4LightJets,'Nmax':10,'xTitle':'N(Ak4 Lightjets)'}
+                ResolvedLightJetsN   = {'objName':'Ak4LightJets','objCont':self.ak4LightJetsByBtagScore,'Nmax':10,'xTitle':'N(Ak4 Lightjets)'}
         
                 for channelDict in ChannelDictList:
                     # Dilepton #
@@ -457,11 +456,11 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**ResolvedBTaggedJetsN))
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**ResolvedLightJetsN))
                     # Ak4 Jets #
-                    plots.extend(makeAk4JetsPlots(**{k:channelDict[k] for k in JetKeys}))
+                    plots.extend(makeAk4JetsPlots(**{k:channelDict[k] for k in JetKeys},HLL=self.HLL))
                     # MET #
                     plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
                     # High level #
-                    plots.extend(makeHighLevelPlotsResolved(**{k:channelDict[k] for k in ResolvedKeys}))
+                    plots.extend(makeHighLevelPlotsResolved(**{k:channelDict[k] for k in ResolvedKeys},HLL=self.HLL))
 
             if any("SemiBoosted" in key for key in jetsel_level):
                 print ("......... processing Semi-Boosted Category")
@@ -526,11 +525,11 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**FatJetsN))
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**FatBJetsN))       
                     # Ak8 Jets #
-                    plots.extend(makeAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys}))
+                    plots.extend(makeSingleLeptonAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys}))
                     # MET #
                     plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
                     # HighLevel #
-                    plots.extend(makeHighLevelPlotsBoosted(**{k:channelDict[k] for k in BoostedKeys}))
+                    plots.extend(makeHighLevelPlotsBoosted(**{k:channelDict[k] for k in BoostedKeys},HLL=self.HLL))
             
             if "Boosted" in jetsel_level:
                 print ("......... Processing Boosted category selection")        
@@ -561,7 +560,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**FatJetsN))
                     plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**FatBJetsN))       
                     # Ak8 Jets #
-                    plots.extend(makeAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys}))
+                    plots.extend(makeSingleLeptonAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys}))
                     # MET #
                     plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
 
@@ -616,7 +615,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                                                 'model_even':BDT_fullReco900R_simple_even, 'model_odd':BDT_fullReco900R_simple_odd})
 
             for channelDict in channelDictList:
-                plots.extend(makeMachineLearningPlotsBDT(**channelDict))
+                plots.extend(makeSingleLeptonMachineLearningPlotsBDT(**channelDict))
             
         #----- Add the Yield plots -----#
         plots.extend(self.yieldPlots.returnPlots())
