@@ -1158,35 +1158,67 @@ def makeBtagDDplots(sel,jet,channel,suffix):
     return plots
 
 #########################  Machine Learning  ################################
-def makeMachineLearningPlotsBDT(sel,lep,met,jets,bJets,lJets,j1,j2,j3,j4,suffix,channel,model):
+def makeMachineLearningPlotsBDT(sel,fakeLepColl,lep,met,jets,bJets,lJets,j1,j2,j3,j4,suffix,channel,model_even,model_odd):
     plots = []
     channelLabel = channelTitleLabel(channel)
 
-    output = model(
-        op.switch(op.rng_len(lJets) >= 2, op.deltaR(op.sort(jets, lambda j : op.deltaR(lep.p4, j.p4))[0].p4,lep.p4), op.c_float(0.)),    # mindr_lep1_jet || mT_top_3particle
-        op.switch(op.rng_len(lJets) >= 2, op.invariant_mass(bJetCorrP4(j1), bJetCorrP4(j2)),MT(lep, met)),    # m_Hbb_regCorr || mT_W
-        op.switch(op.rng_len(lJets) >= 2, op.invariant_mass(j1.p4, j2.p4), op.deltaR(op.sort(jets, lambda j : op.deltaR(lep.p4, j.p4))[0].p4,lep.p4)),     # m_HH || mindr_lep1_jet
-        op.switch(op.rng_len(lJets) >= 2, op.invariant_mass(lep.p4, met.p4), op.deltaR(j1.p4, lep.p4)),     # mWlep_met_simple || dR_b1lep
-        op.switch(op.rng_len(lJets) >= 2, op.deltaR((lep.p4+met.p4), (j3.p4+j4.p4)), op.deltaR(j2.p4, lep.p4)),     # dR_Hww || dR_b2lep
-        op.switch(op.rng_len(lJets) >= 2, op.invariant_mass(j3.p4,j4.p4), op.invariant_mass(bJetCorrP4(j1),bJetCorrP4(j2))), # m_Wjj || m_Hbb_regCorr 
-        op.switch(op.rng_len(lJets) >= 2, op.abs(op.cos((j1.p4+j2.p4).Phi())), bJetCorrP4(j1).Pt()), # cosThetaS_Hbb || selJet1_Hbb_pT
-        op.switch(op.rng_len(lJets) >= 2, op.abs(op.cos((j3.p4+j4.p4).Phi())), bJetCorrP4(j2).Pt()), # cosThetaS_Wjj || selJet2_Hbb_pT
-        op.switch(op.rng_len(lJets) >= 2, op.abs(op.cos((j3.p4+j4.p4).Phi())), op.rng_len(bJets)), # cosThetaS_WW || nBJetMedium
-        op.switch(op.rng_len(lJets) >= 2, op.c_float(0.), lep.p4.Pt()), # cosThetaS_HH || lep_conePt
-        op.switch(op.rng_len(lJets) >= 2, op.rng_len(jets), met.pt), # nJet || met_LD
-        op.switch(op.rng_len(lJets) >= 4, op.rng_len(bJets), op.rng_sum(jets, lambda j : j.p4.Pt())), # nBJetMedium || HT
-        op.switch(op.rng_len(lJets) >= 2, op.deltaR(j1.p4, lep.p4), op.c_float(0.)), # dR_b1lep
-        op.switch(op.rng_len(lJets) >= 2, op.deltaR(j2.p4, lep.p4), op.c_float(0.)), # dR_b2lep
-        op.switch(op.rng_len(lJets) >= 2, bJetCorrP4(j1).Pt(), op.c_float(0.)), # selJet1_Hbb_pT
-        op.switch(op.rng_len(lJets) >= 2, bJetCorrP4(j2).Pt(), op.c_float(0.)), # selJet2_Hbb_pT 
-        op.switch(op.rng_len(lJets) >= 2, lep.p4.Pt(), op.c_float(0.)), # lep_conePt
-        op.switch(op.rng_len(lJets) >= 2, met.pt, op.c_float(0.)), # met_LD
-        op.switch(op.rng_len(lJets) >= 4, op.rng_sum(jets, lambda j : j.p4.Pt()), op.c_float(0.)) # HT
-    )
+    output_odd = model_even(op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.))
+    output_even = model_odd(op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.))
 
-    #for i,node in enumerate(['HH', 'H', 'DY', 'ST', 'ttbar', 'ttVX', 'VVV', 'Rare']):
+    '''
+    output_odd = model_even(
+        mindr_lep1_jet(lep,jets),                             # mindr_lep1_jet
+        op.invariant_mass(bJetCorrP4(j1), bJetCorrP4(j2)),    # m_Hbb_regCorr
+        HHP4_simple_met(bJetCorrP4(j1)+bJetCorrP4(j2), j3.p4, j4.p4, lep.p4, met.p4).M(),   # mHH_simple_met
+        Wlep_met_simple(lep.p4, met.p4).M(),           # mWlep_met_simple
+        HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4).M(), # mWW_simple_met
+        Wjj_simple(j3.p4, j4.p4).M(),                  # mWjj_simple
+        comp_cosThetaS(bJetCorrP4(j1),bJetCorrP4(j2)), # cosThetaS_Hbb
+        comp_cosThetaS(j3.p4, j4.p4),                  # cosThetaS_Wjj_simple
+        comp_cosThetaS(Wjj_simple(j3.p4,j4.p4),Wlep_met_simple(lep.p4,met.p4)),                      # cosThetaS_WW_simple_met
+        comp_cosThetaS(bJetCorrP4(j1)+bJetCorrP4(j2), HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4)), # cosThetaS_HH_simple_met
+        op.rng_len(jets),         # nJet
+        op.rng_len(bJets),        # nBJetMedium
+        op.deltaR(j1.p4, lep.p4), # dR_b1lep
+        op.deltaR(j2.p4, lep.p4), # dR_b2lep
+        op.switch(op.abs(lep.pdgId)==11, lambda_conept_electron(lep), lambda_conept_muon(lep)),          # lep_conePt
+        #lepConePt(lep),           # lep_conePt
+        #op.c_float(1.0),
+        bJetCorrP4(j1).Pt(),      # selJet1_Hbb_pT
+        bJetCorrP4(j2).Pt(),      # selJet2_Hbb_pT 
+        MET_LD(met,jets,fakeLepColl), # met_LD
+        HT(jets),                     # HT
+        op.min(mT2(j3,lep,met), mT2(j4,lep,met)),       # mT_top_3particle
+        MT(lep,met)                   # mT_W
+    )
+    output_even = model_odd(
+        mindr_lep1_jet(lep,jets),                             # mindr_lep1_jet
+        op.invariant_mass(bJetCorrP4(j1), bJetCorrP4(j2)),    # m_Hbb_regCorr
+        HHP4_simple_met(bJetCorrP4(j1)+bJetCorrP4(j2), j3.p4, j4.p4, lep.p4, met.p4).M(),   # mHH_simple_met
+        Wlep_met_simple(lep.p4, met.p4).M(),           # mWlep_met_simple
+        HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4).M(), # mWW_simple_met
+        Wjj_simple(j3.p4, j4.p4).M(),                  # mWjj_simple
+        comp_cosThetaS(bJetCorrP4(j1),bJetCorrP4(j2)), # cosThetaS_Hbb
+        comp_cosThetaS(j3.p4, j4.p4),                  # cosThetaS_Wjj_simple
+        comp_cosThetaS(Wjj_simple(j3.p4,j4.p4),Wlep_met_simple(lep.p4,met.p4)),                      # cosThetaS_WW_simple_met
+        comp_cosThetaS(bJetCorrP4(j1)+bJetCorrP4(j2), HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4)), # cosThetaS_HH_simple_met
+        op.rng_len(jets),         # nJet
+        op.rng_len(bJets),        # nBJetMedium
+        op.deltaR(j1.p4, lep.p4), # dR_b1lep
+        op.deltaR(j2.p4, lep.p4), # dR_b2lep
+        op.switch(op.abs(lep.pdgId)==11, lambda_conept_electron(lep), lambda_conept_muon(lep)),          # lep_conePt
+        #lepConePt(lep),           # lep_conePt
+        #op.c_float(1.0),
+        bJetCorrP4(j1).Pt(),      # selJet1_Hbb_pT
+        bJetCorrP4(j2).Pt(),      # selJet2_Hbb_pT
+        MET_LD(met,jets,fakeLepColl), # met_LD 
+        HT(jets),                 # HT
+        op.min(mT2(j3,lep,met), mT2(j4,lep,met)),       # mT_top_3particle
+        MT(lep,met)               # mT_W
+    )
+    '''
     plots.append(Plot.make1D("%s_%s_BDTOutput"%(channel,suffix),
-                             output[0],
+                             output_odd[0],
                              sel,
                              EquidistantBinning(50,0.,1.),
                              xTitle = 'BDT output',
