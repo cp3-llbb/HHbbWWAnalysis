@@ -6,13 +6,17 @@ import collections
 import logging
 import argparse
 import subprocess
+from functools import reduce
+import operator
 
 class TemplateLatex:
-    def __init__(self,dirpath,logplot=False):
-        self.dirpath = os.path.abspath(dirpath)
-        self.texfile = os.path.join(self.dirpath,"plots.tex")
+    def __init__(self,dirpaths,logplot=False):
+        self.dirpaths = [os.path.abspath(dirpath) for dirpath in dirpaths]
+        self.texfile = os.path.join(os.path.dirname(self.dirpaths[0]),"plots.tex")
         self.filesdict = {}
         self.logplot = logplot
+        if self.logplot:
+            self.texfile = self.texfile.replace('.tex','_log.tex')
 
         # Ordered dicts so that plots keep that order #
         self.channels = collections.OrderedDict([
@@ -87,11 +91,15 @@ class TemplateLatex:
                         ("_highlevelvariable_mTlljj", "Dilepton-Dijet-MET tranverse mass"),
                         ("_highlevelvariable_HT2.", "$H_{T2}$ (scalar sum of the magnitudes of the HH decay momentas)"),
                         ("_highlevelvariable_HT2R.", "$H_{T2}^R$ (ratio of $H_{T2}$ and scalar sum of the transverse momenta HH decay products"),
-
-                     #   ("_ElectronFatjet_DeltaR" , "\Delta R(Electron, Fatjet)"),
-                     #   ("_ElectronJet_DeltaR" , "\Delta R(Electron, Jet)"),
-                     #   ("_MuonFatjet_DeltaR" , "\Delta R(Muon, Fatjet)"),
-                     #   ("_MuonJet_DeltaR" , "\Delta R(Muon, Fatjet)"),
+                        # Machine Learning
+                        ("_DNNOutput_DY", "DNN Output DY"),
+                        ("_DNNOutput_ttbar", "DNN Output ttbar"),
+                        ("_DNNOutput_H.", "DNN Output H"),
+                        ("_DNNOutput_HH.", "DNN Output HH"),
+                        ("_DNNOutput_ST", "DNN Output ST"),
+                        ("_DNNOutput_ttVX", "DNN Output ttVX"),
+                        ("_DNNOutput_VVV", "DNN Output VV(V)"),
+                        ("_DNNOutput_Rare", "DNN Output Rare"),
                         ])
                 # "_" at beginning is useful to distinguish leading and subleading
                 # "." at end is useful to distinguish "HT2" and "HT2R"
@@ -113,7 +121,13 @@ class TemplateLatex:
                 logging.info("... "+"-"*40)
                 logging.info("... Selection : "+selection)
                 variabledict = {}
-                for pdf in glob.glob(os.path.join(self.dirpath,channel+"*"+selection+"*.pdf")):
+                #if self.logplot:
+                base_pdf = channel+"*"+selection+"*.pdf"
+                if self.logplot:
+                    base_pdf = base_pdf.replace('.pdf','_logy.pdf')
+                pdfs = [glob.glob(os.path.join(dirpath,base_pdf)) for dirpath in self.dirpaths]
+                pdfs = reduce(operator.concat, pdfs)
+                for pdf in pdfs:
                     pdf = os.path.basename(pdf)
                     log = "logy" in pdf
                     if self.logplot ^ log: # xor
@@ -142,6 +156,12 @@ class TemplateLatex:
 }
 \usepackage{graphicx}
 \usepackage[english]{babel}
+\graphicspath{
+                        """
+        for dirpath in self.dirpaths:
+            self.content += "{%s/},"%os.path.basename(dirpath)
+        self.content += "}"
+        self.content += r"""
 \begin{document}
                         """
         self.content += "\n"
@@ -184,58 +204,66 @@ class TemplateLatex:
 
     def producePDF(self):
         cwd = os.getcwd()
+        wd = os.path.dirname(self.texfile)
         try:
-            os.chdir(self.dirpath)
-            try:
-                with open('plots_compilation.log', 'w') as output:
-                    process= subprocess.Popen(['pdflatex', os.path.basename(self.texfile)], # We moved to the directory
-                                              stdout=output,
-                                              stderr=output)
-            except:
-                logging.critical("Could not produce the pdf from the Tex file, try manually 'pdflatex %s'"%self.texfile)
-            logging.info("Generated pdf file %s"%(self.texfile.replace(".tex",".pdf")))
-            logging.info("Log available at %s"%(os.path.join(self.dirpath,'plots_compilation.log')))
+            os.chdir(wd)
         except:
-            logging.critical("Could not go to directory %s"%self.dirpath)
+            logging.critical("Could not go to directory %s, will abort"%wd)
+            sys.exit()
+        try:
+            with open('plots_compilation.log', 'w') as output:
+                process= subprocess.Popen(['pdflatex', os.path.basename(self.texfile)], # We moved to the directory
+                                          stdout=output,
+                                          stderr=output)
+        except:
+            logging.critical("Could not produce the pdf from the Tex file, try manually 'pdflatex %s'"%self.texfile)
+        logging.info("Generated pdf file %s"%(self.texfile.replace(".tex",".pdf")))
+        logging.info("Log available at %s"%(os.path.join(wd,'plots_compilation.log')))
         os.chdir(cwd)
         
     def compileYield(self):
-        # Load tex file adn edit content in string #
+        # Load tex file and edit content in string #
         text = r"""
 \documentclass{report}
     \usepackage{booktabs}
     \usepackage{graphicx}
     \usepackage[a4paper,bindingoffset=0.5cm,left=0cm,right=1cm,top=2cm,bottom=2cm,footskip=0.25cm]{geometry}
+
+\begin{document}
                 """
-        with open(os.path.join(self.dirpath,"yields.tex"),"r") as f:
-            while True: 
-                line = f.readline() 
-                if not line:
-                    break
-                if line.startswith(r"\begin{tabular}"):
-                    text += r"\begin{document}"+"\n"
-                    text += r"\resizebox{\textwidth}{!}{"+"\n"
-                text += line
-        text += "\n}\n"+r"\end{document}"
+        wd = os.path.dirname(self.texfile)
+        for dirpath in self.dirpaths:
+            with open(os.path.join(dirpath,"yields.tex"),"r") as f:
+                while True: 
+                    line = f.readline() 
+                    if not line:
+                        break
+                    if line.startswith(r"\begin{document}"):
+                        continue
+                    if line.startswith(r"\begin{tabular}"):
+                        text += r"\resizebox{\textwidth}{!}{"+"\n"
+                    text += line
+            text += "\n}\n"
+        text += r"\end{document}"
 
         # Save new tex file #
-        with open(os.path.join(self.dirpath,"yieldsTable.tex"),"w") as f:
+        with open(os.path.join(wd,"yieldsTable.tex"),"w") as f:
             f.write(text)
         # Move to directory and compile #
         cwd = os.getcwd()
         try:
-            os.chdir(self.dirpath)
-            try:
-                with open('yields_compilation.log', 'w') as output:
-                    process= subprocess.Popen(['pdflatex', "yieldsTable.tex"], # We moved to the directory
-                                              stdout=output,
-                                              stderr=output)
-            except:
-                logging.critical("Could not produce the pdf from the Tex file, try manually 'pdflatex yieldsTable.tex'")
-            logging.info("Generated pdf file %s"%(os.path.join(self.dirpath,"yieldsTable.pdf")))
-            logging.info("Log available at %s"%(os.path.join(self.dirpath,'yields_compilation.log')))
+            os.chdir(wd)
         except:
-            logging.critical("Could not go to directory %s"%self.dirpath)
+            logging.critical("Could not go to directory %s"%wd)
+        try:
+            with open('yields_compilation.log', 'w') as output:
+                process= subprocess.Popen(['pdflatex', "yieldsTable.tex"], # We moved to the directory
+                                          stdout=output,
+                                          stderr=output)
+        except:
+            logging.critical("Could not produce the pdf from the Tex file, try manually 'pdflatex yieldsTable.tex'")
+        logging.info("Generated pdf file %s"%(os.path.join(wd,"yieldsTable.pdf")))
+        logging.info("Log available at %s"%(os.path.join(wd,'yields_compilation.log')))
         os.chdir(cwd)
 
 
@@ -246,8 +274,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(levelname)s - %(message)s',datefmt='%m/%d/%Y %H:%M:%S')
     # Argparse #
     parser = argparse.ArgumentParser(description='Utility to generate Latex slides on the spot for the HH->bbWW analysis')
-    parser.add_argument('-d','--dirname', action='store', required=False, type=str, default='',
-                        help='Path of the directory where the plots are')
+    parser.add_argument('-d','--dirnames', action='store', required=False, type=str, default='', nargs='+',
+                        help='Path of the directory where the plots are (can be several separated by spaces')
     parser.add_argument('-y','--yields', action='store_true', required=False, default=False,
                         help='Wether to compile the yields.tex into yields.pdf')
     parser.add_argument('--pdf', action='store_true', required=False, default=False,
@@ -262,7 +290,7 @@ if __name__ == "__main__":
     if not opt.verbose:
         logging.getLogger().setLevel(logging.INFO)
 
-    instance = TemplateLatex(opt.dirname)
+    instance = TemplateLatex(opt.dirnames,opt.log)
     if opt.yields:
         instance.compileYield()
     if opt.pdf:

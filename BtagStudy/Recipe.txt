@@ -1,0 +1,28 @@
+Details here : https://twiki.cern.ch/twiki/bin/view/CMS/BTagShapeCalibration
+
+The point of this recipe is to produce the reweighting ratio =  Σ w(before)/Σ w(after)
+Where w(before) is the event weight with btagging weight OFF, 
+      w(after) is the event weight with btagging weight ON
+
+Note : Btag weight = Π_i(all jets) SD(jet_i)
+
+The event weight in this case will be binned in terms of jet multiplicity (Ak4 with preselection), without any selection (inclusive analysis)
+
+*Method* 
+- Step 1 : run the Plotter (PlotterHHtobbWWDL.py) in driver mode on an analysis file containing only MC samples (aka analysis2016_MC.yml, or a specific yaml file for some samples)
+    -> Step 1a : run once with `--BtagReweightingOn`
+    -> Step 1b : run once with `--BtagReweightingOff`
+- Step 2 : run the script `ComputeBtagReweightingRatio.py` after editing the paths at the end of the script (the histogram name should not change unless we want to bin on another variable)
+- Step 3 : Put the reweighting files (in json format) in `HHbbWWAnalysis/data/ScaleFactors_Btag/`
+- Step 4 : profit 
+
+The Base class will look at the json corresponding to the name of the sample, so if you remained consistent in sample names there is nothing to change
+
+IMPORTANT NOTES : 
+- The flags `--BtagReweightingOn` and `--BtagReweightingOff` return the plots before any selection is done
+    -> The lepton and jet arguments do not matter and the associated plots will not be produced !!
+- As only a handful of plots will be produced, even with systematics the jobs should run quite fast
+    -> In order to take advantage of that, TimeLimit of 1h (or even below) and Memory of 3000MB should be more than enough and will give more priority to the jobs
+- To not take into account the stitching weights for DY and WJets, one should also use the `--NoStitching`
+
+
