@@ -1,0 +1,1365 @@
+tree: Events
+eras:
+  '2018': 
+    luminosity: 59740.565201546  
+    luminosity-error: 0.025 
+samples:
+######################## Radion 2B2Tau #######################
+
+  GluGluToRadionToHHTo2B2Tau_M-250:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-250_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-250_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 250)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-260:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-260_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-260_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 260)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-270:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-270_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-270_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 270)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-280:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-280_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-280_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 280)
+    type: signal
+
+  GluGluToRadionToHHTo2B2Tau_M-300:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-300_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-300_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 300)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-320:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-320_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-320_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 320)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-350:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-350_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-350_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 350)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-400:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-400_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-400_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 400)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-450:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-450_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-450_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 450)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-500:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-500_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-500_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 500)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-550:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-550_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-550_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 550)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-600:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-600_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-600_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 600)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-650:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-650_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-650_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 650)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-700:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-700_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-700_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 700)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-750:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-750_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-750_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 750)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-800:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-800_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-800_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 800)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-850:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-850_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-850_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 850)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-900:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-900_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-900_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 900)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-1000:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-1000_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-1000_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 1000)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-1250:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-1250_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-1250_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 1250)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-1500:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-1500_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-1500_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 1500)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-1750:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-1750_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-1750_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 1750)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-2000:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-2000_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-2000_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 2000)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-2500:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-2500_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-2500_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 2500)
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-3000:
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-3000_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-3000_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (Radion 2B2Tau, M = 3000)
+    type: signal
+
+######################## VBF Radion 2B2Tau #######################
+
+  VBFToRadionToHHTo2B2Tau_M-250:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-250_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-250_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 250)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-260:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-260_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-260_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 260)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-270:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-270_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-270_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 270)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-280:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-280_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-280_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 280)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-300:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-300_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-300_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 300)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-320:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-320_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-320_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 320)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-350:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-350_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-350_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 350)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-400:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-400_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-400_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 400)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-450:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-450_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-450_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 450)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-500:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-500_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-500_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 500)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-550:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-550_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-550_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 550)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-600:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-600_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-600_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 600)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-650:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-650_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-650_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 650)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-700:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-700_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-700_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 700)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-750:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-750_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-750_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 750)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-800:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-800_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-800_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 800)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-900:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-900_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-900_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 900)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-1000:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-1000_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-1000_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 1000)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-1250:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-1250_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-1250_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 1250)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-1500:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-1500_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-1500_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 1500)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-1750:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-1750_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-1750_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 1750)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-2000:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-2000_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-2000_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 2000)
+    type: signal
+  VBFToRadionToHHTo2B2Tau_M-3000:
+    db: das:/VBFToRadionToHHTo2B2Tau_M-3000_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToRadionToHHTo2B2Tau_M-3000_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Radion 2B2Tau, M = 3000)
+    type: signal
+
+######################## Graviton 2B2Tau #######################
+
+  GluGluToBulkGravitonToHHTo2B2Tau_M-250:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-250_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-250_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 250)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-260:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-260_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-260_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 260)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-270:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-270_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-270_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 270)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-280:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-280_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-280_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 280)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-300:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-300_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-300_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 300)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-320:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-320_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-320_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 320)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-350:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-350_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-350_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 350)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-400:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-400_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-400_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 400)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-450:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-450_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-450_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 450)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-500:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-500_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-500_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 500)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-550:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-550_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-550_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 550)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-600:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-600_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-600_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 600)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-650:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-650_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-650_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 650)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-700:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-700_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-700_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 700)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-750:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-750_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-750_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 750)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-800:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-800_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-800_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 800)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-850:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-850_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-850_2018.json
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 850)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-900:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-900_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-900_2018.json
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 900)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-1000:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-1000_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-1000_2018.json
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 1000)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-1250:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-1250_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-1250_2018.json
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 1250)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-1500:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-1500_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-1500_2018.json
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 1500)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-1750:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-1750_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-1750_2018.json
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 1750)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-2000:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-2000_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-2000_2018.json
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 2000)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-2500:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-2500_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-2500_2018.json
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 2500)
+    type: signal
+  GluGluToBulkGravitonToHHTo2B2Tau_M-3000:
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-3000_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToBulkGravitonToHHTo2B2Tau_M-3000_2018.json
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (GluGlu Graviton 2B2Tau, M = 3000)
+    type: signal
+
+######################## VBF Graviton 2B2Tau #######################
+  VBFToBulkGravitonToHHTo2B2Tau_M-250:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-250_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-250_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 250)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-260:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-260_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-260_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 260)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-270:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-270_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-270_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 270)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-280:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-280_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-280_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 280)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-300:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-300_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-300_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 300)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-320:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-320_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-320_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 320)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-350:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-350_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-350_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 350)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-400:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-400_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-400_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 400)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-450:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-450_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-450_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 450)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-500:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-500_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-500_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 500)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-600:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-600_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-600_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 600)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-650:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-650_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-650_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 650)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-700:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-700_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-700_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 700)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-750:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-750_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-750_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 750)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-850:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-850_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-850_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 850)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-900:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-900_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-900_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 900)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-1000:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-1000_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-1000_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 1000)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-1200:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-1200_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-1200_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 1200)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-1750:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-1750_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-1750_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 1750)
+    type: signal
+  VBFToBulkGravitonToHHTo2B2Tau_M-2000:
+    db: das:/VBFToBulkGravitonToHHTo2B2Tau_M-2000_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFToBulkGravitonToHHTo2B2Tau_M-2000_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF Graviton 2B2Tau, M = 2000)
+    type: signal
+
+######################## VBF 2B2Tau #######################
+
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_0:
+    db: das:/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2Tau, CV = 1, C2V = 1, C3 = 0)
+    type: signal
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_1:
+    db: das:/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2Tau, CV = 1, C2V = 1, C3 = 1)
+    type: signal
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_2:
+    db: das:/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2Tau, CV = 1, C2V = 1, C3 = 2)
+    type: signal
+  VBFHHTo2B2Tau_CV_1_C2V_2_C3_1:
+    db: das:/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2Tau, CV = 1, C2V = 2, C3 = 1)
+    type: signal
+  VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1:
+    db: das:/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2Tau, CV = 1.5, C2V = 1, C3 = 1)
+    type: signal
+  VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1:
+    db: das:/VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (VBF 2B2Tau, CV = 0.5, C2V = 1, C3 = 1)
+    type: signal
+
+
+######################## GluGlu nodes 2B2VTo2L2Nu #######################
+
+  GluGluToHHTo2B2VTo2L2Nu_node_cHHH0:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2VTo2L2Nu, node cHHH0)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_cHHH1:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2VTo2L2Nu, node cHHH1)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2VTo2L2Nu, node cHHH2p45)
+    type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_cHHH5:
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2VTo2L2Nu, node cHHH5)
+    type: signal
+
+
+######################## GluGlu nodes 2B2Tau #######################
+
+  GluGluToHHTo2B2Tau_node_SM:
+    db: das:/GluGluToHHTo2B2Tau_node_SM_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_SM_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node SM)
+    type: signal
+  GluGluToHHTo2B2Tau_node_2:
+    db: das:/GluGluToHHTo2B2Tau_node_2_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_2_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 2)
+    type: signal
+  GluGluToHHTo2B2Tau_node_3:
+    db: das:/GluGluToHHTo2B2Tau_node_3_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_3_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 3)
+    type: signal
+  GluGluToHHTo2B2Tau_node_4:
+    db: das:/GluGluToHHTo2B2Tau_node_4_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_4_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 4)
+    type: signal
+  GluGluToHHTo2B2Tau_node_5:
+    db: das:/GluGluToHHTo2B2Tau_node_5_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_5_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 5)
+    type: signal
+  GluGluToHHTo2B2Tau_node_6:
+    db: das:/GluGluToHHTo2B2Tau_node_6_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_6_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 6)
+    type: signal
+  GluGluToHHTo2B2Tau_node_7:
+    db: das:/GluGluToHHTo2B2Tau_node_7_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_7_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 7)
+    type: signal
+  GluGluToHHTo2B2Tau_node_8:
+    db: das:/GluGluToHHTo2B2Tau_node_8_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_8_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 8)
+    type: signal
+  GluGluToHHTo2B2Tau_node_9:
+    db: das:/GluGluToHHTo2B2Tau_node_9_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_9_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 9)
+    type: signal
+  GluGluToHHTo2B2Tau_node_10:
+    db: das:/GluGluToHHTo2B2Tau_node_10_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_10_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 10)
+    type: signal
+  GluGluToHHTo2B2Tau_node_11:
+    db: das:/GluGluToHHTo2B2Tau_node_11_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_11_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 11)
+    type: signal
+  GluGluToHHTo2B2Tau_node_12:
+    db: das:/GluGluToHHTo2B2Tau_node_12_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_12_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node 12)
+    type: signal
+  GluGluToHHTo2B2Tau_node_cHHH0:
+    db: das:/GluGluToHHTo2B2Tau_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_cHHH0_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node cHHH0)
+    type: signal
+  GluGluToHHTo2B2Tau_node_cHHH1:
+    db: das:/GluGluToHHTo2B2Tau_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_cHHH1_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node cHHH1)
+    type: signal
+  GluGluToHHTo2B2Tau_node_cHHH2p45:
+    db: das:/GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_cHHH2p45_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node cHHH2p45)
+    type: signal
+  GluGluToHHTo2B2Tau_node_cHHH5:
+    db: das:/GluGluToHHTo2B2Tau_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2Tau_node_cHHH5_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2Tau, node cHHH0)
+    type: signal
+
+######################## GluGlu nodes 2B2VLNu2J #######################
+
+  GluGluToHHTo2B2VLNu2J_node_cHHH0:
+    db: das:/GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VLNu2J_node_cHHH0_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2VLNu2J, node cHHH0)
+    type: signal
+  GluGluToHHTo2B2VLNu2J_node_cHHH1:
+    db: das:/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VLNu2J_node_cHHH1_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2VLNu2J, node cHHH1)
+    type: signal
+  GluGluToHHTo2B2VLNu2J_node_cHHH2p45:
+    db: das:/GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VLNu2J_node_cHHH2p45_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2VLNu2J, node cHHH2p45)
+    type: signal
+  GluGluToHHTo2B2VLNu2J_node_cHHH5:
+    db: das:/GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/GluGluToHHTo2B2VLNu2J_node_cHHH5_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 1
+    era: '2018'
+    split: 10
+    line-type: 1
+    legend: HH (2B2VLNu2J, node cHHH5)
+    type: signal
+
+
+######################## PlotIt ##########################
+plotIt:
+  configuration:
+    width: 800
+    height: 600
+    luminosity-label: '%1$.2f fb^{-1} (13 TeV)'
+    experiment: CMS
+    extra-label: 2018Data --Work in progress
+    show-overflow: true
+  legend:
+    position: [0.7, 0.6, 0.91, 0.91]
+  groups:
+    data:
+      legend: data
+    ttbar:
+      fill-color: "#cc7a16"
+      legend: tt
+    ST: 
+      fill-color: "#99053d"
+      legend: Single Top 
+      order: 2
+    DY: 
+      fill-color: "#1a83a1"
+      legend: Drell-Yan
+      order: 3
+    Wjets:
+      fill-color: "#d95564"
+      legend: W+jets
+      order: 4
+    VVV: 
+      fill-color: "#ccbf45"
+      legend: VV(V)
+      order: 5
+    ttV:
+      fill-color: "#174704"
+      legend: tt+V
+      order: 6
+    SM: 
+      fill-color: "#06b894"
+      legend: SM Higgs (ttH, ZH) 
+      order: 7
+    Rares:
+      fill-color: "#610596"
+      legend: Rares
+      order: 8
+    DYEstimation:
+      fill-color: "#1a83a1"
+      legend: Drell-Yan (from data)
+      order: 3
+    Fake:
+      fill-color: "#6e3303"
+      legend: Fake
+      order: 8
+
+  systematics:
+      # on the jets
+    - jer
+    - jesTotal
+      # on the lepton id
+    - mu_loose
+    - mu_tightmva
+    - el_looserecoptlt20
+    - el_looserecoptgt20
+    - el_looseid
+    - el_looseeff
+    - el_tightmva
+     # on the lepton trigger 
+    - ttH_singleElectron_trigSF
+    - ttH_singleMuon_trigSF
+    - ttH_doubleElectron_trigSF 
+    - ttH_doubleMuon_trigSF
+    - ttH_electronMuon_trigSF
+     # on the pileup
+    - pileup
+      # on the jet btagging
+    - deepjet
+    #- deepcsv
+    # Btag SF #
+    - btagSF_lf
+    - btagSF_hf
+    - btagSF_hfstats1
+    - btagSF_hfstats2
+    - btagSF_lfstats1
+    - btagSF_lfstats2
+    - btagSF_cferr1
+    - btagSF_cferr2
+    # Top pt reweighting #
+    - topPtReweighting
+    # Btag reweighting
+    - btag_ratio
+    # DY weight #
+    - dy_reweighting_elel
+    - dy_reweighting_mumu
+    # Fake factor
+    - el_FR_pt_syst
+    - el_FR_barrel_syst
+    - el_FR_norm_syst
+    - electronCorrFR
+    - mu_FR_pt_syst
+    - mu_FR_barrel_syst
+    - mu_FR_norm_syst
+    - muonCorrFR

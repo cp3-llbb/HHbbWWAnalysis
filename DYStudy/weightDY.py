@@ -3,20 +3,32 @@ import sys
 import yaml
 import copy
 import glob
+import math
 import json
 import ROOT
 import numpy as np
+from IPython import embed
+from root_numpy import hist2array   
+from array import array
 
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 
 class WeightDY:
-    def __init__(self, config, title, outputname, mode, era):
+    def __init__(self, channel, config, title, outputname, mode, era, xaxis, yaxis, rebin_1D=None, rebin_2D=None):
+        self.channel    = channel
         self.config     = config
         self.mode       = mode
         self.era        = era
         self.title      = title
-        self.outputname = outputname
+        self.xaxis      = xaxis
+        self.yaxis      = yaxis
+        self.rebin_1D   = rebin_1D
+        self.rebin_2D   = rebin_2D
+        path_out = os.path.join(os.path.abspath(os.path.dirname(__file__)),'weights')
+        if not os.path.exists(path_out):
+            os.makedirs(path_out)
+        self.outputname = os.path.join(path_out,outputname)
         self.hist_type  = None # TH1 or TH2
 
         self.histograms = {}
@@ -55,7 +67,7 @@ class WeightDY:
         """
 
         # Get YAML info #
-        yaml_dict = self.loadYaml(os.path.join(directory,'plots.yml'),histogram)
+        yaml_dict = self.loadYaml(os.path.join(directory,'plots_FakeExtrapolation.yml'),histogram)
 
         # Loop over file to recover histograms #
         hist_dict = {}
@@ -115,7 +127,6 @@ class WeightDY:
     def produceDistribution(self,category,info_dict):
         hist_dict = info_dict['histograms']
         lumi_dict = info_dict['luminosity']
-        plot_dict = info_dict['plot_options']
         samp_dict = info_dict['samples']
 
         if category in ['ZVeto_1b','ZVeto_2b']: # Cannot compare with Data-MC(except DY) here
@@ -128,8 +139,6 @@ class WeightDY:
         for sample, data_dict in samp_dict.items():
             # Get hist #
             h = hist_dict[sample]
-            if self.hist_type == 'TH2':
-                h.Rebin2D(2,3)
             if h is None:
                 continue
             if dist is None:
@@ -143,47 +152,80 @@ class WeightDY:
                 else:
                     raise RuntimeError('Hist type not initialized')
             # Add histograms depending on type #
+            if 'cross-section' in data_dict.keys():
+                factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]
+            else:
+                factor = 1.
+            if 'branching-ratio' in data_dict.keys():
+                factor *= data_dict["branching-ratio"]
+
             if mode == 'data':
                 if data_dict['type'] == 'data':
                     dist.Add(h)
                 if data_dict['type'] == 'mc':
                     if data_dict['group'] != 'DY':
-                        factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]    
-                        #if data_dict['group'] == 'ttbar':
-                        #    factor *= 0.7
                         dist.Add(h,-factor)     
             elif mode == 'mc':
                 if data_dict['type'] == 'mc' and data_dict['group'] == 'DY':
-                    factor = data_dict["cross-section"]*lumi_dict[self.era]/data_dict["generated-events"]    
-                    if data_dict['group'] == 'ttbar':
-                        factor *= 0.7
                     dist.Add(h,factor)  
             else:
                 raise RuntimeError("Unknown mode")
-        dist.GetXaxis().SetTitle(plot_dict['x-axis']) 
-        dist.GetYaxis().SetTitle(plot_dict['y-axis']) 
-        #dist.Sumw2()
+        dist.GetXaxis().SetTitle(self.xaxis)
+        if self.hist_type == 'TH2':
+            dist.GetYaxis().SetTitle(self.yaxis)
         return dist
 
     def produceShape(self,hist_dict):
 
-        hist_dict['ZPeak_0b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_0b'])
-        hist_dict['ZPeak_1b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_1b'])
-        hist_dict['ZPeak_2b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_2b'])
-        hist_dict['ZVeto_0b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_0b'])
-        hist_dict['ZVeto_1b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_1b'])
-        hist_dict['ZVeto_2b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_2b'])
+        #hist_dict['ZPeak_0b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_0b'])
+        #hist_dict['ZPeak_1b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_1b'])
+        #hist_dict['ZPeak_2b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_2b'])
+        #hist_dict['ZVeto_0b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_0b'])
+        #hist_dict['ZVeto_1b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_1b'])
+        #hist_dict['ZVeto_2b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_2b'])
 
 
         self.N_ZPeak0b = hist_dict['ZPeak_0b'].Integral()
         self.N_ZPeak1b = hist_dict['ZPeak_1b'].Integral()
         self.N_ZPeak2b = hist_dict['ZPeak_2b'].Integral()
-        self.N_ZVeto0b= hist_dict['ZVeto_0b'].Integral()
-        self.N_ZVeto1b= hist_dict['ZVeto_1b'].Integral()
-        self.N_ZVeto2b= hist_dict['ZVeto_2b'].Integral()
+        self.N_ZVeto0b = hist_dict['ZVeto_0b'].Integral()
+        self.N_ZVeto1b = hist_dict['ZVeto_1b'].Integral()
+        self.N_ZVeto2b = hist_dict['ZVeto_2b'].Integral()
 
-        self.factor_1b = self.N_ZPeak1b/self.N_ZPeak0b
-        self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
+        # Rebin if requested #
+        if self.hist_type == 'TH1' and self.rebin_1D is not None:
+            hist_dict['ZPeak_0b'] = self.rebinWeights1D(hist_dict['ZPeak_0b'])
+            hist_dict['ZPeak_1b'] = self.rebinWeights1D(hist_dict['ZPeak_1b'])
+            hist_dict['ZPeak_2b'] = self.rebinWeights1D(hist_dict['ZPeak_2b'])
+            hist_dict['ZVeto_0b'] = self.rebinWeights1D(hist_dict['ZVeto_0b'])
+            hist_dict['ZVeto_1b'] = self.rebinWeights1D(hist_dict['ZVeto_1b'])
+            hist_dict['ZVeto_2b'] = self.rebinWeights1D(hist_dict['ZVeto_2b'])
+        if self.hist_type == 'TH2' and self.rebin_2D is not None:
+            hist_dict['ZPeak_0b'] = self.rebinWeights2D(hist_dict['ZPeak_0b'])
+            hist_dict['ZPeak_1b'] = self.rebinWeights2D(hist_dict['ZPeak_1b'])
+            hist_dict['ZPeak_2b'] = self.rebinWeights2D(hist_dict['ZPeak_2b'])
+            hist_dict['ZVeto_0b'] = self.rebinWeights2D(hist_dict['ZVeto_0b'])
+            hist_dict['ZVeto_1b'] = self.rebinWeights2D(hist_dict['ZVeto_1b'])
+            hist_dict['ZVeto_2b'] = self.rebinWeights2D(hist_dict['ZVeto_2b'])
+
+        # mm0b 1257451.0613
+        # mm1b 161402.5533
+        # mm2b 27150.4709
+        # ee0b 274633.8001
+        # ee1b 35004.4788
+        # ee2b 6098.4302
+
+        if self.channel == 'MuMu':
+            self.factor_1b = 161402.5533 / 1257451.0613
+            self.factor_2b = 27150.4709  / 1257451.0613
+            self.factor_ZVeto = 180623.891 / 258598.634
+        if self.channel == 'ElEl':
+            self.factor_1b = 35004.4788 / 274633.8001
+            self.factor_2b = 6098.4302  / 274633.8001
+            self.factor_ZVeto = 32679.407 / 51517.366 
+            
+        #self.N_ZPeak1b/self.N_ZPeak0b
+        #self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
 
         print ("Sum weight ZVeto_0b : ",hist_dict['ZVeto_0b'].Integral())
         print ("Sum weight ZVeto_1b : ",hist_dict['ZVeto_1b'].Integral())
@@ -198,10 +240,10 @@ class WeightDY:
 
         self.weight_1b = hist_dict['ZPeak_1b'].Clone("Weight1B")
         self.weight_1b.Divide(hist_dict['ZPeak_0b'])
-        self.weight_1b.Scale(self.factor_1b)
+        self.weight_1b.Scale(self.factor_1b*self.factor_ZVeto)
         self.weight_2b = hist_dict['ZPeak_2b'].Clone("Weight2B")
         self.weight_2b.Divide(hist_dict['ZPeak_0b'])
-        self.weight_2b.Scale(self.factor_2b)
+        self.weight_2b.Scale(self.factor_2b*self.factor_ZVeto)
             # self.weight = ZPeak_2b / ZPeak_0b (normalized histogram ratio) * N_2b/N_0b (stats factor)
         if self.hist_type == 'TH2':
             hist_dict['ZPeak_0b'].Scale(self.N_ZPeak0b)
@@ -218,8 +260,8 @@ class WeightDY:
             hist_dict['ZVeto_0b'].Scale(1./hist_dict['ZVeto_0b'].Integral())
 
         # Rebin weights # (after computing shape because N bins will be different 
-        #self.weight_1b = self.rebinWeights(self.weight_1b,0.10,5)
-        #self.weight_2b = self.rebinWeights(self.weight_2b,0.15,5)
+        #self.weight_1b = self.rebinWeights1D(self.weight_1b,0.10,5)
+        #self.weight_2b = self.rebinWeights1D(self.weight_2b,0.15,5)
 
         print ("Factor (1b)         : ",self.factor_1b)
         print ("Shape (1b)          : ",self.shape_1b.Integral())
@@ -252,51 +294,57 @@ class WeightDY:
                     h.SetBinContent(i,0)
         return h 
 
+    def rebinWeights1D(self,h):
+        xn = self.rebin_1D
+        hn = h.Rebin(len(xn)-1,'rebin',array('d',xn))
+        return hn
 
-    @staticmethod
-    def rebinWeights(h,threshold,max_rebin):
-        # Produce bins for rebin operation #
-        xbins = []
-        current_rebin = 0
-        cont = []
-        err = []
+    def rebinWeights2D(self,h):
+        x = [h.GetXaxis().GetBinLowEdge(i) for i in range(1,h.GetNbinsX()+2)]
+        y = [h.GetYaxis().GetBinLowEdge(i) for i in range(1,h.GetNbinsY()+2)]
+        xn = self.rebin_2D[0]
+        yn = self.rebin_2D[1]
+
+        assert all([ix in x for ix in xn])
+        assert all([iy in y for iy in yn])
+        
+        hn = ROOT.TH2F("new","new",len(xn)-1,array('f',xn),len(yn)-1,array('f',yn))
+        content, edges = hist2array(h,return_edges=True)
+        xedges = edges[0]
+        yedges = edges[1]
+        
+        binCont = {(i+1,j+1):content[i][j] for i in range(len(xedges)-1) for j in range(len(yedges)-1)}
+        binErr  = {(i+1,j+1):0. for i in range(len(xedges)-1) for j in range(len(yedges)-1)}
+        binNewCont = {}
+        binNewErr  = {}
+        
+        convDict = {}
         for i in range(1,h.GetNbinsX()+1):
-            cont.append(h.GetBinContent(i))
-            err.append(h.GetBinError(i))
-            mean_cont = sum(cont)/len(cont)
-            mean_err = sum(err)/len(err)
-            if mean_cont == 0.:
-                xbins.append(h.GetBinLowEdge(i))
-                cont = []
-                err = []
-                continue
-            if mean_err/mean_cont <= threshold:
-                xbins.append(h.GetBinLowEdge(i))
-                cont = []
-                err = []
-                continue
-            else:
-                current_rebin += 1
-            if current_rebin == max_rebin:
-                xbins.append(h.GetBinLowEdge(i))
-                current_rebin = 0
-                cont = []
-                err = []
-        if xbins[-1] != h.GetBinLowEdge(h.GetNbinsX()+1):
-            xbins[-1] = h.GetBinLowEdge(h.GetNbinsX()+1)
+            for j in range(1,h.GetNbinsY()+1):
+                xLow = h.GetXaxis().GetBinLowEdge(i)
+                xUp  = h.GetXaxis().GetBinUpEdge(i)
+                yLow = h.GetYaxis().GetBinLowEdge(j)
+                yUp  = h.GetYaxis().GetBinUpEdge(j)
+                assert h.GetBinContent(i,j) == binCont[(i,j)]
+                binErr[(i,j)] = h.GetBinError(i,j)
+                ii = hn.GetXaxis().FindBin(xLow)
+                jj = hn.GetYaxis().FindBin(yLow)
+                convDict[(i,j)] = (ii,jj)
+                binNewCont[(ii,jj)] = 0.
+                binNewErr[(ii,jj)] = []
+        for oldidx, newidx in convDict.items():
+            binNewCont[newidx] += binCont[oldidx]
+            binNewErr[newidx].append(binCont[oldidx])
+        for key,val in binNewErr.items():
+            binNewErr[key] = math.sqrt(sum([v**2 for v in val]))
+        
+        for ix,iy in binNewCont.keys():
+            hn.SetBinContent(ix,iy,binNewCont[(ix,iy)])
+            hn.SetBinError(ix,iy,binNewErr[(ix,iy)])
 
-        # Rebin #
-        h_rebin = h.Rebin(len(xbins)-1,'rebin',np.array(xbins))
+        assert abs(h.Integral()-hn.Integral())<0.1
 
-        # Rescale bins (rebin adds the bin while we need the average) #
-        base_width = h.GetBinLowEdge(i+1)-h.GetBinLowEdge(i)
-        for i in range(1,h_rebin.GetNbinsX()+1):
-            width = h_rebin.GetBinLowEdge(i+1)-h_rebin.GetBinLowEdge(i)
-            h_rebin.SetBinContent(i,h_rebin.GetBinContent(i)*base_width/width)
-            h_rebin.SetBinError(i,h_rebin.GetBinError(i)*base_width/width)
-
-        return h_rebin
-
+        return hn
 
     def plotWeights1D(self):
         C = ROOT.TCanvas("c1", "c1", 600, 900)
@@ -334,7 +382,7 @@ class WeightDY:
 
         pad1.cd()
 
-        self.histograms['ZVeto_0b'].SetMaximum(amax*1.1)
+        self.histograms['ZVeto_0b'].SetMaximum(amax*1.2)
         self.histograms['ZVeto_0b'].SetMinimum(0)
         self.histograms['ZVeto_0b'].GetYaxis().SetTitle("Normalized events")
         self.histograms['ZVeto_0b'].GetYaxis().SetTitleSize(0.035)
@@ -382,7 +430,7 @@ class WeightDY:
         pad2.cd()
 
         #self.weight_1b.SetMaximum(max(self.weight_1b.GetMaximum(),self.weight_2b.GetMaximum())*1.1)
-        self.weight_1b.SetMaximum(0.2)
+        self.weight_1b.SetMaximum(self.weight_1b.GetMaximum()*1.8)
         self.weight_1b.SetMinimum(0.)
         self.weight_1b.SetLineWidth(2)
         self.weight_2b.SetLineWidth(2)
@@ -484,23 +532,31 @@ class WeightDY:
         #----- Zpeak and Zveto 0b -----#
         C1.cd(1)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZPeak_1b'].SetTitle('Z Peak 1 btag (%s) : Integral = %0.2f;Lead lepton #eta;Lead lepton P_{T}'%(mode,self.N_ZPeak1b))
+        self.histograms['ZPeak_1b'].SetTitle('Z Peak 1 btag (%s) : Integral = %0.2f'%(mode,self.N_ZPeak1b))
         self.histograms['ZPeak_1b'].SetTitleSize(0.9,"t")
         #self.histograms['ZPeak_1b'].GetZaxis().SetRangeUser(0,amax)
+        self.histograms['ZPeak_1b'].GetXaxis().SetRangeUser(0,self.histograms['ZPeak_1b'].GetXaxis().GetBinUpEdge(self.histograms['ZPeak_1b'].GetNbinsX()))
+        self.histograms['ZPeak_1b'].GetYaxis().SetRangeUser(0,self.histograms['ZPeak_1b'].GetYaxis().GetBinUpEdge(self.histograms['ZPeak_1b'].GetNbinsY()))
         self.histograms['ZPeak_1b'].Draw("colz")
         C1.cd(7)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZPeak_2b'].SetTitle('Z Peak 2 btag (%s) : Integral = %0.2f;Lead lepton #eta;Lead lepton P_{T}'%(mode,self.N_ZPeak2b))
+        self.histograms['ZPeak_2b'].SetTitle('Z Peak 2 btag (%s) : Integral = %0.2f'%(mode,self.N_ZPeak2b))
         #self.histograms['ZPeak_2b'].GetZaxis().SetRangeUser(0,amax)
+        self.histograms['ZPeak_2b'].GetXaxis().SetRangeUser(0,self.histograms['ZPeak_2b'].GetXaxis().GetBinUpEdge(self.histograms['ZPeak_2b'].GetNbinsX()))
+        self.histograms['ZPeak_2b'].GetYaxis().SetRangeUser(0,self.histograms['ZPeak_2b'].GetYaxis().GetBinUpEdge(self.histograms['ZPeak_2b'].GetNbinsY()))
         self.histograms['ZPeak_2b'].Draw("colz")
         C1.cd(5)
         ROOT.gPad.SetRightMargin(0.15)
         self.histograms['ZVeto_0b'].Draw("colz")
         #self.histograms['ZVeto_0b'].GetZaxis().SetRangeUser(0,amax)
-        self.histograms['ZVeto_0b'].SetTitle('Z Veto 0 btag (%s) : Integral = %0.2f;Lead lepton #eta;Lead lepton P_{T}'%(mode,self.N_ZVeto0b))
+        self.histograms['ZVeto_0b'].GetXaxis().SetRangeUser(0,self.histograms['ZVeto_0b'].GetXaxis().GetBinUpEdge(self.histograms['ZVeto_0b'].GetNbinsX()))
+        self.histograms['ZVeto_0b'].GetYaxis().SetRangeUser(0,self.histograms['ZVeto_0b'].GetYaxis().GetBinUpEdge(self.histograms['ZVeto_0b'].GetNbinsY()))
+        self.histograms['ZVeto_0b'].SetTitle('Z Veto 0 btag (%s) : Integral = %0.2f'%(mode,self.N_ZVeto0b))
         C1.cd(4)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZPeak_0b'].SetTitle('Z Peak 0 btag (%s) : Integral = %0.2fLead lepton #eta;Lead lepton P_{T};'%(mode,self.N_ZPeak0b))
+        self.histograms['ZPeak_0b'].SetTitle('Z Peak 0 btag (%s) : Integral = %0.2f'%(mode,self.N_ZPeak0b))
+        self.histograms['ZPeak_0b'].GetXaxis().SetRangeUser(0,self.histograms['ZPeak_0b'].GetXaxis().GetBinUpEdge(self.histograms['ZPeak_0b'].GetNbinsX()))
+        self.histograms['ZPeak_0b'].GetYaxis().SetRangeUser(0,self.histograms['ZPeak_0b'].GetYaxis().GetBinUpEdge(self.histograms['ZPeak_0b'].GetNbinsY()))
         #self.histograms['ZPeak_0b'].GetZaxis().SetRangeUser(0,amax)
         self.histograms['ZPeak_0b'].Draw("colz")
 
@@ -509,13 +565,19 @@ class WeightDY:
         ROOT.gPad.SetRightMargin(0.15)
         #ROOT.gPad.SetLogz()
         self.weight_1b.SetTitle('Weight (1b);Lead lepton #eta;Lead lepton P_{T}')
-        self.weight_1b.GetZaxis().SetRangeUser(0,0.3)
+        #content_w1b = np.ravel(hist2array(self.weight_1b))
+        #self.weight_1b.GetZaxis().SetRangeUser(0,np.percentile(content_w1b,95))
+        self.weight_1b.GetXaxis().SetRangeUser(25,self.weight_1b.GetXaxis().GetBinUpEdge(self.weight_1b.GetNbinsX()))
+        self.weight_1b.GetYaxis().SetRangeUser(25,self.weight_1b.GetYaxis().GetBinUpEdge(self.weight_1b.GetNbinsY()))
         self.weight_1b.Draw("colz")
         C1.cd(8)
         ROOT.gPad.SetRightMargin(0.15)
         #ROOT.gPad.SetLogz()
-        self.weight_2b.SetTitle('Weight (2b)Lead lepton #eta;Lead lepton P_{T};')
-        self.weight_2b.GetZaxis().SetRangeUser(0,0.1)
+        self.weight_2b.SetTitle('Weight (2b);Lead lepton #eta;Lead lepton P_{T};')
+        #content_w2b = np.ravel(hist2array(self.weight_2b))
+        #self.weight_2b.GetZaxis().SetRangeUser(0,np.percentile(content_w2b,95))
+        self.weight_2b.GetXaxis().SetRangeUser(25,self.weight_2b.GetXaxis().GetBinUpEdge(self.weight_2b.GetNbinsX()))
+        self.weight_2b.GetYaxis().SetRangeUser(25,self.weight_2b.GetYaxis().GetBinUpEdge(self.weight_2b.GetNbinsY()))
         self.weight_2b.Draw("colz")
 
         #----- DY shape and MC DY in Zveto -----#
@@ -524,11 +586,15 @@ class WeightDY:
 
         C1.cd(3)
         ROOT.gPad.SetRightMargin(0.15)
-        self.shape_1b.SetTitle(mode+' (Z Veto 1b) : Integral = %0.2f'%self.shape_1b.Integral()+';Lead lepton P_{T};Lead lepton #eta')
+        self.shape_1b.SetTitle(mode+' (Z Veto 1b) : Integral = %0.2f'%self.shape_1b.Integral())
+        self.shape_1b.GetXaxis().SetRangeUser(0,self.shape_1b.GetXaxis().GetBinUpEdge(self.shape_1b.GetNbinsX()))
+        self.shape_1b.GetYaxis().SetRangeUser(0,self.shape_1b.GetYaxis().GetBinUpEdge(self.shape_1b.GetNbinsY()))
         self.shape_1b.Draw("colz")
         C1.cd(9)
         ROOT.gPad.SetRightMargin(0.15)
-        self.shape_2b.SetTitle(mode+' (Z Veto 2b) : Integral = %0.2f'%self.shape_2b.Integral()+';Lead lepton P_{T};Lead lepton #eta')
+        self.shape_2b.SetTitle(mode+' (Z Veto 2b) : Integral = %0.2f'%self.shape_2b.Integral())
+        self.shape_2b.GetXaxis().SetRangeUser(0,self.shape_2b.GetXaxis().GetBinUpEdge(self.shape_2b.GetNbinsX()))
+        self.shape_2b.GetYaxis().SetRangeUser(0,self.shape_2b.GetYaxis().GetBinUpEdge(self.shape_2b.GetNbinsY()))
         self.shape_2b.Draw("colz")
 
 
@@ -606,6 +672,8 @@ class WeightDY:
         ROOT.gPad.SetRightMargin(0.15)
         self.histograms['ZVeto_1b'].SetTitle('DY MC (Z Veto 1b) : Integral = %0.2f'%self.N_ZVeto1b)
         self.histograms['ZVeto_1b'].GetZaxis().SetRangeUser(0,max_1b)
+        self.histograms['ZVeto_1b'].GetXaxis().SetRangeUser(0,self.histograms['ZVeto_1b'].GetXaxis().GetBinUpEdge(self.histograms['ZVeto_1b'].GetNbinsX()))
+        self.histograms['ZVeto_1b'].GetYaxis().SetRangeUser(0,self.histograms['ZVeto_1b'].GetYaxis().GetBinUpEdge(self.histograms['ZVeto_1b'].GetNbinsY()))
         self.histograms['ZVeto_1b'].Draw("colz")
         C2.cd(3)
         ROOT.gPad.SetRightMargin(0.15)
@@ -615,6 +683,8 @@ class WeightDY:
         ROOT.gPad.SetRightMargin(0.15)
         self.histograms['ZVeto_2b'].SetTitle('DY MC (Z Veto 2b) : Integral = %0.2f'%self.N_ZVeto2b)
         self.histograms['ZVeto_2b'].GetZaxis().SetRangeUser(0,max_2b)
+        self.histograms['ZVeto_2b'].GetXaxis().SetRangeUser(0,self.histograms['ZVeto_2b'].GetXaxis().GetBinUpEdge(self.histograms['ZVeto_2b'].GetNbinsX()))
+        self.histograms['ZVeto_2b'].GetYaxis().SetRangeUser(0,self.histograms['ZVeto_2b'].GetYaxis().GetBinUpEdge(self.histograms['ZVeto_2b'].GetNbinsY()))
         self.histograms['ZVeto_2b'].Draw("colz")
         C2.Print(self.outputname+'2_%s.pdf'%self.era)
     
@@ -662,22 +732,22 @@ class WeightDY:
                 xAxis = weight.GetXaxis()
                 yAxis = weight.GetYaxis()
                 # Loop over eta bins in Y #
-                for j in range(1,weight.GetNbinsY()+1):
+                for j in range(1,weight.GetNbinsX()+1):
                     bin_dict = {'values':[]}
-                    etaLow = yAxis.GetBinLowEdge(j)
-                    etaHigh = yAxis.GetBinUpEdge(j)
+                    etaLow = xAxis.GetBinLowEdge(j)
+                    etaHigh = xAxis.GetBinUpEdge(j)
                     bin_dict['bin'] = [etaLow,etaHigh]
                     if len(eta_binning) == 0:
                         eta_binning.append(etaLow)
                     eta_binning.append(etaHigh)
-                    # Loop over PT bins in X #
-                    for i in range(1,weight.GetNbinsX()+1):
-                        if weight.GetBinContent(i,j) == 0:
-                            continue
-                        PtLow  = xAxis.GetBinLowEdge(i)
-                        PtHigh = xAxis.GetBinUpEdge(i)
+                    # Loop over PT bins in Y #
+                    for i in range(1,weight.GetNbinsY()+1):
+                        #if weight.GetBinContent(i,j) == 0:
+                        #    continue
+                        PtLow  = yAxis.GetBinLowEdge(i)
+                        PtHigh = yAxis.GetBinUpEdge(i)
                         bin_dict['values'].append({'bin' : [PtLow,PtHigh],
-                                                   'value' : weight.GetBinContent(i,j),
+                                                   'value' : max(0.,weight.GetBinContent(i,j)),
                                                    'error_low' : weight.GetBinError(i,j),
                                                    'error_high' : weight.GetBinError(i,j)})
                         if len(pt_binning) == 0:
@@ -707,70 +777,46 @@ class WeightDY:
         
         
 if __name__ == "__main__":
-    #----- Path -----#
-    path_ZVeto = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_tight_withRatio_noSyst_v2'
-    path_ZPeak = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016_AutoPULeptonTriggerJetMETBtagSF_tight_withRatio_ZPeak_noSyst_v2'
+    with open (sys.argv[1],'r') as handle:
+        d = yaml.load(handle,Loader=yaml.SafeLoader)
 
-    #----- 1D weight -----#
-    ElElChannel = {'ZVeto_0b' : {'path': path_ZVeto,
-                                 'histname': 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'},
-                   'ZVeto_1b' : {'path': path_ZVeto,
-                                 'histname': 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_pt'},
-                   'ZVeto_2b' : {'path': path_ZVeto,
-                                 'histname': 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'},
-                   'ZPeak_0b' : {'path': path_ZPeak,
-                                 'histname': 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'},
-                   'ZPeak_1b' : {'path': path_ZPeak,
-                                 'histname': 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_pt'},
-                   'ZPeak_2b' : {'path': path_ZPeak,
-                                 'histname': 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}}
-
-    MuMuChannel = {'ZVeto_0b' : {'path': path_ZVeto,
-                                 'histname': 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'},
-                   'ZVeto_1b' : {'path': path_ZVeto,
-                                 'histname': 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_pt'},
-                   'ZVeto_2b' : {'path': path_ZVeto,
-                                 'histname': 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'},
-                   'ZPeak_0b' : {'path': path_ZPeak,
-                                 'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_pt'},
-                   'ZPeak_1b' : {'path': path_ZPeak,
-                                 'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_pt'},
-                   'ZPeak_2b' : {'path': path_ZPeak,
-                                 'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_pt'}}
-
-
-#    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_data_1D','data','2016')
-#    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_data_1D','data','2016')
-#    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_mc_1D','mc','2016')
-#    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_mc_1D','mc','2016')
-
-    #----- 2D weight -----#
-    ElElChannel = {'ZVeto_0b' : {'path': path_ZVeto,
-                                 'histname': 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_ptVSeta'},
-                   'ZVeto_1b' : {'path': path_ZVeto,
-                                 'histname': 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_ptVSeta'},
-                   'ZVeto_2b' : {'path': path_ZVeto,
-                                 'histname': 'ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_ptVSeta'},
-                   'ZPeak_0b' : {'path': path_ZPeak,
-                                 'histname': 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_ptVSeta'},
-                   'ZPeak_1b' : {'path': path_ZPeak,
-                                 'histname': 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_ptVSeta'},
-                   'ZPeak_2b' : {'path': path_ZPeak,
-                                 'histname': 'ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_ptVSeta'}}
-    MuMuChannel = {'ZVeto_0b' : {'path': path_ZVeto,
-                                 'histname': 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_ptVSeta'},
-                   'ZVeto_1b' : {'path': path_ZVeto,
-                                 'histname': 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_ptVSeta'},
-                   'ZVeto_2b' : {'path': path_ZVeto,
-                                 'histname': 'MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_ptVSeta'},
-                   'ZPeak_0b' : {'path': path_ZPeak,
-                                 'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_firstlepton_ptVSeta'},
-                   'ZPeak_1b' : {'path': path_ZPeak,
-                                 'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedOneBtag_firstlepton_ptVSeta'},
-                   'ZPeak_2b' : {'path': path_ZPeak,
-                                 'histname': 'MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_firstlepton_ptVSeta'}}
-
-    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_data_2D','data','2016')
-    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_data_2D','data','2016')
-    instance = WeightDY(ElElChannel,'First lepton P_{T} (e^{+}e^{-} channel)','weight_ElEl_mc_2D','mc','2016')
-    instance = WeightDY(MuMuChannel,'First lepton P_{T} (#mu^{+}#mu^{-} channel)','weight_MuMu_mc_2D','mc','2016')
+    instance = WeightDY(channel     = 'ElEl',
+                        config      = d['ElElChannel'],
+                        title       = d['title']+' (e^{+}e^{-} channel)',
+                        outputname  = d['filename'].format(**{'channel':'ElEl','type':'data'}),
+                        mode        = 'data',
+                        era         = d['era'],
+                        xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
+                        yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
+                        rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
+                        rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
+    instance = WeightDY(channel     = 'ElEl',
+                        config      = d['ElElChannel'],
+                        title       = d['title']+' (e^{+}e^{-} channel)',
+                        outputname  = d['filename'].format(**{'channel':'ElEl','type':'mc'}),
+                        mode        = 'mc',
+                        era         = d['era'],
+                        xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
+                        yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
+                        rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
+                        rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
+    instance = WeightDY(channel     = 'MuMu',
+                        config      = d['MuMuChannel'],
+                        title       = d['title']+' (#mu^{+}#mu^{-} channel)',
+                        outputname  = d['filename'].format(**{'channel':'MuMu','type':'data'}),
+                        mode        = 'data',
+                        era         = d['era'],
+                        xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
+                        yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
+                        rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
+                        rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
+    instance = WeightDY(channel     = 'MuMu',
+                        config      = d['MuMuChannel'],
+                        title       = d['title']+' (#mu^{+}#mu^{-} channel)',
+                        outputname  = d['filename'].format(**{'channel':'MuMu','type':'mc'}),
+                        mode        = 'mc',
+                        era         = d['era'],
+                        xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
+                        yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
+                        rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
+                        rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
