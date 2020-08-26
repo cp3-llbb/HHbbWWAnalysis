@@ -387,7 +387,7 @@ def makeExclusiveTightResolvedJetComboSelection(self,selObject,nbJet,copy_sel=Fa
         selObject.selName += "ExclusiveResolved2b2j"
         selObject.yieldTitle += " + Exclusive Resolved (nbjet $\geq 2$, nAk4LightJets $\geq 2$)"
         selObject.refine(cut   = [op.rng_len(self.ak4BJets) >= 2,
-                                  op.rng_len(self.ak4LightJets) >= 2],
+                                  op.rng_len(self.ak4LightJetsByBtagScore) >= 2],
                         weight = AppliedSF)
 
     else: raise RuntimeError ("Error in Jet Selection!!!")

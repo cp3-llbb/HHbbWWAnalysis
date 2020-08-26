@@ -425,12 +425,12 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         # https://gitlab.cern.ch/cms-hh-bbww/cms-hh-to-bbww/-/blob/master/Legacy/signal_extraction.md
                         self.lightJetPairs_mu2b2j     = op.combine(self.ak4LightJetsByPt, N=2)
                         self.lambda_chooseWjj_mu2b2j  = lambda dijet: op.abs((dijet[0].p4+dijet[1].p4+MuColl[0].p4+self.corrMET.p4).M() - 
-                                                                             (bJetCorrP4(self.ak4BJets[0]) + bJetCorrP4(self.ak4LightJetsByBtagScore[0])).M()) 
+                                                                             (self.HLL.bJetCorrP4(self.ak4BJets[0]) + self.HLL.bJetCorrP4(self.ak4LightJetsByBtagScore[0])).M()) 
                         self.WjjPairs_mu2b2j          = op.sort(self.lightJetPairs_mu2b2j, self.lambda_chooseWjj_mu2b2j)
                         
                         self.lightJetPairs_el2b2j     = op.combine(self.ak4LightJetsByPt, N=2)
                         self.lambda_chooseWjj_el2b2j  = lambda dijet: op.abs((dijet[0].p4+dijet[1].p4+ElColl[0].p4+self.corrMET.p4).M() - 
-                                                                             (bJetCorrP4(self.ak4BJets[0]) + bJetCorrP4(self.ak4LightJetsByBtagScore[0])).M())
+                                                                             (self.HLL.bJetCorrP4(self.ak4BJets[0]) + self.HLL.bJetCorrP4(self.ak4LightJetsByBtagScore[0])).M())
                         self.WjjPairs_el2b2j          = op.sort(self.lightJetPairs_el2b2j, self.lambda_chooseWjj_el2b2j)
                         
 
@@ -615,7 +615,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                                                 'model_even':BDT_fullReco900R_simple_even, 'model_odd':BDT_fullReco900R_simple_odd})
 
             for channelDict in channelDictList:
-                plots.extend(makeSingleLeptonMachineLearningPlotsBDT(**channelDict))
+                plots.extend(makeSingleLeptonMachineLearningPlotsBDT(**channelDict,event=t.event,HLL=self.HLL))
             
         #----- Add the Yield plots -----#
         plots.extend(self.yieldPlots.returnPlots())
