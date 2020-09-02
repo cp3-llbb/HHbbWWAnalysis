@@ -194,7 +194,7 @@ Warning : If the data changes, the code will exit with an error because the mask
 Preprocessing is very important in machine learning to give all the features of the training the same importance.
 We are using here the [Standard Scaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html), the point is to apply :
 ```
-z \rightarrow z-mean/std
+z -> z-mean/std
 ```
 Where mean and std are the mean and standard deviation of the *training* data.
 
