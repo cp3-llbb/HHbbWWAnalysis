@@ -39,6 +39,7 @@ If you do not have sysadmin rights, do not forget to use ``` pipi install --user
 ## Usual workflow
 
 Most of the tweaks are done in two files
+
     - parameters.py : Most of the parameters that will be used in the training 
     - sampleList.py : produces a dict of paths to be used to import data for the training
 
@@ -90,12 +91,15 @@ python HHMachineLearning.py (args) --scan name_of_scan
 ```
 The args depend on what you have hardcoded in HHMachineLearning.py
 
-Note : all the hyperparameter combinations will be run sequentially, this might take time ... 
-Tip : use one combination only (only lists with one item) and small number of epochs to check everything works
+*Note* : all the hyperparameter combinations will be run sequentially, this might take time ... 
+
+*Tip* : use one combination only (only lists with one item) and small number of epochs to check everything works
+
 The products a the scripts are :
     - csv file : contains the parameters in the scan, loss, acc and error
     - zip file : contains model architecture+weights, results in the csv, plus other details
-Tip : You can either unzip the .zip and load the json and h5 files with the classic method ([here](https://machinelearningmastery.com/save-load-keras-deep-learning-models/)).
+    
+*Tip* : You can either unzip the .zip and load the json and h5 files with the classic method ([here](https://machinelearningmastery.com/save-load-keras-deep-learning-models/)).
 Or you can use the `Restore` method of Talos on the zip archive directly (but you need to submit the preprocessing layer specifically, see code in NeuralNet.py)
 
 To submit on the cluster (using the slurm parameters in parameters.py), `--scan` must be replaced by two arguments
@@ -104,7 +108,8 @@ python HHMachineLearning.py (args) --submit name_of_jobs --split 1
 ```
 `--submit` requires a string as name for the output dir (saved in `slurm`) 
 `--split` requires the number of parameters used for each job (almost always 1)
-Note : if using `--split N`, N! combinations will be used (might be reduncancies between different jobs) --- anyway, you will use 1 almost always
+
+*Note* : if using `--split N`, N! combinations will be used (might be reduncancies between different jobs) --- anyway, you will use 1 almost always
 The split parameters will be saved in `split/` it is important that they remain there until the jobs jave finished running. After that they can be removed.
 
 The output and logs will be in `slurm/name_of_jobs`
@@ -123,7 +128,8 @@ Let's say the best model is `slurm/name_of_jobs/output/one_of_the_job_output.zip
 ```
 python Utils.py --zip slurm/name_of_jobs/output/one_of_the_job_output.zip model/my_model.zip
 ```
-Warning : just changind the zip name will not work because the content also needs to change name (hence the function in `Utils.py`)
+
+*Warning* : just changing the zip name will not work because the content also needs to change name (hence the function in `Utils.py`)
 
 The other option with more details is to use the report option
 ```
@@ -152,8 +158,9 @@ python HHMachineLearning.py (args) --model my_model --output key
 ``` 
 Where `key` is one of the key in sampleList.py 
 
-Note : There can be several keys 
-Warning : these samples must not have been used in the training, this will cause undetected overfitting
+*Note* : There can be several keys 
+
+*Warning* : these samples must not have been used in the training, this will cause undetected overfitting
 
 ... And that's it !!
 
@@ -164,7 +171,7 @@ python HHMachineLearning.py (args) --submit name_of_jobs --split 1 --resubmit /s
 ```
 The script will check what hyperparameters have been processed and which ones are missing, the corresponding jobs will be in a new directory and need to be moved back to the initial one before the csv concatenation step.
 
-Warning : the hyperparameter dict in parameters.py must not change in the meantime !!! (especially number of epochs)
+*Warning* : the hyperparameter dict in parameters.py must not change in the meantime !!! (especially number of epochs)
 Otherwise the parameters in the csv will have changed. But the slurm parameters and keras callbacks can change at resubmission.
 
 ### Preprocessing and training/test split
@@ -177,9 +184,11 @@ Depending on the ratios in parameters.py, a boolean mask is generated for each d
     - False -> test set
     - True -> training set
 The mask is generated as a npy object based on the suffix in parameters.py.
-Note : If they do not exist, they will be generated and saved. If they exist they will just be loaded.
-Warning : If the data changes, the code will exit with an error because the masks do not fit anymore (either delete them or chaneg suffix).  
-Tip : the point of the mask is that for each hyperparameter the training and test data will be the same and not randomized at each trial.
+
+*Note* : If they do not exist, they will be generated and saved. If they exist they will just be loaded.
+Warning : If the data changes, the code will exit with an error because the masks do not fit anymore (either delete them or change suffix).  
+
+*Tip* : the point of the mask is that for each hyperparameter the training and test data will be the same and not randomized at each trial.
 
 #### Preprocessing
 Preprocessing is very important in machine learning to give all the features of the training the same importance.
@@ -214,7 +223,7 @@ learning weight = event weight * Xsec / event weight sum
 ```
 Where these values come from the json files in parameters.py
 
-Warning : this is only valid for backgrounds, for signal the Xsec is unknown so better keep only the event weight
+*Warning* : this is only valid for backgrounds, for signal the Xsec is unknown so better keep only the event weight
 
 On the other side, it is possible that there is less signal statistics than background. To alleviates that, the sum of learning weights is equalized between signal and background.
 
