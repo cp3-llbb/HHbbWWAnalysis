@@ -25,6 +25,41 @@ def switch_on_index(indexes, condition, contA, contB):
     base = contA._base
     return [base[op.switch(condition, contA[index].idx, contB[index].idx)] for index in indexes]       
 
+def returnMVAInputs(dilep,jets):
+    return [op.switch(op.rng_len(dilep)>0,dilep[0][0].p4.E(),op.c_float(0.)),
+            op.switch(op.rng_len(dilep)>0,dilep[0][0].p4.Px(),op.c_float(0.)),
+            op.switch(op.rng_len(dilep)>0,dilep[0][0].p4.Py(),op.c_float(0.)),
+            op.switch(op.rng_len(dilep)>0,dilep[0][0].p4.Pz(),op.c_float(0.)),
+            op.switch(op.rng_len(dilep)>0,dilep[0][0].charge,op.c_int(0.)),
+            op.switch(op.rng_len(dilep)>0,dilep[0][0].pdgId,op.c_int(0.)),
+            op.switch(op.rng_len(dilep)>0,dilep[0][1].p4.E(),op.c_float(0.)),
+            op.switch(op.rng_len(dilep)>0,dilep[0][1].p4.Px(),op.c_float(0.)),
+            op.switch(op.rng_len(dilep)>0,dilep[0][1].p4.Py(),op.c_float(0.)),
+            op.switch(op.rng_len(dilep)>0,dilep[0][1].p4.Pz(),op.c_float(0.)),
+            op.switch(op.rng_len(dilep)>0,dilep[0][1].charge,op.c_int(0.)),
+            op.switch(op.rng_len(dilep)>0,dilep[0][1].pdgId,op.c_int(0.)),
+            op.switch(op.rng_len(jets)>0,jets[0].p4.E(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>0,jets[0].p4.Px(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>0,jets[0].p4.Py(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>0,jets[0].p4.Pz(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>0,jets[0].btagDeepFlavB,op.c_float(0.)),
+            op.switch(op.rng_len(jets)>1,jets[1].p4.E(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>1,jets[1].p4.Px(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>1,jets[1].p4.Py(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>1,jets[1].p4.Pz(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>1,jets[1].btagDeepFlavB,op.c_float(0.)),
+            op.switch(op.rng_len(jets)>2,jets[2].p4.E(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>2,jets[2].p4.Px(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>2,jets[2].p4.Py(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>2,jets[2].p4.Pz(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>2,jets[2].btagDeepFlavB,op.c_float(0.)),
+            op.switch(op.rng_len(jets)>3,jets[3].p4.E(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>3,jets[3].p4.Px(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>3,jets[3].p4.Py(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>3,jets[3].p4.Pz(),op.c_float(0.)),
+            op.switch(op.rng_len(jets)>3,jets[3].btagDeepFlavB,op.c_float(0.))]
+
+
 #===============================================================================================#
 #                                       PlotterHHtobbWW                                         #
 #===============================================================================================#
@@ -47,6 +82,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
     def definePlots(self, t, noSel, sample=None, sampleCfg=None): 
         noSel = super(PlotterNanoHHtobbWWDL,self).prepareObjects(t, noSel, sample, sampleCfg, 'DL')
+
         #----- Machine Learning Model -----#                
         path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','model.pb')
         if not os.path.exists(path_model):
@@ -124,6 +160,43 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 OSElElDilepton = self.ElElDileptonFakeExtrapolationSel
                 OSMuMuDilepton = self.MuMuDileptonFakeExtrapolationSel
                 OSElMuDilepton = self.ElMuDileptonFakeExtrapolationSel
+
+
+            #----- DY reweighting -----#
+            mvaOutputElEl = LBN(*returnMVAInputs(dilep=self.ElElDileptonTightSel,jets=self.ak4Jets))
+            mvaOutputMuMu = LBN(*returnMVAInputs(dilep=self.ElElDileptonTightSel,jets=self.ak4Jets))
+            if self.era == "2016":
+                # output = ['HH', 'H', 'DY', 'ST', 'ttbar', 'ttVX', 'VVV', 'Rare']
+                convDict = {'HH':0, 'H':1, 'DY':2, 'ST':3, 'TT':4, 'TTVX':5, 'VVV':6, 'Rare':7}
+                if self.args.DYVariable not in convDict.keys():
+                    raise RuntimeError
+                self.DYReweighting1bElEl = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_DNNoutput%s_data_1b'%self.args.DYVariable), combine="weight", systName="dy_reweighting_1b_elel", 
+                                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputElEl[convDict[self.args.DYVariable]]})
+                self.DYReweighting1bMuMu = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_DNNoutput%s_data_1b'%self.args.DYVariable), combine="weight", systName="dy_reweighting_1b_mumu",
+                                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputMuMu[convDict[self.args.DYVariable]]})
+                self.DYReweighting2bElEl = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_DNNoutput%s_data_2b'%self.args.DYVariable), combine="weight", systName="dy_reweighting_2b_elel",
+                                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputElEl[convDict[self.args.DYVariable]]})
+                self.DYReweighting2bMuMu = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_DNNoutput%s_data_2b'%self.args.DYVariable), combine="weight", systName="dy_reweighting_2b_mumu",
+                                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputMuMu[convDict[self.args.DYVariable]]})
+                #self.DYReweighting1bElEl = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_DNNoutputHH_data_1b'), combine="weight", systName="dy_reweighting_1b_elel",
+                #                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputElEl[0]})
+                #self.DYReweighting1bMuMu = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_DNNoutputHH_data_1b'), combine="weight", systName="dy_reweighting_1b_mumu",
+                #                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputMuMu[0]})
+                #self.DYReweighting2bElEl = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_DNNoutputHH_data_2b'), combine="weight", systName="dy_reweighting_2b_elel",
+                #                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputElEl[0]})
+                #self.DYReweighting2bMuMu = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_DNNoutputHH_data_2b'), combine="weight", systName="dy_reweighting_2b_mumu",
+                #                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputMuMu[0]})
+
+                #self.DYReweighting1bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_1b'), combine="weight", systName="dy_reweighting_1b_elel", defineOnFirstUse=(not forSkimmer))
+                #self.DYReweighting1bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_1b'), combine="weight", systName="dy_reweighting_1b_mumu", defineOnFirstUse=(not forSkimmer))
+                #self.DYReweighting2bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_2b'), combine="weight", systName="dy_reweighting_2b_elel", defineOnFirstUse=(not forSkimmer))
+                #self.DYReweighting2bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_2b'), combine="weight", systName="dy_reweighting_2b_mumu", defineOnFirstUse=(not forSkimmer))
+            else:
+                self.DYReweighting1bElEl = lambda dilep : None
+                self.DYReweighting1bMuMu = lambda dilep : None
+                self.DYReweighting2bElEl = lambda dilep : None
+                self.DYReweighting2bMuMu = lambda dilep : None
+
 
             #----- Separate selections ------#
             ElElSelObjectDilepton = selectionList[0]

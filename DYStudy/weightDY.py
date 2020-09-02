@@ -224,7 +224,7 @@ class WeightDY:
             self.factor_2b = 6098.4302  / 274633.8001
             self.factor_ZVeto = 32679.407 / 51517.366 
             
-        #self.N_ZPeak1b/self.N_ZPeak0b
+        #self.factor_1b = self.N_ZPeak1b/self.N_ZPeak0b
         #self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
 
         print ("Sum weight ZVeto_0b : ",hist_dict['ZVeto_0b'].Integral())
@@ -430,7 +430,10 @@ class WeightDY:
         pad2.cd()
 
         #self.weight_1b.SetMaximum(max(self.weight_1b.GetMaximum(),self.weight_2b.GetMaximum())*1.1)
-        self.weight_1b.SetMaximum(self.weight_1b.GetMaximum()*1.8)
+        #self.weight_1b.SetMaximum(self.weight_1b.GetMaximum()*1.8)
+
+        content_w1b = np.ravel(hist2array(self.weight_1b))
+        self.weight_1b.SetMaximum(np.percentile(content_w1b,95))
         self.weight_1b.SetMinimum(0.)
         self.weight_1b.SetLineWidth(2)
         self.weight_2b.SetLineWidth(2)
