@@ -34244,7 +34244,7 @@
             100.0
           ],
           "value": 1.0,
-          "error_low": 0.2,
+          "error_low": 0.02,
           "error_high": 0.02
         }
       ]
