@@ -750,7 +750,7 @@ One lepton and and one jet argument must be specified in addition to the require
         # Preselection #
         muonsByPt = op.sort(t.Muon, lambda mu : -self.muon_conept[mu.idx]) # Ordering done by conept
         self.lambda_muonPreSel = lambda mu : op.AND(
-                                                    mu.p4.Pt() >= 5.,
+                                                    mu.pt >= 5.,
                                                     op.abs(mu.p4.Eta()) <= 2.4,
                                                     op.abs(mu.dxy) <= 0.05,
                                                     op.abs(mu.dz) <= 0.1,
@@ -778,7 +778,7 @@ One lepton and and one jet argument must be specified in addition to the require
         # Preselection #
         electronsByPt = op.sort(t.Electron, lambda ele : -self.electron_conept[ele.idx]) # Ordering done by conept
         self.lambda_electronPreSel = lambda ele : op.AND(
-                                                        ele.p4.Pt() >= 7.,
+                                                        ele.pt >= 7.,
                                                         op.abs(ele.p4.Eta()) <= 2.5,
                                                         op.abs(ele.dxy) <= 0.05,
                                                         op.abs(ele.dz) <= 0.1,
@@ -987,7 +987,7 @@ One lepton and and one jet argument must be specified in addition to the require
         ##############################################################################
         #                                  Tau                                       #
         ##############################################################################
-        self.lambda_tauSel = lambda ta : op.AND(ta.p4.Pt() > 20.,
+        self.lambda_tauSel = lambda ta : op.AND(ta.pt > 20.,
                                                 op.abs(ta.p4.Eta()) < 2.3,
                                                 op.abs(ta.dxy) <= 1000.0,
                                                 op.abs(ta.dz) <= 0.2,
@@ -1015,13 +1015,13 @@ One lepton and and one jet argument must be specified in addition to the require
         if era == "2016":
             self.lambda_ak4JetsPreSel = lambda j : op.AND(
                                                         j.jetId & 1, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
-                                                        j.p4.Pt() >= 25.,
+                                                        j.pt >= 25.,
                                                         op.abs(j.p4.Eta())<= 2.4
                                                     )
         elif  era == "2017" or era == "2018":
             self.lambda_ak4JetsPreSel = lambda j : op.AND(
                                                         j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
-                                                        j.p4.Pt() >= 25.,
+                                                        j.pt >= 25.,
                                                         op.abs(j.p4.Eta())<= 2.4
                                                     )
         self.ak4JetsPreSel = op.select(self.ak4JetsByPt, self.lambda_ak4JetsPreSel)
@@ -1062,7 +1062,7 @@ One lepton and and one jet argument must be specified in addition to the require
         if era == "2016":
             self.lambda_ak8JetsPreSel = lambda j : op.AND(
                                                         j.jetId & 1, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
-                                                        j.p4.Pt() >= 200.,
+                                                        j.pt >= 200.,
                                                         op.abs(j.p4.Eta())<= 2.4,
                                                         op.AND(j.subJet1._idx.result != -1, j.subJet1.pt >= 20. , op.abs(j.subJet1.eta)<=2.4,
                                                                j.subJet2._idx.result != -1, j.subJet2.pt >= 20. , op.abs(j.subJet2.eta)<=2.4),
@@ -1073,7 +1073,7 @@ One lepton and and one jet argument must be specified in addition to the require
         elif  era == "2017" or era == "2018":
             self.lambda_ak8JetsPreSel = lambda j : op.AND(
                                                         j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
-                                                        j.p4.Pt() >= 200.,
+                                                        j.pt >= 200.,
                                                         op.abs(j.p4.Eta())<= 2.4,
                                                         op.AND(j.subJet1._idx.result != -1, j.subJet1.pt >= 20. , op.abs(j.subJet1.eta)<=2.4,
                                                                j.subJet2._idx.result != -1, j.subJet2.pt >= 20. , op.abs(j.subJet2.eta)<=2.4),
@@ -1222,22 +1222,7 @@ One lepton and and one jet argument must be specified in addition to the require
             self.elTightMVA = self.SF.get_scalefactor("lepton", 'electron_tightMVA_{}'.format(era) , combine="weight", systName="el_tightmva", defineOnFirstUse=(not forSkimmer))
             self.lambda_ElectronTightSF = lambda el : [self.elTightMVA(el)] 
  
-            #### Ak4 Btagging ####
-            #DeepJetTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepFlavB}
-            #self.DeepJetMediumSF = self.SF.get_scalefactor("jet", ("btag_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet", defineOnFirstUse=(not forSkimmer)) # For RESOLVED
-
-            ## Split by flavour #
-            #self.DeepJetMediumSF_lightjets = self.SF.get_scalefactor("lepton", ("btag_lightjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_lightjets", defineOnFirstUse=(not forSkimmer))
-            #self.DeepJetMediumSF_cjets = self.SF.get_scalefactor("lepton", ("btag_cjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_cjets", defineOnFirstUse=(not forSkimmer))
-            #self.DeepJetMediumSF_bjets = self.SF.get_scalefactor("lepton", ("btag_bjets_"+era, "DeepJet_medium"), additionalVariables=DeepJetTag_discriVar, systName="deepjet_bjets", defineOnFirstUse=(not forSkimmer))
-
-            #### Ak8 Btagging ####
-            #DeepCSVTag_discriVar = {"BTagDiscri": lambda j : j.btagDeepB}
-            #self.DeepCSVMediumSF = self.SF.get_scalefactor("jet", ("subjet_btag_"+era, "DeepCSV_medium"), additionalVariables=DeepCSVTag_discriVar, systName="deepcsv", defineOnFirstUse=(not forSkimmer)) # For BOOSTED (btag on subjet)
-                # TODO : add Boosted SF (need NanoAODv7)
-
             #----- Triggers -----# 
-            
             #### Single lepton triggers ####
             self.ttH_singleElectron_trigSF = self.SF.get_scalefactor("lepton", 'singleTrigger_electron_{}'.format(era) , combine="weight", systName="ttH_singleElectron_trigSF", defineOnFirstUse=(not forSkimmer))
             self.ttH_singleMuon_trigSF = self.SF.get_scalefactor("lepton", 'singleTrigger_muon_{}'.format(era) , combine="weight", systName="ttH_singleMuon_trigSF", defineOnFirstUse=(not forSkimmer))
@@ -1393,6 +1378,19 @@ One lepton and and one jet argument must be specified in addition to the require
                                                  sel              = noSel, 
                                                  getters          = {'Discri':lambda j : j.btagDeepFlavB},
                                                  uName            = sample)
+
+#            csvFileNameBoosted = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_2016LegacySF_V1.csv")
+#            self.DeepCsvSubjetDiscReshapingSF = BtagSF(taggerName       = "deepcsvSubjet", 
+#                                                       csvFileName      = csvFileNameBoosted,
+#                                                       wp               = "medium",
+#                                                       sysType          = "central", 
+#                                                       otherSysTypes    = [],#['up','down'],
+#                                                       measurementType  = "lt", 
+#                                                       sel              = noSel, 
+#                                                       getters          = {'Discri':lambda j : j.subJet1.btagDeepB},
+#                                                       uName            = sample+'test')
+#            print ('done')
+
 
             self.btagSF = op.rng_product(self.ak4Jets , lambda j : self.DeepJetDiscReshapingSF(j))
             if self.args.BtagReweightingOn and self.args.BtagReweightingOff:

@@ -245,6 +245,8 @@ def main():
     list_inputs  = parameters.inputs
     list_outputs = parameters.outputs
 
+    lumidict = {'2016':35922,'2017':41529.152060112,'2018':59740.565201546}
+
     if opt.nocache:
         logging.warning('No cache will be used not saved')
     if os.path.exists(parameters.train_cache) and os.path.exists(parameters.test_cache) and not opt.nocache:
@@ -266,7 +268,6 @@ def main():
                 strSelect = ['boosted_{}_{}'.format(channel,node) for channel in channels]
 
             data_node = None
-            lumidict = {'2016':35922,'2017':41529.152060112,'2018':59740.565201546}
 
             for era,samples_dict in zip(['2016','2017','2018'],[samples_dict_2016,samples_dict_2017,samples_dict_2018]):
                 if len(samples_dict.keys())==0:

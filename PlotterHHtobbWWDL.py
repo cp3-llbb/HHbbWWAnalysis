@@ -164,8 +164,8 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
             #----- DY reweighting -----#
             mvaOutputElEl = LBN(*returnMVAInputs(dilep=self.ElElDileptonTightSel,jets=self.ak4Jets))
-            mvaOutputMuMu = LBN(*returnMVAInputs(dilep=self.ElElDileptonTightSel,jets=self.ak4Jets))
-            if self.era == "2016":
+            mvaOutputMuMu = LBN(*returnMVAInputs(dilep=self.MuMuDileptonTightSel,jets=self.ak4Jets))
+            if self.era == "2016" and "DYEstimation" in self.datadrivenScenarios:
                 # output = ['HH', 'H', 'DY', 'ST', 'ttbar', 'ttVX', 'VVV', 'Rare']
                 convDict = {'HH':0, 'H':1, 'DY':2, 'ST':3, 'TT':4, 'TTVX':5, 'VVV':6, 'Rare':7}
                 if self.args.DYVariable not in convDict.keys():
@@ -448,10 +448,17 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 #                    selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjectDileptonAk8JetsInclusiveBoosted})
 #                    selObjectDictList.append({'channel':'ElMu','selObject':ElMuSelObjectDileptonAk8JetsInclusiveBoosted})
 
-            dileptons = {'ElEl':OSElElDilepton[0],'MuMu':OSMuMuDilepton[0],'ElMu':OSElMuDilepton[0]}
+            dileptonsCont = {'ElEl':OSElElDilepton,'MuMu':OSMuMuDilepton,'ElMu':OSElMuDilepton}
+            self.nodes = ['HH', 'H', 'DY', 'ST', 'ttbar', 'ttVX', 'VVV', 'Rare']
+            
             for selObjectDict in selObjectDictList:
-                dilepton = dileptons[selObjectDict['channel']]
-                plots.extend(makeDoubleLeptonMachineLearningPlots(channel=selObjectDict['channel'],l1=dilepton[0],l2=dilepton[1],jets=self.ak4Jets,sel=selObjectDict['selObject'].sel,suffix=selObjectDict['selObject'].selName,model=LBN))
+                dileptons = dileptonsCont[selObjectDict['channel']]
+                output = LBN(*returnMVAInputs(dileptons,self.ak4Jets))
+                selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,plot_yield=True)
+                for selObjNode in selObjNodesDict.values():
+                    cutFlowPlots.append(CutFlowReport(selObjNode.selName,selObjNode.sel))
+                if not self.args.OnlyYield:
+                    plots.extend(makeDoubleLeptonMachineLearningPlots(selObjectDict,output,self.nodes,channel=selObjectDict['channel']))
     
         #----- Add the Yield plots -----#
         plots.extend(self.yieldPlots.returnPlots())

@@ -10,14 +10,19 @@ from tensorflow.python.framework import graph_io
 
 import tensorflow as tf
 
-def KerasToTensorflowModel(path_to_json,path_to_h5,prefix,name,numout,outdir):
+def KerasToTensorflowModel(path_to_json,path_to_h5,prefix,name,numout,outdir,use_preprocess):
     # Make output dire #
     os.makedirs(outdir,exist_ok=True)
 
     # Import model and weights #
     with open(path_to_json,"r") as f:
         loaded_model_json = f.read()
-    loaded_model = model_from_json(loaded_model_json)
+    if use_preprocess:
+        from preprocessing import PreprocessLayer
+        custom_objects =  {'PreprocessLayer': PreprocessLayer}
+    else:
+        custom_objects = {}
+    loaded_model = model_from_json(loaded_model_json,custom_objects=custom_objects)
     loaded_model.load_weights(path_to_h5)
     
     # Alias the outputs in the model - this sometimes makes them easier to access in TF
@@ -50,6 +55,7 @@ if __name__ == '__main__':
     parser.add_argument('--outdir','-o', dest='outdir', required=False, default='./', help='The directory to place the output files - default("./")')
     parser.add_argument('--prefix','-p', dest='prefix', required=False, default='k2tfout', help='The prefix for the output aliasing - default("k2tfout")')
     parser.add_argument('--name', required=False, default='output_graph.pb', help='The name of the resulting output graph - default("output_graph.pb") (MUST NOT forget .pb)')
+    parser.add_argument('--preprocess', action='store_true', required=False, default=False, help='Whether to save the preprocessing layer in the model')
     args = parser.parse_args()
 
     KerasToTensorflowModel(path_to_json     = args.json,
@@ -57,4 +63,5 @@ if __name__ == '__main__':
                            prefix           = args.prefix,
                            name             = args.name,
                            numout           = args.numout,
-                           outdir           = args.outdir)
+                           outdir           = args.outdir,
+                           use_preprocess   = args.preprocess)
