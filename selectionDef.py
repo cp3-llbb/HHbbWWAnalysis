@@ -29,7 +29,7 @@ class SelectionObject:
                                    weight  = weight,
                                    autoSyst= autoSyst)
 
-    def create(self, ddSuffix, cut=None, weight=None, ddCut=None, ddWeight=None, autoSyst=None, enable=True):
+    def create(self, ddSuffix, cut=None, weight=None, ddCut=None, ddWeight=None, autoSyst=True, enable=True):
         """
         Overload the create function for data-driven estimation to avoid repeating the sel and selName arg 
         """
@@ -829,7 +829,8 @@ def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,plot_yie
                          cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
                          weight    = AppliedSF,
                          ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-                         ddWeight  = self.DYReweighting1bElEl(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
+                         ddWeight  = self.DYReweighting1bElEl(0),
+                         #ddWeight  = self.DYReweighting1bElEl(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
                          #ddWeight  = self.DYReweighting1bElEl([self.ElElDileptonTightSel[0][0],self.ak4LightJetsByBtagScore[0]]), # FIXME : might trigger segfault if not used with --Tight 
                          #ddWeight  = self.DYReweighting2bElEl(self.ElElDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
                          enable    = enable)
@@ -838,7 +839,8 @@ def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,plot_yie
                          cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
                          weight    = AppliedSF,
                          ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-                         ddWeight  = self.DYReweighting1bMuMu(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
+                         ddWeight  = self.DYReweighting1bMuMu(0), # FIXME : might trigger segfault if not used with --Tight 
+                         #ddWeight  = self.DYReweighting1bMuMu(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
                          #ddWeight  = self.DYReweighting1bMuMu([self.MuMuDileptonTightSel[0][0],self.ak4LightJetsByBtagScore[0]]), # FIXME : might trigger segfault if not used with --Tight 
                          #ddWeight  = self.DYReweighting2bMuMu(self.MuMuDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
                          enable    = enable)
@@ -878,7 +880,8 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yi
                          cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
                          weight    = AppliedSF,
                          ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-                         ddWeight  = self.DYReweighting2bElEl(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
+                         ddWeight  = self.DYReweighting2bElEl(0),
+                         #ddWeight  = self.DYReweighting2bElEl(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
                          #ddWeight  = self.DYReweighting2bElEl([self.ElElDileptonTightSel[0][0],self.ak4LightJetsByBtagScore[0]]), # FIXME : might trigger segfault if not used with --Tight 
                          #ddWeight  = self.DYReweighting2bElEl(self.ElElDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
                          enable    = enable)
@@ -887,7 +890,8 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yi
                          cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
                          weight    = AppliedSF,
                          ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-                         ddWeight  = self.DYReweighting2bMuMu(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
+                         ddWeight  = self.DYReweighting2bElEl(0),
+                         #ddWeight  = self.DYReweighting2bMuMu(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
                          #ddWeight  = self.DYReweighting2bMuMu([self.MuMuDileptonTightSel[0][0],self.ak4LightJetsByBtagScore[0]]), # FIXME : might trigger segfault if not used with --Tight 
                          #ddWeight  = self.DYReweighting2bMuMu(self.MuMuDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
                          enable    = enable)
@@ -923,6 +927,7 @@ def makeInclusiveBoostedSelection(self,selObject,copy_sel=False,plot_yield=False
     if copy_sel:
         selObject = copy(selObject)
     AppliedSF = None # TODO: correct at v7
+    #AppliedSF = self.DeepCsvSubjetDiscReshapingSF(self.ak8BJets[0].subJet1)
     selObject.selName += "InclusiveBoosted"
     selObject.yieldTitle += " + Inclusive Boosted"
     selObject.refine(cut    = [op.rng_len(self.ak8BJets)>=1],
@@ -932,4 +937,17 @@ def makeInclusiveBoostedSelection(self,selObject,copy_sel=False,plot_yield=False
     if copy_sel:
         return selObject
     
+
+def makeDNNOutputNodesSelections(self,selObject,output,plot_yield=False):
+    selBaseObject = copy(selObject)
+    selObjDict = {}
+    for i,node in enumerate(self.nodes):
+        newSelObj = copy(selBaseObject)
+        newSelObj.selName += '%snode'%node
+        newSelObj.yieldTitle += " in %s node"%node 
+        print (newSelObj.selName)
+        newSelObj.refine(cut = [op.rng_max_element_by(output).op.index == op.c_int(i)])
+        #selObject.refine(cut = [output[i] >= output[j] for j in range(len(self.nodes)) if j != i])
+        selObjDict[node] = newSelObj
+    return selObjDict
 

@@ -3,15 +3,16 @@ import sys
 import glob
 import copy
 import yaml
-import root_numpy
-import math
+import argparse
 import numpy as np
+import math
+from itertools import chain
 from pprint import pprint
 import ROOT
 
 
 class DataCard:
-    def __init__(self,datacardName,path,yamlName,groups,hist_conv,era,use_syst=False,root_subdir=None):
+    def __init__(self,datacardName,path,yamlName,groups,hist_conv,era,use_syst=False,root_subdir=None,pseudodata=False):
         self.datacardName = datacardName
         self.path = path
         self.groups = groups
@@ -19,11 +20,24 @@ class DataCard:
         self.era = str(era)
         self.use_syst = use_syst
         self.root_subdir = root_subdir
+        self.pseudodata = pseudodata
+
+        if self.pseudodata:
+            self.groups = self.generatePseudoData(self.groups)
         self.content = {k:{g:None for g in self.groups.keys()} for k in self.hist_conv.keys()}
 
         self.yaml_dict = self.loadYaml(os.path.join(self.path,yamlName))
         self.loopOverFiles()
+        if self.pseudodata:
+            self.roundFakeData()
         self.saveDatacard()
+
+    @staticmethod
+    def generatePseudoData(groups):
+        newg = {k:v for k,v in groups.items() if k!='data_obs'} 
+        newg['data_obs'] = list(chain.from_iterable([v for v in newg.values()]))
+        newg['data_real'] = groups['data_obs']
+        return newg
 
     def loopOverFiles(self):
         for f in glob.glob(os.path.join(self.path,'results','*.root')):
@@ -31,12 +45,17 @@ class DataCard:
                 continue
             sample = os.path.basename(f)
             # Check if in the group list #
-            group = self.findGroup(sample)
-            if group is None:
+            groups = self.findGroup(sample)
+            if self.pseudodata and 'data_real' in groups:
+                continue
+            if len(groups) == 0:
                 raise RuntimeError("[WARNING] Could not find sample %s in group list"%sample)
 
             hist_dict = self.getHistograms(f)
-            self.addSampleToGroup(hist_dict,group)
+            for group in groups:
+                self.addSampleToGroup(copy.deepcopy(hist_dict),group)
+                # deepcopy is needed so that if the histogram is in two groups
+                # acting on one version will not change the other
 
     def addSampleToGroup(self,hist_dict,group):
         for histname,hist in hist_dict.items():
@@ -46,13 +65,12 @@ class DataCard:
                 self.content[histname][group].Add(hist)
 
     def findGroup(self,sample):
-        gr = None
+        gr = []
         for key,val in self.groups.items():
             if not isinstance(val,list):
-                raise RuntimeError("Group %s does not consist in a lost"%key)
+                raise RuntimeError("Group %s does not consist in a list"%key)
             if sample in val:
-                gr = key
-                break
+                gr.append(key)
         return gr
                 
     def getHistograms(self,rootfile):
@@ -98,7 +116,7 @@ class DataCard:
     @staticmethod
     def getHistogram(f,histnom,lumi=None,xsec=None,br=None,sumweight=None):
         # Get hist #
-        h = copy.deepcopy(f.Get(histnom))
+        h = copy.copy(f.Get(histnom))
         # Normalize hist to data #
         if lumi is not None and xsec is not None and br is not None and sumweight is not None:
             h.Scale(lumi*xsec*br/sumweight)
@@ -130,9 +148,23 @@ class DataCard:
 
         return {'luminosity':lumi_dict,'samples':sample_dict}
 
+    def roundFakeData(self):
+        for hist_dict in self.content.values():
+            for group, hist in hist_dict.items():
+                if group == 'data_obs':
+                    for i in range(0,hist.GetNbinsX()+2):
+                        if hist.GetBinContent(i) > 0:
+                            hist.SetBinContent(i,round(hist.GetBinContent(i)))
+                            hist.SetBinError(i,math.sqrt(hist.GetBinContent(i)))
+                        else:
+                            hist.SetBinContent(i,0)
+                            hist.SetBinError(i,0)
 
     def saveDatacard(self):
         path_datacard = os.path.join(os.path.abspath(os.path.dirname(__file__)),self.datacardName)
+        if self.pseudodata:
+            path_datacard += "_pseudodata"
+
         if not os.path.exists(path_datacard):
             os.makedirs(path_datacard)
         for key, gdict in self.content.items():
@@ -156,8 +188,15 @@ class DataCard:
 
 
 if __name__=="__main__":
-    if len(sys.argv) !=2:
+    parser = argparse.ArgumentParser(description='Produce datacards')
+    parser.add_argument('--yaml', action='store', required=True, type=str,
+                        help='Yaml containing parameters')
+    parser.add_argument('--pseudodata', action='store_true', required=False, default=False,
+                        help='Whether to use pseudo data (data = sum of MC)')
+    args = parser.parse_args()
+
+    if args.yaml is None:
         raise RuntimeError("Must provide the YAML file")
-    with open(sys.argv[1],'r') as handle:
+    with open(args.yaml,'r') as handle:
         f = yaml.load(handle)
-    instance = DataCard(datacardName=sys.argv[1].replace('.yml',''),**f)
+    instance = DataCard(datacardName=args.yaml.replace('.yml',''),pseudodata=args.pseudodata,**f)

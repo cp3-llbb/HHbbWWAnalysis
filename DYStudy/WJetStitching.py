@@ -85,16 +85,6 @@ def returnContent(h):
             '4j800HT' :  h.GetBinContent(7,5),
             '4j1200HT' : h.GetBinContent(8,5),
             '4j2500HT' : h.GetBinContent(9,5),
-
-            '5j0HT' :    h.GetBinContent(1,6),
-            '5j70HT' :   h.GetBinContent(2,6),
-            '5j100HT' :  h.GetBinContent(3,6),
-            '5j200HT' :  h.GetBinContent(4,6),
-            '5j400HT' :  h.GetBinContent(5,6),
-            '5j600HT' :  h.GetBinContent(6,6),
-            '5j800HT' :  h.GetBinContent(7,6),
-            '5j1200HT' : h.GetBinContent(8,6),
-            '5j2500HT' : h.GetBinContent(9,6),
             }
 
 params = list(returnContent(h_inc).keys())
@@ -104,18 +94,17 @@ block1j = ['1j0HT','1j70HT','1j100HT','1j200HT','1j400HT','1j600HT','1j800HT','1
 block2j = ['2j0HT','2j70HT','2j100HT','2j200HT','2j400HT','2j600HT','2j800HT','2j1200HT','2j2500HT']
 block3j = ['3j0HT','3j70HT','3j100HT','3j200HT','3j400HT','3j600HT','3j800HT','3j1200HT','3j2500HT']
 block4j = ['4j0HT','4j70HT','4j100HT','4j200HT','4j400HT','4j600HT','4j800HT','4j1200HT','4j2500HT']
-block5j = ['5j0HT','5j70HT','5j100HT','5j200HT','5j400HT','5j600HT','5j800HT','5j1200HT','5j2500HT']
-block0HT = ['0j0HT','1j0HT','2j0HT','3j0HT','4j0HT','5j0HT']
-block70HT = ['0j70HT','1j70HT','2j70HT','3j70HT','4j70HT','5j70HT']
-block100HT = ['0j100HT','1j100HT','2j100HT','3j100HT','4j100HT','5j100HT']
-block200HT = ['0j200HT','1j200HT','2j200HT','3j200HT','4j200HT','5j200HT']
-block400HT = ['0j400HT','1j400HT','2j400HT','3j400HT','4j400HT','5j400HT']
-block600HT = ['0j600HT','1j600HT','2j600HT','3j600HT','4j600HT','5j600HT']
-block800HT = ['0j800HT','1j800HT','2j800HT','3j800HT','4j800HT','5j800HT']
-block1200HT = ['0j1200HT','1j1200HT','2j1200HT','3j1200HT','4j1200HT','5j1200HT']
-block2500HT = ['0j2500HT','1j2500HT','2j2500HT','3j2500HT','4j2500HT','5j2500HT']
+block0HT = ['0j0HT','1j0HT','2j0HT','3j0HT','4j0HT']
+block70HT = ['0j70HT','1j70HT','2j70HT','3j70HT','4j70HT']
+block100HT = ['0j100HT','1j100HT','2j100HT','3j100HT','4j100HT']
+block200HT = ['0j200HT','1j200HT','2j200HT','3j200HT','4j200HT']
+block400HT = ['0j400HT','1j400HT','2j400HT','3j400HT','4j400HT']
+block600HT = ['0j600HT','1j600HT','2j600HT','3j600HT','4j600HT']
+block800HT = ['0j800HT','1j800HT','2j800HT','3j800HT','4j800HT']
+block1200HT = ['0j1200HT','1j1200HT','2j1200HT','3j1200HT','4j1200HT']
+block2500HT = ['0j2500HT','1j2500HT','2j2500HT','3j2500HT','4j2500HT']
 
-blocks = [block0j,block1j,block2j,block3j,block4j,block5j,block0HT,block70HT,block100HT,block200HT,block400HT,block600HT,block800HT,block1200HT,block2500HT]
+blocks = [block0j,block1j,block2j,block3j,block4j,block0HT,block70HT,block100HT,block200HT,block400HT,block600HT,block800HT,block1200HT,block2500HT]
 
 dict_content = {'Inclusive' : returnContent(h_inc),
                 'Exclusive 1J' : returnContent(h_1j),
@@ -180,34 +169,29 @@ sums_params = {col:df[col].sum(axis=0) for col in params}
 print ('Xsec per parameter')
 xsec_params = {p:(df[p]*df['xsec']/df['total']).sum() for p in params}
 for p in xsec_params.keys():
-    if ('0j' in p and not '0HT' in p) or (not '0j' in p and '0HT' in p):
+    pjet = p[:2]
+    pHT  = p[2:]
+    if ('0j' == pjet and not '0HT' == pHT) or (not '0j' == pjet and '0HT' == pHT):
         xsec_params[p] /= 2
-    elif not '0j' in p and not '0HT' in p:
+    elif not '0j' == pjet and not '0HT' == pHT:
         xsec_params[p] /= 3
 df_xsec_params = pd.DataFrame(list(xsec_params.values()), index=xsec_params.keys(), columns=['Xsec per parameter'])
 for p in params:
     print ("Parameter %s, xsec = %0.3f"%(p,xsec_params[p]))
-df_xsec_params.to_excel(sys.argv[2]+'_xsec.xls',float_format='%0.10f')
+if len(sys.argv)>2:
+    df_xsec_params.to_excel(sys.argv[2]+'_xsec.xls',float_format='%0.10f')
 
 print ('Xsec per exclusif parameter')
 xsec_test = {}
 exclusiveParams = ['0j','1j','2j','3j','4j','0HT','70HT','100HT','200HT','400HT','600HT','800HT','1200HT','2500HT']
 for p in exclusiveParams:
-    col = [c for c in df.columns if p in c]
+    col = [c for c in df.columns if p == c[:2] or p == c[2:]]
     xsec_test[p] = df[col].loc['Inclusive'].sum()/df['total'].loc['Inclusive']*dict_xsec['Inclusive']
-pprint (xsec_test)
 print ("Xsec sum over jet bins :",sum([v for k,v in xsec_test.items() if 'j' in k]))
 print ("Xsec sum over HT  bins :",sum([v for k,v in xsec_test.items() if 'HT' in k]))
 print ("Inclusive xsec",dict_xsec['Inclusive'])
-#xsecExclu = {exp:sum([x for p,x in xsec_params.items() if exp in p]) for exp in exclusiveParams}
-#for p,x in xsecExclu.items():
-#    df_inc = df[[col for col in df.columns if p in col]].loc['Inclusive']
-#    #correct_xsec = dict_xsec['Inclusive'] * df[[col for col in df.columns if p in col]].loc['Inclusive'].sum() / df['total']['Inclusive']
-#    #print ("Exclusive sample %s, Xsec %0.3f - Correct %0.3f"%(p,x,correct_xsec))
-#    print ("Exclusive sample %s xsec = %0.3f"%(p,x))
     
 print ('Total Xsec per param %0.3f - Inclusive Xsec %0.3f'%(sum(xsec_params.values()),dict_xsec['Inclusive']))
-
 
 print ('Lumiscale weight per sample')
 df_w_sample = df['xsec']/df['total']
@@ -239,7 +223,6 @@ for col in df_w_stitching.columns:
         if not jetBin in dict_weights[sample].keys():
             dict_weights[sample][jetBin] = []
         dict_weights[sample][jetBin].append({'low':HTBin[0],'up':HTBin[1] if len(HTBin)>1 else HTBin[0],'value':df_w_stitching[col].loc[index]})
-#pprint (dict_weights) 
 if len(sys.argv)>2:
     with open(sys.argv[2]+'.json','w') as f:
         json.dump(dict_weights,f,indent=4)

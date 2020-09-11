@@ -27,7 +27,7 @@ class highlevelLambdas:
         # Transverse mass #
         self.MT_ll = lambda l1,l2,met : op.sqrt(2*self.ll_p4(l1,l2).Pt()*met.pt*(1-op.cos(self.ll_p4(l1,l2).Phi()-met.phi)))
         self.MT_lljj = lambda l1,l2,j1,j2,met : op.sqrt(2*self.lljj_p4(l1,l2,j1,j2).Pt()*met.pt*(1-op.cos(self.lljj_p4(l1,l2,j1,j2).Phi()-met.phi)))
-        self.MT = lambda lep,met : op.sqrt(2*lep.p4.Pt()*met.pt*(1-op.cos(lep.p4.Phi()-met.phi)))
+        self.MT = lambda lep,met : op.sqrt(2*lep.pt*met.pt*(1-op.cos(lep.p4.Phi()-met.phi)))
         self.MT_W1W2_ljj = lambda lep,j1,j2,met : op.sqrt(2*self.lep2j_p4(lep,j1,j2).Pt()*met.pt*(1-op.cos(self.lep2j_p4(lep,j1,j2).Phi()-met.phi)))
         self.MT_W1W2_lj  = lambda lep,j1,met : op.sqrt(2*self.lep1j_p4(lep,j1).Pt()*met.pt*(1-op.cos(self.lep1j_p4(lep,j1).Phi()-met.phi)))
             # TODO : clean different versions (eg MT)
@@ -41,21 +41,21 @@ class highlevelLambdas:
         
         # Higgs related variables #
         self.HT2 = lambda l1,l2,j1,j2,met : op.sqrt(op.pow(met.pt*op.cos(met.phi)+l1.p4.Px()+l2.p4.Px(),2)+op.pow(met.pt*op.sin(met.phi)+l1.p4.Py()+l2.p4.Py(),2)) + op.abs((j1.p4+j2.p4).Pt())
-        self.HT2R = lambda l1,l2,j1,j2,met : self.HT2(met,l1,l2,j1,j2)/(met.pt+l1.p4.Pt()+l2.p4.Pt()+j1.p4.Pt()+j2.p4.Pt())
+        self.HT2R = lambda l1,l2,j1,j2,met : self.HT2(met,l1,l2,j1,j2)/(met.pt+l1.pt+l2.pt+j1.pt+j2.pt)
         self.HT2_l3jmet  = lambda l,j1,j2,j3,met : op.sqrt(op.pow(met.pt*op.cos(met.phi)+l.p4.Px(),2)+op.pow(met.pt*op.sin(met.phi)+l.p4.Py(),2)) + op.abs((j1.p4+j2.p4+j3.p4).Pt())
-        self.HT2R_l3jmet = lambda l,j1,j2,j3,met : self.HT2_l3jmet(met,l,j1,j2,j3)/(met.pt+l.p4.Pt()+j1.p4.Pt()+j2.p4.Pt()+j3.p4.Pt())
+        self.HT2R_l3jmet = lambda l,j1,j2,j3,met : self.HT2_l3jmet(met,l,j1,j2,j3)/(met.pt+l.pt+j1.pt+j2.pt+j3.pt)
         self.HT2_l4jmet  = lambda l,j1,j2,j3,j4,met : op.sqrt(op.pow(met.pt*op.cos(met.phi)+l.p4.Px(),2)+op.pow(met.pt*op.sin(met.phi)+l.p4.Py(),2)) + op.abs((j1.p4+j2.p4+j3.p4+j4.p4).Pt())
-        self.HT2R_l4jmet = lambda l,j1,j2,j3,j4,met : self.HT2_l4jmet(met,l,j1,j2,j3,j4)/(met.pt+l.p4.Pt()+j1.p4.Pt()+j2.p4.Pt()+j3.p4.Pt()+j4.p4.Pt())
+        self.HT2R_l4jmet = lambda l,j1,j2,j3,j4,met : self.HT2_l4jmet(met,l,j1,j2,j3,j4)/(met.pt+l.pt+j1.pt+j2.pt+j3.pt+j4.pt)
         
         #min j1j2DR
         self.MinDiJetDRLoose = lambda j1,j2,j3: op.min(op.min(op.deltaR(j1.p4,j2.p4), op.deltaR(j2.p4,j3.p4)), op.deltaR(j1.p4,j3.p4))
         
         # ------------------------------------ lambdas for BDT variables ------------------------------------ #
         self.mindr_lep1_jet = lambda lep, jets : op.deltaR(lep.p4, op.sort(jets, lambda j : op.deltaR(lep.p4, j.p4))[0].p4)
-        self.HT = lambda jets : op.rng_sum(jets, lambda j : j.p4.Pt())
+        self.HT = lambda jets : op.rng_sum(jets, lambda j : j.pt)
         
         # mT2
-        self.ET  = lambda lep : op.sqrt(op.pow(lep.p4.M(),2) + op.pow(lep.p4.Pt(),2))
+        self.ET  = lambda lep : op.sqrt(op.pow(lep.p4.M(),2) + op.pow(lep.pt,2))
         self.mT2 = lambda jet, lep, met : (op.pow(jet.p4.M(),2) + op.pow(lep.p4.M(),2) + op.pow(met.p4.M(),2) + 
                                       2*(ET(lep)*ET(jet) - (lep.p4.Px()*jet.p4.Px() + lep.p4.Py()*jet.p4.Py())) +
                                       2*(ET(lep)*ET(met) - (lep.p4.Px()*met.p4.Px() + lep.p4.Py()*met.p4.Py())) +
