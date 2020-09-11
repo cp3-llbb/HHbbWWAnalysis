@@ -166,10 +166,21 @@ def makeLHEPlots(sel, LHE):
                              sel,
                              VariableBinning([70,100,200,400,600,800,1200,2500]),
                              xTitle='LHE HT'))
+    plots.append(Plot.make1D("LHE_HT_finer",
+                             LHE.HT,
+                             sel,
+                             EquidistantBinning(40, 0., 400.), 
+                             xTitle='LHE HT'))
     plots.append(Plot.make2D("LHE_HTVSNjets",
                              [LHE.HT,LHE.Njets],
                              sel,
                              [VariableBinning([0,70,100,200,400,600,800,1200,2500]),EquidistantBinning(5,0.,5)],
+                             yTitle='LHE Njets',
+                             xTitle='LHE HT'))
+    plots.append(Plot.make2D("LHE_HTVSNjets_finer",
+                             [LHE.HT,LHE.Njets],
+                             sel,
+                             [EquidistantBinning(40, 0., 400.),EquidistantBinning(5,0.,5)],
                              yTitle='LHE Njets',
                              xTitle='LHE HT'))
     return plots
@@ -1614,7 +1625,8 @@ def makeSingleLeptonMachineLearningPlotsBDT(sel,fakeLepColl,lep,met,jets,bJets,l
 
     #output_odd = model_even(op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.))
     #output_even = model_odd(op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.))
-    inputs = [op.c_float(0.)]*21
+    inputs = [op.c_float(0.)]*21 
+    # TODO : 
     output = op.switch(event%2,model_odd(*inputs),model_even(*inputs))
 
     '''
@@ -1693,9 +1705,9 @@ def makeSingleLeptonMachineLearningPlotsBDTmissReco(sel,lep,met,jets,bJets,lJets
                    bJetCorrP4(j2).Pt(),
                    op.deltaR(lep.p4, j3.p4),
                    op.rng_len(bJets),
-                   lep.p4.Pt(),
+                   lep.pt,
                    met.pt,
-                   op.rng_sum(jets, lambda j : j.p4.Pt()))
+                   op.rng_sum(jets, lambda j : j.pt))
 
     for i,node in enumerate(['HH', 'H', 'DY', 'ST', 'ttbar', 'ttVX', 'VVV', 'Rare']):
         plots.append(Plot.make1D("%s_%s_BDTOutput_%s"%(channel,suffix,node),
@@ -1707,45 +1719,14 @@ def makeSingleLeptonMachineLearningPlotsBDTmissReco(sel,lep,met,jets,bJets,lJets
 
     return plots
     '''
-def makeDoubleLeptonMachineLearningPlots(sel,l1,l2,jets,suffix,channel,model):
+def makeDoubleLeptonMachineLearningPlots(selObjNodesDict,output,nodes,channel):
     plots = []
 
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
 
-    output = model(l1.p4.E(),
-                   l1.p4.Px(),
-                   l1.p4.Py(),
-                   l1.p4.Pz(),
-                   l1.charge,
-                   l1.pdgId,
-                   l2.p4.E(),
-                   l2.p4.Px(),
-                   l2.p4.Py(),
-                   l2.p4.Pz(),
-                   l2.charge,
-                   l2.pdgId,
-                   jets[0].p4.E(),
-                   jets[0].p4.Px(),
-                   jets[0].p4.Py(),
-                   jets[0].p4.Pz(),
-                   jets[0].btagDeepFlavB,
-                   jets[1].p4.E(),
-                   jets[1].p4.Px(),
-                   jets[1].p4.Py(),
-                   jets[1].p4.Pz(),
-                   jets[1].btagDeepFlavB,
-                   op.switch(op.rng_len(jets)>2,jets[2].p4.E(),op.c_float(0.)),
-                   op.switch(op.rng_len(jets)>2,jets[2].p4.Px(),op.c_float(0.)),
-                   op.switch(op.rng_len(jets)>2,jets[2].p4.Py(),op.c_float(0.)),
-                   op.switch(op.rng_len(jets)>2,jets[2].p4.Pz(),op.c_float(0.)),
-                   op.switch(op.rng_len(jets)>2,jets[2].btagDeepFlavB,op.c_float(0.)),
-                   op.switch(op.rng_len(jets)>3,jets[3].p4.E(),op.c_float(0.)),
-                   op.switch(op.rng_len(jets)>3,jets[3].p4.Px(),op.c_float(0.)),
-                   op.switch(op.rng_len(jets)>3,jets[3].p4.Py(),op.c_float(0.)),
-                   op.switch(op.rng_len(jets)>3,jets[3].p4.Pz(),op.c_float(0.)),
-                   op.switch(op.rng_len(jets)>3,jets[3].btagDeepFlavB,op.c_float(0.)))
-
-    for i,node in enumerate(['HH', 'H', 'DY', 'ST', 'ttbar', 'ttVX', 'VVV', 'Rare']):
+    for i,node in enumerate(nodes):
+        suffix = selObjNodesDict[node].selName
+        sel = selObjNodesDict[node].sel
         plots.append(Plot.make1D("%s_%s_DNNOutput_%s"%(channel,suffix,node),
                                  output[i],
                                  sel,

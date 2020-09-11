@@ -97,11 +97,20 @@ class ScaleFactorsbbWW:
         # DY weight for 1 and 2 btag # 
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
                                                 entry_key   = 'DY_2016',
-                                                base_key    = '{channel}_{type}_{btag}',
-                                                #base_str    = 'weight_firstLeptonPtVSLeadjetPt_{channel}_{type}_2D_weight_{btag}_2016.json',
-                                                #base_str    = 'weight_firstleptonPtVsEta_{channel}_{type}_2D_weight_{btag}_2016.json',
-                                                base_str    = 'weight_leadjetPt_{channel}_{type}_1D_weight_{btag}_2016.json',
-                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b']})
+                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
+                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b'],
+                                                               'variable':['DNNoutputDY',
+                                                                           'DNNoutputH', 
+                                                                           'DNNoutputHH', 
+                                                                           'DNNoutputRare', 
+                                                                           'DNNoutputST', 
+                                                                           'DNNoutputTT', 
+                                                                           'DNNoutputTTVX', 
+                                                                           'DNNoutputVVV', 
+                                                                           'firstleptonPt',
+                                                                           'firstleptonPtVsEta',
+                                                                           'leadjetPt']})
 
         #  Fake rates #
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',

@@ -1,0 +1,3 @@
+[submodule "MachineLearning/HHMachineLearning/talos"]
+	path = MachineLearning/HHMachineLearning/talos
+	url = git@github.com:FlorianBury/talos.git

@@ -26,28 +26,22 @@ class DataDrivenFake(DataDrivenContribution):
 
 class DataDrivenDY(DataDrivenContribution):
     def usesSample(self, sampleName, sampleConfig):
-        #return sampleConfig['group'] != 'DY' # Use data and non DY MC 
-        return sampleConfig['group'] == 'data'
+        #return sampleConfig['group'] == 'data' # Data driven 
+        return sampleConfig['group'] == 'DY' # For Closure : change modifiedSampleConfig
     def replacesSample(self, sampleName, sampleConfig):
         return sampleConfig['group'] == 'DY' # Replace DY by data evaluation
     def modifiedSampleConfig(self, sampleName, sampleConfig, lumi=None):
         modCfg = dict(sampleConfig)
         if 'type' in sampleConfig.keys() and sampleConfig["type"]=="signal":
             return {}
-        if sampleConfig["group"] == "data":
-            # Data : add as MC with correct normalization so that lumi*Xsec/generated-events = 1
-            modCfg.update({"type": "mc",
-                           "generated-events": lumi,
-                           "cross-section": 1.,
-                           "group": "DYEstimation"})
-#        else:
-#            if sampleConfig["group"] == "DY":
-#                return {}
-#            else:
-#                modCfg.update({"branching-ratio" : -1.,
-#                               "group": "DYEstimation"})
-        else:
-            return {}
+        #if sampleConfig["group"] == "data":
+        #    # Data : add as MC with correct normalization so that lumi*Xsec/generated-events = 1
+        #    modCfg.update({"type": "mc",
+        #                   "generated-events": lumi,
+        #                   "cross-section": 1.,
+        #                   "group": "DYEstimation"})
+        if sampleConfig["group"] == "DY": # Closure 
+            modCfg.update({"group": "DYEstimation"})
 
         return modCfg
 

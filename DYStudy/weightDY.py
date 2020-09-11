@@ -33,6 +33,7 @@ class WeightDY:
 
         self.histograms = {}
         for cat, inp in self.config.items():
+            print ('Recovering %s'%cat)
             dirInfo = self.extractDirInformation(inp['path'],inp['histname'])
             self.histograms[cat] = self.produceDistribution(cat,dirInfo)
 
@@ -224,7 +225,7 @@ class WeightDY:
             self.factor_2b = 6098.4302  / 274633.8001
             self.factor_ZVeto = 32679.407 / 51517.366 
             
-        #self.N_ZPeak1b/self.N_ZPeak0b
+        #self.factor_1b = self.N_ZPeak1b/self.N_ZPeak0b
         #self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
 
         print ("Sum weight ZVeto_0b : ",hist_dict['ZVeto_0b'].Integral())
@@ -237,6 +238,14 @@ class WeightDY:
         hist_dict['ZPeak_0b'].Scale(1./hist_dict['ZPeak_0b'].Integral())
         hist_dict['ZPeak_1b'].Scale(1./hist_dict['ZPeak_1b'].Integral())
         hist_dict['ZPeak_2b'].Scale(1./hist_dict['ZPeak_2b'].Integral())
+
+        if self.hist_type == 'TH1':
+            from CDFShift import CDFShift
+            inst1b = CDFShift(hist_dict['ZPeak_0b'],hist_dict['ZPeak_1b'],hist_dict['ZVeto_0b'],additional_hist={'ZVeto_1b':hist_dict['ZVeto_1b']})
+            inst1b.saveToRoot('test1b')
+            inst2b = CDFShift(hist_dict['ZPeak_0b'],hist_dict['ZPeak_2b'],hist_dict['ZVeto_0b'],additional_hist={'ZVeto_2b':hist_dict['ZVeto_2b']})
+            inst2b.saveToRoot('test2b')
+            sys.exit()
 
         self.weight_1b = hist_dict['ZPeak_1b'].Clone("Weight1B")
         self.weight_1b.Divide(hist_dict['ZPeak_0b'])
@@ -430,7 +439,10 @@ class WeightDY:
         pad2.cd()
 
         #self.weight_1b.SetMaximum(max(self.weight_1b.GetMaximum(),self.weight_2b.GetMaximum())*1.1)
-        self.weight_1b.SetMaximum(self.weight_1b.GetMaximum()*1.8)
+        #self.weight_1b.SetMaximum(self.weight_1b.GetMaximum()*1.8)
+
+        content_w1b = np.ravel(hist2array(self.weight_1b))
+        self.weight_1b.SetMaximum(np.percentile(content_w1b,95))
         self.weight_1b.SetMinimum(0.)
         self.weight_1b.SetLineWidth(2)
         self.weight_2b.SetLineWidth(2)
@@ -773,7 +785,7 @@ class WeightDY:
         self.weight_2b.Write("Weight2B")
         root_file.Write()
         root_file.Close()
-        
+
         
         
 if __name__ == "__main__":
@@ -790,33 +802,33 @@ if __name__ == "__main__":
                         yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
                         rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
                         rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
-    instance = WeightDY(channel     = 'ElEl',
-                        config      = d['ElElChannel'],
-                        title       = d['title']+' (e^{+}e^{-} channel)',
-                        outputname  = d['filename'].format(**{'channel':'ElEl','type':'mc'}),
-                        mode        = 'mc',
-                        era         = d['era'],
-                        xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
-                        yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
-                        rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
-                        rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
-    instance = WeightDY(channel     = 'MuMu',
-                        config      = d['MuMuChannel'],
-                        title       = d['title']+' (#mu^{+}#mu^{-} channel)',
-                        outputname  = d['filename'].format(**{'channel':'MuMu','type':'data'}),
-                        mode        = 'data',
-                        era         = d['era'],
-                        xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
-                        yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
-                        rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
-                        rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
-    instance = WeightDY(channel     = 'MuMu',
-                        config      = d['MuMuChannel'],
-                        title       = d['title']+' (#mu^{+}#mu^{-} channel)',
-                        outputname  = d['filename'].format(**{'channel':'MuMu','type':'mc'}),
-                        mode        = 'mc',
-                        era         = d['era'],
-                        xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
-                        yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
-                        rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
-                        rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
+#    instance = WeightDY(channel     = 'ElEl',
+#                        config      = d['ElElChannel'],
+#                        title       = d['title']+' (e^{+}e^{-} channel)',
+#                        outputname  = d['filename'].format(**{'channel':'ElEl','type':'mc'}),
+#                        mode        = 'mc',
+#                        era         = d['era'],
+#                        xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
+#                        yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
+#                        rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
+#                        rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
+#    instance = WeightDY(channel     = 'MuMu',
+#                        config      = d['MuMuChannel'],
+#                        title       = d['title']+' (#mu^{+}#mu^{-} channel)',
+#                        outputname  = d['filename'].format(**{'channel':'MuMu','type':'data'}),
+#                        mode        = 'data',
+#                        era         = d['era'],
+#                        xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
+#                        yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
+#                        rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
+#                        rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
+#    instance = WeightDY(channel     = 'MuMu',
+#                        config      = d['MuMuChannel'],
+#                        title       = d['title']+' (#mu^{+}#mu^{-} channel)',
+#                        outputname  = d['filename'].format(**{'channel':'MuMu','type':'mc'}),
+#                        mode        = 'mc',
+#                        era         = d['era'],
+#                        xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
+#                        yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
+#                        rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
+#                        rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)

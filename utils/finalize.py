@@ -3,21 +3,25 @@ import sys
 import subprocess
 import glob
 import argparse
-
+from pprint import pprint
 
 def finalize(path,force=False,verbose=False,onlyFailed=False):
     path = os.path.abspath(path)
 
     with open(os.path.join(path,'batch','input','cluster_id'),'r') as f:
         cluster_id = str(int(f.readline()))
-
-    p = subprocess.Popen(['sacct', '-j', cluster_id, '--format=jobid%25,State', '-X', '--noheader'], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['sacct', '-j', cluster_id, '--format=jobid%25,State%25', '-X', '--noheader'], stdout=subprocess.PIPE)
     out, _ = p.communicate()
     status = {}
     for line in out.decode("utf-8").splitlines():
-        n, s = line.split()
+        n, s = line.split()[:2]
         n = n.replace(cluster_id+"_","")
-        status[n] = s
+        if '-' in n: # Sometimes sacct returns range [..-..]
+            bounds = n.replace('[','').replace(']','').split('-')
+            for i in range(int(bounds[0]),int(bounds[1])+1):
+                status[str(i)] = s
+        else:
+            status[n] = s
 
     state = ["COMPLETED","FAILED","TIMEOUT","OUT_OF_MEMORY","CANCELLED"]
     for s in state:
@@ -27,18 +31,20 @@ def finalize(path,force=False,verbose=False,onlyFailed=False):
         content = {}
         for num in status.keys():
             p = os.path.join(path,'batch','output',num)
+            if verbose:
+                print ('Looking at %s'%p)
             if not os.path.exists(p):
                 content[p] = None
             else:
                 #content[p] = os.listdir(p)[0] if len(os.listdir(p))!=0 else ''
-                content[p] = os.listdir(p)[0] if len(os.listdir(p))!=0 else None
+                content[p] = os.listdir(p) if len(os.listdir(p))!=0 else None
+            if verbose:
+                print ('... Found',content[p],'[%s/%s]'%(num,len(status.keys())))
     else:
         content = {os.path.basename(k):None for k,v in status.items() if v in  ['FAILED','TIMEOUT','OUT_OF_MEMORY']}
         print ('Following command will only be for failed jobs')
-    #import pprint
-    #pprint.pprint(content)
 
-    if None in content.values() and not force:
+    if None in content.values():
         print ("Some outputs are missing")
         sbatch_cmd = "sbatch --array="
         list_num = [os.path.basename(k) for k,v in content.items() if v is None]
@@ -62,20 +68,19 @@ def finalize(path,force=False,verbose=False,onlyFailed=False):
         return sbatch_cmd
     else:
         print ("All the outputs are present, will hadd them now") 
-        samples = sorted(list(set(content.values())))
-            
+        samples = sorted(list(set([item for sublist in content.values() for item in sublist])))
         if force:
             print ("Careful ! Force hadding the output")
             content  = {k:v for k,v in content.items() if v is not None}
         else:
             samples = [sample for sample in samples if sample not in [os.path.basename(f) for f in glob.glob(os.path.join(path,'results','*.root'))]]
             if len(samples) == 0:
-                print ('All root files are in result, if ou want to force hadd, use --force')
+                print ('All root files are in results dir, if you want to force hadd, use --force')
                 return 0
         for sample in samples:
             if sample is '':
                 continue
-            list_sample = [os.path.join(k,v) for k,v in content.items() if v==sample]
+            list_sample = [os.path.join(path,f) for path,files in content.items() for f in files if f==sample]
             cmd = ['hadd','-f',os.path.join(path,'results',sample)]+list_sample
             if verbose:
                 print ("Command : ",' '.join(cmd))
