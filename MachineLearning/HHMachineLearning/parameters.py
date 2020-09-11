@@ -23,6 +23,7 @@ path_model = os.path.join(main_path,'model')
 training_ratio = 0.7    # Training set sent to keras
 evaluation_ratio = 0.1  # Evaluation set sent to autom8
 output_ratio = 0.2      # Output set for plotting later
+assert training_ratio + evaluation_ratio + output_ratio == 1 
 # Will only be taken into account for the masks generation, ignored after
 
 ############################### Slurm parameters ######################################

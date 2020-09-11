@@ -31,14 +31,6 @@ class ConcatenateCSV:
             # Use pandas to get the dict inside the csv file #
             panda_data = read_csv(f)
             panda_data['zip'] = os.path.basename(f.replace('.csv','.zip'))
-            #for i in range(panda_data.shape[0]):
-            #    print (i)
-            #    for col in panda_data.columns:
-            #        val = panda_data[col].iloc[i]
-            #        if isinstance(val,str):
-            #            corr_val = self._correct(val)
-            #            panda_data[col].iloc[i] = corr_val
-
             # Initialize dict at first elements #
             if self.counter == 0:
                 self.full_df = panda_data

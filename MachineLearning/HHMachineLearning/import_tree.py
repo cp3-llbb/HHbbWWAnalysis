@@ -57,7 +57,6 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
         logging.debug('\t\t\tCross section : %0.5f'%xsec)
         logging.debug('\t\t\tEvent weight sum : %0.2f'%event_weight_sum)
         logging.debug('\t\t\tLuminosity : %0.2f'%luminosity)
-
         logging.debug('\t\tRelative weight %0.3e'%relative_weight)
     # Read the tree and convert it to a numpy structured array
     if weight is not None:
