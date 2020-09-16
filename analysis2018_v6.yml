@@ -375,26 +375,6 @@ samples:
     era: '2018'
     split: 10
 
-####### Standard model higgs : TTVH
-  TTWH: 
-    db: das:/TTWH_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/NANOAODSIM
-    files: dascache/TTWH_2018.dat
-    generated-events: 'genEventSumw_'
-    cross-section: 0.001582
-    group: SM
-    era: '2018'
-    split: 10
-
-  TTZH: 
-    db: das:/TTZH_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/NANOAODSIM
-    files: dascache/TTZH_2018.dat
-    generated-events: 'genEventSumw_'
-    cross-section: 0.001535
-    group: SM
-    era: '2018'
-    split: 10
-
-
 ####### VV(V) : ZZ + WW + WZ
 
   ZZTo2L2Q: 
@@ -458,6 +438,24 @@ samples:
     group: VVV
     era: '2018'
     split: 20
+
+  WZG:
+    db: das:/WZG_TuneCP5_13TeV-amcatnlo-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
+    files: dascache/WZG_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 0.04345
+    group: VVV
+    era: '2018'
+    split: 10
+  ZGToLLG:
+    db: das:/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/NANOAODSIM
+    files: dascache/ZGToLLG_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 55.59
+    group: VVV
+    era: '2018'
+    split: 10
+
 
 
 ####### VV(V) : VVV
@@ -626,7 +624,7 @@ samples:
     files: dascache/TTZToLLNuNu_M-10_2018.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.2814
-    group: ttVV
+    group: ttVX
     era: '2018'
     split: 10
 
@@ -635,7 +633,7 @@ samples:
     files: dascache/TTZToLL_M-1to10_2018.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.0822
-    group: ttVV
+    group: ttVX
     era: '2018'
     split: 10
 
@@ -644,7 +642,7 @@ samples:
     files: dascache/TTZToQQ_2018.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.5868
-    group: ttVV
+    group: ttVX
     era: '2018'
     split: 10
 
@@ -653,7 +651,7 @@ samples:
     files: dascache/TTWJetsToLNu_2018.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.1960
-    group: ttVV
+    group: ttVX
     era: '2018'
     split: 10
 
@@ -662,7 +660,7 @@ samples:
     files: dascache/TTWJetsToQQ_2018.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.4049
-    group: ttVV
+    group: ttVX
     era: '2018'
     split: 10
 
@@ -671,20 +669,30 @@ samples:
     files: dascache/TTWW_2018.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.006981
-    group: ttVV
+    group: ttVX
     era: '2018'
     split: 10
+
+  TTWH: 
+    db: das:/TTWH_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/NANOAODSIM
+    files: dascache/TTWH_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 0.001582
+    group: ttVX
+    era: '2018'
+    split: 10
+
+  TTZH: 
+    db: das:/TTZH_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/NANOAODSIM
+    files: dascache/TTZH_2018.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 0.001535
+    group: ttVX
+    era: '2018'
+    split: 10
+
 
 ####### Rares
-
-  WZG:
-    db: das:/WZG_TuneCP5_13TeV-amcatnlo-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/NANOAODSIM
-    files: dascache/WZG_2018.dat
-    generated-events: 'genEventSumw_'
-    cross-section: 0.04345
-    group: Rares 
-    era: '2018'
-    split: 10
 
   WGToLNuG:
     db: das:/WGToLNuG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/NANOAODSIM
@@ -695,14 +703,6 @@ samples:
     era: '2018'
     split: 10
 
-  ZGToLLG:
-    db: das:/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/NANOAODSIM
-    files: dascache/ZGToLLG_2018.dat
-    generated-events: 'genEventSumw_'
-    cross-section: 55.59
-    group: Rares 
-    era: '2018'
-    split: 10
 
   TGJets:
     db: das:/TGJets_leptonDecays_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/NANOAODSIM
@@ -942,13 +942,13 @@ plotIt:
       fill-color: "#ccbf45"
       legend: VV(V)
       order: 5
-    ttV:
+    ttVX:
       fill-color: "#174704"
-      legend: tt+V
+      legend: tt+VX
       order: 6
     SM: 
       fill-color: "#06b894"
-      legend: SM Higgs (ttH, ZH) 
+      legend: SM Higgs (ggH, qqH, VH)
       order: 7
     Rares:
       fill-color: "#610596"

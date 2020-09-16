@@ -8,8 +8,7 @@ from root_numpy import array2root
 
 from NeuralNet import HyperModel
 from import_tree import Tree2Pandas
-from signal_coupling import Decoupler, Recoupler
-from parameterize_classifier import ParametrizeClassifier
+from generate_mask import GenerateSliceIndices, GenerateSliceMask
 import parameters
 
 
@@ -33,8 +32,21 @@ class ProduceOutput:
         output = None
 
         # Get Model Output #
-        instance = HyperModel(self.model)
-        output = instance.HyperRestore(inputs,generator=self.generator,generator_filepath=self.generator_filepath)
+        if len(self.model) == 1: # classic training
+            instance = HyperModel(self.model)
+            output = instance.HyperRestore(inputs,generator=self.generator,generator_filepath=self.generator_filepath)
+        else: # cross validation
+            for model_idx,model in enumerate(self.model):
+                instance = HyperModel(model)
+                apply_idx, _, _ = GenerateSliceIndices(model_idx)
+                apply_mask = GenerateSliceMask(apply_idx,data['mask']) 
+                model_out = instance.HyperRestore(inputs[apply_mask],generator=self.generator,generator_filepath=self.generator_filepath)
+                if output is None:
+                    output = model_out
+                else:
+                    output = np.concatenate((output,model_out),axis=0)
+            assert output.shape[0] == data.shape[0]
+
 
         # From numpy output array to df #
         output_df = pd.DataFrame(output,columns=[('output_%s'%o).replace('$','') for o in parameters.outputs],index=pd.RangeIndex(start=0,stop=output.shape[0]))
