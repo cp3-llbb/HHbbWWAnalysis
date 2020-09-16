@@ -61,7 +61,7 @@ class HyperModel:
     #############################################################################################
     # HyperScan #
     #############################################################################################
-    def HyperScan(self,data,list_inputs,list_outputs,task,generator=False,resume=False):
+    def HyperScan(self,data,list_inputs,list_outputs,task,model_idx=None,generator=False,resume=False):
         """
         Performs the scan for hyperparameters
         If task is specified, will load a pickle dict splitted from the whole set of parameters
@@ -84,8 +84,17 @@ class HyperModel:
             self.x = data[list_inputs].values
             self.y = data[list_outputs+['learning_weights']].values
             # Data splitting #
-            size = parameters.training_ratio/(parameters.training_ratio+parameters.evaluation_ratio)
-            self.x_train, self.x_val, self.y_train, self.y_val = train_test_split(self.x,self.y,train_size=size)
+            if model_idx is None:
+                size = parameters.training_ratio/(parameters.training_ratio+parameters.evaluation_ratio)
+                self.x_train, self.x_val, self.y_train, self.y_val = train_test_split(self.x,self.y,train_size=size)
+            else: # Cross validation : take the training and evaluation set based on the mask
+                # model_idx == index of mask on which model will be applied (aka, not trained nor evaluated)
+                train_idx = (data['mask'] != model_idx) & (data['mask'] != (model_idx+1)%parameters.N_slices)
+                eval_idx = data['mask'] == (model_idx+1)%parameters.N_slices
+                self.x_train = self.x[train_idx]
+                self.y_train = self.y[train_idx]
+                self.x_val   = self.x[eval_idx]
+                self.y_val   = self.y[eval_idx]
             logging.info("Training set   : %d"%self.x_train.shape[0])
             logging.info("Evaluation set : %d"%self.x_val.shape[0])
         else:
@@ -127,13 +136,17 @@ class HyperModel:
         # This is only valid in worker mode, not driver #
         no = 1
         if self.task == '': # If done on frontend
-            self.name = self.name
-            self.path_model = os.path.join(parameters.main_path,'model',self.name)
+            name = self.name
             while os.path.exists(os.path.join(parameters.path_model,self.name+'_'+str(no)+'.csv')):
                 no +=1
-            self.name_model = self.name+'_'+str(no)
+            if model_idx is not None:
+                name += '_crossval%d'%model_idx
+            self.name_model = name+'_'+str(no)
         else:               # If job on cluster
-            self.name_model = self.name+'_'+self.task.replace('.pkl','')
+            name = self.name
+            if model_idx is not None:
+                name += '_crossval%d'%model_idx
+            self.name_model = name+'_'+self.task.replace('.pkl','')
 
         # Define scan object #
         self.h = Scan(x=self.x_train,                       # Training inputs 

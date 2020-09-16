@@ -15,21 +15,37 @@ from keras.regularizers import l1,l2
 ##################################  Path variables ####################################
 
 main_path = os.path.abspath(os.path.dirname(__file__))
-path_out = os.path.abspath('~/scratch/HHMachineLearning_output')
+path_out = '/home/ucl/cp3/fbury/scratch/HHMachineLearning_output/'
 path_model = os.path.join(main_path,'model')
 
 ##############################  Datasets proportion   #################################
-# Total must be 1 #
+crossvalidation = True
+
+# Classic training #
+# -> For crossvalidation == False
 training_ratio = 0.7    # Training set sent to keras
 evaluation_ratio = 0.1  # Evaluation set sent to autom8
 output_ratio = 0.2      # Output set for plotting later
 assert training_ratio + evaluation_ratio + output_ratio == 1 
 # Will only be taken into account for the masks generation, ignored after
 
+# Cross-validation #
+# -> For crossvalidation == True
+N_models = 3  # Number of models to train
+N_train  = 3  # Number of slices on which to train
+N_eval   = 1  # Number of slices on which to evaluate the model
+N_apply  = 2  # Number of slices on which the model will be applied for uses in analysis
+N_slices = N_train+N_eval+N_apply
+splitbranch = 'event' # Will split the training based on "event % N_slices" 
+# /!\ Don't forget to add "splitbranch" in other_variables
+
+assert N_slices % N_models == 0# will not work otherwise
+assert N_apply == N_slices/N_models # Otherwise the same slice can be applied on both network 
+
 ############################### Slurm parameters ######################################
 partition = 'cp3'  # Def, cp3 or cp3-gpu
 QOS = 'cp3' # cp3 or normal
-time = '0-06:00:00' # days-hh:mm:ss
+time = '0-00:10:00' # days-hh:mm:ss
 mem = '6000' # ram in MB
 tasks = '1' # Number of threads(as a string) (not parallel training for classic mode)
 
@@ -82,32 +98,32 @@ reduceLR_params = {'monitor'    : 'val_loss',   # Value to monitor
 #################################  Scan dictionary   ##################################
 # /!\ Lists must always contain something (even if 0), otherwise 0 hyperparameters #
 # Classification #
-p = { 
-    'lr' : [0.01], 
-    'first_neuron' : [32,64,128],
-    'activation' : [selu],
-    'dropout' : [0.,0.1,0.2,0.3,0.4,0.5],
-    'hidden_layers' : [2,3,4,5], # does not take into account the first layer
-    'output_activation' : [softmax],
-    'l2' : [0],
-    'optimizer' : [Adam],  
-    'epochs' : [400],   
-    'batch_size' : [512], 
-    'loss_function' : [categorical_crossentropy] 
-}
 #p = { 
 #    'lr' : [0.01], 
-#    'first_neuron' : [32],
-#    'activation' : [relu],
-#    'dropout' : [0.],
-#    'hidden_layers' : [1], # does not take into account the first layer
+#    'first_neuron' : [32,64,128],
+#    'activation' : [selu],
+#    'dropout' : [0.,0.1,0.2,0.3,0.4,0.5],
+#    'hidden_layers' : [2,3,4,5], # does not take into account the first layer
 #    'output_activation' : [softmax],
 #    'l2' : [0],
 #    'optimizer' : [Adam],  
-#    'epochs' : [1],   
+#    'epochs' : [400],   
 #    'batch_size' : [512], 
 #    'loss_function' : [categorical_crossentropy] 
 #}
+p = { 
+    'lr' : [0.01], 
+    'first_neuron' : [32],
+    'activation' : [relu],
+    'dropout' : [0.],
+    'hidden_layers' : [1,2,3,4,5], # does not take into account the first layer
+    'output_activation' : [softmax],
+    'l2' : [0],
+    'optimizer' : [Adam],  
+    'epochs' : [1],   
+    'batch_size' : [512], 
+    'loss_function' : [categorical_crossentropy] 
+}
 
 
 repetition = 1 # How many times each hyperparameter has to be used 
@@ -167,6 +183,9 @@ outputs = [
 
 # Other variables you might want to save in the tree #
 other_variables = [
+                    'event',
+                    'ls',
+                    'run',
                  ]
 
 

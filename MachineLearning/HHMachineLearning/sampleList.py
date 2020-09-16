@@ -2135,46 +2135,46 @@ samples_dict_2016['boosted_ElMu_HH'] = [
 ########################  ERA 2017 ##########################
 
 #-------------------  RESOLVED 1 BTAG ------------------------#
-samples_dict_2016['resolved_1b_ElEl_DY'] = []
-samples_dict_2016['resolved_1b_ElEl_H'] = []
-samples_dict_2016['resolved_1b_ElEl_ST'] = []
-samples_dict_2016['resolved_1b_ElEl_TT'] = []
-samples_dict_2016['resolved_1b_ElEl_TTVX'] = []
-samples_dict_2016['resolved_1b_ElEl_VVV'] = []
-samples_dict_2016['resolved_1b_ElEl_Rare'] = []
-samples_dict_2016['resolved_1b_ElEl_HH'] = []
+samples_dict_2017['resolved_1b_ElEl_DY'] = []
+samples_dict_2017['resolved_1b_ElEl_H'] = []
+samples_dict_2017['resolved_1b_ElEl_ST'] = []
+samples_dict_2017['resolved_1b_ElEl_TT'] = []
+samples_dict_2017['resolved_1b_ElEl_TTVX'] = []
+samples_dict_2017['resolved_1b_ElEl_VVV'] = []
+samples_dict_2017['resolved_1b_ElEl_Rare'] = []
+samples_dict_2017['resolved_1b_ElEl_HH'] = []
 
-samples_dict_2016['resolved_1b_MuMu_DY'] = []
-samples_dict_2016['resolved_1b_MuMu_H'] = []
-samples_dict_2016['resolved_1b_MuMu_ST'] = []
-samples_dict_2016['resolved_1b_MuMu_TT'] = []
-samples_dict_2016['resolved_1b_MuMu_TTVX'] = []
-samples_dict_2016['resolved_1b_MuMu_VVV'] = []
-samples_dict_2016['resolved_1b_MuMu_Rare'] = []
-samples_dict_2016['resolved_1b_MuMu_HH'] = []
+samples_dict_2017['resolved_1b_MuMu_DY'] = []
+samples_dict_2017['resolved_1b_MuMu_H'] = []
+samples_dict_2017['resolved_1b_MuMu_ST'] = []
+samples_dict_2017['resolved_1b_MuMu_TT'] = []
+samples_dict_2017['resolved_1b_MuMu_TTVX'] = []
+samples_dict_2017['resolved_1b_MuMu_VVV'] = []
+samples_dict_2017['resolved_1b_MuMu_Rare'] = []
+samples_dict_2017['resolved_1b_MuMu_HH'] = []
 
 #-------------------  RESOLVED 2 BTAG ------------------------#
-samples_dict_2016['resolved_2b_ElEl_DY'] = []
-samples_dict_2016['resolved_2b_ElEl_H'] = []
-samples_dict_2016['resolved_2b_ElEl_ST'] = []
-samples_dict_2016['resolved_2b_ElEl_TT'] = []
-samples_dict_2016['resolved_2b_ElEl_TTVX'] = []
-samples_dict_2016['resolved_2b_ElEl_VVV'] = []
-samples_dict_2016['resolved_2b_ElEl_Rare'] = []
-samples_dict_2016['resolved_2b_ElEl_HH'] = []
+samples_dict_2017['resolved_2b_ElEl_DY'] = []
+samples_dict_2017['resolved_2b_ElEl_H'] = []
+samples_dict_2017['resolved_2b_ElEl_ST'] = []
+samples_dict_2017['resolved_2b_ElEl_TT'] = []
+samples_dict_2017['resolved_2b_ElEl_TTVX'] = []
+samples_dict_2017['resolved_2b_ElEl_VVV'] = []
+samples_dict_2017['resolved_2b_ElEl_Rare'] = []
+samples_dict_2017['resolved_2b_ElEl_HH'] = []
 
-samples_dict_2016['resolved_2b_MuMu_DY'] = []
-samples_dict_2016['resolved_2b_MuMu_H'] = []
-samples_dict_2016['resolved_2b_MuMu_ST'] = []
-samples_dict_2016['resolved_2b_MuMu_TT'] = []
-samples_dict_2016['resolved_2b_MuMu_TTVX'] = []
-samples_dict_2016['resolved_2b_MuMu_VVV'] = []
-samples_dict_2016['resolved_2b_MuMu_Rare'] = []
-samples_dict_2016['resolved_2b_MuMu_HH'] = []
+samples_dict_2017['resolved_2b_MuMu_DY'] = []
+samples_dict_2017['resolved_2b_MuMu_H'] = []
+samples_dict_2017['resolved_2b_MuMu_ST'] = []
+samples_dict_2017['resolved_2b_MuMu_TT'] = []
+samples_dict_2017['resolved_2b_MuMu_TTVX'] = []
+samples_dict_2017['resolved_2b_MuMu_VVV'] = []
+samples_dict_2017['resolved_2b_MuMu_Rare'] = []
+samples_dict_2017['resolved_2b_MuMu_HH'] = []
 
 #-------------------  BOOSTED  ------------------------#
 
-samples_dict_2016['boosted_ElEl_DY'] = [
+samples_dict_2017['boosted_ElEl_DY'] = [
 'SkimDL2017_Background_Boosted_ElEl/results/DYJetsToLL_M-10to50.root',
 'SkimDL2017_Background_Boosted_ElEl/results/DYJetsToLL_M-50.root',
 'SkimDL2017_Background_Boosted_ElEl/results/DYToLL_0J.root',
@@ -2182,7 +2182,7 @@ samples_dict_2016['boosted_ElEl_DY'] = [
 'SkimDL2017_Background_Boosted_ElEl/results/DYToLL_2J.root',
                                         ]
 
-samples_dict_2016['boosted_ElEl_H'] = [
+samples_dict_2017['boosted_ElEl_H'] = [
 'SkimDL2017_Background_Boosted_ElEl/results/GluGluHToBB.root',
 'SkimDL2017_Background_Boosted_ElEl/results/GluGluHToGG.root',
 'SkimDL2017_Background_Boosted_ElEl/results/GluGluHToMuMu.root',
@@ -2208,7 +2208,7 @@ samples_dict_2016['boosted_ElEl_H'] = [
 'SkimDL2017_Background_Boosted_ElEl/results/WplusH_HToBB_WToLNu.root',
                                         ]
 
-samples_dict_2016['boosted_ElEl_ST'] = [
+samples_dict_2017['boosted_ElEl_ST'] = [
 'SkimDL2017_Background_Boosted_ElEl/results/ST_schannel_4f.root',
 'SkimDL2017_Background_Boosted_ElEl/results/ST_tchannel_antitop_4f.root',
 'SkimDL2017_Background_Boosted_ElEl/results/ST_tchannel_top_4f.root',
@@ -2218,13 +2218,13 @@ samples_dict_2016['boosted_ElEl_ST'] = [
 
                                         ]
 
-samples_dict_2016['boosted_ElEl_TT'] = [
+samples_dict_2017['boosted_ElEl_TT'] = [
 'SkimDL2017_Background_Boosted_ElEl/results/TTTo2L2Nu.root',
 'SkimDL2017_Background_Boosted_ElEl/results/TTToHadronic.root',
 'SkimDL2017_Background_Boosted_ElEl/results/TTToSemiLeptonic.root',
                                         ]
 
-samples_dict_2016['boosted_ElEl_TTVX'] = [
+samples_dict_2017['boosted_ElEl_TTVX'] = [
 'SkimDL2017_Background_Boosted_ElEl/results/TTWH.root',
 'SkimDL2017_Background_Boosted_ElEl/results/TTWJetsToLNu.root',
 'SkimDL2017_Background_Boosted_ElEl/results/TTWJetsToQQ.root',
@@ -2236,7 +2236,7 @@ samples_dict_2016['boosted_ElEl_TTVX'] = [
 
                                          ]
 
-samples_dict_2016['boosted_ElEl_VVV'] = [
+samples_dict_2017['boosted_ElEl_VVV'] = [
 'SkimDL2017_Background_Boosted_ElEl/results/W1JetsToLNu.root',
 'SkimDL2017_Background_Boosted_ElEl/results/W2JetsToLNu.root',
 'SkimDL2017_Background_Boosted_ElEl/results/W3JetsToLNu.root',
@@ -2265,7 +2265,7 @@ samples_dict_2016['boosted_ElEl_VVV'] = [
 
                                         ]
 
-samples_dict_2016['boosted_ElEl_Rare'] = [
+samples_dict_2017['boosted_ElEl_Rare'] = [
 'SkimDL2017_Background_Boosted_ElEl/results/TTTT.root',
 'SkimDL2017_Background_Boosted_ElEl/results/TGJets.root',
 'SkimDL2017_Background_Boosted_ElEl/results/TTGJets.root',
@@ -2276,7 +2276,7 @@ samples_dict_2016['boosted_ElEl_Rare'] = [
 'SkimDL2017_Background_Boosted_ElEl/results/WpWpJJ.root',
                                          ]
 
-samples_dict_2016['boosted_ElEl_HH'] = [
+samples_dict_2017['boosted_ElEl_HH'] = [
 'SkimDL2017_Signal_Boosted_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-250.root',
 'SkimDL2017_Signal_Boosted_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-260.root',
 'SkimDL2017_Signal_Boosted_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-270.root',
@@ -2440,7 +2440,6 @@ samples_dict_2016['boosted_ElEl_HH'] = [
 'SkimDL2017_Signal_Boosted_ElEl/results/GluGluToRadionToHHTo2B2WToLNu2J_M-850.root',
 'SkimDL2017_Signal_Boosted_ElEl/results/GluGluToRadionToHHTo2B2WToLNu2J_M-900.root',
 'SkimDL2017_Signal_Boosted_ElEl/results/GluGluToRadionToHHTo2B2WToLNu2J_node_SM.root',
-'SkimDL2017_Signal_Boosted_ElEl/results/__skeleton__GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root',
 'SkimDL2017_Signal_Boosted_ElEl/results/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1.root',
 'SkimDL2017_Signal_Boosted_ElEl/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0.root',
 'SkimDL2017_Signal_Boosted_ElEl/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1.root',
@@ -2495,7 +2494,7 @@ samples_dict_2016['boosted_ElEl_HH'] = [
 'SkimDL2017_Signal_Boosted_ElEl/results/VBFToRadionToHHTo2B2VTo2L2Nu_M-750.root',
                                         ]
 
-samples_dict_2016['boosted_MuMu_DY'] = [
+samples_dict_2017['boosted_MuMu_DY'] = [
 'SkimDL2017_Background_Boosted_MuMu/results/DYJetsToLL_M-10to50.root',
 'SkimDL2017_Background_Boosted_MuMu/results/DYJetsToLL_M-50.root',
 'SkimDL2017_Background_Boosted_MuMu/results/DYToLL_0J.root',
@@ -2503,7 +2502,7 @@ samples_dict_2016['boosted_MuMu_DY'] = [
 'SkimDL2017_Background_Boosted_MuMu/results/DYToLL_2J.root',
                                         ]
 
-samples_dict_2016['boosted_MuMu_H'] = [
+samples_dict_2017['boosted_MuMu_H'] = [
 'SkimDL2017_Background_Boosted_MuMu/results/GluGluHToBB.root',
 'SkimDL2017_Background_Boosted_MuMu/results/GluGluHToGG.root',
 'SkimDL2017_Background_Boosted_MuMu/results/GluGluHToMuMu.root',
@@ -2529,7 +2528,7 @@ samples_dict_2016['boosted_MuMu_H'] = [
 'SkimDL2017_Background_Boosted_MuMu/results/WplusH_HToBB_WToLNu.root',
                                         ]
 
-samples_dict_2016['boosted_MuMu_ST'] = [
+samples_dict_2017['boosted_MuMu_ST'] = [
 'SkimDL2017_Background_Boosted_MuMu/results/ST_schannel_4f.root',
 'SkimDL2017_Background_Boosted_MuMu/results/ST_tchannel_antitop_4f.root',
 'SkimDL2017_Background_Boosted_MuMu/results/ST_tchannel_top_4f.root',
@@ -2539,13 +2538,13 @@ samples_dict_2016['boosted_MuMu_ST'] = [
 
                                         ]
 
-samples_dict_2016['boosted_MuMu_TT'] = [
+samples_dict_2017['boosted_MuMu_TT'] = [
 'SkimDL2017_Background_Boosted_MuMu/results/TTTo2L2Nu.root',
 'SkimDL2017_Background_Boosted_MuMu/results/TTToHadronic.root',
 'SkimDL2017_Background_Boosted_MuMu/results/TTToSemiLeptonic.root',
                                         ]
 
-samples_dict_2016['boosted_MuMu_TTVX'] = [
+samples_dict_2017['boosted_MuMu_TTVX'] = [
 'SkimDL2017_Background_Boosted_MuMu/results/TTWH.root',
 'SkimDL2017_Background_Boosted_MuMu/results/TTWJetsToLNu.root',
 'SkimDL2017_Background_Boosted_MuMu/results/TTWJetsToQQ.root',
@@ -2557,7 +2556,7 @@ samples_dict_2016['boosted_MuMu_TTVX'] = [
 
                                          ]
 
-samples_dict_2016['boosted_MuMu_VVV'] = [
+samples_dict_2017['boosted_MuMu_VVV'] = [
 'SkimDL2017_Background_Boosted_MuMu/results/W1JetsToLNu.root',
 'SkimDL2017_Background_Boosted_MuMu/results/W2JetsToLNu.root',
 'SkimDL2017_Background_Boosted_MuMu/results/W3JetsToLNu.root',
@@ -2586,7 +2585,7 @@ samples_dict_2016['boosted_MuMu_VVV'] = [
 
                                         ]
 
-samples_dict_2016['boosted_MuMu_Rare'] = [
+samples_dict_2017['boosted_MuMu_Rare'] = [
 'SkimDL2017_Background_Boosted_MuMu/results/TTTT.root',
 'SkimDL2017_Background_Boosted_MuMu/results/TGJets.root',
 'SkimDL2017_Background_Boosted_MuMu/results/TTGJets.root',
@@ -2597,7 +2596,7 @@ samples_dict_2016['boosted_MuMu_Rare'] = [
 'SkimDL2017_Background_Boosted_MuMu/results/WpWpJJ.root',
                                          ]
 
-samples_dict_2016['boosted_MuMu_HH'] = [
+samples_dict_2017['boosted_MuMu_HH'] = [
 'SkimDL2017_Signal_Boosted_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-250.root',
 'SkimDL2017_Signal_Boosted_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-260.root',
 'SkimDL2017_Signal_Boosted_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-270.root',
@@ -2761,7 +2760,6 @@ samples_dict_2016['boosted_MuMu_HH'] = [
 'SkimDL2017_Signal_Boosted_MuMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-850.root',
 'SkimDL2017_Signal_Boosted_MuMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-900.root',
 'SkimDL2017_Signal_Boosted_MuMu/results/GluGluToRadionToHHTo2B2WToLNu2J_node_SM.root',
-'SkimDL2017_Signal_Boosted_MuMu/results/__skeleton__GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root',
 'SkimDL2017_Signal_Boosted_MuMu/results/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1.root',
 'SkimDL2017_Signal_Boosted_MuMu/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0.root',
 'SkimDL2017_Signal_Boosted_MuMu/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1.root',
@@ -2814,4 +2812,324 @@ samples_dict_2016['boosted_MuMu_HH'] = [
 'SkimDL2017_Signal_Boosted_MuMu/results/VBFToRadionToHHTo2B2VTo2L2Nu_M-350.root',
 'SkimDL2017_Signal_Boosted_MuMu/results/VBFToRadionToHHTo2B2VTo2L2Nu_M-400.root',
 'SkimDL2017_Signal_Boosted_MuMu/results/VBFToRadionToHHTo2B2VTo2L2Nu_M-750.root',
+                                        ]
+
+samples_dict_2017['boosted_ElMu_DY'] = [
+'SkimDL2017_Background_Boosted_ElMu/results/DYJetsToLL_M-10to50.root',
+'SkimDL2017_Background_Boosted_ElMu/results/DYJetsToLL_M-50.root',
+'SkimDL2017_Background_Boosted_ElMu/results/DYToLL_0J.root',
+'SkimDL2017_Background_Boosted_ElMu/results/DYToLL_1J.root',
+'SkimDL2017_Background_Boosted_ElMu/results/DYToLL_2J.root',
+                                        ]
+
+samples_dict_2017['boosted_ElMu_H'] = [
+'SkimDL2017_Background_Boosted_ElMu/results/GluGluHToBB.root',
+'SkimDL2017_Background_Boosted_ElMu/results/GluGluHToGG.root',
+'SkimDL2017_Background_Boosted_ElMu/results/GluGluHToElMu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/GluGluHToTauTau.root',
+'SkimDL2017_Background_Boosted_ElMu/results/GluGluHToWWTo2L2Nu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/GluGluHToWWToLNuQQ.root',
+'SkimDL2017_Background_Boosted_ElMu/results/GluGluHToZZTo2L2Q.root',
+'SkimDL2017_Background_Boosted_ElMu/results/GluGluHToZZTo4L.root',
+'SkimDL2017_Background_Boosted_ElMu/results/HZJ_HToWW.root',
+'SkimDL2017_Background_Boosted_ElMu/results/ZH_HToBB_ZToLL.root',
+'SkimDL2017_Background_Boosted_ElMu/results/ZHToTauTau.root',
+'SkimDL2017_Background_Boosted_ElMu/results/VBFHToBB.root',
+'SkimDL2017_Background_Boosted_ElMu/results/VBFHToGG.root',
+'SkimDL2017_Background_Boosted_ElMu/results/VBFHToElMu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/VBFHToTauTau.root',
+'SkimDL2017_Background_Boosted_ElMu/results/VBFHToWWTo2L2Nu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/VBFHToWWToLNuQQ.root',
+'SkimDL2017_Background_Boosted_ElMu/results/VBFHToZZTo4L.root',
+'SkimDL2017_Background_Boosted_ElMu/results/VHToNonbb.root',
+'SkimDL2017_Background_Boosted_ElMu/results/ttHJetTobb.root',
+'SkimDL2017_Background_Boosted_ElMu/results/ttHJetToNonbb.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WminusH_HToBB_WToLNu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WplusH_HToBB_WToLNu.root',
+                                        ]
+
+samples_dict_2017['boosted_ElMu_ST'] = [
+'SkimDL2017_Background_Boosted_ElMu/results/ST_schannel_4f.root',
+'SkimDL2017_Background_Boosted_ElMu/results/ST_tchannel_antitop_4f.root',
+'SkimDL2017_Background_Boosted_ElMu/results/ST_tchannel_top_4f.root',
+'SkimDL2017_Background_Boosted_ElMu/results/ST_tW_antitop_5f.root',
+'SkimDL2017_Background_Boosted_ElMu/results/ST_tWll_5f.root',
+'SkimDL2017_Background_Boosted_ElMu/results/ST_tW_top_5f.root',
+
+                                        ]
+
+samples_dict_2017['boosted_ElMu_TT'] = [
+'SkimDL2017_Background_Boosted_ElMu/results/TTTo2L2Nu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/TTToHadronic.root',
+'SkimDL2017_Background_Boosted_ElMu/results/TTToSemiLeptonic.root',
+                                        ]
+
+samples_dict_2017['boosted_ElMu_TTVX'] = [
+'SkimDL2017_Background_Boosted_ElMu/results/TTWH.root',
+'SkimDL2017_Background_Boosted_ElMu/results/TTWJetsToLNu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/TTWJetsToQQ.root',
+'SkimDL2017_Background_Boosted_ElMu/results/TTWW.root',
+'SkimDL2017_Background_Boosted_ElMu/results/TTZH.root',
+'SkimDL2017_Background_Boosted_ElMu/results/TTZToLL_M-1to10.root',
+'SkimDL2017_Background_Boosted_ElMu/results/TTZToLLNuNu_M-10.root',
+'SkimDL2017_Background_Boosted_ElMu/results/TTZToQQ.root',
+
+                                         ]
+
+samples_dict_2017['boosted_ElMu_VVV'] = [
+'SkimDL2017_Background_Boosted_ElMu/results/W1JetsToLNu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/W2JetsToLNu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/W3JetsToLNu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/W4JetsToLNu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WJetsToLNu_HT-100To200.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WJetsToLNu_HT-1200To2500.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WJetsToLNu_HT-200To400.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WJetsToLNu_HT-2500ToInf.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WJetsToLNu_HT-400To600.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WJetsToLNu_HT-600To800.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WJetsToLNu_HT-70To100.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WJetsToLNu_HT-800To1200.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WJetsToLNu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WWTo2L2Nu_DoubleScattering.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WWTo2L2Nu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WWToLNuQQ.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WWW.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WWZ.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WZG.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WZTo3LNu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WZZ.root',
+'SkimDL2017_Background_Boosted_ElMu/results/ZGToLLG.root',
+'SkimDL2017_Background_Boosted_ElMu/results/ZZTo2L2Q.root',
+'SkimDL2017_Background_Boosted_ElMu/results/ZZTo4L.root',
+'SkimDL2017_Background_Boosted_ElMu/results/ZZZ.root',
+
+                                        ]
+
+samples_dict_2017['boosted_ElMu_Rare'] = [
+'SkimDL2017_Background_Boosted_ElMu/results/TTTT.root',
+'SkimDL2017_Background_Boosted_ElMu/results/TGJets.root',
+'SkimDL2017_Background_Boosted_ElMu/results/TTGJets.root',
+'SkimDL2017_Background_Boosted_ElMu/results/THQ.root',
+'SkimDL2017_Background_Boosted_ElMu/results/THW.root',
+'SkimDL2017_Background_Boosted_ElMu/results/tZq_ll.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WGToLNuG.root',
+'SkimDL2017_Background_Boosted_ElMu/results/WpWpJJ.root',
+                                         ]
+
+samples_dict_2017['boosted_ElMu_HH'] = [
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-250.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-260.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-270.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-280.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-300.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-350.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-550.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-600.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-650.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-800.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-1000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-1250.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-1500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-1750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-2000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-2500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-250.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-260.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-270.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-280.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-3000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-300.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-320.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-350.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-550.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-600.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-700.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-800.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-850.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1250.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-2000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-2500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-250.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-260.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-270.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-280.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-3000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-300.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-320.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-350.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-400.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-450.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-550.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-600.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-650.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-700.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-800.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-850.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-900.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2Tau_node_12.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2Tau_node_2.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2Tau_node_3.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2Tau_node_4.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2Tau_node_7.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2Tau_node_9.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2Tau_node_cHHH0.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2Tau_node_cHHH1.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2Tau_node_cHHH2p45.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2Tau_node_cHHH5.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2Tau_node_SM.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2VLNu2J_node_cHHH0.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2VLNu2J_node_cHHH1.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2VLNu2J_node_cHHH2p45.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2VLNu2J_node_cHHH5.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2VTo2L2Nu_node_12.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2VTo2L2Nu_node_2.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2VTo2L2Nu_node_3.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2VTo2L2Nu_node_7.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2VTo2L2Nu_node_9.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToHHTo2B2VTo2L2Nu_node_SM.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-1000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-1250.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-1500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-1750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-2000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-2500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-250.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-260.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-270.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-280.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-3000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-300.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-320.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-350.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-450.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-550.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-600.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-650.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-700.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-800.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-850.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-900.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-1000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-1250.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-1500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-1750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-2000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-2500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-270.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-280.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-3000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-320.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-350.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-400.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-600.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-650.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-700.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-800.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-850.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-1000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-1250.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-1500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-1750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-2000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-2500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-250.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-260.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-270.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-280.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-3000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-300.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-320.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-350.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-400.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-450.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-550.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-600.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-650.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-700.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-800.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-850.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_M-900.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/GluGluToRadionToHHTo2B2WToLNu2J_node_SM.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-1000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-1750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-2000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-250.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-260.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-270.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-280.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-300.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-320.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-350.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-400.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-450.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-600.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-650.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-700.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-850.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToBulkGravitonToHHTo2B2Tau_M-900.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-1000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-1250.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-1500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-1750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-2000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-250.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-260.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-270.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-280.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-3000.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-300.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-350.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-400.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-450.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-500.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-550.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-600.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-650.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-700.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-750.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-800.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-850.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2Tau_M-900.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2VTo2L2Nu_M-300.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2VTo2L2Nu_M-350.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2VTo2L2Nu_M-400.root',
+'SkimDL2017_Signal_Boosted_ElMu/results/VBFToRadionToHHTo2B2VTo2L2Nu_M-750.root',
                                         ]
