@@ -26,28 +26,28 @@ def switch_on_index(indexes, condition, contA, contB):
     return [base[op.switch(condition, contA[index].idx, contB[index].idx)] for index in indexes]       
 
 def returnMVAInputs(dilep,jets):
-    return [op.switch(op.rng_len(dilep)>0,dilep[0][0].p4.E(),op.c_float(0.)),
-            op.switch(op.rng_len(dilep)>0,dilep[0][0].p4.Px(),op.c_float(0.)),
-            op.switch(op.rng_len(dilep)>0,dilep[0][0].p4.Py(),op.c_float(0.)),
-            op.switch(op.rng_len(dilep)>0,dilep[0][0].p4.Pz(),op.c_float(0.)),
-            op.switch(op.rng_len(dilep)>0,dilep[0][0].charge,op.c_int(0.)),
-            op.switch(op.rng_len(dilep)>0,dilep[0][0].pdgId,op.c_int(0.)),
-            op.switch(op.rng_len(dilep)>0,dilep[0][1].p4.E(),op.c_float(0.)),
-            op.switch(op.rng_len(dilep)>0,dilep[0][1].p4.Px(),op.c_float(0.)),
-            op.switch(op.rng_len(dilep)>0,dilep[0][1].p4.Py(),op.c_float(0.)),
-            op.switch(op.rng_len(dilep)>0,dilep[0][1].p4.Pz(),op.c_float(0.)),
-            op.switch(op.rng_len(dilep)>0,dilep[0][1].charge,op.c_int(0.)),
-            op.switch(op.rng_len(dilep)>0,dilep[0][1].pdgId,op.c_int(0.)),
-            op.switch(op.rng_len(jets)>0,jets[0].p4.E(),op.c_float(0.)),
-            op.switch(op.rng_len(jets)>0,jets[0].p4.Px(),op.c_float(0.)),
-            op.switch(op.rng_len(jets)>0,jets[0].p4.Py(),op.c_float(0.)),
-            op.switch(op.rng_len(jets)>0,jets[0].p4.Pz(),op.c_float(0.)),
-            op.switch(op.rng_len(jets)>0,jets[0].btagDeepFlavB,op.c_float(0.)),
-            op.switch(op.rng_len(jets)>1,jets[1].p4.E(),op.c_float(0.)),
-            op.switch(op.rng_len(jets)>1,jets[1].p4.Px(),op.c_float(0.)),
-            op.switch(op.rng_len(jets)>1,jets[1].p4.Py(),op.c_float(0.)),
-            op.switch(op.rng_len(jets)>1,jets[1].p4.Pz(),op.c_float(0.)),
-            op.switch(op.rng_len(jets)>1,jets[1].btagDeepFlavB,op.c_float(0.)),
+    return [dilep[0][0].p4.E(),
+            dilep[0][0].p4.Px(),
+            dilep[0][0].p4.Py(),
+            dilep[0][0].p4.Pz(),
+            dilep[0][0].charge,
+            dilep[0][0].pdgId,
+            dilep[0][1].p4.E(),
+            dilep[0][1].p4.Px(),
+            dilep[0][1].p4.Py(),
+            dilep[0][1].p4.Pz(),
+            dilep[0][1].charge,
+            dilep[0][1].pdgId,
+            jets[0].p4.E(),
+            jets[0].p4.Px(),
+            jets[0].p4.Py(),
+            jets[0].p4.Pz(),
+            jets[0].btagDeepFlavB,
+            jets[1].p4.E(),
+            jets[1].p4.Px(),
+            jets[1].p4.Py(),
+            jets[1].p4.Pz(),
+            jets[1].btagDeepFlavB,
             op.switch(op.rng_len(jets)>2,jets[2].p4.E(),op.c_float(0.)),
             op.switch(op.rng_len(jets)>2,jets[2].p4.Px(),op.c_float(0.)),
             op.switch(op.rng_len(jets)>2,jets[2].p4.Py(),op.c_float(0.)),
@@ -58,7 +58,6 @@ def returnMVAInputs(dilep,jets):
             op.switch(op.rng_len(jets)>3,jets[3].p4.Py(),op.c_float(0.)),
             op.switch(op.rng_len(jets)>3,jets[3].p4.Pz(),op.c_float(0.)),
             op.switch(op.rng_len(jets)>3,jets[3].btagDeepFlavB,op.c_float(0.))]
-
 
 #===============================================================================================#
 #                                       PlotterHHtobbWW                                         #
@@ -76,7 +75,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             self.datadrivenContributions["FakeExtrapolation"] = DataDrivenFake(contrib.name, contrib.config)
         if "DYEstimation" in self.datadrivenContributions: 
             contrib = self.datadrivenContributions["DYEstimation"]
-            self.datadrivenContributions["DYEstimation"] = DataDrivenDY(contrib.name, contrib.config)
+            self.datadrivenContributions["DYEstimation"] = DataDrivenDY(contrib.name, contrib.config, self.args.pseudodata)
             
 
 
@@ -99,10 +98,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         cutFlowPlots = []
 
         era = sampleCfg['era']
-
-        self.sample = sample
-        self.sampleCfg = sampleCfg
-        self.era = era
 
         self.yieldPlots = makeYieldPlots(self.args.Synchronization)
 
@@ -458,12 +453,12 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 for selObjNode in selObjNodesDict.values():
                     cutFlowPlots.append(CutFlowReport(selObjNode.selName,selObjNode.sel))
                 if not self.args.OnlyYield:
-                    plots.extend(makeDoubleLeptonMachineLearningPlots(selObjectDict,output,self.nodes,channel=selObjectDict['channel']))
+                    plots.extend(makeDoubleLeptonMachineLearningPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
     
         #----- Add the Yield plots -----#
         plots.extend(self.yieldPlots.returnPlots())
 
-        #plots.extend(cutFlowPlots)
+        plots.extend(cutFlowPlots)
 
         #----- Return -----#
         return plots

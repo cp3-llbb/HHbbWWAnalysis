@@ -941,13 +941,12 @@ def makeInclusiveBoostedSelection(self,selObject,copy_sel=False,plot_yield=False
 def makeDNNOutputNodesSelections(self,selObject,output,plot_yield=False):
     selBaseObject = copy(selObject)
     selObjDict = {}
+    maxIdx = op.rng_max_element_index(output)
     for i,node in enumerate(self.nodes):
         newSelObj = copy(selBaseObject)
         newSelObj.selName += '%snode'%node
         newSelObj.yieldTitle += " in %s node"%node 
-        print (newSelObj.selName)
-        newSelObj.refine(cut = [op.rng_max_element_by(output).op.index == op.c_int(i)])
-        #selObject.refine(cut = [output[i] >= output[j] for j in range(len(self.nodes)) if j != i])
+        newSelObj.refine(cut = [maxIdx == op.c_int(i)]) 
         selObjDict[node] = newSelObj
     return selObjDict
 

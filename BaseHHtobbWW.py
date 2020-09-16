@@ -7,12 +7,14 @@ from bamboo import treefunctions as op
 from bamboo.analysismodules import NanoAODModule, NanoAODHistoModule, NanoAODSkimmerModule
 from bamboo.analysisutils import makeMultiPrimaryDatasetTriggerSelection
 from bamboo.scalefactors import binningVariables_nano, BtagSF
+from bamboo.plots import SelectionWithDataDriven
 
 from METScripts import METFilter, METcorrection
 from scalefactorsbbWW import ScaleFactorsbbWW
 from btagHelper import makeBtagRatioReweighting
 from triggers import returnTriggerRanges
 from highlevelLambdas import highlevelLambdas
+from DDHelper import DataDrivenPseudoData
 
 #===============================================================================================#
 #                                  BaseHHtobbWW                                                 #
@@ -73,10 +75,6 @@ Arguments for the HH->bbWW analysis on bamboo framework
 
     * Plotter arguments *
         --OnlyYield
-
-    * DY correction *
-        --DYDataEstimation1Btag
-        --DYDataEstimation2Btag
 
     * Technical *
         --backend
@@ -223,7 +221,6 @@ One lepton and and one jet argument must be specified in addition to the require
                                 default     = False,
                                 help        = "DY data estimation variable")
 
-
         #----- Skimmer arguments -----#
         parser.add_argument("--Synchronization", 
                             action      = "store_true",
@@ -232,7 +229,7 @@ One lepton and and one jet argument must be specified in addition to the require
         parser.add_argument("--Channel", 
                             action      = "store",
                             type        = str,
-                            help        = "Specify the channel for the tuple : ElEl, ElMu, MuEl")
+                            help        = "Specify the channel for the tuple : ElEl, MuMu, ElMu")
 
         #----- Plotter arguments -----#
         parser.add_argument("--OnlyYield", 
@@ -270,6 +267,12 @@ One lepton and and one jet argument must be specified in addition to the require
     
         self.triggersPerPrimaryDataset = {}
         from bamboo.analysisutils import configureJets ,configureRochesterCorrection, configureType1MET 
+
+        # Save some useful stuff in self #
+        self.sample = sample
+        self.sampleCfg = sampleCfg
+        self.era = era
+
 
         # Check distributed option #
         isNotWorker = (self.args.distributed != "worker") 
@@ -574,6 +577,12 @@ One lepton and and one jet argument must be specified in addition to the require
 
         return tree,noSel,be,lumiArgs
 
+    def initialize(self,forSkimmer=False):
+        super(BaseNanoHHtobbWW, self).initialize()
+        if not forSkimmer and "PseudoData" in self.datadrivenContributions:
+            contrib = self.datadrivenContributions["PseudoData"]
+            self.datadrivenContributions["PseudoData"] = DataDrivenPseudoData(contrib.name, contrib.config)
+
     def prepareObjects(self, t, noSel, sample, sampleCfg, channel, forSkimmer=False):
         # Some imports #
         from bamboo.analysisutils import forceDefine
@@ -591,6 +600,16 @@ One lepton and and one jet argument must be specified in addition to the require
             forceDefine(getattr(t, "_{0}".format("MET" if era != "2017" else "METFixEE2017")).calcProd,noSel) # MET for configureMET
         else:
             print ("No jet corrections applied")
+
+        ###########################################################################
+        #                              Pseudo-data                                #
+        ###########################################################################
+        if not forSkimmer: # Skimmer does not know about self.datadrivenContributions
+            noSel = SelectionWithDataDriven.create(parent   = noSel,
+                                                   name     = 'noSel',
+                                                   ddSuffix = 'Pseudodata',
+                                                   enable   = "PseudoData" in self.datadrivenContributions 
+                                    and self.datadrivenContributions["PseudoData"].usesSample(self.sample, self.sampleCfg))
 
         ###########################################################################
         #                           TTbar reweighting                             #

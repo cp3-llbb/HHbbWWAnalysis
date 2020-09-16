@@ -18,6 +18,10 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
     def __init__(self, args):
         super(SkimmerNanoHHtobbWWDL, self).__init__(args)
 
+    def initialize(self):
+        super(SkimmerNanoHHtobbWWDL, self).initialize(True) # avoids doing the pseudo-data for skimmer
+
+
     def defineSkimSelection(self, t, noSel, sample=None, sampleCfg=None): 
         noSel = super(SkimmerNanoHHtobbWWDL,self).prepareObjects(t, noSel, sample, sampleCfg, "DL", forSkimmer=True)
             # For the Skimmer, SF must not use defineOnFirstUse -> segmentation fault
@@ -304,21 +308,25 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             if self.args.Channel == "MuMu": dilepton = self.MuMuDileptonFakeExtrapolationSel[0]
             if self.args.Channel == "ElMu": dilepton = self.ElMuDileptonFakeExtrapolationSel[0]
 
-        varsToKeep['l1_Px']  = dilepton[0].p4.Px()
-        varsToKeep['l1_Py']  = dilepton[0].p4.Py()
-        varsToKeep['l1_Pz']  = dilepton[0].p4.Pz()
-        varsToKeep['l1_E']   = dilepton[0].p4.E()
-        varsToKeep['l1_pt']  = dilepton[0].pt
-        varsToKeep['l1_eta'] = dilepton[0].eta
-        varsToKeep['l1_phi'] = dilepton[0].phi
+        varsToKeep['l1_Px']     = dilepton[0].p4.Px()
+        varsToKeep['l1_Py']     = dilepton[0].p4.Py()
+        varsToKeep['l1_Pz']     = dilepton[0].p4.Pz()
+        varsToKeep['l1_E']      = dilepton[0].p4.E()
+        varsToKeep['l1_pt']     = dilepton[0].pt
+        varsToKeep['l1_eta']    = dilepton[0].eta
+        varsToKeep['l1_phi']    = dilepton[0].phi
+        varsToKeep['l1_pdgId']  = dilepton[0].pdgId
+        varsToKeep['l1_charge'] = dilepton[0].charge
 
-        varsToKeep['l2_Px']  = dilepton[1].p4.Px()
-        varsToKeep['l2_Py']  = dilepton[1].p4.Py()
-        varsToKeep['l2_Pz']  = dilepton[1].p4.Pz()
-        varsToKeep['l2_E']   = dilepton[1].p4.E()
-        varsToKeep['l2_pt']  = dilepton[1].pt
-        varsToKeep['l2_eta'] = dilepton[1].eta
-        varsToKeep['l2_phi'] = dilepton[1].phi
+        varsToKeep['l2_Px']     = dilepton[1].p4.Px()
+        varsToKeep['l2_Py']     = dilepton[1].p4.Py()
+        varsToKeep['l2_Pz']     = dilepton[1].p4.Pz()
+        varsToKeep['l2_E']      = dilepton[1].p4.E()
+        varsToKeep['l2_pt']     = dilepton[1].pt
+        varsToKeep['l2_eta']    = dilepton[1].eta
+        varsToKeep['l2_phi']    = dilepton[1].phi
+        varsToKeep['l2_pdgId']  = dilepton[1].pdgId
+        varsToKeep['l2_charge'] = dilepton[1].charge
 
         varsToKeep['ll_pt'] = (dilepton[0].p4+dilepton[1].p4).Pt()
         varsToKeep['ll_DR'] = op.deltaR(dilepton[0].p4,dilepton[1].p4)
@@ -395,8 +403,11 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep['HT2R'] = self.HLL.HT2R(dilepton[0],dilepton[1],fatjet.subJet1,fatjet.subJet2,MET)
 
         #----- Additional variables -----#
-        varsToKeep["MC_weight"] = t.genWeight
-        varsToKeep['total_weight'] = selObj.sel.weight
+        varsToKeep["MC_weight"]         = t.genWeight
+        varsToKeep['total_weight']      = selObj.sel.weight
+        varsToKeep["event"]             = None # Already in tree
+        varsToKeep["run"]               = None # Already in tree 
+        varsToKeep["ls"]                = t.luminosityBlock
 
         #return leptonSel.sel, varsToKeep
         return selObj.sel, varsToKeep

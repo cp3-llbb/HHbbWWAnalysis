@@ -25,9 +25,13 @@ Below are the required packages that can be installed with pip.
 If you do not have sysadmin rights, do not forget to use ``` pipi install --user ...  ```
 
 - [Tensorflow](https://www.tensorflow.org/install/pip) (neural networks learning)
+    -> Already on Ingrid, do not install local verison 
 - [Keras](https://pypi.org/project/Keras/) (wraper around Tensorflow)
+    -> Already on Ingrid, do not install local verison 
 - [Talos](https://pypi.org/project/talos/) (hyperparameter scans)
+    -> Special branch already available in this directory (not need to install)
 - [Root_numpy](https://pypi.org/project/root-numpy/) (From ROOT trees to numpy arrays)
+    -> Already on Ingrid, do not install local verison 
 - [Seaborn](https://pypi.org/project/seaborn/) (Data Visualization)
 - [Numpy](https://pypi.org/project/numpy/) (Data manipulation)
 - [Pandas](https://pypi.org/project/pandas/) (Useful to manipulate numpy arrays altogether)
@@ -53,8 +57,10 @@ parameters.py contains the global information required by all the scripts, all t
 
 They will be decribed in the following 
 - paths : where the script will be running, produce the output and models
-- ratios : one part goes for training, one for evaluation of the model (used in hyperparameter scans) and one for producing an output for testing
-    A check is done to make sure the total accounts to 1, cross validation is not yet included
+- ratios : 
+    - classic : one part goes for training, one for evaluation of the model (used in hyperparameter scans) and one for producing an output for testing
+        A check is done to make sure the total accounts to 1
+    - cross-validation : see section below
 - Slurm parameters : will be provided to submit_on_slurm.py
 - Names : includes 
     - Name of the DNN model to be used in Model.py
@@ -233,6 +239,47 @@ In case of multiclassification (eg, ST, DY, and TT classes) all classes need to 
 
 This is implemented in the beginning of HHMachineLearning.py.
 
+### Cross-validation
+[Cross-validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)) is a very useful technique for two reasons :
+    - It makes full use of the statistics (reduces the bias when we have a small number of events)
+    - Allows all the events to be passed through the model when filling histograms in HEP
+In the classical approcah (also called holdout), we train on say ~70% of data and evaluate the performances on the remaining 30% which is unbiased because not seen by the model during the training.
+The issue is that these 30% of the dataset are not used for training the network, if the dataset is huge it is not a problem but otherwise we are impairing the training.
+
+To overcome that, cross-validation consists in training several models on subparts of the data : training, evaluation and application. The first one should be the largest and the last one must not be seen at any point by the associated network here. This will be the events evaluated by it only at the analysis level when filling plots.
+
+*Warning* : it implies that each hyperparameter set will be trained several times, take that into account when evaluating computing time.
+
+Example : the data is split in 5 slices and we train 5 models. We will split according to the event number (because it is unique) but any other branch in the tree will work.
+For a model i :
+    - it will be applied on events for which event_number % 5 == i
+    - it will be evaluated on events for which event_number % 5 == (i+1)%5
+    - it will be trained on the remaining events
+Another possiblity is 3 networks for 6 slices, therefore each network is applied on two data slices
+
+You can also do some fancy stuff like 5 models on 15 slices (10 for learning, 2 for evaluation and 3 for application)
+
+*Warning* : the assumption made here is that each event can only be applied on one model, hence it is required that the application number is equal to number of slices / number of models.
+In addition the number of slices must be multiple of the number of models. Several assertions in the code are there to enforce it.
+
+To enable cross-validation, change the boolean `crossvalidation` in `parameters.py` and tweak the numbers below accordingly.
+The result is that a mask will be added in the dataframe and will serve to determine which model to train/evaluate.
+
+*Note* :  the mask is now saved in the dataframe, and since it depends on the event number (or another metric in the branches) that is invariant there is no need to save it anymore so no mask is saved as npy file (the scaler will still be).
+
+Apart from that the training will remain the same, except that now several models and csv file will be saved, one for each step with additional string _crossval%d. 
+
+Csv concatenation works the same, however in principle the hyperparameter scan with cross-validation would require two nested loops. This is not implemented (maybe in the future) so right now the user has to select one hyperparameter set that has several submodels (aka with same substring "_dict%d" but different "_crossval%d") - we will use submodels to qualify the different models coming from one cross-validation pass. All these submodels need to be saved in `model/` (possibly using `python Utils.py --zip [] []`).
+
+To testing the command for output becomes 
+```
+python HHMachineLearning.py (args) --test --model model_crossval0 model_crossval1 model_crossval2 model_crossval3 model_crossval4
+```
+
+*Note* : `--model` accepts a list as above and will interpret the models as going in that order ! It is the user responsibility to make sure they are given in the right order otherwise models will not be applied on the correct dataset slice (and no error will be shown). 
+
+Each model will then be evaluated on its application slice (aka the one that should be used at the analysis level) to see what is its behaviour and the output tree will be produced as in the classical approach. 
+
 ### Generator
 In case there is too much data in the training (rare in case of HEP) to put them in the RAM, small chunks can be loaded in turns and trained on.
 The advantage is that many threads can be used to generate the training data from root files.
@@ -241,8 +288,9 @@ This will probably not be used here but can be a possibility.
 
 ### Cache
 The importation from root files can be slow and if the training data is not too big it can be cached (see name in parameters.py).
+This is especially useful when modifying the code for rapid testing or evaluation on local. For job submission it is best to use `--nocache`
 
-Warning : whenever you change something in sampleList.py, the preprocessing or mask, the cache must be cleared !!!
+*Warning* : whenever you change something in sampleList.py, the preprocessing or mask, the cache must be cleared !!!
 Otherwise you will still run on the older cache values and not the changes you chose.
 
 

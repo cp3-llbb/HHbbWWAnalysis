@@ -45,6 +45,7 @@ from split_training import DictSplit
 from plot_scans import PlotScans
 from preprocessing import PreprocessLayer
 from data_generator import DataGenerator
+from generate_mask import GenerateSliceIndices, GenerateSliceMask
 import Model
 
 #################################################################################################
@@ -61,7 +62,7 @@ class HyperModel:
     #############################################################################################
     # HyperScan #
     #############################################################################################
-    def HyperScan(self,data,list_inputs,list_outputs,task,generator=False,resume=False):
+    def HyperScan(self,data,list_inputs,list_outputs,task,model_idx=None,generator=False,resume=False):
         """
         Performs the scan for hyperparameters
         If task is specified, will load a pickle dict splitted from the whole set of parameters
@@ -84,8 +85,18 @@ class HyperModel:
             self.x = data[list_inputs].values
             self.y = data[list_outputs+['learning_weights']].values
             # Data splitting #
-            size = parameters.training_ratio/(parameters.training_ratio+parameters.evaluation_ratio)
-            self.x_train, self.x_val, self.y_train, self.y_val = train_test_split(self.x,self.y,train_size=size)
+            if model_idx is None:
+                size = parameters.training_ratio/(parameters.training_ratio+parameters.evaluation_ratio)
+                self.x_train, self.x_val, self.y_train, self.y_val = train_test_split(self.x,self.y,train_size=size)
+            else: # Cross validation : take the training and evaluation set based on the mask
+                # model_idx == index of mask on which model will be applied (aka, not trained nor evaluated)
+                _, eval_idx, train_idx = GenerateSliceIndices(model_idx) #, GenerateSliceMask
+                eval_mask = GenerateSliceMask(eval_idx,data['mask'])
+                train_mask = GenerateSliceMask(train_idx,data['mask'])
+                self.x_val   = self.x[eval_mask]
+                self.y_val   = self.y[eval_mask]
+                self.x_train = self.x[train_mask]
+                self.y_train = self.y[train_mask]
             logging.info("Training set   : %d"%self.x_train.shape[0])
             logging.info("Evaluation set : %d"%self.x_val.shape[0])
         else:
@@ -127,13 +138,17 @@ class HyperModel:
         # This is only valid in worker mode, not driver #
         no = 1
         if self.task == '': # If done on frontend
-            self.name = self.name
-            self.path_model = os.path.join(parameters.main_path,'model',self.name)
+            name = self.name
             while os.path.exists(os.path.join(parameters.path_model,self.name+'_'+str(no)+'.csv')):
                 no +=1
-            self.name_model = self.name+'_'+str(no)
+            if model_idx is not None:
+                name += '_crossval%d'%model_idx
+            self.name_model = name+'_'+str(no)
         else:               # If job on cluster
-            self.name_model = self.name+'_'+self.task.replace('.pkl','')
+            name = self.name
+            if model_idx is not None:
+                name += '_crossval%d'%model_idx
+            self.name_model = name+'_'+self.task.replace('.pkl','')
 
         # Define scan object #
         self.h = Scan(x=self.x_train,                       # Training inputs 
@@ -328,7 +343,7 @@ class HyperModel:
         Reference :
             /home/ucl/cp3/fbury/.local/lib/python3.6/site-packages/talos/commands/restore.py
         """
-        logging.info((' Starting restoration of with model %s.zip '%(self.name).center(80,'-')))
+        logging.info(('Using model %s.zip '%(self.name).center(80,'-')))
         # Load the preprocessing layer #
         # Restore model #
         loaded = False
