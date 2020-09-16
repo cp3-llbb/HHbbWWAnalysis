@@ -320,9 +320,6 @@ def main():
                     raise RuntimeError('Asked for cross validation mask but cannot find the slicing array')
                 try:
                     data['mask'] = (data[parameters.splitbranch] % parameters.N_slices).to_numpy()
-                    print (parameters.splitbranch)
-                    print (parameters.N_slices)
-                    print (data['mask'])
                     # Will contain numbers : 0,1,2,...N_slices-1
                 except ValueError:
                     logging.critical("Problem with the masking")
@@ -418,15 +415,13 @@ def main():
     if opt.scan != '':
         instance = HyperModel(opt.scan)
         if parameters.crossvalidation:
-            for i in range(parameters.N_slices):
+            for i in range(parameters.N_models):
                 logging.info("*"*80)
                 logging.info("Starting training of model %d"%i)
                 instance.HyperScan(data=train_all,
                                    list_inputs=list_inputs,
                                    list_outputs=list_outputs,
                                    task=opt.task,
-                                   generator=opt.generator,
-                                   resume=opt.resume,
                                    model_idx=i)
                 instance.HyperDeploy(best='eval_error')
         else:

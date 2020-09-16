@@ -36,6 +36,8 @@ samples_dict_2016['resolved_1b_ElEl_H'] = [
 'SkimDL2016_Background_Resolved1Btag_ElEl/results/VBFHToWWTo2L2Nu.root',
 'SkimDL2016_Background_Resolved1Btag_ElEl/results/VBFHToWWToLNuQQ.root',
 'SkimDL2016_Background_Resolved1Btag_ElEl/results/VBFHToZZTo4L.root',
+'SkimDL2016_Background_Resolved1Btag_ElEl/results/THQ.root',
+'SkimDL2016_Background_Resolved1Btag_ElEl/results/THW.root',
                                         ] 
 samples_dict_2016['resolved_1b_ElEl_ST'] = [
 'SkimDL2016_Background_Resolved1Btag_ElEl/results/ST_schannel_4f.root',
@@ -94,8 +96,6 @@ samples_dict_2016['resolved_1b_ElEl_VVV'] = [
 
 samples_dict_2016['resolved_1b_ElEl_Rare'] = [
 'SkimDL2016_Background_Resolved1Btag_ElEl/results/TGJets.root',
-'SkimDL2016_Background_Resolved1Btag_ElEl/results/THQ.root',
-'SkimDL2016_Background_Resolved1Btag_ElEl/results/THW.root',
 'SkimDL2016_Background_Resolved1Btag_ElEl/results/TTGJets.root',
 'SkimDL2016_Background_Resolved1Btag_ElEl/results/TTTT.root',
 'SkimDL2016_Background_Resolved1Btag_ElEl/results/tZq_ll.root',
@@ -271,6 +271,8 @@ samples_dict_2016['resolved_1b_MuMu_H'] = [
 'SkimDL2016_Background_Resolved1Btag_MuMu/results/VBFHToWWTo2L2Nu.root',
 'SkimDL2016_Background_Resolved1Btag_MuMu/results/VBFHToWWToLNuQQ.root',
 'SkimDL2016_Background_Resolved1Btag_MuMu/results/VBFHToZZTo4L.root',
+'SkimDL2016_Background_Resolved1Btag_MuMu/results/THQ.root',
+'SkimDL2016_Background_Resolved1Btag_MuMu/results/THW.root',
                                         ] 
 samples_dict_2016['resolved_1b_MuMu_ST'] = [
 'SkimDL2016_Background_Resolved1Btag_MuMu/results/ST_schannel_4f.root',
@@ -330,8 +332,6 @@ samples_dict_2016['resolved_1b_MuMu_VVV'] = [
 
 samples_dict_2016['resolved_1b_MuMu_Rare'] = [
 'SkimDL2016_Background_Resolved1Btag_MuMu/results/TGJets.root',
-'SkimDL2016_Background_Resolved1Btag_MuMu/results/THQ.root',
-'SkimDL2016_Background_Resolved1Btag_MuMu/results/THW.root',
 'SkimDL2016_Background_Resolved1Btag_MuMu/results/TTGJets.root',
 'SkimDL2016_Background_Resolved1Btag_MuMu/results/TTTT.root',
 'SkimDL2016_Background_Resolved1Btag_MuMu/results/tZq_ll.root',
@@ -507,6 +507,8 @@ samples_dict_2016['resolved_1b_ElMu_H'] = [
 'SkimDL2016_Background_Resolved1Btag_ElMu/results/VBFHToWWTo2L2Nu.root',
 'SkimDL2016_Background_Resolved1Btag_ElMu/results/VBFHToWWToLNuQQ.root',
 'SkimDL2016_Background_Resolved1Btag_ElMu/results/VBFHToZZTo4L.root',
+'SkimDL2016_Background_Resolved1Btag_ElMu/results/THQ.root',
+'SkimDL2016_Background_Resolved1Btag_ElMu/results/THW.root',
                                         ] 
 samples_dict_2016['resolved_1b_ElMu_ST'] = [
 'SkimDL2016_Background_Resolved1Btag_ElMu/results/ST_schannel_4f.root',
@@ -566,8 +568,6 @@ samples_dict_2016['resolved_1b_ElMu_VVV'] = [
 
 samples_dict_2016['resolved_1b_ElMu_Rare'] = [
 'SkimDL2016_Background_Resolved1Btag_ElMu/results/TGJets.root',
-'SkimDL2016_Background_Resolved1Btag_ElMu/results/THQ.root',
-'SkimDL2016_Background_Resolved1Btag_ElMu/results/THW.root',
 'SkimDL2016_Background_Resolved1Btag_ElMu/results/TTGJets.root',
 'SkimDL2016_Background_Resolved1Btag_ElMu/results/TTTT.root',
 'SkimDL2016_Background_Resolved1Btag_ElMu/results/tZq_ll.root',
@@ -744,6 +744,8 @@ samples_dict_2016['resolved_2b_ElEl_H'] = [
 'SkimDL2016_Background_Resolved2Btag_ElEl/results/VBFHToWWTo2L2Nu.root',
 'SkimDL2016_Background_Resolved2Btag_ElEl/results/VBFHToWWToLNuQQ.root',
 'SkimDL2016_Background_Resolved2Btag_ElEl/results/VBFHToZZTo4L.root',
+'SkimDL2016_Background_Resolved2Btag_ElEl/results/THQ.root',
+'SkimDL2016_Background_Resolved2Btag_ElEl/results/THW.root',
                                         ] 
 samples_dict_2016['resolved_2b_ElEl_ST'] = [
 'SkimDL2016_Background_Resolved2Btag_ElEl/results/ST_schannel_4f.root',
@@ -803,8 +805,6 @@ samples_dict_2016['resolved_2b_ElEl_VVV'] = [
 
 samples_dict_2016['resolved_2b_ElEl_Rare'] = [
 'SkimDL2016_Background_Resolved2Btag_ElEl/results/TGJets.root',
-'SkimDL2016_Background_Resolved2Btag_ElEl/results/THQ.root',
-'SkimDL2016_Background_Resolved2Btag_ElEl/results/THW.root',
 'SkimDL2016_Background_Resolved2Btag_ElEl/results/TTGJets.root',
 'SkimDL2016_Background_Resolved2Btag_ElEl/results/TTTT.root',
 'SkimDL2016_Background_Resolved2Btag_ElEl/results/tZq_ll.root',
@@ -980,6 +980,8 @@ samples_dict_2016['resolved_2b_MuMu_H'] = [
 'SkimDL2016_Background_Resolved2Btag_MuMu/results/VBFHToWWTo2L2Nu.root',
 'SkimDL2016_Background_Resolved2Btag_MuMu/results/VBFHToWWToLNuQQ.root',
 'SkimDL2016_Background_Resolved2Btag_MuMu/results/VBFHToZZTo4L.root',
+'SkimDL2016_Background_Resolved2Btag_MuMu/results/THQ.root',
+'SkimDL2016_Background_Resolved2Btag_MuMu/results/THW.root',
                                         ] 
 samples_dict_2016['resolved_2b_MuMu_ST'] = [
 'SkimDL2016_Background_Resolved2Btag_MuMu/results/ST_schannel_4f.root',
@@ -1039,8 +1041,6 @@ samples_dict_2016['resolved_2b_MuMu_VVV'] = [
 
 samples_dict_2016['resolved_2b_MuMu_Rare'] = [
 'SkimDL2016_Background_Resolved2Btag_MuMu/results/TGJets.root',
-'SkimDL2016_Background_Resolved2Btag_MuMu/results/THQ.root',
-'SkimDL2016_Background_Resolved2Btag_MuMu/results/THW.root',
 'SkimDL2016_Background_Resolved2Btag_MuMu/results/TTGJets.root',
 'SkimDL2016_Background_Resolved2Btag_MuMu/results/TTTT.root',
 'SkimDL2016_Background_Resolved2Btag_MuMu/results/tZq_ll.root',
@@ -1216,6 +1216,8 @@ samples_dict_2016['resolved_2b_ElMu_H'] = [
 'SkimDL2016_Background_Resolved2Btag_ElMu/results/VBFHToWWTo2L2Nu.root',
 'SkimDL2016_Background_Resolved2Btag_ElMu/results/VBFHToWWToLNuQQ.root',
 'SkimDL2016_Background_Resolved2Btag_ElMu/results/VBFHToZZTo4L.root',
+'SkimDL2016_Background_Resolved2Btag_ElMu/results/THQ.root',
+'SkimDL2016_Background_Resolved2Btag_ElMu/results/THW.root',
                                         ] 
 samples_dict_2016['resolved_2b_ElMu_ST'] = [
 'SkimDL2016_Background_Resolved2Btag_ElMu/results/ST_schannel_4f.root',
@@ -1275,8 +1277,6 @@ samples_dict_2016['resolved_2b_ElMu_VVV'] = [
 
 samples_dict_2016['resolved_2b_ElMu_Rare'] = [
 'SkimDL2016_Background_Resolved2Btag_ElMu/results/TGJets.root',
-'SkimDL2016_Background_Resolved2Btag_ElMu/results/THQ.root',
-'SkimDL2016_Background_Resolved2Btag_ElMu/results/THW.root',
 'SkimDL2016_Background_Resolved2Btag_ElMu/results/TTGJets.root',
 'SkimDL2016_Background_Resolved2Btag_ElMu/results/TTTT.root',
 'SkimDL2016_Background_Resolved2Btag_ElMu/results/tZq_ll.root',
@@ -1453,6 +1453,8 @@ samples_dict_2016['boosted_ElEl_H'] = [
 'SkimDL2016_Background_Boosted_ElEl/results/VBFHToWWTo2L2Nu.root',
 'SkimDL2016_Background_Boosted_ElEl/results/VBFHToWWToLNuQQ.root',
 'SkimDL2016_Background_Boosted_ElEl/results/VBFHToZZTo4L.root',
+'SkimDL2016_Background_Boosted_ElEl/results/THW.root',
+'SkimDL2016_Background_Boosted_ElEl/results/THQ.root',
                                         ] 
 samples_dict_2016['boosted_ElEl_ST'] = [
 'SkimDL2016_Background_Boosted_ElEl/results/ST_schannel_4f.root',
@@ -1511,10 +1513,8 @@ samples_dict_2016['boosted_ElEl_VVV'] = [
                                         ]
 
 samples_dict_2016['boosted_ElEl_Rare'] = [
-'SkimDL2016_Background_Boosted_ElEl/results/TGJets.root',
-'SkimDL2016_Background_Boosted_ElEl/results/THQ.root',
-'SkimDL2016_Background_Boosted_ElEl/results/THW.root',
 'SkimDL2016_Background_Boosted_ElEl/results/TTGJets.root',
+'SkimDL2016_Background_Boosted_ElEl/results/TGJets.root',
 'SkimDL2016_Background_Boosted_ElEl/results/TTTT.root',
 'SkimDL2016_Background_Boosted_ElEl/results/tZq_ll.root',
 'SkimDL2016_Background_Boosted_ElEl/results/VHToNonbb.root',
@@ -1689,6 +1689,8 @@ samples_dict_2016['boosted_MuMu_H'] = [
 'SkimDL2016_Background_Boosted_MuMu/results/VBFHToWWTo2L2Nu.root',
 'SkimDL2016_Background_Boosted_MuMu/results/VBFHToWWToLNuQQ.root',
 'SkimDL2016_Background_Boosted_MuMu/results/VBFHToZZTo4L.root',
+'SkimDL2016_Background_Boosted_MuMu/results/THQ.root',
+'SkimDL2016_Background_Boosted_MuMu/results/THW.root',
                                         ] 
 samples_dict_2016['boosted_MuMu_ST'] = [
 'SkimDL2016_Background_Boosted_MuMu/results/ST_schannel_4f.root',
@@ -1730,7 +1732,6 @@ samples_dict_2016['boosted_MuMu_VVV'] = [
 'SkimDL2016_Background_Boosted_MuMu/results/WJetsToLNu_HT-70To100.root',
 'SkimDL2016_Background_Boosted_MuMu/results/WJetsToLNu_HT-800To1200.root',
 'SkimDL2016_Background_Boosted_MuMu/results/WJetsToLNu.root',
-
 'SkimDL2016_Background_Boosted_MuMu/results/WWTo2L2Nu_DoubleScattering.root',
 'SkimDL2016_Background_Boosted_MuMu/results/WWTo2L2Nu.root',
 'SkimDL2016_Background_Boosted_MuMu/results/WWToLNuQQ.root',
@@ -1748,8 +1749,6 @@ samples_dict_2016['boosted_MuMu_VVV'] = [
 
 samples_dict_2016['boosted_MuMu_Rare'] = [
 'SkimDL2016_Background_Boosted_MuMu/results/TGJets.root',
-'SkimDL2016_Background_Boosted_MuMu/results/THQ.root',
-'SkimDL2016_Background_Boosted_MuMu/results/THW.root',
 'SkimDL2016_Background_Boosted_MuMu/results/TTGJets.root',
 'SkimDL2016_Background_Boosted_MuMu/results/TTTT.root',
 'SkimDL2016_Background_Boosted_MuMu/results/tZq_ll.root',
@@ -1925,6 +1924,8 @@ samples_dict_2016['boosted_ElMu_H'] = [
 'SkimDL2016_Background_Boosted_ElMu/results/VBFHToWWTo2L2Nu.root',
 'SkimDL2016_Background_Boosted_ElMu/results/VBFHToWWToLNuQQ.root',
 'SkimDL2016_Background_Boosted_ElMu/results/VBFHToZZTo4L.root',
+'SkimDL2016_Background_Boosted_ElMu/results/THQ.root',
+'SkimDL2016_Background_Boosted_ElMu/results/THW.root',
                                         ] 
 samples_dict_2016['boosted_ElMu_ST'] = [
 'SkimDL2016_Background_Boosted_ElMu/results/ST_schannel_4f.root',
@@ -1983,8 +1984,6 @@ samples_dict_2016['boosted_ElMu_VVV'] = [
 
 samples_dict_2016['boosted_ElMu_Rare'] = [
 'SkimDL2016_Background_Boosted_ElMu/results/TGJets.root',
-'SkimDL2016_Background_Boosted_ElMu/results/THQ.root',
-'SkimDL2016_Background_Boosted_ElMu/results/THW.root',
 'SkimDL2016_Background_Boosted_ElMu/results/TTGJets.root',
 'SkimDL2016_Background_Boosted_ElMu/results/TTTT.root',
 'SkimDL2016_Background_Boosted_ElMu/results/tZq_ll.root',
@@ -2206,6 +2205,8 @@ samples_dict_2017['boosted_ElEl_H'] = [
 'SkimDL2017_Background_Boosted_ElEl/results/ttHJetToNonbb.root',
 'SkimDL2017_Background_Boosted_ElEl/results/WminusH_HToBB_WToLNu.root',
 'SkimDL2017_Background_Boosted_ElEl/results/WplusH_HToBB_WToLNu.root',
+'SkimDL2017_Background_Boosted_ElEl/results/THQ.root',
+'SkimDL2017_Background_Boosted_ElEl/results/THW.root',
                                         ]
 
 samples_dict_2017['boosted_ElEl_ST'] = [
@@ -2269,8 +2270,6 @@ samples_dict_2017['boosted_ElEl_Rare'] = [
 'SkimDL2017_Background_Boosted_ElEl/results/TTTT.root',
 'SkimDL2017_Background_Boosted_ElEl/results/TGJets.root',
 'SkimDL2017_Background_Boosted_ElEl/results/TTGJets.root',
-'SkimDL2017_Background_Boosted_ElEl/results/THQ.root',
-'SkimDL2017_Background_Boosted_ElEl/results/THW.root',
 'SkimDL2017_Background_Boosted_ElEl/results/tZq_ll.root',
 'SkimDL2017_Background_Boosted_ElEl/results/WGToLNuG.root',
 'SkimDL2017_Background_Boosted_ElEl/results/WpWpJJ.root',
@@ -2526,6 +2525,8 @@ samples_dict_2017['boosted_MuMu_H'] = [
 'SkimDL2017_Background_Boosted_MuMu/results/ttHJetToNonbb.root',
 'SkimDL2017_Background_Boosted_MuMu/results/WminusH_HToBB_WToLNu.root',
 'SkimDL2017_Background_Boosted_MuMu/results/WplusH_HToBB_WToLNu.root',
+'SkimDL2017_Background_Boosted_MuMu/results/THQ.root',
+'SkimDL2017_Background_Boosted_MuMu/results/THW.root',
                                         ]
 
 samples_dict_2017['boosted_MuMu_ST'] = [
@@ -2589,8 +2590,6 @@ samples_dict_2017['boosted_MuMu_Rare'] = [
 'SkimDL2017_Background_Boosted_MuMu/results/TTTT.root',
 'SkimDL2017_Background_Boosted_MuMu/results/TGJets.root',
 'SkimDL2017_Background_Boosted_MuMu/results/TTGJets.root',
-'SkimDL2017_Background_Boosted_MuMu/results/THQ.root',
-'SkimDL2017_Background_Boosted_MuMu/results/THW.root',
 'SkimDL2017_Background_Boosted_MuMu/results/tZq_ll.root',
 'SkimDL2017_Background_Boosted_MuMu/results/WGToLNuG.root',
 'SkimDL2017_Background_Boosted_MuMu/results/WpWpJJ.root',
@@ -2846,6 +2845,8 @@ samples_dict_2017['boosted_ElMu_H'] = [
 'SkimDL2017_Background_Boosted_ElMu/results/ttHJetToNonbb.root',
 'SkimDL2017_Background_Boosted_ElMu/results/WminusH_HToBB_WToLNu.root',
 'SkimDL2017_Background_Boosted_ElMu/results/WplusH_HToBB_WToLNu.root',
+'SkimDL2017_Background_Boosted_ElMu/results/THQ.root',
+'SkimDL2017_Background_Boosted_ElMu/results/THW.root',
                                         ]
 
 samples_dict_2017['boosted_ElMu_ST'] = [
@@ -2909,8 +2910,6 @@ samples_dict_2017['boosted_ElMu_Rare'] = [
 'SkimDL2017_Background_Boosted_ElMu/results/TTTT.root',
 'SkimDL2017_Background_Boosted_ElMu/results/TGJets.root',
 'SkimDL2017_Background_Boosted_ElMu/results/TTGJets.root',
-'SkimDL2017_Background_Boosted_ElMu/results/THQ.root',
-'SkimDL2017_Background_Boosted_ElMu/results/THW.root',
 'SkimDL2017_Background_Boosted_ElMu/results/tZq_ll.root',
 'SkimDL2017_Background_Boosted_ElMu/results/WGToLNuG.root',
 'SkimDL2017_Background_Boosted_ElMu/results/WpWpJJ.root',
