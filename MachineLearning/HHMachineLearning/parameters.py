@@ -32,9 +32,9 @@ assert training_ratio + evaluation_ratio + output_ratio == 1
 # Cross-validation #
 # -> For crossvalidation == True
 N_models = 5  # Number of models to train
-N_train  = 10  # Number of slices on which to train
-N_eval   = 2  # Number of slices on which to evaluate the model
-N_apply  = 3  # Number of slices on which the model will be applied for uses in analysis
+N_train  = 3  # Number of slices on which to train
+N_eval   = 1  # Number of slices on which to evaluate the model
+N_apply  = 1  # Number of slices on which the model will be applied for uses in analysis
 N_slices = N_train+N_eval+N_apply
 splitbranch = 'event' # Will split the training based on "event % N_slices" 
 # /!\ Don't forget to add "splitbranch" in other_variables
@@ -47,7 +47,7 @@ if N_apply != N_slices/N_models: # Otherwise the same slice can be applied on se
 ############################### Slurm parameters ######################################
 partition = 'cp3'  # Def, cp3 or cp3-gpu
 QOS = 'cp3' # cp3 or normal
-time = '0-00:10:00' # days-hh:mm:ss
+time = '0-01:00:00' # days-hh:mm:ss
 mem = '6000' # ram in MB
 tasks = '1' # Number of threads(as a string) (not parallel training for classic mode)
 
@@ -118,7 +118,7 @@ p = {
     'first_neuron' : [32],
     'activation' : [relu],
     'dropout' : [0.],
-    'hidden_layers' : [1,2,3,4,5], # does not take into account the first layer
+    'hidden_layers' : [1], # does not take into account the first layer
     'output_activation' : [softmax],
     'l2' : [0],
     'optimizer' : [Adam],  
