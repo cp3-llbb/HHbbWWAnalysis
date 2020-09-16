@@ -8,6 +8,7 @@ from root_numpy import array2root
 
 from NeuralNet import HyperModel
 from import_tree import Tree2Pandas
+from generate_mask import GenerateSliceIndices, GenerateSliceMask
 import parameters
 
 
@@ -37,8 +38,9 @@ class ProduceOutput:
         else: # cross validation
             for model_idx,model in enumerate(self.model):
                 instance = HyperModel(model)
-                apply_idx = (data['mask'] == model_idx)
-                model_out = instance.HyperRestore(inputs[apply_idx],generator=self.generator,generator_filepath=self.generator_filepath)
+                apply_idx, _, _ = GenerateSliceIndices(model_idx)
+                apply_mask = GenerateSliceMask(apply_idx,data['mask']) 
+                model_out = instance.HyperRestore(inputs[apply_mask],generator=self.generator,generator_filepath=self.generator_filepath)
                 if output is None:
                     output = model_out
                 else:

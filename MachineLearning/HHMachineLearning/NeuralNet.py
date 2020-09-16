@@ -45,6 +45,7 @@ from split_training import DictSplit
 from plot_scans import PlotScans
 from preprocessing import PreprocessLayer
 from data_generator import DataGenerator
+from generate_mask import GenerateSliceIndices, GenerateSliceMask
 import Model
 
 #################################################################################################
@@ -89,12 +90,13 @@ class HyperModel:
                 self.x_train, self.x_val, self.y_train, self.y_val = train_test_split(self.x,self.y,train_size=size)
             else: # Cross validation : take the training and evaluation set based on the mask
                 # model_idx == index of mask on which model will be applied (aka, not trained nor evaluated)
-                train_idx = (data['mask'] != model_idx) & (data['mask'] != (model_idx+1)%parameters.N_slices)
-                eval_idx = data['mask'] == (model_idx+1)%parameters.N_slices
-                self.x_train = self.x[train_idx]
-                self.y_train = self.y[train_idx]
-                self.x_val   = self.x[eval_idx]
-                self.y_val   = self.y[eval_idx]
+                _, eval_idx, train_idx = GenerateSliceIndices(model_idx) #, GenerateSliceMask
+                eval_mask = GenerateSliceMask(eval_idx,data['mask'])
+                train_mask = GenerateSliceMask(train_idx,data['mask'])
+                self.x_val   = self.x[eval_mask]
+                self.y_val   = self.y[eval_mask]
+                self.x_train = self.x[train_mask]
+                self.y_train = self.y[train_mask]
             logging.info("Training set   : %d"%self.x_train.shape[0])
             logging.info("Evaluation set : %d"%self.x_val.shape[0])
         else:
@@ -341,7 +343,7 @@ class HyperModel:
         Reference :
             /home/ucl/cp3/fbury/.local/lib/python3.6/site-packages/talos/commands/restore.py
         """
-        logging.info((' Starting restoration of with model %s.zip '%(self.name).center(80,'-')))
+        logging.info(('Using model %s.zip '%(self.name).center(80,'-')))
         # Load the preprocessing layer #
         # Restore model #
         loaded = False
