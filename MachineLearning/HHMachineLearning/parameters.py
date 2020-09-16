@@ -31,16 +31,18 @@ assert training_ratio + evaluation_ratio + output_ratio == 1
 
 # Cross-validation #
 # -> For crossvalidation == True
-N_models = 3  # Number of models to train
-N_train  = 3  # Number of slices on which to train
-N_eval   = 1  # Number of slices on which to evaluate the model
-N_apply  = 2  # Number of slices on which the model will be applied for uses in analysis
+N_models = 5  # Number of models to train
+N_train  = 10  # Number of slices on which to train
+N_eval   = 2  # Number of slices on which to evaluate the model
+N_apply  = 3  # Number of slices on which the model will be applied for uses in analysis
 N_slices = N_train+N_eval+N_apply
 splitbranch = 'event' # Will split the training based on "event % N_slices" 
 # /!\ Don't forget to add "splitbranch" in other_variables
 
-assert N_slices % N_models == 0# will not work otherwise
-assert N_apply == N_slices/N_models # Otherwise the same slice can be applied on both network 
+if N_slices % N_models != 0: # will not work otherwise
+    raise RuntimeError("N_slices [{}] % N_models [{}] should be == 0".format(N_slices,N_models))
+if N_apply != N_slices/N_models: # Otherwise the same slice can be applied on several networks
+    raise RuntimeError("You have asked {} models that should be applied {} times, the number of slices should be {} but is {}+{}+{}".format(N_models,N_apply,N_models*N_apply,N_train,N_eval,N_apply))
 
 ############################### Slurm parameters ######################################
 partition = 'cp3'  # Def, cp3 or cp3-gpu

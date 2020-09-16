@@ -248,12 +248,16 @@ The issue is that these 30% of the dataset are not used for training the network
 
 To overcome that, cross-validation consists in training several models on subparts of the data : training, evaluation and application. The first one should be the largest and the last one must not be seen at any point by the associated network here. This will be the events evaluated by it only at the analysis level when filling plots.
 
+*Warning* : it implies that each hyperparameter set will be trained several times, take that into account when evaluating computing time.
+
 Example : the data is split in 5 slices and we train 5 models. We will split according to the event number (because it is unique) but any other branch in the tree will work.
 For a model i :
     - it will be applied on events for which event_number % 5 == i
     - it will be evaluated on events for which event_number % 5 == (i+1)%5
     - it will be trained on the remaining events
 Another possiblity is 3 networks for 6 slices, therefore each network is applied on two data slices
+
+You can also do some fancy stuff like 5 models on 15 slices (10 for learning, 2 for evaluation and 3 for application)
 
 *Warning* : the assumption made here is that each event can only be applied on one model, hence it is required that the application number is equal to number of slices / number of models.
 In addition the number of slices must be multiple of the number of models. Several assertions in the code are there to enforce it.

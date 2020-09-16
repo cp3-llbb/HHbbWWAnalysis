@@ -137,7 +137,7 @@ def main():
     from produce_output import ProduceOutput
     from make_scaler import MakeScaler
     from submit_on_slurm import submit_on_slurm
-    from generate_mask import GenerateMask
+    from generate_mask import GenerateMask, GenerateSliceIndices, GenerateSliceMask
     from split_training import DictSplit
     from concatenate_csv import ConcatenateCSV
     from sampleList import samples_dict_2016, samples_dict_2017, samples_dict_2018, samples_path
@@ -320,6 +320,9 @@ def main():
                     raise RuntimeError('Asked for cross validation mask but cannot find the slicing array')
                 try:
                     data['mask'] = (data[parameters.splitbranch] % parameters.N_slices).to_numpy()
+                    print (parameters.splitbranch)
+                    print (parameters.N_slices)
+                    print (data['mask'])
                     # Will contain numbers : 0,1,2,...N_slices-1
                 except ValueError:
                     logging.critical("Problem with the masking")
@@ -391,11 +394,14 @@ def main():
     if parameters.crossvalidation: 
         N = train_all.shape[0]
         logging.info('Cross-validation has been requested on set of %d events'%N)
-        for i in range(parameters.N_slices):
-            na = train_all[train_all['mask'] == i].shape[0]
-            ne = train_all[train_all['mask'] == (i+1)%parameters.N_slices].shape[0]
-            nt = N - na -na
-            logging.info('... Model %d will be applied on %d [%.2f%%] events, evaluated on %d [%.2f%%] events and trained on the remaining %d [%.2f%%] events'%(i,na,na*100/N,ne,ne*100/N,nt,nt*100/N))
+        for i in range(parameters.N_models):
+            slices_apply , slices_eval, slices_train = GenerateSliceIndices(i)
+            logging.info('... Model %d :'%i)
+            for slicename, slices in zip (['Applied','Evaluated','Trained'],[slices_apply , slices_eval, slices_train]):
+                selector = np.full((train_all.shape[0]), False, dtype=bool)
+                selector = GenerateSliceMask(slices,train_all['mask'])
+                n = train_all[selector].shape[0]
+                logging.info('     %10s on %10d [%3.2f%%] events'%(slicename,n,n*100/N)+' (With mask indices : ['+','.join([str(s) for s in slices])+'])')
     else:
         logging.info("Sample size for the output  : %d"%test_all.shape[0])
 
