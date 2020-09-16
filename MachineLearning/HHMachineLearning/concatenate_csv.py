@@ -12,7 +12,6 @@ import pandas as pd
 import parameters 
 
 class ConcatenateCSV:
-
     def __init__(self,path): 
         self.path = path
         self.Concatenate()
