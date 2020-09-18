@@ -4,6 +4,7 @@ import re
 import math
 import glob
 import csv
+import yaml
 import os
 import sys
 import pprint
@@ -35,11 +36,17 @@ def get_options():
     """
     parser = argparse.ArgumentParser(description='HHMachineLearning')
 
+    # Configuration parameters #
+    p = parser.add_argument_group('Required configuration parameters')
+    p.add_argument('--config', action='store', required=True, type=str,
+        help='Yaml file containing sample list')
+
+
     # Scan, deploy and restore arguments #
     a = parser.add_argument_group('Scan, deploy and restore arguments')
-    a.add_argument('-s','--scan', action='store', required=False, type=str, default='',
-        help='Name of the scan to be used (modify scan parameters in NeuralNet.py)')
-    a.add_argument('-task','--task', action='store', required=False, type=str, default='',
+    a.add_argument('--scan', action='store', required=False, type=str, default='',
+        help='Name of the scan to be used')
+    a.add_argument('--task', action='store', required=False, type=str, default='',
         help='Name of dict to be used for scan (Used by function itself when submitting jobs or DEBUG)')
     a.add_argument('--generator', action='store_true', required=False, default=False, 
         help='Whether to use a generator for the neural network')
@@ -48,29 +55,29 @@ def get_options():
 
     # Splitting and submitting jobs arguments #
     b = parser.add_argument_group('Splitting and submitting jobs arguments')
-    b.add_argument('-split','--split', action='store', required=False, type=int, default=0,
+    b.add_argument('--split', action='store', required=False, type=int, default=0,
         help='Number of parameter sets per jobs to be used for splitted training for slurm submission (if -1, will create a single subdict)')
-    b.add_argument('-submit','--submit', action='store', required=False, default='', type=str,
+    b.add_argument('--submit', action='store', required=False, default='', type=str,
         help='Whether to submit on slurm and name for the save (must have specified --split)')
-    b.add_argument('-resubmit','--resubmit', action='store', required=False, default='', type=str,
+    b.add_argument('--resubmit', action='store', required=False, default='', type=str,
         help='Whether to resubmit failed jobs given a specific path containing the jobs that succeded')
-    b.add_argument('-debug','--debug', action='store_true', required=False, default=False,
+    b.add_argument('--debug', action='store_true', required=False, default=False,
         help='Debug mode of the slurm submission, does everything except submit the jobs')
 
     # Analyzing or producing outputs for given model (csv or zip file) #
     c = parser.add_argument_group('Analyzing or producing outputs for given model (csv or zip file)')
-    c.add_argument('-r','--report', action='store', required=False, type=str, default='',
+    c.add_argument('--report', action='store', required=False, type=str, default='',
         help='Name of the csv file for the reporting (without .csv)')
-    c.add_argument('-m','--model', action='store', required=False, nargs='+', type=str, default='',
+    c.add_argument('--model', action='store', required=False, nargs='+', type=str, default='',
         help='Loads the provided model name (without .zip and type, it will find them), list can be used in case of cross validation') 
     c.add_argument('--test', action='store_true', required=False, default=False,
         help='Applies the provided model (do not forget -o) on the test set and output the tree') 
-    c.add_argument('-o','--output', action='store', required=False, nargs='+', type=str, default=[], 
+    c.add_argument('--output', action='store', required=False, nargs='+', type=str, default=[], 
         help='Applies the provided model (do not forget -o) on the list of keys from sampleList.py (separated by spaces)') 
 
     # Concatenating csv files arguments #
     d = parser.add_argument_group('Concatenating csv files arguments')
-    d.add_argument('-csv','--csv', action='store', required=False, type=str, default='',
+    d.add_argument('--csv', action='store', required=False, type=str, default='',
         help='Whether to concatenate the csv files from different slurm jobs into a main one, \
               please provide the path to the csv files')
 
@@ -140,7 +147,6 @@ def main():
     from generate_mask import GenerateMask, GenerateSliceIndices, GenerateSliceMask
     from split_training import DictSplit
     from concatenate_csv import ConcatenateCSV
-    from sampleList import samples_dict_2016, samples_dict_2017, samples_dict_2018, samples_path
     from threadGPU import utilizationGPU
     import parameters
 
@@ -245,10 +251,14 @@ def main():
     list_inputs  = parameters.inputs
     list_outputs = parameters.outputs
 
+    # Load samples #
+    with open (opt.config,'r') as f:
+        sampleConfig = yaml.load(f)
+
     lumidict = {'2016':35922,'2017':41529.152060112,'2018':59740.565201546}
 
     if opt.nocache:
-        logging.warning('No cache will be used not saved')
+        logging.warning('No cache will be used nor saved')
     if os.path.exists(parameters.train_cache) and not opt.nocache:
         logging.info('Will load training data from cache')
         logging.info('... Training set : %s'%parameters.train_cache)
@@ -262,9 +272,9 @@ def main():
         nodes = ['TT','DY','ST','VVV','TTVX','H','Rare','HH']
         channels = ['ElEl','MuMu','ElMu']
         data_dict = {}
-        strSelect = []
         for node in nodes:
-            list_sample = []
+            logging.info('Starting data importation for class %s'%node)
+            strSelect = []
             if opt.resolved1b:
                 strSelect.extend(['resolved_1b_{}_{}'.format(channel,node) for channel in channels])
             if opt.resolved2b:
@@ -274,8 +284,7 @@ def main():
 
             data_node = None
 
-            #for era,samples_dict in zip(['2016','2017','2018'],[samples_dict_2016,samples_dict_2017,samples_dict_2018]):
-            for era,samples_dict in zip(['2016','2017','2018'],[{},samples_dict_2017,{}]):
+            for era,samples_dict in sampleConfig['sampleDict'].items():
                 if len(samples_dict.keys())==0:
                     logging.info('\tSample dict for era {} is empty'.format(era))
                     continue
@@ -286,7 +295,8 @@ def main():
                     xsec_json = None
                     event_weight_sum_json = None
                 list_sample = [sample for key in strSelect for sample in samples_dict[key]]
-                data_node_era = LoopOverTrees(input_dir                 = samples_path,
+
+                data_node_era = LoopOverTrees(input_dir                 = sampleConfig['sampleDir'],
                                               variables                 = variables,
                                               weight                    = parameters.weights,
                                               list_sample               = list_sample,
@@ -299,16 +309,16 @@ def main():
                     data_node = data_node_era
                 else:
                     data_node = pd.concat([data_node,data_node_era],axis=0)
-                logging.info('\t{} Sample size for era {} : {}'.format(node,era,data_node_era.shape[0]))
+                logging.info('\t{} class in era {} : sample size = {}, weight sum = {:.3e} (with normalization = {:.3e})'.format(node,era,data_node_era.shape[0],data_node_era[parameters.weights].sum(),data_node_era['event_weight'].sum()))
             data_dict[node] = data_node
-            logging.info('{} Sample size for all eras : {}'.format(node,data_node.shape[0]))
+            logging.info('{} class for all eras : sample size = {}, weight sum = {:.3e} (with normalization = {:.3e})'.format(node,data_node.shape[0],data_node[parameters.weights].sum(),data_node['event_weight'].sum()))
 
         # Weight equalization #
         if parameters.weights is not None:
             for node, data in data_dict.items():
-                sum_weights = data[parameters.weights].sum()
+                sum_weights = data['event_weight'].sum()
                 logging.info('Sum of weight for %s samples : %.2e'%(node,sum_weights))
-                data['learning_weights'] = data[parameters.weights]/sum_weights*1e5
+                data['learning_weights'] = data['event_weight']/sum_weights*1e5
                 logging.info('\t -> After equalization : %0.2e'%data['learning_weights'].sum())
 
         # Data splitting #
@@ -376,13 +386,14 @@ def main():
         if opt.scan!='': # If we don't scan we don't need to scale the data
             MakeScaler(train_all,list_inputs) 
 
+      # Caching #
         if not opt.nocache:
             train_all.to_pickle(parameters.train_cache)
-            if not parameters.crossvalidation:
-                test_all.to_pickle(parameters.test_cache)
             logging.info('Data saved to cache')
             logging.info('... Training set : %s'%parameters.train_cache)
-            logging.info('... Testing  set : %s'%parameters.test_cache)
+            if not parameters.crossvalidation:
+                test_all.to_pickle(parameters.test_cache)
+                logging.info('... Testing  set : %s'%parameters.test_cache)
      
     list_inputs  = [var.replace('$','') for var in parameters.inputs]
     list_outputs = [var.replace('$','') for var in parameters.outputs]
@@ -405,8 +416,8 @@ def main():
     #############################################################################################
     # DNN #
     #############################################################################################
+    # Start the GPU monitoring thread #
     if opt.GPU:
-        # Start the GPU monitoring thread #
         thread = utilizationGPU(print_time = 900,
                                 print_current = False,
                                 time_step=0.01)

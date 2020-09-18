@@ -458,7 +458,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         #----- Add the Yield plots -----#
         plots.extend(self.yieldPlots.returnPlots())
 
-        plots.extend(cutFlowPlots)
+        #plots.extend(cutFlowPlots)
 
         #----- Return -----#
         return plots
