@@ -45,10 +45,10 @@ if N_apply != N_slices/N_models: # Otherwise the same slice can be applied on se
     raise RuntimeError("You have asked {} models that should be applied {} times, the number of slices should be {} but is {}+{}+{}".format(N_models,N_apply,N_models*N_apply,N_train,N_eval,N_apply))
 
 ############################### Slurm parameters ######################################
-partition = 'cp3'  # Def, cp3 or cp3-gpu
-QOS = 'cp3' # cp3 or normal
-time = '0-01:00:00' # days-hh:mm:ss
-mem = '6000' # ram in MB
+partition = 'cp3-gpu'  # Def, cp3 or cp3-gpu
+QOS = 'cp3-gpu' # cp3 or normal
+time = '0-00:10:00' # days-hh:mm:ss
+mem = '60000' # ram in MB
 tasks = '1' # Number of threads(as a string) (not parallel training for classic mode)
 
 ######################################  Names  ########################################
