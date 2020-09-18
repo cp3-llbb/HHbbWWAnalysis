@@ -12,6 +12,7 @@ import zipfile
 import pandas
 import pprint
 from sklearn import preprocessing
+import numpy as np
 
 ##################################################################################################
 ##########################                 GetEntries                   ##########################
@@ -231,7 +232,6 @@ def find_rows(a, b):
     Find the matching rows between a and b
     Returns numpy arrays of the matches as [idx in a,idx in b]
     """
-    import numpy as np
     dt = np.dtype((np.void, a.dtype.itemsize * a.shape[1]))
 
     a_view = np.ascontiguousarray(a).view(dt).ravel()
@@ -348,6 +348,7 @@ def RemovePreprocessingLayer(json_file,h5_file,suffix):
 
     # Remove Preprocess layer from h5 file #
     print ("Modifying the h5 file content %s"%h5_file)
+    import h5py
     f = h5py.File(h5_file, 'r')
     new_f = h5py.File("%s%s"%(suffix,h5_file), 'w')
 

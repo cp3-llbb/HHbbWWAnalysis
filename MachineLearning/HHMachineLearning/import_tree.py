@@ -67,6 +67,8 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
     df = pd.DataFrame(data)
     if weight is not None:
         df['event_weight'] = df[weight]*relative_weight
+    else:
+        df['event_weight'] = np.ones(df.shape[0])
 
     # Only part of tree #
     if n:
@@ -142,18 +144,6 @@ def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=
                          start                      = start) 
         if df is None:
             continue
-
-#        # Find mH, mA #
-#        if sample_name.find('HToZA')!=-1: # Signal -> Search for mH and mA
-#            mH = [int(re.findall(r'\d+', sample_name)[2])]*df.shape[0]    
-#            mA = [int(re.findall(r'\d+', sample_name)[3])]*df.shape[0]    
-#        else: # Background, set them at 0
-#            mH = [0]*df.shape[0]
-#            mA = [0]*df.shape[0]
-#
-#        # Register in DF #
-#        df['mH'] = pd.Series(mH)
-#        df['mA'] = pd.Series(mA)
 
         # Register sample name #
         df['sample'] = pd.Series([sample_name.replace('.root','')]*df.shape[0])

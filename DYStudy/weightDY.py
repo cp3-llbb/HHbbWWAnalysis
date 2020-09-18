@@ -38,6 +38,7 @@ class WeightDY:
             self.histograms[cat] = self.produceDistribution(cat,dirInfo)
 
         self.produceShape(self.histograms)
+        sys.exit()
 
         if self.hist_type == 'TH1':
             self.plotWeights1D()
@@ -244,10 +245,12 @@ class WeightDY:
         if self.hist_type == 'TH1':
             from CDFShift import CDFShift
             inst1b = CDFShift(hist_dict['ZPeak_0b'],hist_dict['ZPeak_1b'],hist_dict['ZVeto_0b'],additional_hist={'ZVeto_1b':hist_dict['ZVeto_1b']})
-            inst1b.saveToRoot('test1b')
+            inst1b.saveToRoot(self.outputname+'_CDFShift1b.root')
+            inst1b.plotFromRoot(self.outputname+'_CDFShift1b.root','1b')
             inst2b = CDFShift(hist_dict['ZPeak_0b'],hist_dict['ZPeak_2b'],hist_dict['ZVeto_0b'],additional_hist={'ZVeto_2b':hist_dict['ZVeto_2b']})
-            inst2b.saveToRoot('test2b')
-            sys.exit()
+            inst2b.saveToRoot(self.outputname+'_CDFShift2b.root')
+            inst2b.plotFromRoot(self.outputname+'_CDFShift2b.root','2b')
+            return
 
         self.weight_1b = hist_dict['ZPeak_1b'].Clone("Weight1B")
         self.weight_1b.Divide(hist_dict['ZPeak_0b'])

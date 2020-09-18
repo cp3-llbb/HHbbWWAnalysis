@@ -36,6 +36,9 @@ class highlevelLambdas:
         self.M_lljj = lambda l1,l2,j1,j2 : op.invariant_mass(self.lljj_p4(l1,l2,j1,j2))
         self.MinDR_lj = lambda l1,l2,j1,j2 : op.min(op.min(op.deltaR(l1.p4,j1.p4),op.deltaR(l1.p4,j2.p4)),
                                                op.min(op.deltaR(l2.p4,j1.p4),op.deltaR(l2.p4,j2.p4)))
+
+        self.JetsMinDR = lambda l,j1,j2 : op.min(op.deltaR(l.p4,j1.p4),op.deltaR(l.p4,j2.p4))
+        self.LepsMinDR = lambda j,l1,l2 : op.min(op.deltaR(j.p4,l1.p4),op.deltaR(j.p4,l2.p4))
         
         self.MinDR_lep3j = lambda lep,j1,j2,j3 : op.min(op.min(op.deltaR(lep.p4,j1.p4),op.deltaR(lep.p4,j2.p4)),op.deltaR(lep.p4,j3.p4))
         
@@ -114,26 +117,11 @@ class highlevelLambdas:
         lepSumPx = lambda leps : op.rng_sum(leps, lambda l : l.p4.Px())
         lepSumPy = lambda leps : op.rng_sum(leps, lambda l : l.p4.Py())
         self.MET_LD = lambda met, jets, leps : 0.6*met.pt + 0.4*op.sqrt(op.pow(jetSumPx(jets)+lepSumPx(leps),2)+op.pow(jetSumPy(jets)+lepSumPy(leps),2)) 
+
+        SumPx = lambda objs : op.rng_sum(objs, lambda obj : obj.p4.Px())
+        SumPy = lambda objs : op.rng_sum(objs, lambda obj : obj.p4.Py())
+
+        self.MET_LD_DL = lambda met, jets, electrons, muons : 0.6*met.pt + 0.4*op.sqrt(op.pow(SumPx(jets)+SumPx(electrons)+SumPx(muons),2)
+                                                                                      +op.pow(SumPy(jets)+SumPy(electrons)+SumPy(muons),2))
         
-        
-        
-#        # Lepton conePt
-#        # from Base
-#        lambda_conept_electron = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
-#                                                             # if (abs(lep.pdgId)!=11 and abs(lep.pdgId)!=13): return lep.pt : anything that is not muon or electron
-#                                                             (op.AND(op.abs(lep.pdgId)==11 , lep.mvaTTH > 0.80) , op.static_cast("Float_t",lep.pt)),
-#                                                             # if electron, check above MVA 
-#                                                             op.static_cast("Float_t",0.9*lep.pt*(1.+lep.jetRelIso)))
-#                                                             # else: return 0.90 * lep.pt / jetPtRatio where jetPtRatio = 1./(Electron_jetRelIso + 1.)
-#        # from Base
-#        lambda_conept_muon = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
-#                                                         # if (abs(lep.pdgId)!=11 and abs(lep.pdgId)!=13): return lep.pt : anything that is not muon or electron
-#                                                         (op.AND(op.abs(lep.pdgId)==13 , lep.mediumId ,lep.mvaTTH > 0.85) , op.static_cast("Float_t",lep.pt)),
-#                                                         # if muon, check that passes medium and above MVA
-#                                                         op.static_cast("Float_t",0.9*lep.pt*(1.+lep.jetRelIso)))
-#                                                         # else: return 0.90 * lep.pt / lep.jetPtRatiov2
-#        
-#        lepConePt = lambda lep: op.switch(op.abs(lep.pdgId) == 11, lambda_conept_electron(lep), lambda_conept_muon(lep))
-        # TODO : remove above -> conept can be accessed as HHself.muon_conept(muon.idx) and same for electron
-        
-        
+   
