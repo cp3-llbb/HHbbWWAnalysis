@@ -20,7 +20,7 @@ from ROOT import TChain, TFile, TTree
 # Tree2Pandas#
 ###############################################################################
 
-def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_weight_sum=None, luminosity=None, n=None, tree_name='Events',start=None):
+def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_weight_sum=None, luminosity=None, tree_name='tree',start=None,stop=None):
     """
     Convert a ROOT TTree to a pandas DF
     """
@@ -49,7 +49,7 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
     logging.debug('\tNumber of events : %d'%N)
 
     relative_weight = 1
-    if xsec is not None and event_weight_sum is not None:
+    if weight is not None and xsec is not None and event_weight_sum is not None:
         if luminosity is None:
             luminosity = 1
         relative_weight = xsec * luminosity / event_weight_sum
@@ -61,7 +61,7 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
     # Read the tree and convert it to a numpy structured array
     if weight is not None:
         variables += [weight]
-    data = tree2array(tree, branches=variables, selection=cut, start=start, stop=n)
+    data = tree2array(tree, branches=variables, selection=cut, start=start, stop=stop)
     
     # Convert to pandas dataframe #
     df = pd.DataFrame(data)
@@ -71,16 +71,11 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
         df['event_weight'] = np.ones(df.shape[0])
 
     # Only part of tree #
-    if n:
-        if n == -1:
-            n = N # Get all entries
-        if start:
-            if n < start:
-                logging.critical('Importing tree with start higher than end, will output empty tree')
-            logging.info("Reading from {} to {} in input tree".format(start,n))
-        else:
-            logging.info("Reading only {} from input tree".format(n))
-        
+    if start is not None or stop is not None:
+        ni = start if start is not None else 0
+        nf = stop if stop is not None else N
+        logging.debug("Reading from {} to {} in input tree (over {} entries)".format(ni,nf,N))
+    file_handle.Close()
 
     return df
 
@@ -88,7 +83,7 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
 # LoopOverTrees #
 ###############################################################################
 
-def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=None, xsec_json=None, event_weight_sum_json=None, luminosity=None, list_sample=None, start=None, n=None):
+def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=None, xsec_dict=None, event_weight_sum_dict=None, lumi_dict=None, eras=None, tree_name='tree', list_sample=None, start=None, stop=None):
     """
     Loop over ROOT trees inside input_dir and process them using Tree2Pandas.
     """
@@ -99,15 +94,14 @@ def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=
     logging.debug("Accessing directory : "+input_dir)
 
     # Xsec #
-    xsec = None
-    if xsec_json is not None:
-        with open(xsec_json,'r') as handle:
-            dict_xsec = json.load(handle)
+    if xsec_dict is not None and not isinstance(xsec_dict,dict):
+        raise NotImplementedError('Cannot handle xsec not being a dict')
     # Event weight sum #
-    event_weight_sum = None
-    if event_weight_sum_json is not None:
-        with open(event_weight_sum_json,'r') as handle:
-            dict_event_weight_sum = json.load(handle)
+    if event_weight_sum_dict is not None and not isinstance(event_weight_sum_dict,dict):
+        raise NotImplementedError('Cannot handle event weight sum not being a dict')
+    if eras is None and (xsec_dict is None or event_weight_sum_dict is None):
+        raise RuntimeError('If you plan to use xsec and even weight sum you need to provide the eras (either one value or a list with one element per sample)')
+        
 
     # Wether to use a given sample list or loop over files inside a dir #
     if list_sample is None:
@@ -115,22 +109,63 @@ def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=
     else:
         list_sample = [os.path.join(input_dir,s) for s in list_sample]
 
+    # Start and stop #
+    if isinstance(start,list) and isinstance(stop,list):
+        if len(start) != len(list_sample):
+            raise RuntimeError("Start events list does not match the list samples")
+        if len(stop) != len(list_sample):
+            raise RuntimeError("Stop events list does not match the list samples")
+
     # Loop over the files #
     first_file = True
     all_df = pd.DataFrame() 
-    for sample in list_sample:
+    for i,sample in enumerate(list_sample):
         logging.debug("\tAccessing file : %s"%sample)
         sample_name = os.path.basename(sample)
 
-        if xsec_json is not None:
-            for name,xs in dict_xsec.items():
+        # Get era if given #
+        if isinstance(eras,str):
+            era = eras
+        elif isinstance(eras,list):
+            if len(eras) != len(list_sample):
+                raise RuntimeError("List of eras has length %d and sample list has length %d"(len(eras),len(list_sample)))
+            era = eras[i]
+
+        # Cross section #
+        xsec = None
+        if xsec_dict is not None:
+            for name,xs in xsec_dict[era].items():
                 if name in sample_name:
                     xsec = xs
-        if event_weight_sum_json is not None:
-            for name,ews in dict_event_weight_sum.items():
+
+        # Event weight sum #
+        event_weight_sum = None
+        if event_weight_sum_dict is not None:
+            for name,ews in event_weight_sum_dict[era].items():
                 if name in sample_name:
                     event_weight_sum = ews
-       
+
+        # Luminority #
+        luminosity = None
+        if lumi_dict is not None:
+            luminosity = lumi_dict[era]
+
+        # Start #
+        ni = None
+        if start is not None:
+            if isinstance(start,list):
+                ni = start[i]
+            else:
+                ni = start
+
+        # Stop #
+        nf = None
+        if stop is not None:
+            if isinstance(stop,list):
+                nf = stop[i]
+            else:
+                nf = stop
+
         # Get the data as pandas df #
         df = Tree2Pandas(input_file                 = sample,
                          variables                  = variables,
@@ -139,9 +174,9 @@ def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=
                          xsec                       = xsec,
                          event_weight_sum           = event_weight_sum,
                          luminosity                 = luminosity,
-                         n                          = n,
-                         tree_name                  = 'Events',
-                         start                      = start) 
+                         tree_name                  = tree_name,
+                         start                      = ni,
+                         stop                       = nf) 
         if df is None:
             continue
 
@@ -151,7 +186,12 @@ def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=
         # Register additional columns #
         if len(additional_columns.keys()) != 0:
             for key,val in additional_columns.items():
-                df[key] = pd.Series([val]*df.shape[0])
+                if isinstance(val,list):
+                    if len(val) != len(list_sample):
+                        raise RuntimeError('Value list %s you want to add has len %d while there are %d samples'%(key,len(val),len(list_sample)))
+                    df[key] = pd.Series([val[i]]*df.shape[0])
+                else:
+                    df[key] = pd.Series([val]*df.shape[0])
 
         # Concatenate into full df #
         if first_file:

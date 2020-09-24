@@ -1096,7 +1096,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                                         op.abs(j.p4.Eta())<= 2.4,
                                                         op.AND(j.subJet1._idx.result != -1, j.subJet1.pt >= 20. , op.abs(j.subJet1.eta)<=2.4,
                                                                j.subJet2._idx.result != -1, j.subJet2.pt >= 20. , op.abs(j.subJet2.eta)<=2.4),
-                                                               # Fatjet subjets must exist before checking Pt and eta 
+                                                        # Fatjet subjets must exist before checking Pt and eta 
                                                         op.AND(j.msoftdrop >= 30, j.msoftdrop <= 210),
                                                         j.tau2/j.tau1 <= 0.75
                                                     )
@@ -1112,20 +1112,16 @@ One lepton and and one jet argument must be specified in addition to the require
         ############     Btagging     #############
         # The DeepCSV b-tagging algorithm is used on subjets 
         if era == "2016": 
-            self.lambda_ak8Btag = lambda fatjet : op.OR(op.AND(fatjet.subJet1.pt >= 30, fatjet.subJet1.btagDeepB > 0.6321),
-                                                        op.AND(fatjet.subJet2.pt >= 30, fatjet.subJet2.btagDeepB > 0.6321))
-            self.lambda_ak8noBtag = lambda fatjet : op.NOT(op.OR(op.AND(fatjet.subJet1.pt >= 30, fatjet.subJet1.btagDeepB > 0.6321),
-                                                        op.AND(fatjet.subJet2.pt >= 30, fatjet.subJet2.btagDeepB > 0.6321)))
+            self.lambda_subjetBtag = lambda subjet: subjet.btagDeepB > 0.6321
         elif era =="2017":
-            self.lambda_ak8Btag = lambda fatjet : op.OR(op.AND(fatjet.subJet1.pt >= 30, fatjet.subJet1.btagDeepB > 0.4941),
-                                                        op.AND(fatjet.subJet2.pt >= 30, fatjet.subJet2.btagDeepB > 0.4941))
-            self.lambda_ak8noBtag = lambda fatjet : op.NOT(op.OR(op.AND(fatjet.subJet1.pt >= 30, fatjet.subJet1.btagDeepB > 0.4941),
-                                                        op.AND(fatjet.subJet2.pt >= 30, fatjet.subJet2.btagDeepB > 0.4941)))
+            self.lambda_subjetBtag = lambda subjet: subjet.btagDeepB > 0.4941
         elif era == "2018":
-            self.lambda_ak8Btag = lambda fatjet : op.OR(op.AND(fatjet.subJet1.pt >= 30, fatjet.subJet1.btagDeepB > 0.4184),
-                                                        op.AND(fatjet.subJet2.pt >= 30, fatjet.subJet2.btagDeepB > 0.4184))
-            self.lambda_ak8noBtag = lambda fatjet : op.NOT(op.OR(op.AND(fatjet.subJet1.pt >= 30, fatjet.subJet1.btagDeepB > 0.4184),
-                                                        op.AND(fatjet.subJet2.pt >= 30, fatjet.subJet2.btagDeepB > 0.4184)))
+            self.lambda_subjetBtag = lambda subjet: subjet.btagDeepB > 0.4184
+
+        self.lambda_ak8Btag = lambda fatjet : op.OR(op.AND(fatjet.subJet1.pt >= 30, self.lambda_subjetBtag(fatjet.subJet1)),
+                                                    op.AND(fatjet.subJet2.pt >= 30, self.lambda_subjetBtag(fatjet.subJet2)))
+        self.lambda_ak8noBtag = lambda fatjet : op.NOT(op.OR(op.AND(fatjet.subJet1.pt >= 30, self.lambda_subjetBtag(fatjet.subJet1)),
+                                                       op.AND(fatjet.subJet2.pt >= 30, self.lambda_subjetBtag(fatjet.subJet2))))
 
         self.ak8BJets = op.select(self.ak8Jets, self.lambda_ak8Btag)
         self.ak8nonBJets = op.select(self.ak8Jets, self.lambda_ak8noBtag)
@@ -1369,27 +1365,29 @@ One lepton and and one jet argument must be specified in addition to the require
         #                    b-tagging efficiency scale factors                   #
         ###########################################################################
         if self.is_MC and not self.args.DYStitchingPlots and not self.args.WJetsStitchingPlots:
-            #----- Method 1.d -----#
+            #----- AK4 jets -> using Method 1.d -----#
             # See https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagShapeCalibration
             # W_btag = Π_i(all jets) SD(jet_i)  which must be multiplied by r = Σ w(before)/Σ w(after) (before/after using the btag weight, no btag selection for both)
                 
             if era == '2016':
                 if ('db' in sampleCfg.keys() and 'TuneCP5' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['TuneCP5' in f for f in sampleCfg['files']])):
-                    csvFileName = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_2016LegacySF_V1_TuneCP5.csv")
+                    csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_2016LegacySF_V1_TuneCP5.csv")
                 else: # With CUETP8M1
-                    csvFileName = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_2016LegacySF_V1.csv")
+                    csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_2016LegacySF_V1.csv")
             if era == '2017':
-                csvFileName = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepFlavour_94XSF_V4_B_F.csv")
+                csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepFlavour_94XSF_V4_B_F.csv")
             if era == '2018':
-                csvFileName = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_102XSF_V2.csv")
+                csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_102XSF_V2.csv")
                 
+            if not os.path.exists(csvFileNameAk4):
+                raise RuntimeError('Could not find Ak4 csv file %s'%csvFileNameAk4)
+            print ('Btag Ak4 CSV file',csvFileNameAk4)
 
-            print ('Btag CSV file',csvFileName)
-    
+            #----- Ak4 SF -----# 
             systTypes = ["jes", "lf", "hf", "hfstats1", "hfstats2","lfstats1", "lfstats2", "cferr1", "cferr2"]
                 # From https://twiki.cern.ch/twiki/bin/view/CMS/BTagShapeCalibration#Systematic_uncertainties
             self.DeepJetDiscReshapingSF = BtagSF(taggerName       = "deepjet", 
-                                                 csvFileName      = csvFileName,
+                                                 csvFileName      = csvFileNameAk4,
                                                  wp               = "reshaping",  # "loose", "medium", "tight" or "reshaping"
                                                  sysType          = "central", 
                                                  otherSysTypes    = ['up_'+s for s in systTypes]+['down_'+s for s in systTypes], 
@@ -1397,21 +1395,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                                  sel              = noSel, 
                                                  getters          = {'Discri':lambda j : j.btagDeepFlavB},
                                                  uName            = sample)
+            self.btagAk4SF = op.rng_product(self.ak4Jets , lambda j : self.DeepJetDiscReshapingSF(j))
 
-#            csvFileNameBoosted = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_2016LegacySF_V1.csv")
-#            self.DeepCsvSubjetDiscReshapingSF = BtagSF(taggerName       = "deepcsvSubjet", 
-#                                                       csvFileName      = csvFileNameBoosted,
-#                                                       wp               = "medium",
-#                                                       sysType          = "central", 
-#                                                       otherSysTypes    = [],#['up','down'],
-#                                                       measurementType  = "lt", 
-#                                                       sel              = noSel, 
-#                                                       getters          = {'Discri':lambda j : j.subJet1.btagDeepB},
-#                                                       uName            = sample+'test')
-#            print ('done')
-
-
-            self.btagSF = op.rng_product(self.ak4Jets , lambda j : self.DeepJetDiscReshapingSF(j))
             if self.args.BtagReweightingOn and self.args.BtagReweightingOff:
                 raise RuntimeError("Reweighting cannot be both on and off") 
             if self.args.BtagReweightingOn: # Do not apply the ratio
@@ -1428,8 +1413,38 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                 numJets  = op.rng_len(self.ak4Jets),
                                                                 systName = 'btag_ratio',
                                                                 nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
-                noSel = noSel.refine("BtagSF" , weight = [self.btagSF,self.BtagRatioWeight])
+                noSel = noSel.refine("BtagAk4SF" , weight = [self.btagAk4SF,self.BtagRatioWeight])
+            #----- AK8 jets -> using Method 1.a -----#
+            # See https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagShapeCalibration
 
+            if era == '2016':
+                csvFileNameAk8= os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_2016LegacySF_V1.csv")
+            if era == '2017':
+                csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_94XSF_V4_B_F_v2.csv")
+            if era == '2018':
+                csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_102XSF_V1.csv")
+                
+            if not os.path.exists(csvFileNameAk8):
+                raise RuntimeError('Could not find Ak8 csv file %s'%csvFileNameAk8)
+            print ('Btag Ak8 CSV file',csvFileNameAk8)
+            isNanov7 = ('db' in sampleCfg.keys() and 'NanoAODv7' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['NanoAODv7' in f for f in sampleCfg['files']]))
+            #----- Ak8 SF -----# 
+            if isNanov7:
+                self.DeepCsvSubjetMediumSF = BtagSF(taggerName       = "deepcsvSubjet", 
+                                                    csvFileName      = csvFileNameAk8,
+                                                    wp               = "medium",
+                                                    sysType          = "central", 
+                                                    otherSysTypes    = ['up','down'],
+                                                    measurementType  = {"B": "lt", "C": "lt", "UDSG": "incl"},
+                                                    getters          = {'Discri':lambda subjet : subjet.btagDeepB,
+                                                                        'JetFlavour': lambda subjet : op.static_cast("BTagEntry::JetFlavor",
+                                                                                                            op.multiSwitch((subjet.nBHadrons>0,op.c_int(0)), # B -> flav = 5 -> BTV = 0
+                                                                                                            (subjet.nCHadrons>0,op.c_int(1)), # C -> flav = 4 -> BTV = 1
+                                                                                                            op.c_int(2)))},                  # UDSG -> flav = 0 -> BTV = 2
+                                                    sel              = noSel, 
+                                                    uName            = sample)
+                self.btagAk8SF = op.rng_product(self.ak8Jets , lambda j : self.DeepCsvSubjetMediumSF(j.subJet1)*self.DeepCsvSubjetMediumSF(j.subJet2))
+                noSel = noSel.refine("BtagAk8SF" , weight = [self.btagAk8SF])
 
         # Return #
         return noSel
