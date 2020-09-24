@@ -1196,14 +1196,6 @@ def makeDoubleLeptonAk8JetsPlots(sel, fatjet, suffix, channel):
                              title='Soft Drop mass of the fatjet',
                              xTitle="M_{Soft Drop}(fatjet) [GeV]",
                              plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_fatjet_softdropmass"%(channel,suffix),
-                             fatjet.msoftdrop,
-                             sel,
-                             EquidistantBinning(40,0.,200.),
-                             title='Soft Drop mass of the fatjet',
-                             xTitle="M_{Soft Drop}(fatjet) [GeV]",
-                             plotopts = channelLabel))
-    # Newly added
     plots.append(Plot.make1D("%s_%s_fatjet_btagDeepB"%(channel,suffix),
                              fatjet.btagDeepB,
                              sel,
@@ -1568,12 +1560,12 @@ def makeDoubleLeptonHighLevelQuantities (sel,met,l1,l2,j1,j2,suffix,channel,HLL)
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
 
     # Bjets corr mass #
-    plots.append(Plot.make2D("%s_%s_highlevelvariable_bbRegcorrMass"%(channel,suffix),
-                             op.invariant_mass(HLL.bJetCorrP4(j1), HLL.bJetCorrP4(j2)),
-                             sel,
-                             EquidistantBinning(60,0.,300.),
-                             xTitle="m_{bb}^{Regcorr}",
-                             plotopts = channelLabel))
+#    plots.append(Plot.make2D("%s_%s_highlevelvariable_bbRegcorrMass"%(channel,suffix),
+#                             op.invariant_mass(HLL.bJetCorrP4(j1), HLL.bJetCorrP4(j2)),
+#                             sel,
+#                             EquidistantBinning(60,0.,300.),
+#                             xTitle="m_{bb}^{Regcorr}",
+#                             plotopts = channelLabel))
 
 
     # Lepton PT versus Jet Pt #

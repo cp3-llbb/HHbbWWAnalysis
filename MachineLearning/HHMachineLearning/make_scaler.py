@@ -2,7 +2,7 @@ import os
 import logging
 import pickle
 import glob
-#import enlighten
+import enlighten
 import numpy as np
 import pandas as pd
 from sklearn import preprocessing
@@ -11,7 +11,8 @@ from root_numpy import tree2array, rec2array
 
 import parameters
 
-def MakeScaler(data=None,list_inputs=[],generator=False,batch=100000):
+def MakeScaler(data=None,list_inputs=[],generator=False,batch=5000,list_samples=None):
+    logging.info('Starting computation for the scaler')
     # Generate scaler #
     scaler_name = 'scaler_'+parameters.suffix+'.pkl'
     scaler_path = os.path.join(parameters.main_path,scaler_name)
@@ -22,40 +23,48 @@ def MakeScaler(data=None,list_inputs=[],generator=False,batch=100000):
             scaler.fit(data[list_inputs])
         # For generator #
         if generator:
-            logging.info("-"*80)
+            if list_samples is None:
+                raise RuntimeError("Generator mask asked, you need to provide a sample list")
             logging.info("Computing mean")
             # Mean Loop #
             mean = np.zeros(len(list_inputs))
             Ntot = 0
-            for f in glob.glob(parameters.path_gen_training+'/*root'):
+            pbar = enlighten.Counter(total=len(list_samples), desc='Mean', unit='File')
+            for f in list_samples:
+                if not os.path.exists(f):
+                    continue
                 file_handle = TFile.Open(f)
-                tree = file_handle.Get('tree')
+                if not file_handle.GetListOfKeys().Contains(parameters.tree_name):
+                    continue
+                tree = file_handle.Get(parameters.tree_name)
                 N = tree.GetEntries()
                 Ntot += N
-                logging.info("Opening file %s (%d entries)"%(f,N))
+                logging.debug("Opening file %s (%d entries)"%(f,N))
                 # Loop over batches #
-                #pbar = enlighten.Counter(total=N//batch+1, desc='Mean', unit='Batch')
                 for i in range(0, N, batch):
                     array = rec2array(tree2array(tree,branches=list_inputs,start=i,stop=i+batch))
                     mean += np.sum(array,axis=0)
-                    #pbar.update()
+                pbar.update()
             mean /= Ntot
             
             # Var Loop #
-            logging.info("-"*80)
             logging.info("Computing std")
             std = np.zeros(len(list_inputs))
-            for f in glob.glob(parameters.path_gen_training+'/*root'):
+            pbar = enlighten.Counter(total=len(list_samples), desc='Std', unit='File')
+            for f in list_samples:
+                if not os.path.exists(f):
+                    continue
                 file_handle = TFile.Open(f)
-                tree = file_handle.Get('tree')
+                if not file_handle.GetListOfKeys().Contains(parameters.tree_name):
+                    continue
+                tree = file_handle.Get(parameters.tree_name)
                 N = tree.GetEntries()
-                logging.info("Opening file %s (%d entries)"%(f,N))
+                logging.debug("Opening file %s (%d entries)"%(f,N))
                 # Loop over batches #
-                #pbar = enlighten.Counter(total=N//batch+1, desc='Std', unit='Batch')
                 for i in range(0, N, batch):
                     array = rec2array(tree2array(tree,branches=list_inputs,start=i,stop=i+batch))
                     std += np.sum(np.square(array-mean),axis=0)
-                    #pbar.update()
+                pbar.update()
             std = np.sqrt(std/Ntot)
             # Set manually #
             scaler.mean_ = mean

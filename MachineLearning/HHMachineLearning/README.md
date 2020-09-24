@@ -38,14 +38,11 @@ If you do not have sysadmin rights, do not forget to use ``` pipi install --user
 - [Astetik](https://pypi.org/project/astetik/) (Simplified templates of seaborn required by Talos)
 - [Enlighten](https://pypi.org/project/enlighten/) (Practical process bar)
 - [Scipy](https://pypi.org/project/scipy/) (Data processing)
-
+- [PrettyTable](https://pypi.org/project/PrettyTable/) (table printing)
 
 ## Usual workflow
 
-Most of the tweaks are done in two files
-
-    - parameters.py : Most of the parameters that will be used in the training 
-    - sampleList.py : produces a dict of paths to be used to import data for the training
+Most of the tweaks are done in one file : parameters.py
 
 They will be described in details in the next subsections
 
@@ -63,7 +60,8 @@ They will be decribed in the following
     - cross-validation : see section below
 - Slurm parameters : will be provided to submit_on_slurm.py
 - Names : includes 
-    - Name of the DNN model to be used in Model.py
+    - physics config : config YAML (see below), lumi and eras dict
+    - categories : which categories to take from config yaml, nodes for classes and channels
     - suffix : used to generate the mask and scaler (see explanation below)
     - cache : to cache the data (see later)
     - json files : contain xsec and event weight sum information
@@ -86,6 +84,17 @@ They will be decribed in the following
         Note : for branches that are not in tree but will be added later (eg tag) : use $string ($ will be removed after)
     - other_variables : other variables you want to keep in the tree but not use as inputs not targets
 - make_dtype : this is because we use root_numpy to produce the root files and it does not like '.', '(', ')', '-' or '*'
+
+### Sample dict ###
+
+Yaml dict containing two keys :
+- sampleDir : directory to be added in front of all the samples
+- sampleDict : dict of all the samples per era
+    -> key : era
+        -> key : category + channel + node
+        -> val : list of samples
+
+*Tip* : A helper `produceSampleList.py` based on analysis bamboo yaml file is available.
 
 ### Workflow 
 
@@ -281,10 +290,42 @@ python HHMachineLearning.py (args) --test --model model_crossval0 model_crossval
 Each model will then be evaluated on its application slice (aka the one that should be used at the analysis level) to see what is its behaviour and the output tree will be produced as in the classical approach. 
 
 ### Generator
-In case there is too much data in the training (rare in case of HEP) to put them in the RAM, small chunks can be loaded in turns and trained on.
+In case there is too much data in the training to put them in the RAM, small chunks can be loaded in turns and trained on.
 The advantage is that many threads can be used to generate the training data from root files.
 
-This will probably not be used here but can be a possibility.
+To use the generator, add the flag `--generator`. 
+
+*Note* : no data importation is done before the learning, everything is done on the fly which introduces some complexity
+
+The generator can use both classic holdout or cross-validation but the working differs from before.
+
+*Warning* : the scaler still needs to be computed before the learning can actually take place. If no mask is found (based on suffix in `parameters.py`) it will create one by loopng through the files in the sample list YAML file batch by batch (same variables as for output).
+
+The generator tries to be smart and populate the batches in the same proportion as in the input root files (to avoid a batch being filled only with the same class) and will reweight each class to not imbalance the training. The repartition will be printed out for the user to check everything seems fine. 
+
+*Note* : for this to work well, the batch size needs to be large enough. Given also that the bootleneck comes from the data transfer, large batches will improve computation time, especially for the GPU (the IO bandwidth there is not amazing). 
+
+Keras provides the possibility to use multiprocessing, this is specified by the `workers` variable in `parameters.py`. 0 means the main thread will go fetch a batch from the input root files and then do the learning, sequentially. 1 or more means one thread does the learning and n others will produce batches and put them into queue.
+
+This means that when submitting jobs, additional number of tasks can be asked to accelerate training (see the slurm parameters in `parameters.py`).
+
+Producing output trees will also work in generator mode, except that the workers part is not available (otherwise could not retrieve the inputs to put in output tree). So the production is done in a simple loop (will look later into multiprocessing for that). One root tree will be produced per slice, a simple `hadd` afterwards will do just fine.
+
+#### Holdout mode
+This will run when `parameters.crossvalidation = False`.
+
+In this mode, a mask still needs to be computed (with keys 0 for training, 1 for evaluation and 2 for output) : this is done automatically based on `parameters.suffix` (generated or loaded if present).
+
+Apart from that the usual commands will still work
+
+*Note* : given technical issues, the imported dataframe size will be bigger than the batch size (sometimes significantly) and an internal mask will be used to select the events in the corretct set. This will be fixed in the future.
+
+#### Cross-validation
+
+This will run when `parameters.crossvalidation = True`.
+
+Nothing much new compared to usual commands. The output will be produced per slice AND per model (a bit slower then, but `hadd` will also work as fine).
+
 
 ### Cache
 The importation from root files can be slow and if the training data is not too big it can be cached (see name in parameters.py).
@@ -293,6 +334,7 @@ This is especially useful when modifying the code for rapid testing or evaluatio
 *Warning* : whenever you change something in sampleList.py, the preprocessing or mask, the cache must be cleared !!!
 Otherwise you will still run on the older cache values and not the changes you chose.
 
+*Note* : caching is of course not used if using the generator.
 
 ## Authors
 
