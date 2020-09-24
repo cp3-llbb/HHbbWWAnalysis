@@ -253,10 +253,10 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep["fakeRate"] = op.c_float(-9999.)
 
             # Btagging SF #
-            varsToKeep["btag_SF"] = self.btagSF
+            varsToKeep["btag_SF"] = self.btagAk4SF
             if "BtagRatioWeight" in self.__dict__.keys():
                 varsToKeep["btag_reweighting"] = self.BtagRatioWeight
-                varsToKeep["btag_reweighting_SF"] = self.btagSF * self.BtagRatioWeight
+                varsToKeep["btag_reweighting_SF"] = self.btagAk4SF * self.BtagRatioWeight
 
             # ttbar PT reweighting #
             if "group" in sampleCfg and sampleCfg["group"] == 'ttbar':
@@ -372,6 +372,7 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep['j1_pt']  = j1.pt
             varsToKeep['j1_eta'] = j1.eta
             varsToKeep['j1_phi'] = j1.phi
+            varsToKeep['j1_btag']= j1.btagDeepFlavB
 
             varsToKeep['j2_Px']  = j2.p4.Px()
             varsToKeep['j2_Py']  = j2.p4.Py()
@@ -380,6 +381,7 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep['j2_pt']  = j2.pt
             varsToKeep['j2_eta'] = j2.eta
             varsToKeep['j2_phi'] = j2.phi
+            varsToKeep['j2_btag']= j2.btagDeepFlavB
 
             varsToKeep['jj_pt'] = (j1.p4+j2.p4).Pt()
             varsToKeep['jj_DR'] = op.deltaR(j1.p4,j2.p4)
@@ -419,6 +421,7 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep['j1_pt']  = j1.pt
             varsToKeep['j1_eta'] = j1.eta
             varsToKeep['j1_phi'] = j1.phi
+            varsToKeep['j1_btag']= j1.btagDeepB
 
             varsToKeep['j2_Px']  = j2.p4.Px()
             varsToKeep['j2_Py']  = j2.p4.Py()
@@ -427,6 +430,7 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep['j2_pt']  = j2.pt
             varsToKeep['j2_eta'] = j2.eta
             varsToKeep['j2_phi'] = j2.phi
+            varsToKeep['j2_btag']= j2.btagDeepB
 
             varsToKeep['fatjet_Px']  = fatjet.p4.Px()
             varsToKeep['fatjet_Py']  = fatjet.p4.Py()

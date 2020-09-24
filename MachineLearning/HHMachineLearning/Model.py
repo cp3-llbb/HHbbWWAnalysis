@@ -4,10 +4,12 @@ import sys
 import json
 import shutil
 import pickle
+import yaml
 import string
 import logging
 import random
 import csv
+import itertools
 
 import numpy as np
 
@@ -255,13 +257,13 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
     OUT = Dense(y_train.shape[1],activation=params['output_activation'],name='OUT')(HIDDEN)
 
     # Tensorboard logs #
-    path_board = os.path.join(parameters.main_path,"TensorBoard")
-    suffix = 0
-    while(os.path.exists(os.path.join(path_board,"Run_"+str(suffix)))):
-        suffix += 1
-    path_board = os.path.join(path_board,"Run_"+str(suffix))
-    os.makedirs(path_board)
-    logging.info("TensorBoard log dir is at %s"%path_board)
+#    path_board = os.path.join(parameters.main_path,"TensorBoard")
+#    suffix = 0
+#    while(os.path.exists(os.path.join(path_board,"Run_"+str(suffix)))):
+#        suffix += 1
+#    path_board = os.path.join(path_board,"Run_"+str(suffix))
+#    os.makedirs(path_board)
+#    logging.info("TensorBoard log dir is at %s"%path_board)
 
     # Callbacks #
     # Early stopping to stop learning if val_loss plateau for too long #
@@ -271,13 +273,14 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
     # Custom loss function plot for debugging #
     loss_history = LossHistory()
     # Tensorboard for checking live the loss curve #
-    board = TensorBoard(log_dir=path_board, 
-                        histogram_freq=1, 
-                        batch_size=params['batch_size'], 
-                        write_graph=True, 
-                        write_grads=True, 
-                        write_images=True)
-    Callback_list = [loss_history,early_stopping,reduceLR,board]
+#    board = TensorBoard(log_dir=path_board, 
+#                        histogram_freq=1, 
+#                        batch_size=params['batch_size'], 
+#                        write_graph=True, 
+#                        write_grads=True, 
+#                        write_images=True)
+#    Callback_list = [loss_history,early_stopping,reduceLR,board]
+    Callback_list = [loss_history,early_stopping,reduceLR]
 
     # Compile #
     if 'resume' not in params:  # Normal learning 
@@ -297,17 +300,22 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
 
     utils.print_summary(model=model) #used to print model
     # Generator #
-    training_generator = DataGenerator(path = parameters.path_gen_training,
+    training_generator = DataGenerator(path = parameters.config,
                                        inputs = parameters.inputs,
                                        outputs = parameters.outputs,
+                                       cut = parameters.cut,
+                                       weight  = parameters.weight,
                                        batch_size = params['batch_size'],
                                        state_set = 'training',
-                                       weights_generator = weights_generator)
-    validation_generator = DataGenerator(path = parameters.path_gen_validation,
-                                       inputs = parameters.inputs,
-                                       outputs = parameters.outputs,
-                                       batch_size = params['batch_size'],
-                                       state_set = 'validation')
+                                       model_idx = params['model_idx'] if parameters.crossvalidation else None)
+    validation_generator = DataGenerator(path = parameters.config,
+                                         inputs = parameters.inputs,
+                                         outputs = parameters.outputs,
+                                         cut = parameters.cut,
+                                         weight  = parameters.weight,
+                                         batch_size = params['batch_size'],
+                                         state_set = 'validation',
+                                         model_idx = params['model_idx'] if parameters.crossvalidation else None)
 
     # Some verbose logging #
     logging.info("Will use %d workers"%parameters.workers)
@@ -319,7 +327,7 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
     history = model.fit_generator(generator             = training_generator,   # Training data from generator instance
                                   validation_data       = validation_generator, # Validation data from generator instance
                                   epochs                = params['epochs'],     # Number of epochs
-                                  verbose               = 1,
+                                  verbose               = 2,
                                   max_queue_size        = parameters.workers*2, # Length of batch queue
                                   callbacks             = Callback_list,        # Callbacks
                                   initial_epoch         = initial_epoch,        # In case of resumed training will be different from 0
