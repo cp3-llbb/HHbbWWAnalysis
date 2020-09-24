@@ -55,14 +55,25 @@ class HyperModel:
     #############################################################################################
     # __init ___#
     #############################################################################################
-    def __init__(self,name):
+    def __init__(self,name,list_inputs=None,list_outputs=None):
         self.name = name
         self.custom_objects =  {'PreprocessLayer': PreprocessLayer} # Needs to be specified when saving and restoring
+        self.list_inputs = list_inputs
+        self.list_outputs = list_outputs
+        # Printing #
+        if self.list_inputs is not None:
+            logging.info('Number of features : %d'%len(self.list_inputs))
+            for name in self.list_inputs:
+                logging.info('..... %s'%name)
+        if self.list_outputs is not None:
+            logging.info('Number of outputs : %d'%len(self.list_outputs))
+            for name in self.list_outputs:
+                logging.info('..... %s'%name)
 
     #############################################################################################
     # HyperScan #
     #############################################################################################
-    def HyperScan(self,data,list_inputs,list_outputs,task,model_idx=None,generator=False,resume=False):
+    def HyperScan(self,data,task,model_idx=None,generator=False,resume=False):
         """
         Performs the scan for hyperparameters
         If task is specified, will load a pickle dict splitted from the whole set of parameters
@@ -71,19 +82,11 @@ class HyperModel:
         Reference : /home/ucl/cp3/fbury/.local/lib/python3.6/site-packages/talos/scan/Scan.py
         """
         logging.info(' Starting scan '.center(80,'-'))
-
-        # Printing #
-        logging.info('Number of features : %d'%len(list_inputs))
-        for name in list_inputs:
-            logging.info('..... %s'%name)
-        logging.info('Number of outputs : %d'%len(list_outputs))
-        for name in list_outputs:
-            logging.info('..... %s'%name)
             
         # Records #
         if not generator:
-            self.x = data[list_inputs].values
-            self.y = data[list_outputs+['learning_weights']].values
+            self.x = data[self.list_inputs].values
+            self.y = data[self.list_outputs+['learning_weights']].values
             # Data splitting #
             if model_idx is None:
                 size = parameters.training_ratio/(parameters.training_ratio+parameters.evaluation_ratio)
@@ -101,8 +104,8 @@ class HyperModel:
             logging.info("Evaluation set : %d"%self.x_val.shape[0])
         else:
             # Needs to use dummy inputs to launch talos scan but in Model the generator will be used
-            dummyX = np.ones((1,len(list_inputs)))
-            dummyY = np.ones((1,len(list_outputs)+1)) # emulates output + weights
+            dummyX = np.ones((1,len(self.list_inputs)))
+            dummyY = np.ones((1,len(self.list_outputs))) 
             self.x_train = dummyX
             self.y_train = dummyY
             self.x_val = dummyX
@@ -134,15 +137,19 @@ class HyperModel:
             logging.warning("Since you asked to resume training of model %s, the parameters dictionary has been set to the one used to train the model"%parameters.resume_model)
             logging.info("Will train the model from epoch %d to %d"%(self.p['initial_epoch'][0],self.p['epochs'][0]))
 
+        # add model_idx if cross validation #
+        if parameters.crossvalidation:
+            self.p['model_idx'] = [model_idx]
+
         # Check if no already exists then change it -> avoids rewriting  #
         # This is only valid in worker mode, not driver #
         no = 1
         if self.task == '': # If done on frontend
             name = self.name
-            while os.path.exists(os.path.join(parameters.path_model,self.name+'_'+str(no)+'.csv')):
-                no +=1
             if model_idx is not None:
                 name += '_crossval%d'%model_idx
+            while os.path.exists(os.path.join(parameters.path_model,self.name+'_'+str(no)+'.csv')):
+                no +=1
             self.name_model = name+'_'+str(no)
         else:               # If job on cluster
             name = self.name
@@ -156,7 +163,8 @@ class HyperModel:
                       params=self.p,                        # Parameters dict
                       dataset_name=self.name,               # Name of experiment
                       experiment_no=str(no),                # Number of experiment
-                      model=getattr(Model,parameters.model),# Get the model in Model.py specified by parameters.py
+                      model= getattr(Model,'NeuralNetGeneratorModel')      # Name of the model
+                        if generator else getattr(Model,'NeuralNetModel'),
                       val_split=0.1,                        # How much data is to be used for val_loss
                       reduction_metric='val_loss',          # How to select best model
                       #grid_downsample=0.1,                 # When used in serial mode
@@ -191,13 +199,16 @@ class HyperModel:
                 # Load model #
                 model_eval = model_from_json(self.h.saved_models[i],custom_objects=self.custom_objects)   
                 model_eval.set_weights(self.h.saved_weights[i])
-                model_eval.compile(optimizer=Adam(),loss={'OUT':parameters.p['loss_function']},metrics=['accuracy'])
+                model_eval.compile(optimizer=Adam(),loss={'OUT':parameters.p['loss_function'][0]},metrics=['accuracy'])
                 # Evaluate model #
-                evaluation_generator = DataGenerator(path = parameters.path_gen_evaluation,
+                evaluation_generator = DataGenerator(path = parameters.config,
                                                      inputs = parameters.inputs,
                                                      outputs = parameters.outputs,
+                                                     cut = parameters.cut,
+                                                     weight  = parameters.weight, 
                                                      batch_size = parameters.p['batch_size'][0],
-                                                     state_set = 'evaluation')
+                                                     state_set = 'evaluation',
+                                                     model_idx = model_idx if parameters.crossvalidation else None)
 
                 eval_metric = model_eval.evaluate_generator(generator             = evaluation_generator,
                                                             workers               = parameters.workers,
@@ -336,7 +347,7 @@ class HyperModel:
     #############################################################################################
     # HyperRestore #
     #############################################################################################
-    def HyperRestore(self,inputs,verbose=0,generator=False,generator_filepath=None):
+    def HyperRestore(self,inputs,verbose=0,generator=False,model_idx=None,return_inputs=False):
         """
         Retrieve a zip containing the best model, parameters, x and y data, ... and restores it
         Produces an output from the input numpy array
@@ -355,21 +366,11 @@ class HyperModel:
                 logging.warning('Could not load model due to "%s", will try again in 3s'%e)
                 time.sleep(3)
 
-        # Output of the model #
-        if not generator:
-            outputs = a.model.predict(inputs,batch_size=parameters.output_batch_size,verbose=verbose)
-        else:
-            if generator_filepath is None:
-                logging.error("Generator output must be provided with a filepath")
-                sys.exit(1)
-            output_generator = DataGenerator(path = generator_filepath,
-                                             inputs = parameters.inputs,
-                                             outputs = parameters.outputs,
-                                             batch_size = parameters.output_batch_size,
-                                             state_set = 'output')
-            outputs = a.model.predict_generator(output_generator,
-                                              workers=parameters.workers,
-                                              use_multiprocessing=True,
-                                              verbose=1)
+        outputs = a.model.predict(inputs,batch_size=parameters.output_batch_size,verbose=verbose)
+#                outputs = a.model.predict_generator(output_generator,
+#                                                    workers=parameters.workers,
+#                                                    max_queue_size=2*parameters.workers,
+#                                                    use_multiprocessing=True,
+#                                                    verbose=1)
 
         return outputs

@@ -1,25 +1,54 @@
 import numpy as np
 import os
 import logging
+import ROOT
 
 import parameters
 
 def GenerateMask(N,name):
-    path_mask = os.path.join(parameters.main_path,'mask_'+name)
-    if not os.path.exists(path_mask+'.npy'):                     
+    path_mask = os.path.join(parameters.main_path,'mask_'+name+'.npy')
+    if not os.path.exists(path_mask):                     
         mask = np.full((N,), False, dtype=bool)     
         size = parameters.training_ratio+parameters.evaluation_ratio
         mask[:int(size*N)] = True                         
-        # False => Evaluation set, True => Training set           
+        # False => Output set, True => Training set           
         np.random.shuffle(mask)                                     
         # Save #
         np.save(path_mask,mask)                                 
-        logging.info('Mask not found at '+path_mask+' -> Has been generated')
+        logging.info('Mask not found at %s -> Has been generated'%path_mask)
     else:                                                        
         mask = np.load(path_mask+'.npy')     
-        logging.info('Mask found at '+path_mask+'.npy')
+        logging.info('Mask found at %s'%path_mask)
 
     return mask
+
+def GenerateSampleMasks(list_samples,name):
+    path_mask = os.path.join(parameters.main_path,'mask_'+name+'.npz')
+    if not os.path.exists(path_mask):
+        mask_dict = {}
+        for i,sample in enumerate(list_samples):
+            if not os.path.exists(sample):
+                raise RuntimeError('Sample %s does not exist'%sample)
+            rootFile = ROOT.TFile(sample)
+            if not rootFile.GetListOfKeys().Contains(parameters.tree_name): 
+                logging.debug('Could not find tree %s in file %s'%(parameters.tree_name,sample))
+                continue
+            N = rootFile.Get(parameters.tree_name).GetEntries(parameters.cut)
+            rootFile.Close()
+            Nt = int(parameters.training_ratio*N)
+            Ne = int(parameters.evaluation_ratio*N)
+            No = N-Nt-Ne
+            mask = np.concatenate((np.zeros(Nt),np.ones(Ne),np.ones(No)*2),axis=0)
+            # 0 -> training, 1-> evaluation, 2-> output
+            np.random.shuffle(mask)                                     
+            mask_dict[sample] = mask
+            logging.debug('[%3.2f%%] : Produced mask for %s'%(i*100/len(list_samples),sample))
+        np.savez(path_mask,**mask_dict)
+        logging.info('Mask not found at %s -> Has been generated'%path_mask)
+    else:
+        logging.info('Mask found at %s'%path_mask)
+        mask_dict = np.load(path_mask)
+    return mask_dict
 
 def GenerateSliceIndices(model_idx):
     Nm = parameters.N_models

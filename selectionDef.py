@@ -926,12 +926,9 @@ def makeInclusiveBoostedSelection(self,selObject,copy_sel=False,plot_yield=False
     """
     if copy_sel:
         selObject = copy(selObject)
-    AppliedSF = None # TODO: correct at v7
-    #AppliedSF = self.DeepCsvSubjetDiscReshapingSF(self.ak8BJets[0].subJet1)
     selObject.selName += "InclusiveBoosted"
     selObject.yieldTitle += " + Inclusive Boosted"
-    selObject.refine(cut    = [op.rng_len(self.ak8BJets)>=1],
-                     weight = AppliedSF)
+    selObject.refine(cut    = [op.rng_len(self.ak8BJets)>=1])
     if plot_yield:
         selObject.makeYield(self.yieldPlots)
     if copy_sel:

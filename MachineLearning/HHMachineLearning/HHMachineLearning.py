@@ -11,6 +11,7 @@ import pprint
 import logging
 import copy
 import pickle
+import json
 #import psutil
 from functools import reduce
 import operator
@@ -25,8 +26,7 @@ import pandas as pd
 
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
 # Personal files #
     
@@ -35,12 +35,6 @@ def get_options():
     Parse and return the arguments provided by the user.
     """
     parser = argparse.ArgumentParser(description='HHMachineLearning')
-
-    # Configuration parameters #
-    p = parser.add_argument_group('Required configuration parameters')
-    p.add_argument('--config', action='store', required=True, type=str,
-        help='Yaml file containing sample list')
-
 
     # Scan, deploy and restore arguments #
     a = parser.add_argument_group('Scan, deploy and restore arguments')
@@ -80,16 +74,6 @@ def get_options():
     d.add_argument('--csv', action='store', required=False, type=str, default='',
         help='Whether to concatenate the csv files from different slurm jobs into a main one, \
               please provide the path to the csv files')
-
-    # Concatenating csv files arguments #
-    e = parser.add_argument_group('Physics arguments')
-    e.add_argument('--resolved1b', action='store_true', required=False, default=False,
-       help='Resolved topology with 1 bjet')
-    e.add_argument('--resolved2b', action='store_true', required=False, default=False,
-       help='Resolved topology with 2 bjets')
-    e.add_argument('--boosted', action='store_true', required=False, default=False,
-       help='Boosted topology')
-
 
     # Additional arguments #
     f = parser.add_argument_group('Additional arguments')
@@ -144,7 +128,7 @@ def main():
     from produce_output import ProduceOutput
     from make_scaler import MakeScaler
     from submit_on_slurm import submit_on_slurm
-    from generate_mask import GenerateMask, GenerateSliceIndices, GenerateSliceMask
+    from generate_mask import GenerateMask, GenerateSampleMasks, GenerateSliceIndices, GenerateSliceMask
     from split_training import DictSplit
     from concatenate_csv import ConcatenateCSV
     from threadGPU import utilizationGPU
@@ -176,11 +160,8 @@ def main():
             DictSplit(opt.split,opt.submit,opt.resubmit)
             logging.info('Splitting jobs done')
         
+        config = os.path.join(os.path.abspath(os.path.dirname(__file__)),opt.config)
         # Arguments to send #
-        args = ' ' # Do not forget the spaces after each arg!
-        if opt.resolved1b:          args += ' --resolved1b '
-        if opt.resolved2b:          args += ' --resolved2b '
-        if opt.boosted:             args += ' --boosted '
         if opt.generator:           args += ' --generator '
         if opt.GPU:                 args += ' --GPU '
         if opt.resume:              args += ' --resume '
@@ -252,166 +233,182 @@ def main():
     list_outputs = parameters.outputs
 
     # Load samples #
-    with open (opt.config,'r') as f:
+    with open (parameters.config,'r') as f:
         sampleConfig = yaml.load(f)
 
-    lumidict = {'2016':35922,'2017':41529.152060112,'2018':59740.565201546}
-
-    if opt.nocache:
-        logging.warning('No cache will be used nor saved')
-    if os.path.exists(parameters.train_cache) and not opt.nocache:
-        logging.info('Will load training data from cache')
-        logging.info('... Training set : %s'%parameters.train_cache)
-        train_all = pd.read_pickle(parameters.train_cache)
-        if os.path.exists(parameters.test_cache) and not opt.nocache and not parameters.crossvalidation:
-            logging.info('Will load testing data from cache')
-            logging.info('... Testing  set : %s'%parameters.test_cache)
-            test_all = pd.read_pickle(parameters.test_cache)
-    else:
-        # Import arrays #
-        nodes = ['TT','DY','ST','VVV','TTVX','H','Rare','HH']
-        channels = ['ElEl','MuMu','ElMu']
-        data_dict = {}
-        for node in nodes:
-            logging.info('Starting data importation for class %s'%node)
-            strSelect = []
-            if opt.resolved1b:
-                strSelect.extend(['resolved_1b_{}_{}'.format(channel,node) for channel in channels])
-            if opt.resolved2b:
-                strSelect.extend(['resolved_2b_{}_{}'.format(channel,node) for channel in channels])
-            if opt.boosted:
-                strSelect.extend(['boosted_{}_{}'.format(channel,node) for channel in channels])
-
-            data_node = None
-
-            for era,samples_dict in sampleConfig['sampleDict'].items():
-                if len(samples_dict.keys())==0:
-                    logging.info('\tSample dict for era {} is empty'.format(era))
-                    continue
-                if node != 'HH':
-                    xsec_json = parameters.xsec_json.format(era=era)
-                    event_weight_sum_json = parameters.event_weight_sum_json.format(era=era)
-                else:
-                    xsec_json = None
-                    event_weight_sum_json = None
-                list_sample = [sample for key in strSelect for sample in samples_dict[key]]
-
-                data_node_era = LoopOverTrees(input_dir                 = sampleConfig['sampleDir'],
-                                              variables                 = variables,
-                                              weight                    = parameters.weights,
-                                              list_sample               = list_sample,
-                                              cut                       = parameters.cut,
-                                              xsec_json                 = xsec_json,
-                                              event_weight_sum_json     = event_weight_sum_json,
-                                              luminosity                = lumidict[era],
-                                              additional_columns        = {'tag':node,'era':era})
-                if data_node is None:
-                    data_node = data_node_era
-                else:
-                    data_node = pd.concat([data_node,data_node_era],axis=0)
-                logging.info('\t{} class in era {} : sample size = {}, weight sum = {:.3e} (with normalization = {:.3e})'.format(node,era,data_node_era.shape[0],data_node_era[parameters.weights].sum(),data_node_era['event_weight'].sum()))
-            data_dict[node] = data_node
-            logging.info('{} class for all eras : sample size = {}, weight sum = {:.3e} (with normalization = {:.3e})'.format(node,data_node.shape[0],data_node[parameters.weights].sum(),data_node['event_weight'].sum()))
-
-        # Weight equalization #
-        if parameters.weights is not None:
-            for node, data in data_dict.items():
-                sum_weights = data['event_weight'].sum()
-                logging.info('Sum of weight for %s samples : %.2e'%(node,sum_weights))
-                data['learning_weights'] = data['event_weight']/sum_weights*1e5
-                logging.info('\t -> After equalization : %0.2e'%data['learning_weights'].sum())
-
-        # Data splitting #
-        train_dict = {}
-        test_dict = {}
-        for node,data in data_dict.items():
-            if parameters.crossvalidation: # Cross-validation
-                if parameters.splitbranch not in data.columns:
-                    raise RuntimeError('Asked for cross validation mask but cannot find the slicing array')
-                try:
-                    data['mask'] = (data[parameters.splitbranch] % parameters.N_slices).to_numpy()
-                    # Will contain numbers : 0,1,2,...N_slices-1
-                except ValueError:
-                    logging.critical("Problem with the masking")
-                    raise ValueError
-            else: # Classic separation
-                mask = GenerateMask(data.shape[0],parameters.suffix+'_'+node)
-                try:
-                    train_dict[node] = data[mask==True]
-                    test_dict[node]  = data[mask==False]
-                except ValueError:
-                    logging.critical("Problem with the mask you imported, has the data changed since it was generated ?")
-                    raise ValueError
-         
-        if parameters.crossvalidation:
-            train_all = pd.concat(data_dict.values(),copy=True).reset_index(drop=True)
-            test_all = pd.DataFrame(columns=train_all.columns) # Empty to not break rest of script
-        else:
-            train_all = pd.concat(train_dict.values(),copy=True).reset_index(drop=True)
-            test_all  = pd.concat(test_dict.values(),copy=True).reset_index(drop=True)
-        del data_dict 
-        if not parameters.crossvalidation:
-            del train_dict, test_dict
-        #logging.info('Current memory usage : %0.3f GB'%(pid.memory_info().rss/(1024**3)))
-
-        # Randomize order, we don't want only one type per batch #
-        random_train = np.arange(0,train_all.shape[0]) # needed to randomize x,y and w in same fashion
-        np.random.shuffle(random_train) # Not needed for testing
-        train_all = train_all.iloc[random_train]
-          
-        # Add target #
-        label_encoder = LabelEncoder()
-        onehot_encoder = OneHotEncoder(sparse=False)
-        label_encoder.fit(train_all['tag'])
-        # From strings to labels #
-        train_integers = label_encoder.transform(train_all['tag']).reshape(-1, 1)
-        if not parameters.crossvalidation:
-            test_integers = label_encoder.transform(test_all['tag']).reshape(-1, 1)
-        # From labels to strings #
-        train_onehot = onehot_encoder.fit_transform(train_integers)
-        if not parameters.crossvalidation:
-            test_onehot = onehot_encoder.fit_transform(test_integers)
-        # From arrays to pd DF #
-        train_cat = pd.DataFrame(train_onehot,columns=label_encoder.classes_,index=train_all.index)
-        if not parameters.crossvalidation:
-            test_cat = pd.DataFrame(test_onehot,columns=label_encoder.classes_,index=test_all.index)
-        # Add to full #
-        train_all = pd.concat([train_all,train_cat],axis=1)
-        if not parameters.crossvalidation:
-            test_all = pd.concat([test_all,test_cat],axis=1)
-
-        # Preprocessing #
-        # The purpose is to create a scaler object and save it
-        # The preprocessing will be implemented in the network with a custom layer
-        if opt.scan!='': # If we don't scan we don't need to scale the data
-            MakeScaler(train_all,list_inputs) 
-
-      # Caching #
-        if not opt.nocache:
-            train_all.to_pickle(parameters.train_cache)
-            logging.info('Data saved to cache')
+    if not opt.generator:
+        if opt.nocache:
+            logging.warning('No cache will be used nor saved')
+        if os.path.exists(parameters.train_cache) and not opt.nocache:
+            logging.info('Will load training data from cache')
             logging.info('... Training set : %s'%parameters.train_cache)
-            if not parameters.crossvalidation:
-                test_all.to_pickle(parameters.test_cache)
+            train_all = pd.read_pickle(parameters.train_cache)
+            if os.path.exists(parameters.test_cache) and not opt.nocache and not parameters.crossvalidation:
+                logging.info('Will load testing data from cache')
                 logging.info('... Testing  set : %s'%parameters.test_cache)
-     
+                test_all = pd.read_pickle(parameters.test_cache)
+        else:
+            # Import arrays #
+            data_dict = {}
+            xsec_dict = dict()
+            event_weight_sum_dict = dict()
+            for era in parameters.eras:
+                with open(parameters.xsec_json.format(era=era),'r') as handle:
+                    xsec_dict[era] = json.load(handle)
+                with open(parameters.event_weight_sum_json.format(era=era),'r') as handle:
+                    event_weight_sum_dict[era] = json.load(handle)
+
+            for node in parameters.nodes:
+                logging.info('Starting data importation for class %s'%node)
+                strSelect = [f'{cat}_{channel}_{node}' for channel in parameters.channels for cat in parameters.categories]
+                data_node = None
+
+                for era,samples_dict in sampleConfig['sampleDict'].items():
+                    if len(samples_dict.keys())==0:
+                        logging.info('\tSample dict for era {} is empty'.format(era))
+                        continue
+                    if node != 'HH':
+                        xsec = xsec_dict
+                        event_weight_sum = event_weight_sum_dict 
+                    else:
+                        xsec = None
+                        event_weight_sum = None
+                    list_sample = [sample for key in strSelect for sample in samples_dict[key]]
+                    data_node_era = LoopOverTrees(input_dir                 = sampleConfig['sampleDir'],
+                                                  variables                 = variables,
+                                                  weight                    = parameters.weight,
+                                                  list_sample               = list_sample,
+                                                  cut                       = parameters.cut,
+                                                  xsec_dict                 = xsec_dict,
+                                                  event_weight_sum_dict     = event_weight_sum_dict,
+                                                  lumi_dict                 = parameters.lumidict,
+                                                  eras                      = era,
+                                                  tree_name                 = parameters.tree_name,
+                                                  additional_columns        = {'tag':node,'era':era})
+                    if data_node is None:
+                        data_node = data_node_era
+                    else:
+                        data_node = pd.concat([data_node,data_node_era],axis=0)
+                    logging.info('\t{} class in era {} : sample size = {:10d}, weight sum = {:.3e} (with normalization = {:.3e})'.format(node,era,data_node_era.shape[0],data_node_era[parameters.weight].sum(),data_node_era['event_weight'].sum()))
+                data_dict[node] = data_node
+                logging.info('{} class for all eras : sample size = {:10d}, weight sum = {:.3e} (with normalization = {:.3e})'.format(node,data_node.shape[0],data_node[parameters.weight].sum(),data_node['event_weight'].sum()))
+
+            # Weight equalization #
+            if parameters.weight is not None:
+                for node, data in data_dict.items():
+                    sum_weights = data['event_weight'].sum()
+                    logging.info('Sum of weight for %s samples : %.2e'%(node,sum_weights))
+                    data['learning_weights'] = data['event_weight']/sum_weights*1e5
+                    logging.info('\t -> After equalization : %0.2e (factor %0.2e)'%(data['learning_weights'].sum(),1.e5/sum_weights))
+
+            # Data splitting #
+            train_dict = {}
+            test_dict = {}
+            for node,data in data_dict.items():
+                if parameters.crossvalidation: # Cross-validation
+                    if parameters.splitbranch not in data.columns:
+                        raise RuntimeError('Asked for cross validation mask but cannot find the slicing array')
+                    try:
+                        data['mask'] = (data[parameters.splitbranch] % parameters.N_slices).to_numpy()
+                        # Will contain numbers : 0,1,2,...N_slices-1
+                    except ValueError:
+                        logging.critical("Problem with the masking")
+                        raise ValueError
+                else: # Classic separation
+                    mask = GenerateMask(data.shape[0],parameters.suffix+'_'+node)
+                    try:
+                        train_dict[node] = data[mask==True]
+                        test_dict[node]  = data[mask==False]
+                    except ValueError:
+                        logging.critical("Problem with the mask you imported, has the data changed since it was generated ?")
+                        raise ValueError
+             
+            if parameters.crossvalidation:
+                train_all = pd.concat(data_dict.values(),copy=True).reset_index(drop=True)
+                test_all = pd.DataFrame(columns=train_all.columns) # Empty to not break rest of script
+            else:
+                train_all = pd.concat(train_dict.values(),copy=True).reset_index(drop=True)
+                test_all  = pd.concat(test_dict.values(),copy=True).reset_index(drop=True)
+            del data_dict 
+            if not parameters.crossvalidation:
+                del train_dict, test_dict
+            #logging.info('Current memory usage : %0.3f GB'%(pid.memory_info().rss/(1024**3)))
+
+            # Randomize order, we don't want only one type per batch #
+            random_train = np.arange(0,train_all.shape[0]) # needed to randomize x,y and w in same fashion
+            np.random.shuffle(random_train) # Not needed for testing
+            train_all = train_all.iloc[random_train]
+              
+            # Add target #
+            label_encoder = LabelEncoder()
+            onehot_encoder = OneHotEncoder(sparse=False)
+            label_encoder.fit(parameters.nodes)
+            # From strings to labels #
+            train_integers = label_encoder.transform(train_all['tag']).reshape(-1, 1)
+            if not parameters.crossvalidation:
+                test_integers = label_encoder.transform(test_all['tag']).reshape(-1, 1)
+            # From labels to strings #
+            onehotobj = onehot_encoder.fit(np.arange(len(outputs)).reshape(-1, 1))
+            train_onehot = onehotobj.transform(train_integers)
+            if not parameters.crossvalidation:
+                test_onehot = onehotobj.transform(test_integers)
+            # From arrays to pd DF #
+            train_cat = pd.DataFrame(train_onehot,columns=label_encoder.classes_,index=train_all.index)
+            if not parameters.crossvalidation:
+                test_cat = pd.DataFrame(test_onehot,columns=label_encoder.classes_,index=test_all.index)
+            # Add to full #
+            train_all = pd.concat([train_all,train_cat],axis=1)
+            if not parameters.crossvalidation:
+                test_all = pd.concat([test_all,test_cat],axis=1)
+
+            # Preprocessing #
+            # The purpose is to create a scaler object and save it
+            # The preprocessing will be implemented in the network with a custom layer
+            if opt.scan!='': # If we don't scan we don't need to scale the data
+                MakeScaler(train_all,list_inputs) 
+
+          # Caching #
+            if not opt.nocache:
+                train_all.to_pickle(parameters.train_cache)
+                logging.info('Data saved to cache')
+                logging.info('... Training set : %s'%parameters.train_cache)
+                if not parameters.crossvalidation:
+                    test_all.to_pickle(parameters.test_cache)
+                    logging.info('... Testing  set : %s'%parameters.test_cache)
+         
+        logging.info("Sample size seen by network : %d"%train_all.shape[0])
+        #logging.info('Current memory usage : %0.3f GB'%(pid.memory_info().rss/(1024**3)))
+        if parameters.crossvalidation: 
+            N = train_all.shape[0]
+            logging.info('Cross-validation has been requested on set of %d events'%N)
+            for i in range(parameters.N_models):
+                slices_apply , slices_eval, slices_train = GenerateSliceIndices(i)
+                logging.info('... Model %d :'%i)
+                for slicename, slices in zip (['Applied','Evaluated','Trained'],[slices_apply , slices_eval, slices_train]):
+                    selector = np.full((train_all.shape[0]), False, dtype=bool)
+                    selector = GenerateSliceMask(slices,train_all['mask'])
+                    n = train_all[selector].shape[0]
+                    logging.info('     %10s on %10d [%3.2f%%] events'%(slicename,n,n*100/N)+' (With mask indices : ['+','.join([str(s) for s in slices])+'])')
+        else:
+            logging.info("Sample size for the output  : %d"%test_all.shape[0])
+    else:
+        logging.info("You asked for generator so no data input has been done")
+        list_samples = [os.path.join(sampleConfig['sampleDir'],sample) for era in parameters.eras for samples in sampleConfig['sampleDict'][era].values() for sample in samples ]
+        # Produce mask if not cross val #
+        if not parameters.crossvalidation:
+            logging.info("Will generate masks for each sample")
+            GenerateSampleMasks(list_samples,parameters.suffix)
+        # Produce scaler #
+        MakeScaler(list_inputs  = list_inputs,
+                   generator    = True,
+                   batch        = parameters.output_batch_size,
+                   list_samples = list_samples) 
+            
+        train_all = None
+        test_all = None
+
     list_inputs  = [var.replace('$','') for var in parameters.inputs]
     list_outputs = [var.replace('$','') for var in parameters.outputs]
-    logging.info("Sample size seen by network : %d"%train_all.shape[0])
-    #logging.info('Current memory usage : %0.3f GB'%(pid.memory_info().rss/(1024**3)))
-    if parameters.crossvalidation: 
-        N = train_all.shape[0]
-        logging.info('Cross-validation has been requested on set of %d events'%N)
-        for i in range(parameters.N_models):
-            slices_apply , slices_eval, slices_train = GenerateSliceIndices(i)
-            logging.info('... Model %d :'%i)
-            for slicename, slices in zip (['Applied','Evaluated','Trained'],[slices_apply , slices_eval, slices_train]):
-                selector = np.full((train_all.shape[0]), False, dtype=bool)
-                selector = GenerateSliceMask(slices,train_all['mask'])
-                n = train_all[selector].shape[0]
-                logging.info('     %10s on %10d [%3.2f%%] events'%(slicename,n,n*100/N)+' (With mask indices : ['+','.join([str(s) for s in slices])+'])')
-    else:
-        logging.info("Sample size for the output  : %d"%test_all.shape[0])
 
     #############################################################################################
     # DNN #
@@ -424,21 +421,19 @@ def main():
         thread.start()
 
     if opt.scan != '':
-        instance = HyperModel(opt.scan)
+        instance = HyperModel(opt.scan,list_inputs,list_outputs)
         if parameters.crossvalidation:
             for i in range(parameters.N_models):
                 logging.info("*"*80)
                 logging.info("Starting training of model %d"%i)
                 instance.HyperScan(data=train_all,
-                                   list_inputs=list_inputs,
-                                   list_outputs=list_outputs,
                                    task=opt.task,
+                                   generator=opt.generator,
+                                   resume=opt.resume,
                                    model_idx=i)
                 instance.HyperDeploy(best='eval_error')
         else:
             instance.HyperScan(data=train_all,
-                               list_inputs=list_inputs,
-                               list_outputs=list_outputs,
                                task=opt.task,
                                generator=opt.generator,
                                resume=opt.resume)
