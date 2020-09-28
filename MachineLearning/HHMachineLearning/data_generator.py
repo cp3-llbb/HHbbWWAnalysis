@@ -10,6 +10,7 @@ import collections
 import random
 import yaml
 import keras
+#import enlighten
 
 from prettytable import PrettyTable
 import numpy as np
@@ -67,7 +68,7 @@ class DataGenerator(keras.utils.Sequence):
             if self.state_set == 'training' or self.state_set == 'validation': self.set_idx = set_indices[2]
             self.cut += ' && (' + ' | '.join(['{}%{}=={}'.format(parameters.splitbranch,parameters.N_slices,idx) for idx in self.set_idx])+')'
         else:
-            self.masks = GenerateSampleMasks(self.list_files, parameters.suffix)
+            self.maskSamples = GenerateSampleMasks(self.list_files, parameters.suffix)
 
         self.xsec_dict = dict()
         self.event_weight_sum_dict = dict()
@@ -81,46 +82,56 @@ class DataGenerator(keras.utils.Sequence):
             logging.warning("More files than requested batch size, might be errors")
         logging.info("Starting importation for %s set"%self.state_set)
 
+        self.get_indices()
         self.get_fractions()
         self.n          = 0
-        self.max        = self.__len__() # Must be after get_fractions because that's where self.n_batches is defined
+        self.max        = self.__len__() # Must be after get_indices because that's where self.n_batches is defined
 
-    def get_fractions(self):
+    def get_indices(self):
         self.batch_sample = dict() 
-        self.pointer = dict()  
-        indices = dict()
-        masks = dict()
+        self.indices = dict()
+        self.masks = dict()
         self.n_tot = 0
-        for f in self.list_files:
+        #pbar = enlighten.Counter(total=len(self.list_files), desc='Indices', unit='File')
+        logging.info('Starting indices importation')
+        for i,f in enumerate(self.list_files):
             rootFile = ROOT.TFile(f)
             tree_exists = rootFile.GetListOfKeys().Contains(parameters.tree_name)
-            rootFile.Close()
             if not tree_exists:
                 continue 
+            n = rootFile.Get(parameters.tree_name).GetEntries()
+            rootFile.Close()
             if self.cut != '':
-                indices[f],_ = np.where(rec2array(root2array(f,parameters.tree_name,branches=[self.cut]))==1)
+                indices_slice = np.zeros((n,1))
+                incn = 100000
+                p = 0
+                while p < n:
+                    indices_slice[p:p+incn] = rec2array(root2array(f,parameters.tree_name,branches=[self.cut],start=p,stop=p+incn))
+                    p += incn
+                self.indices[f],_ = np.where(indices_slice==1)
             else:
-                indices[f] = np.arange(n)
+                self.indices[f] = np.arange(n)
             if not parameters.crossvalidation:
-                mask = self.masks[f]
-                if indices[f].shape[0] != mask.shape[0]:
-                    raise RuntimeError('Sample %s : size %d different from mask size %d'%(f,len(indices[f]),mask.shape[0]))
+                mask = self.maskSamples[f]
+                if self.indices[f].shape[0] != mask.shape[0]:
+                    raise RuntimeError('Sample %s : size %d different from mask size %d'%(f,len(self.indices[f]),mask.shape[0]))
                 if self.state_set == 'training' or self.state_set == 'validation':
-                    masks[f] = mask == 0
+                    self.masks[f] = mask == 0
                 if self.state_set == 'evaluation':
-                    masks[f] = mask == 1
+                    self.masks[f] = mask == 1
                 if self.state_set == 'output':
-                    masks[f] = mask == 2
+                    self.masks[f] = mask == 2
             else:
-                masks[f] = np.full((indices[f].shape[0],), True, dtype=bool)
+                self.masks[f] = np.full((self.indices[f].shape[0],), True, dtype=bool)
             if self.state_set == 'training':
-                masks[f] = np.logical_and(masks[f],indices[f]%10!=0)
+                self.masks[f] = np.logical_and(self.masks[f],self.indices[f]%10!=0)
             if self.state_set == 'validation':
-                masks[f] = np.logical_and(masks[f],indices[f]%10==0)
-            indices[f] = list(indices[f])
-            masks[f] = list(masks[f])
-            assert len(masks[f]) == len(indices[f])
-            self.n_tot += sum(masks[f])
+                self.masks[f] = np.logical_and(self.masks[f],self.indices[f]%10==0)
+            self.indices[f] = list(self.indices[f])
+            self.masks[f] = list(self.masks[f])
+            assert len(self.masks[f]) == len(self.indices[f])
+            self.n_tot += sum(self.masks[f])
+            #pbar.update()
         logging.info("Number of events in %s set: %d"%(self.state_set,self.n_tot))
 
         if self.n_tot<self.batch_size:
@@ -130,19 +141,20 @@ class DataGenerator(keras.utils.Sequence):
         logging.info("Will use %d batches of %d events (%d events will be lost for truncation purposes)"%(self.n_batches,self.batch_size,self.n_tot%self.batch_size))
 
         total_in_batch = 0
-        for f in indices.keys():
-            #size_in_batch = math.ceil((len(indices[f])/self.n_tot)*self.batch_size)
+        for f in self.indices.keys():
+            #size_in_batch = math.ceil((len(self.indices[f])/self.n_tot)*self.batch_size)
             if self.state_set == 'training' or self.state_set == 'validation': 
-                size_in_batch = max(math.ceil((sum(masks[f])/self.n_tot)*self.batch_size),1)
+                size_in_batch = max(math.ceil((sum(self.masks[f])/self.n_tot)*self.batch_size),1)
             else:
                 size_in_batch = self.batch_size
             self.batch_sample[f] = size_in_batch 
             total_in_batch += size_in_batch
 
+    def get_fractions(self):
         self.indices_per_batch = []
         self.masks_per_batch = []
-        pointers = {k:0 for k in indices.keys()}
-        keys = list(indices.keys())
+        pointers = {k:0 for k in self.indices.keys()}
+        keys = list(self.indices.keys())
         tag_count = [{}]*self.n_batches
         era_count = [{}]*self.n_batches
         for i in range(self.n_batches):
@@ -156,9 +168,9 @@ class DataGenerator(keras.utils.Sequence):
                 for key in keys:
                     rem = self.batch_size-counter
                     inc = min(rem,self.batch_sample[key])
-                    if pointers[key] < len(indices[key]):
-                        indices_slice = indices[key][pointers[key]:min(pointers[key]+inc,len(indices[key]))]
-                        masks_slice = masks[key][pointers[key]:min(pointers[key]+inc,len(masks[key]))]
+                    if pointers[key] < len(self.ndices[key]):
+                        indices_slice = self.indices[key][pointers[key]:min(pointers[key]+inc,len(self.indices[key]))]
+                        masks_slice = self.masks[key][pointers[key]:min(pointers[key]+inc,len(self.masks[key]))]
                         indices_sample[key].extend(indices_slice)
                         masks_sample[key].extend(masks_slice)
                         pointers[key] += inc
@@ -186,12 +198,6 @@ class DataGenerator(keras.utils.Sequence):
                 era_count[i][eraSelect] += cont
 
             for s, ind in indices_sample.items(): 
-#                mask = masks_sample[s]
-#                ind = [i for i,m in zip(ind,mask) if m]
-#                if len(ind) != 0:
-#                    indices_sample[s] = (min(ind),max(ind))
-#                else:
-#                    indices_sample[s] = []
                 indices_sample[s] = (min(ind),max(ind))
 
             self.indices_per_batch.append(dict(indices_sample))
@@ -265,7 +271,6 @@ class DataGenerator(keras.utils.Sequence):
                              tree_name             = parameters.tree_name,
                              additional_columns    = {'tag':tags,'era':eras},
                              cut                   = self.cut)
-        #logging.info('State %s index %d: has imported %d'%(self.state_set,index,data.shape[0]))
         mask = [m for m in chain.from_iterable(masks)]
         data = data[mask]
         data = data.sample(frac=1).reset_index(drop=True) # Randomize
@@ -304,7 +309,7 @@ class DataGenerator(keras.utils.Sequence):
         return self.n_batches
     def on_epoch_end(self): # performs auto shuffle if enabled
         # Do what we need to do between epochs
-        pass
+        self.get_fractions() # Change the batches after each epoch 
 
     def __next__(self):
         if self.n >= self.max:
