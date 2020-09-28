@@ -729,16 +729,17 @@ samples:
     era: '2016'
     split: 10
 
-
-#### Data Driven 
+#### Data Driven : uses and replaces are overriden anyway
 datadriven:
   DYEstimation:
-    uses: [ data ]
+    uses: [ all ]
     replaces: [ DY ]
   FakeExtrapolation:
     uses : [all]
     replaces : [all]
-
+  PseudoData:
+    uses : [all]
+    replaces : [all]
 
 #### plotIt
 plotIt:

@@ -138,10 +138,6 @@ w0_2j = w0/w_2j
 w1_2j = w1/w_2j
 w2_2j = w2/w_2j
 w3_2j = w3/w_2j
-f_inc = ROOT.TFile(os.path.join(path,'DYJetsToLL_M-50.root'))
-f_0j  = ROOT.TFile(os.path.join(path,'DYToLL_0J.root'))
-f_1j  = ROOT.TFile(os.path.join(path,'DYToLL_1J.root'))
-f_2j  = ROOT.TFile(os.path.join(path,'DYToLL_2J.root'))
 
 if len(sys.argv)>2:
     import json
