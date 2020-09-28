@@ -1424,12 +1424,12 @@ One lepton and and one jet argument must be specified in addition to the require
             if era == '2018':
                 csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_102XSF_V1.csv")
                 
-            if not os.path.exists(csvFileNameAk8):
-                raise RuntimeError('Could not find Ak8 csv file %s'%csvFileNameAk8)
-            print ('Btag Ak8 CSV file',csvFileNameAk8)
             isNanov7 = ('db' in sampleCfg.keys() and 'NanoAODv7' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['NanoAODv7' in f for f in sampleCfg['files']]))
             #----- Ak8 SF -----# 
             if isNanov7:
+                if not os.path.exists(csvFileNameAk8):
+                    raise RuntimeError('Could not find Ak8 csv file %s'%csvFileNameAk8)
+                print ('Btag Ak8 CSV file',csvFileNameAk8)
                 self.DeepCsvSubjetMediumSF = BtagSF(taggerName       = "deepcsvSubjet", 
                                                     csvFileName      = csvFileNameAk8,
                                                     wp               = "medium",

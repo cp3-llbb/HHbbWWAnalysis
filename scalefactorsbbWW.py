@@ -80,7 +80,6 @@ class ScaleFactorsbbWW:
                                                                            'DNNoutputTTVX', 
                                                                            'DNNoutputVVV', 
                                                                            'firstleptonPt',
-                                                                           'firstleptonPtVsEta',
                                                                            'leadjetPt']})
 
         #  Fake rates #
