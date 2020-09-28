@@ -56,8 +56,8 @@ workers = 20
 # Physics Config #
 config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL.yml')
 lumidict = {'2016':35922,'2017':41529.152060112,'2018':59740.565201546}
+eras = ['2016']
 #eras = ['2016','2017','2018'] # To enable or disable eras, add or remove from this list
-eras = ['2016','2017'] # To enable or disable eras, add or remove from this list
 
 categories = ['resolved1b3j','resolved2b2j']
 
@@ -129,15 +129,15 @@ reduceLR_params = {'monitor'    : 'val_loss',   # Value to monitor
 #}
 p = { 
     'lr' : [0.01], 
-    'first_neuron' : [32],
+    'first_neuron' : [256],
     'activation' : [relu],
     'dropout' : [0.],
     'hidden_layers' : [3], # does not take into account the first layer
     'output_activation' : [softmax],
     'l2' : [0],
     'optimizer' : [Adam],  
-    'epochs' : [10],   
-    'batch_size' : [20000], 
+    'epochs' : [5],   
+    'batch_size' : [100000], 
     'loss_function' : [categorical_crossentropy] 
 }
 

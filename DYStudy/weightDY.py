@@ -38,7 +38,7 @@ class WeightDY:
             self.histograms[cat] = self.produceDistribution(cat,dirInfo)
 
         self.produceShape(self.histograms)
-        sys.exit()
+        self.produceCDFShift(self.histograms)
 
         if self.hist_type == 'TH1':
             self.plotWeights1D()
@@ -92,7 +92,7 @@ class WeightDY:
         # Parse YAML #
         with open(yaml_path,"r") as handle:
             full_dict = yaml.load(handle,Loader=yaml.FullLoader)
-        # Get Lumi per era #                                                                                                                                                                                
+        # Get Lumi per era # 
         lumi_dict = full_dict["configuration"]["luminosity"]
 
         # Get plot options #
@@ -131,11 +131,11 @@ class WeightDY:
         lumi_dict = info_dict['luminosity']
         samp_dict = info_dict['samples']
 
-#        if category in ['ZVeto_1b','ZVeto_2b']: # Cannot compare with Data-MC(except DY) here
-#            mode = "mc" 
-#        else:
-#            mode = self.mode
-        mode = self.mode
+        if category in ['ZVeto_1b','ZVeto_2b']: # Cannot compare with Data-MC(except DY) here
+            mode = "mc" 
+        else:
+            mode = self.mode
+        #mode = self.mode
 
         dist = None
         # Loop over hist per sample #
@@ -179,14 +179,6 @@ class WeightDY:
         return dist
 
     def produceShape(self,hist_dict):
-
-        #hist_dict['ZPeak_0b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_0b'])
-        #hist_dict['ZPeak_1b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_1b'])
-        #hist_dict['ZPeak_2b'] = self.padNegativeBinsWithZeros(hist_dict['ZPeak_2b'])
-        #hist_dict['ZVeto_0b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_0b'])
-        #hist_dict['ZVeto_1b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_1b'])
-        #hist_dict['ZVeto_2b'] = self.padNegativeBinsWithZeros(hist_dict['ZVeto_2b'])
-
 
         self.N_ZPeak0b = hist_dict['ZPeak_0b'].Integral()
         self.N_ZPeak1b = hist_dict['ZPeak_1b'].Integral()
@@ -242,16 +234,6 @@ class WeightDY:
         hist_dict['ZPeak_1b'].Scale(1./hist_dict['ZPeak_1b'].Integral())
         hist_dict['ZPeak_2b'].Scale(1./hist_dict['ZPeak_2b'].Integral())
 
-        if self.hist_type == 'TH1':
-            from CDFShift import CDFShift
-            inst1b = CDFShift(hist_dict['ZPeak_0b'],hist_dict['ZPeak_1b'],hist_dict['ZVeto_0b'],additional_hist={'ZVeto_1b':hist_dict['ZVeto_1b']})
-            inst1b.saveToRoot(self.outputname+'_CDFShift1b.root')
-            inst1b.plotFromRoot(self.outputname+'_CDFShift1b.root','1b')
-            inst2b = CDFShift(hist_dict['ZPeak_0b'],hist_dict['ZPeak_2b'],hist_dict['ZVeto_0b'],additional_hist={'ZVeto_2b':hist_dict['ZVeto_2b']})
-            inst2b.saveToRoot(self.outputname+'_CDFShift2b.root')
-            inst2b.plotFromRoot(self.outputname+'_CDFShift2b.root','2b')
-            return
-
         self.weight_1b = hist_dict['ZPeak_1b'].Clone("Weight1B")
         self.weight_1b.Divide(hist_dict['ZPeak_0b'])
         self.weight_1b.Scale(self.factor_1b*self.factor_ZVeto)
@@ -282,31 +264,114 @@ class WeightDY:
         print ("Factor (2b)         : ",self.factor_2b)
         print ("Shape (2b)          : ",self.shape_2b.Integral())
 
-    @staticmethod
-    def findNegativeBinsInTh2(h):
-        from ctypes import c_int
-        x = c_int()
-        y = c_int()
-        z = c_int()
-        for i in range(h.GetNbinsX()*h.GetNbinsY()):
-            cont = h.GetBinContent(i)
-            if cont<0:
-                h.GetBinXYZ(i,x,y,z)
-                print ("\tGlobal bin %d : X bin %d, Y bin %d, Z bin %d"%(i,x.value,y.value,z.value))
-                print ("\tBin content :",cont)
-                print ("\tBin low edge : X %0.2f, Y %0.2f"%(h.GetXaxis().GetBinLowEdge(x.value),h.GetYaxis().GetBinLowEdge(y.value)))
+    def produceCDFShift(self,hist_dict):
+        from CDFShift import CDFShift
+        inst1b = CDFShift(hist_dict['ZPeak_0b'],
+                          hist_dict['ZPeak_1b'],
+                          hist_dict['ZVeto_0b'],
+                          additional_hist={'Z Veto 1b':hist_dict['ZVeto_1b']})
+        inst2b = CDFShift(hist_dict['ZPeak_0b'],
+                          hist_dict['ZPeak_2b'],
+                          hist_dict['ZVeto_0b'],
+                          additional_hist={'Z Veto 2b':hist_dict['ZVeto_2b']})
+        name1b = self.outputname+'_CDFShift1b.root'
+        name2b = self.outputname+'_CDFShift2b.root'
+        inst1b.saveToRoot(name1b)
+        inst2b.saveToRoot(name2b)
 
-    @staticmethod
-    def padNegativeBinsWithZeros(h):
-        if 'TH1' in h.ClassName():
-            for i in range(h.GetNbinsX()):
-                if h.GetBinContent(i)<0:
-                    h.SetBinContent(i,0)
-        elif 'TH2' in h.ClassName():
-            for i in range(h.GetNbinsX()*h.GetNbinsY()):
-                if h.GetBinContent(i)<0:
-                    h.SetBinContent(i,0)
-        return h 
+        self.plotCDFShift(inst1b,name1b.replace('.root','.pdf'),cat='1b',mode=self.mode) 
+        self.plotCDFShift(inst2b,name2b.replace('.root','.pdf'),cat='2b',mode=self.mode)
+
+    def plotCDFShift(self,cdfobj,pdfname,cat,mode):
+        if mode == 'mc': mode = 'DY MC'
+        if mode == 'data': mode = 'Data - Bkgd MC (except DY)'
+        leg1 = ROOT.TLegend(0.6,0.6,0.85,0.85)
+        leg1.AddEntry(cdfobj.h1,'Z peak 0b [%s]'%(mode))
+        leg1.AddEntry(cdfobj.h2,'Z peak %s [%s]'%(cat,mode))
+        leg1.AddEntry(cdfobj.h3,'Z veto 0b [%s]'%(mode))
+        leg1.AddEntry(cdfobj.nh3,'Z veto %s [%s extrapolated]'%(cat,mode))
+        for name,obj in self.additional_hist.items():
+            leg1.AddEntry(obj,name+' [DY MC]')
+        
+        cdfobj.h1.SetLineColor(ROOT.kRed+1)
+        cdfobj.h2.SetLineColor(ROOT.kBlue+1)
+        cdfobj.h3.SetLineColor(ROOT.kGreen+1)
+        cdfobj.nh3.SetLineColor(ROOT.kMagenta+1)
+        for obj in self.additional_hist.values():
+            obj.SetLineColor(ROOT.kOrange+2)
+        
+        leg2 = ROOT.TLegend(0.6,0.6,0.85,0.85)
+        leg2.AddEntry(cdfobj.cdf1,'Z peak 0b [%s]'%(mode))
+        leg2.AddEntry(cdfobj.cdf2,'Z peak %s [%s]'%(cat,mode))
+        leg2.AddEntry(cdfobj.cdf3,'Z veto 0b [%s]'%(mode))
+        leg2.AddEntry(cdfobj.ncdf3,'Z veto %s [%s extrapolated]'%(cat,mode))
+        for name,obj in self.additional_cdf.items():
+            leg1.AddEntry(obj,name+' [DY MC]')
+        
+        cdf1.SetLineColor(ROOT.kRed+1)
+        cdf2.SetLineColor(ROOT.kBlue+1)
+        cdf3.SetLineColor(ROOT.kGreen+1)
+        ncdf3.SetLineColor(ROOT.kMagenta+1)
+        for obj in self.additional_cdf.values():
+            obj.SetLineColor(ROOT.kOrange+2)
+        
+        c = ROOT.TCanvas('c','c',800,600)
+        c.Print(pdfname+'[')
+        
+        c.Divide(2,1)
+        maxh = max([h.GetMaximum() for h in [cdfobj.h1,cdfobj.h2,cdfobj.h3,self.additional_hist.values()]])*1.1
+
+        c[1].cd()
+        h1.GetYaxis().SetRangeUser(0.,maxh)
+        h1.SetTitle('Histograms')
+        h1.Draw("hist")
+        h2.Draw("hist same")
+        h3.Draw("hist same")
+
+        c[2].cd()
+        nh3.Draw("hist")
+        for obj in self.additional_hist.values():
+            obj.Draw("hist same")
+        leg1.Draw()
+
+        c.Print(pdfname)
+        c.Clear()
+        
+        maxh = max([h.GetMaximum() for h in [cdfobj.cdf1,cdfobj.cdf2,cdfobj.cdf3,self.additional_cdf.values()]])*1.1
+        cdf1.SetTitle('CDF')
+        cdf1.GetYaxis().SetRangeUser(0.,maxh)
+        cdf1.Draw("hist")
+        cdf2.Draw("hist same")
+        cdf3.Draw("hist same")
+        ncdf3.Draw("hist same")
+        for obj in self.additional_cdf.values():
+            obj.Draw("hist same")
+        leg2.Draw()
+        
+        c.Print(pdfname)
+        c.Clear()
+
+        cdfobj.gncdf3.SetTitle('Non corrected cdf')
+        cdfobj.gncdf3.Draw()
+
+        c.Print(pdfname)
+        c.Clear()
+
+        cdfobj.shift.SetTitle('Shift;Shift;CDF y')
+        cdfobj.shift.Draw()
+
+        c.Print(pdfname)
+        c.Clear()
+        
+        cdfobj.shift_inv.SetTitle('Inverted Shift;CDF y;Shift')
+        cdfobj.shift_inv.Draw()
+
+        c.Print(pdfname)
+        c.Clear()
+
+        c.Print(pdfname+']')
+
+        f.Close()
 
     def rebinWeights1D(self,h):
         xn = self.rebin_1D

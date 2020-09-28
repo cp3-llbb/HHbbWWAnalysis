@@ -14,7 +14,7 @@ import parameters
 def MakeScaler(data=None,list_inputs=[],generator=False,batch=5000,list_samples=None):
     logging.info('Starting computation for the scaler')
     # Generate scaler #
-    scaler_name = 'scaler_'+parameters.suffix+'.pkl'
+    scaler_name = 'scaler_'+parameters.suffix+'_'.join(parameters.eras)+'.pkl'
     scaler_path = os.path.join(parameters.main_path,scaler_name)
     scaler = preprocessing.StandardScaler()
     if not os.path.exists(scaler_path):

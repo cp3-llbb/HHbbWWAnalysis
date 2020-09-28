@@ -1082,8 +1082,6 @@ plotIt:
   groups:
     data:
       legend: data
-    pseudodata:
-      legend: pseudo-data
     ttbar:
       fill-color: "#cc7a16"
       legend: tt
@@ -1116,13 +1114,9 @@ plotIt:
       fill-color: "#610596"
       legend: Rares
       order: 8
-    DYEstimation_data:
+    DYEstimation:
       fill-color: "#1a83a1"
       legend: Drell-Yan (from data)
-      order: 3
-    DYEstimation_pseudodata:
-      fill-color: "#1a83a1"
-      legend: Drell-Yan (from pseudo-data)
       order: 3
     Fake:
       fill-color: "#6e3303"

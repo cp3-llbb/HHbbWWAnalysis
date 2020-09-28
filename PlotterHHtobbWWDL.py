@@ -75,7 +75,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             self.datadrivenContributions["FakeExtrapolation"] = DataDrivenFake(contrib.name, contrib.config)
         if "DYEstimation" in self.datadrivenContributions: 
             contrib = self.datadrivenContributions["DYEstimation"]
-            self.datadrivenContributions["DYEstimation"] = DataDrivenDY(contrib.name, contrib.config, self.args.pseudodata)
+            self.datadrivenContributions["DYEstimation"] = DataDrivenDY(contrib.name, contrib.config)
             
 
 
@@ -162,17 +162,17 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             mvaOutputMuMu = LBN(*returnMVAInputs(dilep=self.MuMuDileptonTightSel,jets=self.ak4Jets))
             if self.era == "2016" and "DYEstimation" in self.datadrivenScenarios:
                 # output = ['HH', 'H', 'DY', 'ST', 'ttbar', 'ttVX', 'VVV', 'Rare']
-                convDict = {'HH':0, 'H':1, 'DY':2, 'ST':3, 'TT':4, 'TTVX':5, 'VVV':6, 'Rare':7}
-                if self.args.DYVariable not in convDict.keys():
-                    raise RuntimeError
-                self.DYReweighting1bElEl = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_DNNoutput%s_data_1b'%self.args.DYVariable), combine="weight", systName="dy_reweighting_1b_elel", 
-                                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputElEl[convDict[self.args.DYVariable]]})
-                self.DYReweighting1bMuMu = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_DNNoutput%s_data_1b'%self.args.DYVariable), combine="weight", systName="dy_reweighting_1b_mumu",
-                                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputMuMu[convDict[self.args.DYVariable]]})
-                self.DYReweighting2bElEl = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_DNNoutput%s_data_2b'%self.args.DYVariable), combine="weight", systName="dy_reweighting_2b_elel",
-                                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputElEl[convDict[self.args.DYVariable]]})
-                self.DYReweighting2bMuMu = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_DNNoutput%s_data_2b'%self.args.DYVariable), combine="weight", systName="dy_reweighting_2b_mumu",
-                                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputMuMu[convDict[self.args.DYVariable]]})
+                #convDict = {'HH':0, 'H':1, 'DY':2, 'ST':3, 'TT':4, 'TTVX':5, 'VVV':6, 'Rare':7}
+                #if self.args.DYVariable not in convDict.keys():
+                #    raise RuntimeError
+                #self.DYReweighting1bElEl = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_DNNoutput%s_data_1b'%self.args.DYVariable), combine="weight", systName="dy_reweighting_1b_elel", 
+                #                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputElEl[convDict[self.args.DYVariable]]})
+                #self.DYReweighting1bMuMu = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_DNNoutput%s_data_1b'%self.args.DYVariable), combine="weight", systName="dy_reweighting_1b_mumu",
+                #                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputMuMu[convDict[self.args.DYVariable]]})
+                #self.DYReweighting2bElEl = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_DNNoutput%s_data_2b'%self.args.DYVariable), combine="weight", systName="dy_reweighting_2b_elel",
+                #                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputElEl[convDict[self.args.DYVariable]]})
+                #self.DYReweighting2bMuMu = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_DNNoutput%s_data_2b'%self.args.DYVariable), combine="weight", systName="dy_reweighting_2b_mumu",
+                #                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputMuMu[convDict[self.args.DYVariable]]})
                 #self.DYReweighting1bElEl = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_DNNoutputHH_data_1b'), combine="weight", systName="dy_reweighting_1b_elel",
                 #                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputElEl[0]})
                 #self.DYReweighting1bMuMu = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_DNNoutputHH_data_1b'), combine="weight", systName="dy_reweighting_1b_mumu",
@@ -181,7 +181,16 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 #                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputElEl[0]})
                 #self.DYReweighting2bMuMu = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_DNNoutputHH_data_2b'), combine="weight", systName="dy_reweighting_2b_mumu",
                 #                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputMuMu[0]})
+                mode = 'mc' if "PseudoData" in self.datadrivenScenarios else 'data'
 
+                self.DYReweighting1bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_leadjetPt_{}_1b'.format(mode)), combine="weight", systName="dy_reweighting_1b_elel", defineOnFirstUse=(not forSkimmer),
+                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
+                self.DYReweighting1bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_leadjetPt_{}_1b'.format(mode)), combine="weight", systName="dy_reweighting_1b_mumu", defineOnFirstUse=(not forSkimmer),
+                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
+                self.DYReweighting2bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_leadjetPt_{}_2b'.format(mode)), combine="weight", systName="dy_reweighting_2b_elel", defineOnFirstUse=(not forSkimmer),
+                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
+                self.DYReweighting2bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_leadjetPt_{}_2b'.format(mode)), combine="weight", systName="dy_reweighting_2b_mumu", defineOnFirstUse=(not forSkimmer),
+                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
                 #self.DYReweighting1bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_1b'), combine="weight", systName="dy_reweighting_1b_elel", defineOnFirstUse=(not forSkimmer))
                 #self.DYReweighting1bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_1b'), combine="weight", systName="dy_reweighting_1b_mumu", defineOnFirstUse=(not forSkimmer))
                 #self.DYReweighting2bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_2b'), combine="weight", systName="dy_reweighting_2b_elel", defineOnFirstUse=(not forSkimmer))
