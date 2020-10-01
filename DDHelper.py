@@ -25,10 +25,16 @@ class DataDrivenFake(DataDrivenContribution):
         return modCfg
 
 class DataDrivenDY(DataDrivenContribution):
+    def __init__(self, name, config, pseudodata=False):
+        self.pseudodata = pseudodata
+        super(DataDrivenDY,self).__init__(name,config)
     def usesSample(self, sampleName, sampleConfig):
         if 'group' not in sampleConfig.keys():
             return False # Signal samples not to be used
-        return sampleConfig['group'] == 'data' # Data driven 
+        if not self.pseudodata:
+            return sampleConfig['group'] == 'data' # Data driven 
+        else:
+            return sampleConfig['group'] != 'data' # Closure
     def replacesSample(self, sampleName, sampleConfig):
         if 'group' not in sampleConfig.keys():
             return False # Signal samples not to be used
@@ -38,12 +44,16 @@ class DataDrivenDY(DataDrivenContribution):
         if 'type' in sampleConfig.keys() and sampleConfig["type"]=="signal":
             return {}
         else:
-            if sampleConfig["group"] == "data":
+            if sampleConfig["group"] == "data" and not self.pseudodata:
                 # Data : add as MC with correct normalization so that lumi*Xsec/generated-events = 1
                 modCfg.update({"type": "mc",
                                "generated-events": lumi,
                                "cross-section": 1.,
                                "group": "DYEstimation"})
+            if sampleConfig["group"] != "data" and self.pseudodata:
+                # Closure 
+                modCfg.update({"group": "DYEstimation"})
+
         return modCfg
 
 class DataDrivenPseudoData(DataDrivenContribution):
@@ -57,5 +67,6 @@ class DataDrivenPseudoData(DataDrivenContribution):
             return {}
         if sampleConfig["group"] != "data": 
             modCfg.update({"group": "pseudodata",
-                           "stack-index":1})
+                           "stack-index":1,
+                           "type":'mc'})
         return modCfg

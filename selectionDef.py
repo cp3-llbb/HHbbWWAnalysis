@@ -230,14 +230,14 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                                             cut       = [op.rng_len(self.leadElectronTightSel) == 1],
                                             weight    = ElTightSF(self.leadElectronTightSel),
                                             ddCut     = [op.rng_len(self.leadElectronFakeExtrapolationSel) == 1],
-                                            ddWeight  = self.ElFakeFactor(self.leadElectronFakeExtrapolationSel[0]),
+                                            ddWeight  = [self.ElFakeFactor(self.leadElectronFakeExtrapolationSel[0])]+ElTightSF(self.leadElectronFakeExtrapolationSel[0]),
                                             enable    = "FakeExtrapolation" in self.datadrivenContributions and 
                                             self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg))
                     MuTightSelObject.create(ddSuffix  = "FakeExtrapolation",
                                             cut       = [op.rng_len(self.leadMuonTightSel) == 1],
                                             weight    = MuTightSF(self.leadMuonTightSel),
                                             ddCut     = [op.rng_len(self.leadMuonFakeExtrapolationSel) == 1],
-                                            ddWeight  = self.MuFakeFactor(self.leadMuonFakeExtrapolationSel[0]),
+                                            ddWeight  = [self.MuFakeFactor(self.leadMuonFakeExtrapolationSel[0])]+MuTightSF(self.leadMuonFakeExtrapolationSel[0]),
                                             enable    = "FakeExtrapolation" in self.datadrivenContributions 
                                             and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg))
 
@@ -268,8 +268,10 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                                                                yieldTitle   = "Fake extrapolated lepton (channel $\mu^+/\mu^-$)")
                 
                 # Selection : at least one tight dilepton #
-                ElFakeExtrapolationSelObject.refine(cut    = [op.rng_len(self.leadElectronFakeExtrapolationSel) == 1])
-                MuFakeExtrapolationSelObject.refine(cut    = [op.rng_len(self.leadMuonFakeExtrapolationSel) == 1])
+                ElFakeExtrapolationSelObject.refine(cut    = [op.rng_len(self.leadElectronFakeExtrapolationSel) == 1],
+                                                    weight = ElTightSF(self.leadElectronFakeExtrapolationSel[0]))
+                MuFakeExtrapolationSelObject.refine(cut    = [op.rng_len(self.leadMuonFakeExtrapolationSel) == 1],
+                                                    weight = MuTightSF(self.leadMuonFakeExtrapolationSel[0]))
                 
                 # Yield #
                 if plot_yield:
@@ -675,19 +677,19 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                                               cut       = [op.rng_len(self.ElElDileptonTightSel) >= 1],
                                               weight    = ElElTightSF(self.ElElDileptonTightSel[0]),
                                               ddCut     = [op.rng_len(self.ElElDileptonFakeExtrapolationSel) >= 1],
-                                              ddWeight  = self.ElElFakeFactor(self.ElElDileptonFakeExtrapolationSel[0]),
+                                              ddWeight  = [self.ElElFakeFactor(self.ElElDileptonFakeExtrapolationSel[0])]+ElElTightSF(self.ElElDileptonFakeExtrapolationSel[0]),
                                               enable    = enable)
                     MuMuTightSelObject.create(ddSuffix  = "FakeExtrapolation",
                                               cut       = [op.rng_len(self.MuMuDileptonTightSel) >= 1],
                                               weight    = MuMuTightSF(self.MuMuDileptonTightSel[0]),
                                               ddCut     = [op.rng_len(self.MuMuDileptonFakeExtrapolationSel) >= 1],
-                                              ddWeight  = self.MuMuFakeFactor(self.MuMuDileptonFakeExtrapolationSel[0]),
+                                              ddWeight  = [self.MuMuFakeFactor(self.MuMuDileptonFakeExtrapolationSel[0])]+MuMuTightSF(self.MuMuDileptonFakeExtrapolationSel[0]),
                                               enable    = enable)
                     ElMuTightSelObject.create(ddSuffix  = "FakeExtrapolation",
                                               cut       = [op.rng_len(self.ElMuDileptonTightSel) >= 1],
                                               weight    = ElMuTightSF(self.ElMuDileptonTightSel[0]),
                                               ddCut     = [op.rng_len(self.ElMuDileptonFakeExtrapolationSel) >= 1],
-                                              ddWeight  = self.ElMuFakeFactor(self.ElMuDileptonFakeExtrapolationSel[0]),
+                                              ddWeight  = [self.ElMuFakeFactor(self.ElMuDileptonFakeExtrapolationSel[0])]+ElMuTightSF(self.ElMuDileptonFakeExtrapolationSel[0]),
                                               enable    = enable)
                 else:
                     ElElTightSelObject.refine(cut    = [op.rng_len(self.ElElDileptonTightSel) >= 1],
@@ -710,8 +712,12 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                     ElElTightSelObject.yieldTitle+= " + Z peak $|M_{ll}-M_Z| < 10 GeV$" 
                     MuMuTightSelObject.yieldTitle+= " + Z peak $|M_{ll}-M_Z| < 10 GeV$"
 
-                    ElElTightSelObject.refine(cut = [op.switch(op.rng_len(self.ElElDileptonTightSel)>=1,lambda_inZ(self.ElElDileptonTightSel[0]),lambda_inZ(self.ElElDileptonFakeExtrapolationSel[0]))])
-                    MuMuTightSelObject.refine(cut = [op.switch(op.rng_len(self.MuMuDileptonTightSel)>=1,lambda_inZ(self.MuMuDileptonTightSel[0]),lambda_inZ(self.MuMuDileptonFakeExtrapolationSel[0]))])
+                    ElElTightSelObject.refine(cut = [op.switch(op.rng_len(self.ElElDileptonTightSel)>=1,
+                                                               lambda_inZ(self.ElElDileptonTightSel[0]),
+                                                               lambda_inZ(self.ElElDileptonFakeExtrapolationSel[0]))])
+                    MuMuTightSelObject.refine(cut = [op.switch(op.rng_len(self.MuMuDileptonTightSel)>=1,
+                                                               lambda_inZ(self.MuMuDileptonTightSel[0]),
+                                                               lambda_inZ(self.MuMuDileptonFakeExtrapolationSel[0]))])
 
                     if plot_yield:
                         ElElTightSelObject.makeYield(self.yieldPlots)
@@ -733,9 +739,12 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                                                                  selName      = "HasElMuFakeExtrapolation",
                                                                  yieldTitle   = "OS fake extrapolated lepton pair (channel $e^{\pm}\mu^{\mp}$)")
                 # Selection : at least one tight dilepton #
-                ElElFakeExtrapolationSelObject.refine(cut    = [op.rng_len(self.ElElDileptonFakeExtrapolationSel) >= 1])
-                MuMuFakeExtrapolationSelObject.refine(cut    = [op.rng_len(self.MuMuDileptonFakeExtrapolationSel) >= 1])
-                ElMuFakeExtrapolationSelObject.refine(cut    = [op.rng_len(self.ElMuDileptonFakeExtrapolationSel) >= 1])
+                ElElFakeExtrapolationSelObject.refine(cut    = [op.rng_len(self.ElElDileptonFakeExtrapolationSel) >= 1],
+                                                      weight = ElElTightSF(self.ElElDileptonFakeExtrapolationSel[0]))
+                MuMuFakeExtrapolationSelObject.refine(cut    = [op.rng_len(self.MuMuDileptonFakeExtrapolationSel) >= 1],
+                                                      weight = MuMuTightSF(self.MuMuDileptonFakeExtrapolationSel[0]))
+                ElMuFakeExtrapolationSelObject.refine(cut    = [op.rng_len(self.ElMuDileptonFakeExtrapolationSel) >= 1],
+                                                      weight = ElMuTightSF(self.ElMuDileptonFakeExtrapolationSel[0]))
 
                 # Yield #
                 if plot_yield:

@@ -168,7 +168,7 @@ class DataGenerator(keras.utils.Sequence):
                 for key in keys:
                     rem = self.batch_size-counter
                     inc = min(rem,self.batch_sample[key])
-                    if pointers[key] < len(self.ndices[key]):
+                    if pointers[key] < len(self.indices[key]):
                         indices_slice = self.indices[key][pointers[key]:min(pointers[key]+inc,len(self.indices[key]))]
                         masks_slice = self.masks[key][pointers[key]:min(pointers[key]+inc,len(self.masks[key]))]
                         indices_sample[key].extend(indices_slice)
@@ -207,7 +207,7 @@ class DataGenerator(keras.utils.Sequence):
     
         pt_tag = PrettyTable(["Batch"]+parameters.nodes) 
         for i in range(len(tag_count)):
-            pt_tag.add_row(['Batch %d'%i]+["%d [%3.2f]"%(tag_count[i][node],tag_count[i][node]*100/self.batch_size) for node in parameters.nodes])  
+            pt_tag.add_row(['Batch %d'%i]+["%d [%3.2f%%]"%(tag_count[i][node],tag_count[i][node]*100/self.batch_size) for node in parameters.nodes])  
         pt_tag.add_row(['Total']+["%d [%3.2f%%]"%(tag_count_all[node],tag_count_all[node]*100/self.n_tot) for node in parameters.nodes])  
         logging.info("Node content per batch")
         for line in pt_tag.get_string().split('\n'):
@@ -215,7 +215,7 @@ class DataGenerator(keras.utils.Sequence):
 
         pt_era = PrettyTable(["Batch"]+parameters.eras) 
         for i in range(len(era_count)):
-            pt_era.add_row(['Batch %d'%i]+["%d [%3.2f]"%(era_count[i][era],era_count[i][era]*100/self.batch_size) for era in parameters.eras])  
+            pt_era.add_row(['Batch %d'%i]+["%d [%3.2f%%]"%(era_count[i][era],era_count[i][era]*100/self.batch_size) for era in parameters.eras])  
         pt_era.add_row(['Total']+["%d [%3.2f%%]"%(era_count_all[era],era_count_all[era]*100/self.n_tot)for era in parameters.eras])  
         logging.info("Era content per batch")
         for line in pt_era.get_string().split('\n'):
@@ -309,7 +309,8 @@ class DataGenerator(keras.utils.Sequence):
         return self.n_batches
     def on_epoch_end(self): # performs auto shuffle if enabled
         # Do what we need to do between epochs
-        self.get_fractions() # Change the batches after each epoch 
+        #self.get_fractions() # Change the batches after each epoch 
+            # TODO : not sure we need it
 
     def __next__(self):
         if self.n >= self.max:
