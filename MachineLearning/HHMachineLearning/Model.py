@@ -225,7 +225,7 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
                         sample_weight   = w_train,
                         epochs          = params['epochs'],
                         batch_size      = params['batch_size'],
-                        verbose         = 2,
+                        verbose         = 1,
                         validation_data = ({'IN':x_val},{'OUT':y_val},w_val),
                         callbacks       = Callback_list)
 
@@ -327,7 +327,7 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
     history = model.fit_generator(generator             = training_generator,   # Training data from generator instance
                                   validation_data       = validation_generator, # Validation data from generator instance
                                   epochs                = params['epochs'],     # Number of epochs
-                                  verbose               = 2,
+                                  verbose               = 1,
                                   max_queue_size        = parameters.workers*2, # Length of batch queue
                                   callbacks             = Callback_list,        # Callbacks
                                   initial_epoch         = initial_epoch,        # In case of resumed training will be different from 0

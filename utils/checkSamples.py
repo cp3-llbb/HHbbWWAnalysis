@@ -77,6 +77,8 @@ processAndSave(miniaod_file='signal_miniaod_samples_2018.txt',nanoaod_file='sign
 processAndSave(miniaod_file='background_miniaod_samples_2016.txt',nanoaod_file='background_nanoaod_samples_2016_v6.txt',version='NanoAODv6')
 processAndSave(miniaod_file='background_miniaod_samples_2017.txt',nanoaod_file='background_nanoaod_samples_2017_v6.txt',version='NanoAODv6')
 processAndSave(miniaod_file='background_miniaod_samples_2018.txt',nanoaod_file='background_nanoaod_samples_2018_v6.txt',version='NanoAODv6')
+processAndSave(miniaod_file='all_miniaod_mc.txt',nanoaod_file='all_nanoaod_mc.txt',version='NanoAODv6')
+processAndSave(miniaod_file='all_miniaod_data.txt',nanoaod_file='all_nanoaod_data.txt',version='Nano25Oct2019')
 processAndSave(miniaod_file='data_miniaod_samples_2016.txt',nanoaod_file='data_nanoaod_samples_2016_Nano25Oct2019.txt',version='Nano25Oct2019')
 processAndSave(miniaod_file='data_miniaod_samples_2017.txt',nanoaod_file='data_nanoaod_samples_2017_Nano25Oct2019.txt',version='Nano25Oct2019')
 processAndSave(miniaod_file='data_miniaod_samples_2018.txt',nanoaod_file='data_nanoaod_samples_2018_Nano25Oct2019.txt',version='Nano25Oct2019')

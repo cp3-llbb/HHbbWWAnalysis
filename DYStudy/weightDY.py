@@ -7,9 +7,10 @@ import math
 import json
 import ROOT
 import numpy as np
-from IPython import embed
 from root_numpy import hist2array   
 from array import array
+
+from CDFShift import CDFShift
 
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
@@ -179,6 +180,7 @@ class WeightDY:
         return dist
 
     def produceShape(self,hist_dict):
+        hist_dict = copy.deepcopy(hist_dict)
 
         self.N_ZPeak0b = hist_dict['ZPeak_0b'].Integral()
         self.N_ZPeak1b = hist_dict['ZPeak_1b'].Integral()
@@ -265,113 +267,172 @@ class WeightDY:
         print ("Shape (2b)          : ",self.shape_2b.Integral())
 
     def produceCDFShift(self,hist_dict):
-        from CDFShift import CDFShift
+        hist_dict = copy.deepcopy(hist_dict)
+
         inst1b = CDFShift(hist_dict['ZPeak_0b'],
                           hist_dict['ZPeak_1b'],
                           hist_dict['ZVeto_0b'],
-                          additional_hist={'Z Veto 1b':hist_dict['ZVeto_1b']})
+                          norm = hist_dict['ZVeto_0b'].Integral()*self.factor_1b*self.factor_ZVeto,
+                          #norm = hist_dict['ZVeto_1b'].Integral(),
+                          additional_hist={'ZVeto_1b':hist_dict['ZVeto_1b']})
         inst2b = CDFShift(hist_dict['ZPeak_0b'],
                           hist_dict['ZPeak_2b'],
                           hist_dict['ZVeto_0b'],
-                          additional_hist={'Z Veto 2b':hist_dict['ZVeto_2b']})
+                          norm = hist_dict['ZVeto_0b'].Integral()*self.factor_2b*self.factor_ZVeto,
+                          #norm = hist_dict['ZVeto_2b'].Integral(),
+                          additional_hist={'ZVeto_2b':hist_dict['ZVeto_2b']})
         name1b = self.outputname+'_CDFShift1b.root'
         name2b = self.outputname+'_CDFShift2b.root'
         inst1b.saveToRoot(name1b)
         inst2b.saveToRoot(name2b)
 
-        self.plotCDFShift(inst1b,name1b.replace('.root','.pdf'),cat='1b',mode=self.mode) 
-        self.plotCDFShift(inst2b,name2b.replace('.root','.pdf'),cat='2b',mode=self.mode)
+        hist_dict1b = hist_dict
+        hist_dict1b.update({'ZPeak_0b_cdf'              : inst1b.cdf1,
+                            'ZPeak_1b_cdf'              : inst1b.cdf2,
+                            'ZVeto_0b_cdf'              : inst1b.cdf3,
+                            'ZVeto_1b_cdf'              : inst1b.additional_cdf['cdf_ZVeto_1b'],
+                            'ZVeto_1b_extrapolated'     : inst1b.returnHist(),
+                            'ZVeto_1b_extrapolated_cdf' : inst1b.ncdf3,
+                            'cdf_graph'                 : inst1b.gncdf3,
+                            'shift'                     : inst1b.gshift,
+                            'shift_inv'                 : inst1b.gshift_inv})
+        hist_dict2b = hist_dict
+        hist_dict2b.update({'ZPeak_0b_cdf'              : inst2b.cdf1,
+                            'ZPeak_2b_cdf'              : inst2b.cdf2,
+                            'ZVeto_0b_cdf'              : inst2b.cdf3,
+                            'ZVeto_2b_cdf'              : inst2b.additional_cdf['cdf_ZVeto_2b'],
+                            'ZVeto_2b_extrapolated'     : inst2b.returnHist(),
+                            'ZVeto_2b_extrapolated_cdf' : inst2b.ncdf3,
+                            'cdf_graph'                 : inst1b.gncdf3,
+                            'shift'                     : inst1b.gshift,
+                            'shift_inv'                 : inst1b.gshift_inv})
 
-    def plotCDFShift(self,cdfobj,pdfname,cat,mode):
+        self.plotCDFShift(hist_dict1b,name1b.replace('.root','.pdf'),cat='1b',mode=self.mode) 
+        self.plotCDFShift(hist_dict2b,name2b.replace('.root','.pdf'),cat='2b',mode=self.mode)
+
+    @staticmethod
+    def plotInCanvas(hist_dict,legend_pos,pdfname,logy=False,opt='',norm=False,text=None,textpos=None,maxy=None):
+#        for hist in hist_dict.values():
+#            for i in range(1,hist.GetNbinsX()+1):
+#                if hist.GetBinContent(i)>0:
+#                    hist.SetBinError(i,math.sqrt(hist.GetBinContent(i)))
+#                else:
+#                    hist.SetBinError(i,math.sqrt(-hist.GetBinContent(i)))
+
+        hist_dict = copy.deepcopy(hist_dict)
+        if norm:
+            for hist in hist_dict.values():
+                hist.Scale(1./hist.Integral())
+        c = ROOT.TCanvas('c1','c1',800,600)
+        if logy:
+            c.SetLogy()
+        leg = ROOT.TLegend(*legend_pos)
+        leg.SetBorderSize(0)
+        leg.SetFillStyle(0)
+        maxh = max([h.GetMaximum() for h in hist_dict.values()])*1.1
+        if maxy is not None:
+            maxh = min(maxh,maxy)
+        for name,hist in hist_dict.items():
+            leg.AddEntry(hist,name)
+        for hist in hist_dict.values():
+            hist.GetYaxis().SetRangeUser(0,maxh)
+            hist.SetTitle('')
+            hist.Draw(opt)
+            if 'same' not in opt: opt += " same"
+        leg.Draw()
+        if text is not None and textpos is not None:
+            pt = ROOT.TPaveText(*textpos,"NDC")
+            pt.SetBorderSize(0)
+            pt.SetFillStyle(0)
+            for t in text:
+                pt.AddText(t)
+            pt.Draw()
+        c.Print(pdfname)
+            
+
+    def plotCDFShift(self,hist_dict,pdfname,cat,mode):
         if mode == 'mc': mode = 'DY MC'
-        if mode == 'data': mode = 'Data - Bkgd MC (except DY)'
-        leg1 = ROOT.TLegend(0.6,0.6,0.85,0.85)
-        leg1.AddEntry(cdfobj.h1,'Z peak 0b [%s]'%(mode))
-        leg1.AddEntry(cdfobj.h2,'Z peak %s [%s]'%(cat,mode))
-        leg1.AddEntry(cdfobj.h3,'Z veto 0b [%s]'%(mode))
-        leg1.AddEntry(cdfobj.nh3,'Z veto %s [%s extrapolated]'%(cat,mode))
-        for name,obj in self.additional_hist.items():
-            leg1.AddEntry(obj,name+' [DY MC]')
-        
-        cdfobj.h1.SetLineColor(ROOT.kRed+1)
-        cdfobj.h2.SetLineColor(ROOT.kBlue+1)
-        cdfobj.h3.SetLineColor(ROOT.kGreen+1)
-        cdfobj.nh3.SetLineColor(ROOT.kMagenta+1)
-        for obj in self.additional_hist.values():
-            obj.SetLineColor(ROOT.kOrange+2)
-        
-        leg2 = ROOT.TLegend(0.6,0.6,0.85,0.85)
-        leg2.AddEntry(cdfobj.cdf1,'Z peak 0b [%s]'%(mode))
-        leg2.AddEntry(cdfobj.cdf2,'Z peak %s [%s]'%(cat,mode))
-        leg2.AddEntry(cdfobj.cdf3,'Z veto 0b [%s]'%(mode))
-        leg2.AddEntry(cdfobj.ncdf3,'Z veto %s [%s extrapolated]'%(cat,mode))
-        for name,obj in self.additional_cdf.items():
-            leg1.AddEntry(obj,name+' [DY MC]')
-        
+        if mode == 'data': mode = 'DY data'
+
+        h1 = hist_dict['ZPeak_0b']
+        h2 = hist_dict['ZPeak_%s'%(cat)]
+        h3 = hist_dict['ZVeto_0b']
+        h4 = hist_dict['ZVeto_%s'%(cat)]
+        nh4 = hist_dict['ZVeto_%s_extrapolated'%(cat)]
+
+        cdf1 = hist_dict['ZPeak_0b_cdf']
+        cdf2 = hist_dict['ZPeak_%s_cdf'%(cat)]
+        cdf3 = hist_dict['ZVeto_0b_cdf']
+        cdf4 = hist_dict['ZVeto_%s_cdf'%(cat)]
+        ncdf4 = hist_dict['ZVeto_%s_extrapolated_cdf'%(cat)]
+
+        h1.SetLineColor(ROOT.kRed+1)
+        h2.SetLineColor(ROOT.kBlue+1)
+        h3.SetLineColor(ROOT.kGreen+1)
+        h4.SetLineColor(ROOT.kOrange+2)
+        nh4.SetLineColor(ROOT.kMagenta+1)
+               
         cdf1.SetLineColor(ROOT.kRed+1)
         cdf2.SetLineColor(ROOT.kBlue+1)
         cdf3.SetLineColor(ROOT.kGreen+1)
-        ncdf3.SetLineColor(ROOT.kMagenta+1)
-        for obj in self.additional_cdf.values():
-            obj.SetLineColor(ROOT.kOrange+2)
-        
+        cdf4.SetLineColor(ROOT.kOrange+2)
+        ncdf4.SetLineColor(ROOT.kMagenta+1)
+
         c = ROOT.TCanvas('c','c',800,600)
         c.Print(pdfname+'[')
+
+        d = {'Z peak 0b [%s]'%(mode):                     h1,
+             'Z peak %s [%s]'%(cat,mode):                 h2,
+             'Z veto 0b [%s]'%(mode):                     h3,
+             'Z veto %s [DY MC]'%(cat):                   h4,
+             'Z veto %s [%s extrapolated]'%(cat,mode):    nh4}
+        self.plotInCanvas(d,[0.4,0.6,0.85,0.85],pdfname,norm=True,opt="hist")
+        d = {'Z peak 0b [%s]'%(mode):                     cdf1,
+             'Z peak %s [%s]'%(cat,mode):                 cdf2,
+             'Z veto 0b [%s]'%(mode):                     cdf3,
+             'Z veto %s [DY MC]'%(cat):                   cdf4,
+             'Z veto %s [%s extrapolated]'%(cat,mode):    ncdf4}
+        self.plotInCanvas(d,[0.4,0.15,0.85,0.5],pdfname,opt="hist",maxy=1.)
+
+        d = {'Z peak 0b [%s]'%(mode):                     h1,
+             'Z peak %s [%s]'%(cat,mode):                 h2,
+             'Z veto 0b [%s]'%(mode):                     h3}
+        self.plotInCanvas(d,[0.5,0.5,0.85,0.85],pdfname,opt="hist")
+
+        d = {'#splitline{Z veto %s [DY MC]}{Integral = %0.3f}'%(cat,h4.Integral()):                 h4,
+             '#splitline{Z veto %s [%s extrapolated]}{Integral = %0.3f}'%(cat,mode,nh4.Integral()): nh4}  
+        text = ["KS test (no option) : %0.3e"%(nh4.KolmogorovTest(h4)),
+                "KS test (option 'M') : %0.3e"%(nh4.KolmogorovTest(h4,"M")),
+                "KS test (option 'X') : %0.3e"%(nh4.KolmogorovTest(h4,"X")),
+                "Z Veto 0b correction factor : %0.5f"%(self.factor_ZVeto),
+                "Factor Z Peak %s / Z Peak 0b : %0.5f"%(cat,self.factor_1b if cat == '1b' else self.factor_2b)]
+        self.plotInCanvas(d,[0.5,0.6,0.85,0.85],pdfname,text=text,textpos=[0.5,0.35,0.85,0.55],opt='hist')
+
+        d = {'Z peak 0b [%s]'%(mode):                     cdf1,
+             'Z peak %s [%s]'%(cat,mode):                 cdf2,
+             'Z veto 0b [%s]'%(mode):                     cdf3}
+        self.plotInCanvas(d,[0.4,0.15,0.85,0.5],pdfname,opt="hist",maxy=1.)
         
-        c.Divide(2,1)
-        maxh = max([h.GetMaximum() for h in [cdfobj.h1,cdfobj.h2,cdfobj.h3,self.additional_hist.values()]])*1.1
+        c.Clear()
+        hist_dict['cdf_graph'].SetTitle('Non corrected cdf')
+        hist_dict['cdf_graph'].Draw()
 
-        c[1].cd()
-        h1.GetYaxis().SetRangeUser(0.,maxh)
-        h1.SetTitle('Histograms')
-        h1.Draw("hist")
-        h2.Draw("hist same")
-        h3.Draw("hist same")
+        c.Print(pdfname)
+        c.Clear()
 
-        c[2].cd()
-        nh3.Draw("hist")
-        for obj in self.additional_hist.values():
-            obj.Draw("hist same")
-        leg1.Draw()
+        hist_dict['shift'].SetTitle('Shift;Shift;CDF y')
+        hist_dict['shift'].Draw()
 
         c.Print(pdfname)
         c.Clear()
         
-        maxh = max([h.GetMaximum() for h in [cdfobj.cdf1,cdfobj.cdf2,cdfobj.cdf3,self.additional_cdf.values()]])*1.1
-        cdf1.SetTitle('CDF')
-        cdf1.GetYaxis().SetRangeUser(0.,maxh)
-        cdf1.Draw("hist")
-        cdf2.Draw("hist same")
-        cdf3.Draw("hist same")
-        ncdf3.Draw("hist same")
-        for obj in self.additional_cdf.values():
-            obj.Draw("hist same")
-        leg2.Draw()
-        
-        c.Print(pdfname)
-        c.Clear()
-
-        cdfobj.gncdf3.SetTitle('Non corrected cdf')
-        cdfobj.gncdf3.Draw()
-
-        c.Print(pdfname)
-        c.Clear()
-
-        cdfobj.shift.SetTitle('Shift;Shift;CDF y')
-        cdfobj.shift.Draw()
-
-        c.Print(pdfname)
-        c.Clear()
-        
-        cdfobj.shift_inv.SetTitle('Inverted Shift;CDF y;Shift')
-        cdfobj.shift_inv.Draw()
+        hist_dict['shift_inv'].SetTitle('Inverted Shift;CDF y;Shift')
+        hist_dict['shift_inv'].Draw()
 
         c.Print(pdfname)
         c.Clear()
 
         c.Print(pdfname+']')
-
-        f.Close()
 
     def rebinWeights1D(self,h):
         xn = self.rebin_1D
@@ -426,6 +487,13 @@ class WeightDY:
         return hn
 
     def plotWeights1D(self):
+        histograms = copy.deepcopy(self.histograms)
+
+        for name in ['ZVeto_0b','ZPeak_0b','ZPeak_1b','ZPeak_2b']:
+            histograms[name].Scale(1./ histograms[name].Integral()) 
+
+        amax = max([histograms[k].GetMaximum() for k in ['ZVeto_0b','ZPeak_0b','ZPeak_1b','ZPeak_2b']])
+
         C = ROOT.TCanvas("c1", "c1", 600, 900)
 
         pad1 = ROOT.TPad("pad1", "pad1", 0., 0.0, 1., 1.0)
@@ -457,45 +525,45 @@ class WeightDY:
         pad3.Draw()
 
         ##########  PAD 1 ##########
-        amax = max([self.histograms[k].GetMaximum() for k in ['ZVeto_0b','ZPeak_0b','ZPeak_2b','ZPeak_1b','ZPeak_1b']])
+        amax = max([histograms[k].GetMaximum() for k in ['ZVeto_0b','ZPeak_0b','ZPeak_2b','ZPeak_1b','ZPeak_1b']])
 
         pad1.cd()
 
-        self.histograms['ZVeto_0b'].SetMaximum(amax*1.2)
-        self.histograms['ZVeto_0b'].SetMinimum(0)
-        self.histograms['ZVeto_0b'].GetYaxis().SetTitle("Normalized events")
-        self.histograms['ZVeto_0b'].GetYaxis().SetTitleSize(0.035)
-        self.histograms['ZVeto_0b'].GetYaxis().SetTitleOffset(1.30)
-        self.histograms['ZVeto_0b'].GetYaxis().SetLabelSize(0.02)
-        self.histograms['ZVeto_0b'].GetXaxis().SetTitleSize(0.)
-        self.histograms['ZVeto_0b'].GetXaxis().SetLabelSize(0.)
-        self.histograms['ZVeto_0b'].SetTitle(self.title)
+        histograms['ZVeto_0b'].SetMaximum(amax*1.2)
+        histograms['ZVeto_0b'].SetMinimum(0)
+        histograms['ZVeto_0b'].GetYaxis().SetTitle("Normalized events")
+        histograms['ZVeto_0b'].GetYaxis().SetTitleSize(0.035)
+        histograms['ZVeto_0b'].GetYaxis().SetTitleOffset(1.30)
+        histograms['ZVeto_0b'].GetYaxis().SetLabelSize(0.02)
+        histograms['ZVeto_0b'].GetXaxis().SetTitleSize(0.)
+        histograms['ZVeto_0b'].GetXaxis().SetLabelSize(0.)
+        histograms['ZVeto_0b'].SetTitle(self.title)
 
-        self.histograms['ZVeto_0b'].SetLineWidth(2) 
-        self.histograms['ZVeto_1b'].SetLineWidth(2) 
-        self.histograms['ZVeto_2b'].SetLineWidth(2) 
-        self.histograms['ZPeak_0b'].SetLineWidth(2) 
-        self.histograms['ZPeak_1b'].SetLineWidth(2) 
-        self.histograms['ZPeak_2b'].SetLineWidth(2) 
-        self.histograms['ZVeto_0b'].SetLineColor(418) 
-        self.histograms['ZPeak_0b'].SetLineColor(602)
-        self.histograms['ZPeak_1b'].SetLineColor(619)
-        self.histograms['ZPeak_2b'].SetLineColor(634)
+        histograms['ZVeto_0b'].SetLineWidth(2) 
+        histograms['ZVeto_1b'].SetLineWidth(2) 
+        histograms['ZVeto_2b'].SetLineWidth(2) 
+        histograms['ZPeak_0b'].SetLineWidth(2) 
+        histograms['ZPeak_1b'].SetLineWidth(2) 
+        histograms['ZPeak_2b'].SetLineWidth(2) 
+        histograms['ZVeto_0b'].SetLineColor(418) 
+        histograms['ZPeak_0b'].SetLineColor(602)
+        histograms['ZPeak_1b'].SetLineColor(619)
+        histograms['ZPeak_2b'].SetLineColor(634)
 
 
-        self.histograms['ZVeto_0b'].Draw("hist")
-        self.histograms['ZPeak_0b'].Draw("same hist")
-        self.histograms['ZPeak_1b'].Draw("same hist")
-        self.histograms['ZPeak_2b'].Draw("same hist")
+        histograms['ZVeto_0b'].Draw("hist")
+        histograms['ZPeak_0b'].Draw("same hist")
+        histograms['ZPeak_1b'].Draw("same hist")
+        histograms['ZPeak_2b'].Draw("same hist")
 
         leg1 = ROOT.TLegend(0.50,0.73,0.89,0.91)
         leg1.SetHeader("Legend","C")
         leg1.SetTextSize(0.02)
         mode = "DY data estimation" if self.mode == "data" else "DY MC"
-        leg1.AddEntry(self.histograms['ZVeto_0b'],"#splitline{Z Veto 0 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZVeto0b))
-        leg1.AddEntry(self.histograms['ZPeak_0b'],"#splitline{Z Peak 0 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak0b))
-        leg1.AddEntry(self.histograms['ZPeak_1b'],"#splitline{Z Peak 1 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak1b))
-        leg1.AddEntry(self.histograms['ZPeak_2b'],"#splitline{Z Peak 2 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak2b))
+        leg1.AddEntry(histograms['ZVeto_0b'],"#splitline{Z Veto 0 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZVeto0b))
+        leg1.AddEntry(histograms['ZPeak_0b'],"#splitline{Z Peak 0 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak0b))
+        leg1.AddEntry(histograms['ZPeak_1b'],"#splitline{Z Peak 1 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak1b))
+        leg1.AddEntry(histograms['ZPeak_2b'],"#splitline{Z Peak 2 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak2b))
         leg1.Draw()
 
         text = ROOT.TPaveText(0.6,0.65,0.85,0.72,"NB NDC")
@@ -544,17 +612,17 @@ class WeightDY:
         ##########  PAD 3 ##########
         pad3.cd()
 
-        max_shape = max([h.GetMaximum() for h in [self.histograms['ZVeto_1b'],self.histograms['ZVeto_2b'],self.shape_1b,self.shape_2b]])
+        max_shape = max([h.GetMaximum() for h in [histograms['ZVeto_1b'],histograms['ZVeto_2b'],self.shape_1b,self.shape_2b]])
 
         self.shape_1b.SetLineWidth(2) 
         self.shape_2b.SetLineWidth(2) 
         self.shape_1b.SetLineColor(602) 
         self.shape_2b.SetLineColor(600) 
 
-        self.histograms['ZVeto_1b'].SetLineWidth(1)
-        self.histograms['ZVeto_2b'].SetLineWidth(1)
-        self.histograms['ZVeto_1b'].SetLineColor(602)
-        self.histograms['ZVeto_2b'].SetLineColor(600)
+        histograms['ZVeto_1b'].SetLineWidth(1)
+        histograms['ZVeto_2b'].SetLineWidth(1)
+        histograms['ZVeto_1b'].SetLineColor(602)
+        histograms['ZVeto_2b'].SetLineColor(600)
 
         self.shape_1b.SetMinimum(0)
         self.shape_1b.SetMaximum(max_shape*1.1)
@@ -570,16 +638,16 @@ class WeightDY:
 
         self.shape_1b.Draw("H")
         self.shape_2b.Draw("H same")
-        self.histograms['ZVeto_1b'].Draw("H same")
-        self.histograms['ZVeto_2b'].Draw("H same")
+        histograms['ZVeto_1b'].Draw("H same")
+        histograms['ZVeto_2b'].Draw("H same")
 
         leg3 = ROOT.TLegend(0.5,0.40,0.89,0.93)
         leg3.SetHeader("Legend","C")
         leg3.SetTextSize(0.04)
         leg3.AddEntry(self.shape_1b,"#splitline{DY shape from data (1b)}{Integral = %0.2f}"%self.shape_1b.Integral() if self.mode == 'data' else "#splitline{DY shape from MC (1b)}{Integral = %0.2f}"%self.shape_1b.Integral())
-        leg3.AddEntry(self.histograms['ZVeto_1b'],"#splitline{Z Veto (1b) (DY MC)}{Integral = %0.2f}"%self.N_ZVeto1b)
+        leg3.AddEntry(histograms['ZVeto_1b'],"#splitline{Z Veto (1b) (DY MC)}{Integral = %0.2f}"%self.N_ZVeto1b)
         leg3.AddEntry(self.shape_2b,"#splitline{DY shape from data (2b)}{Integral = %0.2f}"%self.shape_2b.Integral() if self.mode == 'data' else "#splitline{DY shape from MC (2b)}{Integral = %0.2f}"%self.shape_2b.Integral())
-        leg3.AddEntry(self.histograms['ZVeto_2b'],"#splitline{Z Veto (2b) (DY MC)}{Integral = %0.2f}"%self.N_ZVeto2b)
+        leg3.AddEntry(histograms['ZVeto_2b'],"#splitline{Z Veto (2b) (DY MC)}{Integral = %0.2f}"%self.N_ZVeto2b)
         leg3.Draw()
 
 
@@ -588,6 +656,8 @@ class WeightDY:
 
 
     def plotWeights2D(self):
+        histograms = copy.deepcopy(self.histograms)
+
         ROOT.gStyle.SetTitleW(1.)
         C1 = ROOT.TCanvas("c1", "c1", 4000, 4000)
         C1.Divide(3,3)
@@ -596,52 +666,52 @@ class WeightDY:
 
 #        print ('-'*80)
 #        print ("Examining ZVeto_0b")
-#        self.findNegativeBinsInTh2(self.histograms['ZVeto_0b'])
+#        self.findNegativeBinsInTh2(histograms['ZVeto_0b'])
 #        print ('-'*80)
 #        print ("Examining ZPeak_0b")
-#        self.findNegativeBinsInTh2(self.histograms['ZPeak_0b'])
+#        self.findNegativeBinsInTh2(histograms['ZPeak_0b'])
 #        print ('-'*80)
 #        print ("Examining ZPeak_2b")
-#        self.findNegativeBinsInTh2(self.histograms['ZPeak_2b'])
+#        self.findNegativeBinsInTh2(histograms['ZPeak_2b'])
 #        print ('-'*80)
 #        print ("Examining ZVeto_0b")
-#        self.findNegativeBinsInTh2(self.histograms['ZPeak_1b'])
+#        self.findNegativeBinsInTh2(histograms['ZPeak_1b'])
 #        print ('-'*80)
 
 
 
-        amax = max([self.histograms[k].GetMaximum() for k in ['ZVeto_0b','ZPeak_0b','ZPeak_2b','ZPeak_1b']])
+        amax = max([histograms[k].GetMaximum() for k in ['ZVeto_0b','ZPeak_0b','ZPeak_2b','ZPeak_1b']])
 
         #----- Zpeak and Zveto 0b -----#
         C1.cd(1)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZPeak_1b'].SetTitle('Z Peak 1 btag (%s) : Integral = %0.2f'%(mode,self.N_ZPeak1b))
-        self.histograms['ZPeak_1b'].SetTitleSize(0.9,"t")
-        #self.histograms['ZPeak_1b'].GetZaxis().SetRangeUser(0,amax)
-        self.histograms['ZPeak_1b'].GetXaxis().SetRangeUser(0,self.histograms['ZPeak_1b'].GetXaxis().GetBinUpEdge(self.histograms['ZPeak_1b'].GetNbinsX()))
-        self.histograms['ZPeak_1b'].GetYaxis().SetRangeUser(0,self.histograms['ZPeak_1b'].GetYaxis().GetBinUpEdge(self.histograms['ZPeak_1b'].GetNbinsY()))
-        self.histograms['ZPeak_1b'].Draw("colz")
+        histograms['ZPeak_1b'].SetTitle('Z Peak 1 btag (%s) : Integral = %0.2f'%(mode,self.N_ZPeak1b))
+        histograms['ZPeak_1b'].SetTitleSize(0.9,"t")
+        #histograms['ZPeak_1b'].GetZaxis().SetRangeUser(0,amax)
+        histograms['ZPeak_1b'].GetXaxis().SetRangeUser(0,histograms['ZPeak_1b'].GetXaxis().GetBinUpEdge(histograms['ZPeak_1b'].GetNbinsX()))
+        histograms['ZPeak_1b'].GetYaxis().SetRangeUser(0,histograms['ZPeak_1b'].GetYaxis().GetBinUpEdge(histograms['ZPeak_1b'].GetNbinsY()))
+        histograms['ZPeak_1b'].Draw("colz")
         C1.cd(7)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZPeak_2b'].SetTitle('Z Peak 2 btag (%s) : Integral = %0.2f'%(mode,self.N_ZPeak2b))
-        #self.histograms['ZPeak_2b'].GetZaxis().SetRangeUser(0,amax)
-        self.histograms['ZPeak_2b'].GetXaxis().SetRangeUser(0,self.histograms['ZPeak_2b'].GetXaxis().GetBinUpEdge(self.histograms['ZPeak_2b'].GetNbinsX()))
-        self.histograms['ZPeak_2b'].GetYaxis().SetRangeUser(0,self.histograms['ZPeak_2b'].GetYaxis().GetBinUpEdge(self.histograms['ZPeak_2b'].GetNbinsY()))
-        self.histograms['ZPeak_2b'].Draw("colz")
+        histograms['ZPeak_2b'].SetTitle('Z Peak 2 btag (%s) : Integral = %0.2f'%(mode,self.N_ZPeak2b))
+        #histograms['ZPeak_2b'].GetZaxis().SetRangeUser(0,amax)
+        histograms['ZPeak_2b'].GetXaxis().SetRangeUser(0,histograms['ZPeak_2b'].GetXaxis().GetBinUpEdge(histograms['ZPeak_2b'].GetNbinsX()))
+        histograms['ZPeak_2b'].GetYaxis().SetRangeUser(0,histograms['ZPeak_2b'].GetYaxis().GetBinUpEdge(histograms['ZPeak_2b'].GetNbinsY()))
+        histograms['ZPeak_2b'].Draw("colz")
         C1.cd(5)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZVeto_0b'].Draw("colz")
-        #self.histograms['ZVeto_0b'].GetZaxis().SetRangeUser(0,amax)
-        self.histograms['ZVeto_0b'].GetXaxis().SetRangeUser(0,self.histograms['ZVeto_0b'].GetXaxis().GetBinUpEdge(self.histograms['ZVeto_0b'].GetNbinsX()))
-        self.histograms['ZVeto_0b'].GetYaxis().SetRangeUser(0,self.histograms['ZVeto_0b'].GetYaxis().GetBinUpEdge(self.histograms['ZVeto_0b'].GetNbinsY()))
-        self.histograms['ZVeto_0b'].SetTitle('Z Veto 0 btag (%s) : Integral = %0.2f'%(mode,self.N_ZVeto0b))
+        histograms['ZVeto_0b'].Draw("colz")
+        #histograms['ZVeto_0b'].GetZaxis().SetRangeUser(0,amax)
+        histograms['ZVeto_0b'].GetXaxis().SetRangeUser(0,histograms['ZVeto_0b'].GetXaxis().GetBinUpEdge(histograms['ZVeto_0b'].GetNbinsX()))
+        histograms['ZVeto_0b'].GetYaxis().SetRangeUser(0,histograms['ZVeto_0b'].GetYaxis().GetBinUpEdge(histograms['ZVeto_0b'].GetNbinsY()))
+        histograms['ZVeto_0b'].SetTitle('Z Veto 0 btag (%s) : Integral = %0.2f'%(mode,self.N_ZVeto0b))
         C1.cd(4)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZPeak_0b'].SetTitle('Z Peak 0 btag (%s) : Integral = %0.2f'%(mode,self.N_ZPeak0b))
-        self.histograms['ZPeak_0b'].GetXaxis().SetRangeUser(0,self.histograms['ZPeak_0b'].GetXaxis().GetBinUpEdge(self.histograms['ZPeak_0b'].GetNbinsX()))
-        self.histograms['ZPeak_0b'].GetYaxis().SetRangeUser(0,self.histograms['ZPeak_0b'].GetYaxis().GetBinUpEdge(self.histograms['ZPeak_0b'].GetNbinsY()))
-        #self.histograms['ZPeak_0b'].GetZaxis().SetRangeUser(0,amax)
-        self.histograms['ZPeak_0b'].Draw("colz")
+        histograms['ZPeak_0b'].SetTitle('Z Peak 0 btag (%s) : Integral = %0.2f'%(mode,self.N_ZPeak0b))
+        histograms['ZPeak_0b'].GetXaxis().SetRangeUser(0,histograms['ZPeak_0b'].GetXaxis().GetBinUpEdge(histograms['ZPeak_0b'].GetNbinsX()))
+        histograms['ZPeak_0b'].GetYaxis().SetRangeUser(0,histograms['ZPeak_0b'].GetYaxis().GetBinUpEdge(histograms['ZPeak_0b'].GetNbinsY()))
+        #histograms['ZPeak_0b'].GetZaxis().SetRangeUser(0,amax)
+        histograms['ZPeak_0b'].Draw("colz")
 
         #----- Weights -----#
         C1.cd(2)
@@ -664,7 +734,7 @@ class WeightDY:
         self.weight_2b.Draw("colz")
 
         #----- DY shape and MC DY in Zveto -----#
-        #max_shape = max([h.GetMaximum() for h in [self.histograms['ZVeto_1b'],self.histograms['ZVeto_2b'],self.shape_1b,self.shape_2b]])
+        #max_shape = max([h.GetMaximum() for h in [histograms['ZVeto_1b'],histograms['ZVeto_2b'],self.shape_1b,self.shape_2b]])
         mode = "DY shape from data" if self.mode == "data" else "DY shape from MC"
 
         C1.cd(3)
@@ -741,8 +811,8 @@ class WeightDY:
         C1.Print(self.outputname+'1_%s.pdf'%self.era)
 
         #----- Shape and DY MC comparison -----#
-        max_1b = max([self.histograms['ZVeto_1b'].GetMaximum(),self.shape_1b.GetMaximum()])
-        max_2b = max([self.histograms['ZVeto_2b'].GetMaximum(),self.shape_2b.GetMaximum()])
+        max_1b = max([histograms['ZVeto_1b'].GetMaximum(),self.shape_1b.GetMaximum()])
+        max_2b = max([histograms['ZVeto_2b'].GetMaximum(),self.shape_2b.GetMaximum()])
 
         C2 = ROOT.TCanvas("c2", "c2", 4000, 4000)
         C2.Divide(2,2)
@@ -753,22 +823,22 @@ class WeightDY:
         self.shape_1b.Draw("colz")
         C2.cd(2)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZVeto_1b'].SetTitle('DY MC (Z Veto 1b) : Integral = %0.2f'%self.N_ZVeto1b)
-        self.histograms['ZVeto_1b'].GetZaxis().SetRangeUser(0,max_1b)
-        self.histograms['ZVeto_1b'].GetXaxis().SetRangeUser(0,self.histograms['ZVeto_1b'].GetXaxis().GetBinUpEdge(self.histograms['ZVeto_1b'].GetNbinsX()))
-        self.histograms['ZVeto_1b'].GetYaxis().SetRangeUser(0,self.histograms['ZVeto_1b'].GetYaxis().GetBinUpEdge(self.histograms['ZVeto_1b'].GetNbinsY()))
-        self.histograms['ZVeto_1b'].Draw("colz")
+        histograms['ZVeto_1b'].SetTitle('DY MC (Z Veto 1b) : Integral = %0.2f'%self.N_ZVeto1b)
+        histograms['ZVeto_1b'].GetZaxis().SetRangeUser(0,max_1b)
+        histograms['ZVeto_1b'].GetXaxis().SetRangeUser(0,histograms['ZVeto_1b'].GetXaxis().GetBinUpEdge(histograms['ZVeto_1b'].GetNbinsX()))
+        histograms['ZVeto_1b'].GetYaxis().SetRangeUser(0,histograms['ZVeto_1b'].GetYaxis().GetBinUpEdge(histograms['ZVeto_1b'].GetNbinsY()))
+        histograms['ZVeto_1b'].Draw("colz")
         C2.cd(3)
         ROOT.gPad.SetRightMargin(0.15)
         self.shape_2b.GetZaxis().SetRangeUser(0,max_2b)
         self.shape_2b.Draw("colz")
         C2.cd(4)
         ROOT.gPad.SetRightMargin(0.15)
-        self.histograms['ZVeto_2b'].SetTitle('DY MC (Z Veto 2b) : Integral = %0.2f'%self.N_ZVeto2b)
-        self.histograms['ZVeto_2b'].GetZaxis().SetRangeUser(0,max_2b)
-        self.histograms['ZVeto_2b'].GetXaxis().SetRangeUser(0,self.histograms['ZVeto_2b'].GetXaxis().GetBinUpEdge(self.histograms['ZVeto_2b'].GetNbinsX()))
-        self.histograms['ZVeto_2b'].GetYaxis().SetRangeUser(0,self.histograms['ZVeto_2b'].GetYaxis().GetBinUpEdge(self.histograms['ZVeto_2b'].GetNbinsY()))
-        self.histograms['ZVeto_2b'].Draw("colz")
+        histograms['ZVeto_2b'].SetTitle('DY MC (Z Veto 2b) : Integral = %0.2f'%self.N_ZVeto2b)
+        histograms['ZVeto_2b'].GetZaxis().SetRangeUser(0,max_2b)
+        histograms['ZVeto_2b'].GetXaxis().SetRangeUser(0,histograms['ZVeto_2b'].GetXaxis().GetBinUpEdge(histograms['ZVeto_2b'].GetNbinsX()))
+        histograms['ZVeto_2b'].GetYaxis().SetRangeUser(0,histograms['ZVeto_2b'].GetYaxis().GetBinUpEdge(histograms['ZVeto_2b'].GetNbinsY()))
+        histograms['ZVeto_2b'].Draw("colz")
         C2.Print(self.outputname+'2_%s.pdf'%self.era)
     
 

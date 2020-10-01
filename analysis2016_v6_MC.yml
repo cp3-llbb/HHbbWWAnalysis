@@ -1,7 +1,7 @@
 tree: Events
 eras:
   '2016': 
-    luminosity: 35922 #pb # TODO  to compute agin with brilcal
+    luminosity: 35922 #pb 
     luminosity-error: 0.025     #pb
 samples:
 ######### DY
@@ -12,7 +12,7 @@ samples:
     cross-section: 18610.0 #pb
     group: DY
     era: '2016'
-    split: 50
+    split: 30
 
   DYJetsToLL_M-50:
     db: das:/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext2-v1/NANOAODSIM
@@ -21,7 +21,7 @@ samples:
     cross-section: 6077.22 # pb
     group: DY
     era: '2016'
-    split: 50
+    split: 30
 
   DYToLL_0J:
     db: ["das:/DYToLL_0J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM", "das:/DYToLL_0J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_backup_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM"]
@@ -30,7 +30,7 @@ samples:
     cross-section: 4843.6 #pb
     group: DY
     era: '2016'
-    split: 50
+    split: 30
     
   DYToLL_1J:
     db: ["das:/DYToLL_1J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM","das:/DYToLL_1J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_backup_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM"]
@@ -39,7 +39,7 @@ samples:
     cross-section: 897.8 #pb
     group: DY
     era: '2016'
-    split: 50
+    split: 30
   
   DYToLL_2J:
     db: ["das:/DYToLL_2J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM","das:/DYToLL_2J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM"]
@@ -48,7 +48,7 @@ samples:
     cross-section: 335.8  #pb
     group: DY
     era: '2016'
-    split: 50
+    split: 30
 
 
 ######### ttbar
@@ -59,7 +59,7 @@ samples:
     cross-section: 88.40
     group: ttbar
     era: '2016'
-    split: 73
+    split: 40
   
   TTToSemiLeptonic: 
     db: das:/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -68,7 +68,7 @@ samples:
     cross-section: 365.52
     group: ttbar
     era: '2016'
-    split: 126
+    split: 40
   
   TTToHadronic: 
     db: das:/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -77,7 +77,7 @@ samples:
     cross-section: 377.85
     group: ttbar
     era: '2016'
-    split: 88
+    split: 40
 
 ###########   single top
   ST_tW_top_5f:
@@ -87,7 +87,7 @@ samples:
     cross-section: 35.85
     group: ST
     era: '2016'
-    split: 20
+    split: 10
 
   ST_tW_antitop_5f:
     db: das:/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
@@ -96,7 +96,7 @@ samples:
     cross-section: 35.85
     group: ST
     era: '2016'
-    split: 20
+    split: 10
 
   ST_tchannel_antitop_4f:
     db: ["das:/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM","das:/ST_t-channel_antitop_4f_inclusiveDecays_13TeV_PSweights-powhegV2-madspin/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM"]
@@ -105,7 +105,7 @@ samples:
     cross-section: 80.95 
     group: ST
     era: '2016'
-    split: 50
+    split: 20
 
   ST_tchannel_top_4f:
     db: das:/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -114,7 +114,7 @@ samples:
     cross-section: 136.02
     group: ST
     era: '2016'
-    split: 50
+    split: 20
 
   ST_schannel_4f: 
     db: ["das:/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM","das:/ST_s-channel_4f_leptonDecays_13TeV_PSweights-amcatnlo-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM"]
@@ -123,7 +123,7 @@ samples:
     cross-section: 3.364
     group: ST
     era: '2016'
-    split: 50
+    split: 20
 
   ST_tWll_5f: 
     db: das:/ST_tWll_5f_LO_13TeV-MadGraph-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -132,7 +132,7 @@ samples:
     cross-section: 0.01096 
     group: ST
     era: '2016'
-    split: 50
+    split: 20
         
 
 ####### Standard model higgs : ggH
@@ -357,26 +357,6 @@ samples:
     era: '2016'
     split: 10
 
-####### Standard model higgs : TTVH
-  TTWH: 
-    db: das:/TTWH_TuneCUETP8M2T4_13TeV-madgraph-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
-    files: dascache/TTWH_2016.dat
-    generated-events: 'genEventSumw_'
-    cross-section: 0.001582
-    group: SM
-    era: '2016'
-    split: 10
-
-  TTZH: # Missing, need to request
-    db: das:/TTZH_TuneCUETP8M2T4_13TeV-madgraph-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
-    files: dascache/TTZH_2016.dat
-    generated-events: 'genEventSumw_'
-    cross-section: 0.001535
-    group: SM
-    era: '2016'
-    split: 10
-
-
 
 ####### VV(V) : ZZ + WW + WZ
   ZZTo2L2Q:
@@ -386,7 +366,7 @@ samples:
     cross-section: 5.52 
     group: VVV 
     era: '2016'
-    split: 50
+    split: 20
 
   ZZTo4L:
     db: das:/ZZTo4L_13TeV_powheg_pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -395,7 +375,7 @@ samples:
     cross-section: 1.256 
     group: VVV
     era: '2016'
-    split: 50
+    split: 30
 
   WWTo2L2Nu:
     db: das:/WWTo2L2Nu_13TeV-powheg/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -422,7 +402,7 @@ samples:
     cross-section: 4.43
     group: VVV
     era: '2016'
-    split: 20
+    split: 10
 
   WZTo2L2Q:
     db: das:/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -431,7 +411,7 @@ samples:
     cross-section: 5.60
     group: VVV
     era: '2016'
-    split: 20
+    split: 10
 
   WWToLNuQQ:
     db: ["das:/WWToLNuQQ_13TeV-powheg/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM","das:/WWToLNuQQ_13TeV-powheg/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM"]
@@ -440,7 +420,25 @@ samples:
     cross-section: 50.45 
     group: VVV
     era: '2016'
-    split: 20
+    split: 10
+
+  WZG:
+    db: das:/WZG_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
+    files: dascache/WZG_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 0.04345
+    group: VVV
+    era: '2016'
+    split: 10
+  ZGTo2LG:
+    db: das:/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
+    files: dascache/ZGTo2LG_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 123.9
+    group: VVV
+    era: '2016'
+    split: 10
+
 
 ####### VV(V) : VVV
 
@@ -489,7 +487,7 @@ samples:
     cross-section: 61526.7 
     group: Wjets
     era: '2016'
-    split: 50
+    split: 20
 
   W1JetsToLNu:
     db: das:/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -498,7 +496,7 @@ samples:
     cross-section: 9442.49
     group: Wjets
     era: '2016'
-    split: 20
+    split: 10
 
   W2JetsToLNu:
     db: ["das:/W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM","das:/W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM"]
@@ -507,7 +505,7 @@ samples:
     cross-section: 3252.49
     group: Wjets
     era: '2016'
-    split: 20
+    split: 10
 
   W3JetsToLNu:
     db: ["das:/W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM","das:/W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM"]
@@ -516,7 +514,7 @@ samples:
     cross-section: 1153.42
     group: Wjets
     era: '2016'
-    split: 20
+    split: 10
 
   W4JetsToLNu:
     db: ["das:/W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM","das:/W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext2-v1/NANOAODSIM"]
@@ -525,7 +523,7 @@ samples:
     cross-section: 634.05
     group: Wjets
     era: '2016'
-    split: 20
+    split: 10
 
   WJetsToLNu_HT-70To100:
     db: das:/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -534,7 +532,7 @@ samples:
     cross-section: 1504.92
     group: Wjets
     era: '2016'
-    split: 20
+    split: 10
 
   WJetsToLNu_HT-100To200:
     db: ["das:/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM","das:/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM"]
@@ -543,7 +541,7 @@ samples:
     cross-section: 1625.08
     group: Wjets
     era: '2016'
-    split: 20
+    split: 10
 
   WJetsToLNu_HT-200To400:
     db: ["das:/WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM","das:/WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM","das:/WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext2-v1/NANOAODSIM"]
@@ -552,7 +550,7 @@ samples:
     cross-section: 477.96
     group: Wjets
     era: '2016'
-    split: 20
+    split: 10
 
   WJetsToLNu_HT-400To600:
     db: ["das:/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM","das:/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM"]
@@ -561,7 +559,7 @@ samples:
     cross-section: 67.441
     group: Wjets
     era: '2016'
-    split: 20
+    split: 10
 
   WJetsToLNu_HT-600To800:
     db: ["das:/WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM","das:/WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM"]
@@ -570,7 +568,7 @@ samples:
     cross-section: 15.096
     group: Wjets
     era: '2016'
-    split: 20
+    split: 10
 
   WJetsToLNu_HT-800To1200:
     db: ["das:/WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM","das:/WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM"]
@@ -579,7 +577,7 @@ samples:
     cross-section: 6.3626
     group: Wjets
     era: '2016'
-    split: 20
+    split: 10
 
   WJetsToLNu_HT-1200To2500:
     db: ["das:/WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM","das:/WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM"]
@@ -588,7 +586,7 @@ samples:
     cross-section: 1.2658
     group: Wjets
     era: '2016'
-    split: 20
+    split: 10
 
   WJetsToLNu_HT-2500ToInf:
     db: ["das:/WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM","das:/WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM"]
@@ -597,7 +595,7 @@ samples:
     cross-section: 0.009405
     group: Wjets
     era: '2016'
-    split: 20
+    split: 10
 
 ####### TTV(V) : TTZ + TTW + TTWW
 
@@ -606,7 +604,7 @@ samples:
     files: dascache/TTZToLLNuNu_M-10_2016.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.2814
-    group: ttVV
+    group: ttVX
     era: '2016'
     split: 10
 
@@ -615,7 +613,7 @@ samples:
     files: dascache/TTZToLL_M-1to10_2016.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.0822
-    group: ttVV
+    group: ttVX
     era: '2016'
     split: 10
 
@@ -624,7 +622,7 @@ samples:
     files: dascache/TTZToQQ_2016.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.5868
-    group: ttVV
+    group: ttVX
     era: '2016'
     split: 10
 
@@ -633,7 +631,7 @@ samples:
     files: dascache/TTWJetsToLNu_2016.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.1960
-    group: ttVV
+    group: ttVX
     era: '2016'
     split: 10
 
@@ -642,7 +640,7 @@ samples:
     files: dascache/TTWJetsToQQ_2016.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.4049
-    group: ttVV
+    group: ttVX
     era: '2016'
     split: 10
 
@@ -651,20 +649,29 @@ samples:
     files: dascache/TTWW_2016.dat
     generated-events: 'genEventSumw_'
     cross-section: 0.006981
-    group: ttVV
+    group: ttVX
+    era: '2016'
+    split: 10
+
+  TTWH: 
+    db: das:/TTWH_TuneCUETP8M2T4_13TeV-madgraph-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
+    files: dascache/TTWH_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 0.001582
+    group: ttVX
+    era: '2016'
+    split: 10
+
+  TTZH: 
+    db: das:/TTZH_TuneCUETP8M2T4_13TeV-madgraph-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
+    files: dascache/TTZH_2016.dat
+    generated-events: 'genEventSumw_'
+    cross-section: 0.001535
+    group: ttVX
     era: '2016'
     split: 10
 
 ####### Rares
-
-  WZG:
-    db: das:/WZG_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
-    files: dascache/WZG_2016.dat
-    generated-events: 'genEventSumw_'
-    cross-section: 0.04345
-    group: Rares 
-    era: '2016'
-    split: 10
 
   WGToLNuG:
     db: das:/WGToLNuG_01J_5f_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -675,14 +682,6 @@ samples:
     era: '2016'
     split: 10
 
-  ZGTo2LG:
-    db: das:/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/NANOAODSIM
-    files: dascache/ZGTo2LG_2016.dat
-    generated-events: 'genEventSumw_'
-    cross-section: 123.9
-    group: Rares 
-    era: '2016'
-    split: 10
 
   TGJets:
     db: das:/TGJets_leptonDecays_13TeV_amcatnlo_madspin_pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
@@ -741,6 +740,7 @@ datadriven:
     uses : [all]
     replaces : [all]
 
+
 #### plotIt
 plotIt:
   configuration:
@@ -759,6 +759,12 @@ plotIt:
   groups:
     data:
       legend: data
+    pseudodata:
+      drawing-options: P
+      legend: pseudo-data
+      marker-color: 1
+      marker-size: 1
+      marker-type: 20
     ttbar:
       fill-color: "#cc7a16"
       legend: tt
@@ -779,13 +785,13 @@ plotIt:
       fill-color: "#ccbf45"
       legend: VV(V)
       order: 5
-    ttVV:
+    ttVX:
       fill-color: "#174704"
-      legend: tt+V(V)
+      legend: tt+VX
       order: 6
     SM:
       fill-color: "#06b894"
-      legend: SM Higgs (ggH, qqH, ttH, ZH)
+      legend: SM Higgs (ggH, qqH, VH)
       order: 7
     Rares:
       fill-color: "#610596"
@@ -794,11 +800,11 @@ plotIt:
     DYEstimation:
       fill-color: "#1a83a1"
       legend: Drell-Yan (from data)
-      order: 9
+      order: 3
     Fake:
       fill-color: "#6e3303"
       legend: Fake
-      order: 10
+      order: 9
   systematics:
       # on the jets
     - jer
