@@ -160,8 +160,9 @@ def main():
             DictSplit(opt.split,opt.submit,opt.resubmit)
             logging.info('Splitting jobs done')
         
-        config = os.path.join(os.path.abspath(os.path.dirname(__file__)),opt.config)
         # Arguments to send #
+        args = '' 
+        if opt.generator:           args += ' --generator '
         if opt.generator:           args += ' --generator '
         if opt.GPU:                 args += ' --GPU '
         if opt.resume:              args += ' --resume '
@@ -263,16 +264,11 @@ def main():
                 strSelect = [f'{cat}_{channel}_{node}' for channel in parameters.channels for cat in parameters.categories]
                 data_node = None
 
-                for era,samples_dict in sampleConfig['sampleDict'].items():
+                for era in parameters.eras:
+                    samples_dict = sampleConfig['sampleDict'][era]
                     if len(samples_dict.keys())==0:
                         logging.info('\tSample dict for era {} is empty'.format(era))
                         continue
-                    if node != 'HH':
-                        xsec = xsec_dict
-                        event_weight_sum = event_weight_sum_dict 
-                    else:
-                        xsec = None
-                        event_weight_sum = None
                     list_sample = [sample for key in strSelect for sample in samples_dict[key]]
                     data_node_era = LoopOverTrees(input_dir                 = sampleConfig['sampleDir'],
                                                   variables                 = variables,

@@ -31,7 +31,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                  "log-y"  : "both",
                                  "ratio-y-axis-range" : [0.8,1.2],
                                  "ratio-y-axis" : 'Ratio Data/MC',
-                                 "sort-by-yields" : False}
+                                 "sort-by-yields" : True}
 
     #-------------------------------------------------------------------------------------------#
     #                                       addArgs                                             #
@@ -239,6 +239,7 @@ One lepton and and one jet argument must be specified in addition to the require
         parser.add_argument("--Classifier", 
                             action      = "store",
                             type        = str,
+                            default     = "",
                             help        = "BDT-SM | BDT-Rad900 | DNN | LBN")
         parser.add_argument("--WhadTagger", 
                             action      = "store",
@@ -1208,11 +1209,14 @@ One lepton and and one jet argument must be specified in addition to the require
         if self.is_MC:
             #---- Object SF -----# (Will take as argument the era)
             ####  Muons ####
-            self.muLooseId = self.SF.get_scalefactor("lepton", 'muon_loose_{}'.format(era), combine="weight", systName="mu_loose", defineOnFirstUse=(not forSkimmer))
-            self.lambda_MuonLooseSF = lambda mu : [self.muLooseId(mu)]
-                # Need to be defined here to be accessible to Skimmer (check on self.is_MC must be applied there)
+            self.muLooseId = self.SF.get_scalefactor("lepton", 'muon_loose_{}'.format(era), combine="weight", systName="mu_loose", defineOnFirstUse=(not forSkimmer)) 
+            self.lambda_MuonLooseSF = lambda mu : [op.switch(self.lambda_is_matched(mu), self.muLooseId(mu), op.c_float(1.))]
             self.muTightMVA = self.SF.get_scalefactor("lepton", 'muon_tightMVA_{}'.format(era), combine="weight", systName="mu_tightmva", defineOnFirstUse=(not forSkimmer))
-            self.lambda_MuonTightSF = lambda mu : [self.muTightMVA(mu)] 
+            self.lambda_MuonTightSF = lambda mu : [op.switch(self.lambda_muonTightSel(mu),      # check if actual tight lepton (needed because in Fake CR one of the dilepton is not)
+                                                             op.switch(self.lambda_is_matched(mu),  # if gen matched
+                                                                       self.muTightMVA(mu),
+                                                                       op.c_float(1.)),
+                                                             op.c_float(1.))]
 
             ####  Electrons ####
             if era == "2016" or era == "2017": # Electron reco eff depend on Pt for 2016 and 2017
@@ -1228,14 +1232,20 @@ One lepton and and one jet argument must be specified in addition to the require
             self.elLooseEff = self.SF.get_scalefactor("lepton", 'electron_looseeff_{}'.format(era) , combine="weight", systName="el_looseeff", defineOnFirstUse=(not forSkimmer))
 
             if era == "2016" or era == "2017":
-                # Need to be defined here to be accessible to Skimmer (check on self.is_MC must be applied there)
-                self.lambda_ElectronLooseSF = lambda el : [self.elLooseId(el) , self.elLooseEff(el), op.switch(el.pt>20 , self.elLooseRecoPtGt20(el) , self.elLooseRecoPtLt20(el))]
+                self.lambda_ElectronLooseSF = lambda el : [op.switch(self.lambda_is_matched(el),self.elLooseId(el),op.c_float(1.)), 
+                                                           op.switch(self.lambda_is_matched(el),self.elLooseEff(el),op.c_float(1.)), 
+                                                           op.switch(self.lambda_is_matched(el),op.switch(el.pt>20, self.elLooseRecoPtGt20(el), self.elLooseRecoPtLt20(el)),op.c_float(1.))]
             elif era == "2018": 
-                # Need to be defined here to be accessible to Skimmer (check on self.is_MC must be applied there)
-                self.lambda_ElectronLooseSF = lambda el : [self.elLooseId(el) , self.elLooseEff(el), self.elLooseReco(el)] 
-
+                self.lambda_ElectronLooseSF = lambda el : [op.switch(self.lambda_is_matched(el),self.elLooseId(el),op.c_float(1.)),
+                                                           op.switch(self.lambda_is_matched(el),self.elLooseEff(el),op.c_float(1.)),
+                                                           op.switch(self.lambda_is_matched(el),self.elLooseReco(el),op.c_float(1.))]
+                
             self.elTightMVA = self.SF.get_scalefactor("lepton", 'electron_tightMVA_{}'.format(era) , combine="weight", systName="el_tightmva", defineOnFirstUse=(not forSkimmer))
-            self.lambda_ElectronTightSF = lambda el : [self.elTightMVA(el)] 
+            self.lambda_ElectronTightSF = lambda el : [op.switch(self.lambda_electronTightSel(el),      # check if actual tight lepton (needed because in Fake CR one of the dilepton is not)
+                                                                    op.switch(self.lambda_is_matched(el), # check if gen matched
+                                                                        self.elTightMVA(el),
+                                                                        op.c_float(1.)),
+                                                                    op.c_float(1.))] 
  
             #----- Triggers -----# 
             #### Single lepton triggers ####

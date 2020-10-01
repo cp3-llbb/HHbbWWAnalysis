@@ -69,25 +69,25 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
     def initialize(self):
         super(PlotterNanoHHtobbWWDL, self).initialize()
-        # Change the way the FakeExtrapolation is postProcesses (avoids overriding the `postProcess` method) 
+        # Change the way the FakeExtrapolation is postProcessed (avoids overriding the `postProcess` method) 
         if "FakeExtrapolation" in self.datadrivenContributions:
             contrib = self.datadrivenContributions["FakeExtrapolation"]
             self.datadrivenContributions["FakeExtrapolation"] = DataDrivenFake(contrib.name, contrib.config)
         if "DYEstimation" in self.datadrivenContributions: 
             contrib = self.datadrivenContributions["DYEstimation"]
-            self.datadrivenContributions["DYEstimation"] = DataDrivenDY(contrib.name, contrib.config)
-            
+            self.datadrivenContributions["DYEstimation"] = DataDrivenDY(contrib.name, contrib.config,"PseudoData" in self.datadrivenContributions)
 
 
     def definePlots(self, t, noSel, sample=None, sampleCfg=None): 
         noSel = super(PlotterNanoHHtobbWWDL,self).prepareObjects(t, noSel, sample, sampleCfg, 'DL')
 
         #----- Machine Learning Model -----#                
-        path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','model.pb')
+        path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',self.args.Classifier,'model','model.pb')
+        print ("DNN model : %s"%path_model)
         if not os.path.exists(path_model):
             raise RuntimeError('Could not find model file %s'%path_model)
         try:
-            LBN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(["input_1", "input_2"], "model/output/Softmax"))
+            DNN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(["input_1", "input_2"], "model/output/Softmax"))
         except:
             raise RuntimeError('Could not load model %s'%path_model)
 
@@ -158,9 +158,9 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
 
             #----- DY reweighting -----#
-            mvaOutputElEl = LBN(*returnMVAInputs(dilep=self.ElElDileptonTightSel,jets=self.ak4Jets))
-            mvaOutputMuMu = LBN(*returnMVAInputs(dilep=self.MuMuDileptonTightSel,jets=self.ak4Jets))
-            if self.era == "2016" and "DYEstimation" in self.datadrivenScenarios:
+            #mvaOutputElEl = DNN(*returnMVAInputs(dilep=self.ElElDileptonTightSel,jets=self.ak4Jets))
+            #mvaOutputMuMu = DNN(*returnMVAInputs(dilep=self.MuMuDileptonTightSel,jets=self.ak4Jets))
+            if self.era == "2016" and 'DYEstimation' in self.datadrivenContributions:
                 # output = ['HH', 'H', 'DY', 'ST', 'ttbar', 'ttVX', 'VVV', 'Rare']
                 #convDict = {'HH':0, 'H':1, 'DY':2, 'ST':3, 'TT':4, 'TTVX':5, 'VVV':6, 'Rare':7}
                 #if self.args.DYVariable not in convDict.keys():
@@ -181,16 +181,16 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 #                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputElEl[0]})
                 #self.DYReweighting2bMuMu = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_DNNoutputHH_data_2b'), combine="weight", systName="dy_reweighting_2b_mumu",
                 #                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: mvaOutputMuMu[0]})
-                mode = 'mc' if "PseudoData" in self.datadrivenScenarios else 'data'
+                mode = 'mc' if "PseudoData" in self.datadrivenContributions else 'data'
 
-                self.DYReweighting1bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_leadjetPt_{}_1b'.format(mode)), combine="weight", systName="dy_reweighting_1b_elel", defineOnFirstUse=(not forSkimmer),
-                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
-                self.DYReweighting1bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_leadjetPt_{}_1b'.format(mode)), combine="weight", systName="dy_reweighting_1b_mumu", defineOnFirstUse=(not forSkimmer),
-                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
-                self.DYReweighting2bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_leadjetPt_{}_2b'.format(mode)), combine="weight", systName="dy_reweighting_2b_elel", defineOnFirstUse=(not forSkimmer),
-                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
-                self.DYReweighting2bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_leadjetPt_{}_2b'.format(mode)), combine="weight", systName="dy_reweighting_2b_mumu", defineOnFirstUse=(not forSkimmer),
-                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
+                self.DYReweighting1bElEl = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_leadjetPt_{}_1b'.format(mode)), combine="weight", systName="dy_reweighting_1b_elel", 
+                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
+                self.DYReweighting1bMuMu = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_leadjetPt_{}_1b'.format(mode)), combine="weight", systName="dy_reweighting_1b_mumu", 
+                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
+                self.DYReweighting2bElEl = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_leadjetPt_{}_2b'.format(mode)), combine="weight", systName="dy_reweighting_2b_elel", 
+                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
+                self.DYReweighting2bMuMu = self.SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_leadjetPt_{}_2b'.format(mode)), combine="weight", systName="dy_reweighting_2b_mumu", 
+                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
                 #self.DYReweighting1bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_1b'), combine="weight", systName="dy_reweighting_1b_elel", defineOnFirstUse=(not forSkimmer))
                 #self.DYReweighting1bMuMu = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'MuMu_data_1b'), combine="weight", systName="dy_reweighting_1b_mumu", defineOnFirstUse=(not forSkimmer))
                 #self.DYReweighting2bElEl = SF.get_scalefactor("lepton", ('DY_{}'.format(era),'ElEl_data_2b'), combine="weight", systName="dy_reweighting_2b_elel", defineOnFirstUse=(not forSkimmer))
@@ -457,7 +457,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             
             for selObjectDict in selObjectDictList:
                 dileptons = dileptonsCont[selObjectDict['channel']]
-                output = LBN(*returnMVAInputs(dileptons,self.ak4Jets))
+                output = DNN(*returnMVAInputs(dileptons,self.ak4Jets))
                 selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,plot_yield=True)
                 for selObjNode in selObjNodesDict.values():
                     cutFlowPlots.append(CutFlowReport(selObjNode.selName,selObjNode.sel))
