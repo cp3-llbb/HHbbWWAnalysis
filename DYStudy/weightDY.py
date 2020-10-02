@@ -381,22 +381,22 @@ class WeightDY:
         c = ROOT.TCanvas('c','c',800,600)
         c.Print(pdfname+'[')
 
-        d = {'Z peak 0b [%s]'%(mode):                     h1,
-             'Z peak %s [%s]'%(cat,mode):                 h2,
-             'Z veto 0b [%s]'%(mode):                     h3,
-             'Z veto %s [DY MC]'%(cat):                   h4,
-             'Z veto %s [%s extrapolated]'%(cat,mode):    nh4}
-        self.plotInCanvas(d,[0.4,0.6,0.85,0.85],pdfname,norm=True,opt="hist")
-        d = {'Z peak 0b [%s]'%(mode):                     cdf1,
-             'Z peak %s [%s]'%(cat,mode):                 cdf2,
-             'Z veto 0b [%s]'%(mode):                     cdf3,
-             'Z veto %s [DY MC]'%(cat):                   cdf4,
-             'Z veto %s [%s extrapolated]'%(cat,mode):    ncdf4}
+        d = {'#splitline{Z peak 0b [%s]}{Integral = %0.3f}'%(mode,h1.Integral())                    : h1,
+             '#splitline{Z peak %s [%s]}{Integral = %0.3f}'%(cat,mode,h2.Integral())                : h2,
+             '#splitline{Z veto 0b [%s]}{Integral = %0.3f}'%(mode,h3.Integral())                    : h3,
+             '#splitline{Z veto %s [DY MC]}{Integral = %0.3f}'%(cat,h4.Integral())                  : h4,
+             '#splitline{Z veto %s [%s extrapolated]}{Integral = %0.3f}'%(cat,mode,nh4.Integral())  : nh4}
+        self.plotInCanvas(d,[0.4,0.4,0.85,0.85],pdfname,norm=True,opt="hist")
+        d = {'Z peak 0b [%s]'%(mode)                    : cdf1,
+             'Z peak %s [%s]'%(cat,mode)                : cdf2,
+             'Z veto 0b [%s]'%(mode)                    : cdf3,
+             'Z veto %s [DY MC]'%(cat)                  : cdf4,
+             'Z veto %s [%s extrapolated]'%(cat,mode)   : ncdf4}
         self.plotInCanvas(d,[0.4,0.15,0.85,0.5],pdfname,opt="hist",maxy=1.)
 
-        d = {'Z peak 0b [%s]'%(mode):                     h1,
-             'Z peak %s [%s]'%(cat,mode):                 h2,
-             'Z veto 0b [%s]'%(mode):                     h3}
+        d = {'#splitline{Z peak 0b [%s]}{Integral = %0.3f}'%(mode,h1.Integral())      : h1,
+             '#splitline{Z peak %s [%s]}{Integral = %0.3f}'%(cat,mode,h2.Integral())  : h2,
+             '#splitline{Z veto 0b [%s]}{Integral = %0.3f}'%(mode,h3.Integral())      : h3}
         self.plotInCanvas(d,[0.5,0.5,0.85,0.85],pdfname,opt="hist")
 
         d = {'#splitline{Z veto %s [DY MC]}{Integral = %0.3f}'%(cat,h4.Integral()):                 h4,
