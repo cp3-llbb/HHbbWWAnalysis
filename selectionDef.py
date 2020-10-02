@@ -103,10 +103,10 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
         ElTightSF = lambda lepColl : self.lambda_ElectronTightSF(lepColl[0])
         MuTightSF = lambda lepColl : self.lambda_MuonTightSF(lepColl[0])
     else:
-        ElLooseSF = lambda lepColl : None
-        MuLooseSF = lambda lepColl : None
-        ElTightSF = lambda lepColl : None
-        MuTightSF = lambda lepColl : None
+        ElLooseSF = lambda lepColl : []
+        MuLooseSF = lambda lepColl : []
+        ElTightSF = lambda lepColl : []
+        MuTightSF = lambda lepColl : []
 
     
     #--- Preselection ---#
@@ -514,13 +514,13 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
         MuMuTightSF = lambda dilep : self.lambda_MuonTightSF(dilep[0]) + self.lambda_MuonTightSF(dilep[1])
         ElMuTightSF = lambda dilep : self.lambda_ElectronTightSF(dilep[0]) + self.lambda_MuonTightSF(dilep[1])
     else:
-        ElElLooseSF = lambda dilep : None
-        MuMuLooseSF = lambda dilep : None
-        ElMuLooseSF = lambda dilep : None
+        ElElLooseSF = lambda dilep : []
+        MuMuLooseSF = lambda dilep : []
+        ElMuLooseSF = lambda dilep : []
 
-        ElElTightSF = lambda dilep : None
-        MuMuTightSF = lambda dilep : None
-        ElMuTightSF = lambda dilep : None
+        ElElTightSF = lambda dilep : [] 
+        MuMuTightSF = lambda dilep : []
+        ElMuTightSF = lambda dilep : []
 
 
         
