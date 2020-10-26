@@ -1742,11 +1742,22 @@ def makeSingleLeptonMachineLearningPlotsBDTmissReco(sel,lep,met,jets,bJets,lJets
 
     return plots
     '''
-def makeDoubleLeptonMachineLearningPlots(selObjNodesDict,output,nodes,channel):
+def makeDoubleLeptonMachineLearningInputPlots(sel,suffix,channel,inputs):
+    plots = []
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
+    for (varname,vartitle,binning),variable in inputs.items():
+        plots.append(Plot.make1D("%s_%s_DNNInput_%s"%(channel,suffix,varname),
+                                 variable,
+                                 sel,
+                                 EquidistantBinning(*binning),
+                                 xTitle = '%s'%vartitle,
+                                 plotopts = channelLabel))
+    return plots
+    
+def makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,nodes,channel):
     plots = []
 
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
-
     for i,node in enumerate(nodes):
         suffix = selObjNodesDict[node].selName
         sel = selObjNodesDict[node].sel

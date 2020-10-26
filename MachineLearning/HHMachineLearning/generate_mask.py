@@ -6,7 +6,9 @@ import ROOT
 import parameters
 
 def GenerateMask(N,name):
-    path_mask = os.path.join(parameters.main_path,'mask_'+name+'.npy')
+    if not name.endswith(".npy"):
+        name += ".npy"
+    path_mask = os.path.join(parameters.main_path,'mask_'+name)
     if not os.path.exists(path_mask):                     
         mask = np.full((N,), False, dtype=bool)     
         size = parameters.training_ratio+parameters.evaluation_ratio
@@ -17,13 +19,15 @@ def GenerateMask(N,name):
         np.save(path_mask,mask)                                 
         logging.info('Mask not found at %s -> Has been generated'%path_mask)
     else:                                                        
-        mask = np.load(path_mask+'.npy')     
+        mask = np.load(path_mask)     
         logging.info('Mask found at %s'%path_mask)
 
     return mask
 
 def GenerateSampleMasks(list_samples,name):
-    path_mask = os.path.join(parameters.main_path,'mask_'+name+'.npz')
+    if not name.endswith(".npz"):
+        name += ".npz"
+    path_mask = os.path.join(parameters.main_path,'mask_'+name)
     if not os.path.exists(path_mask):
         mask_dict = {}
         for i,sample in enumerate(list_samples):

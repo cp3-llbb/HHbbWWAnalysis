@@ -653,7 +653,7 @@ class Plot_Multi_ROC:
         self.lb.fit(self.classes)                       # Carefull ! Alphabetic order !
             # classes in lb -> lb.classes_
         if self.classes != sorted(self.classes):
-            raise RuntimeError('The classes need to be sorted otherwise LabelBinarizer will give wring results')
+            raise RuntimeError('The classes need to be sorted alphabetically otherwise LabelBinarizer will give wrong results')
 
     def AddToROC(self,filename):
         """ 

@@ -309,6 +309,7 @@ class DataGenerator(keras.utils.Sequence):
         return self.n_batches
     def on_epoch_end(self): # performs auto shuffle if enabled
         # Do what we need to do between epochs
+        pass
         #self.get_fractions() # Change the batches after each epoch 
             # TODO : not sure we need it
 

@@ -51,7 +51,7 @@ class WeightDY:
         self.saveToJson()
         self.saveToRoot()
 
-    def extractDirInformation(self,directory,histogram):
+    def extractDirInformation(self,directory,histograms):
         """ 
         Returns dict with 
           ->keys : 'luminosity', 'plot_options', 'samples', 'histograms'
@@ -66,11 +66,13 @@ class WeightDY:
                   -> val : dict information (cross section, group, ...)
               -> 'histograms : dict
                   -> key : name rootfile 
-                  -> val : histogram 
+                  -> val : histogram  (sum of list of histograms)
         """
+        if not isinstance(histograms,list):
+            histograms = [histograms]
 
         # Get YAML info #
-        yaml_dict = self.loadYaml(os.path.join(directory,'plots_FakeExtrapolation.yml'),histogram)
+        yaml_dict = self.loadYaml(os.path.join(directory,'plots_FakeExtrapolation.yml'),histograms)
 
         # Loop over file to recover histograms #
         hist_dict = {}
@@ -83,13 +85,32 @@ class WeightDY:
                 print ("[WARNING] File %s will be ignored"%(name))
                 continue
             # Save hist in dict #
-            h = self.getHistogram(f,histogram)
-            hist_dict[name] =h 
+            hist = None
+            for histogram in histograms:
+                h = self.getHistogram(f,histogram)
+                if hist is None:
+                    hist = copy.deepcopy(h)
+                else:   
+                    if h.GetNbinsX() != hist.GetNbinsX():
+                        raise RuntimeError("Histograms you want to add have different number of bins in X axis : %d vs %d"%(h.GetNbinsX(),hist.GetNbinsX()))
+                    elif self.hist_type == 'TH2' and h.GetNbinsY() != hist.GetNbinsY():
+                        raise RuntimeError("Histograms you want to add have different number of bins in Y axis : %d vs %d"%(h.GetNbinsY(),hist.GetNbinsY()))
+                    elif h.GetXaxis().GetBinLowEdge(1) != hist.GetXaxis().GetBinLowEdge(1):
+                        raise RuntimeError("Histograms you want to add have different first edge in X axis : %d vs %d"%(h.GetXaxis().GetBinLowEdge(1),hist.GetXaxis().GetBinLowEdge(1)))
+                    elif h.GetXaxis().GetBinUpEdge(h.GetNbinsX()) != hist.GetXaxis().GetBinUpEdge(hist.GetNbinsX()):
+                        raise RuntimeError("Histograms you want to add have different last edge in X axis : %d vs %d"%(h.GetXaxis().GetBinUpEdge(h.GetNbinsX()),hist.GetXaxis().GetBinUpEdge(hist.GetNbinsX())))
+                    elif self.hist_type == 'TH2' and h.GetYaxis().GetBinLowEdge(1) != hist.GetYaxis().GetBinLowEdge(1):
+                        raise RuntimeError("Histograms you want to add have different first edge in Y axis : %d vs %d"%(h.GetYaxis().GetBinLowEdge(1),hist.GetYaxis().GetBinLowEdge(1)))
+                    elif self.hist_type == 'TH2' and h.GetYaxis().GetBinUpEdge(h.GetNbinsY()+1) != hist.GetYaxis().GetBinLowEdge(hist.GetNbinsY()+1):
+                        raise RuntimeError("Histograms you want to add have different last edge in Y axis : %d vs %d"%(h.GetYaxis().GetBinUpEdge(h.GetNbinsY()),hist.GetYaxis().GetBinUpEdge(hist.GetNbinsY())))
+                    else:
+                        hist.Add(h)
+            hist_dict[name] = hist
 
         yaml_dict.update({'histograms':hist_dict})
         return yaml_dict
 
-    def loadYaml(self,yaml_path,histogram):
+    def loadYaml(self,yaml_path,histograms):
         # Parse YAML #
         with open(yaml_path,"r") as handle:
             full_dict = yaml.load(handle,Loader=yaml.FullLoader)
@@ -97,12 +118,19 @@ class WeightDY:
         lumi_dict = full_dict["configuration"]["luminosity"]
 
         # Get plot options #
-        opt_to_keep = ['x-axis','y-axis']
-        try:
-            options_dict = {k:full_dict["plots"][histogram][k] for k in full_dict["plots"][histogram].keys() & opt_to_keep}
-        except KeyError:
-            print ("Could not find hist %s in YAML %s, will proceed without"%(histogram,yaml_path))
-            options_dict = {k:'' for k in opt_to_keep}
+        opt_to_keep = ['x-axis','y-axis','x-axis-range']
+        options_dict = {k:None for k in opt_to_keep}
+        for histogram in histograms:
+            try:
+                for k in full_dict["plots"][histogram].keys() & opt_to_keep:
+                    if options_dict[k] is None:
+                        options_dict[k] = full_dict["plots"][histogram][k]
+                    else:
+                        if options_dict[k] != full_dict["plots"][histogram][k]:
+                            raise RuntimeError('The plots you want to add have different plot parameters')
+            except KeyError:
+                print ("Could not find hist %s in YAML %s, will proceed without"%(histogram,yaml_path))
+                options_dict = {k:'' for k in opt_to_keep}
 
         # Get data per sample #
         sample_dict = {}
@@ -136,7 +164,6 @@ class WeightDY:
             mode = "mc" 
         else:
             mode = self.mode
-        #mode = self.mode
 
         dist = None
         # Loop over hist per sample #
@@ -216,14 +243,32 @@ class WeightDY:
                 self.factor_1b = 161402.5533 / 1257451.0613
                 self.factor_2b = 27150.4709  / 1257451.0613
                 self.factor_ZVeto = 180623.891 / 258598.634
-            if self.channel == 'ElEl':
+            elif self.channel == 'ElEl':
                 self.factor_1b = 35004.4788 / 274633.8001
                 self.factor_2b = 6098.4302  / 274633.8001
                 self.factor_ZVeto = 32679.407 / 51517.366 
+            elif self.channel == "SSDL":
+                self.factor_1b = (161402.5533+35004.4788) / (1257451.0613+274633.8001)
+                self.factor_2b = (27150.4709+6098.4302) / (1257451.0613+274633.8001)
+                self.factor_ZVeto = (180623.891+32679.407) / (258598.634+51517.366)
+            else:
+                raise RuntimeError("Channel '%s' not understood"%self.channel)
+
         elif self.mode == "mc":
-            self.factor_1b = self.N_ZPeak1b/self.N_ZPeak0b
-            self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
+            #self.factor_1b = self.N_ZPeak1b/self.N_ZPeak0b
+            #self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
             self.factor_ZVeto = 1.
+            self.factor_1b = self.N_ZVeto1b/self.N_ZVeto0b
+            self.factor_2b = self.N_ZVeto2b/self.N_ZVeto0b
+
+        print ("Factor in Z peak : 1b/0b")
+        print ("%0.5f / %0.5f -> %0.5f"%(self.N_ZPeak1b,self.N_ZPeak0b,self.N_ZPeak1b/self.N_ZPeak0b))
+        print ("Factor in Z peak : 2b/0b")
+        print ("%0.5f / %0.5f -> %0.5f"%(self.N_ZPeak2b,self.N_ZPeak0b,self.N_ZPeak2b/self.N_ZPeak0b))
+        print ("Factor in Z veto: 1b/0b")
+        print ("%0.5f / %0.5f -> %0.5f"%(self.N_ZVeto1b,self.N_ZVeto0b,self.N_ZVeto1b/self.N_ZVeto0b))
+        print ("Factor in Z veto : 2b/0b")
+        print ("%0.5f / %0.5f -> %0.5f"%(self.N_ZVeto2b,self.N_ZVeto0b,self.N_ZVeto2b/self.N_ZVeto0b))
 
         print ("Sum weight ZVeto_0b : ",hist_dict['ZVeto_0b'].Integral())
         print ("Sum weight ZVeto_1b : ",hist_dict['ZVeto_1b'].Integral())
@@ -231,6 +276,8 @@ class WeightDY:
         print ("Sum weight ZPeak_0b : ",hist_dict['ZPeak_0b'].Integral())
         print ("Sum weight ZPeak_1b : ",hist_dict['ZPeak_1b'].Integral())
         print ("Sum weight ZPeak_2b : ",hist_dict['ZPeak_2b'].Integral())
+        if any([hist.Integral()<=0. for hist in hist_dict.values()]):
+            raise RuntimeError("One histogram has integral below or equal to 0.")
 
         hist_dict['ZPeak_0b'].Scale(1./hist_dict['ZPeak_0b'].Integral())
         hist_dict['ZPeak_1b'].Scale(1./hist_dict['ZPeak_1b'].Integral())
@@ -239,9 +286,14 @@ class WeightDY:
         self.weight_1b = hist_dict['ZPeak_1b'].Clone("Weight1B")
         self.weight_1b.Divide(hist_dict['ZPeak_0b'])
         self.weight_1b.Scale(self.factor_1b*self.factor_ZVeto)
+        #self.weight_1b.Scale(self.factor_1b*self.factor_ZVeto/self.weight_1b.Integral())
+        print ("Weight 1b integral  : %0.5f"%self.weight_1b.Integral())
+
         self.weight_2b = hist_dict['ZPeak_2b'].Clone("Weight2B")
         self.weight_2b.Divide(hist_dict['ZPeak_0b'])
         self.weight_2b.Scale(self.factor_2b*self.factor_ZVeto)
+        #self.weight_2b.Scale(self.factor_2b*self.factor_ZVeto/self.weight_2b.Integral())
+        print ("Weight 2b integral  : %0.5f"%self.weight_2b.Integral())
             # self.weight = ZPeak_2b / ZPeak_0b (normalized histogram ratio) * N_2b/N_0b (stats factor)
         if self.hist_type == 'TH2':
             hist_dict['ZPeak_0b'].Scale(self.N_ZPeak0b)
@@ -254,12 +306,6 @@ class WeightDY:
         self.shape_2b.Multiply(self.weight_2b)
             # self.shape = (ZPeak_2b / ZPeak_0b) * ZVeto_0b (unnormalized histogram) = shape of the data DY in SR
 
-        if self.hist_type == 'TH1':
-            hist_dict['ZVeto_0b'].Scale(1./hist_dict['ZVeto_0b'].Integral())
-
-        # Rebin weights # (after computing shape because N bins will be different 
-        #self.weight_1b = self.rebinWeights1D(self.weight_1b,0.10,5)
-        #self.weight_2b = self.rebinWeights1D(self.weight_2b,0.15,5)
 
         print ("Factor (1b)         : ",self.factor_1b)
         print ("Shape (1b)          : ",self.shape_1b.Integral())
@@ -267,7 +313,6 @@ class WeightDY:
         print ("Shape (2b)          : ",self.shape_2b.Integral())
 
     def produceCDFShift(self,hist_dict):
-        hist_dict = copy.deepcopy(hist_dict)
 
         inst1b = CDFShift(hist_dict['ZPeak_0b'],
                           hist_dict['ZPeak_1b'],
@@ -286,39 +331,48 @@ class WeightDY:
         inst1b.saveToRoot(name1b)
         inst2b.saveToRoot(name2b)
 
-        hist_dict1b = hist_dict
+        hist_dict1b = copy.deepcopy(hist_dict)
         hist_dict1b.update({'ZPeak_0b_cdf'              : inst1b.cdf1,
                             'ZPeak_1b_cdf'              : inst1b.cdf2,
                             'ZVeto_0b_cdf'              : inst1b.cdf3,
                             'ZVeto_1b_cdf'              : inst1b.additional_cdf['cdf_ZVeto_1b'],
-                            'ZVeto_1b_extrapolated'     : inst1b.returnHist(),
+                            'ZVeto_1b_extrapolated'     : inst1b.nh3,
                             'ZVeto_1b_extrapolated_cdf' : inst1b.ncdf3,
                             'cdf_graph'                 : inst1b.gncdf3,
-                            'shift'                     : inst1b.gshift,
-                            'shift_inv'                 : inst1b.gshift_inv})
-        hist_dict2b = hist_dict
+                            'shift'                     : inst1b.g,
+                            'shift_inv'                 : inst1b.ginv,
+                            'shift_up'                  : inst1b.g_up,
+                            'shift_inv_up'              : inst1b.ginv_up,
+                            'shift_down'                : inst1b.g_down,
+                            'shift_inv_down'            : inst1b.ginv_down,
+                            'cdf_bin_err'               : inst1b.cdf_bin_err,
+                            'cdf_shift_err'             : inst1b.cdf_shift_err,
+                            'cdf_tot_err'               : inst1b.cdf_tot_err,
+                            })
+        hist_dict2b = copy.deepcopy(hist_dict)
         hist_dict2b.update({'ZPeak_0b_cdf'              : inst2b.cdf1,
                             'ZPeak_2b_cdf'              : inst2b.cdf2,
                             'ZVeto_0b_cdf'              : inst2b.cdf3,
                             'ZVeto_2b_cdf'              : inst2b.additional_cdf['cdf_ZVeto_2b'],
-                            'ZVeto_2b_extrapolated'     : inst2b.returnHist(),
+                            'ZVeto_2b_extrapolated'     : inst2b.nh3,
                             'ZVeto_2b_extrapolated_cdf' : inst2b.ncdf3,
-                            'cdf_graph'                 : inst1b.gncdf3,
-                            'shift'                     : inst1b.gshift,
-                            'shift_inv'                 : inst1b.gshift_inv})
+                            'cdf_graph'                 : inst2b.gncdf3,
+                            'shift'                     : inst2b.g,
+                            'shift_inv'                 : inst2b.ginv,
+                            'shift_up'                  : inst2b.g_up,
+                            'shift_inv_up'              : inst2b.ginv_up,
+                            'shift_down'                : inst2b.g_down,
+                            'shift_inv_down'            : inst2b.ginv_down,
+                            'cdf_bin_err'               : inst2b.cdf_bin_err,
+                            'cdf_shift_err'             : inst2b.cdf_shift_err,
+                            'cdf_tot_err'               : inst2b.cdf_tot_err,
+                            })
 
         self.plotCDFShift(hist_dict1b,name1b.replace('.root','.pdf'),cat='1b',mode=self.mode) 
         self.plotCDFShift(hist_dict2b,name2b.replace('.root','.pdf'),cat='2b',mode=self.mode)
 
     @staticmethod
-    def plotInCanvas(hist_dict,legend_pos,pdfname,logy=False,opt='',norm=False,text=None,textpos=None,maxy=None):
-#        for hist in hist_dict.values():
-#            for i in range(1,hist.GetNbinsX()+1):
-#                if hist.GetBinContent(i)>0:
-#                    hist.SetBinError(i,math.sqrt(hist.GetBinContent(i)))
-#                else:
-#                    hist.SetBinError(i,math.sqrt(-hist.GetBinContent(i)))
-
+    def plotHistInCanvas(hist_dict,pdfname,legend_pos=None,logy=False,opt='',norm=False,text=None,textpos=None,maxy=None,title=''):
         hist_dict = copy.deepcopy(hist_dict)
         if norm:
             for hist in hist_dict.values():
@@ -326,20 +380,23 @@ class WeightDY:
         c = ROOT.TCanvas('c1','c1',800,600)
         if logy:
             c.SetLogy()
-        leg = ROOT.TLegend(*legend_pos)
-        leg.SetBorderSize(0)
-        leg.SetFillStyle(0)
+        if legend_pos is not None:
+            leg = ROOT.TLegend(*legend_pos)
+            leg.SetBorderSize(0)
+            leg.SetFillStyle(0)
+            for name,hist in hist_dict.items():
+                leg.AddEntry(hist,name)
         maxh = max([h.GetMaximum() for h in hist_dict.values()])*1.1
+        minh = max([h.GetMinimum() for h in hist_dict.values()])*1.1
         if maxy is not None:
             maxh = min(maxh,maxy)
-        for name,hist in hist_dict.items():
-            leg.AddEntry(hist,name)
         for hist in hist_dict.values():
-            hist.GetYaxis().SetRangeUser(0,maxh)
-            hist.SetTitle('')
+            hist.GetYaxis().SetRangeUser(minh,maxh)
+            hist.SetTitle(title)
             hist.Draw(opt)
             if 'same' not in opt: opt += " same"
-        leg.Draw()
+        if legend_pos is not None:
+            leg.Draw()
         if text is not None and textpos is not None:
             pt = ROOT.TPaveText(*textpos,"NDC")
             pt.SetBorderSize(0)
@@ -348,9 +405,45 @@ class WeightDY:
                 pt.AddText(t)
             pt.Draw()
         c.Print(pdfname)
-            
+
+    @staticmethod
+    def plotGraphInCanvas(graph_dict,pdfname,legend_pos=None,logy=False,text=None,textpos=None,title=''):
+        graph_dict = copy.deepcopy(graph_dict)
+        c = ROOT.TCanvas('c1','c1',800,600)
+        if logy:
+            c.SetLogy()
+
+        mg = ROOT.TMultiGraph()
+        for name,graph in graph_dict.items():
+            graph.SetTitle(name)
+            mg.Add(graph)
+        mg.SetTitle(title)
+
+        mg.Draw("AL")
+
+        if legend_pos is not None:
+            leg = c.BuildLegend()
+            leg.SetBorderSize(0)
+            leg.SetFillStyle(0)
+            ROOT.gPad.Update()
+            leg.SetX1NDC(legend_pos[0])
+            leg.SetY1NDC(legend_pos[1])
+            leg.SetX2NDC(legend_pos[2])
+            leg.SetY2NDC(legend_pos[3])
+            ROOT.gPad.Modified()
+
+        if text is not None and textpos is not None:
+            pt = ROOT.TPaveText(*textpos,"NDC")
+            pt.SetBorderSize(0)
+            pt.SetFillStyle(0)
+            for t in text:
+                pt.AddText(t)
+            pt.Draw()
+        c.Print(pdfname)
 
     def plotCDFShift(self,hist_dict,pdfname,cat,mode):
+        hist_dict = copy.deepcopy(hist_dict)
+        
         if mode == 'mc': mode = 'DY MC'
         if mode == 'data': mode = 'DY data'
 
@@ -366,38 +459,50 @@ class WeightDY:
         cdf4 = hist_dict['ZVeto_%s_cdf'%(cat)]
         ncdf4 = hist_dict['ZVeto_%s_extrapolated_cdf'%(cat)]
 
-        h1.SetLineColor(ROOT.kRed+1)
-        h2.SetLineColor(ROOT.kBlue+1)
-        h3.SetLineColor(ROOT.kGreen+1)
-        h4.SetLineColor(ROOT.kOrange+2)
-        nh4.SetLineColor(ROOT.kMagenta+1)
+        h1.SetLineColor(602)
+        h2.SetLineColor(619 if cat=='1b' else 634)
+        h3.SetLineColor(418)
+        h4.SetLineColor(808)
+        nh4.SetLineColor(433)
+
+        h1.SetLineWidth(2)
+        h2.SetLineWidth(2)
+        h3.SetLineWidth(2)
+        h4.SetLineWidth(2)
+        nh4.SetLineWidth(2)
                
-        cdf1.SetLineColor(ROOT.kRed+1)
-        cdf2.SetLineColor(ROOT.kBlue+1)
-        cdf3.SetLineColor(ROOT.kGreen+1)
-        cdf4.SetLineColor(ROOT.kOrange+2)
-        ncdf4.SetLineColor(ROOT.kMagenta+1)
+        cdf1.SetLineColor(602)
+        cdf2.SetLineColor(619 if cat=='1b' else 634)
+        cdf3.SetLineColor(418)
+        cdf4.SetLineColor(808)
+        ncdf4.SetLineColor(433)
+
+        cdf1.SetLineWidth(2)
+        cdf2.SetLineWidth(2)
+        cdf3.SetLineWidth(2)
+        cdf4.SetLineWidth(2)
+        ncdf4.SetLineWidth(2)
 
         c = ROOT.TCanvas('c','c',800,600)
         c.Print(pdfname+'[')
 
-        d = {'#splitline{Z peak 0b [%s]}{Integral = %0.3f}'%(mode,h1.Integral())                    : h1,
-             '#splitline{Z peak %s [%s]}{Integral = %0.3f}'%(cat,mode,h2.Integral())                : h2,
-             '#splitline{Z veto 0b [%s]}{Integral = %0.3f}'%(mode,h3.Integral())                    : h3,
-             '#splitline{Z veto %s [DY MC]}{Integral = %0.3f}'%(cat,h4.Integral())                  : h4,
-             '#splitline{Z veto %s [%s extrapolated]}{Integral = %0.3f}'%(cat,mode,nh4.Integral())  : nh4}
-        self.plotInCanvas(d,[0.4,0.4,0.85,0.85],pdfname,norm=True,opt="hist")
+        d = {'Z peak 0b [%s]'%(mode)                    : h1,
+             'Z peak %s [%s]'%(cat,mode)                : h2,
+             'Z veto 0b [%s]'%(mode)                    : h3,
+             'Z veto %s [DY MC]'%(cat)                  : h4,
+             'Z veto %s [%s extrapolated]'%(cat,mode)   : nh4}
+        self.plotHistInCanvas(d,legend_pos=[0.4,0.5,0.85,0.85],pdfname=pdfname,norm=True,opt="hist")
         d = {'Z peak 0b [%s]'%(mode)                    : cdf1,
              'Z peak %s [%s]'%(cat,mode)                : cdf2,
              'Z veto 0b [%s]'%(mode)                    : cdf3,
              'Z veto %s [DY MC]'%(cat)                  : cdf4,
              'Z veto %s [%s extrapolated]'%(cat,mode)   : ncdf4}
-        self.plotInCanvas(d,[0.4,0.15,0.85,0.5],pdfname,opt="hist",maxy=1.)
+        self.plotHistInCanvas(d,legend_pos=[0.4,0.15,0.85,0.5],pdfname=pdfname,opt="hist",maxy=1.)
 
         d = {'#splitline{Z peak 0b [%s]}{Integral = %0.3f}'%(mode,h1.Integral())      : h1,
              '#splitline{Z peak %s [%s]}{Integral = %0.3f}'%(cat,mode,h2.Integral())  : h2,
              '#splitline{Z veto 0b [%s]}{Integral = %0.3f}'%(mode,h3.Integral())      : h3}
-        self.plotInCanvas(d,[0.5,0.5,0.85,0.85],pdfname,opt="hist")
+        self.plotHistInCanvas(d,legend_pos=[0.5,0.5,0.85,0.85],pdfname=pdfname,opt="HE1")
 
         d = {'#splitline{Z veto %s [DY MC]}{Integral = %0.3f}'%(cat,h4.Integral()):                 h4,
              '#splitline{Z veto %s [%s extrapolated]}{Integral = %0.3f}'%(cat,mode,nh4.Integral()): nh4}  
@@ -406,31 +511,46 @@ class WeightDY:
                 "KS test (option 'X') : %0.3e"%(nh4.KolmogorovTest(h4,"X")),
                 "Z Veto 0b correction factor : %0.5f"%(self.factor_ZVeto),
                 "Factor Z Peak %s / Z Peak 0b : %0.5f"%(cat,self.factor_1b if cat == '1b' else self.factor_2b)]
-        self.plotInCanvas(d,[0.5,0.6,0.85,0.85],pdfname,text=text,textpos=[0.5,0.35,0.85,0.55],opt='hist')
+        self.plotHistInCanvas(d,legend_pos=[0.5,0.6,0.85,0.85],pdfname=pdfname,text=text,textpos=[0.5,0.35,0.85,0.55],opt='HE1')
 
         d = {'Z peak 0b [%s]'%(mode):                     cdf1,
              'Z peak %s [%s]'%(cat,mode):                 cdf2,
              'Z veto 0b [%s]'%(mode):                     cdf3}
-        self.plotInCanvas(d,[0.4,0.15,0.85,0.5],pdfname,opt="hist",maxy=1.)
+        self.plotHistInCanvas(d,legend_pos=[0.4,0.15,0.85,0.5],pdfname=pdfname,opt="HE1",maxy=1.)
         
-        c.Clear()
-        hist_dict['cdf_graph'].SetTitle('Non corrected cdf')
-        hist_dict['cdf_graph'].Draw()
+        self.plotGraphInCanvas({'':hist_dict['cdf_graph']},pdfname=pdfname,title="Non corrected pdf")
+        d = {'Z veto %s [DY MC]'%(cat)                  : cdf4,
+             'Z veto %s [%s extrapolated]'%(cat,mode)   : ncdf4}
+        self.plotHistInCanvas(d,legend_pos=[0.4,0.15,0.85,0.5],pdfname=pdfname,opt="HE1")
 
-        c.Print(pdfname)
-        c.Clear()
 
-        hist_dict['shift'].SetTitle('Shift;Shift;CDF y')
-        hist_dict['shift'].Draw()
+        hist_dict['shift'].SetLineStyle(1)
+        hist_dict['shift_up'].SetLineStyle(2)
+        hist_dict['shift_down'].SetLineStyle(3)
+        d = {"Shift nominal"    :hist_dict['shift'],
+             "Shift up"         :hist_dict['shift_up'],
+             "Shift down"       :hist_dict['shift_down']}
 
-        c.Print(pdfname)
-        c.Clear()
+        self.plotGraphInCanvas(d,legend_pos=[0.2,0.2,0.5,0.5],pdfname=pdfname,title="Shift variations;Shift value;CDF y")
         
-        hist_dict['shift_inv'].SetTitle('Inverted Shift;CDF y;Shift')
-        hist_dict['shift_inv'].Draw()
+        hist_dict['shift_inv'].SetLineStyle(1)
+        hist_dict['shift_inv_up'].SetLineStyle(2)
+        hist_dict['shift_inv_down'].SetLineStyle(3)
 
-        c.Print(pdfname)
-        c.Clear()
+        d = {"Shift nominal"    :hist_dict['shift_inv'],
+             "Shift up"         :hist_dict['shift_inv_up'],
+             "Shift down"       :hist_dict['shift_inv_down']}
+        self.plotGraphInCanvas(d,legend_pos=[0.2,0.2,0.5,0.5],pdfname=pdfname,title="Shift variations;CDF y;Shift value")
+
+        hist_dict['cdf_tot_err'].SetLineStyle(1)
+        hist_dict['cdf_shift_err'].SetLineStyle(2)
+        hist_dict['cdf_bin_err'].SetLineStyle(3)
+
+        d = {"Total error"  : hist_dict['cdf_tot_err'],
+             "Shift error"  : hist_dict['cdf_shift_err'],
+             "Bin error"    : hist_dict['cdf_bin_err']}
+
+        self.plotGraphInCanvas(d,legend_pos=[0.5,0.4,0.85,0.75],pdfname=pdfname,title="Statistical error")
 
         c.Print(pdfname+']')
 
@@ -557,7 +677,6 @@ class WeightDY:
         histograms['ZPeak_2b'].Draw("same hist")
 
         leg1 = ROOT.TLegend(0.50,0.73,0.89,0.91)
-        leg1.SetHeader("Legend","C")
         leg1.SetTextSize(0.02)
         mode = "DY data estimation" if self.mode == "data" else "DY MC"
         leg1.AddEntry(histograms['ZVeto_0b'],"#splitline{Z Veto 0 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZVeto0b))
@@ -567,21 +686,22 @@ class WeightDY:
         leg1.Draw()
 
         text = ROOT.TPaveText(0.6,0.65,0.85,0.72,"NB NDC")
-        text.SetFillStyle(1001)
-        text.AddText("N_{1b}/N_{0b} = %0.5f"%self.factor_1b)
-        text.AddText("N_{2b}/N_{0b} = %0.5f"%self.factor_2b)
-        text.AddText("N_{0b}^{corr} = %0.5f"%self.factor_ZVeto)
+        #text.SetFillStyle(1001)
+        text.AddText("N_{Z peak}^{1b}/N_{Z peak}^{0b} = %0.5f"%self.factor_1b)
+        text.AddText("N_{Z peak}^{2b}/N_{Z peak}^{0b} = %0.5f"%self.factor_2b)
+        text.AddText("N_{Z veto}^{0b} = %0.5f"%self.factor_ZVeto)
+        text.SetBorderSize(0)
         text.Draw()
 
 
         ##########  PAD 2 ##########
         pad2.cd()
 
-        #self.weight_1b.SetMaximum(max(self.weight_1b.GetMaximum(),self.weight_2b.GetMaximum())*1.1)
+        self.weight_1b.SetMaximum(max(self.weight_1b.GetMaximum(),self.weight_2b.GetMaximum())*1.1)
         #self.weight_1b.SetMaximum(self.weight_1b.GetMaximum()*1.8)
 
-        content_w1b = np.ravel(hist2array(self.weight_1b))
-        self.weight_1b.SetMaximum(np.percentile(content_w1b,95))
+        #content_w1b = np.ravel(hist2array(self.weight_1b))
+        #self.weight_1b.SetMaximum(np.percentile(content_w1b,99))
         self.weight_1b.SetMinimum(0.)
         self.weight_1b.SetLineWidth(2)
         self.weight_2b.SetLineWidth(2)
@@ -602,11 +722,12 @@ class WeightDY:
         self.weight_1b.Draw("ep")
         self.weight_2b.Draw("ep same")
 
-        leg2 = ROOT.TLegend(0.65,0.85,0.89,0.98)
-        leg2.SetHeader("Legend","C")
+        leg2 = ROOT.TLegend(0.65,0.75,0.89,0.88)
         leg2.SetTextSize(0.03)
         leg2.AddEntry(self.weight_1b,"Weight (1b)")
         leg2.AddEntry(self.weight_2b,"Weight (2b)")
+        leg2.SetBorderSize(0)
+
         leg2.Draw()
 
         ##########  PAD 3 ##########
@@ -618,6 +739,10 @@ class WeightDY:
         self.shape_2b.SetLineWidth(2) 
         self.shape_1b.SetLineColor(602) 
         self.shape_2b.SetLineColor(600) 
+
+        if self.rebin_1D is not None:
+            histograms['ZVeto_1b'] = self.rebinWeights1D(histograms['ZVeto_1b'])
+            histograms['ZVeto_2b'] = self.rebinWeights1D(histograms['ZVeto_2b'])
 
         histograms['ZVeto_1b'].SetLineWidth(1)
         histograms['ZVeto_2b'].SetLineWidth(1)
@@ -642,7 +767,6 @@ class WeightDY:
         histograms['ZVeto_2b'].Draw("H same")
 
         leg3 = ROOT.TLegend(0.5,0.40,0.89,0.93)
-        leg3.SetHeader("Legend","C")
         leg3.SetTextSize(0.04)
         leg3.AddEntry(self.shape_1b,"#splitline{DY shape from data (1b)}{Integral = %0.2f}"%self.shape_1b.Integral() if self.mode == 'data' else "#splitline{DY shape from MC (1b)}{Integral = %0.2f}"%self.shape_1b.Integral())
         leg3.AddEntry(histograms['ZVeto_1b'],"#splitline{Z Veto (1b) (DY MC)}{Integral = %0.2f}"%self.N_ZVeto1b)
@@ -968,6 +1092,29 @@ if __name__ == "__main__":
                         title       = d['title']+' (#mu^{+}#mu^{-} channel)',
                         outputname  = d['filename'].format(**{'channel':'MuMu','type':'mc'}),
                         mode        = 'mc',
+                        era         = d['era'],
+                        xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
+                        yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
+                        rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
+                        rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
+    d["SameSignDLChannel"] = {cat:{'path':d['MuMuChannel'][cat]['path'],
+                                 'histname':[d['MuMuChannel'][cat]['histname'],d['ElElChannel'][cat]['histname']]}   
+                                 for cat in d['MuMuChannel'].keys()}
+    instance = WeightDY(channel     = 'SSDL',
+                        config      = d['SameSignDLChannel'],
+                        title       = d['title']+' (#mu^{+}#mu^{-} + e^{+}e^{-} channel)',
+                        outputname  = d['filename'].format(**{'channel':'SSDL','type':'mc'}),
+                        mode        = 'mc',
+                        era         = d['era'],
+                        xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
+                        yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
+                        rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
+                        rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
+    instance = WeightDY(channel     = 'SSDL',
+                        config      = d['SameSignDLChannel'],
+                        title       = d['title']+' (#mu^{+}#mu^{-} + e^{+}e^{-} channel)',
+                        outputname  = d['filename'].format(**{'channel':'SSDL','type':'data'}),
+                        mode        = 'data',
                         era         = d['era'],
                         xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
                         yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
