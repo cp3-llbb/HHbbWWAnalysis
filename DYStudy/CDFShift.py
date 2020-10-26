@@ -24,9 +24,12 @@ class CDFShift:
         print ('Output histogram will be scaled by %0.5f'%self.norm)
 
         # Normalize #
-        self.h1.Scale(1./self.h1.Integral())
-        self.h2.Scale(1./self.h2.Integral())
-        self.h3.Scale(1./self.h3.Integral())
+        if self.h1.Integral() != 0:
+            self.h1.Scale(1./self.h1.Integral())
+        if self.h2.Integral() != 0:
+            self.h2.Scale(1./self.h2.Integral())
+        if self.h3.Integral() != 0:
+            self.h3.Scale(1./self.h3.Integral())
 
         # Get CDF #
         self.cdf1 = self.produceCDF(self.h1,'cdf1') 
@@ -36,7 +39,8 @@ class CDFShift:
         self.additional_hist = deepcopy(additional_hist)
         for name in self.additional_hist:
             self.padHistNegativeBins(self.additional_hist[name])
-            self.additional_hist[name].Scale(1./self.additional_hist[name].Integral())
+            if self.additional_hist[name].Integral() != 0:
+                self.additional_hist[name].Scale(1./self.additional_hist[name].Integral())
         self.additional_cdf = {'cdf_'+name:self.produceCDF(hist,'cdf_'+name) for name,hist in self.additional_hist.items()}
 
         self.rootsave = {'h1'  : self.h1,
@@ -80,9 +84,14 @@ class CDFShift:
             cont2_down[-1] = 1
             print ('[Warning] cdf 2 down variation does not reach 1, artificially fix that')
 
-
+        if self.verbose:
+            print ("Producing the nominal shift")
         shift, ypos             = self.getShiftFromBinning(edges1,cont1,edges2,cont2)
+        if self.verbose:
+            print ("Producing the up shift")
         shift_up, ypos_up       = self.getShiftFromBinning(edges1,cont1_up,edges2,cont2_up)
+        if self.verbose:
+            print ("Producing the down shift")
         shift_down, ypos_down   = self.getShiftFromBinning(edges1,cont1_down,edges2,cont2_down)
 
         self.g,self.ginv              = self.plotShift(shift,ypos)
@@ -217,6 +226,7 @@ class CDFShift:
                     if self.verbose:
                         print ('First bin non zero, taking its x')
                 elif i2 == i2l: 
+                    #break # TODO : test
                     x2 = e2[i2l+1]
                     if self.verbose:
                         print ('Last bin, taking last edge')
@@ -248,6 +258,7 @@ class CDFShift:
                     if self.verbose:
                         print ('First bin non zero, taking its x')
                 elif i1 == i1l:
+                    #break # TODO : test
                     x1 = e1[i1l+1]
                     if self.verbose:
                         print ('Last bin, taking last edge')
@@ -313,6 +324,7 @@ class CDFShift:
         iiu = iuf
         iid = idf
         shift_var = [0]*len(c3)
+        kept_idx = []
         for i in range(len(c3)):
             y = c3[i]
             if self.verbose:
@@ -332,6 +344,7 @@ class CDFShift:
             up_var = su[iiu] + (y-yu[iiu])/(yu[iiu+1]-yu[iiu]) * (su[iiu+1]-su[iiu])
             down_var = sd[iid] + (y-yd[iid])/(yd[iid+1]-yd[iid]) * (sd[iid+1]-sd[iid])
             shift_var[i] = max(shift_var[i-1],math.sqrt(0.5*((sn[iin]-up_var)**2+(sn[iin]-down_var)**2)))
+            #shift_var[i] = math.sqrt(0.5*((sn[iin]-up_var)**2+(sn[iin]-down_var)**2))
 
             assert y>=yu[iiu] and y<=yu[iiu+1]
             assert y>=yd[iid] and y<=yd[iid+1]
@@ -359,9 +372,11 @@ class CDFShift:
             elif e3[i]+x > e3[-1]:
                 print ('Warning : idx %d %.10f after last bin %.10f'%(i,e3[i]+x,e3[-1]))
             else:
+                kept_idx.append(i)
                 nc3.append(y)
                 ne3.append(e3[i]+x)
-                nerr3.append(math.sqrt(err3[i]**2+shift_var[i]**2))
+                #nerr3.append(math.sqrt(err3[i]**2+shift_var[i]**2))
+                nerr3.append(err3[i])
             ngc3.append(y)
             nge3.append(e3[i]+x)
         ne3.append(e3[-1])
@@ -377,21 +392,20 @@ class CDFShift:
             self.gncdf3.SetPoint(i,nge3[i+1],ngc3[i])
         self.rootsave['gncdf3'] = self.gncdf3
     
-        self.cdf_bin_err = ROOT.TGraph(len(err3))
-        for i in range(len(err3)):
-            self.cdf_bin_err.SetPoint(i,e3[i],err3[i])
+        self.cdf_bin_err = ROOT.TGraph(len(kept_idx))
+        for i,ik in enumerate(kept_idx):
+            self.cdf_bin_err.SetPoint(i,ne3[i+1],err3[ik])
         self.rootsave['cdf_bin_err'] = self.cdf_bin_err
 
-        self.cdf_shift_err = ROOT.TGraph(len(shift_var))
-        for i in range(len(shift_var)):
-            self.cdf_shift_err.SetPoint(i,e3[i],shift_var[i])
+        self.cdf_shift_err = ROOT.TGraph(len(kept_idx))
+        for i,ik in enumerate(kept_idx):
+            self.cdf_shift_err.SetPoint(i,ne3[i+1],shift_var[ik])
         self.rootsave['cdf_shift_err'] = self.cdf_shift_err
 
-        self.cdf_tot_err = ROOT.TGraph(len(nerr3))
-        for i in range(len(nerr3)):
-            self.cdf_tot_err.SetPoint(i,ne3[i],nerr3[i])
+        self.cdf_tot_err = ROOT.TGraph(len(kept_idx))
+        for i in range(len(kept_idx)):
+            self.cdf_tot_err.SetPoint(i,ne3[i+1],nerr3[i])
         self.rootsave['cdf_tot_err'] = self.cdf_tot_err
-
 
         return ne3,nc3,nerr3
 
@@ -492,5 +506,6 @@ class CDFShift:
 
 
     def returnHist(self):
+        print ("\nWeight 2b integral : %0.5f\n"%self.weight_2b.Integral())
         return self.nh3
         

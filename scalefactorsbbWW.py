@@ -70,17 +70,7 @@ class ScaleFactorsbbWW:
                                                 entry_key   = 'DY_2016',
                                                 base_key    = '{channel}_{variable}_{type}_{btag}',
                                                 base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
-                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b'],
-                                                               'variable':['DNNoutputDY',
-                                                                           'DNNoutputH', 
-                                                                           'DNNoutputHH', 
-                                                                           'DNNoutputRare', 
-                                                                           'DNNoutputST', 
-                                                                           'DNNoutputTT', 
-                                                                           'DNNoutputTTVX', 
-                                                                           'DNNoutputVVV', 
-                                                                           'firstleptonPt',
-                                                                           'leadjetPt']})
+                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['data','mc'],'btag':['1b','2b'],'variable':['leadjetPt','fatjetsoftDropmass']})
 
         #  Fake rates #
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
@@ -93,6 +83,14 @@ class ScaleFactorsbbWW:
                                                 base_key    = '{syst}_syst',
                                                 base_str    = 'TTHFakeRates_Muon_2016_{syst}Syst.json',
                                                 format_dict = {'syst':['pt','barrel','norm']})
+
+        # PU ID SF #
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'Btag_SF',
+                                                entry_key   = 'jet_puid',
+                                                base_key    = '{eom}_{mcsf}_{era}_{wp}',
+                                                base_str    = 'PUID_80X_{eom}_{mcsf}_{era}_{wp}.json',
+                                                format_dict = {'eom':["eff", "mistag"],'mcsf':["mc", "sf"],'wp':['L','M','T'],'era':['2016','2017','2018']})
+                                                
 
         #----- 2017 -----#
         # Check links of 2016 #

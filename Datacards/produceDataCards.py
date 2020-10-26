@@ -93,23 +93,30 @@ class DataCard:
 
         # Loop through hists #
         hist_dict = {}
-        for datacardname, histname in self.hist_conv.items():
-            # Check #
-            if not histname in list_histnames:
-                print ("Could not find hist %s in %s"%(histname,rootfile))
-                continue
-            listsyst = [hn for hn in list_histnames if histname in hn and '__' in hn] if self.use_syst else []
-            # Nominal histogram #
-            h = self.getHistogram(f,histname,lumi,br,xsec,sumweight)
-            hist_dict[datacardname] = h
-            # Systematic histograms #
-            for syst in listsyst:
-                systName = syst.split('__')[-1]
-                systName.replace('up','Up')
-                systName.replace('down','Down')
-                h = self.getHistogram(f,syst,lumi,br,xsec,sumweight)
-                hist_dict[datacardname+'_'+systName] = h
-            # Save in dict #
+        for datacardname, histnames in self.hist_conv.items():
+            if not isinstance(histnames,list):
+                histnames = [histnames]
+            hist_dict[datacardname] = None
+            for histname in histnames:
+                # Check #
+                if not histname in list_histnames:
+                    print ("Could not find hist %s in %s"%(histname,rootfile))
+                    continue
+                listsyst = [hn for hn in list_histnames if histname in hn and '__' in hn] if self.use_syst else []
+                # Nominal histogram #
+                h = self.getHistogram(f,histname,lumi,br,xsec,sumweight)
+                if hist_dict[datacardname] is None:
+                    hist_dict[datacardname] = copy.deepcopy(h)
+                else:
+                    hist_dict[datacardname].Add(h)
+                # Systematic histograms #
+                for syst in listsyst:
+                    systName = syst.split('__')[-1]
+                    systName.replace('up','Up')
+                    systName.replace('down','Down')
+                    h = self.getHistogram(f,syst,lumi,br,xsec,sumweight)
+                    hist_dict[datacardname+'_'+systName] = h
+                # Save in dict #
         f.Close()
         return hist_dict
 
