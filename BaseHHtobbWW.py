@@ -64,7 +64,6 @@ Arguments for the HH->bbWW analysis on bamboo framework
         --TightResolved2b2j
         --SemiBoostedHbb
         --SemiBoostedWjj
-        --Boosted
         --TTBarCR
         --BtagReweightingOn
         --BtagReweightingOff
@@ -188,7 +187,11 @@ One lepton and and one jet argument must be specified in addition to the require
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for the semi boosted category (Hbb resolved, Wjj boosted)")
-        parser.add_argument("--Boosted", 
+        parser.add_argument("--Boosted0Btag", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the inclusive boosted category")
+        parser.add_argument("--Boosted1Btag", 
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for the inclusive boosted category")
@@ -239,7 +242,6 @@ One lepton and and one jet argument must be specified in addition to the require
         parser.add_argument("--Classifier", 
                             action      = "store",
                             type        = str,
-                            default     = "",
                             help        = "BDT-SM | BDT-Rad900 | DNN | LBN")
         parser.add_argument("--WhadTagger", 
                             action      = "store",
@@ -292,7 +294,7 @@ One lepton and and one jet argument must be specified in addition to the require
         # Check if basic synchronization is required (no corrections and triggers) #
         self.inclusive_sel = ((self.args.Synchronization 
                                   and not any([self.args.__dict__[key] for key in['Preselected', 'Fakeable', 'Tight', 'FakeExtrapolation']]) \
-                                  and not any([self.args.__dict__[key] for key in['Ak4', 'Ak8', 'Resolved0Btag', 'Resolved1Btag', 'Resolved2Btag', 'Boosted']]) \
+                                  and not any([self.args.__dict__[key] for key in['Ak4', 'Ak8', 'Resolved0Btag', 'Resolved1Btag', 'Resolved2Btag', 'Boosted0Btag','Boosted1Btag']]) \
                                   and (self.args.Channel is None or self.args.Channel=='None')) \
                                   # No channel selection
                                   # None is local mode, "None" in distributed mode
@@ -1035,12 +1037,14 @@ One lepton and and one jet argument must be specified in addition to the require
         if era == "2016":
             self.lambda_ak4JetsPreSel = lambda j : op.AND(
                                                         j.jetId & 1, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
+                                                        op.OR(j.puId,j.pt>=50), # Jet PU ID bit1 is loose (only to be applied to jets with pt<50)
                                                         j.pt >= 25.,
                                                         op.abs(j.p4.Eta())<= 2.4
                                                     )
         elif  era == "2017" or era == "2018":
             self.lambda_ak4JetsPreSel = lambda j : op.AND(
                                                         j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
+                                                        op.OR(j.puId,j.pt>=50), # Jet PU ID bit1 is loose (only to be applied to jets with pt<50)
                                                         j.pt >= 25.,
                                                         op.abs(j.p4.Eta())<= 2.4
                                                     )
@@ -1207,6 +1211,12 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         self.SF = ScaleFactorsbbWW()    
         if self.is_MC:
+            #---- PU ID SF ----#
+            self.jetpuid_sf_eff = self.SF.get_scalefactor("lepton", ('jet_puid','eff_sf_{}_L'.format(era)),combine="weight", systName="jetpuid_eff_sf", defineOnFirstUse=(not forSkimmer))
+            self.jetpuid_sf_mis = self.SF.get_scalefactor("lepton", ('jet_puid','mistag_sf_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag_sf", defineOnFirstUse=(not forSkimmer))
+            self.jetpuid_mc_eff = self.SF.get_scalefactor("lepton", ('jet_puid','eff_mc_{}_L'.format(era)),combine="weight", systName="jetpuid_eff_mc", defineOnFirstUse=(not forSkimmer))
+            self.jetpuid_mc_mis = self.SF.get_scalefactor("lepton", ('jet_puid','mistag_mc_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag_mc", defineOnFirstUse=(not forSkimmer))
+
             #---- Object SF -----# (Will take as argument the era)
             ####  Muons ####
             self.muLooseId = self.SF.get_scalefactor("lepton", 'muon_loose_{}'.format(era), combine="weight", systName="mu_loose", defineOnFirstUse=(not forSkimmer)) 
@@ -1316,6 +1326,23 @@ One lepton and and one jet argument must be specified in addition to the require
         #                             High level lambdas                            #
         #############################################################################
         self.HLL = highlevelLambdas(self)
+
+        #############################################################################
+        #                           Jet PU ID reweighting                           #
+        #############################################################################
+        if self.is_MC and not self.args.DYStitchingPlots and not self.args.WJetsStitchingPlots:
+            # TODO : add systematic variations 
+            ak4Jets_below50 = op.select(self.ak4Jets, lambda j : j.pt < 50.)
+            wFail = op.extMethod("scalefactorWeightForFailingObject", returnType="double")
+            puid_reweighting = op.rng_product(ak4Jets_below50, lambda j : op.switch(j.genJet.isValid,
+                                                                                    op.switch(j.puId & 1,
+                                                                                              self.jetpuid_sf_eff(j), 
+                                                                                              wFail(self.jetpuid_sf_eff(j), self.jetpuid_mc_eff(j))),
+                                                                                    op.switch(j.puId & 1,
+                                                                                              self.jetpuid_sf_mis(j), 
+                                                                                              wFail(self.jetpuid_sf_mis(j), self.jetpuid_mc_mis(j)))))
+            noSel.refine("jetPUIDReweighting",weight=puid_reweighting)
+
         
         #############################################################################
         #                             Fake Factors                                  #

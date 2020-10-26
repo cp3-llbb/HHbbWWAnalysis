@@ -158,7 +158,8 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
     y_val= y_val[:,:-1]
     
     # Design network #
-    with open(os.path.join(parameters.main_path,'scaler_'+parameters.suffix+'.pkl'), 'rb') as handle: # Import scaler that was created before
+    scaler_name = 'scaler_'+parameters.suffix+'_'.join(parameters.eras)+'.pkl' 
+    with open(os.path.join(parameters.main_path,scaler_name), 'rb') as handle: # Import scaler that was created before
         scaler = pickle.load(handle)
     IN = Input(shape=(x_train.shape[1],),name='IN')
     L0 = PreprocessLayer(batch_size=params['batch_size'],mean=scaler.mean_,std=scaler.scale_,name='Preprocess')(IN)
@@ -246,7 +247,8 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
     """
     
     # Design network #
-    with open(os.path.join(parameters.main_path,'scaler_'+parameters.suffix+'.pkl'), 'rb') as handle: # Import scaler that was created before
+    scaler_name = 'scaler_'+parameters.suffix+'_'.join(parameters.eras)+'.pkl' 
+    with open(os.path.join(parameters.main_path,scaler_name), 'rb') as handle: # Import scaler that was created before
         scaler = pickle.load(handle)
     IN = Input(shape=(x_train.shape[1],),name='IN')
     L0 = PreprocessLayer(batch_size=params['batch_size'],mean=scaler.mean_,std=scaler.scale_,name='Preprocess')(IN)

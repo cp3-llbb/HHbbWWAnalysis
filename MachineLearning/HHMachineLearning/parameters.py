@@ -15,11 +15,11 @@ from keras.regularizers import l1,l2
 ##################################  Path variables ####################################
 
 main_path = os.path.abspath(os.path.dirname(__file__))
-path_out = '/nfs/scratch/fynu/gsaha/HHMLOutput'
+path_out = '/home/ucl/cp3/fbury/scratch/HHMachineLearning_output/'
 path_model = os.path.join(main_path,'model')
 
 ##############################  Datasets proportion   #################################
-crossvalidation = True
+crossvalidation = False
 
 # Classic training #
 # -> For crossvalidation == False
@@ -128,15 +128,15 @@ reduceLR_params = {'monitor'    : 'val_loss',   # Value to monitor
 #    'loss_function' : [categorical_crossentropy] 
 #}
 p = { 
-    'lr' : [0.01], 
+    'lr' : [0.0001], 
     'first_neuron' : [256],
     'activation' : [relu],
     'dropout' : [0.],
-    'hidden_layers' : [3], # does not take into account the first layer
+    'hidden_layers' : [5], # does not take into account the first layer
     'output_activation' : [softmax],
     'l2' : [0],
     'optimizer' : [Adam],  
-    'epochs' : [5],   
+    'epochs' : [50],   
     'batch_size' : [100000], 
     'loss_function' : [categorical_crossentropy] 
 }
@@ -148,7 +148,8 @@ repetition = 1 # How many times each hyperparameter has to be used
 
 cut = 'MC_weight > 0'
 
-weight = 'total_weight'
+#weight = 'total_weight'
+weight = None
 
 # Input branches (combinations possible just as in ROOT #
 inputs = [
