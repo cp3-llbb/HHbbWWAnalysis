@@ -38,6 +38,7 @@ def main():
     # Select samples #
     #############################################################################################
     INPUT_DIR = os.path.join('/home/ucl/cp3/fbury/scratch/HHMachineLearning_output/',opt.model)
+    #INPUT_DIR = os.path.asbpath(opt.model)
     logging.info('Taking inputs from %s'%INPUT_DIR)
     
     # For each directory, puth the path in dict the value is the list of histograms #

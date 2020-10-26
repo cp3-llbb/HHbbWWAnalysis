@@ -280,22 +280,31 @@ def main():
                                                   lumi_dict                 = parameters.lumidict,
                                                   eras                      = era,
                                                   tree_name                 = parameters.tree_name,
-                                                  additional_columns        = {'tag':node,'era':era})
+                                                  additional_columns        = {'tag':node,'era':era},
+                                                  stop                      = 10000) # TODO : remove 
                     if data_node is None:
                         data_node = data_node_era
                     else:
                         data_node = pd.concat([data_node,data_node_era],axis=0)
-                    logging.info('\t{} class in era {} : sample size = {:10d}, weight sum = {:.3e} (with normalization = {:.3e})'.format(node,era,data_node_era.shape[0],data_node_era[parameters.weight].sum(),data_node_era['event_weight'].sum()))
+                    era_str = '\t{:5s} class in era {} : sample size = {:10d}'.format(node,era,data_node_era.shape[0])
+                    if parameters.weight is not None:
+                        era_str += ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_node_era[parameters.weight].sum(),data_node_era['event_weight'].sum())
+                    logging.info(era_str)
                 data_dict[node] = data_node
-                logging.info('{} class for all eras : sample size = {:10d}, weight sum = {:.3e} (with normalization = {:.3e})'.format(node,data_node.shape[0],data_node[parameters.weight].sum(),data_node['event_weight'].sum()))
+                all_eras_str = '{:5s} class for all eras : sample size =   {:10d}'.format(node,data_node.shape[0])
+                if parameters.weight is not None:
+                    all_eras_str +=  ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_node[parameters.weight].sum(),data_node['event_weight'].sum())
+                logging.info(all_eras_str)
 
             # Weight equalization #
-            if parameters.weight is not None:
-                for node, data in data_dict.items():
+            for node, data in data_dict.items():
+                if parameters.weight is not None:
                     sum_weights = data['event_weight'].sum()
                     logging.info('Sum of weight for %s samples : %.2e'%(node,sum_weights))
                     data['learning_weights'] = data['event_weight']/sum_weights*1e5
                     logging.info('\t -> After equalization : %0.2e (factor %0.2e)'%(data['learning_weights'].sum(),1.e5/sum_weights))
+                else:
+                    data['learning_weights'] = pd.Series([1.]*data.shape[0])
 
             # Data splitting #
             train_dict = {}
@@ -344,7 +353,7 @@ def main():
             if not parameters.crossvalidation:
                 test_integers = label_encoder.transform(test_all['tag']).reshape(-1, 1)
             # From labels to strings #
-            onehotobj = onehot_encoder.fit(np.arange(len(outputs)).reshape(-1, 1))
+            onehotobj = onehot_encoder.fit(np.arange(len(list_outputs)).reshape(-1, 1))
             train_onehot = onehotobj.transform(train_integers)
             if not parameters.crossvalidation:
                 test_onehot = onehotobj.transform(test_integers)

@@ -64,7 +64,6 @@ Arguments for the HH->bbWW analysis on bamboo framework
         --TightResolved2b2j
         --SemiBoostedHbb
         --SemiBoostedWjj
-        --Boosted
         --TTBarCR
         --BtagReweightingOn
         --BtagReweightingOff
@@ -188,7 +187,11 @@ One lepton and and one jet argument must be specified in addition to the require
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for the semi boosted category (Hbb resolved, Wjj boosted)")
-        parser.add_argument("--Boosted", 
+        parser.add_argument("--Boosted0Btag", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the inclusive boosted category")
+        parser.add_argument("--Boosted1Btag", 
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for the inclusive boosted category")
@@ -291,7 +294,7 @@ One lepton and and one jet argument must be specified in addition to the require
         # Check if basic synchronization is required (no corrections and triggers) #
         self.inclusive_sel = ((self.args.Synchronization 
                                   and not any([self.args.__dict__[key] for key in['Preselected', 'Fakeable', 'Tight', 'FakeExtrapolation']]) \
-                                  and not any([self.args.__dict__[key] for key in['Ak4', 'Ak8', 'Resolved0Btag', 'Resolved1Btag', 'Resolved2Btag', 'Boosted']]) \
+                                  and not any([self.args.__dict__[key] for key in['Ak4', 'Ak8', 'Resolved0Btag', 'Resolved1Btag', 'Resolved2Btag', 'Boosted0Btag','Boosted1Btag']]) \
                                   and (self.args.Channel is None or self.args.Channel=='None')) \
                                   # No channel selection
                                   # None is local mode, "None" in distributed mode
@@ -1328,10 +1331,7 @@ One lepton and and one jet argument must be specified in addition to the require
         #                           Jet PU ID reweighting                           #
         #############################################################################
         if self.is_MC and not self.args.DYStitchingPlots and not self.args.WJetsStitchingPlots:
-            self.jetpuid_sf_eff = self.SF.get_scalefactor("lepton", ('jet_puid','eff_sf_{}_L'.format(era)),combine="weight", systName="jetpuid_eff_sf", defineOnFirstUse=(not forSkimmer))
-            self.jetpuid_sf_mis = self.SF.get_scalefactor("lepton", ('jet_puid','mistag_sf_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag_sf", defineOnFirstUse=(not forSkimmer))
-            self.jetpuid_mc_eff = self.SF.get_scalefactor("lepton", ('jet_puid','eff_mc_{}_L'.format(era)),combine="weight", systName="jetpuid_eff_mc", defineOnFirstUse=(not forSkimmer))
-            self.jetpuid_mc_mis = self.SF.get_scalefactor("lepton", ('jet_puid','mistag_mc_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag_mc", defineOnFirstUse=(not forSkimmer))
+            # TODO : add systematic variations 
             ak4Jets_below50 = op.select(self.ak4Jets, lambda j : j.pt < 50.)
             wFail = op.extMethod("scalefactorWeightForFailingObject", returnType="double")
             puid_reweighting = op.rng_product(ak4Jets_below50, lambda j : op.switch(j.genJet.isValid,
