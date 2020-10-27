@@ -1,0 +1,242 @@
+path: /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV6_Tight_Fake_AllDNN/
+use_syst: False
+
+hist_conv:
+  HH_cat_ee_0b_fatjet1_pt: ElEl_HasElElTightOneAk8JetInclusiveBoostedNoBtag_fatjet_pt
+  HH_cat_ee_1b_fatjet1_pt: ElEl_HasElElTightOneAk8JetInclusiveBoostedOneBtag_fatjet_pt
+
+  HH_cat_ee_0b_fatjet1_softdropmass: ElEl_HasElElTightOneAk8JetInclusiveBoostedNoBtag_fatjet_softdropmass
+  HH_cat_ee_1b_fatjet1_softdropmass: ElEl_HasElElTightOneAk8JetInclusiveBoostedOneBtag_fatjet_softdropmass
+
+  HH_cat_mm_0b_fatjet1_pt: MuMu_HasMuMuTightOneAk8JetInclusiveBoostedNoBtag_fatjet_pt
+  HH_cat_mm_1b_fatjet1_pt: MuMu_HasMuMuTightOneAk8JetInclusiveBoostedOneBtag_fatjet_pt
+
+  HH_cat_mm_0b_fatjet1_softdropmass: MuMu_HasMuMuTightOneAk8JetInclusiveBoostedNoBtag_fatjet_softdropmass
+  HH_cat_mm_1b_fatjet1_softdropmass: MuMu_HasMuMuTightOneAk8JetInclusiveBoostedOneBtag_fatjet_softdropmass
+
+
+  HH_cat_SSDL_0b_fatjet1_pt: 
+    - ElEl_HasElElTightOneAk8JetInclusiveBoostedNoBtag_fatjet_pt
+    - MuMu_HasMuMuTightOneAk8JetInclusiveBoostedNoBtag_fatjet_pt
+  HH_cat_SSDL_1b_fatjet1_pt: 
+    - ElEl_HasElElTightOneAk8JetInclusiveBoostedOneBtag_fatjet_pt
+    - MuMu_HasMuMuTightOneAk8JetInclusiveBoostedOneBtag_fatjet_pt
+
+  HH_cat_SSDL_0b_fatjet1_softdropmass: 
+    - ElEl_HasElElTightOneAk8JetInclusiveBoostedNoBtag_fatjet_softdropmass
+    - MuMu_HasMuMuTightOneAk8JetInclusiveBoostedNoBtag_fatjet_softdropmass
+  HH_cat_SSDL_1b_fatjet1_softdropmass: 
+    - ElEl_HasElElTightOneAk8JetInclusiveBoostedOneBtag_fatjet_softdropmass
+    - MuMu_HasMuMuTightOneAk8JetInclusiveBoostedOneBtag_fatjet_softdropmass
+
+
+yamlName: plots_FakeExtrapolation.yml
+
+era: 2018
+
+groups:
+  data_obs: 
+    - DoubleMuon_2018A.root
+    - DoubleMuon_2018B.root
+    - DoubleMuon_2018C.root
+    - DoubleMuon_2018D.root
+    - EGamma_2018A.root
+    - EGamma_2018B.root
+    - EGamma_2018C.root
+    - EGamma_2018D.root
+    - MuonEG_2018A.root
+    - MuonEG_2018B.root
+    - MuonEG_2018C.root
+    - MuonEG_2018D.root
+    - SingleMuon_2018A.root
+    - SingleMuon_2018B.root
+    - SingleMuon_2018C.root
+    - SingleMuon_2018D.root
+  DY:
+    - DYJetsToLL_M-10to50.root
+    - DYJetsToLL_M-50.root
+    - DYToLL_0J.root
+    - DYToLL_1J.root
+    - DYToLL_2J.root
+  TT:
+    - ST_schannel_4f.root
+    - ST_tchannel_antitop_4f.root
+    - ST_tchannel_top_4f.root
+    - ST_tW_antitop_5f.root
+    - ST_tWll_5f.root
+    - ST_tW_top_5f.root
+    - TTTo2L2Nu.root
+    - TTToHadronic.root
+    - TTToSemiLeptonic.root
+  WJets:
+    - WJetsToLNu_HT-100To200.root
+    - WJetsToLNu_HT-1200To2500.root
+    - WJetsToLNu_HT-200To400.root
+    - WJetsToLNu_HT-2500ToInf.root
+    - WJetsToLNu_HT-400To600.root
+    - WJetsToLNu_HT-600To800.root
+    - WJetsToLNu_HT-70To100.root
+    - WJetsToLNu_HT-800To1200.root
+    - WJetsToLNu.root
+    - W1JetsToLNu.root
+    - W2JetsToLNu.root
+    - W3JetsToLNu.root
+    - W4JetsToLNu.root
+  VH:
+    - WminusH_HToBB_WToLNu.root
+    - WplusH_HToBB_WToLNu.root
+    - ZH_HToBB_ZToLL.root
+    - ZHToTauTau.root
+    - HZJ_HToWW.root
+    - VHToNonbb.root
+  TH:
+    - THQ.root
+    - THW.root
+  TTH:
+    - ttHJetTobb.root
+    - ttHJetToNonbb.root
+  ZZ:
+    - ZZTo2L2Q.root
+    - ZZTo4L.root
+    - ZZZ.root
+  WZ:
+    - WZG.root
+    - WZTo2L2Q.root
+    - WZTo3LNu.root
+    - WZZ.root
+  WW:
+    - WWTo2L2Nu_DoubleScattering.root
+    - WWTo2L2Nu.root
+    - WWToLNuQQ.root
+    - WWW.root
+    - WWZ.root
+  TTZ:
+    - TTZH.root
+    - TTZToLL_M-1to10.root
+    - TTZToLLNuNu_M-10.root
+    - TTZToQQ.root
+  TTW:
+    - TTWH.root
+    - TTWJetsToLNu.root
+    - TTWJetsToQQ.root
+  TTWW:
+    - TTWW.root
+  Other:
+    - GluGluHToBB.root
+    - GluGluHToGG.root
+    - GluGluHToMuMu.root
+    - GluGluHToTauTau.root
+    - GluGluHToWWTo2L2Nu.root
+    - GluGluHToWWToLNuQQ.root
+    - GluGluHToZZTo2L2Q.root
+    - GluGluHToZZTo4L.root
+    - VBFHToBB.root
+    - VBFHToGG.root
+    - VBFHToMuMu.root
+    - VBFHToTauTau.root
+    - VBFHToWWTo2L2Nu.root
+    - VBFHToWWToLNuQQ.root
+    - VBFHToZZTo4L.root
+    - TGJets.root
+    - TTGJets.root
+    - TTTT.root
+    - WGToLNuG.root
+    - WpWpJJ.root
+    - tZq_ll.root
+    - ZGToLLG.root
+  data_fake:
+    - DoubleMuon_2018AFakeExtrapolation.root
+    - DoubleMuon_2018BFakeExtrapolation.root
+    - DoubleMuon_2018CFakeExtrapolation.root
+    - DoubleMuon_2018DFakeExtrapolation.root
+    - DYJetsToLL_M-10to50FakeExtrapolation.root
+    - DYJetsToLL_M-50FakeExtrapolation.root
+    - DYToLL_0JFakeExtrapolation.root
+    - DYToLL_1JFakeExtrapolation.root
+    - DYToLL_2JFakeExtrapolation.root
+    - EGamma_2018AFakeExtrapolation.root
+    - EGamma_2018BFakeExtrapolation.root
+    - EGamma_2018CFakeExtrapolation.root
+    - EGamma_2018DFakeExtrapolation.root
+    - GluGluHToBBFakeExtrapolation.root
+    - GluGluHToGGFakeExtrapolation.root
+    - GluGluHToMuMuFakeExtrapolation.root
+    - GluGluHToTauTauFakeExtrapolation.root
+    - GluGluHToWWTo2L2NuFakeExtrapolation.root
+    - GluGluHToWWToLNuQQFakeExtrapolation.root
+    - GluGluHToZZTo2L2QFakeExtrapolation.root
+    - GluGluHToZZTo4LFakeExtrapolation.root
+    - HZJ_HToWWFakeExtrapolation.root
+    - MuonEG_2018AFakeExtrapolation.root
+    - MuonEG_2018BFakeExtrapolation.root
+    - MuonEG_2018CFakeExtrapolation.root
+    - MuonEG_2018DFakeExtrapolation.root
+    - SingleMuon_2018AFakeExtrapolation.root
+    - SingleMuon_2018BFakeExtrapolation.root
+    - SingleMuon_2018CFakeExtrapolation.root
+    - SingleMuon_2018DFakeExtrapolation.root
+    - ST_schannel_4fFakeExtrapolation.root
+    - ST_tchannel_antitop_4fFakeExtrapolation.root
+    - ST_tchannel_top_4fFakeExtrapolation.root
+    - ST_tW_antitop_5fFakeExtrapolation.root
+    - ST_tWll_5fFakeExtrapolation.root
+    - ST_tW_top_5fFakeExtrapolation.root
+    - TGJetsFakeExtrapolation.root
+    - THQFakeExtrapolation.root
+    - THWFakeExtrapolation.root
+    - TTGJetsFakeExtrapolation.root
+    - ttHJetTobbFakeExtrapolation.root
+    - ttHJetToNonbbFakeExtrapolation.root
+    - TTTo2L2NuFakeExtrapolation.root
+    - TTToHadronicFakeExtrapolation.root
+    - TTToSemiLeptonicFakeExtrapolation.root
+    - TTTTFakeExtrapolation.root
+    - TTWHFakeExtrapolation.root
+    - TTWJetsToLNuFakeExtrapolation.root
+    - TTWJetsToQQFakeExtrapolation.root
+    - TTWWFakeExtrapolation.root
+    - TTZHFakeExtrapolation.root
+    - TTZToLL_M-1to10FakeExtrapolation.root
+    - TTZToLLNuNu_M-10FakeExtrapolation.root
+    - TTZToQQFakeExtrapolation.root
+    - tZq_llFakeExtrapolation.root
+    - VBFHToBBFakeExtrapolation.root
+    - VBFHToGGFakeExtrapolation.root
+    - VBFHToMuMuFakeExtrapolation.root
+    - VBFHToTauTauFakeExtrapolation.root
+    - VBFHToWWTo2L2NuFakeExtrapolation.root
+    - VBFHToWWToLNuQQFakeExtrapolation.root
+    - VBFHToZZTo4LFakeExtrapolation.root
+    - VHToNonbbFakeExtrapolation.root
+    - W1JetsToLNuFakeExtrapolation.root
+    - W2JetsToLNuFakeExtrapolation.root
+    - W3JetsToLNuFakeExtrapolation.root
+    - W4JetsToLNuFakeExtrapolation.root
+    - WGToLNuGFakeExtrapolation.root
+    - WJetsToLNuFakeExtrapolation.root
+    - WJetsToLNu_HT-100To200FakeExtrapolation.root
+    - WJetsToLNu_HT-1200To2500FakeExtrapolation.root
+    - WJetsToLNu_HT-200To400FakeExtrapolation.root
+    - WJetsToLNu_HT-2500ToInfFakeExtrapolation.root
+    - WJetsToLNu_HT-400To600FakeExtrapolation.root
+    - WJetsToLNu_HT-600To800FakeExtrapolation.root
+    - WJetsToLNu_HT-70To100FakeExtrapolation.root
+    - WJetsToLNu_HT-800To1200FakeExtrapolation.root
+    - WminusH_HToBB_WToLNuFakeExtrapolation.root
+    - WplusH_HToBB_WToLNuFakeExtrapolation.root
+    - WpWpJJFakeExtrapolation.root
+    - WWTo2L2Nu_DoubleScatteringFakeExtrapolation.root
+    - WWTo2L2NuFakeExtrapolation.root
+    - WWToLNuQQFakeExtrapolation.root
+    - WWWFakeExtrapolation.root
+    - WWZFakeExtrapolation.root
+    - WZGFakeExtrapolation.root
+    - WZTo2L2QFakeExtrapolation.root
+    - WZTo3LNuFakeExtrapolation.root
+    - WZZFakeExtrapolation.root
+    - ZGToLLGFakeExtrapolation.root
+    - ZH_HToBB_ZToLLFakeExtrapolation.root
+    - ZHToTauTauFakeExtrapolation.root
+    - ZZTo2L2QFakeExtrapolation.root
+    - ZZTo4LFakeExtrapolation.root
+    - ZZZFakeExtrapolation.root
