@@ -732,51 +732,69 @@ def MakeMultiROCPlot(list_obj,name,title=None):
     #----- Confusion matrix -----#
     y_true = None
     y_pred = None
+    sample_weight = None
     for i,obj in enumerate(list_obj):
         if y_pred is None and y_true is None:
             y_true = obj.scores
             y_pred = obj.prob_per_class
+            sample_weight = obj.weight
         else:   
             y_true.append(obj.scores,axis=0)
             y_pred.append(obj.prob_per_class,axis=0)
+            if sample_weight is not None:
+                sample_weight.append(obj.weight,axis=0)
         
     # From multi class to one hot #
     y_true = y_true.argmax(axis=1)
     y_pred = y_pred.argmax(axis=1)
-    cm = confusion_matrix(y_true,y_pred)
+    if sample_weight is not None:
+        sample_weight = sample_weight.reshape(-1)
+    cm = confusion_matrix(y_true,y_pred,sample_weight=sample_weight)
     accuracy = np.trace(cm) / float(np.sum(cm))                                                      
     misclass = 1 - accuracy
 
     # Normalize #
-    cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+    cmx = cm/np.tile(cm.sum(axis=0),cm[0].shape[0]).reshape(*cm.shape)
+    cmy = cm/np.repeat(cm.sum(axis=1),cm[0].shape[0]).reshape(*cm.shape)
+
     # Cmap #
-    cmap = plt.get_cmap('Blues')
+    cmapx = plt.get_cmap('Blues')
+    cmapy = plt.get_cmap('Reds')
+    cmap = plt.get_cmap('Greens')
 
-    # Plot CM #
-    fig = plt.figure(figsize=(10, 9))
-    plt.subplots_adjust(left=0.10, right=0.99, top=0.90, bottom=0.10)
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    fig.suptitle('Confusion matrix')
-    plt.colorbar()
+    for cmi,cmap,label in zip([cm,cmx,cmy],[cmap,cmapx,cmapy],['plain','normedx','normedy']):
+        # Plot CM #
+        fig = plt.figure(figsize=(10, 9))
+        plt.subplots_adjust(left=0.10, right=0.99, top=0.90, bottom=0.10)
+        plt.imshow(cmi, interpolation='nearest', cmap=cmap)
+        fig.suptitle('Confusion matrix')
+        plt.colorbar()
 
-    target_names = list_obj[0].lb.classes_
+        target_names = list_obj[0].lb.classes_
 
-    tick_marks = np.arange(len(target_names))
-    plt.xticks(tick_marks, target_names, rotation=45)
-    plt.yticks(tick_marks, target_names)
+        tick_marks = np.arange(len(target_names))
+        plt.xticks(tick_marks, target_names, rotation=45)
+        plt.yticks(tick_marks, target_names)
 
-    # Labels and numbers #
-    thresh = cm.max() / 1.5
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, "{:0.2f}".format(cm[i, j]),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
+        # Labels and numbers #
+        thresh = cmi.max() / 1.5
+        for i, j in itertools.product(range(cmi.shape[0]), range(cmi.shape[1])):
+            plt.text(j, i, "{:0.2f}".format(cmi[i, j]),
+                     horizontalalignment="center",
+                     color="white" if cmi[i, j] > thresh else "black")
 
-    plt.ylabel('True label (normed)')
-    plt.xlabel('Predicted label')
-    fig.savefig(name+'_confusion.png')#,bbox_inches='tight')
-    logging.info('Confusion matrix curved saved as %s_confusion.png'%name)
-    plt.close(fig)
+        xlabel = 'Predicted label'
+        ylabel = 'True label'
+        if label == 'normedx':
+            xlabel += ' (normed)'
+        if label == 'normedy':
+            ylabel += ' (normed)'
+        plt.ylabel(xlabel)
+        plt.xlabel(ylabel)
+        namefig = '%s_%s.png'%(name,label)
+        fig.savefig(namefig)#,bbox_inches='tight')
+        logging.info('Confusion matrix curved saved as %s'%namefig)
+        plt.close(fig)
 
 
 #####################################   ProcessYAML   ############################################

@@ -44,6 +44,7 @@ import parameters
 from split_training import DictSplit
 from plot_scans import PlotScans
 from preprocessing import PreprocessLayer
+import OneHot
 from data_generator import DataGenerator
 from generate_mask import GenerateSliceIndices, GenerateSliceMask
 import Model
@@ -57,14 +58,20 @@ class HyperModel:
     #############################################################################################
     def __init__(self,name,list_inputs=None,list_outputs=None):
         self.name = name
-        self.custom_objects =  {'PreprocessLayer': PreprocessLayer} # Needs to be specified when saving and restoring
+        self.custom_objects =  {'PreprocessLayer': PreprocessLayer,
+                                'OneHot': OneHot.OneHot} 
+                                # Needs to be specified when saving and restoring
         self.list_inputs = list_inputs
         self.list_outputs = list_outputs
         # Printing #
         if self.list_inputs is not None:
             logging.info('Number of features : %d'%len(self.list_inputs))
-            for name in self.list_inputs:
-                logging.info('..... %s'%name)
+            for name,onehot in zip(self.list_inputs,parameters.onehots):
+                if onehot != 'onehot_unit':
+                    onehot_inst = getattr(OneHot,onehot)()
+                    logging.info('..... %s (onehot encoding : %d bits)'%(name,1+onehot_inst.add_dim))
+                else:
+                    logging.info('..... %s'%name)
         if self.list_outputs is not None:
             logging.info('Number of outputs : %d'%len(self.list_outputs))
             for name in self.list_outputs:

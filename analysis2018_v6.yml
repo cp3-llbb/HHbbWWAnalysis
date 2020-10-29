@@ -898,12 +898,15 @@ samples:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
     split: 50
 
-#### Data Driven 
+#### Data Driven : uses and replaces are overriden anyway
 datadriven:
   DYEstimation:
-    uses: [ data ]
+    uses: [ all ]
     replaces: [ DY ]
   FakeExtrapolation:
+    uses : [all]
+    replaces : [all]
+  PseudoData:
     uses : [all]
     replaces : [all]
 
@@ -926,11 +929,12 @@ plotIt:
     ttbar:
       fill-color: "#cc7a16"
       legend: tt
-    ST: 
+      order: 1
+    ST:
       fill-color: "#99053d"
-      legend: Single Top 
+      legend: Single Top
       order: 2
-    DY: 
+    DY:
       fill-color: "#1a83a1"
       legend: Drell-Yan
       order: 3
@@ -946,7 +950,7 @@ plotIt:
       fill-color: "#174704"
       legend: tt+VX
       order: 6
-    SM: 
+    SM:
       fill-color: "#06b894"
       legend: SM Higgs (ggH, qqH, VH)
       order: 7
@@ -961,7 +965,8 @@ plotIt:
     Fake:
       fill-color: "#6e3303"
       legend: Fake
-      order: 8
+      order: 9
+
 
   systematics:
       # on the jets

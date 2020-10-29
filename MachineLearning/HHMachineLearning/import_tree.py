@@ -48,6 +48,15 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
     N = tree.GetEntries()
     logging.debug('\tNumber of events : %d'%N)
 
+    # Read the tree and convert it to a numpy structured array
+    if weight is not None:
+        variables += [weight]
+    data = tree2array(tree, branches=variables, selection=cut, start=start, stop=stop)
+
+    # Convert to pandas dataframe #
+    df = pd.DataFrame(data)
+
+     # Reweighting #
     relative_weight = 1
     if weight is not None and xsec is not None and event_weight_sum is not None:
         if luminosity is None:
@@ -58,13 +67,10 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
         logging.debug('\t\t\tEvent weight sum : %0.2f'%event_weight_sum)
         logging.debug('\t\t\tLuminosity : %0.2f'%luminosity)
         logging.debug('\t\tRelative weight %0.3e'%relative_weight)
-    # Read the tree and convert it to a numpy structured array
-    if weight is not None:
-        variables += [weight]
-    data = tree2array(tree, branches=variables, selection=cut, start=start, stop=stop)
-    
-    # Convert to pandas dataframe #
-    df = pd.DataFrame(data)
+        df['cross_section'] = np.ones(df.shape[0])*xsec
+        df['luminosity'] = np.ones(df.shape[0])*luminosity
+        df['event_weight_sum'] = np.ones(df.shape[0])*event_weight_sum
+   
     if weight is not None:
         df['event_weight'] = df[weight]*relative_weight
     else:
@@ -133,17 +139,13 @@ def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=
 
         # Cross section #
         xsec = None
-        if xsec_dict is not None:
-            for name,xs in xsec_dict[era].items():
-                if name in sample_name:
-                    xsec = xs
+        if xsec_dict is not None and sample_name in xsec_dict[era].keys():
+            xsec = xsec_dict[era][sample_name]
 
         # Event weight sum #
         event_weight_sum = None
-        if event_weight_sum_dict is not None:
-            for name,ews in event_weight_sum_dict[era].items():
-                if name in sample_name:
-                    event_weight_sum = ews
+        if event_weight_sum_dict is not None and sample_name in event_weight_sum_dict[era].keys():
+            event_weight_sum = event_weight_sum_dict[era][sample_name]
 
         # Luminority #
         luminosity = None
