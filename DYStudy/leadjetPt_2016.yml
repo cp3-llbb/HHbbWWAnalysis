@@ -1,0 +1,50 @@
+path_ZVeto: &path_ZVeto /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_Tight_Fake_AllDNN/
+path_ZPeak: &path_ZPeak /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_Tight_Fake_ZPeak_AllDNN/
+
+
+era: '2016'
+title: 'Lead Jet P_{T}'
+xaxis: 'Lead jet P_{T}'
+filename: 'weight_leadjetPt_{channel}_{type}_1D'
+category: 'resolved'
+rebin_1D: [0,5,10,15,20,25,30,35,40,45,50,60,70,80,90,100,120,140,160,200]
+
+ElElChannel:
+  ZVeto_0b:
+    path: *path_ZVeto
+    histname: ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt
+  ZVeto_1b: 
+    path: *path_ZVeto
+    histname: ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt
+  ZVeto_2b: 
+    path: *path_ZVeto
+    histname: ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt
+  ZPeak_0b:
+    path: *path_ZPeak
+    histname: ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt
+  ZPeak_1b: 
+    path: *path_ZPeak
+    histname: ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt
+  ZPeak_2b: 
+    path: *path_ZPeak
+    histname: ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt
+
+MuMuChannel:
+  ZVeto_0b:
+    path: *path_ZVeto
+    histname: MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt
+  ZVeto_1b: 
+    path: *path_ZVeto
+    histname: MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt
+  ZVeto_2b: 
+    path: *path_ZVeto
+    histname: MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt
+  ZPeak_0b:
+    path: *path_ZPeak
+    histname: MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt
+  ZPeak_1b: 
+    path: *path_ZPeak
+    histname: MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt
+  ZPeak_2b: 
+    path: *path_ZPeak
+    histname: MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt

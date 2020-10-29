@@ -16,20 +16,29 @@ ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 
 class WeightDY:
-    def __init__(self, channel, config, title, outputname, mode, era, xaxis, yaxis, rebin_1D=None, rebin_2D=None):
+    def __init__(self, channel, config, title, outputname, mode, cat, era, xaxis, yaxis, rebin_1D=None, rebin_2D=None):
         self.channel    = channel
         self.config     = config
         self.mode       = mode
+        self.cat        = cat
         self.era        = era
         self.title      = title
         self.xaxis      = xaxis
         self.yaxis      = yaxis
         self.rebin_1D   = rebin_1D
         self.rebin_2D   = rebin_2D
-        path_out = os.path.join(os.path.abspath(os.path.dirname(__file__)),'weights')
-        if not os.path.exists(path_out):
-            os.makedirs(path_out)
-        self.outputname = os.path.join(path_out,outputname)
+        path_out_root = os.path.join(os.path.abspath(os.path.dirname(__file__)),'weights','root')
+        path_out_pdf  = os.path.join(os.path.abspath(os.path.dirname(__file__)),'weights','pdf')
+        path_out_json = os.path.join(os.path.abspath(os.path.dirname(__file__)),'weights','json')
+        if not os.path.exists(path_out_root):
+            os.makedirs(path_out_root)
+        if not os.path.exists(path_out_pdf):
+            os.makedirs(path_out_pdf)
+        if not os.path.exists(path_out_json):
+            os.makedirs(path_out_json)
+        self.outputname_root = os.path.join(path_out_root,outputname)
+        self.outputname_pdf  = os.path.join(path_out_pdf,outputname)
+        self.outputname_json = os.path.join(path_out_json,outputname)
         self.hist_type  = None # TH1 or TH2
 
         self.histograms = {}
@@ -39,7 +48,9 @@ class WeightDY:
             self.histograms[cat] = self.produceDistribution(cat,dirInfo)
 
         self.produceShape(self.histograms)
-        self.produceCDFShift(self.histograms)
+
+        if self.cat == 'resolved':
+            self.produceCDFShift(self.histograms)
 
         if self.hist_type == 'TH1':
             self.plotWeights1D()
@@ -206,111 +217,128 @@ class WeightDY:
             dist.GetYaxis().SetTitle(self.yaxis)
         return dist
 
+    def getNumericalFactors(self):
+        with open('numerical.yml','r') as f:
+            d = yaml.load(f)[int(self.era)][self.cat]
+
+        if self.channel == "ElEl":
+            self.factor_ZVeto = d['ZVeto_0b']['ElEl']['S+B'] / d['ZVeto_0b']['ElEl']['prefit']
+            self.factor_1b    = d['ZPeak_1b']['ElEl']['S+B'] / d['ZPeak_0b']['ElEl']['S+B']
+            if self.cat == 'resolved':
+                self.factor_2b  = d['ZPeak_2b']['ElEl']['S+B'] / d['ZPeak_0b']['ElEl']['S+B']
+
+        elif self.channel == "MuMu":
+            self.factor_ZVeto = d['ZVeto_0b']['MuMu']['S+B'] / d['ZVeto_0b']['MuMu']['prefit']
+            self.factor_1b    = d['ZPeak_1b']['MuMu']['S+B'] / d['ZPeak_0b']['MuMu']['S+B']
+            if self.cat == 'resolved':
+                self.factor_2b  = d['ZPeak_2b']['MuMu']['S+B'] / d['ZPeak_0b']['MuMu']['S+B']
+        elif self.channel == "SSDL":
+            self.factor_ZVeto = (d['ZVeto_0b']['ElEl']['S+B']+d['ZVeto_0b']['MuMu']['S+B']) / (d['ZVeto_0b']['ElEl']['prefit']+d['ZVeto_0b']['MuMu']['prefit'])
+            self.factor_1b    = (d['ZPeak_1b']['ElEl']['S+B']+d['ZPeak_1b']['MuMu']['S+B']) / (d['ZPeak_0b']['ElEl']['S+B']+d['ZPeak_0b']['MuMu']['S+B'])
+            if self.cat == 'resolved':
+                self.factor_2b    = (d['ZPeak_2b']['ElEl']['S+B']+d['ZPeak_2b']['MuMu']['S+B']) / (d['ZPeak_0b']['ElEl']['S+B']+d['ZPeak_0b']['MuMu']['S+B'])
+        else:
+            raise RuntimeError("Channel '%s' not understood"%self.channel)
+        
     def produceShape(self,hist_dict):
         hist_dict = copy.deepcopy(hist_dict)
 
         self.N_ZPeak0b = hist_dict['ZPeak_0b'].Integral()
         self.N_ZPeak1b = hist_dict['ZPeak_1b'].Integral()
-        self.N_ZPeak2b = hist_dict['ZPeak_2b'].Integral()
         self.N_ZVeto0b = hist_dict['ZVeto_0b'].Integral()
         self.N_ZVeto1b = hist_dict['ZVeto_1b'].Integral()
-        self.N_ZVeto2b = hist_dict['ZVeto_2b'].Integral()
+        if self.cat == 'resolved':
+            self.N_ZPeak2b = hist_dict['ZPeak_2b'].Integral()
+            self.N_ZVeto2b = hist_dict['ZVeto_2b'].Integral()
 
         # Rebin if requested #
         if self.hist_type == 'TH1' and self.rebin_1D is not None:
             hist_dict['ZPeak_0b'] = self.rebinWeights1D(hist_dict['ZPeak_0b'])
             hist_dict['ZPeak_1b'] = self.rebinWeights1D(hist_dict['ZPeak_1b'])
-            hist_dict['ZPeak_2b'] = self.rebinWeights1D(hist_dict['ZPeak_2b'])
             hist_dict['ZVeto_0b'] = self.rebinWeights1D(hist_dict['ZVeto_0b'])
             hist_dict['ZVeto_1b'] = self.rebinWeights1D(hist_dict['ZVeto_1b'])
-            hist_dict['ZVeto_2b'] = self.rebinWeights1D(hist_dict['ZVeto_2b'])
+            if self.cat == 'resolved':
+                hist_dict['ZPeak_2b'] = self.rebinWeights1D(hist_dict['ZPeak_2b'])
+                hist_dict['ZVeto_2b'] = self.rebinWeights1D(hist_dict['ZVeto_2b'])
         if self.hist_type == 'TH2' and self.rebin_2D is not None:
             hist_dict['ZPeak_0b'] = self.rebinWeights2D(hist_dict['ZPeak_0b'])
             hist_dict['ZPeak_1b'] = self.rebinWeights2D(hist_dict['ZPeak_1b'])
-            hist_dict['ZPeak_2b'] = self.rebinWeights2D(hist_dict['ZPeak_2b'])
             hist_dict['ZVeto_0b'] = self.rebinWeights2D(hist_dict['ZVeto_0b'])
             hist_dict['ZVeto_1b'] = self.rebinWeights2D(hist_dict['ZVeto_1b'])
-            hist_dict['ZVeto_2b'] = self.rebinWeights2D(hist_dict['ZVeto_2b'])
+            if self.cat == 'resolved':
+                hist_dict['ZVeto_2b'] = self.rebinWeights2D(hist_dict['ZVeto_2b'])
+                hist_dict['ZPeak_2b'] = self.rebinWeights2D(hist_dict['ZPeak_2b'])
 
         if self.mode == "data":
-            # mm0b 1257451.0613
-            # mm1b 161402.5533
-            # mm2b 27150.4709
-            # ee0b 274633.8001
-            # ee1b 35004.4788
-            # ee2b 6098.4302
-            if self.channel == 'MuMu':
-                self.factor_1b = 161402.5533 / 1257451.0613
-                self.factor_2b = 27150.4709  / 1257451.0613
-                self.factor_ZVeto = 180623.891 / 258598.634
-            elif self.channel == 'ElEl':
-                self.factor_1b = 35004.4788 / 274633.8001
-                self.factor_2b = 6098.4302  / 274633.8001
-                self.factor_ZVeto = 32679.407 / 51517.366 
-            elif self.channel == "SSDL":
-                self.factor_1b = (161402.5533+35004.4788) / (1257451.0613+274633.8001)
-                self.factor_2b = (27150.4709+6098.4302) / (1257451.0613+274633.8001)
-                self.factor_ZVeto = (180623.891+32679.407) / (258598.634+51517.366)
-            else:
-                raise RuntimeError("Channel '%s' not understood"%self.channel)
+            self.getNumericalFactors()
 
         elif self.mode == "mc":
             #self.factor_1b = self.N_ZPeak1b/self.N_ZPeak0b
             #self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
             self.factor_ZVeto = 1.
             self.factor_1b = self.N_ZVeto1b/self.N_ZVeto0b
-            self.factor_2b = self.N_ZVeto2b/self.N_ZVeto0b
+            if self.cat == 'resolved':
+                self.factor_2b = self.N_ZVeto2b/self.N_ZVeto0b
 
         print ("Factor in Z peak : 1b/0b")
         print ("%0.5f / %0.5f -> %0.5f"%(self.N_ZPeak1b,self.N_ZPeak0b,self.N_ZPeak1b/self.N_ZPeak0b))
-        print ("Factor in Z peak : 2b/0b")
-        print ("%0.5f / %0.5f -> %0.5f"%(self.N_ZPeak2b,self.N_ZPeak0b,self.N_ZPeak2b/self.N_ZPeak0b))
         print ("Factor in Z veto: 1b/0b")
         print ("%0.5f / %0.5f -> %0.5f"%(self.N_ZVeto1b,self.N_ZVeto0b,self.N_ZVeto1b/self.N_ZVeto0b))
-        print ("Factor in Z veto : 2b/0b")
-        print ("%0.5f / %0.5f -> %0.5f"%(self.N_ZVeto2b,self.N_ZVeto0b,self.N_ZVeto2b/self.N_ZVeto0b))
+
+        if self.cat == 'resolved':
+            print ("Factor in Z peak : 2b/0b")
+            print ("%0.5f / %0.5f -> %0.5f"%(self.N_ZPeak2b,self.N_ZPeak0b,self.N_ZPeak2b/self.N_ZPeak0b))
+            print ("Factor in Z veto : 2b/0b")
+            print ("%0.5f / %0.5f -> %0.5f"%(self.N_ZVeto2b,self.N_ZVeto0b,self.N_ZVeto2b/self.N_ZVeto0b))
 
         print ("Sum weight ZVeto_0b : ",hist_dict['ZVeto_0b'].Integral())
-        print ("Sum weight ZVeto_1b : ",hist_dict['ZVeto_1b'].Integral())
-        print ("Sum weight ZVeto_2b : ",hist_dict['ZVeto_2b'].Integral())
         print ("Sum weight ZPeak_0b : ",hist_dict['ZPeak_0b'].Integral())
+        print ("Sum weight ZVeto_1b : ",hist_dict['ZVeto_1b'].Integral())
         print ("Sum weight ZPeak_1b : ",hist_dict['ZPeak_1b'].Integral())
-        print ("Sum weight ZPeak_2b : ",hist_dict['ZPeak_2b'].Integral())
+        if self.cat == 'resolved':
+            print ("Sum weight ZVeto_2b : ",hist_dict['ZVeto_2b'].Integral())
+            print ("Sum weight ZPeak_2b : ",hist_dict['ZPeak_2b'].Integral())
         if any([hist.Integral()<=0. for hist in hist_dict.values()]):
             raise RuntimeError("One histogram has integral below or equal to 0.")
 
         hist_dict['ZPeak_0b'].Scale(1./hist_dict['ZPeak_0b'].Integral())
         hist_dict['ZPeak_1b'].Scale(1./hist_dict['ZPeak_1b'].Integral())
-        hist_dict['ZPeak_2b'].Scale(1./hist_dict['ZPeak_2b'].Integral())
+        if self.cat == 'resolved':
+            hist_dict['ZPeak_2b'].Scale(1./hist_dict['ZPeak_2b'].Integral())
 
         self.weight_1b = hist_dict['ZPeak_1b'].Clone("Weight1B")
         self.weight_1b.Divide(hist_dict['ZPeak_0b'])
         self.weight_1b.Scale(self.factor_1b*self.factor_ZVeto)
         #self.weight_1b.Scale(self.factor_1b*self.factor_ZVeto/self.weight_1b.Integral())
-        print ("Weight 1b integral  : %0.5f"%self.weight_1b.Integral())
+        print ("Weight 1b integral  :  %0.5f"%self.weight_1b.Integral())
 
-        self.weight_2b = hist_dict['ZPeak_2b'].Clone("Weight2B")
-        self.weight_2b.Divide(hist_dict['ZPeak_0b'])
-        self.weight_2b.Scale(self.factor_2b*self.factor_ZVeto)
-        #self.weight_2b.Scale(self.factor_2b*self.factor_ZVeto/self.weight_2b.Integral())
-        print ("Weight 2b integral  : %0.5f"%self.weight_2b.Integral())
-            # self.weight = ZPeak_2b / ZPeak_0b (normalized histogram ratio) * N_2b/N_0b (stats factor)
+        if self.cat == 'resolved':
+            self.weight_2b = hist_dict['ZPeak_2b'].Clone("Weight2B")
+            self.weight_2b.Divide(hist_dict['ZPeak_0b'])
+            self.weight_2b.Scale(self.factor_2b*self.factor_ZVeto)
+            #self.weight_2b.Scale(self.factor_2b*self.factor_ZVeto/self.weight_2b.Integral())
+            print ("Weight 2b integral  :  %0.5f"%self.weight_2b.Integral())
+                # self.weight = ZPeak_2b / ZPeak_0b (normalized histogram ratio) * N_2b/N_0b (stats factor)
+
         if self.hist_type == 'TH2':
             hist_dict['ZPeak_0b'].Scale(self.N_ZPeak0b)
             hist_dict['ZPeak_1b'].Scale(self.N_ZPeak1b)
-            hist_dict['ZPeak_2b'].Scale(self.N_ZPeak2b)
+            if self.cat == 'resolved':
+                hist_dict['ZPeak_2b'].Scale(self.N_ZPeak2b)
 
         self.shape_1b = hist_dict['ZVeto_0b'].Clone("Shape1B")
         self.shape_1b.Multiply(self.weight_1b)
-        self.shape_2b = hist_dict['ZVeto_0b'].Clone("Shape2B")
-        self.shape_2b.Multiply(self.weight_2b)
-            # self.shape = (ZPeak_2b / ZPeak_0b) * ZVeto_0b (unnormalized histogram) = shape of the data DY in SR
+        if self.cat == 'resolved':
+            self.shape_2b = hist_dict['ZVeto_0b'].Clone("Shape2B")
+            self.shape_2b.Multiply(self.weight_2b)
+        # self.shape = (ZPeak_2b / ZPeak_0b) * ZVeto_0b (unnormalized histogram) = shape of the data DY in SR
 
 
         print ("Factor (1b)         : ",self.factor_1b)
         print ("Shape (1b)          : ",self.shape_1b.Integral())
-        print ("Factor (2b)         : ",self.factor_2b)
-        print ("Shape (2b)          : ",self.shape_2b.Integral())
+        if self.cat == 'resolved':
+            print ("Factor (2b)         : ",self.factor_2b)
+            print ("Shape (2b)          : ",self.shape_2b.Integral())
 
     def produceCDFShift(self,hist_dict):
 
@@ -326,8 +354,10 @@ class WeightDY:
                           norm = hist_dict['ZVeto_0b'].Integral()*self.factor_2b*self.factor_ZVeto,
                           #norm = hist_dict['ZVeto_2b'].Integral(),
                           additional_hist={'ZVeto_2b':hist_dict['ZVeto_2b']})
-        name1b = self.outputname+'_CDFShift1b.root'
-        name2b = self.outputname+'_CDFShift2b.root'
+        name1b = self.outputname_root+'_CDFShift1b.root'
+        name2b = self.outputname_root+'_CDFShift2b.root'
+        pdf1b = self.outputname_pdf+'_CDFShift1b.pdf'
+        pdf2b = self.outputname_pdf+'_CDFShift2b.pdf'
         inst1b.saveToRoot(name1b)
         inst2b.saveToRoot(name2b)
 
@@ -368,8 +398,8 @@ class WeightDY:
                             'cdf_tot_err'               : inst2b.cdf_tot_err,
                             })
 
-        self.plotCDFShift(hist_dict1b,name1b.replace('.root','.pdf'),cat='1b',mode=self.mode) 
-        self.plotCDFShift(hist_dict2b,name2b.replace('.root','.pdf'),cat='2b',mode=self.mode)
+        self.plotCDFShift(hist_dict1b,pdf1b,cat='1b',mode=self.mode) 
+        self.plotCDFShift(hist_dict2b,pdf2b,cat='2b',mode=self.mode)
 
     @staticmethod
     def plotHistInCanvas(hist_dict,pdfname,legend_pos=None,logy=False,opt='',norm=False,text=None,textpos=None,maxy=None,title=''):
@@ -386,8 +416,8 @@ class WeightDY:
             leg.SetFillStyle(0)
             for name,hist in hist_dict.items():
                 leg.AddEntry(hist,name)
-        maxh = max([h.GetMaximum() for h in hist_dict.values()])*1.1
-        minh = max([h.GetMinimum() for h in hist_dict.values()])*1.1
+        maxh = max([h.GetMaximum() for h in hist_dict.values()])*1.2
+        minh = max([h.GetMinimum() for h in hist_dict.values()])*1.2
         if maxy is not None:
             maxh = min(maxh,maxy)
         for hist in hist_dict.values():
@@ -491,18 +521,18 @@ class WeightDY:
              'Z veto 0b [%s]'%(mode)                    : h3,
              'Z veto %s [DY MC]'%(cat)                  : h4,
              'Z veto %s [%s extrapolated]'%(cat,mode)   : nh4}
-        self.plotHistInCanvas(d,legend_pos=[0.4,0.5,0.85,0.85],pdfname=pdfname,norm=True,opt="hist")
+        self.plotHistInCanvas(d,legend_pos=[0.5,0.6,0.85,0.85],pdfname=pdfname,norm=True,opt="hist")
         d = {'Z peak 0b [%s]'%(mode)                    : cdf1,
              'Z peak %s [%s]'%(cat,mode)                : cdf2,
              'Z veto 0b [%s]'%(mode)                    : cdf3,
              'Z veto %s [DY MC]'%(cat)                  : cdf4,
              'Z veto %s [%s extrapolated]'%(cat,mode)   : ncdf4}
-        self.plotHistInCanvas(d,legend_pos=[0.4,0.15,0.85,0.5],pdfname=pdfname,opt="hist",maxy=1.)
+        self.plotHistInCanvas(d,legend_pos=[0.4,0.15,0.85,0.4],pdfname=pdfname,opt="hist",maxy=1.)
 
         d = {'#splitline{Z peak 0b [%s]}{Integral = %0.3f}'%(mode,h1.Integral())      : h1,
              '#splitline{Z peak %s [%s]}{Integral = %0.3f}'%(cat,mode,h2.Integral())  : h2,
              '#splitline{Z veto 0b [%s]}{Integral = %0.3f}'%(mode,h3.Integral())      : h3}
-        self.plotHistInCanvas(d,legend_pos=[0.5,0.5,0.85,0.85],pdfname=pdfname,opt="HE1")
+        self.plotHistInCanvas(d,legend_pos=[0.5,0.6,0.85,0.85],pdfname=pdfname,opt="HE1")
 
         d = {'#splitline{Z veto %s [DY MC]}{Integral = %0.3f}'%(cat,h4.Integral()):                 h4,
              '#splitline{Z veto %s [%s extrapolated]}{Integral = %0.3f}'%(cat,mode,nh4.Integral()): nh4}  
@@ -516,12 +546,12 @@ class WeightDY:
         d = {'Z peak 0b [%s]'%(mode):                     cdf1,
              'Z peak %s [%s]'%(cat,mode):                 cdf2,
              'Z veto 0b [%s]'%(mode):                     cdf3}
-        self.plotHistInCanvas(d,legend_pos=[0.4,0.15,0.85,0.5],pdfname=pdfname,opt="HE1",maxy=1.)
+        self.plotHistInCanvas(d,legend_pos=[0.4,0.15,0.85,0.4],pdfname=pdfname,opt="HE1",maxy=1.)
         
         self.plotGraphInCanvas({'':hist_dict['cdf_graph']},pdfname=pdfname,title="Non corrected pdf")
         d = {'Z veto %s [DY MC]'%(cat)                  : cdf4,
              'Z veto %s [%s extrapolated]'%(cat,mode)   : ncdf4}
-        self.plotHistInCanvas(d,legend_pos=[0.4,0.15,0.85,0.5],pdfname=pdfname,opt="HE1")
+        self.plotHistInCanvas(d,legend_pos=[0.4,0.15,0.85,0.4],pdfname=pdfname,opt="HE1")
 
 
         hist_dict['shift'].SetLineStyle(1)
@@ -660,21 +690,23 @@ class WeightDY:
         histograms['ZVeto_0b'].SetTitle(self.title)
 
         histograms['ZVeto_0b'].SetLineWidth(2) 
-        histograms['ZVeto_1b'].SetLineWidth(2) 
-        histograms['ZVeto_2b'].SetLineWidth(2) 
-        histograms['ZPeak_0b'].SetLineWidth(2) 
-        histograms['ZPeak_1b'].SetLineWidth(2) 
-        histograms['ZPeak_2b'].SetLineWidth(2) 
         histograms['ZVeto_0b'].SetLineColor(418) 
+        histograms['ZVeto_1b'].SetLineWidth(2) 
+        histograms['ZPeak_0b'].SetLineWidth(2) 
         histograms['ZPeak_0b'].SetLineColor(602)
+        histograms['ZPeak_1b'].SetLineWidth(2) 
         histograms['ZPeak_1b'].SetLineColor(619)
-        histograms['ZPeak_2b'].SetLineColor(634)
+        if self.cat == 'resolved':
+            histograms['ZVeto_2b'].SetLineWidth(2) 
+            histograms['ZPeak_2b'].SetLineWidth(2) 
+            histograms['ZPeak_2b'].SetLineColor(634)
 
 
         histograms['ZVeto_0b'].Draw("hist")
         histograms['ZPeak_0b'].Draw("same hist")
         histograms['ZPeak_1b'].Draw("same hist")
-        histograms['ZPeak_2b'].Draw("same hist")
+        if self.cat == 'resolved':
+            histograms['ZPeak_2b'].Draw("same hist")
 
         leg1 = ROOT.TLegend(0.50,0.73,0.89,0.91)
         leg1.SetTextSize(0.02)
@@ -682,13 +714,15 @@ class WeightDY:
         leg1.AddEntry(histograms['ZVeto_0b'],"#splitline{Z Veto 0 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZVeto0b))
         leg1.AddEntry(histograms['ZPeak_0b'],"#splitline{Z Peak 0 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak0b))
         leg1.AddEntry(histograms['ZPeak_1b'],"#splitline{Z Peak 1 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak1b))
-        leg1.AddEntry(histograms['ZPeak_2b'],"#splitline{Z Peak 2 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak2b))
+        if self.cat == 'resolved':
+            leg1.AddEntry(histograms['ZPeak_2b'],"#splitline{Z Peak 2 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak2b))
         leg1.Draw()
 
         text = ROOT.TPaveText(0.6,0.65,0.85,0.72,"NB NDC")
         #text.SetFillStyle(1001)
         text.AddText("N_{Z peak}^{1b}/N_{Z peak}^{0b} = %0.5f"%self.factor_1b)
-        text.AddText("N_{Z peak}^{2b}/N_{Z peak}^{0b} = %0.5f"%self.factor_2b)
+        if self.cat == 'resolved':
+            text.AddText("N_{Z peak}^{2b}/N_{Z peak}^{0b} = %0.5f"%self.factor_2b)
         text.AddText("N_{Z veto}^{0b} = %0.5f"%self.factor_ZVeto)
         text.SetBorderSize(0)
         text.Draw()
@@ -697,19 +731,19 @@ class WeightDY:
         ##########  PAD 2 ##########
         pad2.cd()
 
-        self.weight_1b.SetMaximum(max(self.weight_1b.GetMaximum(),self.weight_2b.GetMaximum())*1.1)
-        #self.weight_1b.SetMaximum(self.weight_1b.GetMaximum()*1.8)
+        self.weight_1b.SetMaximum(self.weight_1b.GetMaximum()*1.1)
 
         #content_w1b = np.ravel(hist2array(self.weight_1b))
         #self.weight_1b.SetMaximum(np.percentile(content_w1b,99))
         self.weight_1b.SetMinimum(0.)
         self.weight_1b.SetLineWidth(2)
-        self.weight_2b.SetLineWidth(2)
         self.weight_1b.SetLineColor(602)
-        self.weight_2b.SetLineColor(600)
         #self.weight.SetLineWidth(2)
         #self.weight.SetLineColor(634)
         self.weight_1b.SetTitle("")
+        if self.cat == 'resolved':
+            self.weight_2b.SetLineWidth(2)
+            self.weight_2b.SetLineColor(600)
 
         self.weight_1b.GetYaxis().SetTitle("Weight")
         self.weight_1b.GetYaxis().SetTitleSize(0.035)
@@ -720,12 +754,14 @@ class WeightDY:
         self.weight_1b.GetXaxis().SetLabelSize(0.)
 
         self.weight_1b.Draw("ep")
-        self.weight_2b.Draw("ep same")
+        if self.cat == 'resolved':
+            self.weight_2b.Draw("ep same")
 
         leg2 = ROOT.TLegend(0.65,0.75,0.89,0.88)
         leg2.SetTextSize(0.03)
         leg2.AddEntry(self.weight_1b,"Weight (1b)")
-        leg2.AddEntry(self.weight_2b,"Weight (2b)")
+        if self.cat == 'resolved':
+            leg2.AddEntry(self.weight_2b,"Weight (2b)")
         leg2.SetBorderSize(0)
 
         leg2.Draw()
@@ -733,21 +769,24 @@ class WeightDY:
         ##########  PAD 3 ##########
         pad3.cd()
 
-        max_shape = max([h.GetMaximum() for h in [histograms['ZVeto_1b'],histograms['ZVeto_2b'],self.shape_1b,self.shape_2b]])
+        max_shape = max([h.GetMaximum() for h in [histograms['ZVeto_1b'],self.shape_1b]])
 
         self.shape_1b.SetLineWidth(2) 
-        self.shape_2b.SetLineWidth(2) 
         self.shape_1b.SetLineColor(602) 
-        self.shape_2b.SetLineColor(600) 
+        if self.cat == 'resolved':
+            self.shape_2b.SetLineWidth(2) 
+            self.shape_2b.SetLineColor(600) 
 
         if self.rebin_1D is not None:
             histograms['ZVeto_1b'] = self.rebinWeights1D(histograms['ZVeto_1b'])
-            histograms['ZVeto_2b'] = self.rebinWeights1D(histograms['ZVeto_2b'])
+            if self.cat == 'resolved':
+                histograms['ZVeto_2b'] = self.rebinWeights1D(histograms['ZVeto_2b'])
 
         histograms['ZVeto_1b'].SetLineWidth(1)
-        histograms['ZVeto_2b'].SetLineWidth(1)
         histograms['ZVeto_1b'].SetLineColor(602)
-        histograms['ZVeto_2b'].SetLineColor(600)
+        if self.cat == 'resolved':
+            histograms['ZVeto_2b'].SetLineWidth(1)
+            histograms['ZVeto_2b'].SetLineColor(600)
 
         self.shape_1b.SetMinimum(0)
         self.shape_1b.SetMaximum(max_shape*1.1)
@@ -762,21 +801,23 @@ class WeightDY:
         self.shape_1b.GetXaxis().SetLabelSize(0.05)
 
         self.shape_1b.Draw("H")
-        self.shape_2b.Draw("H same")
         histograms['ZVeto_1b'].Draw("H same")
-        histograms['ZVeto_2b'].Draw("H same")
+        if self.cat == 'resolved':
+            self.shape_2b.Draw("H same")
+            histograms['ZVeto_2b'].Draw("H same")
 
         leg3 = ROOT.TLegend(0.5,0.40,0.89,0.93)
         leg3.SetTextSize(0.04)
         leg3.AddEntry(self.shape_1b,"#splitline{DY shape from data (1b)}{Integral = %0.2f}"%self.shape_1b.Integral() if self.mode == 'data' else "#splitline{DY shape from MC (1b)}{Integral = %0.2f}"%self.shape_1b.Integral())
         leg3.AddEntry(histograms['ZVeto_1b'],"#splitline{Z Veto (1b) (DY MC)}{Integral = %0.2f}"%self.N_ZVeto1b)
-        leg3.AddEntry(self.shape_2b,"#splitline{DY shape from data (2b)}{Integral = %0.2f}"%self.shape_2b.Integral() if self.mode == 'data' else "#splitline{DY shape from MC (2b)}{Integral = %0.2f}"%self.shape_2b.Integral())
-        leg3.AddEntry(histograms['ZVeto_2b'],"#splitline{Z Veto (2b) (DY MC)}{Integral = %0.2f}"%self.N_ZVeto2b)
+        if self.cat == 'resolved':
+            leg3.AddEntry(self.shape_2b,"#splitline{DY shape from data (2b)}{Integral = %0.2f}"%self.shape_2b.Integral() if self.mode == 'data' else "#splitline{DY shape from MC (2b)}{Integral = %0.2f}"%self.shape_2b.Integral())
+            leg3.AddEntry(histograms['ZVeto_2b'],"#splitline{Z Veto (2b) (DY MC)}{Integral = %0.2f}"%self.N_ZVeto2b)
         leg3.Draw()
 
 
 
-        C.Print(self.outputname+'_%s.pdf'%self.era)
+        C.Print(self.outputname_pdf+'_%s.pdf'%self.era)
 
 
     def plotWeights2D(self):
@@ -932,7 +973,7 @@ class WeightDY:
         arrmul2b_3.Draw()
 
 
-        C1.Print(self.outputname+'1_%s.pdf'%self.era)
+        C1.Print(self.outputname_pdf+'1_%s.pdf'%self.era)
 
         #----- Shape and DY MC comparison -----#
         max_1b = max([histograms['ZVeto_1b'].GetMaximum(),self.shape_1b.GetMaximum()])
@@ -963,14 +1004,19 @@ class WeightDY:
         histograms['ZVeto_2b'].GetXaxis().SetRangeUser(0,histograms['ZVeto_2b'].GetXaxis().GetBinUpEdge(histograms['ZVeto_2b'].GetNbinsX()))
         histograms['ZVeto_2b'].GetYaxis().SetRangeUser(0,histograms['ZVeto_2b'].GetYaxis().GetBinUpEdge(histograms['ZVeto_2b'].GetNbinsY()))
         histograms['ZVeto_2b'].Draw("colz")
-        C2.Print(self.outputname+'2_%s.pdf'%self.era)
+        C2.Print(self.outputname_pdf+'2_%s.pdf'%self.era)
     
 
 
     def saveToJson(self):
+        names = ['weight_1b']
+        weights = [self.weight_1b]
+        if self.cat == 'resolved':
+            names.append('weight_2b')
+            weights.append(self.weight_2b)
         json_dict = {'dimension': 2, 'variables': ['Eta','Pt'], 'error_type': 'absolute'}
         if self.hist_type == 'TH1':
-            for name,weight in zip(['weight_1b','weight_2b'],[self.weight_1b, self.weight_2b]):
+            for name,weight in zip(names,weights):
                 # Fill data #
                 binning = []
                 data = []
@@ -997,11 +1043,11 @@ class WeightDY:
                 json_dict['binning'] = {'x':[-2.5,2.5],'y':binning}
                 json_dict['data'] = [{'bin':[-2.5,2.5],'values':data}]
 
-                with open(self.outputname+'_%s_%s.json'%(name,self.era),'w') as f:
+                with open(self.outputname_json+'_%s_%s.json'%(name,self.era),'w') as f:
                     json.dump(json_dict,f,indent=4)
-                print ("Saved json to",self.outputname+'_%s_%s.json'%(name,self.era))
+                print ("Saved json to",self.outputname_json+'_%s_%s.json'%(name,self.era))
         if self.hist_type == 'TH2':
-            for name,weight in zip(['weight_1b','weight_2b'],[self.weight_1b, self.weight_2b]):
+            for name,weight in zip(names,weights):
                 # Fill data #
                 eta_binning = []
                 pt_binning = []
@@ -1038,16 +1084,17 @@ class WeightDY:
                 json_dict['data'] = data
 
                 # Save to json #
-                with open(self.outputname+'_%s_%s.json'%(name,self.era),'w') as f:
+                with open(self.outputname_json+'_%s_%s.json'%(name,self.era),'w') as f:
                     json.dump(json_dict,f,indent=2)
-                print ("Saved json to",self.outputname+'_%s_%s.json'%(name,self.era))
+                print ("Saved json to",self.outputname_json+'_%s_%s.json'%(name,self.era))
                     
 
             
     def saveToRoot(self):
-        root_file = ROOT.TFile(self.outputname+'_%s.root'%self.era,"recreate")
+        root_file = ROOT.TFile(self.outputname_root+'_%s.root'%self.era,"recreate")
         self.weight_1b.Write("Weight1B")
-        self.weight_2b.Write("Weight2B")
+        if self.cat == 'resolved':
+            self.weight_2b.Write("Weight2B")
         root_file.Write()
         root_file.Close()
 
@@ -1062,6 +1109,7 @@ if __name__ == "__main__":
                         title       = d['title']+' (e^{+}e^{-} channel)',
                         outputname  = d['filename'].format(**{'channel':'ElEl','type':'data'}),
                         mode        = 'data',
+                        cat         = d['category'],
                         era         = d['era'],
                         xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
                         yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
@@ -1072,6 +1120,7 @@ if __name__ == "__main__":
                         title       = d['title']+' (e^{+}e^{-} channel)',
                         outputname  = d['filename'].format(**{'channel':'ElEl','type':'mc'}),
                         mode        = 'mc',
+                        cat         = d['category'],
                         era         = d['era'],
                         xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
                         yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
@@ -1082,6 +1131,7 @@ if __name__ == "__main__":
                         title       = d['title']+' (#mu^{+}#mu^{-} channel)',
                         outputname  = d['filename'].format(**{'channel':'MuMu','type':'data'}),
                         mode        = 'data',
+                        cat         = d['category'],
                         era         = d['era'],
                         xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
                         yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
@@ -1092,6 +1142,7 @@ if __name__ == "__main__":
                         title       = d['title']+' (#mu^{+}#mu^{-} channel)',
                         outputname  = d['filename'].format(**{'channel':'MuMu','type':'mc'}),
                         mode        = 'mc',
+                        cat         = d['category'],
                         era         = d['era'],
                         xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
                         yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
@@ -1105,6 +1156,7 @@ if __name__ == "__main__":
                         title       = d['title']+' (#mu^{+}#mu^{-} + e^{+}e^{-} channel)',
                         outputname  = d['filename'].format(**{'channel':'SSDL','type':'mc'}),
                         mode        = 'mc',
+                        cat         = d['category'],
                         era         = d['era'],
                         xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
                         yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
@@ -1115,6 +1167,7 @@ if __name__ == "__main__":
                         title       = d['title']+' (#mu^{+}#mu^{-} + e^{+}e^{-} channel)',
                         outputname  = d['filename'].format(**{'channel':'SSDL','type':'data'}),
                         mode        = 'data',
+                        cat         = d['category'],
                         era         = d['era'],
                         xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
                         yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,

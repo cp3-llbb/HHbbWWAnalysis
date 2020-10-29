@@ -77,8 +77,8 @@ def main():
 
     templates = [
                     ############       TH1       ##############
-                    #Template(tpl = '.yml.tpl',
-                    #         class_name = 'Plot_TH1'),
+                    Template(tpl = 'TH1_event_weight.yml.tpl',
+                             class_name = 'Plot_TH1'),
                     #########       TH1 Ratio       ###########
                     #Template(tpl = '.yml.tpl',
                     #         class_name = 'Plot_Ratio_TH1'),

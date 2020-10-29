@@ -281,30 +281,34 @@ def main():
                                                   eras                      = era,
                                                   tree_name                 = parameters.tree_name,
                                                   additional_columns        = {'tag':node,'era':era},
-                                                  stop                      = 10000) # TODO : remove 
+                                                  stop                      = 300000) # TODO : remove 
+                    data_node_era = data_node_era.sample(frac=1)[:300000] # TODO : remove 
                     if data_node is None:
                         data_node = data_node_era
                     else:
                         data_node = pd.concat([data_node,data_node_era],axis=0)
-                    era_str = '\t{:5s} class in era {} : sample size = {:10d}'.format(node,era,data_node_era.shape[0])
+                    era_str = '{:5s} class in era {} : sample size = {:10d}'.format(node,era,data_node_era.shape[0])
                     if parameters.weight is not None:
                         era_str += ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_node_era[parameters.weight].sum(),data_node_era['event_weight'].sum())
                     logging.info(era_str)
                 data_dict[node] = data_node
-                all_eras_str = '{:5s} class for all eras : sample size =   {:10d}'.format(node,data_node.shape[0])
+                all_eras_str = '{:5s} class for all eras : sample size = {:10d}'.format(node,data_node.shape[0])
                 if parameters.weight is not None:
                     all_eras_str +=  ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_node[parameters.weight].sum(),data_node['event_weight'].sum())
                 logging.info(all_eras_str)
+            list_inputs  = [var.replace('$','') for var in parameters.inputs]
+            list_outputs = [var.replace('$','') for var in parameters.outputs]
 
             # Weight equalization #
+            N = sum([data.shape[0] for data in data_dict.values()])/len(data_dict)
             for node, data in data_dict.items():
                 if parameters.weight is not None:
                     sum_weights = data['event_weight'].sum()
                     logging.info('Sum of weight for %s samples : %.2e'%(node,sum_weights))
-                    data['learning_weights'] = data['event_weight']/sum_weights*1e5
+                    data['learning_weights'] = data['event_weight']/sum_weights*N
                     logging.info('\t -> After equalization : %0.2e (factor %0.2e)'%(data['learning_weights'].sum(),1.e5/sum_weights))
                 else:
-                    data['learning_weights'] = pd.Series([1.]*data.shape[0])
+                    data['learning_weights'] = pd.Series([1.]*data.shape[0],index=data.index)
 
             # Data splitting #
             train_dict = {}
@@ -411,7 +415,6 @@ def main():
             
         train_all = None
         test_all = None
-
     list_inputs  = [var.replace('$','') for var in parameters.inputs]
     list_outputs = [var.replace('$','') for var in parameters.outputs]
 
@@ -452,7 +455,9 @@ def main():
     if len(opt.model) != 0: 
         # Make path #
         output_name = "test" 
-        model_name = opt.model[0][:-1]
+        model_name = opt.model[0]
+        if parameters.crossvalidation:
+            model_name = model_name[:-1]
         path_output = os.path.join(parameters.path_out,model_name,output_name)
         if not os.path.exists(path_output):
             os.makedirs(path_output)

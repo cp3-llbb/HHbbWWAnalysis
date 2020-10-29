@@ -1,0 +1,48 @@
+path_ZVeto: &path_ZVeto /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV6_Tight_Fake_AllDNN/
+path_ZPeak: &path_ZPeak /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV6_Tight_Fake_ZPeak_AllDNN/
+
+era: '2017'
+title: 'DNN output ST'
+xaxis: 'DNN output ST'
+filename: 'weight_DNNoutputST_{channel}_{type}_DNN01_1D'
+category: 'resolved'
+
+ElElChannel:
+  ZVeto_0b:
+    path: *path_ZVeto
+    histname: ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag01STnode_DNNOutput_ST
+  ZVeto_1b: 
+    path: *path_ZVeto
+    histname: ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag01STnode_DNNOutput_ST
+  ZVeto_2b: 
+    path: *path_ZVeto
+    histname: ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags01STnode_DNNOutput_ST
+  ZPeak_0b:
+    path: *path_ZPeak
+    histname: ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag01STnode_DNNOutput_ST
+  ZPeak_1b: 
+    path: *path_ZPeak
+    histname: ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedOneBtag01STnode_DNNOutput_ST
+  ZPeak_2b: 
+    path: *path_ZPeak
+    histname: ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags01STnode_DNNOutput_ST
+
+MuMuChannel:
+  ZVeto_0b:
+    path: *path_ZVeto
+    histname: MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag01STnode_DNNOutput_ST
+  ZVeto_1b: 
+    path: *path_ZVeto
+    histname: MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag01STnode_DNNOutput_ST
+  ZVeto_2b: 
+    path: *path_ZVeto
+    histname: MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags01STnode_DNNOutput_ST
+  ZPeak_0b:
+    path: *path_ZPeak
+    histname: MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedNoBtag01STnode_DNNOutput_ST
+  ZPeak_1b: 
+    path: *path_ZPeak
+    histname: MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedOneBtag01STnode_DNNOutput_ST
+  ZPeak_2b: 
+    path: *path_ZPeak
+    histname: MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags01STnode_DNNOutput_ST

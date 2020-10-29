@@ -1,0 +1,53 @@
+path_ZVeto: &path_ZVeto /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_Tight_Fake_DNNExcluNodes/
+path_ZPeak: &path_ZPeak /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_Tight_ZPeak_Fake_DNNExcluNodes/
+
+rebin_2D:
+  - [0,25,30,35,40,45,50,75,100,150,300]
+  - [0,25,30,35,40,45,50,75,100,150,300]
+
+xaxis: 'First lepton P_{T}'
+yaxis: 'Lead jet P_{T}'
+
+era: '2016'
+title: 'First lepton P_{T} vs Lead jet P_{T}'
+filename: 'weight_firstLeptonPtVSLeadjetPt_{channel}_{type}_2D'
+
+ElElChannel:
+  ZVeto_0b:
+    path: *path_ZVeto
+    histname: ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_highlevelvariable_firstLeptonPtVSLeadjetPt
+  ZVeto_1b: 
+    path: *path_ZVeto
+    histname: ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_highlevelvariable_firstLeptonPtVSLeadjetPt
+  ZVeto_2b: 
+    path: *path_ZVeto
+    histname: ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_highlevelvariable_firstLeptonPtVSLeadjetPt
+  ZPeak_0b:
+    path: *path_ZPeak
+    histname: ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_highlevelvariable_firstLeptonPtVSLeadjetPt
+  ZPeak_1b: 
+    path: *path_ZPeak
+    histname: ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedOneBtag_highlevelvariable_firstLeptonPtVSLeadjetPt
+  ZPeak_2b: 
+    path: *path_ZPeak
+    histname: ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_highlevelvariable_firstLeptonPtVSLeadjetPt
+
+MuMuChannel:
+  ZVeto_0b:
+    path: *path_ZVeto
+    histname: MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_highlevelvariable_firstLeptonPtVSLeadjetPt
+  ZVeto_1b: 
+    path: *path_ZVeto
+    histname: MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_highlevelvariable_firstLeptonPtVSLeadjetPt
+  ZVeto_2b: 
+    path: *path_ZVeto
+    histname: MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_highlevelvariable_firstLeptonPtVSLeadjetPt
+  ZPeak_0b:
+    path: *path_ZPeak
+    histname: MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_highlevelvariable_firstLeptonPtVSLeadjetPt
+  ZPeak_1b: 
+    path: *path_ZPeak
+    histname: MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedOneBtag_highlevelvariable_firstLeptonPtVSLeadjetPt
+  ZPeak_2b: 
+    path: *path_ZPeak
+    histname: MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_highlevelvariable_firstLeptonPtVSLeadjetPt
