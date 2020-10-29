@@ -5,7 +5,7 @@ era: '2016'
 title: 'DNN output Rare'
 xaxis: 'DNN output Rare'
 filename: 'weight_DNNoutputRare_{channel}_{type}_DNN04_1D'
-
+category: 'resolved'
 
 ElElChannel:
   ZVeto_0b:

@@ -810,32 +810,19 @@ def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,plot_yie
     selObject.yieldTitle += " + Exclusive Resolved (1 bjet)"
 
     enable = use_dd and "DYEstimation" in self.datadrivenContributions and self.datadrivenContributions["DYEstimation"].usesSample(self.sample, self.sampleCfg) 
-#    if "ElEl" in selObject.selName:
-#        selObject.create(ddSuffix  = "DYEstimation",
-#                         cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
-#                         weight    = AppliedSF,
-#                         ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-#                         #ddWeight  = self.DYReweighting1bElEl(0),
-#                         ddWeight  = self.ResolvedDYReweighting1b(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
-#                         #ddWeight  = self.DYReweighting1bElEl([self.ElElDileptonTightSel[0][0],self.ak4LightJetsByBtagScore[0]]), # FIXME : might trigger segfault if not used with --Tight 
-#                         #ddWeight  = self.DYReweighting2bElEl(self.ElElDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
-#                         enable    = enable)
-#    elif "MuMu" in selObject.selName:
-#        selObject.create(ddSuffix  = "DYEstimation",
-#                         cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
-#                         weight    = AppliedSF,
-#                         ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-#                         #ddWeight  = self.DYReweighting1bMuMu(0), # FIXME : might trigger segfault if not used with --Tight 
-#                         ddWeight  = self.ResolvedDYReweighting1b(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
-#                         #ddWeight  = self.DYReweighting1bMuMu([self.MuMuDileptonTightSel[0][0],self.ak4LightJetsByBtagScore[0]]), # FIXME : might trigger segfault if not used with --Tight 
-#                         #ddWeight  = self.DYReweighting2bMuMu(self.MuMuDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
-#                         enable    = enable)
-    if "ElEl" in selObject.selName or "MuMu" in selObject.selName:
+    if "ElEl" in selObject.selName:
         selObject.create(ddSuffix  = "DYEstimation",
                          cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
                          weight    = AppliedSF,
                          ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-                         ddWeight  = self.ResolvedDYReweighting1b(self.ak4LightJetsByBtagScore[0]), 
+                         ddWeight  = self.ResolvedDYReweighting1bElEl(self.ak4LightJetsByBtagScore[0]), 
+                         enable    = enable)
+    elif "MuMu" in selObject.selName:
+        selObject.create(ddSuffix  = "DYEstimation",
+                         cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
+                         weight    = AppliedSF,
+                         ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
+                         ddWeight  = self.ResolvedDYReweighting1bMuMu(self.ak4LightJetsByBtagScore[0]), 
                          enable    = enable)
     elif "ElMu" in selObject.selName:
         selObject.refine(cut    = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
@@ -865,34 +852,20 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yi
     selObject.yieldTitle += " + Exclusive Resolved (2 bjets)"
 
     enable = use_dd and "DYEstimation" in self.datadrivenContributions and self.datadrivenContributions["DYEstimation"].usesSample(self.sample, self.sampleCfg) 
-#    if "ElEl" in selObject.selName:
-#        selObject.create(ddSuffix  = "DYEstimation",
-#                         cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
-#                         weight    = AppliedSF,
-#                         ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-#                         #ddWeight  = self.DYReweighting2bElEl(0),
-#                         ddWeight  = self.DYReweighting2bElEl(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
-#                         #ddWeight  = self.DYReweighting2bElEl([self.ElElDileptonTightSel[0][0],self.ak4LightJetsByBtagScore[0]]), # FIXME : might trigger segfault if not used with --Tight 
-#                         #ddWeight  = self.DYReweighting2bElEl(self.ElElDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
-#                         enable    = enable)
-#    elif "MuMu" in selObject.selName:
-#        selObject.create(ddSuffix  = "DYEstimation",
-#                         cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
-#                         weight    = AppliedSF,
-#                         ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-#                         #ddWeight  = self.DYReweighting2bElEl(0),
-#                         ddWeight  = self.DYReweighting2bMuMu(self.ak4LightJetsByBtagScore[0]), # FIXME : might trigger segfault if not used with --Tight 
-#                         #ddWeight  = self.DYReweighting2bMuMu([self.MuMuDileptonTightSel[0][0],self.ak4LightJetsByBtagScore[0]]), # FIXME : might trigger segfault if not used with --Tight 
-#                         #ddWeight  = self.DYReweighting2bMuMu(self.MuMuDileptonTightSel[0][0]), # FIXME : might trigger segfault if not used with --Tight 
-#                         enable    = enable)
-    if "ElEl" in selObject.selName or "MuMu" in selObject.selName:
+    if "ElEl" in selObject.selName:
         selObject.create(ddSuffix  = "DYEstimation",
-                         cut       = [op.rng_len(self.ak4BJets)==2,op.rng_len(self.ak8BJets)==0],
+                         cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
                          weight    = AppliedSF,
                          ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-                         ddWeight  = self.ResolvedDYReweighting2b(self.ak4LightJetsByBtagScore[0]), 
+                         ddWeight  = self.ResolvedDYReweighting2bElEl(self.ak4LightJetsByBtagScore[0]), 
                          enable    = enable)
-
+    elif "MuMu" in selObject.selName:
+        selObject.create(ddSuffix  = "DYEstimation",
+                         cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
+                         weight    = AppliedSF,
+                         ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
+                         ddWeight  = self.ResolvedDYReweighting2bMuMu(self.ak4LightJetsByBtagScore[0]), 
+                         enable    = enable)
     elif "ElMu" in selObject.selName:
         selObject.refine(cut    = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
                          weight = AppliedSF)
@@ -946,14 +919,20 @@ def makeInclusiveBoostedOneBtagSelection(self,selObject,copy_sel=False,plot_yiel
     selObject.yieldTitle += " + Inclusive Boosted 1 Btag"
 
     enable = use_dd and "DYEstimation" in self.datadrivenContributions and self.datadrivenContributions["DYEstimation"].usesSample(self.sample, self.sampleCfg) 
-    if "ElEl" in selObject.selName or "MuMu" in selObject.selName:
+    if "ElEl" in selObject.selName:
         selObject.create(ddSuffix  = "DYEstimation",
                          cut       = [op.rng_len(self.ak8BJets) >= 1],
                          weight    = AppliedSF,
                          ddCut     = [op.rng_len(self.ak8BJets) == 0],
-                         ddWeight  = self.BoostedDYReweighting1b(self.ak8Jets[0]), 
+                         ddWeight  = self.BoostedDYReweighting1bElEl(self.ak8Jets[0]), 
                          enable    = enable)
-
+    elif "MuMu" in selObject.selName:
+        selObject.create(ddSuffix  = "DYEstimation",
+                         cut       = [op.rng_len(self.ak8BJets) >= 1],
+                         weight    = AppliedSF,
+                         ddCut     = [op.rng_len(self.ak8BJets) == 0],
+                         ddWeight  = self.BoostedDYReweighting1bMuMu(self.ak8Jets[0]), 
+                         enable    = enable)
     elif "ElMu" in selObject.selName:
         selObject.refine(cut    = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
                          weight = AppliedSF)

@@ -5,7 +5,7 @@ era: '2017'
 title: 'DNN output DY'
 xaxis: 'DNN output DY'
 filename: 'weight_DNNoutputDY_{channel}_{type}_DNN04_1D'
-
+category: 'resolved'
 
 ElElChannel:
   ZVeto_0b:

@@ -91,6 +91,12 @@ class ScaleFactorsbbWW:
                                                 base_str    = 'PUID_80X_{eom}_{mcsf}_{era}_{wp}.json',
                                                 format_dict = {'eom':["eff", "mistag"],'mcsf':["mc", "sf"],'wp':['L','M','T'],'era':['2016','2017','2018']})
                                                 
+        # Ak8 efficiency btagging #
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'Btag_SF',
+                                                entry_key   = 'ak8btag_eff_2016',
+                                                base_key    = 'eff_{flav}',
+                                                base_str    = 'BtagAk8_{flav}_2016.json',
+                                                format_dict = {'flav':['bjets','cjets','lightjets']})
 
         #----- 2017 -----#
         # Check links of 2016 #

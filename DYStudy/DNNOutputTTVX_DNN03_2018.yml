@@ -5,7 +5,7 @@ era: '2018'
 title: 'DNN output TTVX'
 xaxis: 'DNN output TTVX'
 filename: 'weight_DNNoutputTTVX_{channel}_{type}_DNN03_1D'
-
+category: 'resolved'
 
 ElElChannel:
   ZVeto_0b:

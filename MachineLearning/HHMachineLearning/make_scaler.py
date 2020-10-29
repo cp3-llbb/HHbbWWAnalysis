@@ -70,6 +70,10 @@ def MakeScaler(data=None,list_inputs=[],generator=False,batch=5000,list_samples=
             scaler.mean_ = mean
             scaler.scale_ = std
 
+        # Disable preprocess on onehot variables #
+        scaler.mean_[parameters.mask_onehot] = 0.
+        scaler.scale_[parameters.mask_onehot] = 1.
+
         # Save #
         with open(scaler_path, 'wb') as handle:
             pickle.dump(scaler, handle)
@@ -79,11 +83,13 @@ def MakeScaler(data=None,list_inputs=[],generator=False,batch=5000,list_samples=
         with open(scaler_path, 'rb') as handle:
             scaler = pickle.load(handle)
         logging.info('Scaler %s has been imported'%scaler_name)
-     # Test the scaler #
+    # Test the scaler #
     if data is not None:
         try:
-            mean_scale = np.mean(scaler.transform(data[list_inputs]))
-            var_scale = np.var(scaler.transform(data[list_inputs]))
+            y = scaler.transform(data[list_inputs])
+            # Compute mean and var for inputs not in onehot encoding #
+            mean_scale = np.mean(y[:,[not m for m in parameters.mask_onehot]])
+            var_scale  = np.var(y[:,[not m for m in parameters.mask_onehot]])
         except ValueError:
             raise ValueError("Problem with the scaler '%s' you imported, has the data changed since it was generated ?"%scaler_name)
         if abs(mean_scale)>0.01 or abs((var_scale-1)/var_scale)>0.01: # Check that scaling is correct to 1%

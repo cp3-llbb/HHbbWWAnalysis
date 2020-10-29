@@ -5,7 +5,7 @@ era: '2016'
 title: 'Lead fatjet P_{T}'
 xaxis: 'Lead fatjet P_{T}'
 filename: 'weight_fatjetPt_{channel}_{type}_1D'
-
+category: 'boosted'
 rebin_1D: [0,200,220,240,260,280,300,350,400,500,600]
 
 ElElChannel:

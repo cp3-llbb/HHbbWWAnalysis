@@ -1082,12 +1082,6 @@ plotIt:
   groups:
     data:
       legend: data
-    pseudodata:
-      drawing-options: P
-      legend: pseudo-data
-      marker-color: 1
-      marker-size: 1
-      marker-type: 20
     ttbar:
       fill-color: "#cc7a16"
       legend: tt
