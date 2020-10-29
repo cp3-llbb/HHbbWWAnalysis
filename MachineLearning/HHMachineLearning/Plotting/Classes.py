@@ -732,18 +732,24 @@ def MakeMultiROCPlot(list_obj,name,title=None):
     #----- Confusion matrix -----#
     y_true = None
     y_pred = None
+    sample_weight = None
     for i,obj in enumerate(list_obj):
         if y_pred is None and y_true is None:
             y_true = obj.scores
             y_pred = obj.prob_per_class
+            sample_weight = obj.weight
         else:   
             y_true.append(obj.scores,axis=0)
             y_pred.append(obj.prob_per_class,axis=0)
+            if sample_weight is not None:
+                sample_weight.append(obj.weight,axis=0)
         
     # From multi class to one hot #
     y_true = y_true.argmax(axis=1)
     y_pred = y_pred.argmax(axis=1)
-    cm = confusion_matrix(y_true,y_pred)
+    if sample_weight is not None:
+        sample_weight = sample_weight.reshape(-1)
+    cm = confusion_matrix(y_true,y_pred,sample_weight=sample_weight)
     accuracy = np.trace(cm) / float(np.sum(cm))                                                      
     misclass = 1 - accuracy
 
@@ -754,8 +760,9 @@ def MakeMultiROCPlot(list_obj,name,title=None):
     # Cmap #
     cmapx = plt.get_cmap('Blues')
     cmapy = plt.get_cmap('Reds')
+    cmap = plt.get_cmap('Greens')
 
-    for cmi,cmap,label in zip([cmx,cmy],[cmapx,cmapy],['normedx','normedy']):
+    for cmi,cmap,label in zip([cm,cmx,cmy],[cmap,cmapx,cmapy],['plain','normedx','normedy']):
         # Plot CM #
         fig = plt.figure(figsize=(10, 9))
         plt.subplots_adjust(left=0.10, right=0.99, top=0.90, bottom=0.10)
@@ -776,12 +783,14 @@ def MakeMultiROCPlot(list_obj,name,title=None):
                      horizontalalignment="center",
                      color="white" if cmi[i, j] > thresh else "black")
 
+        xlabel = 'Predicted label'
+        ylabel = 'True label'
         if label == 'normedx':
-            plt.ylabel('True label')
-            plt.xlabel('Predicted label (normed)')
+            xlabel += ' (normed)'
         if label == 'normedy':
-            plt.ylabel('True label (normed)')
-            plt.xlabel('Predicted label')
+            ylabel += ' (normed)'
+        plt.ylabel(xlabel)
+        plt.xlabel(ylabel)
         namefig = '%s_%s.png'%(name,label)
         fig.savefig(namefig)#,bbox_inches='tight')
         logging.info('Confusion matrix curved saved as %s'%namefig)

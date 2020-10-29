@@ -39,6 +39,7 @@ import matplotlib.pyplot as plt
 import parameters
 from preprocessing import PreprocessLayer
 from data_generator import DataGenerator
+import OneHot 
 
 #################################################################################################
 # LossHistory #
@@ -156,6 +157,9 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
     w_val = y_val[:,-1]
     y_train = y_train[:,:-1]
     y_val= y_val[:,:-1]
+
+
+    onehots = [getattr(OneHot,onehot)() for onehot in parameters.onehots]
     
     # Design network #
     scaler_name = 'scaler_'+parameters.suffix+'_'.join(parameters.eras)+'.pkl' 
@@ -163,20 +167,20 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
         scaler = pickle.load(handle)
     IN = Input(shape=(x_train.shape[1],),name='IN')
     L0 = PreprocessLayer(batch_size=params['batch_size'],mean=scaler.mean_,std=scaler.scale_,name='Preprocess')(IN)
+    OH = OneHot.OneHot(onehots=onehots)(L0)
     L1 = Dense(params['first_neuron'],
                activation=params['activation'],
-               kernel_regularizer=l2(params['l2']))(L0)
+               kernel_regularizer=l2(params['l2']))(OH)
     HIDDEN = hidden_layers(params,1,batch_normalization=True).API(L1)
     OUT = Dense(y_train.shape[1],activation=params['output_activation'],name='OUT')(HIDDEN)
 
     # Check preprocessing #
     preprocess = Model(inputs=[IN],outputs=[L0])
     out_preprocess = preprocess.predict(x_train,batch_size=params['batch_size'])
-    mean_scale = np.mean(out_preprocess)
-    std_scale = np.std(out_preprocess)
-    if abs(mean_scale)>0.01 or abs((std_scale-1)/std_scale)>0.01: # Check that scaling is correct to 1%
-        logging.critical("Something is wrong with the preprocessing layer (mean = %0.6f, std = %0.6f), maybe you loaded an incorrect scaler"%(mean_scale,std_scale))
-        raise RuntimeError
+    mean_scale = np.mean(out_preprocess[:,[not m for m in parameters.mask_onehot]])
+    std_scale = np.std(out_preprocess[:,[not m for m in parameters.mask_onehot]])
+    #if abs(mean_scale)>0.01 or abs((std_scale-1)/std_scale)>0.01: # Check that scaling is correct to 1%
+        #raise RuntimeError("Something is wrong with the preprocessing layer (mean = %0.6f, std = %0.6f), maybe you loaded an incorrect scaler"%(mean_scale,std_scale))
 
     # Tensorboard logs #
     #path_board = os.path.join(parameters.main_path,"TensorBoard")
@@ -245,16 +249,17 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
     Keras model for the Neural Network, used to scan the hyperparameter space by Talos
     Uses the generator rather than the input data (which are dummies)
     """
-    
+    onehots = [getattr(OneHot,onehot)() for onehot in parameters.onehots]
     # Design network #
     scaler_name = 'scaler_'+parameters.suffix+'_'.join(parameters.eras)+'.pkl' 
     with open(os.path.join(parameters.main_path,scaler_name), 'rb') as handle: # Import scaler that was created before
         scaler = pickle.load(handle)
     IN = Input(shape=(x_train.shape[1],),name='IN')
     L0 = PreprocessLayer(batch_size=params['batch_size'],mean=scaler.mean_,std=scaler.scale_,name='Preprocess')(IN)
+    OH = OneHot.OneHot(onehots=onehots)(L0)
     L1 = Dense(params['first_neuron'],
                activation=params['activation'],
-               kernel_regularizer=l2(params['l2']))(L0)
+               kernel_regularizer=l2(params['l2']))(OH)
     HIDDEN = hidden_layers(params,1,batch_normalization=True).API(L1)
     OUT = Dense(y_train.shape[1],activation=params['output_activation'],name='OUT')(HIDDEN)
 

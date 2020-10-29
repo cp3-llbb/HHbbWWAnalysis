@@ -1,7 +1,7 @@
 multiclass:
   filename: 
   tree: tree
-  weight: ''
+  weight: 'event_weight'
   name: multiclass 
   bins: 50
   xmin: 0

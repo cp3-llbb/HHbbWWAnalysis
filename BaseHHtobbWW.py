@@ -1256,6 +1256,13 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                         self.elTightMVA(el),
                                                                         op.c_float(1.)),
                                                                     op.c_float(1.))] 
+            #### Ak8 btag efficiencies ####
+            self.Ak8Eff_bjets = self.SF.get_scalefactor("lepton",('ak8btag_eff_{}'.format(era),'eff_bjets'),combine="weight", systName="ak8btag_eff_bjets", defineOnFirstUse=(not forSkimmer),
+                                                        additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
+            self.Ak8Eff_cjets = self.SF.get_scalefactor("lepton",('ak8btag_eff_{}'.format(era),'eff_cjets'),combine="weight", systName="ak8btag_eff_cjets", defineOnFirstUse=(not forSkimmer),
+                                                        additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
+            self.Ak8Eff_lightjets = self.SF.get_scalefactor("lepton",('ak8btag_eff_{}'.format(era),'eff_lightjets'),combine="weight", systName="ak8btag_eff_lightjets", defineOnFirstUse=(not forSkimmer),
+                                                        additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
  
             #----- Triggers -----# 
             #### Single lepton triggers ####
@@ -1476,12 +1483,39 @@ One lepton and and one jet argument must be specified in addition to the require
                                                     getters          = {'Discri':lambda subjet : subjet.btagDeepB,
                                                                         'JetFlavour': lambda subjet : op.static_cast("BTagEntry::JetFlavor",
                                                                                                             op.multiSwitch((subjet.nBHadrons>0,op.c_int(0)), # B -> flav = 5 -> BTV = 0
-                                                                                                            (subjet.nCHadrons>0,op.c_int(1)), # C -> flav = 4 -> BTV = 1
-                                                                                                            op.c_int(2)))},                  # UDSG -> flav = 0 -> BTV = 2
+                                                                                                                           (subjet.nCHadrons>0,op.c_int(1)), # C -> flav = 4 -> BTV = 1
+                                                                                                                           op.c_int(2)))},                  # UDSG -> flav = 0 -> BTV = 2
                                                     sel              = noSel, 
                                                     uName            = sample)
-                self.btagAk8SF = op.rng_product(self.ak8Jets , lambda j : self.DeepCsvSubjetMediumSF(j.subJet1)*self.DeepCsvSubjetMediumSF(j.subJet2))
-                noSel = noSel.refine("BtagAk8SF" , weight = [self.btagAk8SF])
+
+                # Reweighting #
+                wFail = op.extMethod("scalefactorWeightForFailingObject", returnType="double") # 
+                # double scalefactorWeightForFailingObject(double sf, double eff) {
+                #  return (1.-sf*eff)/(1.-eff);
+                #  }
+
+                # Method 1.a
+                # P(MC) = Π_{i tagged} eff_i Π_{j not tagged} (1-eff_j)
+                # P(data) = Π_{i tagged} SF_i x eff_i Π_{j not tagged} (1-SF_jxeff_j)
+                # w = P(data) / P(MC) = Π_{i tagged} SF_i Π_{j not tagged} (1-SF_jxeff_j)/(1-eff_j)
+                # NB : for  SF_i, self.DeepCsvSubjetMediumSF will find the correct SF based on the true flavour
+                #      however for eff_i, this comes from json SF and differs by flavour -> need multiSwitch
+                lambda_subjetWeight = lambda subjet : op.multiSwitch((subjet.nBHadrons>0,      # True bjets 
+                                                                      op.switch(self.lambda_subjetBtag(subjet),                                         # check if tagged
+                                                                                self.DeepCsvSubjetMediumSF(subjet),                                     # Tag : return SF_i
+                                                                                wFail(self.DeepCsvSubjetMediumSF(subjet),self.Ak8Eff_bjets(subjet)))),  # Not tagged : return (1-SF_jxeff_j)/(1-eff_j)
+                                                                     (subjet.nCHadrons>0,      # True cjets 
+                                                                      op.switch(self.lambda_subjetBtag(subjet),                                         # check if tagged
+                                                                                self.DeepCsvSubjetMediumSF(subjet),                                     # Tag : return SF_i
+                                                                                wFail(self.DeepCsvSubjetMediumSF(subjet),self.Ak8Eff_cjets(subjet)))),  # Not tagged : return (1-SF_jxeff_j)/(1-eff_j)
+                                                                      # Else : true lightjets 
+                                                                      op.switch(self.lambda_subjetBtag(subjet),                                               # check if tagged
+                                                                                self.DeepCsvSubjetMediumSF(subjet),                                           # Tag : return SF_i
+                                                                                wFail(self.DeepCsvSubjetMediumSF(subjet),self.Ak8Eff_lightjets(subjet))))     # Not tagged : return (1-SF_jxeff_j)/(1-eff_j)
+                self.ak8BtagReweighting = op.rng_product(self.ak8Jets, lambda j : lambda_subjetWeight(j.subJet1)*lambda_subjetWeight(j.subJet2))
+                noSel = noSel.refine("BtagAk8SF" , weight = [self.ak8BtagReweighting])
+                                                                     
+
 
         # Return #
         return noSel

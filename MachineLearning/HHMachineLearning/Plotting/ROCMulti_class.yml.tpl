@@ -41,7 +41,7 @@ ROC_multi:
     - y
     - salmon 
 
-  weight : ''
+  weight : 'event_weight'
   title : Multiclass
   cut : ''
   selector :
