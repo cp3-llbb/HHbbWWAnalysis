@@ -276,6 +276,8 @@ One lepton and and one jet argument must be specified in addition to the require
         self.sampleCfg = sampleCfg
         self.era = era
 
+        # Check if v7 #
+        self.isNanov7 = ('db' in sampleCfg.keys() and 'NanoAODv7' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['NanoAODv7' in f for f in sampleCfg['files']]))
 
         # Check distributed option #
         isNotWorker = (self.args.distributed != "worker") 
@@ -1257,12 +1259,13 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                         op.c_float(1.)),
                                                                     op.c_float(1.))] 
             #### Ak8 btag efficiencies ####
-            self.Ak8Eff_bjets = self.SF.get_scalefactor("lepton",('ak8btag_eff_{}'.format(era),'eff_bjets'),combine="weight", systName="ak8btag_eff_bjets", defineOnFirstUse=(not forSkimmer),
-                                                        additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
-            self.Ak8Eff_cjets = self.SF.get_scalefactor("lepton",('ak8btag_eff_{}'.format(era),'eff_cjets'),combine="weight", systName="ak8btag_eff_cjets", defineOnFirstUse=(not forSkimmer),
-                                                        additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
-            self.Ak8Eff_lightjets = self.SF.get_scalefactor("lepton",('ak8btag_eff_{}'.format(era),'eff_lightjets'),combine="weight", systName="ak8btag_eff_lightjets", defineOnFirstUse=(not forSkimmer),
-                                                        additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
+            if self.isNanov7:
+                self.Ak8Eff_bjets = self.SF.get_scalefactor("lepton",('ak8btag_eff_{}'.format(era),'eff_bjets'),combine="weight", systName="ak8btag_eff_bjets", defineOnFirstUse=(not forSkimmer),
+                                                            additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
+                self.Ak8Eff_cjets = self.SF.get_scalefactor("lepton",('ak8btag_eff_{}'.format(era),'eff_cjets'),combine="weight", systName="ak8btag_eff_cjets", defineOnFirstUse=(not forSkimmer),
+                                                            additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
+                self.Ak8Eff_lightjets = self.SF.get_scalefactor("lepton",('ak8btag_eff_{}'.format(era),'eff_lightjets'),combine="weight", systName="ak8btag_eff_lightjets", defineOnFirstUse=(not forSkimmer),
+                                                            additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
  
             #----- Triggers -----# 
             #### Single lepton triggers ####
@@ -1458,19 +1461,19 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                 systName = 'btag_ratio',
                                                                 nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
                 noSel = noSel.refine("BtagAk4SF" , weight = [self.btagAk4SF,self.BtagRatioWeight])
-            #----- AK8 jets -> using Method 1.a -----#
-            # See https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagShapeCalibration
 
-            if era == '2016':
-                csvFileNameAk8= os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_2016LegacySF_V1.csv")
-            if era == '2017':
-                csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_94XSF_V4_B_F_v2.csv")
-            if era == '2018':
-                csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_102XSF_V1.csv")
+            if self.isNanov7:
+                #----- AK8 jets -> using Method 1.a -----#
+                # See https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagShapeCalibration
+
+                if era == '2016':
+                    csvFileNameAk8= os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_2016LegacySF_V1.csv")
+                if era == '2017':
+                    csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_94XSF_V4_B_F_v2.csv")
+                if era == '2018':
+                    csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_102XSF_V1.csv")
                 
-            isNanov7 = ('db' in sampleCfg.keys() and 'NanoAODv7' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['NanoAODv7' in f for f in sampleCfg['files']]))
-            #----- Ak8 SF -----# 
-            if isNanov7:
+                #----- Ak8 SF -----# 
                 if not os.path.exists(csvFileNameAk8):
                     raise RuntimeError('Could not find Ak8 csv file %s'%csvFileNameAk8)
                 print ('Btag Ak8 CSV file',csvFileNameAk8)
