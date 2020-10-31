@@ -1,0 +1,295 @@
+path: /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_Tight_Signal/
+use_syst: False
+
+hist_conv:
+  HH_cat_ee_resolved_0b_MHH : ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_highlevelvariable_MHH
+  HH_cat_ee_resolved_1b_MHH : ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_highlevelvariable_MHH
+  HH_cat_ee_resolved_2b_MHH : ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_highlevelvariable_MHH
+  HH_cat_ee_boosted_0b_MHH  : ElEl_HasElElTightOneAk8JetInclusiveBoostedNoBtag_highlevelvariable_MHH
+  HH_cat_ee_boosted_1b_MHH  : ElEl_HasElElTightOneAk8JetInclusiveBoostedOneBtag_highlevelvariable_MHH
+  HH_cat_mm_resolved_0b_MHH : MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_highlevelvariable_MHH
+  HH_cat_mm_resolved_1b_MHH : MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_highlevelvariable_MHH
+  HH_cat_mm_resolved_2b_MHH : MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_highlevelvariable_MHH
+  HH_cat_mm_boosted_0b_MHH  : MuMu_HasMuMuTightOneAk8JetInclusiveBoostedNoBtag_highlevelvariable_MHH
+  HH_cat_mm_boosted_1b_MHH  : MuMu_HasMuMuTightOneAk8JetInclusiveBoostedOneBtag_highlevelvariable_MHH
+  HH_cat_em_resolved_0b_MHH : ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedNoBtag_highlevelvariable_MHH
+  HH_cat_em_resolved_1b_MHH : ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedOneBtag_highlevelvariable_MHH
+  HH_cat_em_resolved_2b_MHH : ElMu_HasElMuTightTwoAk4JetsExclusiveResolvedTwoBtags_highlevelvariable_MHH
+  HH_cat_em_boosted_0b_MHH  : ElMu_HasElMuTightOneAk8JetInclusiveBoostedNoBtag_highlevelvariable_MHH
+  HH_cat_em_boosted_1b_MHH  : ElMu_HasElMuTightOneAk8JetInclusiveBoostedOneBtag_highlevelvariable_MHH
+
+yamlName: plots.yml
+
+era: 2016
+
+groups:
+  GluGluToBulkGravitonToHHTo2B2Tau_M-250:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-250.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-260:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-260.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-270:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-270.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-280:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-280.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-300:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-300.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-320:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-320.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-340:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-340.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-350:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-350.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-400:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-450:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-500:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-550:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-550.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-600:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-600.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-650:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-650.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-750:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-750.root
+  GluGluToBulkGravitonToHHTo2B2Tau_M-800:
+  - GluGluToBulkGravitonToHHTo2B2Tau_M-800.root
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-1000:
+  - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-1000.root
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-260:
+  - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-260.root
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-270:
+  - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-270.root
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-300:
+  - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-300.root
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-350:
+  - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-350.root
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400:
+  - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-400.root
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450:
+  - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500:
+  - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-550:
+  - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-550.root
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-600:
+  - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-600.root
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650:
+  - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-650.root
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-700:
+  - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-700.root
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-800:
+  - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-800.root
+  GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900:
+  - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1000:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1000.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-250:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-250.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-260:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-260.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-270:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-270.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-300:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-300.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-350:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-350.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-400:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-400.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-450:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-450.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-500:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-500.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-550:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-550.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-600:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-600.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-650:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-650.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-700:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-700.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-800:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-800.root
+  GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-900:
+  - GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-900.root
+  GluGluToHHTo2B2Tau_node_10:
+  - GluGluToHHTo2B2Tau_node_10.root
+  GluGluToHHTo2B2Tau_node_11:
+  - GluGluToHHTo2B2Tau_node_11.root
+  GluGluToHHTo2B2Tau_node_12:
+  - GluGluToHHTo2B2Tau_node_12.root
+  GluGluToHHTo2B2Tau_node_13:
+  - GluGluToHHTo2B2Tau_node_13.root
+  GluGluToHHTo2B2Tau_node_2:
+  - GluGluToHHTo2B2Tau_node_2.root
+  GluGluToHHTo2B2Tau_node_9:
+  - GluGluToHHTo2B2Tau_node_9.root
+  GluGluToHHTo2B2Tau_node_SM:
+  - GluGluToHHTo2B2Tau_node_SM.root
+  GluGluToHHTo2B2Tau_node_box:
+  - GluGluToHHTo2B2Tau_node_box.root
+  GluGluToHHTo2B2VTo2L2Nu_node_1:
+  - GluGluToHHTo2B2VTo2L2Nu_node_1.root
+  GluGluToHHTo2B2VTo2L2Nu_node_10:
+  - GluGluToHHTo2B2VTo2L2Nu_node_10.root
+  GluGluToHHTo2B2VTo2L2Nu_node_11:
+  - GluGluToHHTo2B2VTo2L2Nu_node_11.root
+  GluGluToHHTo2B2VTo2L2Nu_node_12:
+  - GluGluToHHTo2B2VTo2L2Nu_node_12.root
+  GluGluToHHTo2B2VTo2L2Nu_node_3:
+  - GluGluToHHTo2B2VTo2L2Nu_node_3.root
+  GluGluToHHTo2B2VTo2L2Nu_node_4:
+  - GluGluToHHTo2B2VTo2L2Nu_node_4.root
+  GluGluToHHTo2B2VTo2L2Nu_node_5:
+  - GluGluToHHTo2B2VTo2L2Nu_node_5.root
+  GluGluToHHTo2B2VTo2L2Nu_node_6:
+  - GluGluToHHTo2B2VTo2L2Nu_node_6.root
+  GluGluToHHTo2B2VTo2L2Nu_node_7:
+  - GluGluToHHTo2B2VTo2L2Nu_node_7.root
+  GluGluToHHTo2B2VTo2L2Nu_node_8:
+  - GluGluToHHTo2B2VTo2L2Nu_node_8.root
+  GluGluToHHTo2B2VTo2L2Nu_node_9:
+  - GluGluToHHTo2B2VTo2L2Nu_node_9.root
+  GluGluToHHTo2B2VTo2L2Nu_node_SM:
+  - GluGluToHHTo2B2VTo2L2Nu_node_SM.root
+  GluGluToHHTo2B2VTo2L2Nu_node_box:
+  - GluGluToHHTo2B2VTo2L2Nu_node_box.root
+  GluGluToRadionToHHTo2B2Tau_M-250:
+  - GluGluToRadionToHHTo2B2Tau_M-250.root
+  GluGluToRadionToHHTo2B2Tau_M-260:
+  - GluGluToRadionToHHTo2B2Tau_M-260.root
+  GluGluToRadionToHHTo2B2Tau_M-270:
+  - GluGluToRadionToHHTo2B2Tau_M-270.root
+  GluGluToRadionToHHTo2B2Tau_M-280:
+  - GluGluToRadionToHHTo2B2Tau_M-280.root
+  GluGluToRadionToHHTo2B2Tau_M-300:
+  - GluGluToRadionToHHTo2B2Tau_M-300.root
+  GluGluToRadionToHHTo2B2Tau_M-320:
+  - GluGluToRadionToHHTo2B2Tau_M-320.root
+  GluGluToRadionToHHTo2B2Tau_M-340:
+  - GluGluToRadionToHHTo2B2Tau_M-340.root
+  GluGluToRadionToHHTo2B2Tau_M-350:
+  - GluGluToRadionToHHTo2B2Tau_M-350.root
+  GluGluToRadionToHHTo2B2Tau_M-400:
+  - GluGluToRadionToHHTo2B2Tau_M-400.root
+  GluGluToRadionToHHTo2B2Tau_M-450:
+  - GluGluToRadionToHHTo2B2Tau_M-450.root
+  GluGluToRadionToHHTo2B2Tau_M-500:
+  - GluGluToRadionToHHTo2B2Tau_M-500.root
+  GluGluToRadionToHHTo2B2Tau_M-550:
+  - GluGluToRadionToHHTo2B2Tau_M-550.root
+  GluGluToRadionToHHTo2B2Tau_M-600:
+  - GluGluToRadionToHHTo2B2Tau_M-600.root
+  GluGluToRadionToHHTo2B2Tau_M-800:
+  - GluGluToRadionToHHTo2B2Tau_M-800.root
+  GluGluToRadionToHHTo2B2Tau_M-900:
+  - GluGluToRadionToHHTo2B2Tau_M-900.root
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-1000:
+  - GluGluToRadionToHHTo2B2VTo2L2Nu_M-1000.root
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-260:
+  - GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-270:
+  - GluGluToRadionToHHTo2B2VTo2L2Nu_M-270.root
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-300:
+  - GluGluToRadionToHHTo2B2VTo2L2Nu_M-300.root
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-350:
+  - GluGluToRadionToHHTo2B2VTo2L2Nu_M-350.root
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-400:
+  - GluGluToRadionToHHTo2B2VTo2L2Nu_M-400.root
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-450:
+  - GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-500:
+  - GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-550:
+  - GluGluToRadionToHHTo2B2VTo2L2Nu_M-550.root
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-600:
+  - GluGluToRadionToHHTo2B2VTo2L2Nu_M-600.root
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-650:
+  - GluGluToRadionToHHTo2B2VTo2L2Nu_M-650.root
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-750:
+  - GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-800:
+  - GluGluToRadionToHHTo2B2VTo2L2Nu_M-800.root
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-900:
+  - GluGluToRadionToHHTo2B2VTo2L2Nu_M-900.root
+  GluGluToRadionToHHTo2B2WToLNu2J_M-1000:
+  - GluGluToRadionToHHTo2B2WToLNu2J_M-1000.root
+  GluGluToRadionToHHTo2B2WToLNu2J_M-250:
+  - GluGluToRadionToHHTo2B2WToLNu2J_M-250.root
+  GluGluToRadionToHHTo2B2WToLNu2J_M-260:
+  - GluGluToRadionToHHTo2B2WToLNu2J_M-260.root
+  GluGluToRadionToHHTo2B2WToLNu2J_M-270:
+  - GluGluToRadionToHHTo2B2WToLNu2J_M-270.root
+  GluGluToRadionToHHTo2B2WToLNu2J_M-300:
+  - GluGluToRadionToHHTo2B2WToLNu2J_M-300.root
+  GluGluToRadionToHHTo2B2WToLNu2J_M-350:
+  - GluGluToRadionToHHTo2B2WToLNu2J_M-350.root
+  GluGluToRadionToHHTo2B2WToLNu2J_M-400:
+  - GluGluToRadionToHHTo2B2WToLNu2J_M-400.root
+  GluGluToRadionToHHTo2B2WToLNu2J_M-450:
+  - GluGluToRadionToHHTo2B2WToLNu2J_M-450.root
+  GluGluToRadionToHHTo2B2WToLNu2J_M-500:
+  - GluGluToRadionToHHTo2B2WToLNu2J_M-500.root
+  GluGluToRadionToHHTo2B2WToLNu2J_M-550:
+  - GluGluToRadionToHHTo2B2WToLNu2J_M-550.root
+  GluGluToRadionToHHTo2B2WToLNu2J_M-600:
+  - GluGluToRadionToHHTo2B2WToLNu2J_M-600.root
+  GluGluToRadionToHHTo2B2WToLNu2J_M-700:
+  - GluGluToRadionToHHTo2B2WToLNu2J_M-700.root
+  GluGluToRadionToHHTo2B2WToLNu2J_M-800:
+  - GluGluToRadionToHHTo2B2WToLNu2J_M-800.root
+  GluGluToRadionToHHTo2B2WToLNu2J_M-900:
+  - GluGluToRadionToHHTo2B2WToLNu2J_M-900.root
+  GluGluToRadionToHHTo2B2WToLNu2J_node-1:
+  - GluGluToRadionToHHTo2B2WToLNu2J_node-1.root
+  GluGluToRadionToHHTo2B2WToLNu2J_node-10:
+  - GluGluToRadionToHHTo2B2WToLNu2J_node-10.root
+  GluGluToRadionToHHTo2B2WToLNu2J_node-11:
+  - GluGluToRadionToHHTo2B2WToLNu2J_node-11.root
+  GluGluToRadionToHHTo2B2WToLNu2J_node-12:
+  - GluGluToRadionToHHTo2B2WToLNu2J_node-12.root
+  GluGluToRadionToHHTo2B2WToLNu2J_node-2:
+  - GluGluToRadionToHHTo2B2WToLNu2J_node-2.root
+  GluGluToRadionToHHTo2B2WToLNu2J_node-3:
+  - GluGluToRadionToHHTo2B2WToLNu2J_node-3.root
+  GluGluToRadionToHHTo2B2WToLNu2J_node-4:
+  - GluGluToRadionToHHTo2B2WToLNu2J_node-4.root
+  GluGluToRadionToHHTo2B2WToLNu2J_node-5:
+  - GluGluToRadionToHHTo2B2WToLNu2J_node-5.root
+  GluGluToRadionToHHTo2B2WToLNu2J_node-6:
+  - GluGluToRadionToHHTo2B2WToLNu2J_node-6.root
+  GluGluToRadionToHHTo2B2WToLNu2J_node-7:
+  - GluGluToRadionToHHTo2B2WToLNu2J_node-7.root
+  GluGluToRadionToHHTo2B2WToLNu2J_node-8:
+  - GluGluToRadionToHHTo2B2WToLNu2J_node-8.root
+  GluGluToRadionToHHTo2B2WToLNu2J_node-9:
+  - GluGluToRadionToHHTo2B2WToLNu2J_node-9.root
+  GluGluToRadionToHHTo2B2WToLNu2J_node_SM:
+  - GluGluToRadionToHHTo2B2WToLNu2J_node_SM.root
+  GluGluToRadionToHHTo2B2WToLNu2J_node_box:
+  - GluGluToRadionToHHTo2B2WToLNu2J_node_box.root
+  VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1:
+  - VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1.root
+  VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1:
+  - VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1.root
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_0:
+  - VBFHHTo2B2Tau_CV_1_C2V_1_C3_0.root
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_1:
+  - VBFHHTo2B2Tau_CV_1_C2V_1_C3_1.root
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_2:
+  - VBFHHTo2B2Tau_CV_1_C2V_1_C3_2.root
+  VBFHHTo2B2Tau_CV_1_C2V_2_C3_1:
+  - VBFHHTo2B2Tau_CV_1_C2V_2_C3_1.root
+  VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1:
+  - VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1.root
+  VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1:
+  - VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1.root
+  VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0:
+  - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0.root
+  VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1:
+  - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1.root
+  VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2:
+  - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2.root
+  VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1:
+  - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1.root
