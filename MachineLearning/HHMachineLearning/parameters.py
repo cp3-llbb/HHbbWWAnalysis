@@ -47,7 +47,7 @@ if N_apply != N_slices/N_models: # Otherwise the same slice can be applied on se
 ############################### Slurm parameters ######################################
 partition = 'Def'  # Def, cp3 or cp3-gpu
 QOS = 'normal' # cp3 or normal
-time = '0-08:00:00' # days-hh:mm:ss
+time = '0-18:00:00' # days-hh:mm:ss
 mem = '9000' # ram in MB
 tasks = '1' # Number of threads(as a string) (not parallel training for classic mode)
 workers = 20
@@ -64,6 +64,9 @@ categories = ['resolved1b3j','resolved2b2j']
 # Better put them in alphabetical order
 nodes = ['DY', 'H', 'HH', 'Rare', 'ST', 'TT', 'TTVX', 'VVV','WJets']
 channels = ['El','Mu']
+
+# Input plots options #
+node_colors = {'DY':'dodgerblue','H':'mediumaquamarine','HH':'red','Rare':'darkviolet','ST':'firebrick','TT':'darkorange','TTVX':'darkgreen','VVV':'y','WJets':'salmon'}
 
 # Tree name #
 tree_name = 'Events'
@@ -96,7 +99,7 @@ eval_criterion = "eval_error" # either val_loss or eval_error or val_acc
 # Early stopping to stop learning after some criterion 
 early_stopping_params = {'monitor'   : 'val_loss',  # Value to monitor
                          'min_delta' : 0.001,          # Minimum delta to declare an improvement
-                         'patience'  : 20,          # How much time to wait for an improvement
+                         'patience'  : 10,          # How much time to wait for an improvement
                          'verbose'   : 1,           # Verbosity level
                          'restore_best_weights':True,
                          'mode'      : 'min'}       # Mode : 'auto', 'min', 'max'
@@ -115,32 +118,32 @@ reduceLR_params = {'monitor'    : 'val_loss',   # Value to monitor
 #################################  Scan dictionary   ##################################
 # /!\ Lists must always contain something (even if 0), otherwise 0 hyperparameters #
 # Classification #
-#p = { 
-#    'lr' : [0.01,0.001], 
-#    'first_neuron' : [64,128,256,512,1024],
-#    'activation' : [relu],
-#    'dropout' : [0.,0.1,0.2],
-#    'hidden_layers' : [2,3,4,5,6], # does not take into account the first layer
-#    'output_activation' : [softmax],
-#    'l2' : [0,0.01,0.1],
-#    'optimizer' : [Adam],  
-#    'epochs' : [100],   
-#    'batch_size' : [10000], 
-#    'loss_function' : [categorical_crossentropy] 
-#}
 p = { 
-    'lr' : [0.01], 
-    'first_neuron' : [1024],
+    'lr' : [0.01,0.001], 
+    'first_neuron' : [64,128,256,512,1024],
     'activation' : [relu],
-    'dropout' : [0.1],
-    'hidden_layers' : [6], # does not take into account the first layer
+    'dropout' : [0.,0.1,0.2],
+    'hidden_layers' : [2,3,4,5,6], # does not take into account the first layer
     'output_activation' : [softmax],
-    'l2' : [0.001],
+    'l2' : [0,0.01,0.1],
     'optimizer' : [Adam],  
-    'epochs' : [100],   
+    'epochs' : [50],   
     'batch_size' : [10000], 
     'loss_function' : [categorical_crossentropy] 
 }
+#p = { 
+#    'lr' : [0.01], 
+#    'first_neuron' : [524],
+#    'activation' : [relu],
+#    'dropout' : [0.1],
+#    'hidden_layers' : [5], # does not take into account the first layer
+#    'output_activation' : [softmax],
+#    'l2' : [0.001],
+#    'optimizer' : [Adam],  
+#    'epochs' : [50],   
+#    'batch_size' : [10000], 
+#    'loss_function' : [categorical_crossentropy] 
+#}
 
 
 repetition = 1 # How many times each hyperparameter has to be used 
@@ -154,6 +157,7 @@ weight = 'total_weight'
 
 # Input branches (combinations possible just as in ROOT #
 inputs = [
+    # LL variables #
     '$era@onehot_era',
     'lep_E',
     'lep_Px',
@@ -181,47 +185,44 @@ inputs = [
     'j4_Py',
     'j4_Pz',
     #'j4_bTagDeepFlavB',
-    #'nAk4Jets',
-    #'nAk4BJets',
-    #'METpt',
-    #'METphi',
-    #'lep_Px',
-    #'lep_Py',
-    #'lep_Pz',
-    #'lep_E',
-    #'lep_pt',
-    #'lep_eta',
-    #'lepmet_DPhi',
-    #'lepmet_pt',
-    #'lep_MT',
-    #'MET_LD',
-    #'j1_pt',
-    #'j2_pt',
-    #'j3_pt',
-    #'j4_pt',
-    #'j1j2_DR',
-    #'j2j3_DR',
+    # HL variables #
+    'nAk4Jets',
+    'nAk4BJets',
+    'METpt',
+    'METphi',
+    'lep_pt',
+    'lep_eta',
+    'lepmet_DPhi',
+    'lepmet_pt',
+    'lep_MT',
+    'MET_LD',
+    'j1_pt',
+    'j2_pt',
+    'j3_pt',
+    'j4_pt',
+    'j1j2_DR',
+    'j2j3_DR',
     #'j1j4_DR',
     #'j3j4_DR',
-    #'j1j2_M',
-    #'j3j4_M',
-    #'j1MetDPhi',
-    #'j3MetDPhi',
-    #'j1LepDR',
-    #'j3LepDR',
-    #'minJetDR',
-    #'minDR_lep_allJets',
-    #'w1w2_MT',
-    #'HT2_lepJetMet',
-    #'HT2R_lepJetMet',
-    #'mT_top_3particle',
-    #'HWW_Mass',
-    #'HWW_Simple_Mass',
-    #'HWW_dR',
-    #'cosThetaS_Hbb',
-    #'cosThetaS_Wjj_simple',
-    #'cosThetaS_WW_simple_met',
-    #'cosThetaS_HH_simple_met',
+    'j1j2_M',
+    'j3j4_M',
+    'j1MetDPhi',
+    'j3MetDPhi',
+    'j1LepDR',
+    'j3LepDR',
+    'minJetDR',
+    'minDR_lep_allJets',
+    'w1w2_MT',
+    'HT2_lepJetMet',
+    'HT2R_lepJetMet',
+    'mT_top_3particle',
+    'HWW_Mass',
+    'HWW_Simple_Mass',
+    'HWW_dR',
+    'cosThetaS_Hbb',
+    'cosThetaS_Wjj_simple',
+    'cosThetaS_WW_simple_met',
+    'cosThetaS_HH_simple_met',
          ]
 onehots = [inp.split('@')[1] if '@' in inp else 'onehot_unit'  for inp  in  inputs]
 mask_onehot = [len(inp.split('@'))==2 for inp  in  inputs]

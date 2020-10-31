@@ -40,6 +40,7 @@ class highlevelLambdas:
         
         # dilep + dijet #
         self.M_lljj = lambda l1,l2,j1,j2 : op.invariant_mass(self.lljj_p4(l1,l2,j1,j2))
+        self.M_HH = lambda l1,l2,j1,j2,met : op.invariant_mass(l1.p4,l2.p4,j1.p4,j2.p4,met.p4)
         self.MinDR_lj = lambda l1,l2,j1,j2 : op.min(op.min(op.deltaR(l1.p4,j1.p4),op.deltaR(l1.p4,j2.p4)),
                                                op.min(op.deltaR(l2.p4,j1.p4),op.deltaR(l2.p4,j2.p4)))
         self.MinDR_part1_partCont = lambda part1,partCont : op.rng_min(partCont, lambda part2 : op.deltaR(part1.p4, part2.p4))

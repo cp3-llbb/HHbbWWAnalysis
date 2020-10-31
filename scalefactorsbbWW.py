@@ -65,12 +65,18 @@ class ScaleFactorsbbWW:
                                 base_str    = "TTHSF_EGamma_SF2D_MuonTight2016.json")
         
 
-        # DY weight for 1 and 2 btag # 
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
-                                                entry_key   = 'DY_2016',
-                                                base_key    = '{channel}_{variable}_{type}_{btag}',
-                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
-                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['data','mc'],'btag':['1b','2b'],'variable':['leadjetPt','fatjetsoftDropmass']})
+#        # DY weight  # 
+#        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+#                                                entry_key   = 'DY_resolved_2016',
+#                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+#                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
+#                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['data','mc'],'btag':['1b','2b'],'variable':['leadjetPt']})
+#        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+#                                                entry_key   = 'DY_boosted_2016',
+#                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+#                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
+#                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
+
 
         #  Fake rates #
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
@@ -147,8 +153,18 @@ class ScaleFactorsbbWW:
                                                 base_str    = 'TTHFakeRates_Muon_2017_{syst}Syst.json',
                                                 format_dict = {'syst':['pt','barrel','norm']})
 
-
-
+#        # DY weight  # 
+#        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+#                                                entry_key   = 'DY_resolved_2017',
+#                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+#                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2017.json',
+#                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['mc'],'btag':['1b','2b'],'variable':['leadjetPt']})
+#        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+#                                                entry_key   = 'DY_boosted_2017',
+#                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+#                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2017.json',
+#                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
+#
         #----- 2018 -----#
         # Check links of 2016 #
         # Single Trigger SF # (Double triggers are single numbers and are in Base)
@@ -195,7 +211,17 @@ class ScaleFactorsbbWW:
                                                 base_str    = 'TTHFakeRates_Muon_2018_{syst}Syst.json',
                                                 format_dict = {'syst':['pt','barrel','norm']})
 
-
+#        # DY weight  # 
+#        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+#                                                entry_key   = 'DY_resolved_2018',
+#                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+#                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2018.json',
+#                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['mc'],'btag':['1b','2b'],'variable':['leadjetPt']})
+#        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+#                                                entry_key   = 'DY_boosted_2018',
+#                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+#                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2018.json',
+#                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
 
         # Get full dict #
         self.all_scalefactors = instance.GetScaleFactorsDict()

@@ -132,6 +132,7 @@ def main():
     from split_training import DictSplit
     from concatenate_csv import ConcatenateCSV
     from threadGPU import utilizationGPU
+    from input_plots import InputPlots
     import parameters
 
     # Needed because PyROOT messes with argparse
@@ -342,6 +343,9 @@ def main():
             if not parameters.crossvalidation:
                 del train_dict, test_dict
             #logging.info('Current memory usage : %0.3f GB'%(pid.memory_info().rss/(1024**3)))
+
+            # Plots #
+            InputPlots(train_all,list_inputs)
 
             # Randomize order, we don't want only one type per batch #
             random_train = np.arange(0,train_all.shape[0]) # needed to randomize x,y and w in same fashion
