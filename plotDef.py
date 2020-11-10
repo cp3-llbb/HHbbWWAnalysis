@@ -396,6 +396,22 @@ def makeDileptonPlots(sel, dilepton, suffix, channel, is_MC=False):
                              title="Flavour of genParticle (channel %s)"%channel, 
                              xTitle= "GenParticle flavour (second lepton)",
                              plotopts = channelLabel))
+    # ttH mva plot #
+    plots.append(Plot.make1D("%s_%s_firstlepton_ttHmva"%(channel,suffix), 
+                             dilepton[0].mvaTTH, 
+                             sel, 
+                             EquidistantBinning(50,0.,1.),
+                             title="ttH MVA of the first lepton (channel %s)"%channel, 
+                             xTitle= "MVA_{ttH} (first lepton) [GeV]",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_secondlepton_ttHmva"%(channel,suffix), 
+                             dilepton[1].mvaTTH, 
+                             sel, 
+                             EquidistantBinning(50,0.,1.),
+                             title="ttH MVA of the second lepton (channel %s)"%channel, 
+                             xTitle= "MVA_{ttH} (second lepton) [GeV]",
+                             plotopts = channelLabel))
+
 
     return plots
 
