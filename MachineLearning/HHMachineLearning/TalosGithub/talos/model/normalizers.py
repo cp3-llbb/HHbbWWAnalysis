@@ -1,5 +1,5 @@
-from keras.optimizers import SGD, Adam, Adadelta, Adagrad, Adamax, RMSprop
-from keras.optimizers import Nadam
+from tensorflow.keras.optimizers import SGD, Adam, Adadelta, Adagrad, Adamax, RMSprop
+from tensorflow.keras.optimizers import Nadam
 
 
 def lr_normalizer(lr, optimizer):

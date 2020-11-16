@@ -1774,7 +1774,7 @@ def makeDoubleLeptonMachineLearningInputPlots(sel,suffix,channel,inputs):
                                  variable,
                                  sel,
                                  EquidistantBinning(*binning),
-                                 xTitle = '%s'%vartitle,
+                                 xTitle = vartitle,
                                  plotopts = channelLabel))
     return plots
     

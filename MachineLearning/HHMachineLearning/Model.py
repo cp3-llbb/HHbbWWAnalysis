@@ -13,16 +13,14 @@ import itertools
 
 import numpy as np
 
-import keras
-from keras import utils
-from keras.layers import Layer, Input, Dense, Concatenate, BatchNormalization, LeakyReLU, Lambda, Dropout
-from keras.losses import binary_crossentropy, mean_squared_error
-from keras.optimizers import RMSprop, Adam, Nadam, SGD
-from keras.activations import relu, elu, selu, softmax, tanh
-from keras.models import Model, model_from_json, load_model
-from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TensorBoard
-from keras.regularizers import l1,l2
-import keras.backend as K
+from tensorflow.keras import utils
+from tensorflow.keras.layers import Layer, Input, Dense, Concatenate, BatchNormalization, LeakyReLU, Lambda, Dropout
+from tensorflow.keras.losses import binary_crossentropy, mean_squared_error
+from tensorflow.keras.optimizers import RMSprop, Adam, Nadam, SGD
+from tensorflow.keras.activations import relu, elu, selu, softmax, tanh
+from tensorflow.keras.models import Model, model_from_json, load_model
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, TensorBoard
+from tensorflow.keras.regularizers import l1,l2
 import tensorflow as tf
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # removes annoying warning
 
@@ -32,6 +30,8 @@ from talos.model.layers import *
 from talos.model.normalizers import lr_normalizer
 from talos.utils.gpu_utils import parallel_gpu_jobs
 import talos
+
+from lbn import LBN, LBNLayer
 
 import matplotlib.pyplot as plt
 
@@ -44,7 +44,7 @@ import OneHot
 #################################################################################################
 # LossHistory #
 #################################################################################################
-class LossHistory(keras.callbacks.Callback):
+class LossHistory(tf.keras.callbacks.Callback):
     """ Records the history of the training per epoch and per batch """
     def on_train_begin(self, logs={}):
         self.batch_loss         = {'batch':[], 'loss':[]}
@@ -79,7 +79,7 @@ class LossHistory(keras.callbacks.Callback):
         self.epoch_acc['acc'].append(logs.get('acc'))
         self.epoch_val_loss['loss'].append(logs.get('val_loss'))
         self.epoch_val_acc['acc'].append(logs.get('val_acc'))
-        self.epoch_lr['lr'].append(K.eval(self.model.optimizer.lr))
+        self.epoch_lr['lr'].append(tf.keras.backend.eval(self.model.optimizer.lr))
 
         # Batch counting #
         self.epoch_counter += 1
@@ -158,19 +158,38 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
     y_train = y_train[:,:-1]
     y_val= y_val[:,:-1]
 
+    x_train_lbn = x_train[:,-len(parameters.LBN_inputs):].reshape(-1,4,len(parameters.LBN_inputs)//4)
+    x_train = x_train[:,:-len(parameters.LBN_inputs)]
+
+    x_val_lbn = x_val[:,-len(parameters.LBN_inputs):].reshape(-1,4,len(parameters.LBN_inputs)//4)
+    x_val = x_val[:,:-len(parameters.LBN_inputs)]
 
     onehots = [getattr(OneHot,onehot)() for onehot in parameters.onehots]
     
-    # Design network #
+    # Scaler #
     scaler_name = 'scaler_'+parameters.suffix+'_'.join(parameters.eras)+'.pkl' 
     with open(os.path.join(parameters.main_path,scaler_name), 'rb') as handle: # Import scaler that was created before
         scaler = pickle.load(handle)
-    IN = Input(shape=(x_train.shape[1],),name='IN')
+
+    # Design network #
+
+    # Left branch : classic inputs -> Preprocess -> onehot
+    IN = Input(shape=x_train.shape[1:],name='IN')
     L0 = PreprocessLayer(batch_size=params['batch_size'],mean=scaler.mean_,std=scaler.scale_,name='Preprocess')(IN)
-    OH = OneHot.OneHot(onehots=onehots)(L0)
+    OH = OneHot.OneHot(onehots=onehots,name="OneHot")(L0)
+
+    # Right branch : LBN 
+    INLBN = Input(shape=x_train_lbn.shape[1:],name='INLBN')
+    FEATURES = LBNLayer(x_train_lbn.shape[1: ], 
+                        n_particles = max(params['n_particles'],1), # Hack so that 0 does not trigger error
+                        boost_mode  = LBN.PAIRS, 
+                        features    = ["E", "px", "py", "pz", "pt", "p", "m", "pair_cos"],
+                        name='LBN')(INLBN)
+    # Concatenation of left and right #
+    CONC = tf.keras.layers.Concatenate(axis=-1)([FEATURES, OH])
     L1 = Dense(params['first_neuron'],
                activation=params['activation'],
-               kernel_regularizer=l2(params['l2']))(OH)
+               kernel_regularizer=l2(params['l2']))(CONC if params['n_particles'] > 0 else OH)
     HIDDEN = hidden_layers(params,1,batch_normalization=True).API(L1)
     OUT = Dense(y_train.shape[1],activation=params['output_activation'],name='OUT')(HIDDEN)
 
@@ -179,8 +198,8 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
     out_preprocess = preprocess.predict(x_train,batch_size=params['batch_size'])
     mean_scale = np.mean(out_preprocess[:,[not m for m in parameters.mask_onehot]])
     std_scale = np.std(out_preprocess[:,[not m for m in parameters.mask_onehot]])
-    #if abs(mean_scale)>0.01 or abs((std_scale-1)/std_scale)>0.01: # Check that scaling is correct to 1%
-        #raise RuntimeError("Something is wrong with the preprocessing layer (mean = %0.6f, std = %0.6f), maybe you loaded an incorrect scaler"%(mean_scale,std_scale))
+    if abs(mean_scale)>0.01 or abs((std_scale-1)/std_scale)>0.01: # Check that scaling is correct to 1%
+        raise RuntimeError("Something is wrong with the preprocessing layer (mean = %0.6f, std = %0.6f), maybe you loaded an incorrect scaler"%(mean_scale,std_scale))
 
     # Tensorboard logs #
     #path_board = os.path.join(parameters.main_path,"TensorBoard")
@@ -210,28 +229,36 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
     # Compile #
     if 'resume' not in params:  # Normal learning 
         # Define model #
-        model = Model(inputs=[IN], outputs=[OUT])
+        model_inputs = [IN]
+        if params['n_particles'] > 0:
+            model_inputs.append(INLBN)
+        model = Model(inputs=model_inputs, outputs=[OUT])
         initial_epoch = 0
     else: # a model has to be imported and resumes training
-        custom_objects =  {'PreprocessLayer': PreprocessLayer}
+        custom_objects =  {'PreprocessLayer': PreprocessLayer,'OneHot': OneHot.OneHot}
         logging.info("Loaded model %s"%params['resume'])
         a = Restore(params['resume'],custom_objects=custom_objects,method='h5')
         model = a.model
         initial_epoch = params['initial_epoch']
+
         
     model.compile(optimizer=Adam(lr=params['lr']),
                   loss={'OUT':params['loss_function']},
                   metrics=['accuracy'])
-    utils.print_summary(model=model) #used to print model
-
+    print (model.summary())
+    fit_inputs = {'IN':x_train}
+    fit_val = [{'IN':x_val},{'OUT':y_val},w_val]
+    if params['n_particles'] > 0:
+        fit_inputs['INLBN'] = x_train_lbn
+        fit_val[0]['INLBN'] = x_val_lbn
     # Fit #
-    history = model.fit(x               = {'IN':x_train},
+    history = model.fit(x               = fit_inputs,
                         y               = {'OUT':y_train},
                         sample_weight   = w_train,
                         epochs          = params['epochs'],
                         batch_size      = params['batch_size'],
                         verbose         = 1,
-                        validation_data = ({'IN':x_val},{'OUT':y_val},w_val),
+                        validation_data = fit_val,
                         callbacks       = Callback_list)
 
     # Plot history #
@@ -326,7 +353,6 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
 
     # Some verbose logging #
     logging.info("Will use %d workers"%parameters.workers)
-    logging.warning("Keras location " + keras.__file__)
     logging.warning("Tensorflow location "+ tf.__file__)
     logging.warning("GPU ")
     logging.warning(K.tensorflow_backend._get_available_gpus())

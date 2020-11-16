@@ -41,7 +41,9 @@ def get_options():
     a.add_argument('--scan', action='store', required=False, type=str, default='',
         help='Name of the scan to be used')
     a.add_argument('--task', action='store', required=False, type=str, default='',
-        help='Name of dict to be used for scan (Used by function itself when submitting jobs or DEBUG)')
+        help='Name of dict to be used for scan (used by function itself when submitting jobs or DEBUG)')
+    a.add_argument('--modelId', action='store', required=False, type=int, default=-1,
+        help='Model ID or the cross validation (used by function itself when submitting jobs or DEBUG)')
     a.add_argument('--generator', action='store_true', required=False, default=False, 
         help='Whether to use a generator for the neural network')
     a.add_argument('--resume', action='store_true', required=False, default=False,
@@ -168,15 +170,15 @@ def main():
         if opt.GPU:                 args += ' --GPU '
         if opt.resume:              args += ' --resume '
         if opt.nocache:             args += ' --nocache'
-        if opt.model!='':           args += ' --model '+opt.model+' '
+        if opt.model!='':           args += ' --model %s '%opt.model
         if len(opt.output)!=0:      args += ' --output '+ ' '.join(opt.output)+' '
 
         if opt.submit!='':
             logging.info('Submitting jobs with args "%s"'%args)
+            name = opt.submit
             if opt.resubmit:
-                submit_on_slurm(name=opt.submit+'_resubmit',debug=opt.debug,args=args)
-            else:
-                submit_on_slurm(name=opt.submit,debug=opt.debug,args=args)
+                name += '_resubmit'
+            submit_on_slurm(name=name,debug=opt.debug,args=args)
         sys.exit()
 
     #############################################################################################
@@ -230,7 +232,9 @@ def main():
     logging.info('Starting tree importation')
 
     # Import variables from parameters.py
-    variables = parameters.inputs+parameters.outputs+parameters.other_variables
+    variables = parameters.inputs+parameters.LBN_inputs+parameters.outputs+parameters.other_variables
+    variables = [v for i,v in enumerate(variables) if v not in variables[:i]] # avoid repetitons while keeping order
+        
     list_inputs  = parameters.inputs
     list_outputs = parameters.outputs
 
@@ -345,7 +349,7 @@ def main():
             #logging.info('Current memory usage : %0.3f GB'%(pid.memory_info().rss/(1024**3)))
 
             # Plots #
-            InputPlots(train_all,list_inputs)
+            InputPlots(train_all,list_inputs+[inp for inp in parameters.LBN_inputs if inp not in list_inputs])
 
             # Randomize order, we don't want only one type per batch #
             random_train = np.arange(0,train_all.shape[0]) # needed to randomize x,y and w in same fashion
@@ -371,8 +375,10 @@ def main():
                 test_cat = pd.DataFrame(test_onehot,columns=label_encoder.classes_,index=test_all.index)
             # Add to full #
             train_all = pd.concat([train_all,train_cat],axis=1)
+            train_all[list_inputs+list_outputs+parameters.LBN_inputs] = train_all[list_inputs+list_outputs+parameters.LBN_inputs].astype('float32')
             if not parameters.crossvalidation:
                 test_all = pd.concat([test_all,test_cat],axis=1)
+                test_all[list_inputs+list_outputs+parameters.LBN_inputs] = test_all[list_inputs+list_outputs+parameters.LBN_inputs].astype('float32')
 
             # Preprocessing #
             # The purpose is to create a scaler object and save it
@@ -422,6 +428,7 @@ def main():
     list_inputs  = [var.replace('$','') for var in parameters.inputs]
     list_outputs = [var.replace('$','') for var in parameters.outputs]
 
+
     #############################################################################################
     # DNN #
     #############################################################################################
@@ -435,7 +442,12 @@ def main():
     if opt.scan != '':
         instance = HyperModel(opt.scan,list_inputs,list_outputs)
         if parameters.crossvalidation:
-            for i in range(parameters.N_models):
+            modelIds = list(range(parameters.N_models))
+            if opt.modelId != -1:
+                if opt.modelId not in modelIds:
+                    raise RuntimeError("You asked model id %d but only these ids are avilable : ["+','.join([str(m) for m in modelIds])+']')
+                modelIds = [opt.modelId]
+            for i in modelIds:
                 logging.info("*"*80)
                 logging.info("Starting training of model %d"%i)
                 instance.HyperScan(data=train_all,

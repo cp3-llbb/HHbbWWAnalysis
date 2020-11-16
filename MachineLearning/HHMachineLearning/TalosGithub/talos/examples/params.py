@@ -1,6 +1,6 @@
-from keras.optimizers import Adam, Nadam, RMSprop
-from keras.activations import relu, elu, softmax, sigmoid
-from keras.losses import logcosh, binary_crossentropy, categorical_crossentropy
+from tensorflow.keras.optimizers import Adam, Nadam, RMSprop
+from tensorflow.keras.activations import relu, elu, softmax, sigmoid
+from tensorflow.keras.losses import logcosh, binary_crossentropy, categorical_crossentropy
 
 
 def iris():

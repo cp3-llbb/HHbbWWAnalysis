@@ -78,22 +78,30 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         #----- Machine Learning Model -----#                
         #path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',self.args.Classifier,'model','model.pb')
-        DNNs = {}
-        for model_num in ["01","02","03","04"]:
-        #for model_num in ["03"]:
-            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
-            print ("DNN model : %s"%path_model)
-            if not os.path.exists(path_model):
-                raise RuntimeError('Could not find model file %s'%path_model)
-            try:
-                input_names = ["input_1", "input_2"]
-                if model_num in ["03","04"]:
-                    input_names.append("input_3")
-                DNNs[model_num] = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, "model/output/Softmax"))
-            except:
-                raise RuntimeError('Could not load model %s'%path_model)
-
-
+#        DNNs = {}
+#        model_nums = ["07"]
+#        for model_num in model_nums:
+#            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
+#            print ("DNN model : %s"%path_model)
+#            if not os.path.exists(path_model):
+#                raise RuntimeError('Could not find model file %s'%path_model)
+#            try:
+#                input_names = ["input_1", "input_2"]
+#                output_name = "model/output/Softmax"
+#                if model_num in ["03","04"]:
+#                    input_names.append("input_3")
+#                if model_num in ["05","06"]:
+#                    input_names.extend(["input_3","input_4","input_5"])
+#                    #output_name = "model/model_4/output/Softmax"
+#                if model_num in ["07"]:
+#                    input_names.extend(["input_3","input_4","input_5","input_6"])
+#                    output_name = "model/model_4/output/Softmax"
+#                #DNNs[model_num] = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, "model/output/Softmax"))
+#                print (model_num,input_names,output_name)
+#                DNNs[model_num] = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
+#            except:
+#                raise RuntimeError('Could not load model %s'%path_model)
+#
         #----- Dileptons -----#
         selObjectDict = makeDoubleLeptonSelection(self,noSel,plot_yield=True)
         # selObjectDict : keys -> level (str)
@@ -263,7 +271,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 #----- select the jets -----#
                 aka4JetsByBtagScore = op.sort(self.ak4Jets, lambda jet : -jet.btagDeepFlavB)
 
-                container0b2j = [ t.Jet[self.ak4LightJetsByBtagScore[i].idx] for i in range(2) ]
+                container0b2j = [ t.Jet[aka4JetsByBtagScore[i].idx] for i in range(2) ]
                 container1b1j = [ t.Jet[op.switch(op.rng_len(self.ak4BJets) == 1, self.ak4BJets[0].idx,  aka4JetsByBtagScore[0].idx)] ,
                                   t.Jet[op.switch(op.rng_len(self.ak4BJets) == 1, self.ak4LightJetsByBtagScore[0].idx,  aka4JetsByBtagScore[1].idx)]]
                 container2b0j = [ t.Jet[op.switch(op.rng_len(self.ak4BJets) >= 2, self.ak4BJets[i].idx, aka4JetsByBtagScore[i].idx)] for i in range(2) ]
@@ -418,7 +426,8 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             selObjectDictList = []
             bjetsCont = {}
             nbtagconv = {}
-            if not self.args.OnlyYield:
+            #if not self.args.OnlyYield:
+            if True: # TODO : fix
                 if "Ak4" in jetplot_level:
                     selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjectDileptonAk4Jets})
                     selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjectDileptonAk4Jets})
@@ -443,41 +452,61 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     nbtagconv['TwoBtags'] = 2
 
             dileptonsCont = {'ElEl':OSElElDilepton[0],'MuMu':OSMuMuDilepton[0],'ElMu':OSElMuDilepton[0]}
-            self.nodes = ['HH', 'H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
+            self.nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
             
             for selObjectDict in selObjectDictList:
                 dilepton = dileptonsCont[selObjectDict['channel']]
                 resolved_str = [res_str for res_str in bjetsCont.keys() if res_str in selObjectDict["selObject"].selName][0]
                 dibjet = bjetsCont[resolved_str]
+
                 inputsLL = returnLowLevelMVAInputs(self     = self,
-                                                   dilepton = dilepton,
+                                                   l1       = dilepton[0],
+                                                   l2       = dilepton[1],
+                                                   met       = self.corrMET,
                                                    jets     = self.ak4Jets,
                                                    channel  = selObjectDict['channel'])
                 inputsHL = returnHighLevelMVAInputs(self      = self,
-                                                    dilepton  = dilepton,
+                                                    l1        = dilepton[0],
+                                                    l2        = dilepton[1],
                                                     b1        = dibjet[0],
                                                     b2        = dibjet[1],
                                                     met       = self.corrMET,
                                                     jets      = self.ak4Jets,
-                                                    nbtags    = nbtagconv[resolved_str],
-                                                    channel  = selObjectDict['channel'])
+                                                    electrons = self.electronsFakeSel,
+                                                    muons     = self.muonsFakeSel,
+                                                    channel   = selObjectDict['channel'])
+                inputsSupp  = {('year',     'Year',         (3,2016.,2019.))    : op.c_int(self.era),
+                               ('eventnr',  'Event number', (1e6+1,0.,1e6))     : op.c_int(t.event)}
                 plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLL))
-                plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL))
+                #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL))
+                #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsSupp))
                 
-                for model_num,DNN in DNNs.items():
-                    if model_num in ["01","02"]:
-                        inputs = inputsLL
-                    elif model_num in ["03","04"]:
-                        inputs = {**inputsLL,**inputsHL}
-                    else:
-                        raise RuntimeError("Failed to understand model number")
-
-                    output = DNN(*inputs.values())
-                    selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,plot_yield=True,suffix=model_num)
-                    for selObjNode in selObjNodesDict.values():
-                        cutFlowPlots.append(CutFlowReport(selObjNode.selName,selObjNode.sel))
-                    if not self.args.OnlyYield:
-                        plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
+#                for model_num,DNN in DNNs.items():
+#                    if model_num in ["01","02"]:
+#                        inputs = inputsLL
+#                    elif model_num in ["03","04"]:
+#                        inputs = {**inputsLL,**inputsHL}
+#                    elif model_num in ["05","06"]:
+#                        inputs = {**inputsLL,**inputsHL,**inputsSupp}
+#                    elif model_num in ["07"]:
+#                        inputs = {**inputsLL,**inputsHL,**inputsSupp}
+#                    else:
+#                        raise RuntimeError("Failed to understand model number")
+#
+#                    inputs = [op.c_float(0)]*(2*6+4*5+4+22+1+1)
+#                    print (inputs)
+#                    print (len(inputs))
+#
+#                    #output = DNN(*inputs.values())
+#                    output = DNN(*inputs)
+#                    print ('\noutput\n')
+#                    print (type(output))
+#                    print (type(output[0]))
+#                    print ()
+#                    selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,plot_yield=True,suffix=model_num)
+#                    for selObjNode in selObjNodesDict.values():
+#                        cutFlowPlots.append(CutFlowReport(selObjNode.selName,selObjNode.sel))
+#                    plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
             #        plots.append(plots.append(Plot.make1D("DNN_argmax_"+selObjectDict['selObject'].selName,
             #                                              op.rng_max_element_index(output),
             #                                              selObjectDict['selObject'].sel,
@@ -486,9 +515,10 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 
     
         #----- Add the Yield plots -----#
-        plots.extend(self.yieldPlots.returnPlots())
+        #plots.extend(self.yieldPlots.returnPlots())
 
-        #plots.extend(cutFlowPlots)
+        plots.extend(cutFlowPlots)
+
 
         #----- Return -----#
         return plots

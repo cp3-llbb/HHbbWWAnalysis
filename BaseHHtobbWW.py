@@ -820,7 +820,7 @@ One lepton and and one jet argument must be specified in addition to the require
             muonsByPt = op.sort(t.Muon, lambda mu : -self.muon_conept[mu.idx]) # Ordering done by conept
             # Preselection #
             self.lambda_muonPreSel = lambda mu : op.AND(mu.pt >= 5.,
-                                                        op.abs(mu.p4.Eta()) <= 2.4,
+                                                        op.abs(mu.eta) <= 2.4,
                                                         op.abs(mu.dxy) <= 0.05,
                                                         op.abs(mu.dz) <= 0.1,
                                                         mu.miniPFRelIso_all <= 0.4, # mini PF relative isolation, total (with scaled rho*EA PU corrections)
@@ -858,7 +858,7 @@ One lepton and and one jet argument must be specified in addition to the require
             electronsByPt = op.sort(t.Electron, lambda ele : -ele.pt) # Ordering done by pt
             self.lambda_electronTightSel = lambda ele : op.AND(ele.mvaFall17V2Iso_WP90,
                                                                ele.pt >= 15.,
-                                                               op.abs(ele.eta) <= 2.4)
+                                                               op.abs(ele.eta) <= 2.5)
             self.lambda_cleanElectron = lambda ele : op.NOT(op.rng_any(self.muonsTightSel, lambda mu : op.deltaR(mu.p4, ele.p4) <= 0.3 ))
             self.electronsTightSelBeforeCleaning = op.select(electronsByPt, self.lambda_electronTightSel)
             self.electronsTightSel = op.select(self.electronsTightSelBeforeCleaning, self.lambda_cleanElectron)
@@ -866,7 +866,7 @@ One lepton and and one jet argument must be specified in addition to the require
         if self.args.TTHIDLoose or self.args.TTHIDTight:
             electronsByPt = op.sort(t.Electron, lambda ele : -self.electron_conept[ele.idx]) # Ordering done by conept
             self.lambda_electronPreSel = lambda ele : op.AND(ele.pt >= 7.,
-                                                             op.abs(ele.p4.Eta()) <= 2.5,
+                                                             op.abs(ele.eta) <= 2.5,
                                                              op.abs(ele.dxy) <= 0.05,
                                                              op.abs(ele.dz) <= 0.1,
                                                              ele.miniPFRelIso_all <= 0.4, # mini PF relative isolation, total (with scaled rho*EA PU corrections)
@@ -1144,7 +1144,7 @@ One lepton and and one jet argument must be specified in addition to the require
         self.ak4JetsByPt = op.sort(t.Jet, lambda jet : -jet.pt)
         # Preselection #
         self.lambda_ak4JetsPreSel = lambda j : op.AND(j.jetId & 1 if era == "2016" else j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
-                                                      op.OR(j.puId,j.pt>=50.), # Jet PU ID bit1 is loose (only to be applied to jets with pt<50)
+                                                      op.OR(j.puId >= 4,j.pt>=50.), # Jet PU ID bit1 is loose (only to be applied to jets with pt<50)
                                                       j.pt >= 25.,
                                                       op.abs(j.eta) <= 2.4)
         self.ak4JetsPreSel = op.select(self.ak4JetsByPt, self.lambda_ak4JetsPreSel)
@@ -1190,6 +1190,10 @@ One lepton and and one jet argument must be specified in addition to the require
                                                              op.abs(j.eta) > 3.0)))
         self.ak4VBFJetsPreSel = op.select(self.ak4JetsByPt, self.lambda_VBFJets)
         self.ak4VBFJets = op.select(self.ak4VBFJetsPreSel, self.lambda_cleanAk4Jets)
+        self.lambda_VBFPair = lambda j1,j2 : op.AND(op.invariant_mass(j1.p4,j2.p4) > 500.,
+                                                    op.abs(j1.eta - j2.eta) > 3.)
+        self.ak4VBFJetPairsNotSorted = op.combine(self.ak4VBFJets, N=2, pred=self.lambda_VBFPair)
+        self.ak4VBFJetPairs = op.sort(self.ak4VBFJetPairsNotSorted, lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
 
         #############################################################################
         #                                AK8 Jets                                   #
@@ -1621,23 +1625,23 @@ One lepton and and one jet argument must be specified in addition to the require
                                                  uName            = sample)
             self.btagAk4SF = op.rng_product(self.ak4Jets , lambda j : self.DeepJetDiscReshapingSF(j))
 
-            if self.args.BtagReweightingOn and self.args.BtagReweightingOff:
-                raise RuntimeError("Reweighting cannot be both on and off") 
-            if self.args.BtagReweightingOn: # Do not apply the ratio
-                noSel = noSel.refine("BtagSF" , weight = self.btagAk4SF)
-            elif self.args.BtagReweightingOff:
-                pass # Do not apply any SF
-            else:
-                ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(sample,era))
-                if not os.path.exists(ReweightingFileName):
-                    raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
-                print ('Reweighting file',ReweightingFileName)
-
-                self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
-                                                                numJets  = op.rng_len(self.ak4Jets),
-                                                                systName = 'btag_ratio',
-                                                                nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
-                noSel = noSel.refine("BtagAk4SF" , weight = [self.btagAk4SF,self.BtagRatioWeight])
+#            if self.args.BtagReweightingOn and self.args.BtagReweightingOff: # TODO : re-enable
+#                raise RuntimeError("Reweighting cannot be both on and off") 
+#            if self.args.BtagReweightingOn: # Do not apply the ratio
+#                noSel = noSel.refine("BtagSF" , weight = self.btagAk4SF)
+#            elif self.args.BtagReweightingOff:
+#                pass # Do not apply any SF
+#            else:
+#                ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(sample,era))
+#                if not os.path.exists(ReweightingFileName):
+#                    raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
+#                print ('Reweighting file',ReweightingFileName)
+#
+#                self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
+#                                                                numJets  = op.rng_len(self.ak4Jets),
+#                                                                systName = 'btag_ratio',
+#                                                                nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
+#                noSel = noSel.refine("BtagAk4SF" , weight = [self.btagAk4SF,self.BtagRatioWeight])
 
 #            if self.isNanov7:
 #                #----- AK8 jets -> using Method 1.a -----#
