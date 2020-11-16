@@ -8,7 +8,6 @@ samples:
     generated-events: 1.
     cross-section: 1.
     era: '2016'
-    pufile: 'Synchronization_GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_2016.json'
     line-color: "#0f700b"
     line-type: 1
     legend: HH (SM) 1 pb

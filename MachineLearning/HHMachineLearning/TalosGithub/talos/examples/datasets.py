@@ -1,6 +1,6 @@
 import pandas as pd
 from numpy import nan
-from keras.utils import to_categorical
+from tensorflow.keras.utils import to_categorical
 
 
 base = 'https://raw.githubusercontent.com/autonomio/datasets/master/autonomio-datasets/'

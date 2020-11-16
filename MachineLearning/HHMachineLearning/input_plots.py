@@ -8,9 +8,9 @@ from matplotlib.backends.backend_pdf import PdfPages
 import parameters
 
 def InputPlots(data,list_inputs):
-    logging.info("\tPlotting %s"%inp)
     pp = PdfPages('inputs.pdf')
     for inp in list_inputs:
+        logging.info("\tPlotting %s"%inp)
         data[inp] = data[inp].astype(float)
         xmin = min(0.,data[inp].quantile(0.05))
         xmax = data[inp].quantile(0.95)

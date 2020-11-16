@@ -132,8 +132,11 @@ class highlevelLambdas:
 
         #self.MET_LD_DL = lambda met, jets, l1 ,l2 : 0.6*met.pt + 0.4*op.sqrt(op.pow(SumPx(jets)+l1.p4.Px()+l2.p4.Px(),2),
         #                                                                    +op.pow(SumPy(jets)+l1.p4.Py()+l2.p4.Py(),2))
-        self.MET_LD_DL = lambda met, jets, l1 ,l2 : 0.6*met.pt + 0.4*op.rng_sum(jets, (lambda j : j.p4), start=(l1.p4+l2.p4)).Pt()
-                                                                    
+        #self.MET_LD_DL = lambda met, jets, l1 ,l2 : 0.6*met.pt + 0.4*op.rng_sum(jets, (lambda j : j.p4), start=(l1.p4+l2.p4)).Pt()
+        empty_p4 = op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >",([op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.)]))
+        self.MET_LD_DL = lambda met, jets, electrons, muons : 0.6 * met.pt +\
+                    0.4* (op.rng_sum(jets, (lambda j : j.p4), start=empty_p4) + op.rng_sum(electrons, (lambda e : e.p4), start=empty_p4) + op.rng_sum(muons, (lambda m : m.p4), start=empty_p4)).Pt()
+
     def getCorrBp4(self,j):
         return  op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >", (j.pt*j.bRegCorr, j.eta, j.phi, j.mass*j.bRegCorr)) 
    

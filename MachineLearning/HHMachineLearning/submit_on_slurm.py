@@ -38,6 +38,8 @@ def submit_on_slurm(name,args,debug=False):
         config.inputParams += [[""]]
     if not output:
         config.inputParamsNames += ['scan','task']
+        if parameters.crossvalidation:
+            config.inputParamsNames += 'modelId'
 
     config.payload = """ """
 
@@ -48,6 +50,8 @@ def submit_on_slurm(name,args,debug=False):
     config.payload += "python3 {script} "
     if not output:
         config.payload += "--scan ${{scan}} --task ${{task}} "
+    if parameters.crossvalidation:
+        config.payload += "--modelId ${{modelId}}"
     config.payload += args
 
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -67,7 +71,11 @@ def submit_on_slurm(name,args,debug=False):
     if not output:
         for f in glob.glob(os.path.join(parameters.main_path,'split',name,'*.pkl')):
             task = os.path.basename(f)
-            slurm_config.inputParams.append([name,task])
+            if parameters.crossvalidation:
+                for N in range(parameters.N_models):
+                    slurm_config.inputParams.append([name,task,N])
+            else:
+                slurm_config.inputParams.append([name,task])
 
     # Submit job!
 

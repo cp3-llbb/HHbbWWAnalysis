@@ -7,10 +7,12 @@
 #           (optionnaly NeuralNet.py for early_stopping etc)
 import multiprocessing
 import os
-from keras.losses import binary_crossentropy, mean_squared_error, logcosh, cosine_proximity, categorical_crossentropy
-from keras.optimizers import RMSprop, Adam, Nadam, SGD            
-from keras.activations import relu, elu, selu, softmax, tanh, sigmoid
-from keras.regularizers import l1,l2 
+from tensorflow.keras.losses import binary_crossentropy, mean_squared_error, logcosh, categorical_crossentropy
+from tensorflow.keras.optimizers import RMSprop, Adam, Nadam, SGD            
+from tensorflow.keras.activations import relu, elu, selu, softmax, tanh, sigmoid
+from tensorflow.keras.regularizers import l1,l2 
+
+from grouped_entropy import GroupedXEnt
 
 ##################################  Path variables ####################################
 
@@ -19,7 +21,7 @@ path_out = '/home/ucl/cp3/fbury/scratch/HHMachineLearning_output/'
 path_model = os.path.join(main_path,'model')
 
 ##############################  Datasets proportion   #################################
-crossvalidation = False
+crossvalidation = True 
 
 # Classic training #
 # -> For crossvalidation == False
@@ -62,8 +64,9 @@ eras = ['2016']
 categories = ['resolved1b3j','resolved2b2j']
 
 # Better put them in alphabetical order
-nodes = ['DY', 'H', 'HH', 'Rare', 'ST', 'TT', 'TTVX', 'VVV','WJets']
+nodes = ['DY', 'H', 'HH', 'Rare', 'ST', 'TT', 'WJets']
 channels = ['El','Mu']
+group_ids = [0,0,1,2,3,4,5,6]
 
 # Input plots options #
 node_colors = {'DY':'dodgerblue','H':'mediumaquamarine','HH':'red','Rare':'darkviolet','ST':'firebrick','TT':'darkorange','TTVX':'darkgreen','VVV':'y','WJets':'salmon'}
@@ -118,32 +121,35 @@ reduceLR_params = {'monitor'    : 'val_loss',   # Value to monitor
 #################################  Scan dictionary   ##################################
 # /!\ Lists must always contain something (even if 0), otherwise 0 hyperparameters #
 # Classification #
-p = { 
-    'lr' : [0.01,0.001], 
-    'first_neuron' : [64,128,256,512,1024],
-    'activation' : [relu],
-    'dropout' : [0.,0.1,0.2],
-    'hidden_layers' : [2,3,4,5,6], # does not take into account the first layer
-    'output_activation' : [softmax],
-    'l2' : [0,0.01,0.1],
-    'optimizer' : [Adam],  
-    'epochs' : [50],   
-    'batch_size' : [10000], 
-    'loss_function' : [categorical_crossentropy] 
-}
+grouped_loss = GroupedXEnt(group_ids)
 #p = { 
-#    'lr' : [0.01], 
-#    'first_neuron' : [524],
+#    'lr' : [0.01,0.001], 
+#    'first_neuron' : [64,128,256,512,1024],
 #    'activation' : [relu],
-#    'dropout' : [0.1],
-#    'hidden_layers' : [5], # does not take into account the first layer
+#    'dropout' : [0.,0.1,0.2],
+#    'hidden_layers' : [2,3,4,5,6], # does not take into account the first layer
 #    'output_activation' : [softmax],
-#    'l2' : [0.001],
+#    'l2' : [0,0.01,0.1],
 #    'optimizer' : [Adam],  
 #    'epochs' : [50],   
 #    'batch_size' : [10000], 
-#    'loss_function' : [categorical_crossentropy] 
+#    'n_particles' : [16],
+#    'loss_function' : [grouped_loss] , #  [categorical_crossentropy]
 #}
+p = { 
+    'lr' : [0.01], 
+    'first_neuron' : [64],
+    'activation' : [relu],
+    'dropout' : [0.1],
+    'hidden_layers' : [2], # does not take into account the first layer
+    'output_activation' : [softmax],
+    'l2' : [0.001],
+    'optimizer' : [Adam],  
+    'epochs' : [1],   
+    'batch_size' : [10000], 
+    'n_particles' : [0],
+    'loss_function' : [categorical_crossentropy] 
+}
 
 
 repetition = 1 # How many times each hyperparameter has to be used 
@@ -228,6 +234,15 @@ onehots = [inp.split('@')[1] if '@' in inp else 'onehot_unit'  for inp  in  inpu
 mask_onehot = [len(inp.split('@'))==2 for inp  in  inputs]
 inputs = [inp.split('@')[0] for inp  in  inputs]
 
+LBN_inputs = ['lep_E','lep_Px','lep_Py','lep_Pz',
+              'j1_E','j1_Px','j1_Py','j1_Pz',
+              'j2_E','j2_Px','j2_Py','j2_Pz',
+              'j3_E','j3_Px','j3_Py','j3_Pz',
+              'j4_E','j4_Px','j4_Py','j4_Pz']
+# /!\ format = [E,Px,Py,Pz] per particle
+assert len(LBN_inputs)%4 == 0
+
+
 # Output branches #
 outputs = [
             '$DY',
@@ -236,8 +251,6 @@ outputs = [
             '$Rare',
             '$ST',
             '$TT',
-            '$TTVX',
-            '$VVV',
             '$WJets',
           ] 
 
