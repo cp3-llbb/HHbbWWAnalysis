@@ -44,7 +44,7 @@ def finalize(path,force=False,verbose=False,onlyFailed=False):
         content = {os.path.basename(k):None for k,v in status.items() if v in  ['FAILED','TIMEOUT','OUT_OF_MEMORY']}
         print ('Following command will only be for failed jobs')
 
-    if None in content.values():
+    if None in content.values() and not force:
         print ("Some outputs are missing")
         sbatch_cmd = "sbatch --array="
         list_num = [os.path.basename(k) for k,v in content.items() if v is None]
@@ -67,12 +67,13 @@ def finalize(path,force=False,verbose=False,onlyFailed=False):
         print (sbatch_cmd)
         return sbatch_cmd
     else:
-        print ("All the outputs are present, will hadd them now") 
+        pprint (content)
         samples = sorted(list(set([item for sublist in content.values() for item in sublist])))
         if force:
             print ("Careful ! Force hadding the output")
             content  = {k:v for k,v in content.items() if v is not None}
         else:
+            print ("All the outputs are present, will hadd them now") 
             samples = [sample for sample in samples if sample not in [os.path.basename(f) for f in glob.glob(os.path.join(path,'results','*.root'))]]
             if len(samples) == 0:
                 print ('All root files are in results dir, if you want to force hadd, use --force')

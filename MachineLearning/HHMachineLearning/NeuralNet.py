@@ -17,25 +17,13 @@ import plotille # For plots in terminal
 
 from sklearn.model_selection import train_test_split
 
-import keras
-from keras import utils
-from keras.layers import Layer, Input, Dense, Concatenate, BatchNormalization, LeakyReLU, Lambda, Dropout
-from keras.losses import binary_crossentropy, mean_squared_error, logcosh
-from keras.optimizers import RMSprop, Adam, Nadam, SGD
-from keras.activations import relu, elu, selu, softmax, tanh
-from keras.models import Model, model_from_json, load_model
-from keras.callbacks import EarlyStopping, ReduceLROnPlateau
-from keras.regularizers import l1,l2
-import keras.backend as K
-import tensorflow as tf
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # removes annoying warning
-
 from talos import Scan, Reporting, Predict, Evaluate, Deploy, Restore, Autom8
 from talos.utils.best_model import *
 from talos.model.layers import *
 from talos.model.normalizers import lr_normalizer
 from talos.utils.gpu_utils import parallel_gpu_jobs
 import talos
+from lbn import LBNLayer
 
 import matplotlib.pyplot as plt
 
@@ -59,7 +47,8 @@ class HyperModel:
     def __init__(self,name,list_inputs=None,list_outputs=None):
         self.name = name
         self.custom_objects =  {'PreprocessLayer': PreprocessLayer,
-                                'OneHot': OneHot.OneHot} 
+                                'OneHot': OneHot.OneHot,
+                                'LBNLayer':LBNLayer} 
                                 # Needs to be specified when saving and restoring
         self.list_inputs = list_inputs
         self.list_outputs = list_outputs
@@ -92,21 +81,22 @@ class HyperModel:
             
         # Records #
         if not generator:
-            self.x = data[self.list_inputs].values
-            self.y = data[self.list_outputs+['learning_weights']].values
+            x = data[self.list_inputs+parameters.LBN_inputs].values
+            y = data[self.list_outputs+['learning_weights']].values
             # Data splitting #
             if model_idx is None:
                 size = parameters.training_ratio/(parameters.training_ratio+parameters.evaluation_ratio)
-                self.x_train, self.x_val, self.y_train, self.y_val = train_test_split(self.x,self.y,train_size=size)
+                self.x_train, self.x_val, self.y_train, self.y_val = train_test_split(x,y,train_size=size)
+
             else: # Cross validation : take the training and evaluation set based on the mask
                 # model_idx == index of mask on which model will be applied (aka, not trained nor evaluated)
                 _, eval_idx, train_idx = GenerateSliceIndices(model_idx) #, GenerateSliceMask
                 eval_mask = GenerateSliceMask(eval_idx,data['mask'])
                 train_mask = GenerateSliceMask(train_idx,data['mask'])
-                self.x_val   = self.x[eval_mask]
-                self.y_val   = self.y[eval_mask]
-                self.x_train = self.x[train_mask]
-                self.y_train = self.y[train_mask]
+                self.x_val   = x[eval_mask]
+                self.y_val   = y[eval_mask]
+                self.x_train = x[train_mask]
+                self.y_train = y[train_mask]
             logging.info("Training set   : %d"%self.x_train.shape[0])
             logging.info("Evaluation set : %d"%self.x_val.shape[0])
         else:
@@ -186,6 +176,10 @@ class HyperModel:
                       custom_objects=self.custom_objects,   # Custom object : custom layer
                 )
         if not generator:
+            # Split for LBN #
+            x_val1 = self.x_val[:,:-len(parameters.LBN_inputs)],
+            x_val2 = self.x_val[:,-len(parameters.LBN_inputs):].reshape(-1,4,len(parameters.LBN_inputs)//4)
+            self.x_val = (x_val1,x_val2)
             # Use the save information in DF #
             self.h_with_eval = Autom8(scan_object = self.h,     # the scan object
                                       x_val = self.x_val,       # Evaluation inputs

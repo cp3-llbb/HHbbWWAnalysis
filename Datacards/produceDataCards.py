@@ -13,14 +13,14 @@ import ROOT
 
 class DataCard:
     def __init__(self,datacardName,path,yamlName,groups,hist_conv,era,use_syst=False,root_subdir=None,pseudodata=False):
-        self.datacardName = datacardName
-        self.path = path
-        self.groups = groups
-        self.hist_conv = hist_conv
-        self.era = str(era)
-        self.use_syst = use_syst
-        self.root_subdir = root_subdir
-        self.pseudodata = pseudodata
+        self.datacardName   = datacardName
+        self.path           = path
+        self.groups         = groups
+        self.hist_conv      = hist_conv
+        self.era            = str(era)
+        self.use_syst       = use_syst
+        self.root_subdir    = root_subdir
+        self.pseudodata     = pseudodata
 
         if self.pseudodata:
             self.groups = self.generatePseudoData(self.groups)
@@ -58,11 +58,22 @@ class DataCard:
                 # acting on one version will not change the other
 
     def addSampleToGroup(self,hist_dict,group):
-        for histname,hist in hist_dict.items():
+        for histname,hists in hist_dict.items():
+            nominal = hists['nominal']
             if self.content[histname][group] is None:
-                self.content[histname][group] = hist
+                self.content[histname][group] = copy.deepcopy(nominal)
             else:
-                self.content[histname][group].Add(hist)
+                self.content[histname][group].Add(nominal)
+            if self.use_syst:
+                for systName in hists.keys():
+                    if systName == 'nominal':
+                        continue
+                    hist = hists[systName]
+                    groupsyst = group + '_' + systName
+                    if groupsyst not in self.content[histname].keys():
+                        self.content[histname][groupsyst] = copy.deepcopy(hist)
+                    else:
+                        self.content[histname][groupsyst].Add(hist)
 
     def findGroup(self,sample):
         gr = []
@@ -94,9 +105,9 @@ class DataCard:
         # Loop through hists #
         hist_dict = {}
         for datacardname, histnames in self.hist_conv.items():
+            hist_dict[datacardname] = {}
             if not isinstance(histnames,list):
                 histnames = [histnames]
-            hist_dict[datacardname] = None
             for histname in histnames:
                 # Check #
                 if not histname in list_histnames:
@@ -105,18 +116,18 @@ class DataCard:
                 listsyst = [hn for hn in list_histnames if histname in hn and '__' in hn] if self.use_syst else []
                 # Nominal histogram #
                 h = self.getHistogram(f,histname,lumi,br,xsec,sumweight)
-                if hist_dict[datacardname] is None:
-                    hist_dict[datacardname] = copy.deepcopy(h)
+                if not 'nominal' in hist_dict[datacardname].keys():
+                    hist_dict[datacardname]['nominal'] = copy.deepcopy(h)
                 else:
-                    hist_dict[datacardname].Add(h)
+                    hist_dict[datacardname]['nominal'].Add(h)
                 # Systematic histograms #
                 for syst in listsyst:
-                    systName = syst.split('__')[-1]
-                    systName.replace('up','Up')
-                    systName.replace('down','Down')
                     h = self.getHistogram(f,syst,lumi,br,xsec,sumweight)
-                    hist_dict[datacardname+'_'+systName] = h
-                # Save in dict #
+                    systName = syst.split('__')[-1].replace('up','Up').replace('down','Down')
+                    if not systName in hist_dict[datacardname].keys():
+                        hist_dict[datacardname][systName] = copy.deepcopy(h)
+                    else:
+                        hist_dict[datacardname][systName].Add(h)
         f.Close()
         return hist_dict
 

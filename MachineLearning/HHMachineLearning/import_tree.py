@@ -70,6 +70,10 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
         df['cross_section'] = np.ones(df.shape[0])*xsec
         df['luminosity'] = np.ones(df.shape[0])*luminosity
         df['event_weight_sum'] = np.ones(df.shape[0])*event_weight_sum
+    else:
+        df['cross_section'] = np.ones(df.shape[0])
+        df['luminosity'] = np.ones(df.shape[0])
+        df['event_weight_sum'] = np.ones(df.shape[0])
    
     if weight is not None:
         df['event_weight'] = df[weight]*relative_weight
@@ -202,4 +206,8 @@ def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=
         else:
             all_df = pd.concat([all_df,df])
         all_df = all_df.reset_index(drop=True) # Otherwise there will be an index repetition for each file
+
+    # Remove possible nan #
+    all_df = all_df[~all_df.isnull().any(axis=1)]
+
     return all_df

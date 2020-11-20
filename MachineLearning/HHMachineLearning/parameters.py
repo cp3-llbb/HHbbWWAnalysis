@@ -7,10 +7,12 @@
 #           (optionnaly NeuralNet.py for early_stopping etc)
 import multiprocessing
 import os
-from keras.losses import binary_crossentropy, mean_squared_error, logcosh, cosine_proximity, categorical_crossentropy
-from keras.optimizers import RMSprop, Adam, Nadam, SGD            
-from keras.activations import relu, elu, selu, softmax, tanh, sigmoid
-from keras.regularizers import l1,l2 
+from tensorflow.keras.losses import binary_crossentropy, mean_squared_error, logcosh, categorical_crossentropy
+from tensorflow.keras.optimizers import RMSprop, Adam, Nadam, SGD            
+from tensorflow.keras.activations import relu, elu, selu, softmax, tanh, sigmoid
+from tensorflow.keras.regularizers import l1,l2 
+
+from grouped_entropy import GroupedXEnt
 
 ##################################  Path variables ####################################
 
@@ -19,7 +21,7 @@ path_out = '/home/ucl/cp3/fbury/scratch/HHMachineLearning_output/'
 path_model = os.path.join(main_path,'model')
 
 ##############################  Datasets proportion   #################################
-crossvalidation = False
+crossvalidation = True 
 
 # Classic training #
 # -> For crossvalidation == False
@@ -47,7 +49,7 @@ if N_apply != N_slices/N_models: # Otherwise the same slice can be applied on se
 ############################### Slurm parameters ######################################
 partition = 'Def'  # Def, cp3 or cp3-gpu
 QOS = 'normal' # cp3 or normal
-time = '0-08:00:00' # days-hh:mm:ss
+time = '0-18:00:00' # days-hh:mm:ss
 mem = '9000' # ram in MB
 tasks = '1' # Number of threads(as a string) (not parallel training for classic mode)
 workers = 20
@@ -62,8 +64,12 @@ eras = ['2016']
 categories = ['resolved1b3j','resolved2b2j']
 
 # Better put them in alphabetical order
-nodes = ['DY', 'H', 'HH', 'Rare', 'ST', 'TT', 'TTVX', 'VVV','WJets']
+nodes = ['DY', 'H', 'HH', 'Rare', 'ST', 'TT', 'WJets']
 channels = ['El','Mu']
+group_ids = [0,0,1,2,3,4,5,6]
+
+# Input plots options #
+node_colors = {'DY':'dodgerblue','H':'mediumaquamarine','HH':'red','Rare':'darkviolet','ST':'firebrick','TT':'darkorange','TTVX':'darkgreen','VVV':'y','WJets':'salmon'}
 
 # Tree name #
 tree_name = 'Events'
@@ -96,7 +102,7 @@ eval_criterion = "eval_error" # either val_loss or eval_error or val_acc
 # Early stopping to stop learning after some criterion 
 early_stopping_params = {'monitor'   : 'val_loss',  # Value to monitor
                          'min_delta' : 0.001,          # Minimum delta to declare an improvement
-                         'patience'  : 20,          # How much time to wait for an improvement
+                         'patience'  : 10,          # How much time to wait for an improvement
                          'verbose'   : 1,           # Verbosity level
                          'restore_best_weights':True,
                          'mode'      : 'min'}       # Mode : 'auto', 'min', 'max'
@@ -115,6 +121,7 @@ reduceLR_params = {'monitor'    : 'val_loss',   # Value to monitor
 #################################  Scan dictionary   ##################################
 # /!\ Lists must always contain something (even if 0), otherwise 0 hyperparameters #
 # Classification #
+grouped_loss = GroupedXEnt(group_ids)
 #p = { 
 #    'lr' : [0.01,0.001], 
 #    'first_neuron' : [64,128,256,512,1024],
@@ -124,21 +131,23 @@ reduceLR_params = {'monitor'    : 'val_loss',   # Value to monitor
 #    'output_activation' : [softmax],
 #    'l2' : [0,0.01,0.1],
 #    'optimizer' : [Adam],  
-#    'epochs' : [100],   
+#    'epochs' : [50],   
 #    'batch_size' : [10000], 
-#    'loss_function' : [categorical_crossentropy] 
+#    'n_particles' : [16],
+#    'loss_function' : [grouped_loss] , #  [categorical_crossentropy]
 #}
 p = { 
     'lr' : [0.01], 
-    'first_neuron' : [1024],
+    'first_neuron' : [64,128,256],
     'activation' : [relu],
     'dropout' : [0.1],
-    'hidden_layers' : [6], # does not take into account the first layer
+    'hidden_layers' : [2,4], # does not take into account the first layer
     'output_activation' : [softmax],
     'l2' : [0.001],
     'optimizer' : [Adam],  
-    'epochs' : [100],   
+    'epochs' : [1],   
     'batch_size' : [10000], 
+    'n_particles' : [0],
     'loss_function' : [categorical_crossentropy] 
 }
 
@@ -154,6 +163,7 @@ weight = 'total_weight'
 
 # Input branches (combinations possible just as in ROOT #
 inputs = [
+    # LL variables #
     '$era@onehot_era',
     'lep_E',
     'lep_Px',
@@ -181,51 +191,57 @@ inputs = [
     'j4_Py',
     'j4_Pz',
     #'j4_bTagDeepFlavB',
-    #'nAk4Jets',
-    #'nAk4BJets',
-    #'METpt',
-    #'METphi',
-    #'lep_Px',
-    #'lep_Py',
-    #'lep_Pz',
-    #'lep_E',
-    #'lep_pt',
-    #'lep_eta',
-    #'lepmet_DPhi',
-    #'lepmet_pt',
-    #'lep_MT',
-    #'MET_LD',
-    #'j1_pt',
-    #'j2_pt',
-    #'j3_pt',
-    #'j4_pt',
-    #'j1j2_DR',
-    #'j2j3_DR',
+    # HL variables #
+    'nAk4Jets',
+    'nAk4BJets',
+    'METpt',
+    'METphi',
+    'lep_pt',
+    'lep_eta',
+    'lepmet_DPhi',
+    'lepmet_pt',
+    'lep_MT',
+    'MET_LD',
+    'j1_pt',
+    'j2_pt',
+    'j3_pt',
+    'j4_pt',
+    'j1j2_DR',
+    'j2j3_DR',
     #'j1j4_DR',
     #'j3j4_DR',
-    #'j1j2_M',
-    #'j3j4_M',
-    #'j1MetDPhi',
-    #'j3MetDPhi',
-    #'j1LepDR',
-    #'j3LepDR',
-    #'minJetDR',
-    #'minDR_lep_allJets',
-    #'w1w2_MT',
-    #'HT2_lepJetMet',
-    #'HT2R_lepJetMet',
-    #'mT_top_3particle',
-    #'HWW_Mass',
-    #'HWW_Simple_Mass',
-    #'HWW_dR',
-    #'cosThetaS_Hbb',
-    #'cosThetaS_Wjj_simple',
-    #'cosThetaS_WW_simple_met',
-    #'cosThetaS_HH_simple_met',
+    'j1j2_M',
+    'j3j4_M',
+    'j1MetDPhi',
+    'j3MetDPhi',
+    'j1LepDR',
+    'j3LepDR',
+    'minJetDR',
+    'minDR_lep_allJets',
+    'w1w2_MT',
+    'HT2_lepJetMet',
+    'HT2R_lepJetMet',
+    'mT_top_3particle',
+    'HWW_Mass',
+    'HWW_Simple_Mass',
+    'HWW_dR',
+    'cosThetaS_Hbb',
+    'cosThetaS_Wjj_simple',
+    'cosThetaS_WW_simple_met',
+    'cosThetaS_HH_simple_met',
          ]
 onehots = [inp.split('@')[1] if '@' in inp else 'onehot_unit'  for inp  in  inputs]
 mask_onehot = [len(inp.split('@'))==2 for inp  in  inputs]
 inputs = [inp.split('@')[0] for inp  in  inputs]
+
+LBN_inputs = ['lep_E','lep_Px','lep_Py','lep_Pz',
+              'j1_E','j1_Px','j1_Py','j1_Pz',
+              'j2_E','j2_Px','j2_Py','j2_Pz',
+              'j3_E','j3_Px','j3_Py','j3_Pz',
+              'j4_E','j4_Px','j4_Py','j4_Pz']
+# /!\ format = [E,Px,Py,Pz] per particle
+assert len(LBN_inputs)%4 == 0
+
 
 # Output branches #
 outputs = [
@@ -235,8 +251,6 @@ outputs = [
             '$Rare',
             '$ST',
             '$TT',
-            '$TTVX',
-            '$VVV',
             '$WJets',
           ] 
 

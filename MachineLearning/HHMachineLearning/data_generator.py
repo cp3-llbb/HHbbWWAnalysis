@@ -9,7 +9,7 @@ import copy
 import collections
 import random
 import yaml
-import keras
+import tensorflow as tf
 #import enlighten
 
 from prettytable import PrettyTable
@@ -26,7 +26,7 @@ from import_tree import LoopOverTrees
 from generate_mask import GenerateSampleMasks, GenerateSliceIndices
 
 
-class DataGenerator(keras.utils.Sequence):
+class DataGenerator(tf.keras.utils.Sequence):
     def __init__(self,path,inputs,outputs,weight,cut='',batch_size=32,state_set='',model_idx=None):
         self.path       = path                          # Path to root file : can be single file, list or dir (in which case will take all files inside)
         self.inputs     = inputs                        # List of strings of the variables as inputs
