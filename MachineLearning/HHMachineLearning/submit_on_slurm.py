@@ -39,7 +39,7 @@ def submit_on_slurm(name,args,debug=False):
     if not output:
         config.inputParamsNames += ['scan','task']
         if parameters.crossvalidation:
-            config.inputParamsNames += 'modelId'
+            config.inputParamsNames += ['modelId']
 
     config.payload = """ """
 
@@ -85,8 +85,10 @@ def submit_on_slurm(name,args,debug=False):
         submitWorker()
         logging.info("Done")
     else:
+        logging.info("Number of jobs : %d"%len(slurm_config.inputParams))
         logging.debug(slurm_config.payload)
         logging.debug(slurm_config.inputParamsNames)
-        logging.debug(slurm_config.inputParams)
+        for inputParam in slurm_config.inputParams:
+            logging.debug(inputParam)
         logging.info('... don\'t worry, jobs not sent')
 

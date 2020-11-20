@@ -11,7 +11,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)))) # Add 
 from BaseHHtobbWW import BaseNanoHHtobbWW
 from selectionDef import *
 from highlevelLambdas import *
-from mvaEvaluatorDL import returnLowLevelMVAInputs, returnHighLevelMVAInputs
+from mvaEvaluatorDL import *
 
 #===============================================================================================#
 #                                 SkimmerHHtobbWW                                               #
@@ -421,28 +421,49 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
 #            varsToKeep['n_ak4_btag'] = op.static_cast("UInt_t",op.rng_len(self.ak4BJets))
 
             # DNN #
-            inputsLL = returnLowLevelMVAInputs(self     = self,
-                                               l1       = l1,
-                                               l2       = l2,
-                                               met      = self.corrMET,                                                                                                                               
-                                               jets     = self.ak4Jets,
-                                               channel  = self.args.Channel)
+            inputsLeps = returnLeptonsMVAInputs(self     = self,
+                                                l1       = l1,
+                                                l2       = l2,
+                                                channel  = self.args.Channel)
+            inputsJets =    returnJetsMVAInputs(self = self,
+                                                jets = self.ak4Jets)
+            inputsMET =      returnMETMVAInputs(self = self,
+                                                met  = self.corrMET)     
             inputsHL = returnHighLevelMVAInputs(self      = self,
                                                 l1        = l1,
                                                 l2        = l2,
                                                 b1        = j1,
                                                 b2        = j2,
-                                                met       = self.corrMET,                                                                                                                               
+                                                met       = self.corrMET,
                                                 jets      = self.ak4Jets,
                                                 electrons = self.electronsTightSel,
                                                 muons     = self.muonsTightSel,
                                                 channel   = self.args.Channel)
-            inputsSupp  = {('year',     'Year',         (3,2016.,2019.))    : op.c_int(int(self.era)),
-                           ('eventnbr', 'Event number', (1e6+1,0.,1e6))     : op.c_int(t.event)}
-            inputs = {**inputsLL,**inputsHL,**inputsSupp}
+            inputsParam = returnParamMVAInputs(self)
+            inputsEventNr = returnEventNrMVAInputs(self,t)
+
+            inputs = {**inputsLeps,**inputsJets,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
             for (varname,_,_),var in inputs.items():
                 varsToKeep[varname] = var
             varsToKeep['n_jets'] = op.static_cast("UInt_t",op.rng_len(self.ak4Jets))
+
+            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','07','model','model.pb')
+            nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
+            print ("DNN model : %s"%path_model)
+            if not os.path.exists(path_model):
+                raise RuntimeError('Could not find model file %s'%path_model)
+            try:
+                input_names = ["input_1","input_2","input_3","input_4","input_5","input_6"]
+                output_name = "Identity"
+                DNN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
+            except:
+                raise RuntimeError('Could not load model %s'%path_model)
+            outputs = DNN(*inputs.values())
+            for node, output in zip(nodes,outputs): 
+                varsToKeep[node] = output
+
+            
+    
 
 
 #
