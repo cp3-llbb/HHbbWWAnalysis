@@ -826,7 +826,7 @@ One lepton and and one jet argument must be specified in addition to the require
             muonsByPt = op.sort(t.Muon, lambda mu : -mu.pt) # Ordering done by pt
             self.lambda_muonTightSel = lambda mu : op.AND(mu.tightId,
                                                           mu.pfRelIso04_all <= 0.15,
-                                                          mu.pt > 15.,
+                                                          mu.pt >= 15.,
                                                           op.abs(mu.eta) <= 2.4)
             self.muonsTightSel = op.select(muonsByPt, self.lambda_muonTightSel)
                                                         
@@ -1186,6 +1186,7 @@ One lepton and and one jet argument must be specified in addition to the require
         else:
             self.lambda_cleanAk4Jets = lambda j : op.c_float(True)
         self.ak4Jets = op.select(self.ak4JetsPreSel,self.lambda_cleanAk4Jets) # Pt ordered
+        self.ak4JetsByBtagScore = op.sort(self.ak4Jets, lambda j : -j.btagDeepFlavB) # Btag score ordered
     
         ############     Btagging     #############
         # The pfDeepFlavour (DeepJet) algorithm is used
@@ -1208,48 +1209,19 @@ One lepton and and one jet argument must be specified in addition to the require
         self.remainingJets = op.select(self.ak4LightJetsByPt, lambda jet : jet.idx != self.ak4LightJetsByBtagScore[0].idx)
         # Wjj selection for resolved2b2j
 
-        ###########    VBF jets   ############
-        self.lambda_VBFJets = lambda j : op.AND(j.jetId & 1 if era == "2016" else j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
-                                                j.pt >= 25.,
-                                                op.abs(j.eta) <= 4.7,
-                                                op.OR(j.pt >= 60.,
-                                                      op.AND(op.abs(j.eta) < 2.7, 
-                                                             op.abs(j.eta) > 3.0)))
-        self.ak4VBFJetsPreSel = op.select(self.ak4JetsByPt, self.lambda_VBFJets)
-        self.ak4VBFJets = op.select(self.ak4VBFJetsPreSel, self.lambda_cleanAk4Jets)
-        self.lambda_VBFPair = lambda j1,j2 : op.AND(op.invariant_mass(j1.p4,j2.p4) > 500.,
-                                                    op.abs(j1.eta - j2.eta) > 3.)
-        self.ak4VBFJetPairsNotSorted = op.combine(self.ak4VBFJets, N=2, pred=self.lambda_VBFPair)
-        self.ak4VBFJetPairs = op.sort(self.ak4VBFJetPairsNotSorted, lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
-
         #############################################################################
         #                                AK8 Jets                                   #
         #############################################################################
         self.ak8JetsByPt = op.sort(t.FatJet, lambda jet : -jet.pt)
-        #self.ak8JetsByPt = op.sort(t.FatJet, lambda jet : -jet.btagDeepB)
         # Preselection #
-        if era == "2016":
-            self.lambda_ak8JetsPreSel = lambda j : op.AND(
-                                                        j.jetId & 1, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
-                                                        j.pt >= 200.,
-                                                        op.abs(j.p4.Eta())<= 2.4,
-                                                        op.AND(j.subJet1._idx.result != -1, j.subJet1.pt >= 20. , op.abs(j.subJet1.eta)<=2.4,
-                                                               j.subJet2._idx.result != -1, j.subJet2.pt >= 20. , op.abs(j.subJet2.eta)<=2.4),
-                                                               # Fatjet subjets must exist before checking Pt and eta 
-                                                        op.AND(j.msoftdrop >= 30, j.msoftdrop <= 210),
-                                                        j.tau2/j.tau1 <= 0.75
-                                                    )
-        elif  era == "2017" or era == "2018":
-            self.lambda_ak8JetsPreSel = lambda j : op.AND(
-                                                        j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
-                                                        j.pt >= 200.,
-                                                        op.abs(j.p4.Eta())<= 2.4,
-                                                        op.AND(j.subJet1._idx.result != -1, j.subJet1.pt >= 20. , op.abs(j.subJet1.eta)<=2.4,
-                                                               j.subJet2._idx.result != -1, j.subJet2.pt >= 20. , op.abs(j.subJet2.eta)<=2.4),
-                                                        # Fatjet subjets must exist before checking Pt and eta 
-                                                        op.AND(j.msoftdrop >= 30, j.msoftdrop <= 210),
-                                                        j.tau2/j.tau1 <= 0.75
-                                                    )
+        self.lambda_ak8JetsPreSel = lambda j : op.AND(j.jetId & 1 if era == "2016" else j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
+                                                      j.pt >= 200.,
+                                                      op.abs(j.p4.Eta())<= 2.4,
+                                                      op.AND(j.subJet1._idx.result != -1, j.subJet1.pt >= 20. , op.abs(j.subJet1.eta)<=2.4,
+                                                             j.subJet2._idx.result != -1, j.subJet2.pt >= 20. , op.abs(j.subJet2.eta)<=2.4),
+                                                             # Fatjet subjets must exist before checking Pt and eta 
+                                                      op.AND(j.msoftdrop >= 30, j.msoftdrop <= 210),
+                                                      j.tau2/j.tau1 <= 0.75)
         self.ak8JetsPreSel = op.select(self.ak8JetsByPt, self.lambda_ak8JetsPreSel)
         # Cleaning #
         if self.args.POGID:
@@ -1282,6 +1254,39 @@ One lepton and and one jet argument must be specified in addition to the require
         # Ak4 Jet Collection cleaned from Ak8b #
         self.lambda_cleanAk4FromAk8b = lambda ak4j : op.NOT(op.AND(op.rng_len(self.ak8BJets) > 0, op.deltaR(ak4j.p4,self.ak8BJets[0].p4) <= 0.8))
         self.ak4JetsCleanedFromAk8b  = op.select(self.ak4LightJetsByPt, self.lambda_cleanAk4FromAk8b)
+
+        #############################################################################
+        #                                VBF Jets                                   #
+        #############################################################################
+        self.lambda_VBFJets = lambda j : op.AND(j.jetId & 1 if era == "2016" else j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
+                                                j.pt >= 25.,
+                                                op.abs(j.eta) <= 4.7,
+                                                op.OR(j.pt >= 60.,
+                                                      op.AND(op.abs(j.eta) < 2.7, 
+                                                             op.abs(j.eta) > 3.0)))
+        self.VBFJetsPreSel = op.select(self.ak4JetsByPt, self.lambda_VBFJets)
+        if self.args.POGID:
+            self.lambda_cleanVBFLeptons = lambda j : op.AND(op.NOT(op.rng_any(self.electronsTightSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.4 )), 
+                                                            op.NOT(op.rng_any(self.muonsTightSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.4 )))
+        elif self.args.TTHIDLoose or self.args.TTHIDFakeable:
+            self.lambda_cleanVBFLeptons = lambda j : op.AND(op.NOT(op.rng_any(self.electronsFakeSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.4 )), 
+                                                            op.NOT(op.rng_any(self.muonsFakeSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.4 )))
+
+        if channel == "DL":
+            self.lambda_cleanVBFAk4 = lambda j : op.AND(op.NOT(op.rng_any(self.ak4JetsByBtagScore[:2], lambda ak4Jet : op.deltaR(j.p4, ak4Jet.p4) <= 0.8 )))
+            self.lambda_cleanVBFAk8 = lambda j : op.AND(op.NOT(op.rng_any(self.ak8Jets, lambda ak8Jet : op.deltaR(j.p4, ak8Jet.p4) <= 1.2 )))
+        if channel == "SL":
+            raise NotImplementedError
+
+        self.VBFJets = op.select(self.VBFJetsPreSel, self.lambda_cleanVBFLeptons)
+        self.VBFJetsResolved = op.select(self.VBFJets, self.lambda_cleanVBFAk4)
+        self.VBFJetsBoosted  = op.select(self.VBFJets, self.lambda_cleanVBFAk8)
+
+        self.lambda_VBFPair = lambda j1,j2 : op.AND(op.invariant_mass(j1.p4,j2.p4) > 500.,
+                                                    op.abs(j1.eta - j2.eta) > 3.)
+
+        self.VBFJetPairsResolved = op.sort(op.combine(self.VBFJetsResolved, N=2, pred=self.lambda_VBFPair), lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
+        self.VBFJetPairsBoosted  = op.sort(op.combine(self.VBFJetsBoosted,  N=2, pred=self.lambda_VBFPair), lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
 
         #############################################################################
         #                               Triggers                                    #
