@@ -396,6 +396,22 @@ def makeDileptonPlots(sel, dilepton, suffix, channel, is_MC=False):
                              title="Flavour of genParticle (channel %s)"%channel, 
                              xTitle= "GenParticle flavour (second lepton)",
                              plotopts = channelLabel))
+    # ttH mva plot #
+    plots.append(Plot.make1D("%s_%s_firstlepton_ttHmva"%(channel,suffix), 
+                             dilepton[0].mvaTTH, 
+                             sel, 
+                             EquidistantBinning(50,0.,1.),
+                             title="ttH MVA of the first lepton (channel %s)"%channel, 
+                             xTitle= "MVA_{ttH} (first lepton) [GeV]",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_secondlepton_ttHmva"%(channel,suffix), 
+                             dilepton[1].mvaTTH, 
+                             sel, 
+                             EquidistantBinning(50,0.,1.),
+                             title="ttH MVA of the second lepton (channel %s)"%channel, 
+                             xTitle= "MVA_{ttH} (second lepton) [GeV]",
+                             plotopts = channelLabel))
+
 
     return plots
 
@@ -1620,6 +1636,14 @@ def makeDoubleLeptonHighLevelQuantities (sel,met,l1,l2,j1,j2,suffix,channel,HLL)
                              title='Transverse mass of dilepton+dijet and MET (%s channel)'%channel,
                              xTitle="M_{T}(lljj,MET) [GeV]",
                              plotopts = channelLabel))
+    # M_HH #
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_MHH"%(channel,suffix),
+                             HLL.M_HH(l1,l2,j1,j2,met),
+                             sel,
+                             EquidistantBinning(100,0.,1500.),
+                             title='HH invariant mass (%s channel)'%channel,
+                             xTitle="M_{HH}(lljj,MET) [GeV]",
+                             plotopts = channelLabel))
 
 
     # Scalar magnitude sum #
@@ -1750,7 +1774,7 @@ def makeDoubleLeptonMachineLearningInputPlots(sel,suffix,channel,inputs):
                                  variable,
                                  sel,
                                  EquidistantBinning(*binning),
-                                 xTitle = '%s'%vartitle,
+                                 xTitle = vartitle,
                                  plotopts = channelLabel))
     return plots
     
@@ -1767,6 +1791,13 @@ def makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,nodes,chan
                                  EquidistantBinning(50,0.,1.),
                                  xTitle = 'DNN output %s'%node,
                                  plotopts = channelLabel))
+        plots.append(Plot.make1D("%s_%s_DNNOutputRebin_%s"%(channel,suffix,node),
+                                 output[i],
+                                 sel,
+                                 EquidistantBinning(1,0.,1.),
+                                 xTitle = 'DNN output %s'%node,
+                                 plotopts = channelLabel))
+
 
     return plots    
 

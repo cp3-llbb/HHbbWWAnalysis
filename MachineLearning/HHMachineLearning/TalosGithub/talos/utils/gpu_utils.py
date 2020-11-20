@@ -1,6 +1,6 @@
 import tensorflow as tf
-import keras.backend as K
-from keras.utils import multi_gpu_model
+import tensorflow.keras.backend as K
+from tensorflow.keras.utils import multi_gpu_model
 
 
 def parallel_gpu_jobs(allow_growth=True, fraction=.5):
