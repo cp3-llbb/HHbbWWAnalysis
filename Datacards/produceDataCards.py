@@ -13,14 +13,14 @@ import ROOT
 
 class DataCard:
     def __init__(self,datacardName,path,yamlName,groups,hist_conv,era,use_syst=False,root_subdir=None,pseudodata=False):
-        self.datacardName = datacardName
-        self.path = path
-        self.groups = groups
-        self.hist_conv = hist_conv
-        self.era = str(era)
-        self.use_syst = use_syst
-        self.root_subdir = root_subdir
-        self.pseudodata = pseudodata
+        self.datacardName   = datacardName
+        self.path           = path
+        self.groups         = groups
+        self.hist_conv      = hist_conv
+        self.era            = str(era)
+        self.use_syst       = use_syst
+        self.root_subdir    = root_subdir
+        self.pseudodata     = pseudodata
 
         if self.pseudodata:
             self.groups = self.generatePseudoData(self.groups)

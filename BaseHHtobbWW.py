@@ -98,6 +98,10 @@ One lepton and and one jet argument must be specified in addition to the require
                             action      = "store_true",
                             default     = False,
                             help="Disable all systematic variations (default=False)")
+        parser.add_argument("--Events", 
+                            nargs       = '+',
+                            type        = int,
+                            help="Cut on events (as list)")
 
 
         #----- Lepton selection arguments -----#
@@ -265,6 +269,7 @@ One lepton and and one jet argument must be specified in addition to the require
         from bamboo.treedecorators import NanoAODDescription, nanoRochesterCalc, nanoJetMETCalc, nanoJetMETCalc_METFixEE2017
         # JEC's Recommendation for Full RunII: https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC
         # JER : -----------------------------: https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
+
         # Get base aguments #
         era = sampleCfg['era']
         self.is_MC = self.isMC(sample) # no confusion between boolean is_MC and method isMC()
@@ -273,7 +278,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                           sample        = sample, 
                                                                           sampleCfg     = sampleCfg, 
                                                                           description   = NanoAODDescription.get(
-                                                                                            tag             = "v5", 
+                                                                                            tag             = "v7", 
                                                                                             year            = (era if era else "2016"),
                                                                                             isMC            = self.is_MC,
                                                                                             systVariations  = [ (nanoJetMETCalc_METFixEE2017 if era == "2017" else nanoJetMETCalc)]),
@@ -283,6 +288,13 @@ One lepton and and one jet argument must be specified in addition to the require
         self.triggersPerPrimaryDataset = {}
         from bamboo.analysisutils import configureJets ,configureRochesterCorrection, configureType1MET 
 
+        # Event cut #
+        if self.args.Events:
+            print ("Events to use only :")
+            for e in self.args.Events:
+                print ('... %d'%e)
+            noSel = noSel.refine('eventcut',cut = [op.OR(*[tree.event == e for e in self.args.Events])])
+
         # Save some useful stuff in self #
         self.sample = sample
         self.sampleCfg = sampleCfg
@@ -290,6 +302,8 @@ One lepton and and one jet argument must be specified in addition to the require
 
         # Check if v7 #
         self.isNanov7 = ('db' in sampleCfg.keys() and 'NanoAODv7' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['NanoAODv7' in f for f in sampleCfg['files']]))
+        if self.isNanov7:
+            print ("Using NanoAODv7")
 
         # Check distributed option #
         isNotWorker = (self.args.distributed != "worker") 
@@ -621,9 +635,9 @@ One lepton and and one jet argument must be specified in addition to the require
         ###########################################################################
         #                              Pseudo-data                                #
         ###########################################################################
-        if not forSkimmer: # Skimmer does not know about self.datadrivenContributions
+        if not forSkimmer and "PseudoData" in self.datadrivenContributions: # Skimmer does not know about self.datadrivenContributions
             noSel = SelectionWithDataDriven.create(parent   = noSel,
-                                                   name     = 'noSel',
+                                                   name     = 'pseudodata',
                                                    ddSuffix = 'Pseudodata',
                                                    enable   = "PseudoData" in self.datadrivenContributions 
                                     and self.datadrivenContributions["PseudoData"].usesSample(self.sample, self.sampleCfg))
@@ -920,9 +934,11 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
 
         if self.args.POGID:
-            self.ElElTightDileptonPairs = op.combine(self.electronsTightSel, N=2)
+            # To remove mll>12 resonances #
+            self.ElElTightDileptonPairs = op.combine(self.electronsTightSelBeforeCleaning, N=2)
             self.MuMuTightDileptonPairs = op.combine(self.muonsTightSel, N=2)
-            self.ElMuTightDileptonPairs = op.combine((self.electronsTightSel,self.muonsTightSel))
+            self.ElMuTightDileptonPairs = op.combine((self.electronsTightSelBeforeCleaning,self.muonsTightSel))
+            # To remove Z peak resonances #
             self.ElElTightDileptonOSPairs = op.combine(self.electronsTightSel, N=2, pred=lambda l1,l2: l1.charge != l2.charge)
             self.MuMuTightDileptonOSPairs = op.combine(self.muonsTightSel, N=2, pred=lambda l1,l2: l1.charge != l2.charge)
 
@@ -1008,7 +1024,18 @@ One lepton and and one jet argument must be specified in addition to the require
 
 
             if self.args.POGID:
-                self.leadElectronsTightSel, self.leadMuonsTightSel = makeDLPair(self.electronsTightSel,self.muonsTightSel)
+                self.leadElectronsTightSel = self.electronsTightSel[:op.multiSwitch(
+                    (op.AND(op.rng_len(self.electronsTightSel) == 2,op.rng_len(self.muonsTightSel) == 0), op.static_cast("std::size_t", op.c_int(2))),
+                    (op.AND(op.rng_len(self.electronsTightSel) == 0,op.rng_len(self.muonsTightSel) == 2), op.static_cast("std::size_t", op.c_int(0))),
+                    (op.AND(op.rng_len(self.electronsTightSel) == 1,op.rng_len(self.muonsTightSel) == 1), op.static_cast("std::size_t", op.c_int(1))),
+                    op.c_int(0))]
+                self.leadMuonsTightSel = self.muonsTightSel[:op.multiSwitch(
+                    (op.AND(op.rng_len(self.electronsTightSel) == 2,op.rng_len(self.muonsTightSel) == 0), op.static_cast("std::size_t", op.c_int(0))),
+                    (op.AND(op.rng_len(self.electronsTightSel) == 0,op.rng_len(self.muonsTightSel) == 2), op.static_cast("std::size_t", op.c_int(2))),
+                    (op.AND(op.rng_len(self.electronsTightSel) == 1,op.rng_len(self.muonsTightSel) == 1), op.static_cast("std::size_t", op.c_int(1))),
+                    op.c_int(0))]
+
+                #self.leadElectronsTightSel, self.leadMuonsTightSel = makeDLPair(self.electronsTightSel,self.muonsTightSel)
 
                 # Tight pair #
                 self.ElElDileptonTightSel = op.combine(self.leadElectronsTightSel,N=2)
@@ -1144,7 +1171,7 @@ One lepton and and one jet argument must be specified in addition to the require
         self.ak4JetsByPt = op.sort(t.Jet, lambda jet : -jet.pt)
         # Preselection #
         self.lambda_ak4JetsPreSel = lambda j : op.AND(j.jetId & 1 if era == "2016" else j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
-                                                      op.OR(j.puId >= 4,j.pt>=50.), # Jet PU ID bit1 is loose (only to be applied to jets with pt<50)
+                                                      op.OR(((j.puId >> 2) & 1) ,j.pt>=50.), # Jet PU ID bit1 is loose (only to be applied to jets with pt<50)
                                                       j.pt >= 25.,
                                                       op.abs(j.eta) <= 2.4)
         self.ak4JetsPreSel = op.select(self.ak4JetsByPt, self.lambda_ak4JetsPreSel)
@@ -1267,10 +1294,10 @@ One lepton and and one jet argument must be specified in addition to the require
         #----- Select triggers -----#
         def returnTriggers(keys):
             # MC : just OR the different paths 
-            if self.is_MC:
+            if self.is_MC or self.isNanov7:
                 return op.OR(*[trig for k in keys for trig in self.triggersPerPrimaryDataset[k]])
-            # Data : due to bug in NanoAOD production, check that the event run number is inside the ranges computed by bricalc
-            else:
+            else: # Only for NanoV6
+                # Data : due to bug in NanoAOD production, check that the event run number is inside the ranges computed by bricalc
                 conversion = {'SingleElectron':'1e','SingleMuon':'1mu','MuonEG':'1e1mu','DoubleEGamma':'2e','DoubleMuon':'2mu'}
                 list_cond = []
                 for trigKey in keys:
@@ -1291,11 +1318,11 @@ One lepton and and one jet argument must be specified in addition to the require
         if channel == "DL":
             # Select correct triggers #
             if self.args.POGID:
-                self.triggers = op.multiSwitch((op.rng_len(self.leadElectronsTightSel)>=2 , returnTriggers(["SingleElectron","DoubleEGamma"])),
+                self.triggers = op.multiSwitch((op.rng_len(self.leadElectronsTightSel)==2 , returnTriggers(["SingleElectron","DoubleEGamma"])),
                                                       # 2 fakeable electrons as leading
-                                                (op.AND(op.rng_len(self.leadElectronsTightSel)>=1,op.rng_len(self.leadMuonsTightSel)>=1) , returnTriggers(["SingleMuon","SingleElectron","MuonEG"])),
+                                                (op.AND(op.rng_len(self.leadElectronsTightSel)==1,op.rng_len(self.leadMuonsTightSel)==1) , returnTriggers(["SingleMuon","SingleElectron","MuonEG"])),
                                                       # 1 fakeable electron + 1 fakeable muon as leading
-                                                (op.rng_len(self.leadMuonsTightSel)>=2 , returnTriggers(["SingleMuon","DoubleMuon"])),
+                                                (op.rng_len(self.leadMuonsTightSel)==2 , returnTriggers(["SingleMuon","DoubleMuon"])),
                                                       # 2 fakeable muons as leading
                                                 op.c_bool(False))
                                                       # Number of fakeable leptons < 2 : not selected
@@ -1323,7 +1350,7 @@ One lepton and and one jet argument must be specified in addition to the require
             if channel == "DL":
                 # Make sure to have at least two fakeable leptons #
                 if self.args.POGID:
-                    noSel = noSel.refine("hasAtLeast2TightLeptons", cut = [op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel) >= 2])
+                    noSel = noSel.refine("has2TightLeptons", cut = [op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel) == 2])
                 if self.args.TTHIDLoose or self.args.TTHIDTight:
                     noSel = noSel.refine("hasAtLeast2FakeableLeptons", cut = [op.rng_len(self.electronsFakeSel)+op.rng_len(self.muonsFakeSel) >= 2])
             if channel == "SL":
@@ -1525,10 +1552,10 @@ One lepton and and one jet argument must be specified in addition to the require
             ak4Jets_below50 = op.select(self.ak4Jets, lambda j : j.pt < 50.)
             wFail = op.extMethod("scalefactorWeightForFailingObject", returnType="double")
             puid_reweighting = op.rng_product(ak4Jets_below50, lambda j : op.switch(j.genJet.isValid,
-                                                                                    op.switch(j.puId & 1,
+                                                                                    op.switch(((j.puId >> 2) & 1),
                                                                                               self.jetpuid_sf_eff(j), 
                                                                                               wFail(self.jetpuid_sf_eff(j), self.jetpuid_mc_eff(j))),
-                                                                                    op.switch(j.puId & 1,
+                                                                                    op.switch(((j.puId >> 2) & 1),
                                                                                               self.jetpuid_sf_mis(j), 
                                                                                               wFail(self.jetpuid_sf_mis(j), self.jetpuid_mc_mis(j)))))
             noSel.refine("jetPUIDReweighting",weight=puid_reweighting)
@@ -1625,23 +1652,23 @@ One lepton and and one jet argument must be specified in addition to the require
                                                  uName            = sample)
             self.btagAk4SF = op.rng_product(self.ak4Jets , lambda j : self.DeepJetDiscReshapingSF(j))
 
-#            if self.args.BtagReweightingOn and self.args.BtagReweightingOff: # TODO : re-enable
-#                raise RuntimeError("Reweighting cannot be both on and off") 
-#            if self.args.BtagReweightingOn: # Do not apply the ratio
-#                noSel = noSel.refine("BtagSF" , weight = self.btagAk4SF)
-#            elif self.args.BtagReweightingOff:
-#                pass # Do not apply any SF
-#            else:
-#                ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(sample,era))
-#                if not os.path.exists(ReweightingFileName):
-#                    raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
-#                print ('Reweighting file',ReweightingFileName)
-#
-#                self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
-#                                                                numJets  = op.rng_len(self.ak4Jets),
-#                                                                systName = 'btag_ratio',
-#                                                                nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
-#                noSel = noSel.refine("BtagAk4SF" , weight = [self.btagAk4SF,self.BtagRatioWeight])
+            if self.args.BtagReweightingOn and self.args.BtagReweightingOff: 
+                raise RuntimeError("Reweighting cannot be both on and off") 
+            if self.args.BtagReweightingOn:
+                noSel = noSel.refine("BtagSF" , weight = self.btagAk4SF)
+            elif self.args.BtagReweightingOff:
+                pass # Do not apply any SF
+            else:
+                ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(sample,era))
+                if not os.path.exists(ReweightingFileName):
+                    raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
+                print ('Reweighting file',ReweightingFileName)
+
+                self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
+                                                                numJets  = op.rng_len(self.ak4Jets),
+                                                                systName = 'btag_ratio',
+                                                                nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
+                noSel = noSel.refine("BtagAk4SF" , weight = [self.btagAk4SF,self.BtagRatioWeight])
 
 #            if self.isNanov7:
 #                #----- AK8 jets -> using Method 1.a -----#
