@@ -68,10 +68,22 @@ def returnHighLevelMVAInputs(self,l1,l2,b1,b2,met,jets,electrons,muons,channel):
         return op._to.Reduce.fromRngFun(rng, op.c_float(float("+inf"), typeName), ( lambda fn : (
                 lambda res, elm : op.extMethod("std::min", returnType="Float_t")(res, fn(elm))
                         ) )(fun) )
+    if hasattr(b1,'bRegCorr') and hasattr(b2,'bRegCorr'):
+        bRegCorr = self.HLL.getCorrBp4
+    else:
+        def bRegCorr(obj):
+            return obj.p4
+
+    if self.args.Boosted0Btag or self.args.Boosted1Btag:
+        VBF_tag = op.c_int(op.rng_len(self.VBFJetPairsBoosted)>0)
+    if self.args.Resolved0Btag or self.args.Resolved1Btag or self.args.Resolved2Btag:
+        VBF_tag = op.c_int(op.rng_len(self.VBFJetPairsResolved)>0)
+    else:
+        raise RuntimeError("Wrong selection to be used by the DNN")
 
 
     return {('m_bb',                   'Di-bjet invariant mass [GeV]',            (100,0.,1000.))   : op.invariant_mass(b1.p4,b2.p4),
-            ('m_bb_bregcorr',          'Di-bjet invariant mass (regcorr) [GeV]',  (100,0.,1000.))   : op.invariant_mass(self.HLL.getCorrBp4(b1),self.HLL.getCorrBp4(b2)),
+            ('m_bb_bregcorr',          'Di-bjet invariant mass (regcorr) [GeV]',  (100,0.,1000.))   : op.invariant_mass(bRegCorr(b1),bRegCorr(b2)),
             ('ht',                     'HT(jets) [GeV]',                          (100,0.,1000.))   : op.rng_sum(jets, lambda j : j.pt),
             ('min_dr_jets_lep1',       'Min(#Delta R(lead lepton,jets))',         (25,0.,5.))       : op.switch(l1conept(l1) >= l2conept(l2),
                                                                                                                 self.HLL.MinDR_part1_partCont(l1,jets),
@@ -85,7 +97,7 @@ def returnHighLevelMVAInputs(self,l1,l2,b1,b2,met,jets,electrons,muons,channel):
             ('min_dr_jet',             'Min(#Delta R(jets))',                     (25,0.,5.))       : op.rng_min(dijets,lambda dijet : op.deltaR(dijet[0].p4,dijet[1].p4)),
             ('min_dphi_jet',           'Min(#Delta #Phi(jets))',                  (16,0.,3.2))      : rng_min(dijets,lambda dijet : op.abs(op.deltaPhi(dijet[0].p4,dijet[1].p4)),typeName='double'),
             ('m_hh_simplemet',         'M_{HH} (simple MET) [GeV]',               (100,0.,1000.))   : op.invariant_mass(b1.p4,b2.p4,l1.p4,l2.p4,met.p4),
-            ('m_hh_simplemet_bregcorr','M_{HH} (simple MET) (regcorr) [GeV]',     (100,0.,1000.))   : op.invariant_mass(self.HLL.getCorrBp4(b1),self.HLL.getCorrBp4(b2),l1.p4,l2.p4,met.p4),
+            ('m_hh_simplemet_bregcorr','M_{HH} (simple MET) (regcorr) [GeV]',     (100,0.,1000.))   : op.invariant_mass(bRegCorr(b1),bRegCorr(b2),l1.p4,l2.p4,met.p4),
             ('met_ld',                 'MET_{LD}',                                (100,0.,1000.))   : self.HLL.MET_LD_DL(met,jets,electrons,muons),
             ('dr_bb',                  'Di-bjet #Delta R',                        (25,0.,5.))       : op.deltaR(b1.p4,b2.p4),
             ('dphi_bb',                'Di-bjet #Delta #Phi',                     (32,-3.2,3.2))    : op.abs(op.deltaPhi(b1.p4,b2.p4)), 
@@ -96,7 +108,7 @@ def returnHighLevelMVAInputs(self,l1,l2,b1,b2,met,jets,electrons,muons,channel):
             ('mww_simplemet',          'M_{WW} (simple MET) [GeV]',               (100,0.,1000.))   : op.invariant_mass(l1.p4,l2.p4,met.p4),
             #('max_m_jj',               'Max(M_{jj}) [GeV]',                       (100,0.,1000.))   : op.invariant_mass(jets[0].p4,jets[1].p4),
             ('n_btag',                 'N_b',                                     (6,0.,5.))        : op.static_cast("UInt_t",op.rng_len(self.ak4BJets)),
-            ('VBF_tag',                'VBF tag',                                 (2,0.,2.))        : op.c_int(op.rng_len(self.ak4VBFJetPairs)>0)}
+            ('VBF_tag',                'VBF tag',                                 (2,0.,2.))        : VBF_tag}
 
 def returnParamMVAInputs(self):
     return {('year',     'Year',         (3,2016.,2019.))    : op.c_int(int(self.era))}
