@@ -130,9 +130,6 @@ class highlevelLambdas:
         SumPx = lambda objs : op.rng_sum(objs, lambda obj : obj.p4.Px())
         SumPy = lambda objs : op.rng_sum(objs, lambda obj : obj.p4.Py())
 
-        #self.MET_LD_DL = lambda met, jets, l1 ,l2 : 0.6*met.pt + 0.4*op.sqrt(op.pow(SumPx(jets)+l1.p4.Px()+l2.p4.Px(),2),
-        #                                                                    +op.pow(SumPy(jets)+l1.p4.Py()+l2.p4.Py(),2))
-        #self.MET_LD_DL = lambda met, jets, l1 ,l2 : 0.6*met.pt + 0.4*op.rng_sum(jets, (lambda j : j.p4), start=(l1.p4+l2.p4)).Pt()
         empty_p4 = op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >",([op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.)]))
         self.MET_LD_DL = lambda met, jets, electrons, muons : 0.6 * met.pt +\
                     0.4* (op.rng_sum(jets, (lambda j : j.p4), start=empty_p4) + op.rng_sum(electrons, (lambda e : e.p4), start=empty_p4) + op.rng_sum(muons, (lambda m : m.p4), start=empty_p4)).Pt()

@@ -67,7 +67,6 @@ def finalize(path,force=False,verbose=False,onlyFailed=False):
         print (sbatch_cmd)
         return sbatch_cmd
     else:
-        pprint (content)
         samples = sorted(list(set([item for sublist in content.values() for item in sublist])))
         if force:
             print ("Careful ! Force hadding the output")
