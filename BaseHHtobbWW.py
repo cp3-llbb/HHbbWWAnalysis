@@ -1268,9 +1268,11 @@ One lepton and and one jet argument must be specified in addition to the require
         if self.args.POGID:
             self.lambda_cleanVBFLeptons = lambda j : op.AND(op.NOT(op.rng_any(self.electronsTightSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.4 )), 
                                                             op.NOT(op.rng_any(self.muonsTightSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.4 )))
-        elif self.args.TTHIDLoose or self.args.TTHIDFakeable:
+        elif self.args.TTHIDLoose or self.args.TTHIDTight:
             self.lambda_cleanVBFLeptons = lambda j : op.AND(op.NOT(op.rng_any(self.electronsFakeSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.4 )), 
                                                             op.NOT(op.rng_any(self.muonsFakeSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.4 )))
+        else:
+            self.lambda_cleanVBFLeptons = lambda j : op.c_bool(True)
 
         if channel == "DL":
             self.lambda_cleanVBFAk4 = lambda j : op.AND(op.NOT(op.rng_any(self.ak4JetsByBtagScore[:2], lambda ak4Jet : op.deltaR(j.p4, ak4Jet.p4) <= 0.8 )))
