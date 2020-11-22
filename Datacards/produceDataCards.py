@@ -22,20 +22,22 @@ class DataCard:
         self.root_subdir    = root_subdir
         self.pseudodata     = pseudodata
 
+        self.yaml_dict = self.loadYaml(os.path.join(self.path,yamlName))
+
         if self.pseudodata:
             self.groups = self.generatePseudoData(self.groups)
         self.content = {k:{g:None for g in self.groups.keys()} for k in self.hist_conv.keys()}
 
-        self.yaml_dict = self.loadYaml(os.path.join(self.path,yamlName))
         self.loopOverFiles()
         if self.pseudodata:
             self.roundFakeData()
         self.saveDatacard()
 
-    @staticmethod
-    def generatePseudoData(groups):
+    def generatePseudoData(self,groups):
+        back_samples = [sample for sample,sampleCfg in self.yaml_dict['samples'].items() if sampleCfg['type']=='mc']
         newg = {k:v for k,v in groups.items() if k!='data_obs'} 
-        newg['data_obs'] = list(chain.from_iterable([v for v in newg.values()]))
+        newg['data_obs'] = [sample for sample,sampleCfg in self.yaml_dict['samples'].items() if sampleCfg['type']=='mc']
+        #newg['data_obs'] = list(chain.from_iterable([v for v in newg.values() if ]))
         newg['data_real'] = groups['data_obs']
         return newg
 

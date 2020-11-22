@@ -913,7 +913,7 @@ samples:
     cross-section: 0.0017707494044057947
     scale: 10000
     db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
-    era: '2016'
+    era: '2017'
     files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8_2017.dat
     generated-events: 'genEventSumw'
     legend: HH (cHHH0) (x10000)
@@ -926,7 +926,7 @@ samples:
     cross-section: 0.0007885391471259366
     scale: 10000
     db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
-    era: '2016'
+    era: '2017'
     files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8_2017.dat
     generated-events: 'genEventSumw'
     legend: HH (cHHH1) (x10000)
@@ -939,7 +939,7 @@ samples:
     cross-section: 0.00033398686119390133
     scale: 10000
     db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
-    era: '2016'
+    era: '2017'
     files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8_2017.dat
     generated-events: 'genEventSumw'
     legend: HH (cHHH2p45) (x10000)
@@ -952,7 +952,7 @@ samples:
     cross-section: 0.0023296541606490757
     scale: 10000
     db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
-    era: '2016'
+    era: '2017'
     files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8_2017.dat
     generated-events: 'genEventSumw'
     legend: HH (cHHH5) (x10000)
