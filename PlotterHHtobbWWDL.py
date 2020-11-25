@@ -460,14 +460,16 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
                 yields.add(selObjectDict['selObject'].sel,title=selObjectDict['selObject'].yieldTitle)
 
-                inputsLeps = returnLeptonsMVAInputs(self     = self,
-                                                    l1       = dilepton[0],
-                                                    l2       = dilepton[1],
-                                                    channel  = selObjectDict['channel'])
-                inputsJets =    returnJetsMVAInputs(self = self,
-                                                    jets = self.ak4Jets)
-                inputsMET =      returnMETMVAInputs(self = self,
-                                                    met  = self.corrMET)     
+                inputsLeps = returnLeptonsMVAInputs(self      = self,
+                                                    l1        = dilepton[0],
+                                                    l2        = dilepton[1],
+                                                    channel   = selObjectDict['channel'])
+                inputsJets =    returnJetsMVAInputs(self      = self,
+                                                    jets      = self.ak4Jets)
+                inputsMET =      returnMETMVAInputs(self      = self,
+                                                    met       = self.corrMET)     
+                #inputsFatjet =  returnFatjetMVAInputs(self      = self,
+                #                                    fatjets   = container1fatb)
                 inputsHL = returnHighLevelMVAInputs(self      = self,
                                                     l1        = dilepton[0],
                                                     l2        = dilepton[1],
@@ -483,6 +485,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
                 #print ("Lepton variables : %d"%len(inputsLeps))
                 #print ("Jet variables    : %d"%len(inputsJets))
+                #print ("Fatjet variables : %d"%len(inputsFatjet))
                 #print ("MET variables    : %d"%len(inputsMET))
                 #print ("HL variables     : %d"%len(inputsHL))
                 #print ("Param variables  : %d"%len(inputsParam))
@@ -490,6 +493,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
                 #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLeps))
                 #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets))
+                #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))
                 #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsMET))
                 #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL))
                 #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam))
@@ -504,6 +508,8 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         inputs = {**inputsLeps,**inputsJets,**inputsHL,**inputsParam}
                     elif model_num in ["07"]:
                         inputs = {**inputsLeps,**inputsJets,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
+                    #elif model_num in ["08"]:
+                    #    inputs = {**inputsLeps,**inputsFatjet,**inputsJets,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
                     else:
                         raise RuntimeError("Failed to understand model number")
 

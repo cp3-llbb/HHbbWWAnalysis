@@ -252,13 +252,13 @@ def makeSinleptonPlots(sel, lep, suffix, channel, is_MC=False):
                              plotopts = channelLabel))
 
     # PT-eta plots #
-    plots.append(Plot.make2D("%s_%s_lepton_ptVSeta"%(channel,suffix), 
-                             [lep.pt, lep.eta],
-                             sel, 
-                             [EquidistantBinning(60,0.,300.),EquidistantBinning(22, -3., 3.)],
-                             xTitle= "P_{T} (lepton) [GeV]",
-                             yTitle= "#eta (lepton)",
-                             plotopts = channelLabel))
+#    plots.append(Plot.make2D("%s_%s_lepton_ptVSeta"%(channel,suffix), 
+#                             [lep.pt, lep.eta],
+#                             sel, 
+#                             [EquidistantBinning(60,0.,300.),EquidistantBinning(22, -3., 3.)],
+#                             xTitle= "P_{T} (lepton) [GeV]",
+#                             yTitle= "#eta (lepton)",
+#                             plotopts = channelLabel))
 
     # Phi plot #
     plots.append(Plot.make1D("%s_%s_lepton_phi"%(channel,suffix), 
@@ -317,13 +317,13 @@ def makeDileptonPlots(sel, dilepton, suffix, channel, is_MC=False):
                              plotopts = channelLabel))
 
     # PT-eta plots #
-    plots.append(Plot.make2D("%s_%s_firstlepton_ptVSeta"%(channel,suffix), 
-                             [dilepton[0].eta, dilepton[0].pt],
-                             sel, 
-                             [EquidistantBinning(22, -3., 3.),EquidistantBinning(60,0.,300.)],
-                             xTitle= "P_{T} (first lepton) [GeV]",
-                             yTitle= "#eta (second lepton)",
-                             plotopts = channelLabel))
+#    plots.append(Plot.make2D("%s_%s_firstlepton_ptVSeta"%(channel,suffix), 
+#                             [dilepton[0].eta, dilepton[0].pt],
+#                             sel, 
+#                             [EquidistantBinning(22, -3., 3.),EquidistantBinning(60,0.,300.)],
+#                             xTitle= "P_{T} (first lepton) [GeV]",
+#                             yTitle= "#eta (second lepton)",
+#                             plotopts = channelLabel))
 
     # Eta plot #
     plots.append(Plot.make1D("%s_%s_firstlepton_eta"%(channel,suffix), 
@@ -1585,14 +1585,14 @@ def makeDoubleLeptonHighLevelQuantities (sel,met,l1,l2,j1,j2,suffix,channel,HLL)
 
 
     # Lepton PT versus Jet Pt #
-    plots.append(Plot.make2D("%s_%s_highlevelvariable_firstLeptonPtVSLeadjetPt"%(channel,suffix),
-                             [l1.pt,j1.pt],
-                             sel,
-                             [EquidistantBinning(60,0.,300.),EquidistantBinning(60,0.,300.)],
-                             xTitle="First lepton P_{T}",
-                             yTitle="Leading jet P_{T}",
-                             plotopts = channelLabel))
-
+#    plots.append(Plot.make2D("%s_%s_highlevelvariable_firstLeptonPtVSLeadjetPt"%(channel,suffix),
+#                             [l1.pt,j1.pt],
+#                             sel,
+#                             [EquidistantBinning(60,0.,300.),EquidistantBinning(60,0.,300.)],
+#                             xTitle="First lepton P_{T}",
+#                             yTitle="Leading jet P_{T}",
+#                             plotopts = channelLabel))
+#
     # dilepton-MET plots #
     plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepMETdeltaPhi"%(channel,suffix),
                              op.abs(HLL.DilepMET_deltaPhi(l1,l2,met)),
@@ -1791,13 +1791,7 @@ def makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,nodes,chan
                                  EquidistantBinning(50,0.,1.),
                                  xTitle = 'DNN output %s'%node,
                                  plotopts = channelLabel))
-        plots.append(Plot.make1D("%s_%s_DNNOutputRebin_%s"%(channel,suffix,node),
-                                 output[i],
-                                 sel,
-                                 EquidistantBinning(1,0.,1.),
-                                 xTitle = 'DNN output %s'%node,
-                                 plotopts = channelLabel))
-
+      
 
     return plots    
 
