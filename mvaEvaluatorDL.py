@@ -45,6 +45,18 @@ def returnJetsMVAInputs(self,jets):
             ('j4_Pz',       'Subsubsublead jet P_z [GeV]',  (40,-200.,200.))     : op.switch(op.rng_len(jets)>3,jets[3].p4.Pz(),op.c_float(0.)),
             ('j4_btag',     'Subsubsublead jet btag score', (50,0.,1.)  )        : op.switch(op.rng_len(jets)>3,jets[3].btagDeepFlavB,op.c_float(0.))}
 
+def returnFatjetMVAInputs(self,fatjets):
+    return {('fatjet_E',        'Fatjet E [GeV]',               (50,0.,500.))        : op.switch(op.rng_len(fatjets)>0, fatjets[0].p4.E(), op.c_float(0.)),
+            ('fatjet_Px',       'Fatjet P_x [GeV]',             (40,-200.,200.))     : op.switch(op.rng_len(fatjets)>0, fatjets[0].p4.Px(), op.c_float(0.)),
+            ('fatjet_Py',       'Fatjet P_y [GeV]',             (40,-200.,200.))     : op.switch(op.rng_len(fatjets)>0, fatjets[0].p4.Py(), op.c_float(0.)),
+            ('fatjet_Pz',       'Fatjet P_z [GeV]',             (40,-200.,200.))     : op.switch(op.rng_len(fatjets)>0, fatjets[0].p4.Pz(), op.c_float(0.)),
+            ('fatjet_tau1',     'Fatjet #tau_1',                (50,0.,1.))          : op.switch(op.rng_len(fatjets)>0, fatjets[0].tau1, op.c_float(0.)),
+            ('fatjet_tau2',     'Fatjet #tau_2',                (50,0.,1.))          : op.switch(op.rng_len(fatjets)>0, fatjets[0].tau2, op.c_float(0.)), 
+            ('fatjet_tau3',     'Fatjet #tau_3',                (50,0.,1.))          : op.switch(op.rng_len(fatjets)>0, fatjets[0].tau3, op.c_float(0.)),
+            ('fatjet_tau4',     'Fatjet #tau_4',                (50,0.,1.))          : op.switch(op.rng_len(fatjets)>0, fatjets[0].tau4, op.c_float(0.)), 
+            ('fatjet_softdrop', 'Fatjet softdrop mass [GeV]',   (50,0.,1000.))       : op.switch(op.rng_len(fatjets)>0, fatjets[0].msoftdrop, op.c_float(0.))}
+
+
 def returnMETMVAInputs(self,met):
     return {('met_E',       'MET Energy',                   (50,0.,500.))        : met.p4.E(),
             ('met_Px',      'MET P_x',                      (40,-200.,200.))     : met.p4.Px(),
@@ -114,5 +126,5 @@ def returnParamMVAInputs(self):
     return {('year',     'Year',         (3,2016.,2019.))    : op.c_int(int(self.era))}
 
 def returnEventNrMVAInputs(self,t):
-    return {('eventnr',  'Event number', (1e6+1,0.,1e6))     : op.c_int(t.event)}
+    return {('eventnr',  'Event number', (int(1e6+1),0.,1e6))     : op.c_int(t.event)}
 

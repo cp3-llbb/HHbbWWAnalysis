@@ -105,11 +105,16 @@ class ScaleFactorsbbWW:
                                                 format_dict = {'wp':['Loose','Tight'],'syst':['pt','barrel','norm']})
         # PU ID SF #
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'Btag_SF',
-                                                entry_key   = 'jet_puid',
-                                                base_key    = '{eom}_{mcsf}_{era}_{wp}',
-                                                base_str    = 'PUID_80X_{eom}_{mcsf}_{era}_{wp}.json',
-                                                format_dict = {'eom':["eff", "mistag"],'mcsf':["mc", "sf"],'wp':['L','M','T'],'era':['2016','2017','2018']})
-                                                
+                                                entry_key   = 'jet_puid_eff',
+                                                base_key    = '{eom}_{era}_{wp}',
+                                                base_str    = 'PUID_EFF_h2_{eom}_mc{era}_T.json',
+                                                format_dict = {'eom':["eff", "mistag"],'wp':['L','M','T'],'era':['2016','2017','2018']})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'Btag_SF',
+                                                entry_key   = 'jet_puid_sf',
+                                                base_key    = '{eom}_{era}_{wp}',
+                                                base_str    = 'PUID_SF_h2_{eom}_sf{era}_T.json',
+                                                format_dict = {'eom':["eff", "mistag"],'wp':['L','M','T'],'era':['2016','2017','2018']})
+
         # Ak8 efficiency btagging #
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'Btag_SF',
                                                 entry_key   = 'ak8btag_eff_2016',

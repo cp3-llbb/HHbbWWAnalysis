@@ -336,13 +336,14 @@ One lepton and and one jet argument must be specified in addition to the require
             print ("Inclusive analysis, no selections applied")
 
         #----- Theory uncertainties -----#
-#        if self.is_MC:
-#            qcdScaleVariations = { f"qcdScalevar{i}": tree.LHEScaleWeight[i] for i in [0, 1, 3, 5, 7, 8] }
-#            qcdScaleSyst = op.systematic(op.c_float(1.), name="qcdScale", **qcdScaleVariations)
-#            psISRSyst = op.systematic(op.c_float(1.), name="psISR", up=tree.PSWeight[2], down=tree.PSWeight[0])
-#            psFSRSyst = op.systematic(op.c_float(1.), name="psFSR", up=tree.PSWeight[3], down=tree.PSWeight[1])
-#            pdfsWeight = op.systematic(op.c_float(1.), name="pdfsWgt", up=tree.LHEPdfWeight, down=tree.LHEPdfWeight)
-#            noSel = noSel.refine("theorySystematics", weight = [qcdScaleSyst,psISRSyst,psFSRSyst,pdfsWeight])
+        if self.is_MC:
+            #qcdScaleVariations = { f"qcdScalevar{i}": tree.LHEScaleWeight[i] for i in [0, 1, 3, 5, 7, 8] }
+            #qcdScaleSyst = op.systematic(op.c_float(1.), name="qcdScale", **qcdScaleVariations)
+            psISRSyst = op.systematic(op.c_float(1.), name="psISR", up=tree.PSWeight[2], down=tree.PSWeight[0])
+            psFSRSyst = op.systematic(op.c_float(1.), name="psFSR", up=tree.PSWeight[3], down=tree.PSWeight[1])
+            #pdfsWeight = op.systematic(op.c_float(1.), name="pdfsWgt", up=tree.LHEPdfWeight, down=tree.LHEPdfWeight)
+            #noSel = noSel.refine("theorySystematics", weight = [qcdScaleSyst,psISRSyst,psFSRSyst,pdfsWeight])
+            noSel = noSel.refine("PSweights", weight = [psISRSyst,psFSRSyst])
 
         #----- Triggers and Corrections -----#
         self.triggersPerPrimaryDataset = {}
@@ -403,7 +404,6 @@ One lepton and and one jet argument must be specified in addition to the require
             # Links : 
             # JEC : https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECDataMC
             # JER (smear) : https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
-
             # JetMET treatment #
             if not self.args.Synchronization:
                 if self.is_MC:   # if MC -> needs smearing
@@ -411,7 +411,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jetType               = "AK4PFchs",
                                   jec                   = "Summer16_07Aug2017_V11_MC",
                                   smear                 = "Summer16_25nsV1_MC",
-                                  jesUncertaintySources = ["Total"],
+                                  jesUncertaintySources = "Merged",
+                                  regroupTag            = "V2",
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -420,7 +421,8 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Summer16_07Aug2017_V11_MC",
                                       smear                 = "Summer16_25nsV1_MC",
-                                      jesUncertaintySources = ["Total"],
+                                      jesUncertaintySources = "Merged",
+                                      regroupTag            = "V2",
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
@@ -487,7 +489,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jetType               = "AK4PFchs",
                                   jec                   = "Fall17_17Nov2017_V32_MC",
                                   smear                 = "Fall17_V3b_MC",
-                                  jesUncertaintySources = ["Total"],
+                                  jesUncertaintySources = "Merged",
+                                  regroupTag            = "V2",
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -496,7 +499,8 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Fall17_17Nov2017_V32_MC",
                                       smear                 = "Fall17_V3b_MC",
-                                      jesUncertaintySources = ["Total"],
+                                      jesUncertaintySources = "Merged",
+                                      regroupTag            = "V2",
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
@@ -562,7 +566,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jetType               = "AK4PFchs",
                                   jec                   = "Autumn18_V19_MC",
                                   smear                 = "Autumn18_V7b_MC",
-                                  jesUncertaintySources = ["Total"],
+                                  jesUncertaintySources = "Merged",
+                                  regroupTag            = "V2",
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -571,7 +576,8 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Autumn18_V19_MC",
                                       smear                 = "Autumn18_V7b_MC",
-                                      jesUncertaintySources = ["Total"],
+                                      jesUncertaintySources = "Merged",
+                                      regroupTag            = "V2",
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
@@ -623,14 +629,6 @@ One lepton and and one jet argument must be specified in addition to the require
 
         era = sampleCfg['era']
         self.era = era
-
-        # Forcedefine : calculate once per event (for every event) #
-        if not self.args.Synchronization:
-            #forceDefine(t._Muon.calcProd, noSel) # Muons for Rochester corrections
-            forceDefine(t._Jet.calcProd, noSel)  # Jets for configureJets
-            forceDefine(getattr(t, "_{0}".format("MET" if era != "2017" else "METFixEE2017")).calcProd,noSel) # MET for configureMET
-        else:
-            print ("No jet corrections applied")
 
         ###########################################################################
         #                              Pseudo-data                                #
@@ -1138,6 +1136,93 @@ One lepton and and one jet argument must be specified in addition to the require
             self.leadElectronFakeExtrapolationSel_nonPrompt = op.select(self.leadElectronFakeSel, pred=lambda_fake_ele_nonPrompt)
             self.leadMuonFakeExtrapolationSel_nonPrompt     = op.select(self.leadMuonFakeSel, pred=lambda_fake_mu_nonPrompt)
 
+        #############################################################################
+        #                               Triggers                                    #
+        #############################################################################
+        #----- Genweight -----#
+        if self.is_MC:
+            noSel = noSel.refine("genWeight", weight=t.genWeight)
+
+        triggerRanges = returnTriggerRanges(era)
+        #----- Select triggers -----#
+        def returnTriggers(keys):
+            # MC : just OR the different paths 
+            if self.is_MC or self.isNanov7:
+                return op.OR(*[trig for k in keys for trig in self.triggersPerPrimaryDataset[k]])
+            else: # Only for NanoV6
+                # Data : due to bug in NanoAOD production, check that the event run number is inside the ranges computed by bricalc
+                conversion = {'SingleElectron':'1e','SingleMuon':'1mu','MuonEG':'1e1mu','DoubleEGamma':'2e','DoubleMuon':'2mu'}
+                list_cond = []
+                for trigKey in keys:
+                    rangekey = conversion[trigKey]
+                    rangeDict = {triggerRanges[rangekey][i]['name']:triggerRanges[rangekey][i]['runs'] for i in range(len(triggerRanges[rangekey]))}
+                    listTrig = self.triggersPerPrimaryDataset[trigKey]
+                    trigNames = [trig._parent.name for trig in listTrig]
+                    for trig,trigName in zip(listTrig,trigNames):
+                        trigRanges = rangeDict[trigName]
+                        list_cond.append(op.AND(trig,op.OR(*[op.in_range(r[0]-1,t.run,r[1]+1) for r in trigRanges])))
+                            # BEWARE : op.in_range is boundaries excluded !!! (hence extension via -1 and +1)
+                return op.OR(*list_cond)
+
+        # NOTE 
+        # For DL the naming convention is self.leadElectronsFakeSel and self.leadMuonsFakeSel (with an "s")
+        # For SL it is self.leadElectronFakeSel and self.leadMuonFakeSel (without "s")
+
+        if channel == "DL":
+            # Select correct triggers #
+            if self.args.POGID:
+                self.triggers = op.multiSwitch((op.rng_len(self.leadElectronsTightSel)==2 , returnTriggers(["SingleElectron","DoubleEGamma"])),
+                                                      # 2 fakeable electrons as leading
+                                                (op.AND(op.rng_len(self.leadElectronsTightSel)==1,op.rng_len(self.leadMuonsTightSel)==1) , returnTriggers(["SingleMuon","SingleElectron","MuonEG"])),
+                                                      # 1 fakeable electron + 1 fakeable muon as leading
+                                                (op.rng_len(self.leadMuonsTightSel)==2 , returnTriggers(["SingleMuon","DoubleMuon"])),
+                                                      # 2 fakeable muons as leading
+                                                op.c_bool(False))
+                                                      # Number of fakeable leptons < 2 : not selected
+
+            if self.args.TTHIDLoose or self.args.TTHIDTight:
+                self.triggers = op.multiSwitch((op.rng_len(self.leadElectronsFakeSel)>=2 , returnTriggers(["SingleElectron","DoubleEGamma"])),
+                                                      # 2 fakeable electrons as leading
+                                                (op.AND(op.rng_len(self.leadElectronsFakeSel)>=1,op.rng_len(self.leadMuonsFakeSel)>=1) , returnTriggers(["SingleMuon","SingleElectron","MuonEG"])),
+                                                      # 1 fakeable electron + 1 fakeable muon as leading
+                                                (op.rng_len(self.leadMuonsFakeSel)>=2 , returnTriggers(["SingleMuon","DoubleMuon"])),
+                                                      # 2 fakeable muons as leading
+                                                op.c_bool(False))
+                                                      # Number of fakeable leptons < 2 : not selected
+        if channel == "SL":
+            # Select correct triggers #
+            self.triggers = op.multiSwitch((op.rng_len(self.leadElectronFakeSel)==1 , returnTriggers(["SingleElectron"])),
+                                           (op.rng_len(self.leadMuonFakeSel)==1 , returnTriggers(["SingleMuon"])),
+                                           op.c_bool(False)) # In principle does not happen
+                             # Keep in mind either op.rng_len(self.leadElectronFakeSel)==1 or op.rng_len(self.leadMuonFakeSel)==1 but not both
+                             # If both ... I made a mistake
+
+        #----- Apply triggers -----#
+        if not self.inclusive_sel:
+            # Fakeable cut #
+            if channel == "DL":
+                # Make sure to have at least two fakeable leptons #
+                if self.args.POGID:
+                    noSel = noSel.refine("has2TightLeptons", cut = [op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel) == 2])
+                if self.args.TTHIDLoose or self.args.TTHIDTight:
+                    noSel = noSel.refine("hasAtLeast2FakeableLeptons", cut = [op.rng_len(self.electronsFakeSel)+op.rng_len(self.muonsFakeSel) >= 2])
+            if channel == "SL":
+                # Make sure to have at least one fakeable lepton #
+                noSel = noSel.refine("hasAtLeast1FakeableLepton", cut = [op.rng_len(self.electronsFakeSel)+op.rng_len(self.muonsFakeSel) >= 1])
+            # Triggers #
+            if self.is_MC:
+                noSel = noSel.refine("withTrig", cut=self.triggers)
+            else:
+                if era == "2018": # For 2018 the electron samples are merged, need to build according dict for primary dataset
+                    trigger_per_pd = { pd : trig for pd, trig in self.triggersPerPrimaryDataset.items() if pd not in ("SingleElectron", "DoubleEGamma") } 
+                    trigger_per_pd["EGamma"] = self.triggersPerPrimaryDataset["SingleElectron"] + self.triggersPerPrimaryDataset["DoubleEGamma"]
+                    noSel = noSel.refine("withTrig", cut=[makeMultiPrimaryDatasetTriggerSelection(sample, trigger_per_pd), self.triggers])
+                else:
+                    noSel = noSel.refine("withTrig", cut=[makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset), self.triggers])
+                # makeMultiPrimaryDatasetTriggerSelection must be done first, to make sure an event is not passed several times from several datasets
+                # Then the trigger selection is based on fakeable leptons
+
+
         ##############################################################################
         #                                  Tau                                       #
         ##############################################################################
@@ -1164,6 +1249,18 @@ One lepton and and one jet argument must be specified in addition to the require
         else:
             self.lambda_tauClean = lambda ta : op.c_float(True)
         self.tauCleanSel = op.select(self.tauSel, self.lambda_tauClean)
+
+
+        ##############################################################################
+        #                             Jets forceDefines                              #
+        ##############################################################################
+        # Forcedefine : calculate once per event (for every event) #
+        if not self.args.Synchronization:
+            #forceDefine(t._Muon.calcProd, noSel) # Muons for Rochester corrections
+            forceDefine(t._Jet.calcProd, noSel)  # Jets for configureJets
+            forceDefine(getattr(t, "_{0}".format("MET" if era != "2017" else "METFixEE2017")).calcProd,noSel) # MET for configureMET
+        else:
+            print ("No jet corrections applied")
 
         #############################################################################
         #                                AK4 Jets                                   #
@@ -1291,101 +1388,16 @@ One lepton and and one jet argument must be specified in addition to the require
         self.VBFJetPairsBoosted  = op.sort(op.combine(self.VBFJetsBoosted,  N=2, pred=self.lambda_VBFPair), lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
 
         #############################################################################
-        #                               Triggers                                    #
-        #############################################################################
-        #----- Genweight -----#
-        if self.is_MC:
-            noSel = noSel.refine("genWeight", weight=t.genWeight)
-
-        triggerRanges = returnTriggerRanges(era)
-        #----- Select triggers -----#
-        def returnTriggers(keys):
-            # MC : just OR the different paths 
-            if self.is_MC or self.isNanov7:
-                return op.OR(*[trig for k in keys for trig in self.triggersPerPrimaryDataset[k]])
-            else: # Only for NanoV6
-                # Data : due to bug in NanoAOD production, check that the event run number is inside the ranges computed by bricalc
-                conversion = {'SingleElectron':'1e','SingleMuon':'1mu','MuonEG':'1e1mu','DoubleEGamma':'2e','DoubleMuon':'2mu'}
-                list_cond = []
-                for trigKey in keys:
-                    rangekey = conversion[trigKey]
-                    rangeDict = {triggerRanges[rangekey][i]['name']:triggerRanges[rangekey][i]['runs'] for i in range(len(triggerRanges[rangekey]))}
-                    listTrig = self.triggersPerPrimaryDataset[trigKey]
-                    trigNames = [trig._parent.name for trig in listTrig]
-                    for trig,trigName in zip(listTrig,trigNames):
-                        trigRanges = rangeDict[trigName]
-                        list_cond.append(op.AND(trig,op.OR(*[op.in_range(r[0]-1,t.run,r[1]+1) for r in trigRanges])))
-                            # BEWARE : op.in_range is boundaries excluded !!! (hence extension via -1 and +1)
-                return op.OR(*list_cond)
-
-        # NOTE 
-        # For DL the naming convention is self.leadElectronsFakeSel and self.leadMuonsFakeSel (with an "s")
-        # For SL it is self.leadElectronFakeSel and self.leadMuonFakeSel (without "s")
-
-        if channel == "DL":
-            # Select correct triggers #
-            if self.args.POGID:
-                self.triggers = op.multiSwitch((op.rng_len(self.leadElectronsTightSel)==2 , returnTriggers(["SingleElectron","DoubleEGamma"])),
-                                                      # 2 fakeable electrons as leading
-                                                (op.AND(op.rng_len(self.leadElectronsTightSel)==1,op.rng_len(self.leadMuonsTightSel)==1) , returnTriggers(["SingleMuon","SingleElectron","MuonEG"])),
-                                                      # 1 fakeable electron + 1 fakeable muon as leading
-                                                (op.rng_len(self.leadMuonsTightSel)==2 , returnTriggers(["SingleMuon","DoubleMuon"])),
-                                                      # 2 fakeable muons as leading
-                                                op.c_bool(False))
-                                                      # Number of fakeable leptons < 2 : not selected
-
-            if self.args.TTHIDLoose or self.args.TTHIDTight:
-                self.triggers = op.multiSwitch((op.rng_len(self.leadElectronsFakeSel)>=2 , returnTriggers(["SingleElectron","DoubleEGamma"])),
-                                                      # 2 fakeable electrons as leading
-                                                (op.AND(op.rng_len(self.leadElectronsFakeSel)>=1,op.rng_len(self.leadMuonsFakeSel)>=1) , returnTriggers(["SingleMuon","SingleElectron","MuonEG"])),
-                                                      # 1 fakeable electron + 1 fakeable muon as leading
-                                                (op.rng_len(self.leadMuonsFakeSel)>=2 , returnTriggers(["SingleMuon","DoubleMuon"])),
-                                                      # 2 fakeable muons as leading
-                                                op.c_bool(False))
-                                                      # Number of fakeable leptons < 2 : not selected
-        if channel == "SL":
-            # Select correct triggers #
-            self.triggers = op.multiSwitch((op.rng_len(self.leadElectronFakeSel)==1 , returnTriggers(["SingleElectron"])),
-                                           (op.rng_len(self.leadMuonFakeSel)==1 , returnTriggers(["SingleMuon"])),
-                                           op.c_bool(False)) # In principle does not happen
-                             # Keep in mind either op.rng_len(self.leadElectronFakeSel)==1 or op.rng_len(self.leadMuonFakeSel)==1 but not both
-                             # If both ... I made a mistake
-
-        #----- Apply triggers -----#
-        if not self.inclusive_sel:
-            # Fakeable cut #
-            if channel == "DL":
-                # Make sure to have at least two fakeable leptons #
-                if self.args.POGID:
-                    noSel = noSel.refine("has2TightLeptons", cut = [op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel) == 2])
-                if self.args.TTHIDLoose or self.args.TTHIDTight:
-                    noSel = noSel.refine("hasAtLeast2FakeableLeptons", cut = [op.rng_len(self.electronsFakeSel)+op.rng_len(self.muonsFakeSel) >= 2])
-            if channel == "SL":
-                # Make sure to have at least one fakeable lepton #
-                noSel = noSel.refine("hasAtLeast1FakeableLepton", cut = [op.rng_len(self.electronsFakeSel)+op.rng_len(self.muonsFakeSel) >= 1])
-            # Triggers #
-            if self.is_MC:
-                noSel = noSel.refine("withTrig", cut=self.triggers)
-            else:
-                if era == "2018": # For 2018 the electron samples are merged, need to build according dict for primary dataset
-                    trigger_per_pd = { pd : trig for pd, trig in self.triggersPerPrimaryDataset.items() if pd not in ("SingleElectron", "DoubleEGamma") } 
-                    trigger_per_pd["EGamma"] = self.triggersPerPrimaryDataset["SingleElectron"] + self.triggersPerPrimaryDataset["DoubleEGamma"]
-                    noSel = noSel.refine("withTrig", cut=[makeMultiPrimaryDatasetTriggerSelection(sample, trigger_per_pd), self.triggers])
-                else:
-                    noSel = noSel.refine("withTrig", cut=[makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset), self.triggers])
-                # makeMultiPrimaryDatasetTriggerSelection must be done first, to make sure an event is not passed several times from several datasets
-                # Then the trigger selection is based on fakeable leptons
-
-        #############################################################################
         #                             Scalefactors                                  #
         #############################################################################
         self.SF = ScaleFactorsbbWW()    
         if self.is_MC:
             #---- PU ID SF ----#
-            self.jetpuid_sf_eff = self.SF.get_scalefactor("lepton", ('jet_puid','eff_sf_{}_L'.format(era)),combine="weight", systName="jetpuid_eff_sf", defineOnFirstUse=(not forSkimmer))
-            self.jetpuid_sf_mis = self.SF.get_scalefactor("lepton", ('jet_puid','mistag_sf_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag_sf", defineOnFirstUse=(not forSkimmer))
-            self.jetpuid_mc_eff = self.SF.get_scalefactor("lepton", ('jet_puid','eff_mc_{}_L'.format(era)),combine="weight", systName="jetpuid_eff_mc", defineOnFirstUse=(not forSkimmer))
-            self.jetpuid_mc_mis = self.SF.get_scalefactor("lepton", ('jet_puid','mistag_mc_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag_mc", defineOnFirstUse=(not forSkimmer))
+            # Efficiency and mistags do not have uncertainties, the systematics are in the SF 
+            self.jetpuid_mc_eff = self.SF.get_scalefactor("lepton", ('jet_puid_eff','eff_{}_L'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer))
+            self.jetpuid_mc_mis = self.SF.get_scalefactor("lepton", ('jet_puid_eff','mistag_{}_L'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer))
+            self.jetpuid_sf_eff = self.SF.get_scalefactor("lepton", ('jet_puid_sf','eff_{}_L'.format(era)),combine="weight", systName="jetpuid_eff_sf", defineOnFirstUse=(not forSkimmer))
+            self.jetpuid_sf_mis = self.SF.get_scalefactor("lepton", ('jet_puid_sf','mistag_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag_sf", defineOnFirstUse=(not forSkimmer))
 
             #---- Object SF -----# (Will take as argument the era)
             ####  Muons ####
@@ -1555,7 +1567,6 @@ One lepton and and one jet argument must be specified in addition to the require
         #                           Jet PU ID reweighting                           #
         #############################################################################
         if self.is_MC and not self.args.DYStitchingPlots and not self.args.WJetsStitchingPlots:
-            # TODO : add systematic variations 
             ak4Jets_below50 = op.select(self.ak4Jets, lambda j : j.pt < 50.)
             wFail = op.extMethod("scalefactorWeightForFailingObject", returnType="double")
             puid_reweighting = op.rng_product(ak4Jets_below50, lambda j : op.switch(j.genJet.isValid,
@@ -1565,7 +1576,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                                     op.switch(((j.puId >> 2) & 1),
                                                                                               self.jetpuid_sf_mis(j), 
                                                                                               wFail(self.jetpuid_sf_mis(j), self.jetpuid_mc_mis(j)))))
-            noSel.refine("jetPUIDReweighting",weight=puid_reweighting)
+            noSel = noSel.refine("jetPUIDReweighting",weight=puid_reweighting)
 
         
         #############################################################################
@@ -1673,7 +1684,6 @@ One lepton and and one jet argument must be specified in addition to the require
 
                 self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
                                                                 numJets  = op.rng_len(self.ak4Jets),
-                                                                systName = 'btag_ratio',
                                                                 nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
                 noSel = noSel.refine("BtagAk4SF" , weight = [self.btagAk4SF,self.BtagRatioWeight])
 
@@ -1732,8 +1742,6 @@ One lepton and and one jet argument must be specified in addition to the require
 #                                                                                wFail(self.DeepCsvSubjetMediumSF(subjet),self.Ak8Eff_lightjets(subjet))))     # Not tagged : return (1-SF_jxeff_j)/(1-eff_j)
 #                self.ak8BtagReweighting = op.rng_product(self.ak8Jets, lambda j : lambda_subjetWeight(j.subJet1)*lambda_subjetWeight(j.subJet2))
 #                noSel = noSel.refine("BtagAk8SF" , weight = [self.ak8BtagReweighting])
-                                                                     
-
-
+       
         # Return #
         return noSel
