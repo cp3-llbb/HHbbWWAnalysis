@@ -41,11 +41,8 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         #---------------------------------------------------------------------------------------#
         if not self.inclusive_sel:
             #----- Check arguments -----#
-            lepton_level = ["Preselected","Fakeable","Tight","FakeExtrapolation"]               # Only one must be in args
             jet_level = ["Ak4","Ak8","Resolved0Btag","Resolved1Btag","Resolved2Btag","Boosted0Btag","Boosted1Btag"] # Only one must be in args
 
-            if [boolean for (level,boolean) in self.args.__dict__.items() if level in lepton_level].count(True) != 1:
-                raise RuntimeError("Only one of the lepton arguments must be used, check --help")
             if [boolean for (level,boolean) in self.args.__dict__.items() if level in jet_level].count(True) != 1:
                 raise RuntimeError("Only one of the jet arguments must be used, check --help")
             if self.args.Channel not in ["ElEl","MuMu","ElMu"]:
@@ -53,16 +50,15 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
 
             #----- Lepton selection -----#
             # Args are passed within the self #
-            selLeptonDict = makeDoubleLeptonSelection(self,noSel,use_dd=False)
+            ElElSelObj,MuMuSelObj,ElMuSelObj = makeDoubleLeptonSelection(self,noSel,use_dd=False)
                 # makeDoubleLeptonSelection returns dict -> value is list of three selections for 3 channels 
                 # [0] -> we take the first and only key and value because restricted to one lepton selection
-            selLeptonList = list(selLeptonDict.values())[0]
             if self.args.Channel == "ElEl":
-                selObj = selLeptonList[0] # First item of list is ElEl selection
+                selObj = ElElSelObj
             if self.args.Channel == "MuMu":
-                selObj = selLeptonList[1] # Second item of list is MuMu selection
+                selObj = MuMuSelObj
             if self.args.Channel == "ElMu":
-                selObj = selLeptonList[2] # Third item of list is ElMu selection
+                selObj = ElMuSelObj
 
             #----- Jet selection -----#
             # Since the selections in one line, we can use the non copy option of the selection to modify the selection object internally
@@ -99,22 +95,20 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep["n_presel_ak4Jet"]   = op.static_cast("UInt_t",op.rng_len(self.ak4Jets))    
             varsToKeep["n_presel_ak8Jet"]   = op.static_cast("UInt_t",op.rng_len(self.ak8BJets))    
             varsToKeep["n_medium_ak4BJet"]  = op.static_cast("UInt_t",op.rng_len(self.ak4BJets))    
-            varsToKeep["is_SR"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElElDileptonTightSel)>=1,
-                                                                            op.rng_len(self.MuMuDileptonTightSel)>=1,
-                                                                            op.rng_len(self.ElMuDileptonTightSel)>=1))
+            varsToKeep["is_SR"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElElTightSel)>=1,
+                                                                            op.rng_len(self.MuMuTightSel)>=1,
+                                                                            op.rng_len(self.ElMuTightSel)>=1))
             varsToKeep["is_CR"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElElDileptonFakeExtrapolationSel)>=1,
                                                                             op.rng_len(self.MuMuDileptonFakeExtrapolationSel)>=1,
                                                                             op.rng_len(self.ElMuDileptonFakeExtrapolationSel)>=1))
-            varsToKeep["is_ee"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElElDileptonTightSel)>=1, op.rng_len(self.ElElDileptonFakeExtrapolationSel)>=1))
-            varsToKeep["is_mm"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.MuMuDileptonTightSel)>=1, op.rng_len(self.MuMuDileptonFakeExtrapolationSel)>=1))
-            varsToKeep["is_em"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElMuDileptonTightSel)>=1, op.rng_len(self.ElMuDileptonFakeExtrapolationSel)>=1))
+            varsToKeep["is_ee"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElElTightSel)>=1, op.rng_len(self.ElElDileptonFakeExtrapolationSel)>=1))
+            varsToKeep["is_mm"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.MuMuTightSel)>=1, op.rng_len(self.MuMuDileptonFakeExtrapolationSel)>=1))
+            varsToKeep["is_em"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElMuTightSel)>=1, op.rng_len(self.ElMuDileptonFakeExtrapolationSel)>=1))
             varsToKeep["is_resolved"]       = op.switch(op.AND(op.rng_len(self.ak4Jets)>=2,op.rng_len(self.ak4BJets)>=1,op.rng_len(self.ak8BJets)==0), op.c_bool(True), op.c_bool(False))
             varsToKeep["is_boosted"]        = op.switch(op.rng_len(self.ak8BJets)>=1, op.c_bool(True), op.c_bool(False))
 
 
             # Triggers #
-            varsToKeep['n_leadfakeableSel_ele']     = op.static_cast("UInt_t",op.rng_len(self.leadElectronsFakeSel))
-            varsToKeep['n_leadfakeableSel_mu']      = op.static_cast("UInt_t",op.rng_len(self.leadMuonsFakeSel))
             varsToKeep["triggers"]                  = self.triggers
             varsToKeep["triggers_SingleElectron"]   = op.OR(*self.triggersPerPrimaryDataset['SingleElectron'])
             varsToKeep["triggers_SingleMuon"]       = op.OR(*self.triggersPerPrimaryDataset['SingleMuon'])
@@ -298,30 +292,16 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         #----- Lepton variables -----#
         if self.args.Channel is None:
             raise RuntimeError("You need to specify --Channel")
-        dilepton = None
-        if self.args.Preselected:
-            if self.args.Channel == "ElEl": dilepton = self.ElElDileptonPreSel[0] 
-            if self.args.Channel == "MuMu": dilepton = self.MuMuDileptonPreSel[0]
-            if self.args.Channel == "ElMu": dilepton = self.ElMuDileptonPreSel[0]
-        if self.args.Fakeable:
-            if self.args.Channel == "ElEl": dilepton = self.ElElDileptonFakeSel[0]
-            if self.args.Channel == "MuMu": dilepton = self.MuMuDileptonFakeSel[0]
-            if self.args.Channel == "ElMu": dilepton = self.ElMuDileptonFakeSel[0]
-        if self.args.Tight:
-            if self.args.Channel == "ElEl": dilepton = self.ElElDileptonTightSel[0]
-            if self.args.Channel == "MuMu": dilepton = self.MuMuDileptonTightSel[0]
-            if self.args.Channel == "ElMu": dilepton = self.ElMuDileptonTightSel[0]
-        if self.args.FakeExtrapolation:
-            if self.args.Channel == "ElEl": dilepton = self.ElElDileptonFakeExtrapolationSel[0]
-            if self.args.Channel == "MuMu": dilepton = self.MuMuDileptonFakeExtrapolationSel[0]
-            if self.args.Channel == "ElMu": dilepton = self.ElMuDileptonFakeExtrapolationSel[0]
+        if self.args.Channel == "ElEl": dilepton = self.ElElTightSel[0]
+        if self.args.Channel == "MuMu": dilepton = self.MuMuTightSel[0]
+        if self.args.Channel == "ElMu": dilepton = self.ElMuTightSel[0]
 
-        varsToKeep["is_SR"] = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElElDileptonTightSel)>0,
-                                                            op.rng_len(self.MuMuDileptonTightSel)>0,
-                                                            op.rng_len(self.ElMuDileptonTightSel)>0))
-        varsToKeep['is_ee'] = op.static_cast("UInt_t",op.rng_len(self.ElElDileptonTightSel)>0)
-        varsToKeep['is_mm'] = op.static_cast("UInt_t",op.rng_len(self.MuMuDileptonTightSel)>0)
-        varsToKeep['is_em'] = op.static_cast("UInt_t",op.rng_len(self.ElMuDileptonTightSel)>0)
+        varsToKeep["is_SR"] = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElElTightSel)>0,
+                                                            op.rng_len(self.MuMuTightSel)>0,
+                                                            op.rng_len(self.ElMuTightSel)>0))
+        varsToKeep['is_ee'] = op.static_cast("UInt_t",op.rng_len(self.ElElTightSel)>0)
+        varsToKeep['is_mm'] = op.static_cast("UInt_t",op.rng_len(self.MuMuTightSel)>0)
+        varsToKeep['is_em'] = op.static_cast("UInt_t",op.rng_len(self.ElMuTightSel)>0)
         varsToKeep['resolved_tag'] = op.static_cast("UInt_t",op.AND(op.rng_len(self.ak4BJets)>=1,op.rng_len(self.ak8BJets)==0))
         varsToKeep['boosted_tag'] = op.static_cast("UInt_t",op.AND(op.rng_len(self.ak8BJets)>0))
 
