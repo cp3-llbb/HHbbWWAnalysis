@@ -100,10 +100,10 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
 
     #---- Select fakeables -----#
     ElSelObj = SelectionObject(sel          = baseSel,
-                               selName      = "Has1Fakeable",
+                               selName      = "Has1FakeableEl",
                                yieldTitle   = "Fakeable lepton (channel $e^{\pm}$)")
     MuSelObj = SelectionObject(sel          = baseSel,
-                               selName      = "Has1Fakeable",
+                               selName      = "Has1FakeableMu",
                                yieldTitle   = "Fakeable lepton (channel $\mu^{\pm}$)")
     ElSelObj.refine(cut = [op.rng_len(self.electronsFakeSel) >= 1,
                            op.OR(op.rng_len(self.muonsFakeSel) == 0,
@@ -375,6 +375,15 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
         # If any dilepton within Z peak, returns False
     lambda_inZ          = lambda dilep : op.in_range(ZMass-10.,op.invariant_mass(dilep[0].p4, dilep[1].p4),ZMass+10.)
 
+    # Pt cuts #
+    lambdaLowPtCutElEl = lambda dilep: op.AND( self.electron_conept[dilep[0].idx] > 15 , self.electron_conept[dilep[1].idx] > 15) # subleading above 15 GeV
+    lambdaLowPtCutMuMu = lambda dilep: op.AND( self.muon_conept[dilep[0].idx] > 15 , self.muon_conept[dilep[1].idx] > 15) # subleading above 15 GeV
+    lambdaLowPtCutElMu = lambda dilep: op.AND( self.electron_conept[dilep[0].idx] > 15 , self.muon_conept[dilep[1].idx] > 15) # subleading above 15 GeV
+    lambdaLeadingPtCutElEl = lambda dilep: op.OR( self.electron_conept[dilep[0].idx] > 25 , self.electron_conept[dilep[1].idx] > 25) # leading above 25 GeV
+    lambdaLeadingPtCutMuMu = lambda dilep: op.OR( self.muon_conept[dilep[0].idx] > 25 , self.muon_conept[dilep[1].idx] > 25) # leading above 25 GeV
+    lambdaLeadingPtCutElMu = lambda dilep: op.OR( self.electron_conept[dilep[0].idx] > 25 , self.muon_conept[dilep[1].idx] > 25) # leading above 25 GeV
+    # Need to split by flavour because conept definition needs it
+
     ######### POG ID selection #########
     if self.args.POGID:
         #---- Lambdas ----#
@@ -392,13 +401,13 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
 
         #---- Select tight leptons ----#
         ElElSelObj = SelectionObject(sel          = baseSel,
-                                     selName      = "Has2Tight",
+                                     selName      = "Has2TightElEl",
                                      yieldTitle   = "Tightdilepton (channel $e^+e^-$)")
         MuMuSelObj = SelectionObject(sel          = baseSel,
-                                     selName      = "Has2Tight",
+                                     selName      = "Has2TightMuMu",
                                      yieldTitle   = "Tight dilepton (channel $\mu^+\mu^-$)")
         ElMuSelObj = SelectionObject(sel          = baseSel,
-                                     selName      = "Has2Tight",
+                                     selName      = "Has2TightElMu",
                                      yieldTitle   = "Tight dilepton (channel $e^{\pm}\mu^{\mp}$)")
 
         ElElSelObj.refine(cut    = [op.rng_len(self.ElElTightSel) == 1,
@@ -434,11 +443,11 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
         ElMuSelObj.yieldTitle += " + SE/SM/EM triggers"
 
         ElElSelObj.refine(cut    = self.returnTriggers(["SingleElectron","DoubleEGamma"]),
-                          weight = ElElLooseSF(self.ElElTightSel[0]))
+                          weight = ElElTightSF(self.ElElTightSel[0]))
         MuMuSelObj.refine(cut    = self.returnTriggers(["SingleMuon","DoubleMuon"]),
-                          weight = MuMuLooseSF(self.MuMuTightSel[0]))
+                          weight = MuMuTightSF(self.MuMuTightSel[0]))
         ElMuSelObj.refine(cut    = self.returnTriggers(["SingleElectron","SingleMuon","MuonEG"]),
-                          weight = ElMuLooseSF(self.ElMuTightSel[0]))
+                          weight = ElMuTightSF(self.ElMuTightSel[0]))
 
         #---- PT cuts ----#
         ElElSelObj.selName += "PtCuts"
@@ -448,58 +457,51 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
         MuMuSelObj.yieldTitle += " + $P_T^{leading} > 25$ + $P_T^{subleading} > 15$"
         ElMuSelObj.yieldTitle += " + $P_T^{leading} > 25$ + $P_T^{subleading} > 15$"
 
-        ElElSelObj.refine(cut = [lambdaLowPtCutElEl(self.ElElTightSel[0]),lambdaHighPtCutElEl(self.ElElTightSel[0])])
-        MuMuSelObj.refine(cut = [lambdaLowPtCutMuMu(self.MuMuTightSel[0]),lambdaHighPtCutMuMu(self.MuMuTightSel[0])])
-        ElMuSelObj.refine(cut = [lambdaLowPtCutElMu(self.ElMuTightSel[0]),lambdaHighPtCutElMu(self.ElMuTightSel[0])])
+        ElElSelObj.refine(cut = [lambdaLowPtCutElEl(self.ElElTightSel[0]),lambdaLeadingPtCutElEl(self.ElElTightSel[0])])
+        MuMuSelObj.refine(cut = [lambdaLowPtCutMuMu(self.MuMuTightSel[0]),lambdaLeadingPtCutMuMu(self.MuMuTightSel[0])])
+        ElMuSelObj.refine(cut = [lambdaLowPtCutElMu(self.ElMuTightSel[0]),lambdaLeadingPtCutElMu(self.ElMuTightSel[0])])
 
         #---- Mll cuts ----#
-        ElElSelObject.selName += "PreMllCut"
-        ElElSelObject.yieldTitle += " + $M_{ll}>12$"
-        MuMuSelObject.selName += "PreMllCut"
-        MuMuSelObject.yieldTitle += " + $M_{ll}>12$"
-        ElMuSelObject.selName += "PreMllCut"
-        ElMuSelObject.yieldTitle += " + $M_{ll}>12$"
+        ElElSelObj.selName += "PreMllCut"
+        ElElSelObj.yieldTitle += " + $M_{ll}>12$"
+        MuMuSelObj.selName += "PreMllCut"
+        MuMuSelObj.yieldTitle += " + $M_{ll}>12$"
+        ElMuSelObj.selName += "PreMllCut"
+        ElMuSelObj.yieldTitle += " + $M_{ll}>12$"
 
-        mllCut = [lambda_lowMllCut(self.ElElDileptonPreSel),lambda_lowMllCut(self.MuMuDileptonPreSel)]
-        ElElSelObject.refine(cut = mllCut)
-        MuMuSelObject.refine(cut = mllCut)
-        ElMuSelObject.refine(cut = mllCut)
+        mllCut = [lambda_lowMllCut(self.ElElTightDileptonPairs),lambda_lowMllCut(self.MuMuTightDileptonPairs)]
+        ElElSelObj.refine(cut = mllCut)
+        MuMuSelObj.refine(cut = mllCut)
+        ElMuSelObj.refine(cut = mllCut)
 
 
         if not self.args.NoZVeto:
-            ElElSelObject.selName += "OutZ"
-            ElElSelObject.yieldTitle += " + Z Veto $|M_{ll}^{Preselected OS SF}-M_Z|>10$"
-            MuMuSelObject.selName += "OutZ"
-            MuMuSelObject.yieldTitle += " + Z Veto $|M_{ll}^{Preselected OS SF}-M_Z|>10$"
-            ElMuSelObject.selName += "OutZ"
-            ElMuSelObject.yieldTitle += " + Z Veto $|M_{ll}^{Preselected OS SF}-M_Z|>10$"
+            ElElSelObj.selName += "OutZ"
+            ElElSelObj.yieldTitle += " + Z Veto $|M_{ll}^{Preselected OS SF}-M_Z|>10$"
+            MuMuSelObj.selName += "OutZ"
+            MuMuSelObj.yieldTitle += " + Z Veto $|M_{ll}^{Preselected OS SF}-M_Z|>10$"
+            ElMuSelObj.selName += "OutZ"
+            ElMuSelObj.yieldTitle += " + Z Veto $|M_{ll}^{Preselected OS SF}-M_Z|>10$"
 
-            outZCut = [lambda_outZ(self.OSElElDileptonPreSel),lambda_outZ(self.OSMuMuDileptonPreSel)]
-            ElElSelObject.refine(cut = outZCut)
-            MuMuSelObject.refine(cut = outZCut)
-            ElMuSelObject.refine(cut = outZCut)
+            outZCut = [lambda_outZ(self.ElElTightDileptonOSPairs),lambda_outZ(self.MuMuTightDileptonOSPairs)]
+            ElElSelObj.refine(cut = outZCut)
+            MuMuSelObj.refine(cut = outZCut)
+            ElMuSelObj.refine(cut = outZCut)
 
         if self.args.ZPeak:
-            ElElSelObject.selName += "ZPeak"
-            MuMuSelObject.selName += "ZPeak"
-            ElElSelObject.yieldTitle+= " + Z peak $|M_{ll}-M_Z| < 10 GeV$" 
-            MuMuSelObject.yieldTitle+= " + Z peak $|M_{ll}-M_Z| < 10 GeV$"
+            ElElSelObj.selName += "ZPeak"
+            MuMuSelObj.selName += "ZPeak"
+            ElElSelObj.yieldTitle+= " + Z peak $|M_{ll}-M_Z| < 10 GeV$" 
+            MuMuSelObj.yieldTitle+= " + Z peak $|M_{ll}-M_Z| < 10 GeV$"
 
-            ElElSelObject.refine(cut = [lambda_inZ(self.ElElTightSel[0])])
-            MuMuSelObject.refine(cut = [lambda_inZ(self.MuMuTightSel[0])])
+            ElElSelObj.refine(cut = [lambda_inZ(self.ElElTightSel[0])])
+            MuMuSelObj.refine(cut = [lambda_inZ(self.MuMuTightSel[0])])
 
 
 
     ######### TTH ID selection #########
     if self.args.TTHIDLoose or self.args.TTHIDTight:
         #--- Lambdas ---#
-        lambdaLowPtCutElEl = lambda dilep: op.AND( self.electron_conept[dilep[0].idx] > 15 , self.electron_conept[dilep[1].idx] > 15) # subleading above 15 GeV
-        lambdaLowPtCutMuMu = lambda dilep: op.AND( self.muon_conept[dilep[0].idx] > 15 , self.muon_conept[dilep[1].idx] > 15) # subleading above 15 GeV
-        lambdaLowPtCutElMu = lambda dilep: op.AND( self.electron_conept[dilep[0].idx] > 15 , self.muon_conept[dilep[1].idx] > 15) # subleading above 15 GeV
-        lambdaLeadingPtCutElEl = lambda dilep: op.OR( self.electron_conept[dilep[0].idx] > 25 , self.electron_conept[dilep[1].idx] > 25) # leading above 25 GeV
-        lambdaLeadingPtCutMuMu = lambda dilep: op.OR( self.muon_conept[dilep[0].idx] > 25 , self.muon_conept[dilep[1].idx] > 25) # leading above 25 GeV
-        lambdaLeadingPtCutElMu = lambda dilep: op.OR( self.electron_conept[dilep[0].idx] > 25 , self.muon_conept[dilep[1].idx] > 25) # leading above 25 GeV
-        # Need to split by flavour because conept definition needs it
 
         # Tight Dilepton : must also be Gen matched if MC #
         lambda_dilepton_matched = lambda dilep : op.AND(self.lambda_is_matched(dilep[0]),self.lambda_is_matched(dilep[1]))
@@ -548,13 +550,13 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
 
         #---- Select fakeables -----# 
         ElElSelObj = SelectionObject(sel          = baseSel,
-                                     selName      = "Has2Fakeable",
+                                     selName      = "Has2FakeableElEl",
                                      yieldTitle   = "Fakeable dilepton (channel $e^+e^-$)")
         MuMuSelObj = SelectionObject(sel          = baseSel,
-                                     selName      = "Has2Fakeable",
+                                     selName      = "Has2FakeableMuMu",
                                      yieldTitle   = "Fakeable dilepton (channel $\mu^+\mu^-$)")
         ElMuSelObj = SelectionObject(sel          = baseSel,
-                                     selName      = "Has2Fakeable",
+                                     selName      = "Has2FakeableElMu",
                                      yieldTitle   = "Fakeable dilepton (channel $e^{\pm}\mu^{\mp}$)")
         ElElSelObj.refine(cut = [op.rng_len(self.ElElFakeSel) >= 1,
                                  op.OR(op.rng_len(self.muonsFakeSel) == 0,
@@ -629,53 +631,53 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
         ElMuSelObj.refine(cut = [lambdaLowPtCutElMu(self.ElMuFakeSel[0]),lambdaHighPtCutElMu(self.ElMuFakeSel[0])])
 
         #---- Mll cuts ----#
-        ElElSelObject.selName += "PreMllCut"
-        ElElSelObject.yieldTitle += " + $M_{ll}>12$"
-        MuMuSelObject.selName += "PreMllCut"
-        MuMuSelObject.yieldTitle += " + $M_{ll}>12$"
-        ElMuSelObject.selName += "PreMllCut"
-        ElMuSelObject.yieldTitle += " + $M_{ll}>12$"
+        ElElSelObj.selName += "PreMllCut"
+        ElElSelObj.yieldTitle += " + $M_{ll}>12$"
+        MuMuSelObj.selName += "PreMllCut"
+        MuMuSelObj.yieldTitle += " + $M_{ll}>12$"
+        ElMuSelObj.selName += "PreMllCut"
+        ElMuSelObj.yieldTitle += " + $M_{ll}>12$"
 
         mllCut = [lambda_lowMllCut(self.ElElDileptonPreSel),lambda_lowMllCut(self.MuMuDileptonPreSel),lambda_lowMllCut(self.ElMuDileptonPreSel)]
-        ElElSelObject.refine(cut = mllCut)
-        MuMuSelObject.refine(cut = mllCut)
-        ElMuSelObject.refine(cut = mllCut)
+        ElElSelObj.refine(cut = mllCut)
+        MuMuSelObj.refine(cut = mllCut)
+        ElMuSelObj.refine(cut = mllCut)
 
 
         if not self.args.NoZVeto:
-            ElElSelObject.selName += "OutZ"
-            ElElSelObject.yieldTitle += " + Z Veto $|M_{ll}^{Preselected OS SF}-M_Z|>10$"
-            MuMuSelObject.selName += "OutZ"
-            MuMuSelObject.yieldTitle += " + Z Veto $|M_{ll}^{Preselected OS SF}-M_Z|>10$"
-            ElMuSelObject.selName += "OutZ"
-            ElMuSelObject.yieldTitle += " + Z Veto $|M_{ll}^{Preselected OS SF}-M_Z|>10$"
+            ElElSelObj.selName += "OutZ"
+            ElElSelObj.yieldTitle += " + Z Veto $|M_{ll}^{Preselected OS SF}-M_Z|>10$"
+            MuMuSelObj.selName += "OutZ"
+            MuMuSelObj.yieldTitle += " + Z Veto $|M_{ll}^{Preselected OS SF}-M_Z|>10$"
+            ElMuSelObj.selName += "OutZ"
+            ElMuSelObj.yieldTitle += " + Z Veto $|M_{ll}^{Preselected OS SF}-M_Z|>10$"
 
             outZCut = [lambda_outZ(self.OSElElDileptonPreSel),lambda_outZ(self.OSMuMuDileptonPreSel)]
-            ElElSelObject.refine(cut = outZCut)
-            MuMuSelObject.refine(cut = outZCut)
-            ElMuSelObject.refine(cut = outZCut)
+            ElElSelObj.refine(cut = outZCut)
+            MuMuSelObj.refine(cut = outZCut)
+            ElMuSelObj.refine(cut = outZCut)
 
         if self.args.ZPeak:
-            ElElSelObject.selName += "ZPeak"
-            MuMuSelObject.selName += "ZPeak"
-            ElElSelObject.yieldTitle+= " + Z peak $|M_{ll}-M_Z| < 10 GeV$" 
-            MuMuSelObject.yieldTitle+= " + Z peak $|M_{ll}-M_Z| < 10 GeV$"
+            ElElSelObj.selName += "ZPeak"
+            MuMuSelObj.selName += "ZPeak"
+            ElElSelObj.yieldTitle+= " + Z peak $|M_{ll}-M_Z| < 10 GeV$" 
+            MuMuSelObj.yieldTitle+= " + Z peak $|M_{ll}-M_Z| < 10 GeV$"
 
-            ElElSelObject.refine(cut = [lambda_inZ(self.ElElFakeSel[0])])
-            MuMuSelObject.refine(cut = [lambda_inZ(self.MuMuFakeSel[0])])
+            ElElSelObj.refine(cut = [lambda_inZ(self.ElElFakeSel[0])])
+            MuMuSelObj.refine(cut = [lambda_inZ(self.MuMuFakeSel[0])])
 
         
         #---- Tight selection ----#
-        ElElSelObject.selName += "TightSelected"
-        ElElSelObject.yieldTitle += " + Tight selection"
-        MuMuSelObject.selName += "TightSelected"
-        MuMuSelObject.yieldTitle += " + Tight selection"
-        ElMuSelObject.selName += "TightSelected"
-        ElMuSelObject.yieldTitle += " + Tight selection"
+        ElElSelObj.selName += "TightSelected"
+        ElElSelObj.yieldTitle += " + Tight selection"
+        MuMuSelObj.selName += "TightSelected"
+        MuMuSelObj.yieldTitle += " + Tight selection"
+        ElMuSelObj.selName += "TightSelected"
+        ElMuSelObj.yieldTitle += " + Tight selection"
         
         if use_dd:
             enable = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg)
-            ElElSelObject.refine(cut      = [lambda_tightpair_ElEl(self.ElElFakeSel[0]),
+            ElElSelObj.refine(cut      = [lambda_tightpair_ElEl(self.ElElFakeSel[0]),
                                              op.rng_len(self.electronsTightSel) == 2,
                                              op.rng_len(self.muonsTightSel) == 0,
                                              self.ElElTightSel[0][0].idx == self.ElElFakeSel[0][0].idx,
@@ -685,7 +687,7 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                                  ddCut    = [lambda_fakepair_ElEl(self.ElElFakeSel[0])],
                                  ddWeight = [self.ElElFakeFactor(ElElFakeSel[0])]+ElElTightSF(ElElFakeSel[0]),
                                  enable   = enable)
-            MuMuSelObject.refine(cut      = [lambda_tightpair_MuMu(self.MuMuFakeSel[0]),
+            MuMuSelObj.refine(cut      = [lambda_tightpair_MuMu(self.MuMuFakeSel[0]),
                                              op.rng_len(self.electronsTightSel) == 0,
                                              op.rng_len(self.muonsTightSel) == 2,
                                              self.MuMuTightSel[0][0].idx == self.MuMuFakeSel[0][0].idx,
@@ -695,7 +697,7 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                                  ddCut    = [lambda_fakepair_MuMu(self.MuMuFakeSel[0])],
                                  ddWeight = [self.MuMuFakeFactor(MuMuFakeSel[0])]+MuMuTightSF(MuMuFakeSel[0]),
                                  enable   = enable)
-            ElMuSelObject.refine(cut      = [lambda_tightpair_ElMu(self.ElMuFakeSel[0]),
+            ElMuSelObj.refine(cut      = [lambda_tightpair_ElMu(self.ElMuFakeSel[0]),
                                              op.rng_len(self.electronsTightSel) == 1,
                                              op.rng_len(self.muonsTightSel) == 1,
                                              self.ElMuTightSel[0][0].idx == self.ElMuFakeSel[0][0].idx,
@@ -706,26 +708,26 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                                  ddWeight = [self.ElMuFakeFactor(ElMuFakeSel[0])]+ElMuTightSF(ElMuFakeSel[0]),
                                  enable   = enable)
         else:
-            ElElSelObject.refine(cut    = [lambda_tightpair_ElEl(self.ElElFakeSel[0]),
+            ElElSelObj.refine(cut    = [lambda_tightpair_ElEl(self.ElElFakeSel[0]),
                                            op.rng_len(self.electronsTightSel) == 2,
                                            op.rng_len(self.muonsTightSel) == 0,
                                            self.ElElTightSel[0][0].idx == self.ElElFakeSel[0][0].idx,
                                            self.ElElTightSel[0][1].idx == self.ElElFakeSel[0][1].idx],
                                  weight = [ElElTightSF(self.ElElFakeSel[0])])
-            MuMuSelObject.refine(cut    = [lambda_tightpair_MuMu(self.MuMuFakeSel[0]),
+            MuMuSelObj.refine(cut    = [lambda_tightpair_MuMu(self.MuMuFakeSel[0]),
                                            op.rng_len(self.electronsTightSel) == 0,
                                            op.rng_len(self.muonsTightSel) == 2,
                                            self.MuMuTightSel[0][0].idx == self.MuMuFakeSel[0][0].idx,
                                            self.MuMuTightSel[0][1].idx == self.MuMuFakeSel[0][1].idx],
                                  weight = [MuMuTightSF(self.MuMuFakeSel[0])])
-            ElMuSelObject.refine(cut    = [lambda_tightpair_ElMu(self.ElMuFakeSel[0]),
+            ElMuSelObj.refine(cut    = [lambda_tightpair_ElMu(self.ElMuFakeSel[0]),
                                            op.rng_len(self.electronsTightSel) == 1,
                                            op.rng_len(self.muonsTightSel) == 1,
                                            self.ElMuTightSel[0][0].idx == self.ElMuFakeSel[0][0].idx,
                                            self.ElMuTightSel[0][1].idx == self.ElMuFakeSel[0][1].idx],
                                  weight = [ElMuTightSF(self.ElMuFakeSel[0])])
 
-    return ElElSelObject,MuMuSelObject,ElMuSelObject
+    return ElElSelObj,MuMuSelObj,ElMuSelObj
             
 
 

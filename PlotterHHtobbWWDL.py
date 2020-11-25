@@ -80,7 +80,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         #----- Machine Learning Model -----#                
         #path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',self.args.Classifier,'model','model.pb')
         DNNs = {}
-        model_nums = ["07"]
+        model_nums = ["08"]
         for model_num in model_nums:
             path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
             print ("DNN model : %s"%path_model)
@@ -94,6 +94,9 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 #                    #output_name = "model/model_4/output/Softmax"
                 if model_num in ["07"]:
                     input_names = ["input_1","input_2","input_3","input_4","input_5","input_6"]
+                    output_name = "Identity"
+                elif model_num in ["08"]:
+                    input_names = ["lep","jet","fat","met","hl","param","eventnr"]
                     output_name = "Identity"
                 else:
                     raise NotImplementedError
@@ -444,8 +447,8 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                                                 jets      = self.ak4Jets)
             inputsMET =      returnMETMVAInputs(self      = self,
                                                 met       = self.corrMET)     
-            #inputsFatjet =  returnFatjetMVAInputs(self      = self,
-            #                                    fatjets   = container1fatb)
+            inputsFatjet =  returnFatjetMVAInputs(self      = self,
+                                                  fatjets   = container1fatb)
             inputsHL = returnHighLevelMVAInputs(self      = self,
                                                 l1        = dilepton[0],
                                                 l2        = dilepton[1],
@@ -484,8 +487,8 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     inputs = {**inputsLeps,**inputsJets,**inputsHL,**inputsParam}
                 elif model_num in ["07"]:
                     inputs = {**inputsLeps,**inputsJets,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
-                #elif model_num in ["08"]:
-                #    inputs = {**inputsLeps,**inputsFatjet,**inputsJets,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
+                elif model_num in ["08"]:
+                    inputs = {**inputsLeps,**inputsJets,**inputsFatjet,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
                 else:
                     raise RuntimeError("Failed to understand model number")
 
