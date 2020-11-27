@@ -147,7 +147,7 @@ p = {
     'optimizer' : [Adam],  
     'epochs' : [1],   
     'batch_size' : [10000], 
-    'n_particles' : [0],
+    'n_particles' : [10],
     'loss_function' : [categorical_crossentropy] 
 }
 

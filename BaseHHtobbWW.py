@@ -45,10 +45,6 @@ Arguments for the HH->bbWW analysis on bamboo framework
 
 ----- Argument groups -----
     * Lepton arguments *
-        --Preselected
-        --Fakeable
-        --Tight
-        --FakeExtrapolation
         --NoZVeto
         --ZPeak
         --NoTauVeto
@@ -117,22 +113,6 @@ One lepton and and one jet argument must be specified in addition to the require
                             action      = "store_true",
                             default     = False,
                             help        = "Use the Tight mva ttH ID tight leptons")
-        parser.add_argument("--Preselected", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Produce the plots/skim for a preselected pair of leptons")
-        parser.add_argument("--Fakeable", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Produce the plots/skim for a fakeable pair of leptons")
-        parser.add_argument("--Tight", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Produce the plots/skim for a tight pair of leptons (MC matched)")
-        parser.add_argument("--FakeExtrapolation", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Produce the plots/skim for a pair of leptons passing the fakeable selection but not the tight (MC matched)")
         parser.add_argument("--NoZVeto", 
                             action      = "store_true",
                             default     = False,
@@ -336,13 +316,14 @@ One lepton and and one jet argument must be specified in addition to the require
             print ("Inclusive analysis, no selections applied")
 
         #----- Theory uncertainties -----#
-#        if self.is_MC:
-#            qcdScaleVariations = { f"qcdScalevar{i}": tree.LHEScaleWeight[i] for i in [0, 1, 3, 5, 7, 8] }
-#            qcdScaleSyst = op.systematic(op.c_float(1.), name="qcdScale", **qcdScaleVariations)
-#            psISRSyst = op.systematic(op.c_float(1.), name="psISR", up=tree.PSWeight[2], down=tree.PSWeight[0])
-#            psFSRSyst = op.systematic(op.c_float(1.), name="psFSR", up=tree.PSWeight[3], down=tree.PSWeight[1])
-#            pdfsWeight = op.systematic(op.c_float(1.), name="pdfsWgt", up=tree.LHEPdfWeight, down=tree.LHEPdfWeight)
-#            noSel = noSel.refine("theorySystematics", weight = [qcdScaleSyst,psISRSyst,psFSRSyst,pdfsWeight])
+        if self.is_MC:
+            #qcdScaleVariations = { f"qcdScalevar{i}": tree.LHEScaleWeight[i] for i in [0, 1, 3, 5, 7, 8] }
+            #qcdScaleSyst = op.systematic(op.c_float(1.), name="qcdScale", **qcdScaleVariations)
+            psISRSyst = op.systematic(op.c_float(1.), name="psISR", up=tree.PSWeight[2], down=tree.PSWeight[0])
+            psFSRSyst = op.systematic(op.c_float(1.), name="psFSR", up=tree.PSWeight[3], down=tree.PSWeight[1])
+            #pdfsWeight = op.systematic(op.c_float(1.), name="pdfsWgt", up=tree.LHEPdfWeight, down=tree.LHEPdfWeight)
+            #noSel = noSel.refine("theorySystematics", weight = [qcdScaleSyst,psISRSyst,psFSRSyst,pdfsWeight])
+            noSel = noSel.refine("PSweights", weight = [psISRSyst,psFSRSyst])
 
         #----- Triggers and Corrections -----#
         self.triggersPerPrimaryDataset = {}
@@ -403,7 +384,6 @@ One lepton and and one jet argument must be specified in addition to the require
             # Links : 
             # JEC : https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECDataMC
             # JER (smear) : https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
-
             # JetMET treatment #
             if not self.args.Synchronization:
                 if self.is_MC:   # if MC -> needs smearing
@@ -411,7 +391,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jetType               = "AK4PFchs",
                                   jec                   = "Summer16_07Aug2017_V11_MC",
                                   smear                 = "Summer16_25nsV1_MC",
-                                  jesUncertaintySources = ["Total"],
+                                  jesUncertaintySources = "Merged",
+                                  regroupTag            = "V2",
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -420,7 +401,8 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Summer16_07Aug2017_V11_MC",
                                       smear                 = "Summer16_25nsV1_MC",
-                                      jesUncertaintySources = ["Total"],
+                                      jesUncertaintySources = "Merged",
+                                      regroupTag            = "V2",
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
@@ -487,7 +469,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jetType               = "AK4PFchs",
                                   jec                   = "Fall17_17Nov2017_V32_MC",
                                   smear                 = "Fall17_V3b_MC",
-                                  jesUncertaintySources = ["Total"],
+                                  jesUncertaintySources = "Merged",
+                                  regroupTag            = "V2",
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -496,7 +479,8 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Fall17_17Nov2017_V32_MC",
                                       smear                 = "Fall17_V3b_MC",
-                                      jesUncertaintySources = ["Total"],
+                                      jesUncertaintySources = "Merged",
+                                      regroupTag            = "V2",
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
@@ -562,7 +546,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jetType               = "AK4PFchs",
                                   jec                   = "Autumn18_V19_MC",
                                   smear                 = "Autumn18_V7b_MC",
-                                  jesUncertaintySources = ["Total"],
+                                  jesUncertaintySources = "Merged",
+                                  regroupTag            = "V2",
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -571,7 +556,8 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Autumn18_V19_MC",
                                       smear                 = "Autumn18_V7b_MC",
-                                      jesUncertaintySources = ["Total"],
+                                      jesUncertaintySources = "Merged",
+                                      regroupTag            = "V2",
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
@@ -623,14 +609,6 @@ One lepton and and one jet argument must be specified in addition to the require
 
         era = sampleCfg['era']
         self.era = era
-
-        # Forcedefine : calculate once per event (for every event) #
-        if not self.args.Synchronization:
-            #forceDefine(t._Muon.calcProd, noSel) # Muons for Rochester corrections
-            forceDefine(t._Jet.calcProd, noSel)  # Jets for configureJets
-            forceDefine(getattr(t, "_{0}".format("MET" if era != "2017" else "METFixEE2017")).calcProd,noSel) # MET for configureMET
-        else:
-            print ("No jet corrections applied")
 
         ###########################################################################
         #                              Pseudo-data                                #
@@ -729,11 +707,10 @@ One lepton and and one jet argument must be specified in addition to the require
 
         # MET corrections #
         MET = t.MET if era != "2017" else t.METFixEE2017
-        #if not self.inclusive_sel:
-        #    self.corrMET = METcorrection(MET,t.PV,sample,era,self.is_MC) # Flatness correction might not be needed
-        #else:
-        #    self.corrMET = MET
-        self.corrMET = MET
+        if not self.args.Synchronization:
+            self.corrMET = METcorrection(MET,t.PV,sample,era,self.is_MC) # Flatness correction might not be needed
+        else:
+            self.corrMET = MET
 
         #############################################################################
         #                      Lepton Lambdas Variables                             #
@@ -759,9 +736,8 @@ One lepton and and one jet argument must be specified in addition to the require
 
         # Cone pt #
         if self.args.POGID:
-            self.electron_conept = op.map(t.Electron, lambda el : el.pt)
-            self.muon_conept = op.map(t.Muon, lambda mu : mu.pt) 
-            # Hack to avoid changing the trigger selection
+            self.lambda_conept_electron = lambda lep : lep.pt
+            self.lambda_conept_muon = lambda lep : lep.pt
         if self.args.TTHIDTight:
             # Def conept : https://github.com/CERN-PH-CMG/cmgtools-lite/blob/f8a34c64a4489d94ff9ac4c0d8b0b06dad46e521/TTHAnalysis/python/tools/conept.py#L74
             self.lambda_conept_electron = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
@@ -776,8 +752,6 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                    # if muon, check that passes medium and above MVA
                                                                    op.static_cast("Float_t",0.9*lep.pt*(1.+lep.jetRelIso)))
                                                                # else: return 0.90 * lep.pt / lep.jetPtRatiov2
-            self.electron_conept = op.map(t.Electron, self.lambda_conept_electron)
-            self.muon_conept = op.map(t.Muon, self.lambda_conept_muon)
         if self.args.TTHIDLoose:
             self.lambda_conept_electron = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
                                                                       # if (abs(lep.pdgId)!=11 and abs(lep.pdgId)!=13): return lep.pt : anything that is not muon or electron
@@ -792,8 +766,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                    op.static_cast("Float_t",0.9*lep.pt*(1.+lep.jetRelIso)))
                                                                # else: return 0.90 * lep.pt / lep.jetPtRatiov2
 
-            self.electron_conept = op.map(t.Electron, self.lambda_conept_electron)
-            self.muon_conept = op.map(t.Muon, self.lambda_conept_muon)
+        self.electron_conept = op.map(t.Electron, self.lambda_conept_electron)
+        self.muon_conept = op.map(t.Muon, self.lambda_conept_muon)
 
         # Btag interpolation #
                     # https://indico.cern.ch/event/812025/contributions/3475878/attachments/1867083/3070589/gp-fr-run2b.pdf (slide 7)
@@ -942,6 +916,11 @@ One lepton and and one jet argument must be specified in addition to the require
             self.ElElTightDileptonOSPairs = op.combine(self.electronsTightSel, N=2, pred=lambda l1,l2: l1.charge != l2.charge)
             self.MuMuTightDileptonOSPairs = op.combine(self.muonsTightSel, N=2, pred=lambda l1,l2: l1.charge != l2.charge)
 
+            if channel == "DL":
+                self.ElElTightSel = op.combine(self.electronsTightSel, N=2)
+                self.MuMuTightSel = op.combine(self.muonsTightSel, N=2)
+                self.ElMuTightSel = op.combine((self.electronsTightSel,self.muonsTightSel))
+
         if self.args.TTHIDLoose or self.args.TTHIDTight:
             #----- Needed for both SL and DL -----#
             # Preselected dilepton -> Mll>12 cut #
@@ -955,188 +934,33 @@ One lepton and and one jet argument must be specified in addition to the require
             self.OSMuMuDileptonPreSel = op.combine(self.muonsPreSel, N=2, pred=self.lambda_leptonOS)
             self.OSElMuDileptonPreSel = op.combine((self.electronsPreSel, self.muonsPreSel), pred=self.lambda_leptonOS) 
 
-        #----- Needed only for DL -----#
-        if channel == "DL":
-            # We need to only select the leading (in conept) fakeable leptons and only work with those
-            # First issue : electrons and muons and in separate containers that cannot be appended
-            # Second issue : before we compare conept of first or second lepton in a container ... we need to check that it is there !
-            # Solution : slice the containers of fakeable leptons but need to separate each case
-            def makeDLPair(electrons,muons):
-                self.leadElectrons = electrons[:op.multiSwitch(
-                                    (op.rng_len(muons)==0 , op.min(op.static_cast("std::size_t", op.c_int(2)), op.rng_len(electrons))),
-                                        # No muon -> take at most the two first electrons
-                                    (op.rng_len(electrons)==0 , op.static_cast("std::size_t", op.c_int(0))),
-                                        # No electron -> slice at 0 
-                                    (op.AND(op.rng_len(electrons)==1 , op.rng_len(muons)==1) , op.static_cast("std::size_t", op.c_int(1))),
-                                        # One electron and one muon : slice electrons at 1
-                                    (op.AND(op.rng_len(electrons)>=2 , op.rng_len(muons)==1), 
-                                        # At least 2 electrons and 1 muon : If both electrons have higher conept, leading leptons will be ele+ele (slice at 2)
-                                        #                                   If muon has higher conept than one of them, leading leptons will be ele+mu (slice at 1)
-                                            op.switch(op.AND(self.electron_conept[electrons[0].idx]>self.muon_conept[muons[0].idx],
-                                                             self.electron_conept[electrons[1].idx]>self.muon_conept[muons[0].idx]),
-                                                      op.static_cast("std::size_t", op.c_int(2)),
-                                                      op.static_cast("std::size_t", op.c_int(1)))),
-                                    (op.AND(op.rng_len(electrons)==1 , op.rng_len(muons)>=2),
-                                        # 1 electron and at least 2 muons: If electron had higher conept than one of the leading muons : leading will be ele+mu (slice at 1)
-                                        #                                  If electron has lower conept than both muons : leading leptons will be mu+mu (slice at 0) 
-                                            op.switch(op.OR(self.electron_conept[electrons[0].idx]>self.muon_conept[muons[0].idx],
-                                                            self.electron_conept[electrons[0].idx]>self.muon_conept[muons[1].idx]),
-                                                      op.static_cast("std::size_t", op.c_int(1)),
-                                                      op.static_cast("std::size_t", op.c_int(0)))),
-                                    op.switch(self.electron_conept[electrons[0].idx]>self.muon_conept[muons[0].idx],
-                                        # At least 2 electrons and 2 muons : If ele1 > mu1 : if ele2>mu1 : leading is ele+ele (slice at 2)
-                                        #                                                    if ele2<mu1 : leading is ele+mu (slice at 1)
-                                        #                                    If ele1 < mu1 : if ele1>mu2 : leading is ele+mu (slice at 1)
-                                        #                                                    if ele1<mu2 : leading is mu+mu (slice at 0)
-                                              op.switch(self.electron_conept[electrons[1].idx]>self.muon_conept[muons[0].idx],
-                                                        op.static_cast("std::size_t", op.c_int(2)),
-                                                        op.static_cast("std::size_t", op.c_int(1))),
-                                              op.switch(self.electron_conept[electrons[0].idx]>self.muon_conept[muons[1].idx],
-                                                        op.static_cast("std::size_t", op.c_int(1)),
-                                                        op.static_cast("std::size_t", op.c_int(0))))
-                                                                                    )]
+            # Dilepton for selection #
+            if channel == "DL":
+                self.ElElFakeSel = op.combine(self.electronsFakeSel, N=2)
+                self.MuMuFakeSel = op.combine(self.muonsFakeSel, N=2)
+                self.ElMuFakeSel = op.combine((self.electronsFakeSel,self.muonsFakeSel))
 
-                self.leadMuons = muons[:op.multiSwitch(  
-                                    # Same logic as for electrons 
-                                    (op.rng_len(electrons)==0 , op.min(op.static_cast("std::size_t", op.c_int(2)), op.rng_len(muons))),
-                                    (op.rng_len(muons)==0 , op.static_cast("std::size_t", op.c_int(0))),
-                                    (op.AND(op.rng_len(muons)==1 , op.rng_len(electrons)==1) , op.static_cast("std::size_t", op.c_int(1))),
-                                    (op.AND(op.rng_len(muons)>=2 , op.rng_len(electrons)==1), 
-                                            op.switch(op.AND(self.muon_conept[muons[0].idx]>self.electron_conept[electrons[0].idx],
-                                                             self.muon_conept[muons[1].idx]>self.electron_conept[electrons[0].idx]),
-                                                      op.static_cast("std::size_t", op.c_int(2)),
-                                                      op.static_cast("std::size_t", op.c_int(1)))),
-                                    (op.AND(op.rng_len(muons)==1 , op.rng_len(electrons)>=2),
-                                            op.switch(op.OR(self.muon_conept[muons[0].idx]>self.electron_conept[electrons[0].idx],
-                                                            self.muon_conept[muons[0].idx]>self.electron_conept[electrons[1].idx]),
-                                                      op.static_cast("std::size_t", op.c_int(1)),
-                                                      op.static_cast("std::size_t", op.c_int(0)))),
-                                    op.switch(self.muon_conept[muons[0].idx]>self.electron_conept[electrons[0].idx],
-                                              op.switch(self.muon_conept[muons[1].idx]>self.electron_conept[electrons[0].idx],
-                                                        op.static_cast("std::size_t", op.c_int(2)),
-                                                        op.static_cast("std::size_t", op.c_int(1))),
-                                              op.switch(self.muon_conept[muons[0].idx]>self.electron_conept[electrons[1].idx],
-                                                        op.static_cast("std::size_t", op.c_int(1)),
-                                                        op.static_cast("std::size_t", op.c_int(0))))
-                                                                            )]
-                return self.leadElectrons,self.leadMuons
+                self.ElElTightSel = op.combine(self.electronsTightSel, N=2)
+                self.MuMuTightSel = op.combine(self.muonsTightSel, N=2)
+                self.ElMuTightSel = op.combine((self.electronsTightSel,self.muonsTightSel))
 
-
-
-            if self.args.POGID:
-                self.leadElectronsTightSel = self.electronsTightSel[:op.multiSwitch(
-                    (op.AND(op.rng_len(self.electronsTightSel) == 2,op.rng_len(self.muonsTightSel) == 0), op.static_cast("std::size_t", op.c_int(2))),
-                    (op.AND(op.rng_len(self.electronsTightSel) == 0,op.rng_len(self.muonsTightSel) == 2), op.static_cast("std::size_t", op.c_int(0))),
-                    (op.AND(op.rng_len(self.electronsTightSel) == 1,op.rng_len(self.muonsTightSel) == 1), op.static_cast("std::size_t", op.c_int(1))),
-                    op.c_int(0))]
-                self.leadMuonsTightSel = self.muonsTightSel[:op.multiSwitch(
-                    (op.AND(op.rng_len(self.electronsTightSel) == 2,op.rng_len(self.muonsTightSel) == 0), op.static_cast("std::size_t", op.c_int(0))),
-                    (op.AND(op.rng_len(self.electronsTightSel) == 0,op.rng_len(self.muonsTightSel) == 2), op.static_cast("std::size_t", op.c_int(2))),
-                    (op.AND(op.rng_len(self.electronsTightSel) == 1,op.rng_len(self.muonsTightSel) == 1), op.static_cast("std::size_t", op.c_int(1))),
-                    op.c_int(0))]
-
-                #self.leadElectronsTightSel, self.leadMuonsTightSel = makeDLPair(self.electronsTightSel,self.muonsTightSel)
-
-                # Tight pair #
-                self.ElElDileptonTightSel = op.combine(self.leadElectronsTightSel,N=2)
-                self.MuMuDileptonTightSel = op.combine(self.leadMuonsTightSel,N=2)
-                self.ElMuDileptonTightSel = op.combine((self.leadElectronsTightSel,self.leadMuonsTightSel))
-                
-            if self.args.TTHIDLoose or self.args.TTHIDTight:
-                self.leadElectronsFakeSel, self.leadMuonsFakeSel = makeDLPair(self.electronsFakeSel,self.muonsFakeSel)
-
-                # Fakeable dilepton #
-                self.ElElDileptonFakeSel = op.combine(self.leadElectronsFakeSel, N=2)
-                self.MuMuDileptonFakeSel = op.combine(self.leadMuonsFakeSel, N=2)
-                self.ElMuDileptonFakeSel = op.combine((self.leadElectronsFakeSel,self.leadMuonsFakeSel))
-                    # Only use the containers with the leading fakeable leptons 
-
-                # Tight Dilepton : must also be Gen matched if MC #
-                lambda_dilepton_matched = lambda dilep : op.AND(self.lambda_is_matched(dilep[0]),self.lambda_is_matched(dilep[1]))
-                lambda_tightpair_ElEl = lambda dilep : op.AND(lambda_dilepton_matched(dilep),
-                                                              self.lambda_electronTightSel(dilep[0]),
-                                                              self.lambda_electronTightSel(dilep[1]))
-                lambda_tightpair_MuMu = lambda dilep : op.AND(lambda_dilepton_matched(dilep),
-                                                              self.lambda_muonTightSel(dilep[0]),
-                                                              self.lambda_muonTightSel(dilep[1]))
-                lambda_tightpair_ElMu = lambda dilep : op.AND(lambda_dilepton_matched(dilep),
-                                                              self.lambda_electronTightSel(dilep[0]),
-                                                              self.lambda_muonTightSel(dilep[1]))
-
-
-                self.ElElDileptonTightSel = op.select(self.ElElDileptonFakeSel, pred=lambda_tightpair_ElEl)
-                self.MuMuDileptonTightSel = op.select(self.MuMuDileptonFakeSel, pred=lambda_tightpair_MuMu)
-                self.ElMuDileptonTightSel = op.select(self.ElMuDileptonFakeSel, pred=lambda_tightpair_ElMu)
-                    # Because self.*DileptonFakeSel has len <= 1 , self.*DileptonTightSel will have length of 0 or 1
-
-                # Fake Extrapolation dilepton #
-                lambda_fakepair_ElEl = lambda dilep : op.AND(lambda_dilepton_matched(dilep),
-                                                             op.NOT(op.AND(self.lambda_electronTightSel(dilep[0]),
-                                                                           self.lambda_electronTightSel(dilep[1]))))
-                lambda_fakepair_MuMu = lambda dilep : op.AND(lambda_dilepton_matched(dilep),
-                                                             op.NOT(op.AND(self.lambda_muonTightSel(dilep[0]),
-                                                                           self.lambda_muonTightSel(dilep[1]))))
-                lambda_fakepair_ElMu = lambda dilep : op.AND(lambda_dilepton_matched(dilep),
-                                                             op.NOT(op.AND(self.lambda_electronTightSel(dilep[0]),
-                                                                           self.lambda_muonTightSel(dilep[1]))))
-            
-                self.ElElDileptonFakeExtrapolationSel = op.select(self.ElElDileptonFakeSel, pred=lambda_fakepair_ElEl)
-                self.MuMuDileptonFakeExtrapolationSel = op.select(self.MuMuDileptonFakeSel, pred=lambda_fakepair_MuMu)
-                self.ElMuDileptonFakeExtrapolationSel = op.select(self.ElMuDileptonFakeSel, pred=lambda_fakepair_ElMu)
-
-        #----- Needed only for SL -----#
-        if channel == "SL":
-            # Same issues as DL 
-            # We want self.leadElectronsFakeSel to have rng_len of [0,1] and self.leadMuonssFakeSel have rng_len of [0,1]
-            # Such that the two containers have a combined rng_len of at most 1 (0 when no fakeable lepton)
-            self.leadElectronFakeSel = self.electronsFakeSel[:op.multiSwitch(
-                            (op.rng_len(self.muonsFakeSel)==0 , op.min(op.static_cast("std::size_t", op.c_int(1)), op.rng_len(self.electronsFakeSel))),
-                                # No muon -> take the first electron, or zero if empty
-                            (op.rng_len(self.electronsFakeSel)==0 , op.static_cast("std::size_t", op.c_int(0))),
-                                # No electron -> slice at 0
-                            # else : at least one electron and one muon, check the leading in conept
-                            op.switch(self.electron_conept[self.electronsFakeSel[0].idx]>self.muon_conept[self.muonsFakeSel[0].idx],
-                                      op.static_cast("std::size_t", op.c_int(1)), # electron is leading, take the first
-                                      op.static_cast("std::size_t", op.c_int(0))) # muon is leading, take no electron
-                                                                        )]
-            self.leadMuonFakeSel = self.muonsFakeSel[:op.multiSwitch(
-                            (op.rng_len(self.electronsFakeSel)==0 , op.min(op.static_cast("std::size_t", op.c_int(1)), op.rng_len(self.muonsFakeSel))),
-                                # No electron -> take the first muon, or zero if empty
-                            (op.rng_len(self.muonsFakeSel)==0 , op.static_cast("std::size_t", op.c_int(0))),
-                                # No muon -> slice at 0
-                            # else : at least one electron and one muon, check the leading in conept
-                            op.switch(self.muon_conept[self.muonsFakeSel[0].idx]>self.electron_conept[self.electronsFakeSel[0].idx],
-                                      op.static_cast("std::size_t", op.c_int(1)), # muon is leading, take the first
-                                      op.static_cast("std::size_t", op.c_int(0))) # electron is leading, take no muon
-                                                                        )]
-
-            # Tight selection #
-            # Only one the fakeable leading lepton
-            lambda_tight_ele = lambda ele : op.AND(self.lambda_is_matched(ele) , self.lambda_electronTightSel(ele))
-            lambda_tight_mu  = lambda mu  : op.AND(self.lambda_is_matched(mu)  , self.lambda_muonTightSel(mu))
-
-            self.leadElectronTightSel = op.select(self.leadElectronFakeSel, pred=lambda_tight_ele)
-            self.leadMuonTightSel     = op.select(self.leadMuonFakeSel, pred=lambda_tight_mu)
-
-            # Fake Extrapolation selection [prompt]#
-
-            lambda_fake_ele = lambda ele : op.AND(self.lambda_is_matched(ele) , op.NOT(self.lambda_electronTightSel(ele)))
-            lambda_fake_mu  = lambda mu  : op.AND(self.lambda_is_matched(mu)  , op.NOT(self.lambda_muonTightSel(mu)))
-
-            self.leadElectronFakeExtrapolationSel = op.select(self.leadElectronFakeSel, pred=lambda_fake_ele)
-            self.leadMuonFakeExtrapolationSel     = op.select(self.leadMuonFakeSel, pred=lambda_fake_mu)
-                # NOTE 
-                # Given that self.lead*FakeSel has len of 0 or 1, by definition we have :
-                #       len(self.lead*TightSel) + len(self.lead*FakeExtrapolationSel) <= 1
-                #           (can be 0 for MC where the lepton is not genMatched)
-                # SR : len(self.lead*TightSel) == 1
-                # Fake CR : len(self.lead*FakeExtrapolationSel) == 1 
-            # Fake Extrapolation selection [non-prompt]#
-            lambda_fake_ele_nonPrompt = lambda ele : op.AND(op.NOT(self.lambda_is_matched(ele)) , op.NOT(self.lambda_electronTightSel(ele)))
-            lambda_fake_mu_nonPrompt  = lambda mu  : op.AND(op.NOT(self.lambda_is_matched(mu))  , op.NOT(self.lambda_muonTightSel(mu)))
-
-            self.leadElectronFakeExtrapolationSel_nonPrompt = op.select(self.leadElectronFakeSel, pred=lambda_fake_ele_nonPrompt)
-            self.leadMuonFakeExtrapolationSel_nonPrompt     = op.select(self.leadMuonFakeSel, pred=lambda_fake_mu_nonPrompt)
+        #############################################################################
+        #                               Triggers                                    #
+        #############################################################################
+        #----- Genweight -----#
+        if self.is_MC:
+            noSel = noSel.refine("genWeight", weight=t.genWeight)
+          
+        #----- Trigger mask for data -----#
+        if not self.is_MC:
+            if era == "2018": # For 2018 the electron samples are merged, need to build according dict for primary dataset
+                trigger_per_pd = { pd : trig for pd, trig in self.triggersPerPrimaryDataset.items() if pd not in ("SingleElectron", "DoubleEGamma") } 
+                trigger_per_pd["EGamma"] = self.triggersPerPrimaryDataset["SingleElectron"] + self.triggersPerPrimaryDataset["DoubleEGamma"]
+                noSel = noSel.refine("DataMaskTriggers", cut=[makeMultiPrimaryDatasetTriggerSelection(sample, trigger_per_pd)])
+            else:
+                noSel = noSel.refine("DataMaskTriggers", cut=[makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset)])
+            # makeMultiPrimaryDatasetTriggerSelection must be done first, to make sure an event is not passed several times from several datasets
+            # Then the trigger selection is based on fakeable leptons
 
         ##############################################################################
         #                                  Tau                                       #
@@ -1165,6 +989,18 @@ One lepton and and one jet argument must be specified in addition to the require
             self.lambda_tauClean = lambda ta : op.c_float(True)
         self.tauCleanSel = op.select(self.tauSel, self.lambda_tauClean)
 
+
+        ##############################################################################
+        #                             Jets forceDefines                              #
+        ##############################################################################
+        # Forcedefine : calculate once per event (for every event) #
+        if not self.args.Synchronization:
+            #forceDefine(t._Muon.calcProd, noSel) # Muons for Rochester corrections
+            forceDefine(t._Jet.calcProd, noSel)  # Jets for configureJets
+            forceDefine(getattr(t, "_{0}".format("MET" if era != "2017" else "METFixEE2017")).calcProd,noSel) # MET for configureMET
+        else:
+            print ("No jet corrections applied")
+
         #############################################################################
         #                                AK4 Jets                                   #
         #############################################################################
@@ -1180,9 +1016,47 @@ One lepton and and one jet argument must be specified in addition to the require
             self.lambda_cleanAk4Jets = lambda j : op.AND(op.NOT(op.rng_any(self.electronsTightSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.4 )), 
                                                          op.NOT(op.rng_any(self.muonsTightSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.4 )))
         elif self.args.TTHIDLoose or self.args.TTHIDTight:
-            self.lambda_cleanAk4Jets = lambda j : op.AND(op.NOT(op.rng_any(self.electronsFakeSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.4 )), 
-                                                         op.NOT(op.rng_any(self.muonsFakeSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.4 )))
-            # remove jets within cone of DR<0.4 of preselected electrons and muons
+            if channel == 'SL':
+                def returnLambdaCleaningWithRespectToLeadingLepton(DR):
+                   return lambda j : op.multiSwitch(
+                            (op.AND(op.rng_len(self.electronsFakeSel) >= 1, op.rng_len(self.muonsFakeSel) == 0), op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR),
+                            (op.AND(op.rng_len(self.electronsFakeSel) == 0, op.rng_len(self.muonsFakeSel) >= 1), op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR),
+                            (op.AND(op.rng_len(self.muonsFakeSel) >= 1, op.rng_len(electrons) >= 1),
+                                   op.switch(self.electron_conept[self.electronsFakeSel[0].idx] >= self.muon_conept[self.muonsFakeSel[0].idx],
+                                             op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR,
+                                             op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR)),
+                            op.c_bool(True))
+                self.lambda_cleanAk4Jets = returnLambdaCleaningWithRespectToLeadingLepton(0.4)
+
+            # remove jets within cone of DR<0.4 of leading lept
+            if channel == 'DL':
+                def returnLambdaCleaningWithRespectToLeadingLeptons(DR):
+                    return lambda j : op.multiSwitch(
+                          (op.AND(op.rng_len(self.electronsFakeSel) >= 2,op.rng_len(self.muonsFakeSel) == 0), 
+                              op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[1].p4)>=DR)),
+                          (op.AND(op.rng_len(self.electronsFakeSel) == 0,op.rng_len(self.muonsFakeSel) >= 2), 
+                              op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[1].p4)>=DR)),
+                          (op.AND(op.rng_len(self.electronsFakeSel) >= 1,op.rng_len(self.muonsFakeSel) >= 1),
+                              op.switch(self.electron_conept[self.electronsFakeSel[0].idx] >= self.muon_conept[self.muonsFakeSel[0].idx],
+                                        # Electron is leading #
+                                        op.multiSwitch((op.rng_len(self.electronsFakeSel) >= 2, op.rng_len(self.muonsFakeSel) == 1,
+                                                            op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[1].p4)>=DR)),
+                                                       (op.rng_len(self.electronsFakeSel) == 1, op.rng_len(self.muonsFakeSel) >= 2,
+                                                            op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR)),
+                                                       op.switch(self.electron_conept[self.electronsFakeSel[1].idx] >= self.muon_conept[self.muonsFakeSel[0].idx],
+                                                                 op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[1].p4)>=DR),
+                                                                 op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR))),
+                                        # Muon is leading #
+                                        op.multiSwitch((op.rng_len(self.muonsFakeSel) >= 2, op.rng_len(self.electronsFakeSel) == 1,
+                                                            op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[1].p4)>=DR)),
+                                                       (op.rng_len(self.muonsFakeSel) == 1, op.rng_len(self.electronsFakeSel) >= 2,
+                                                            op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR)),
+                                                       op.switch(self.muon_conept[self.muonsFakeSel[1].idx] >= self.electron_conept[self.electronsFakeSel[0].idx],
+                                                                 op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[1].p4)>=DR),
+                                                                 op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR))))),
+                           op.c_bool(True))
+                self.lambda_cleanAk4Jets = returnLambdaCleaningWithRespectToLeadingLeptons(0.4)
+            
         else:
             self.lambda_cleanAk4Jets = lambda j : op.c_float(True)
         self.ak4Jets = op.select(self.ak4JetsPreSel,self.lambda_cleanAk4Jets) # Pt ordered
@@ -1217,8 +1091,8 @@ One lepton and and one jet argument must be specified in addition to the require
         self.lambda_ak8JetsPreSel = lambda j : op.AND(j.jetId & 1 if era == "2016" else j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
                                                       j.pt >= 200.,
                                                       op.abs(j.p4.Eta())<= 2.4,
-                                                      op.AND(j.subJet1._idx.result != -1, j.subJet1.pt >= 20. , op.abs(j.subJet1.eta)<=2.4,
-                                                             j.subJet2._idx.result != -1, j.subJet2.pt >= 20. , op.abs(j.subJet2.eta)<=2.4),
+                                                      op.AND(j.subJet1.isValid, j.subJet1.pt >= 20. , op.abs(j.subJet1.eta)<=2.4,
+                                                             j.subJet2.isValid, j.subJet2.pt >= 20. , op.abs(j.subJet2.eta)<=2.4),
                                                              # Fatjet subjets must exist before checking Pt and eta 
                                                       op.AND(j.msoftdrop >= 30, j.msoftdrop <= 210),
                                                       j.tau2/j.tau1 <= 0.75)
@@ -1228,8 +1102,10 @@ One lepton and and one jet argument must be specified in addition to the require
             self.lambda_cleanAk8Jets = lambda j : op.AND(op.NOT(op.rng_any(self.electronsTightSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.8 )), 
                                                          op.NOT(op.rng_any(self.muonsTightSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.8 )))
         elif self.args.TTHIDLoose or self.args.TTHIDTight:
-            self.lambda_cleanAk8Jets = lambda j : op.AND(op.NOT(op.rng_any(self.electronsFakeSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.8 )), 
-                                                         op.NOT(op.rng_any(self.muonsFakeSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.8 )))
+            if channel == 'SL':
+                self.lambda_cleanAk8Jets = returnLambdaCleaningWithRespectToLeadingLepton(0.8)
+            if channel == 'DL':
+                self.lambda_cleanAk8Jets = returnLambdaCleaningWithRespectToLeadingLeptons(0.8)
         # remove jets within cone of DR<0.8 of preselected electrons and muons
         else:
             self.lambda_cleanAk8Jets = lambda j : op.c_float(True)
@@ -1269,8 +1145,10 @@ One lepton and and one jet argument must be specified in addition to the require
             self.lambda_cleanVBFLeptons = lambda j : op.AND(op.NOT(op.rng_any(self.electronsTightSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.4 )), 
                                                             op.NOT(op.rng_any(self.muonsTightSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.4 )))
         elif self.args.TTHIDLoose or self.args.TTHIDTight:
-            self.lambda_cleanVBFLeptons = lambda j : op.AND(op.NOT(op.rng_any(self.electronsFakeSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.4 )), 
-                                                            op.NOT(op.rng_any(self.muonsFakeSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.4 )))
+            if channel == 'SL':
+                self.lambda_cleanVBFLeptons = returnLambdaCleaningWithRespectToLeadingLepton(0.4)
+            if channel == 'DL':
+                self.lambda_cleanVBFLeptons = returnLambdaCleaningWithRespectToLeadingLeptons(0.4)
         else:
             self.lambda_cleanVBFLeptons = lambda j : op.c_bool(True)
 
@@ -1291,101 +1169,16 @@ One lepton and and one jet argument must be specified in addition to the require
         self.VBFJetPairsBoosted  = op.sort(op.combine(self.VBFJetsBoosted,  N=2, pred=self.lambda_VBFPair), lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
 
         #############################################################################
-        #                               Triggers                                    #
-        #############################################################################
-        #----- Genweight -----#
-        if self.is_MC:
-            noSel = noSel.refine("genWeight", weight=t.genWeight)
-
-        triggerRanges = returnTriggerRanges(era)
-        #----- Select triggers -----#
-        def returnTriggers(keys):
-            # MC : just OR the different paths 
-            if self.is_MC or self.isNanov7:
-                return op.OR(*[trig for k in keys for trig in self.triggersPerPrimaryDataset[k]])
-            else: # Only for NanoV6
-                # Data : due to bug in NanoAOD production, check that the event run number is inside the ranges computed by bricalc
-                conversion = {'SingleElectron':'1e','SingleMuon':'1mu','MuonEG':'1e1mu','DoubleEGamma':'2e','DoubleMuon':'2mu'}
-                list_cond = []
-                for trigKey in keys:
-                    rangekey = conversion[trigKey]
-                    rangeDict = {triggerRanges[rangekey][i]['name']:triggerRanges[rangekey][i]['runs'] for i in range(len(triggerRanges[rangekey]))}
-                    listTrig = self.triggersPerPrimaryDataset[trigKey]
-                    trigNames = [trig._parent.name for trig in listTrig]
-                    for trig,trigName in zip(listTrig,trigNames):
-                        trigRanges = rangeDict[trigName]
-                        list_cond.append(op.AND(trig,op.OR(*[op.in_range(r[0]-1,t.run,r[1]+1) for r in trigRanges])))
-                            # BEWARE : op.in_range is boundaries excluded !!! (hence extension via -1 and +1)
-                return op.OR(*list_cond)
-
-        # NOTE 
-        # For DL the naming convention is self.leadElectronsFakeSel and self.leadMuonsFakeSel (with an "s")
-        # For SL it is self.leadElectronFakeSel and self.leadMuonFakeSel (without "s")
-
-        if channel == "DL":
-            # Select correct triggers #
-            if self.args.POGID:
-                self.triggers = op.multiSwitch((op.rng_len(self.leadElectronsTightSel)==2 , returnTriggers(["SingleElectron","DoubleEGamma"])),
-                                                      # 2 fakeable electrons as leading
-                                                (op.AND(op.rng_len(self.leadElectronsTightSel)==1,op.rng_len(self.leadMuonsTightSel)==1) , returnTriggers(["SingleMuon","SingleElectron","MuonEG"])),
-                                                      # 1 fakeable electron + 1 fakeable muon as leading
-                                                (op.rng_len(self.leadMuonsTightSel)==2 , returnTriggers(["SingleMuon","DoubleMuon"])),
-                                                      # 2 fakeable muons as leading
-                                                op.c_bool(False))
-                                                      # Number of fakeable leptons < 2 : not selected
-
-            if self.args.TTHIDLoose or self.args.TTHIDTight:
-                self.triggers = op.multiSwitch((op.rng_len(self.leadElectronsFakeSel)>=2 , returnTriggers(["SingleElectron","DoubleEGamma"])),
-                                                      # 2 fakeable electrons as leading
-                                                (op.AND(op.rng_len(self.leadElectronsFakeSel)>=1,op.rng_len(self.leadMuonsFakeSel)>=1) , returnTriggers(["SingleMuon","SingleElectron","MuonEG"])),
-                                                      # 1 fakeable electron + 1 fakeable muon as leading
-                                                (op.rng_len(self.leadMuonsFakeSel)>=2 , returnTriggers(["SingleMuon","DoubleMuon"])),
-                                                      # 2 fakeable muons as leading
-                                                op.c_bool(False))
-                                                      # Number of fakeable leptons < 2 : not selected
-        if channel == "SL":
-            # Select correct triggers #
-            self.triggers = op.multiSwitch((op.rng_len(self.leadElectronFakeSel)==1 , returnTriggers(["SingleElectron"])),
-                                           (op.rng_len(self.leadMuonFakeSel)==1 , returnTriggers(["SingleMuon"])),
-                                           op.c_bool(False)) # In principle does not happen
-                             # Keep in mind either op.rng_len(self.leadElectronFakeSel)==1 or op.rng_len(self.leadMuonFakeSel)==1 but not both
-                             # If both ... I made a mistake
-
-        #----- Apply triggers -----#
-        if not self.inclusive_sel:
-            # Fakeable cut #
-            if channel == "DL":
-                # Make sure to have at least two fakeable leptons #
-                if self.args.POGID:
-                    noSel = noSel.refine("has2TightLeptons", cut = [op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel) == 2])
-                if self.args.TTHIDLoose or self.args.TTHIDTight:
-                    noSel = noSel.refine("hasAtLeast2FakeableLeptons", cut = [op.rng_len(self.electronsFakeSel)+op.rng_len(self.muonsFakeSel) >= 2])
-            if channel == "SL":
-                # Make sure to have at least one fakeable lepton #
-                noSel = noSel.refine("hasAtLeast1FakeableLepton", cut = [op.rng_len(self.electronsFakeSel)+op.rng_len(self.muonsFakeSel) >= 1])
-            # Triggers #
-            if self.is_MC:
-                noSel = noSel.refine("withTrig", cut=self.triggers)
-            else:
-                if era == "2018": # For 2018 the electron samples are merged, need to build according dict for primary dataset
-                    trigger_per_pd = { pd : trig for pd, trig in self.triggersPerPrimaryDataset.items() if pd not in ("SingleElectron", "DoubleEGamma") } 
-                    trigger_per_pd["EGamma"] = self.triggersPerPrimaryDataset["SingleElectron"] + self.triggersPerPrimaryDataset["DoubleEGamma"]
-                    noSel = noSel.refine("withTrig", cut=[makeMultiPrimaryDatasetTriggerSelection(sample, trigger_per_pd), self.triggers])
-                else:
-                    noSel = noSel.refine("withTrig", cut=[makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset), self.triggers])
-                # makeMultiPrimaryDatasetTriggerSelection must be done first, to make sure an event is not passed several times from several datasets
-                # Then the trigger selection is based on fakeable leptons
-
-        #############################################################################
         #                             Scalefactors                                  #
         #############################################################################
         self.SF = ScaleFactorsbbWW()    
         if self.is_MC:
             #---- PU ID SF ----#
-            self.jetpuid_sf_eff = self.SF.get_scalefactor("lepton", ('jet_puid','eff_sf_{}_L'.format(era)),combine="weight", systName="jetpuid_eff_sf", defineOnFirstUse=(not forSkimmer))
-            self.jetpuid_sf_mis = self.SF.get_scalefactor("lepton", ('jet_puid','mistag_sf_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag_sf", defineOnFirstUse=(not forSkimmer))
-            self.jetpuid_mc_eff = self.SF.get_scalefactor("lepton", ('jet_puid','eff_mc_{}_L'.format(era)),combine="weight", systName="jetpuid_eff_mc", defineOnFirstUse=(not forSkimmer))
-            self.jetpuid_mc_mis = self.SF.get_scalefactor("lepton", ('jet_puid','mistag_mc_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag_mc", defineOnFirstUse=(not forSkimmer))
+            # Efficiency and mistags do not have uncertainties, the systematics are in the SF 
+            self.jetpuid_mc_eff = self.SF.get_scalefactor("lepton", ('jet_puid_eff','eff_{}_L'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer))
+            self.jetpuid_mc_mis = self.SF.get_scalefactor("lepton", ('jet_puid_eff','mistag_{}_L'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer))
+            self.jetpuid_sf_eff = self.SF.get_scalefactor("lepton", ('jet_puid_sf','eff_{}_L'.format(era)),combine="weight", systName="jetpuid_eff_sf", defineOnFirstUse=(not forSkimmer))
+            self.jetpuid_sf_mis = self.SF.get_scalefactor("lepton", ('jet_puid_sf','mistag_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag_sf", defineOnFirstUse=(not forSkimmer))
 
             #---- Object SF -----# (Will take as argument the era)
             ####  Muons ####
@@ -1555,7 +1348,6 @@ One lepton and and one jet argument must be specified in addition to the require
         #                           Jet PU ID reweighting                           #
         #############################################################################
         if self.is_MC and not self.args.DYStitchingPlots and not self.args.WJetsStitchingPlots:
-            # TODO : add systematic variations 
             ak4Jets_below50 = op.select(self.ak4Jets, lambda j : j.pt < 50.)
             wFail = op.extMethod("scalefactorWeightForFailingObject", returnType="double")
             puid_reweighting = op.rng_product(ak4Jets_below50, lambda j : op.switch(j.genJet.isValid,
@@ -1565,7 +1357,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                                     op.switch(((j.puId >> 2) & 1),
                                                                                               self.jetpuid_sf_mis(j), 
                                                                                               wFail(self.jetpuid_sf_mis(j), self.jetpuid_mc_mis(j)))))
-            noSel.refine("jetPUIDReweighting",weight=puid_reweighting)
+            noSel = noSel.refine("jetPUIDReweighting",weight=puid_reweighting)
 
         
         #############################################################################
@@ -1673,7 +1465,6 @@ One lepton and and one jet argument must be specified in addition to the require
 
                 self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
                                                                 numJets  = op.rng_len(self.ak4Jets),
-                                                                systName = 'btag_ratio',
                                                                 nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
                 noSel = noSel.refine("BtagAk4SF" , weight = [self.btagAk4SF,self.BtagRatioWeight])
 
@@ -1732,8 +1523,32 @@ One lepton and and one jet argument must be specified in addition to the require
 #                                                                                wFail(self.DeepCsvSubjetMediumSF(subjet),self.Ak8Eff_lightjets(subjet))))     # Not tagged : return (1-SF_jxeff_j)/(1-eff_j)
 #                self.ak8BtagReweighting = op.rng_product(self.ak8Jets, lambda j : lambda_subjetWeight(j.subJet1)*lambda_subjetWeight(j.subJet2))
 #                noSel = noSel.refine("BtagAk8SF" , weight = [self.ak8BtagReweighting])
-                                                                     
-
-
+       
         # Return #
         return noSel
+
+
+
+    ###########################################################################
+    #                            Lepton triggers                              #
+    ###########################################################################
+    def returnTriggers(self,keys):
+        triggerRanges = returnTriggerRanges(self.era)
+        # MC : just OR the different paths 
+        if self.is_MC or self.isNanov7:
+            return op.OR(*[trig for k in keys for trig in self.triggersPerPrimaryDataset[k]])
+        else: # Only for NanoV6
+            # Data : due to bug in NanoAOD production, check that the event run number is inside the ranges computed by bricalc
+            conversion = {'SingleElectron':'1e','SingleMuon':'1mu','MuonEG':'1e1mu','DoubleEGamma':'2e','DoubleMuon':'2mu'}
+            list_cond = []
+            for trigKey in keys:
+                rangekey = conversion[trigKey]
+                rangeDict = {triggerRanges[rangekey][i]['name']:triggerRanges[rangekey][i]['runs'] for i in range(len(triggerRanges[rangekey]))}
+                listTrig = self.triggersPerPrimaryDataset[trigKey]
+                trigNames = [trig._parent.name for trig in listTrig]
+                for trig,trigName in zip(listTrig,trigNames):
+                    trigRanges = rangeDict[trigName]
+                    list_cond.append(op.AND(trig,op.OR(*[op.in_range(r[0]-1,t.run,r[1]+1) for r in trigRanges])))
+                        # BEWARE : op.in_range is boundaries excluded !!! (hence extension via -1 and +1)
+            return op.OR(*list_cond)
+
