@@ -280,14 +280,14 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         #---------------------------------------------------------------------------------------#
 
         #----- MET variables -----#
-        MET = self.corrMET
-
+#        MET = self.corrMET
+#
 #        varsToKeep['MET_pt']  = MET.pt
 #        varsToKeep['MET_phi']  = MET.phi
-        varsToKeep['met_E'] = MET.p4.E()
-        varsToKeep['met_Px'] = MET.p4.Px()
-        varsToKeep['met_Py'] = MET.p4.Py()
-        varsToKeep['met_Pz'] = MET.p4.Pz()
+#        varsToKeep['met_E'] = MET.p4.E()
+#        varsToKeep['met_Px'] = MET.p4.Px()
+#        varsToKeep['met_Py'] = MET.p4.Py()
+#        varsToKeep['met_Pz'] = MET.p4.Pz()
 
         #----- Lepton variables -----#
         if self.args.Channel is None:
@@ -464,7 +464,7 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
 #            varsToKeep['n_ak8'] = op.static_cast("UInt_t",op.rng_len(self.ak8Jets))
 #            varsToKeep['n_ak8_btag'] = op.static_cast("UInt_t",op.rng_len(self.ak8BJets))
 
-        if any([self.args.__dict__[item] for item in ["Boosted1Btag","Resolved1Btag","Resolved2Btag"]]):
+        if any([self.args.__dict__[item] for item in ["Boosted0Btag","Boosted1Btag","Resolved0Btag","Resolved1Btag","Resolved2Btag"]]):
 
             varsToKeep['n_ak4'] = op.static_cast("UInt_t",op.rng_len(self.ak4Jets))
             varsToKeep['n_ak4_btag'] = op.static_cast("UInt_t",op.rng_len(self.ak4BJets))
@@ -480,41 +480,51 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                                                 jets = self.ak4Jets)
             inputsMET =      returnMETMVAInputs(self = self,
                                                 met  = self.corrMET)     
-            inputsHL = returnHighLevelMVAInputs(self      = self,
-                                                l1        = l1,
-                                                l2        = l2,
-                                                b1        = j1,
-                                                b2        = j2,
-                                                met       = self.corrMET,
-                                                jets      = self.ak4Jets,
-                                                electrons = self.electronsTightSel,
-                                                muons     = self.muonsTightSel,
-                                                channel   = self.args.Channel)
+            inputsFatjet =  returnFatjetMVAInputs(self      = self,
+                                                  fatjets   = self.ak8Jets)
+            inputsHL = returnHighLevelMVAInputs08(self      = self,
+                                                  l1        = l1,
+                                                  l2        = l2,
+                                                  met       = self.corrMET,
+                                                  jets      = self.ak4Jets,
+                                                  bjets     = self.ak4JetsByBtagScore[:op.multiSwitch((op.rng_len(self.ak4JetsByBtagScore)==0,op.static_cast("std::size_t", op.c_int(0))),
+                                                                                                      (op.rng_len(self.ak4JetsByBtagScore)==1,op.static_cast("std::size_t", op.c_int(1))),
+                                                                                                      op.static_cast("std::size_t", op.c_int(2)))],
+                                                  electrons = self.electronsTightSel,
+                                                  muons     = self.muonsTightSel,
+                                                  channel   = self.args.Channel)
+            #inputsHL = returnHighLevelMVAInputs(self      = self,
+            #                                    l1        = l1,
+            #                                    l2        = l2,
+            #                                    b1        = j1,
+            #                                    b2        = j2,
+            #                                    met       = self.corrMET,
+            #                                    jets      = self.ak4Jets,
+            #                                    electrons = self.electronsTightSel,
+            #                                    muons     = self.muonsTightSel,
+            #                                    channel   = self.args.Channel)
             inputsParam = returnParamMVAInputs(self)
             inputsEventNr = returnEventNrMVAInputs(self,t)
 
-            inputs = {**inputsLeps,**inputsJets,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
+            inputs = {**inputsLeps,**inputsJets,**inputsFatjet,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
             for (varname,_,_),var in inputs.items():
                 varsToKeep[varname] = var
 
-            if any([self.args.__dict__[item] for item in ["Resolved1Btag","Resolved2Btag"]]):
-                path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','07','model','model.pb')
-                nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
-                print ("DNN model : %s"%path_model)
-                if not os.path.exists(path_model):
-                    raise RuntimeError('Could not find model file %s'%path_model)
-                try:
-                    input_names = ["input_1","input_2","input_3","input_4","input_5","input_6"]
-                    output_name = "Identity"
-                    DNN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
-                except:
-                    raise RuntimeError('Could not load model %s'%path_model)
-                outputs = DNN(*inputs.values())
-                for node, output in zip(nodes,outputs): 
-                    varsToKeep[node] = output
-
-
-
+            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','08','model','model.pb')
+            nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
+            print ("DNN model : %s"%path_model)
+            if not os.path.exists(path_model):
+                raise RuntimeError('Could not find model file %s'%path_model)
+            try:
+                #input_names = ["input_1","input_2","input_3","input_4","input_5","input_6"]
+                input_names = ["lep","jet","fat","met","hl","param","eventnr"]
+                output_name = "Identity"
+                DNN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
+            except:
+                raise RuntimeError('Could not load model %s'%path_model)
+            outputs = DNN(*inputs.values())
+            for node, output in zip(nodes,outputs): 
+                varsToKeep[node] = output
 
         #----- Additional variables -----#
         varsToKeep["MC_weight"]         = t.genWeight
