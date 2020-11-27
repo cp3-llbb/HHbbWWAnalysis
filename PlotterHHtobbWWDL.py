@@ -402,40 +402,34 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         #----- Machine Learning plots -----#
         selObjectDictList = []
-        bjetsCont = {}
-        nbtagconv = {}
         #if not self.args.OnlyYield:
         if True: # TODO : fix
-            if "Ak4" in jetplot_level:
-                selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjAk4Jets})
-                selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjAk4Jets})
-                selObjectDictList.append({'channel':'ElMu','selObject':ElMuSelObjAk4Jets})
             if "Resolved0Btag" in jetplot_level:
                 selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjAk4JetsExclusiveResolvedNoBtag})
                 selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjAk4JetsExclusiveResolvedNoBtag})
                 selObjectDictList.append({'channel':'ElMu','selObject':ElMuSelObjAk4JetsExclusiveResolvedNoBtag})
-                bjetsCont['NoBtag'] = container0b2j
-                nbtagconv['NoBtag'] = 0
             if "Resolved1Btag" in jetplot_level:
                 selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjAk4JetsExclusiveResolvedOneBtag})
                 selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjAk4JetsExclusiveResolvedOneBtag})
                 selObjectDictList.append({'channel':'ElMu','selObject':ElMuSelObjAk4JetsExclusiveResolvedOneBtag})
-                bjetsCont['OneBtag'] = container1b1j
-                nbtagconv['OneBtag'] = 1
             if "Resolved2Btag" in jetplot_level:
                 selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjAk4JetsExclusiveResolvedTwoBtags})
                 selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjAk4JetsExclusiveResolvedTwoBtags})
                 selObjectDictList.append({'channel':'ElMu','selObject':ElMuSelObjAk4JetsExclusiveResolvedTwoBtags})
-                bjetsCont['TwoBtags'] = container2b0j
-                nbtagconv['TwoBtags'] = 2
+            if "Boosted0Btag" in jetplot_level:
+                selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjAk8JetsInclusiveBoostedNoBtag})
+                selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjAk8JetsInclusiveBoostedNoBtag})
+                selObjectDictList.append({'channel':'ElMu','selObject':ElMuSelObjAk8JetsInclusiveBoostedNoBtag})
+            if "Boosted1Btag" in jetplot_level:
+                selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjAk8JetsInclusiveBoostedOneBtag})
+                selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjAk8JetsInclusiveBoostedOneBtag})
+                selObjectDictList.append({'channel':'ElMu','selObject':ElMuSelObjAk8JetsInclusiveBoostedOneBtag})
 
         dileptonsCont = {'ElEl':OSElElDilepton[0],'MuMu':OSMuMuDilepton[0],'ElMu':OSElMuDilepton[0]}
         self.nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
         
         for selObjectDict in selObjectDictList:
             dilepton = dileptonsCont[selObjectDict['channel']]
-            resolved_str = [res_str for res_str in bjetsCont.keys() if res_str in selObjectDict["selObject"].selName][0]
-            dibjet = bjetsCont[resolved_str]
 
             yields.add(selObjectDict['selObject'].sel,title=selObjectDict['selObject'].yieldTitle)
 
@@ -448,14 +442,13 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             inputsMET =      returnMETMVAInputs(self      = self,
                                                 met       = self.corrMET)     
             inputsFatjet =  returnFatjetMVAInputs(self      = self,
-                                                  fatjets   = container1fatb)
-            inputsHL = returnHighLevelMVAInputs(self      = self,
+                                                  fatjets   = self.ak8Jets)
+            inputsHL = returnHighLevelMVAInputs08(self      = self,
                                                 l1        = dilepton[0],
                                                 l2        = dilepton[1],
-                                                b1        = dibjet[0],
-                                                b2        = dibjet[1],
                                                 met       = self.corrMET,
                                                 jets      = self.ak4Jets,
+                                                bjets     = self.ak4BJets,
                                                 electrons = self.electronsTightSel,
                                                 muons     = self.muonsTightSel,
                                                 channel   = selObjectDict['channel'])
@@ -470,13 +463,13 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             #print ("Param variables  : %d"%len(inputsParam))
             #print ("Event variables  : %d"%len(inputsEventNr))
 
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLeps))
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets))
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsMET))
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL))
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam))
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsEventNr))
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLeps))
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets))
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsMET))
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL))
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam))
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsEventNr))
             
             for model_num,DNN in DNNs.items():
                 if model_num in ["01","02"]:
