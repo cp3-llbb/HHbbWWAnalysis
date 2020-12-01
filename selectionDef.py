@@ -15,10 +15,11 @@ class SelectionObject:
         yieldTitle  : Title for the yield table in LateX
         NB : copy() might be useful to be able to branch out the selection
     """
-    def __init__(self,sel,selName,yieldTitle):
+    def __init__(self,sel,selName,yieldTitle,yieldObj=None):
         self.sel        = sel
         self.selName    = selName
         self.yieldTitle = yieldTitle
+        self.yieldObj   = yieldObj
     
     def refine(self,cut=None,weight=None,autoSyst=True):
         """
@@ -28,6 +29,7 @@ class SelectionObject:
                                    cut     = cut,
                                    weight  = weight,
                                    autoSyst= autoSyst)
+        self._makeYield()
 
     def create(self, ddSuffix, cut=None, weight=None, ddCut=None, ddWeight=None, autoSyst=True, enable=True):
         """
@@ -42,14 +44,13 @@ class SelectionObject:
                                                   ddWeight = ddWeight,
                                                   autoSyst = autoSyst,
                                                   enable   = enable)
+        self._makeYield()
 
-    def makeYield(self,yieldObject):
+    def _makeYield(self):
         """
         Record an entry in the yield table 
         """
-        yieldObject.addYield(sel    = self.sel,
-                             name   = self.selName,
-                             title  = self.yieldTitle)
+        self.yieldObj.add(self.sel,title=self.yieldTitle)
 
 #===============================================================================================#
 #                                        Selections                                             #
@@ -101,10 +102,12 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
     #---- Select fakeables -----#
     ElSelObj = SelectionObject(sel          = baseSel,
                                selName      = "Has1FakeableEl",
-                               yieldTitle   = "Fakeable lepton (channel $e^{\pm}$)")
+                               yieldTitle   = "Fakeable lepton (channel $e^{\pm}$)",
+                               yieldObj     = self.yields)
     MuSelObj = SelectionObject(sel          = baseSel,
                                selName      = "Has1FakeableMu",
-                               yieldTitle   = "Fakeable lepton (channel $\mu^{\pm}$)")
+                               yieldTitle   = "Fakeable lepton (channel $\mu^{\pm}$)",
+                               yieldObj     = self.yields)
     ElSelObj.refine(cut = [op.rng_len(self.electronsFakeSel) >= 1,
                            op.OR(op.rng_len(self.muonsFakeSel) == 0,
                                  self.electron_conept[self.electronsFakeSel[0].idx] > self.muon_conept[self.muonsFakeSel[0].idx])])
@@ -207,7 +210,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
     # Return # 
     return [ElSelObject,MuSelObject]
 
-def makeCoarseResolvedSelection(self,selObject,nJet,copy_sel=False,plot_yield=False):
+def makeCoarseResolvedSelection(self,selObject,nJet,copy_sel=False):
     """
     Produces the Ak4 jet selection
     inputs :
@@ -232,13 +235,11 @@ def makeCoarseResolvedSelection(self,selObject,nJet,copy_sel=False,plot_yield=Fa
         selObject.yieldTitle += " + Ak4 Jets Tight $\geq 4$"
         selObject.refine(cut  = [op.rng_len(self.ak4Jets) >= nJet,
                                  op.rng_len(self.ak8BJets) == 0])
-    if plot_yield:
-        selObject.makeYield(self.yieldPlots)
     if copy_sel :
         return selObject 
 
 
-def makeCoarseBoostedSelection(self,selObject,copy_sel=False,plot_yield=False):
+def makeCoarseBoostedSelection(self,selObject,copy_sel=False):
     """
     Produces the Ak8b jet selection
     inputs :
@@ -252,13 +253,11 @@ def makeCoarseBoostedSelection(self,selObject,copy_sel=False,plot_yield=False):
     selObject.selName += "Ak8BJets"
     selObject.yieldTitle += " + Ak8 bJets $\geq 1$"
     selObject.refine(cut=[op.rng_len(self.ak8BJets) >= 1])
-    if plot_yield:
-        selObject.makeYield(self.yieldPlots)
     if copy_sel:
         return selObject
 
 
-def makeExclusiveLooseResolvedJetComboSelection(self,selObject,nbJet,copy_sel=False,plot_yield=False):
+def makeExclusiveLooseResolvedJetComboSelection(self,selObject,nbJet,copy_sel=False):
     if copy_sel:
         selObject = copy(selObject)
 
@@ -284,12 +283,10 @@ def makeExclusiveLooseResolvedJetComboSelection(self,selObject,nbJet,copy_sel=Fa
                          weight = None)
     else: raise RuntimeError ("Error in Jet Selection!!!")
     
-    if plot_yield:
-        selObject.makeYield(self.yieldPlots)
     if copy_sel:
         return selObject
 
-def makeExclusiveTightResolvedJetComboSelection(self,selObject,nbJet,copy_sel=False,plot_yield=False):
+def makeExclusiveTightResolvedJetComboSelection(self,selObject,nbJet,copy_sel=False):
     if copy_sel:
         selObject = copy(selObject)
 
@@ -317,14 +314,11 @@ def makeExclusiveTightResolvedJetComboSelection(self,selObject,nbJet,copy_sel=Fa
 
     else: raise RuntimeError ("Error in Jet Selection!!!")
 
-    if plot_yield:
-        selObject.makeYield(self.yieldPlots)
-
     if copy_sel:
         return selObject
 
 
-def makeSemiBoostedHbbSelection(self,selObject,nNonb,copy_sel=False,plot_yield=False):
+def makeSemiBoostedHbbSelection(self,selObject,nNonb,copy_sel=False):
     """
     Produces the inclusive boosted selection
     inputs :
@@ -349,14 +343,12 @@ def makeSemiBoostedHbbSelection(self,selObject,nNonb,copy_sel=False,plot_yield=F
         selObject.refine(cut    = [op.rng_len(self.ak4JetsCleanedFromAk8b) >= nNonb],
                          weight = AppliedSF)
 
-    if plot_yield:
-        selObject.makeYield(self.yieldPlots)
     if copy_sel:
         return selObject
 
 
 
-def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True): 
+def makeDoubleLeptonSelection(self,baseSel,use_dd=True): 
     """
     Produces the requested lepton selection (encapsulated in SelectionObject class objects)
     Will produce a dict :
@@ -402,13 +394,16 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
         #---- Select tight leptons ----#
         ElElSelObj = SelectionObject(sel          = baseSel,
                                      selName      = "Has2TightElEl",
-                                     yieldTitle   = "Tightdilepton (channel $e^+e^-$)")
+                                     yieldTitle   = "Tightdilepton (channel $e^+e^-$)",
+                                     yieldObj     = self.yields)
         MuMuSelObj = SelectionObject(sel          = baseSel,
                                      selName      = "Has2TightMuMu",
-                                     yieldTitle   = "Tight dilepton (channel $\mu^+\mu^-$)")
+                                     yieldTitle   = "Tight dilepton (channel $\mu^+\mu^-$)",
+                                     yieldObj     = self.yields)
         ElMuSelObj = SelectionObject(sel          = baseSel,
                                      selName      = "Has2TightElMu",
-                                     yieldTitle   = "Tight dilepton (channel $e^{\pm}\mu^{\mp}$)")
+                                     yieldTitle   = "Tight dilepton (channel $e^{\pm}\mu^{\mp}$)",
+                                     yieldObj     = self.yields)
 
         ElElSelObj.refine(cut    = [op.rng_len(self.ElElTightSel) == 1,
                                     op.rng_len(self.muonsTightSel) == 0],
@@ -501,32 +496,6 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
 
     ######### TTH ID selection #########
     if self.args.TTHIDLoose or self.args.TTHIDTight:
-        #--- Lambdas ---#
-
-        # Tight Dilepton : must also be Gen matched if MC #
-        lambda_dilepton_matched = lambda dilep : op.AND(self.lambda_is_matched(dilep[0]),self.lambda_is_matched(dilep[1]))
-        lambda_tightpair_ElEl = lambda dilep : op.AND(lambda_dilepton_matched(dilep),
-                                                      self.lambda_electronTightSel(dilep[0]),
-                                                      self.lambda_electronTightSel(dilep[1]))
-        lambda_tightpair_MuMu = lambda dilep : op.AND(lambda_dilepton_matched(dilep),
-                                                      self.lambda_muonTightSel(dilep[0]),
-                                                      self.lambda_muonTightSel(dilep[1]))
-        lambda_tightpair_ElMu = lambda dilep : op.AND(lambda_dilepton_matched(dilep),
-                                                      self.lambda_electronTightSel(dilep[0]),
-                                                      self.lambda_muonTightSel(dilep[1]))
-        
-        # Fake Extrapolation dilepton #
-        lambda_fakepair_ElEl = lambda dilep : op.AND(lambda_dilepton_matched(dilep),
-                                                     op.NOT(op.AND(self.lambda_electronTightSel(dilep[0]),
-                                                                   self.lambda_electronTightSel(dilep[1]))))
-        lambda_fakepair_MuMu = lambda dilep : op.AND(lambda_dilepton_matched(dilep),
-                                                     op.NOT(op.AND(self.lambda_muonTightSel(dilep[0]),
-                                                                   self.lambda_muonTightSel(dilep[1]))))
-        lambda_fakepair_ElMu = lambda dilep : op.AND(lambda_dilepton_matched(dilep),
-                                                     op.NOT(op.AND(self.lambda_electronTightSel(dilep[0]),
-                                                                   self.lambda_muonTightSel(dilep[1]))))
-        
-
         #---- SF ----#
         if self.is_MC:
             ElElLooseSF = lambda dilep : [op.defineOnFirstUse(self.lambda_ttH_doubleElectron_trigSF(dilep))] + self.lambda_ElectronLooseSF(dilep[0]) + self.lambda_ElectronLooseSF(dilep[1])
@@ -551,13 +520,16 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
         #---- Select fakeables -----# 
         ElElSelObj = SelectionObject(sel          = baseSel,
                                      selName      = "Has2FakeableElEl",
-                                     yieldTitle   = "Fakeable dilepton (channel $e^+e^-$)")
+                                     yieldTitle   = "Fakeable dilepton (channel $e^+e^-$)",
+                                     yieldObj     = self.yields)
         MuMuSelObj = SelectionObject(sel          = baseSel,
                                      selName      = "Has2FakeableMuMu",
-                                     yieldTitle   = "Fakeable dilepton (channel $\mu^+\mu^-$)")
+                                     yieldTitle   = "Fakeable dilepton (channel $\mu^+\mu^-$)",
+                                     yieldObj     = self.yields)
         ElMuSelObj = SelectionObject(sel          = baseSel,
                                      selName      = "Has2FakeableElMu",
-                                     yieldTitle   = "Fakeable dilepton (channel $e^{\pm}\mu^{\mp}$)")
+                                     yieldTitle   = "Fakeable dilepton (channel $e^{\pm}\mu^{\mp}$)",
+                                     yieldObj     = self.yields)
         ElElSelObj.refine(cut = [op.rng_len(self.ElElFakeSel) >= 1,
                                  op.OR(op.rng_len(self.muonsFakeSel) == 0,
                                        op.AND(op.rng_len(self.muonsFakeSel) == 1,
@@ -579,7 +551,8 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                                               self.muon_conept[self.MuMuFakeSel[0][0].idx] > self.electron_conept[self.electronsFakeSel[1].idx],
                                               self.muon_conept[self.MuMuFakeSel[0][1].idx] > self.electron_conept[self.electronsFakeSel[1].idx]))])
         ElMuSelObj.refine(cut = [op.rng_len(self.ElMuFakeSel) >= 1,
-                                 op.OR(op.rng_len(self.electronsFakeSel) + op.rng_len(self.muonsFakeSel) == 2,
+                                 op.OR(op.AND(op.rng_len(self.electronsFakeSel) == 1,
+                                              op.rng_len(self.muonsFakeSel) == 1),
                                        op.AND(op.rng_len(self.electronsFakeSel) >= 2,
                                               op.rng_len(self.muonsFakeSel) == 1,
                                               self.muon_conept[self.ElMuFakeSel[0][1].idx] > self.electron_conept[self.electronsFakeSel[1].idx]),
@@ -666,6 +639,20 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
             ElElSelObj.refine(cut = [lambda_inZ(self.ElElFakeSel[0])])
             MuMuSelObj.refine(cut = [lambda_inZ(self.MuMuFakeSel[0])])
 
+        #---- Tau veto ----#
+        if not self.args.NoTauVeto: # nTau (isolated from fakeable leptons) = 0
+            # All the preselected leptons outside Z peak region within 10 GeV
+            ElElSelObj.selName += "NoTau"
+            MuMuSelObj.selName += "NoTau"
+            ElMuSelObj.selName += "NoTau"
+            ElElSelObj.yieldTitle += " + Tau Veto"
+            MuMuSelObj.yieldTitle += " + Tau Veto"
+            ElMuSelObj.yieldTitle += " + Tau Veto"
+    
+            ElElSelObj.refine(cut = [op.rng_len(self.tauCleanSel) == 0])
+            MuMuSelObj.refine(cut = [op.rng_len(self.tauCleanSel) == 0])
+            ElMuSelObj.refine(cut = [op.rng_len(self.tauCleanSel) == 0])
+
         
         #---- Tight selection ----#
         ElElSelObj.selName += "TightSelected"
@@ -677,61 +664,61 @@ def makeDoubleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
         
         if use_dd:
             enable = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg)
-            ElElSelObj.create(cut      = [lambda_tightpair_ElEl(self.ElElFakeSel[0]),
+            ElElSelObj.create(cut      = [self.lambda_tightpair_ElEl(self.ElElFakeSel[0]),
                                           op.rng_len(self.electronsTightSel) == 2,
                                           op.rng_len(self.muonsTightSel) == 0,
                                           self.ElElTightSel[0][0].idx == self.ElElFakeSel[0][0].idx,
                                           self.ElElTightSel[0][1].idx == self.ElElFakeSel[0][1].idx],
-                              weight   = [ElElTightSF(self.ElElFakeSel[0])],
+                              weight   = ElElTightSF(self.ElElFakeSel[0]),
                               ddSuffix = "FakeExtrapolation",
-                              ddCut    = [lambda_fakepair_ElEl(self.ElElFakeSel[0])],
+                              ddCut    = [self.lambda_fakepair_ElEl(self.ElElFakeSel[0])],
                               ddWeight = [self.ElElFakeFactor(self.ElElFakeSel[0])]+ElElTightSF(self.ElElFakeSel[0]),
                               enable   = enable)
-            MuMuSelObj.create(cut      = [lambda_tightpair_MuMu(self.MuMuFakeSel[0]),
+            MuMuSelObj.create(cut      = [self.lambda_tightpair_MuMu(self.MuMuFakeSel[0]),
                                           op.rng_len(self.electronsTightSel) == 0,
                                           op.rng_len(self.muonsTightSel) == 2,
                                           self.MuMuTightSel[0][0].idx == self.MuMuFakeSel[0][0].idx,
                                           self.MuMuTightSel[0][1].idx == self.MuMuFakeSel[0][1].idx],
-                              weight   = [MuMuTightSF(self.MuMuFakeSel[0])],
+                              weight   = MuMuTightSF(self.MuMuFakeSel[0]),
                               ddSuffix = "FakeExtrapolation",
-                              ddCut    = [lambda_fakepair_MuMu(self.MuMuFakeSel[0])],
+                              ddCut    = [self.lambda_fakepair_MuMu(self.MuMuFakeSel[0])],
                               ddWeight = [self.MuMuFakeFactor(self.MuMuFakeSel[0])]+MuMuTightSF(self.MuMuFakeSel[0]),
                               enable   = enable)
-            ElMuSelObj.create(cut      = [lambda_tightpair_ElMu(self.ElMuFakeSel[0]),
+            ElMuSelObj.create(cut      = [self.lambda_tightpair_ElMu(self.ElMuFakeSel[0]),
                                           op.rng_len(self.electronsTightSel) == 1,
                                           op.rng_len(self.muonsTightSel) == 1,
                                           self.ElMuTightSel[0][0].idx == self.ElMuFakeSel[0][0].idx,
                                           self.ElMuTightSel[0][1].idx == self.ElMuFakeSel[0][1].idx],
-                              weight   = [ElMuTightSF(self.ElMuFakeSel[0])],
+                              weight   = ElMuTightSF(self.ElMuFakeSel[0]),
                               ddSuffix = "FakeExtrapolation",
-                              ddCut    = [lambda_fakepair_ElMu(self.ElMuFakeSel[0])],
+                              ddCut    = [self.lambda_fakepair_ElMu(self.ElMuFakeSel[0])],
                               ddWeight = [self.ElMuFakeFactor(self.ElMuFakeSel[0])]+ElMuTightSF(self.ElMuFakeSel[0]),
                               enable   = enable)
         else:
-            ElElSelObj.refine(cut    = [lambda_tightpair_ElEl(self.ElElFakeSel[0]),
+            ElElSelObj.refine(cut    = [self.lambda_tightpair_ElEl(self.ElElFakeSel[0]),
                                            op.rng_len(self.electronsTightSel) == 2,
                                            op.rng_len(self.muonsTightSel) == 0,
                                            self.ElElTightSel[0][0].idx == self.ElElFakeSel[0][0].idx,
                                            self.ElElTightSel[0][1].idx == self.ElElFakeSel[0][1].idx],
-                                 weight = [ElElTightSF(self.ElElFakeSel[0])])
-            MuMuSelObj.refine(cut    = [lambda_tightpair_MuMu(self.MuMuFakeSel[0]),
+                              weight = ElElTightSF(self.ElElFakeSel[0]))
+            MuMuSelObj.refine(cut    = [self.lambda_tightpair_MuMu(self.MuMuFakeSel[0]),
                                            op.rng_len(self.electronsTightSel) == 0,
                                            op.rng_len(self.muonsTightSel) == 2,
                                            self.MuMuTightSel[0][0].idx == self.MuMuFakeSel[0][0].idx,
                                            self.MuMuTightSel[0][1].idx == self.MuMuFakeSel[0][1].idx],
-                                 weight = [MuMuTightSF(self.MuMuFakeSel[0])])
-            ElMuSelObj.refine(cut    = [lambda_tightpair_ElMu(self.ElMuFakeSel[0]),
+                              weight = MuMuTightSF(self.MuMuFakeSel[0]))
+            ElMuSelObj.refine(cut    = [self.lambda_tightpair_ElMu(self.ElMuFakeSel[0]),
                                            op.rng_len(self.electronsTightSel) == 1,
                                            op.rng_len(self.muonsTightSel) == 1,
                                            self.ElMuTightSel[0][0].idx == self.ElMuFakeSel[0][0].idx,
                                            self.ElMuTightSel[0][1].idx == self.ElMuFakeSel[0][1].idx],
-                                 weight = [ElMuTightSF(self.ElMuFakeSel[0])])
+                              weight = ElMuTightSF(self.ElMuFakeSel[0]))
 
     return ElElSelObj,MuMuSelObj,ElMuSelObj
             
 
 
-def makeAtLeastTwoAk4JetSelection(self,selObject,copy_sel=False,plot_yield=False,use_dd=True):
+def makeAtLeastTwoAk4JetSelection(self,selObject,copy_sel=False,use_dd=True):
     """
     Produces the Ak4 jet selection
     inputs :
@@ -745,12 +732,10 @@ def makeAtLeastTwoAk4JetSelection(self,selObject,copy_sel=False,plot_yield=False
     selObject.selName += "TwoAk4Jets"
     selObject.yieldTitle += " + Ak4 Jets $\geq 2$"
     selObject.refine(cut=[op.rng_len(self.ak4Jets)>=2])
-    if plot_yield:
-        selObject.makeYield(self.yieldPlots)
     if copy_sel :
         return selObject 
 
-def makeAtLeastOneAk8JetSelection(self,selObject,copy_sel=False,plot_yield=False,use_dd=True):
+def makeAtLeastOneAk8JetSelection(self,selObject,copy_sel=False,use_dd=True):
     """
     Produces the Ak8 jet selection
     inputs :
@@ -764,12 +749,10 @@ def makeAtLeastOneAk8JetSelection(self,selObject,copy_sel=False,plot_yield=False
     selObject.selName += "OneAk8Jet"
     selObject.yieldTitle += " + Ak8 Jets $\geq 1$"
     selObject.refine(cut=[op.rng_len(self.ak8Jets)>=1])
-    if plot_yield:
-        selObject.makeYield(self.yieldPlots)
     if copy_sel:
         return selObject
     
-def makeExclusiveResolvedNoBtagSelection(self,selObject,copy_sel=False,plot_yield=False,use_dd=True):
+def makeExclusiveResolvedNoBtagSelection(self,selObject,copy_sel=False,use_dd=True):
     """
     Produces the exclusive resolved selection with no btagging
     inputs :
@@ -784,12 +767,10 @@ def makeExclusiveResolvedNoBtagSelection(self,selObject,copy_sel=False,plot_yiel
     selObject.selName += "ExclusiveResolvedNoBtag"
     selObject.yieldTitle += " + Exclusive Resolved (0 bjet)"
     selObject.refine(cut=[op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],weight=AppliedSF)
-    if plot_yield:
-        selObject.makeYield(self.yieldPlots)
     if copy_sel:
         return selObject
 
-def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,plot_yield=False,use_dd=True):
+def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,use_dd=True):
     """
     Produces the exclusive resolved selection with only one btagging
     inputs :
@@ -830,12 +811,10 @@ def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,plot_yie
         selObject.refine(cut    = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0], 
                          weight = AppliedSF)
 
-    if plot_yield:
-        selObject.makeYield(self.yieldPlots)
     if copy_sel:
         return selObject
 
-def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yield=False,use_dd=True):
+def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,use_dd=True):
     """
     Produces the exclusive resolved selection with no btagging
     inputs :
@@ -876,18 +855,14 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,plot_yi
         selObject.refine(cut    = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0], 
                          weight = AppliedSF)
 
-    if plot_yield:
-        selObject.makeYield(self.yieldPlots)
     if self.args.TTBarCR:
         selObject.selName += "MbbCut150"
         selObject.yieldTitle += " + $M_{bb}>150$"
         selObject.refine(cut = [op.invariant_mass(self.ak4BJets[0].p4,self.ak4BJets[1].p4)>150])
-        if plot_yield:
-            selObject.makeYield(self.yieldPlots)
     if copy_sel:
         return selObject
 
-def makeInclusiveBoostedNoBtagSelection(self,selObject,copy_sel=False,plot_yield=False):
+def makeInclusiveBoostedNoBtagSelection(self,selObject,copy_sel=False):
     """
     Produces the inclusive boosted selection(0 btag)
     inputs :
@@ -902,12 +877,10 @@ def makeInclusiveBoostedNoBtagSelection(self,selObject,copy_sel=False,plot_yield
     selObject.yieldTitle += " + Inclusive Boosted 0 Btag"
     selObject.refine(cut = [op.rng_len(self.ak8BJets) == 0])
 
-    if plot_yield:
-        selObject.makeYield(self.yieldPlots)
     if copy_sel:
         return selObject
 
-def makeInclusiveBoostedOneBtagSelection(self,selObject,copy_sel=False,plot_yield=False,use_dd=True):
+def makeInclusiveBoostedOneBtagSelection(self,selObject,copy_sel=False,use_dd=True):
     """
     Produces the inclusive boosted selection (1 btag)
     inputs :
@@ -949,14 +922,12 @@ def makeInclusiveBoostedOneBtagSelection(self,selObject,copy_sel=False,plot_yiel
         
 
 
-    if plot_yield:
-        selObject.makeYield(self.yieldPlots)
     if copy_sel:
         return selObject
 
 
 
-def makeDNNOutputNodesSelections(self,selObject,output,plot_yield=False,suffix=""):
+def makeDNNOutputNodesSelections(self,selObject,output,suffix=""):
     selBaseObject = copy(selObject)
     selObjDict = {}
     maxIdx = op.rng_max_element_index(output)
