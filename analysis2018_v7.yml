@@ -821,12 +821,12 @@ samples:
 ### Signal
   GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8:
     cross-section: 0.0017707494044057947
-    scale: 10000
+    scale: 100
     db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
     era: '2018'
     files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8_2018.dat
     generated-events: 'genEventSumw'
-    legend: HH (cHHH0) (x10000)
+    legend: HH (cHHH0) (x100)
     line-type: 1
     line-color: "#0f700b"
     line-type: 1
@@ -835,11 +835,12 @@ samples:
     type: signal
   GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8:
     cross-section: 0.0007885391471259366
-    scale: 10000
+    scale: 100
     db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
     era: '2018'
     files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8_2018.dat
     generated-events: 'genEventSumw'
+    legend: HH (cHHH1) (x100)
     line-type: 1
     line-color: "#d91d09"
     split: 5
@@ -847,12 +848,12 @@ samples:
     type: signal
   GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8:
     cross-section: 0.00033398686119390133
-    scale: 10000
+    scale: 100
     db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
     era: '2018'
     files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8_2018.dat
     generated-events: 'genEventSumw'
-    legend: HH (cHHH2p45) (x10000)
+    legend: HH (cHHH2p45) (x100)
     line-type: 1
     line-color: "#0929e0"
     split: 5
@@ -860,8 +861,7 @@ samples:
     type: signal
   GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8:
     cross-section: 0.0023296541606490757
-    scale: 10000
-    cross-section: 1
+    scale: 100
     db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
     era: '2018'
     files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8_2018.dat

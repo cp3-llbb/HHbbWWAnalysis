@@ -824,6 +824,16 @@ samples:
     line-type: 1
     split: 1
     type: signal
+  GluGluToHHTo2B2VTo2L2Nu_node_2_13TeV-madgraph-v2:
+    cross-section: 1
+    db: das:/GluGluToHHTo2B2VTo2L2Nu_node_2_13TeV-madgraph-v2/RunIISummer16NanoAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v3/NANOAODSIM
+    era: '2016'
+    files: dascache/GluGluToHHTo2B2VTo2L2Nu_node_2_13TeV-madgraph-v2_2016.dat
+    generated-events: genEventSumw
+    legend: HH
+    line-type: 1
+    split: 1
+    type: signal
   GluGluToHHTo2B2VTo2L2Nu_node_3_13TeV-madgraph-v2:
     cross-section: 1
     db: das:/GluGluToHHTo2B2VTo2L2Nu_node_3_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
@@ -1259,6 +1269,16 @@ samples:
     db: das:/GluGluToRadionToHHTo2B2Tau_M-600_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
     era: '2016'
     files: dascache/GluGluToRadionToHHTo2B2Tau_M-600_narrow_13TeV-madgraph_2016.dat
+    generated-events: genEventSumw
+    legend: HH
+    line-type: 1
+    split: 1
+    type: signal
+  GluGluToRadionToHHTo2B2Tau_M-650_narrow_13TeV-madgraph:
+    cross-section: 1
+    db: das:/GluGluToRadionToHHTo2B2Tau_M-650_narrow_13TeV-madgraph/RunIISummer16NanoAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2/NANOAODSIM
+    era: '2016'
+    files: dascache/GluGluToRadionToHHTo2B2Tau_M-650_narrow_13TeV-madgraph_2016.dat
     generated-events: genEventSumw
     legend: HH
     line-type: 1
