@@ -52,18 +52,13 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         plots = []
 
-        cutFlowPlots = []
-
-        yields = CutFlowReport("yields",printInLog=True,recursive=True)
-
         era = sampleCfg['era']
 
-        self.yieldPlots = makeYieldPlots(self.args.Synchronization)
 
         #----- Ratio reweighting variables (before lepton and jet selection) -----#
         if self.args.BtagReweightingOff or self.args.BtagReweightingOn:
             plots.append(objectsNumberPlot(channel="NoChannel",suffix='NoSelection',sel=noSel,objCont=self.ak4Jets,objName='Ak4Jets',Nmax=15,xTitle='N(Ak4 jets)'))
-            plots.append(CutFlowReport("BtagReweightingCutFlowReport",noSel,printInLog=True))
+            plots.append(CutFlowReport("BtagReweightingCutFlowReport",noSel,printInLog=True,recursive=True))
             return plots
 
         #----- Stitching study -----#
@@ -74,7 +69,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 raise RuntimeError("Stitching is only done on WJets MC samples")
             plots.extend(makeLHEPlots(noSel,t.LHE))
             plots.append(objectsNumberPlot(channel="NoChannel",suffix='NoSelection',sel=noSel,objCont=self.ak4Jets,objName='Ak4Jets',Nmax=15,xTitle='N(Ak4 jets)'))
-            plots.append(CutFlowReport("DYStitchingCutFlowReport",noSel,printInLog=True))
+            plots.append(CutFlowReport("DYStitchingCutFlowReport",noSel,printInLog=True,recursive=True))
             return plots
 
         #----- Machine Learning Model -----#                
@@ -87,11 +82,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             if not os.path.exists(path_model):
                 raise RuntimeError('Could not find model file %s'%path_model)
             try:
-#                if model_num in ["03","04"]:
-#                    input_names.append("input_3")
-#                if model_num in ["05","06"]:
-#                    input_names.extend(["input_3","input_4","input_5"])
-#                    #output_name = "model/model_4/output/Softmax"
                 if model_num in ["07"]:
                     input_names = ["input_1","input_2","input_3","input_4","input_5","input_6"]
                     output_name = "Identity"
@@ -105,7 +95,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 raise RuntimeError('Could not load model %s'%path_model)
 
         #----- Dileptons -----#
-        ElElSelObj,MuMuSelObj,ElMuSelObj = makeDoubleLeptonSelection(self,noSel,plot_yield=True)
+        ElElSelObj,MuMuSelObj,ElMuSelObj = makeDoubleLeptonSelection(self,noSel)
 
         # Select the jets selections that will be done depending on user input #
         jet_level = ["Ak4","Ak8","Resolved0Btag","Resolved1Btag","Resolved2Btag","Boosted0Btag","Boosted1Btag"]
@@ -124,9 +114,9 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             OSMuMuDilepton = self.MuMuTightSel
             OSElMuDilepton = self.ElMuTightSel
         if self.args.TTHIDLoose or self.args.TTHIDTight:
-            OSElElDilepton = switch_on_index([0],op.rng_len(self.ElElTightSel)>=1,self.ElElTightSel,self.ElElFakeSel)
-            OSMuMuDilepton = switch_on_index([0],op.rng_len(self.MuMuTightSel)>=1,self.MuMuTightSel,self.MuMuFakeSel)
-            OSElMuDilepton = switch_on_index([0],op.rng_len(self.ElMuTightSel)>=1,self.ElMuTightSel,self.ElMuFakeSel)
+            OSElElDilepton = self.ElElFakeSel
+            OSMuMuDilepton = self.MuMuFakeSel
+            OSElMuDilepton = self.ElMuFakeSel
 
 
         #----- DY reweighting -----#
@@ -183,17 +173,14 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         #----- Ak4 jets selection -----#
         if "Ak4" in jetsel_level:
             print ("...... Processing Ak4 jet selection")
-            ElElSelObjAk4Jets = makeAtLeastTwoAk4JetSelection(self,ElElSelObj,copy_sel=True,plot_yield=True)
-            MuMuSelObjAk4Jets = makeAtLeastTwoAk4JetSelection(self,MuMuSelObj,copy_sel=True,plot_yield=True)
-            ElMuSelObjAk4Jets = makeAtLeastTwoAk4JetSelection(self,ElMuSelObj,copy_sel=True,plot_yield=True)
+            ElElSelObjAk4Jets = makeAtLeastTwoAk4JetSelection(self,ElElSelObj,copy_sel=True)
+            MuMuSelObjAk4Jets = makeAtLeastTwoAk4JetSelection(self,MuMuSelObj,copy_sel=True)
+            ElMuSelObjAk4Jets = makeAtLeastTwoAk4JetSelection(self,ElMuSelObj,copy_sel=True)
 
             # Jet and lepton plots #
             ChannelDictList = []
             if "Ak4" in jetplot_level:
                 # Cut flow report #
-                #cutFlowPlots.append(CutFlowReport(ElElSelObjAk4Jets.selName,ElElSelObjAk4Jets.sel,printInLog=True))
-                #cutFlowPlots.append(CutFlowReport(MuMuSelObjAk4Jets.selName,MuMuSelObjAk4Jets.sel,printInLog=True))
-                #cutFlowPlots.append(CutFlowReport(ElMuSelObjAk4Jets.selName,ElMuSelObjAk4Jets.sel,printInLog=True))
                 if not self.args.OnlyYield:
                     ChannelDictList.append({'channel':'ElEl','sel':ElElSelObjAk4Jets.sel,'dilepton':OSElElDilepton[0],'leadjet':self.ak4Jets[0],'subleadjet':self.ak4Jets[1],'lead_is_b':False,'sublead_is_b':False,'suffix':ElElSelObjAk4Jets.selName,'is_MC':self.is_MC})
                     ChannelDictList.append({'channel':'MuMu','sel':MuMuSelObjAk4Jets.sel,'dilepton':OSMuMuDilepton[0],'leadjet':self.ak4Jets[0],'subleadjet':self.ak4Jets[1],'lead_is_b':False,'sublead_is_b':False,'suffix':MuMuSelObjAk4Jets.selName,'is_MC':self.is_MC})
@@ -214,17 +201,14 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         ##### Ak8 jets selection #####
         if "Ak8" in jetsel_level:
             print ("...... Processing Ak8 jet selection")
-            ElElSelObjAk8Jets = makeAtLeastOneAk8JetSelection(self,ElElSelObj,copy_sel=True,plot_yield=True)
-            MuMuSelObjAk8Jets = makeAtLeastOneAk8JetSelection(self,MuMuSelObj,copy_sel=True,plot_yield=True)
-            ElMuSelObjAk8Jets = makeAtLeastOneAk8JetSelection(self,ElMuSelObj,copy_sel=True,plot_yield=True)
+            ElElSelObjAk8Jets = makeAtLeastOneAk8JetSelection(self,ElElSelObj,copy_sel=True)
+            MuMuSelObjAk8Jets = makeAtLeastOneAk8JetSelection(self,MuMuSelObj,copy_sel=True)
+            ElMuSelObjAk8Jets = makeAtLeastOneAk8JetSelection(self,ElMuSelObj,copy_sel=True)
 
             # Fatjets plots #
             ChannelDictList = []
             if "Ak8" in jetplot_level:
                 # Cut flow report #
-                #cutFlowPlots.append(CutFlowReport(ElElSelObjAk8Jets.selName,ElElSelObjAk8Jets.sel,printInLog=True))
-                #cutFlowPlots.append(CutFlowReport(MuMuSelObjAk8Jets.selName,MuMuSelObjAk8Jets.sel,printInLog=True))
-                #cutFlowPlots.append(CutFlowReport(ElMuSelObjAk8Jets.selName,ElMuSelObjAk8Jets.sel,printInLog=True))
                 if not self.args.OnlyYield:
                     ChannelDictList.append({'channel':'ElEl','sel':ElElSelObjAk8Jets.sel,'dilepton':OSElElDilepton[0],'fatjet':self.ak8Jets[0],'suffix':ElElSelObjAk8Jets.selName,'is_MC':self.is_MC})
                     ChannelDictList.append({'channel':'MuMu','sel':MuMuSelObjAk8Jets.sel,'dilepton':OSMuMuDilepton[0],'fatjet':self.ak8Jets[0],'suffix':MuMuSelObjAk8Jets.selName,'is_MC':self.is_MC})
@@ -258,15 +242,12 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             #----- Resolved selection : 0 Btag -----#
             if "Resolved0Btag" in jetsel_level:
                 print ("...... Processing Resolved jet (0 btag) selection")
-                ElElSelObjAk4JetsExclusiveResolvedNoBtag = makeExclusiveResolvedNoBtagSelection(self,ElElSelObjAk4Jets,copy_sel=True,plot_yield=True)
-                MuMuSelObjAk4JetsExclusiveResolvedNoBtag = makeExclusiveResolvedNoBtagSelection(self,MuMuSelObjAk4Jets,copy_sel=True,plot_yield=True)
-                ElMuSelObjAk4JetsExclusiveResolvedNoBtag = makeExclusiveResolvedNoBtagSelection(self,ElMuSelObjAk4Jets,copy_sel=True,plot_yield=True)
+                ElElSelObjAk4JetsExclusiveResolvedNoBtag = makeExclusiveResolvedNoBtagSelection(self,ElElSelObjAk4Jets,copy_sel=True)
+                MuMuSelObjAk4JetsExclusiveResolvedNoBtag = makeExclusiveResolvedNoBtagSelection(self,MuMuSelObjAk4Jets,copy_sel=True)
+                ElMuSelObjAk4JetsExclusiveResolvedNoBtag = makeExclusiveResolvedNoBtagSelection(self,ElMuSelObjAk4Jets,copy_sel=True)
 
                 if "Resolved0Btag" in jetplot_level:
                     # Cut flow report #
-                    #cutFlowPlots.append(CutFlowReport(ElElSelObjAk4JetsExclusiveResolvedNoBtag.selName,ElElSelObjAk4JetsExclusiveResolvedNoBtag.sel,printInLog=True))
-                    #cutFlowPlots.append(CutFlowReport(MuMuSelObjAk4JetsExclusiveResolvedNoBtag.selName,MuMuSelObjAk4JetsExclusiveResolvedNoBtag.sel,printInLog=True))
-                    #cutFlowPlots.append(CutFlowReport(ElMuSelObjAk4JetsExclusiveResolvedNoBtag.selName,ElMuSelObjAk4JetsExclusiveResolvedNoBtag.sel,printInLog=True))
                     if not self.args.OnlyYield:
                         ChannelDictList.append({'channel':'ElEl','sel':ElElSelObjAk4JetsExclusiveResolvedNoBtag.sel,'dilepton':OSElElDilepton[0],'leadjet':container0b2j[0],'subleadjet':container0b2j[1],'lead_is_b':False,'sublead_is_b':False,'suffix':ElElSelObjAk4JetsExclusiveResolvedNoBtag.selName,'is_MC':self.is_MC})
                         ChannelDictList.append({'channel':'MuMu','sel':MuMuSelObjAk4JetsExclusiveResolvedNoBtag.sel,'dilepton':OSMuMuDilepton[0],'leadjet':container0b2j[0],'subleadjet':container0b2j[1],'lead_is_b':False,'sublead_is_b':False,'suffix':MuMuSelObjAk4JetsExclusiveResolvedNoBtag.selName,'is_MC':self.is_MC})
@@ -274,15 +255,12 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             #----  Resolved selection : 1 Btag  -----#
             if "Resolved1Btag" in jetsel_level:
                 print ("...... Processing Resolved jet (1 btag) selection")
-                ElElSelObjAk4JetsExclusiveResolvedOneBtag = makeExclusiveResolvedOneBtagSelection(self,ElElSelObjAk4Jets,copy_sel=True,plot_yield=True)
-                MuMuSelObjAk4JetsExclusiveResolvedOneBtag = makeExclusiveResolvedOneBtagSelection(self,MuMuSelObjAk4Jets,copy_sel=True,plot_yield=True)
-                ElMuSelObjAk4JetsExclusiveResolvedOneBtag = makeExclusiveResolvedOneBtagSelection(self,ElMuSelObjAk4Jets,copy_sel=True,plot_yield=True)
+                ElElSelObjAk4JetsExclusiveResolvedOneBtag = makeExclusiveResolvedOneBtagSelection(self,ElElSelObjAk4Jets,copy_sel=True)
+                MuMuSelObjAk4JetsExclusiveResolvedOneBtag = makeExclusiveResolvedOneBtagSelection(self,MuMuSelObjAk4Jets,copy_sel=True)
+                ElMuSelObjAk4JetsExclusiveResolvedOneBtag = makeExclusiveResolvedOneBtagSelection(self,ElMuSelObjAk4Jets,copy_sel=True)
 
                 if "Resolved1Btag" in jetplot_level:
                     # Cut flow report #
-                    #cutFlowPlots.append(CutFlowReport(ElElSelObjAk4JetsExclusiveResolvedOneBtag.selName,ElElSelObjAk4JetsExclusiveResolvedOneBtag.sel,printInLog=True))
-                    #cutFlowPlots.append(CutFlowReport(MuMuSelObjAk4JetsExclusiveResolvedOneBtag.selName,MuMuSelObjAk4JetsExclusiveResolvedOneBtag.sel,printInLog=True))
-                    #cutFlowPlots.append(CutFlowReport(ElMuSelObjAk4JetsExclusiveResolvedOneBtag.selName,ElMuSelObjAk4JetsExclusiveResolvedOneBtag.sel,printInLog=True))
                     if not self.args.OnlyYield:
                         ChannelDictList.append({'channel':'ElEl','sel':ElElSelObjAk4JetsExclusiveResolvedOneBtag.sel,'dilepton':OSElElDilepton[0],'leadjet':container1b1j[0],'subleadjet':container1b1j[1],'lead_is_b':True,'sublead_is_b':False,'suffix':ElElSelObjAk4JetsExclusiveResolvedOneBtag.selName,'is_MC':self.is_MC})
                         ChannelDictList.append({'channel':'MuMu','sel':MuMuSelObjAk4JetsExclusiveResolvedOneBtag.sel,'dilepton':OSMuMuDilepton[0],'leadjet':container1b1j[0],'subleadjet':container1b1j[1],'lead_is_b':True,'sublead_is_b':False,'suffix':MuMuSelObjAk4JetsExclusiveResolvedOneBtag.selName,'is_MC':self.is_MC})
@@ -290,15 +268,12 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             #----- Resolved selection : 2 Btags -----#
             if "Resolved2Btag" in jetsel_level:
                 print ("...... Processing Resolved jet (2 btags) selection")
-                ElElSelObjAk4JetsExclusiveResolvedTwoBtags = makeExclusiveResolvedTwoBtagsSelection(self,ElElSelObjAk4Jets,copy_sel=True,plot_yield=True)
-                MuMuSelObjAk4JetsExclusiveResolvedTwoBtags = makeExclusiveResolvedTwoBtagsSelection(self,MuMuSelObjAk4Jets,copy_sel=True,plot_yield=True)
-                ElMuSelObjAk4JetsExclusiveResolvedTwoBtags = makeExclusiveResolvedTwoBtagsSelection(self,ElMuSelObjAk4Jets,copy_sel=True,plot_yield=True)
+                ElElSelObjAk4JetsExclusiveResolvedTwoBtags = makeExclusiveResolvedTwoBtagsSelection(self,ElElSelObjAk4Jets,copy_sel=True)
+                MuMuSelObjAk4JetsExclusiveResolvedTwoBtags = makeExclusiveResolvedTwoBtagsSelection(self,MuMuSelObjAk4Jets,copy_sel=True)
+                ElMuSelObjAk4JetsExclusiveResolvedTwoBtags = makeExclusiveResolvedTwoBtagsSelection(self,ElMuSelObjAk4Jets,copy_sel=True)
 
                 if "Resolved2Btag" in jetplot_level:
                     # Cut flow report #
-                    #cutFlowPlots.append(CutFlowReport(ElElSelObjAk4JetsExclusiveResolvedTwoBtags.selName,ElElSelObjAk4JetsExclusiveResolvedTwoBtags.sel,printInLog=True))
-                    #cutFlowPlots.append(CutFlowReport(MuMuSelObjAk4JetsExclusiveResolvedTwoBtags.selName,MuMuSelObjAk4JetsExclusiveResolvedTwoBtags.sel,printInLog=True))
-                    #cutFlowPlots.append(CutFlowReport(ElMuSelObjAk4JetsExclusiveResolvedTwoBtags.selName,ElMuSelObjAk4JetsExclusiveResolvedTwoBtags.sel,printInLog=True))
                     if not self.args.OnlyYield:
                         ChannelDictList.append({'channel':'ElEl','sel':ElElSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'dilepton':OSElElDilepton[0],'leadjet':container2b0j[0],'subleadjet':container2b0j[1],'lead_is_b':True,'sublead_is_b':True,'suffix':ElElSelObjAk4JetsExclusiveResolvedTwoBtags.selName,'is_MC':self.is_MC})
                         ChannelDictList.append({'channel':'MuMu','sel':MuMuSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'dilepton':OSMuMuDilepton[0],'leadjet':container2b0j[0],'subleadjet':container2b0j[1],'lead_is_b':True,'sublead_is_b':True,'suffix':MuMuSelObjAk4JetsExclusiveResolvedTwoBtags.selName,'is_MC':self.is_MC})
@@ -326,14 +301,11 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             #----- Boosted selection : 0 Btag -----#
             if "Boosted0Btag" in jetsel_level:
                 print ("...... Processing Boosted jet (0 btag) selection")
-                ElElSelObjAk8JetsInclusiveBoostedNoBtag = makeInclusiveBoostedNoBtagSelection(self,ElElSelObjAk8Jets,copy_sel=True,plot_yield=True)
-                MuMuSelObjAk8JetsInclusiveBoostedNoBtag = makeInclusiveBoostedNoBtagSelection(self,MuMuSelObjAk8Jets,copy_sel=True,plot_yield=True)
-                ElMuSelObjAk8JetsInclusiveBoostedNoBtag = makeInclusiveBoostedNoBtagSelection(self,ElMuSelObjAk8Jets,copy_sel=True,plot_yield=True)
+                ElElSelObjAk8JetsInclusiveBoostedNoBtag = makeInclusiveBoostedNoBtagSelection(self,ElElSelObjAk8Jets,copy_sel=True)
+                MuMuSelObjAk8JetsInclusiveBoostedNoBtag = makeInclusiveBoostedNoBtagSelection(self,MuMuSelObjAk8Jets,copy_sel=True)
+                ElMuSelObjAk8JetsInclusiveBoostedNoBtag = makeInclusiveBoostedNoBtagSelection(self,ElMuSelObjAk8Jets,copy_sel=True)
                 if "Boosted0Btag" in jetplot_level:
                     # Cut flow report #
-                    #cutFlowPlots.append(CutFlowReport(ElElSelObjAk8JetsInclusiveBoostedNoBtag.selName,ElElSelObjAk8JetsInclusiveBoostedNoBtag.sel,printInLog=True))
-                    #cutFlowPlots.append(CutFlowReport(MuMuSelObjAk8JetsInclusiveBoostedNoBtag.selName,MuMuSelObjAk8JetsInclusiveBoostedNoBtag.sel,printInLog=True))
-                    #cutFlowPlots.append(CutFlowReport(ElMuSelObjAk8JetsInclusiveBoostedNoBtag.selName,ElMuSelObjAk8JetsInclusiveBoostedNoBtag.sel,printInLog=True))
                     if not self.args.OnlyYield:
                         ChannelDictList.append({'channel':'ElEl','sel':ElElSelObjAk8JetsInclusiveBoostedNoBtag.sel,'dilepton':OSElElDilepton[0],'fatjet':container1fatb[0],'suffix':ElElSelObjAk8JetsInclusiveBoostedNoBtag.selName,'is_MC':self.is_MC})
                         ChannelDictList.append({'channel':'MuMu','sel':MuMuSelObjAk8JetsInclusiveBoostedNoBtag.sel,'dilepton':OSMuMuDilepton[0],'fatjet':container1fatb[0],'suffix':MuMuSelObjAk8JetsInclusiveBoostedNoBtag.selName,'is_MC':self.is_MC})
@@ -341,14 +313,11 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             #----- Boosted selection : 1 Btag -----#
             if "Boosted1Btag" in jetsel_level:
                 print ("...... Processing Boosted jet (1 btag) selection")
-                ElElSelObjAk8JetsInclusiveBoostedOneBtag = makeInclusiveBoostedOneBtagSelection(self,ElElSelObjAk8Jets,copy_sel=True,plot_yield=True)
-                MuMuSelObjAk8JetsInclusiveBoostedOneBtag = makeInclusiveBoostedOneBtagSelection(self,MuMuSelObjAk8Jets,copy_sel=True,plot_yield=True)
-                ElMuSelObjAk8JetsInclusiveBoostedOneBtag = makeInclusiveBoostedOneBtagSelection(self,ElMuSelObjAk8Jets,copy_sel=True,plot_yield=True)
+                ElElSelObjAk8JetsInclusiveBoostedOneBtag = makeInclusiveBoostedOneBtagSelection(self,ElElSelObjAk8Jets,copy_sel=True)
+                MuMuSelObjAk8JetsInclusiveBoostedOneBtag = makeInclusiveBoostedOneBtagSelection(self,MuMuSelObjAk8Jets,copy_sel=True)
+                ElMuSelObjAk8JetsInclusiveBoostedOneBtag = makeInclusiveBoostedOneBtagSelection(self,ElMuSelObjAk8Jets,copy_sel=True)
                 if "Boosted1Btag" in jetplot_level:
                     # Cut flow report #
-                    #cutFlowPlots.append(CutFlowReport(ElElSelObjAk8JetsInclusiveBoostedOneBtag.selName,ElElSelObjAk8JetsInclusiveBoostedOneBtag.sel,printInLog=True))
-                    #cutFlowPlots.append(CutFlowReport(MuMuSelObjAk8JetsInclusiveBoostedOneBtag.selName,MuMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,printInLog=True))
-                    #cutFlowPlots.append(CutFlowReport(ElMuSelObjAk8JetsInclusiveBoostedOneBtag.selName,ElMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,printInLog=True))
                     if not self.args.OnlyYield:
                         ChannelDictList.append({'channel':'ElEl','sel':ElElSelObjAk8JetsInclusiveBoostedOneBtag.sel,'dilepton':OSElElDilepton[0],'fatjet':container1fatb[0],'suffix':ElElSelObjAk8JetsInclusiveBoostedOneBtag.selName,'is_MC':self.is_MC})
                         ChannelDictList.append({'channel':'MuMu','sel':MuMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,'dilepton':OSMuMuDilepton[0],'fatjet':container1fatb[0],'suffix':MuMuSelObjAk8JetsInclusiveBoostedOneBtag.selName,'is_MC':self.is_MC})
@@ -368,37 +337,37 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
         
         #----- High-level combinations -----#
-        # NOTE : very time consuming 
-        ChannelDictList = []
-        if not self.args.OnlyYield:
-            # Resolved No Btag #
-            if "Resolved0Btag" in jetplot_level:
-                ChannelDictList.append({'channel': 'ElEl','met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'j1':container0b2j[0],'j2':container0b2j[1],'sel':ElElSelObjAk4JetsExclusiveResolvedNoBtag.sel,'suffix':ElElSelObjAk4JetsExclusiveResolvedNoBtag.selName})
-                ChannelDictList.append({'channel': 'MuMu','met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'j1':container0b2j[0],'j2':container0b2j[1],'sel':MuMuSelObjAk4JetsExclusiveResolvedNoBtag.sel,'suffix':MuMuSelObjAk4JetsExclusiveResolvedNoBtag.selName})
-                ChannelDictList.append({'channel': 'ElMu','met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'j1':container0b2j[0],'j2':container0b2j[1],'sel':ElMuSelObjAk4JetsExclusiveResolvedNoBtag.sel,'suffix':ElMuSelObjAk4JetsExclusiveResolvedNoBtag.selName})
-            # Resolved One Btag #
-            if "Resolved1Btag" in jetplot_level:
-                ChannelDictList.append({'channel': 'ElEl','met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'j1':container1b1j[0],'j2':container1b1j[1],'sel':ElElSelObjAk4JetsExclusiveResolvedOneBtag.sel,'suffix':ElElSelObjAk4JetsExclusiveResolvedOneBtag.selName})
-                ChannelDictList.append({'channel': 'MuMu','met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'j1':container1b1j[0],'j2':container1b1j[1],'sel':MuMuSelObjAk4JetsExclusiveResolvedOneBtag.sel,'suffix':MuMuSelObjAk4JetsExclusiveResolvedOneBtag.selName})
-                ChannelDictList.append({'channel': 'ElMu','met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'j1':container1b1j[0],'j2':container1b1j[1],'sel':ElMuSelObjAk4JetsExclusiveResolvedOneBtag.sel,'suffix':ElMuSelObjAk4JetsExclusiveResolvedOneBtag.selName})
-            # Resolved Two Btags  #
-            if "Resolved2Btag" in jetplot_level:
-                ChannelDictList.append({'channel': 'ElEl','met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'j1':container2b0j[0],'j2':container2b0j[1],'sel':ElElSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':ElElSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
-                ChannelDictList.append({'channel': 'MuMu','met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'j1':container2b0j[0],'j2':container2b0j[1],'sel':MuMuSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':MuMuSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
-                ChannelDictList.append({'channel': 'ElMu','met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'j1':container2b0j[0],'j2':container2b0j[1],'sel':ElMuSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':ElMuSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
-            # Boosted No Btag #
-            if "Boosted0Btag" in jetplot_level:
-                ChannelDictList.append({'channel': 'ElEl','met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'j1':container1fatb[0].subJet1,'j2':container1fatb[0].subJet2,'sel':ElElSelObjAk8JetsInclusiveBoostedNoBtag.sel,'suffix':ElElSelObjAk8JetsInclusiveBoostedNoBtag.selName})
-                ChannelDictList.append({'channel': 'MuMu','met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'j1':container1fatb[0].subJet1,'j2':container1fatb[0].subJet2,'sel':MuMuSelObjAk8JetsInclusiveBoostedNoBtag.sel,'suffix':MuMuSelObjAk8JetsInclusiveBoostedNoBtag.selName})
-                ChannelDictList.append({'channel': 'ElMu','met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'j1':container1fatb[0].subJet1,'j2':container1fatb[0].subJet2,'sel':ElMuSelObjAk8JetsInclusiveBoostedNoBtag.sel,'suffix':ElMuSelObjAk8JetsInclusiveBoostedNoBtag.selName})
-            # Boosted One Btag #
-            if "Boosted1Btag" in jetplot_level:
-                ChannelDictList.append({'channel': 'ElEl','met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'j1':container1fatb[0].subJet1,'j2':container1fatb[0].subJet2,'sel':ElElSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':ElElSelObjAk8JetsInclusiveBoostedOneBtag.selName})
-                ChannelDictList.append({'channel': 'MuMu','met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'j1':container1fatb[0].subJet1,'j2':container1fatb[0].subJet2,'sel':MuMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':MuMuSelObjAk8JetsInclusiveBoostedOneBtag.selName})
-                ChannelDictList.append({'channel': 'ElMu','met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'j1':container1fatb[0].subJet1,'j2':container1fatb[0].subJet2,'sel':ElMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':ElMuSelObjAk8JetsInclusiveBoostedOneBtag.selName})
-
-        for channelDict in ChannelDictList:
-            plots.extend(makeDoubleLeptonHighLevelQuantities(**channelDict,HLL=self.HLL))
+#        # NOTE : very time consuming 
+#        ChannelDictList = []
+#        if not self.args.OnlyYield:
+#            # Resolved No Btag #
+#            if "Resolved0Btag" in jetplot_level:
+#                ChannelDictList.append({'channel': 'ElEl','met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'j1':container0b2j[0],'j2':container0b2j[1],'sel':ElElSelObjAk4JetsExclusiveResolvedNoBtag.sel,'suffix':ElElSelObjAk4JetsExclusiveResolvedNoBtag.selName})
+#                ChannelDictList.append({'channel': 'MuMu','met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'j1':container0b2j[0],'j2':container0b2j[1],'sel':MuMuSelObjAk4JetsExclusiveResolvedNoBtag.sel,'suffix':MuMuSelObjAk4JetsExclusiveResolvedNoBtag.selName})
+#                ChannelDictList.append({'channel': 'ElMu','met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'j1':container0b2j[0],'j2':container0b2j[1],'sel':ElMuSelObjAk4JetsExclusiveResolvedNoBtag.sel,'suffix':ElMuSelObjAk4JetsExclusiveResolvedNoBtag.selName})
+#            # Resolved One Btag #
+#            if "Resolved1Btag" in jetplot_level:
+#                ChannelDictList.append({'channel': 'ElEl','met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'j1':container1b1j[0],'j2':container1b1j[1],'sel':ElElSelObjAk4JetsExclusiveResolvedOneBtag.sel,'suffix':ElElSelObjAk4JetsExclusiveResolvedOneBtag.selName})
+#                ChannelDictList.append({'channel': 'MuMu','met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'j1':container1b1j[0],'j2':container1b1j[1],'sel':MuMuSelObjAk4JetsExclusiveResolvedOneBtag.sel,'suffix':MuMuSelObjAk4JetsExclusiveResolvedOneBtag.selName})
+#                ChannelDictList.append({'channel': 'ElMu','met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'j1':container1b1j[0],'j2':container1b1j[1],'sel':ElMuSelObjAk4JetsExclusiveResolvedOneBtag.sel,'suffix':ElMuSelObjAk4JetsExclusiveResolvedOneBtag.selName})
+#            # Resolved Two Btags  #
+#            if "Resolved2Btag" in jetplot_level:
+#                ChannelDictList.append({'channel': 'ElEl','met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'j1':container2b0j[0],'j2':container2b0j[1],'sel':ElElSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':ElElSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
+#                ChannelDictList.append({'channel': 'MuMu','met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'j1':container2b0j[0],'j2':container2b0j[1],'sel':MuMuSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':MuMuSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
+#                ChannelDictList.append({'channel': 'ElMu','met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'j1':container2b0j[0],'j2':container2b0j[1],'sel':ElMuSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':ElMuSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
+#            # Boosted No Btag #
+#            if "Boosted0Btag" in jetplot_level:
+#                ChannelDictList.append({'channel': 'ElEl','met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'j1':container1fatb[0].subJet1,'j2':container1fatb[0].subJet2,'sel':ElElSelObjAk8JetsInclusiveBoostedNoBtag.sel,'suffix':ElElSelObjAk8JetsInclusiveBoostedNoBtag.selName})
+#                ChannelDictList.append({'channel': 'MuMu','met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'j1':container1fatb[0].subJet1,'j2':container1fatb[0].subJet2,'sel':MuMuSelObjAk8JetsInclusiveBoostedNoBtag.sel,'suffix':MuMuSelObjAk8JetsInclusiveBoostedNoBtag.selName})
+#                ChannelDictList.append({'channel': 'ElMu','met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'j1':container1fatb[0].subJet1,'j2':container1fatb[0].subJet2,'sel':ElMuSelObjAk8JetsInclusiveBoostedNoBtag.sel,'suffix':ElMuSelObjAk8JetsInclusiveBoostedNoBtag.selName})
+#            # Boosted One Btag #
+#            if "Boosted1Btag" in jetplot_level:
+#                ChannelDictList.append({'channel': 'ElEl','met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'j1':container1fatb[0].subJet1,'j2':container1fatb[0].subJet2,'sel':ElElSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':ElElSelObjAk8JetsInclusiveBoostedOneBtag.selName})
+#                ChannelDictList.append({'channel': 'MuMu','met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'j1':container1fatb[0].subJet1,'j2':container1fatb[0].subJet2,'sel':MuMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':MuMuSelObjAk8JetsInclusiveBoostedOneBtag.selName})
+#                ChannelDictList.append({'channel': 'ElMu','met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'j1':container1fatb[0].subJet1,'j2':container1fatb[0].subJet2,'sel':ElMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':ElMuSelObjAk8JetsInclusiveBoostedOneBtag.selName})
+#
+#        for channelDict in ChannelDictList:
+#            plots.extend(makeDoubleLeptonHighLevelQuantities(**channelDict,HLL=self.HLL))
 
         #----- Machine Learning plots -----#
         selObjectDictList = []
@@ -431,7 +400,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         for selObjectDict in selObjectDictList:
             dilepton = dileptonsCont[selObjectDict['channel']]
 
-            yields.add(selObjectDict['selObject'].sel,title=selObjectDict['selObject'].yieldTitle)
+            #self.yields.add(selObjectDict['selObject'].sel,title=selObjectDict['selObject'].yieldTitle)
 
             inputsLeps = returnLeptonsMVAInputs(self      = self,
                                                 l1        = dilepton[0],
@@ -444,14 +413,15 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             inputsFatjet =  returnFatjetMVAInputs(self      = self,
                                                   fatjets   = self.ak8Jets)
             inputsHL = returnHighLevelMVAInputs08(self      = self,
-                                                l1        = dilepton[0],
-                                                l2        = dilepton[1],
-                                                met       = self.corrMET,
-                                                jets      = self.ak4Jets,
-                                                bjets     = self.ak4BJets,
-                                                electrons = self.electronsTightSel,
-                                                muons     = self.muonsTightSel,
-                                                channel   = selObjectDict['channel'])
+                                                  l1        = dilepton[0],
+                                                  l2        = dilepton[1],
+                                                  met       = self.corrMET,
+                                                  jets      = self.ak4Jets,
+                                                  bjets     = self.ak4JetsByBtagScore[:op.min(op.rng_len(self.ak4JetsByBtagScore),op.static_cast("std::size_t",op.c_int(2)))],
+                                                  electrons = self.electronsTightSel,
+                                                  muons     = self.muonsTightSel,
+                                                  channel   = selObjectDict['channel'])
+
             inputsParam = returnParamMVAInputs(self)
             inputsEventNr = returnEventNrMVAInputs(self,t)
 
@@ -486,16 +456,15 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     raise RuntimeError("Failed to understand model number")
 
                 output = DNN(*inputs.values())
-                selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,plot_yield=True,suffix=model_num)
+                selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,suffix=model_num)
 
                 plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
             
     
         #----- Add the Yield plots -----#
-        #plots.extend(self.yieldPlots.returnPlots())
 
         #plots.extend(cutFlowPlots)
-        plots.append(yields)
+        plots.append(self.yields)
 
 
         #----- Return -----#
