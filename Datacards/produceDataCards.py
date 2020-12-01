@@ -21,7 +21,7 @@ class DataCard:
         self.use_syst       = use_syst
         self.root_subdir    = root_subdir
         self.pseudodata     = pseudodata
-
+        
         self.yaml_dict = self.loadYaml(os.path.join(self.path,yamlName))
 
         if self.pseudodata:
@@ -116,6 +116,7 @@ class DataCard:
                     print ("Could not find hist %s in %s"%(histname,rootfile))
                     continue
                 listsyst = [hn for hn in list_histnames if histname in hn and '__' in hn] if self.use_syst else []
+                
                 # Nominal histogram #
                 h = self.getHistogram(f,histname,lumi,br,xsec,sumweight)
                 if not 'nominal' in hist_dict[datacardname].keys():

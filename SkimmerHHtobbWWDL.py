@@ -51,8 +51,6 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             #----- Lepton selection -----#
             # Args are passed within the self #
             ElElSelObj,MuMuSelObj,ElMuSelObj = makeDoubleLeptonSelection(self,noSel,use_dd=False)
-                # makeDoubleLeptonSelection returns dict -> value is list of three selections for 3 channels 
-                # [0] -> we take the first and only key and value because restricted to one lepton selection
             if self.args.Channel == "ElEl":
                 selObj = ElElSelObj
             if self.args.Channel == "MuMu":
@@ -98,18 +96,18 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep["is_SR"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElElTightSel)>=1,
                                                                             op.rng_len(self.MuMuTightSel)>=1,
                                                                             op.rng_len(self.ElMuTightSel)>=1))
-            varsToKeep["is_CR"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElElDileptonFakeExtrapolationSel)>=1,
-                                                                            op.rng_len(self.MuMuDileptonFakeExtrapolationSel)>=1,
-                                                                            op.rng_len(self.ElMuDileptonFakeExtrapolationSel)>=1))
-            varsToKeep["is_ee"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElElTightSel)>=1, op.rng_len(self.ElElDileptonFakeExtrapolationSel)>=1))
-            varsToKeep["is_mm"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.MuMuTightSel)>=1, op.rng_len(self.MuMuDileptonFakeExtrapolationSel)>=1))
-            varsToKeep["is_em"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElMuTightSel)>=1, op.rng_len(self.ElMuDileptonFakeExtrapolationSel)>=1))
+#            varsToKeep["is_CR"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElElDileptonFakeExtrapolationSel)>=1,
+#                                                                            op.rng_len(self.MuMuDileptonFakeExtrapolationSel)>=1,
+#                                                                            op.rng_len(self.ElMuDileptonFakeExtrapolationSel)>=1))
+            varsToKeep["is_ee"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElElTightSel)>=1))
+            varsToKeep["is_mm"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.MuMuTightSel)>=1))
+            varsToKeep["is_em"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.ElMuTightSel)>=1))
             varsToKeep["is_resolved"]       = op.switch(op.AND(op.rng_len(self.ak4Jets)>=2,op.rng_len(self.ak4BJets)>=1,op.rng_len(self.ak8BJets)==0), op.c_bool(True), op.c_bool(False))
             varsToKeep["is_boosted"]        = op.switch(op.rng_len(self.ak8BJets)>=1, op.c_bool(True), op.c_bool(False))
 
 
             # Triggers #
-            varsToKeep["triggers"]                  = self.triggers
+#            varsToKeep["triggers"]                  = self.triggers
             varsToKeep["triggers_SingleElectron"]   = op.OR(*self.triggersPerPrimaryDataset['SingleElectron'])
             varsToKeep["triggers_SingleMuon"]       = op.OR(*self.triggersPerPrimaryDataset['SingleMuon'])
             varsToKeep["triggers_DoubleElectron"]   = op.OR(*self.triggersPerPrimaryDataset['DoubleEGamma'])
@@ -241,13 +239,10 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep["L1prefire"] = op.c_float(-9999.)
 
             # Fake rate #
-            if self.args.FakeExtrapolation:
-                varsToKeep["fakeRate"] = op.multiSwitch((op.rng_len(self.ElElDileptonFakeExtrapolationSel)>=1,self.ElElFakeFactor(self.ElElDileptonFakeExtrapolationSel[0])),
-                                                        (op.rng_len(self.MuMuDileptonFakeExtrapolationSel)>=1,self.MuMuFakeFactor(self.MuMuDileptonFakeExtrapolationSel[0])),
-                                                        (op.rng_len(self.ElMuDileptonFakeExtrapolationSel)>=1,self.ElMuFakeFactor(self.ElMuDileptonFakeExtrapolationSel[0])),
-                                                        op.c_float(0.))
-            else:
-                varsToKeep["fakeRate"] = op.c_float(-9999.)
+            varsToKeep["fakeRate"] = op.multiSwitch((op.rng_len(self.ElElFakeSel)>=1,self.ElElFakeFactor(self.ElElFakeSel[0])),
+                                                    (op.rng_len(self.MuMuFakeSel)>=1,self.MuMuFakeFactor(self.MuMuFakeSel[0])),
+                                                    (op.rng_len(self.ElMuFakeSel)>=1,self.ElMuFakeFactor(self.ElMuFakeSel[0])),
+                                                    op.c_float(0.))
 
             # Btagging SF #
             varsToKeep["btag_SF"] = self.btagAk4SF
@@ -487,9 +482,7 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                                                   l2        = l2,
                                                   met       = self.corrMET,
                                                   jets      = self.ak4Jets,
-                                                  bjets     = self.ak4JetsByBtagScore[:op.multiSwitch((op.rng_len(self.ak4JetsByBtagScore)==0,op.static_cast("std::size_t", op.c_int(0))),
-                                                                                                      (op.rng_len(self.ak4JetsByBtagScore)==1,op.static_cast("std::size_t", op.c_int(1))),
-                                                                                                      op.static_cast("std::size_t", op.c_int(2)))],
+                                                  bjets     = self.ak4JetsByBtagScore[:op.min(op.rng_len(self.ak4JetsByBtagScore),op.static_cast("std::size_t",op.c_int(2)))],
                                                   electrons = self.electronsTightSel,
                                                   muons     = self.muonsTightSel,
                                                   channel   = self.args.Channel)
@@ -529,11 +522,8 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         #----- Additional variables -----#
         varsToKeep["MC_weight"]         = t.genWeight
         varsToKeep['total_weight']      = selObj.sel.weight
-        varsToKeep["event"]             = None # Already in tree
-        varsToKeep["run"]               = None # Already in tree 
-        varsToKeep["ls"]                = t.luminosityBlock
-
-
-
+#        varsToKeep["event"]             = None # Already in tree
+#        varsToKeep["run"]               = None # Already in tree 
+#        varsToKeep["ls"]                = t.luminosityBlock
 
         return selObj.sel, varsToKeep

@@ -63,74 +63,76 @@ def returnMETMVAInputs(self,met):
             ('met_Py',      'MET P_y',                      (40,-200.,200.))     : met.p4.Py(),
             ('met_Pz',      'MET P_z',                      (40,-200.,200.))     : met.p4.Pz()}
 
-def returnHighLevelMVAInputs(self,l1,l2,b1,b2,met,jets,electrons,muons,channel):
-    if channel == "ElEl":
-        l1conept = lambda l1 : self.electron_conept[l1.idx]
-        l2conept = lambda l2 : self.electron_conept[l2.idx]
-    if channel == "MuMu":
-        l1conept = lambda l1 : self.muon_conept[l1.idx]
-        l2conept = lambda l2 : self.muon_conept[l2.idx]
-    elif channel == "ElMu":
-        l1conept = lambda l1 : self.electron_conept[l1.idx]
-        l2conept = lambda l2 : self.muon_conept[l2.idx]
-    dijets = op.combine(jets, N=2, samePred=(lambda j1,j2 : j1.idx != j2.idx))
-
-    import bamboo.treeoperations as _to
-    def rng_min(rng, fun=(lambda x : x), typeName="float"):
-        return op._to.Reduce.fromRngFun(rng, op.c_float(float("+inf"), typeName), ( lambda fn : (
-                lambda res, elm : op.extMethod("std::min", returnType="Float_t")(res, fn(elm))
-                        ) )(fun) )
-    if hasattr(b1,'bRegCorr') and hasattr(b2,'bRegCorr'):
-        bRegCorr = self.HLL.getCorrBp4
-    else:
-        def bRegCorr(obj):
-            return obj.p4
-
-    if self.args.Boosted0Btag or self.args.Boosted1Btag:
-        VBF_tag = op.c_int(op.rng_len(self.VBFJetPairsBoosted)>0)
-    elif self.args.Resolved0Btag or self.args.Resolved1Btag or self.args.Resolved2Btag:
-        VBF_tag = op.c_int(op.rng_len(self.VBFJetPairsResolved)>0)
-    else:
-        raise RuntimeError("Wrong selection to be used by the DNN")
-
-
-    return {('m_bb',                   'Di-bjet invariant mass [GeV]',            (100,0.,1000.))   : op.invariant_mass(b1.p4,b2.p4),
-            ('m_bb_bregcorr',          'Di-bjet invariant mass (regcorr) [GeV]',  (100,0.,1000.))   : op.invariant_mass(bRegCorr(b1),bRegCorr(b2)),
-            ('ht',                     'HT(jets) [GeV]',                          (100,0.,1000.))   : op.rng_sum(jets, lambda j : j.pt),
-            ('min_dr_jets_lep1',       'Min(#Delta R(lead lepton,jets))',         (25,0.,5.))       : op.switch(l1conept(l1) >= l2conept(l2),
-                                                                                                                self.HLL.MinDR_part1_partCont(l1,jets),
-                                                                                                                self.HLL.MinDR_part1_partCont(l2,jets)),
-            ('min_dr_jets_lep2',       'Min(#Delta R(sublead lepton,jets))',      (25,0.,5.))       : op.switch(l1conept(l1) >= l2conept(l2),
-                                                                                                                self.HLL.MinDR_part1_partCont(l2,jets),
-                                                                                                                self.HLL.MinDR_part1_partCont(l1,jets)),
-            ('m_ll',                   'Dilepton invariant mass [GeV]',           (100,0.,1000.))   : op.invariant_mass(l1.p4,l2.p4),
-            ('dr_ll',                  'Dilepton #Delta R',                       (25,0.,5.))       : op.deltaR(l1.p4,l2.p4),
-            ('dphi_ll',                'Dilepton #Delta #Phi',                    (32,-3.2,3.2))    : op.abs(op.deltaPhi(l1.p4,l2.p4)),
-            ('min_dr_jet',             'Min(#Delta R(jets))',                     (25,0.,5.))       : op.rng_min(dijets,lambda dijet : op.deltaR(dijet[0].p4,dijet[1].p4)),
-            ('min_dphi_jet',           'Min(#Delta #Phi(jets))',                  (16,0.,3.2))      : rng_min(dijets,lambda dijet : op.abs(op.deltaPhi(dijet[0].p4,dijet[1].p4)),typeName='double'),
-            ('m_hh_simplemet',         'M_{HH} (simple MET) [GeV]',               (100,0.,1000.))   : op.invariant_mass(b1.p4,b2.p4,l1.p4,l2.p4,met.p4),
-            ('m_hh_simplemet_bregcorr','M_{HH} (simple MET) (regcorr) [GeV]',     (100,0.,1000.))   : op.invariant_mass(bRegCorr(b1),bRegCorr(b2),l1.p4,l2.p4,met.p4),
-            ('met_ld',                 'MET_{LD}',                                (100,0.,1000.))   : self.HLL.MET_LD_DL(met,jets,electrons,muons),
-            ('dr_bb',                  'Di-bjet #Delta R',                        (25,0.,5.))       : op.deltaR(b1.p4,b2.p4),
-            ('dphi_bb',                'Di-bjet #Delta #Phi',                     (32,-3.2,3.2))    : op.abs(op.deltaPhi(b1.p4,b2.p4)), 
-            ('min_dr_leps_b1',         'Min(#Delta R(lead bjet,dilepton))',       (25,0.,5.))       : self.HLL.MinDR_part1_dipart(b1,[l1,l2]),
-            ('min_dr_leps_b2',         'Min(#Delta R(sublead bjet,dilepton))',    (25,0.,5.))       : self.HLL.MinDR_part1_dipart(b2,[l1,l2]),
-            ('lep1_conept',            'Lead lepton cone-P_T [GeV]',              (40,0.,200.))     : op.switch(l1conept(l1) >= l2conept(l2) , l1conept(l1) , l2conept(l2)),
-            ('lep2_conept',            'Sublead lepton cone-P_T [GeV]',           (40,0.,200.))     : op.switch(l1conept(l1) >= l2conept(l2) , l2conept(l2) , l1conept(l1)),
-            ('mww_simplemet',          'M_{WW} (simple MET) [GeV]',               (100,0.,1000.))   : op.invariant_mass(l1.p4,l2.p4,met.p4),
-            ('n_btag',                 'N_b',                                     (6,0.,5.))        : op.static_cast("UInt_t",op.rng_len(self.ak4BJets)),
-            ('VBF_tag',                'VBF tag',                                 (2,0.,2.))        : VBF_tag}
+#def returnHighLevelMVAInputs(self,l1,l2,b1,b2,met,jets,electrons,muons,channel):
+#    if channel == "ElEl":
+#        l1conept = lambda l1 : self.electron_conept[l1.idx]
+#        l2conept = lambda l2 : self.electron_conept[l2.idx]
+#    elif channel == "MuMu":
+#        l1conept = lambda l1 : self.muon_conept[l1.idx]
+#        l2conept = lambda l2 : self.muon_conept[l2.idx]
+#    elif channel == "ElMu":
+#        l1conept = lambda l1 : self.electron_conept[l1.idx]
+#        l2conept = lambda l2 : self.muon_conept[l2.idx]
+#    dijets = op.combine(jets, N=2, samePred=(lambda j1,j2 : j1.idx != j2.idx))
+#
+#    import bamboo.treeoperations as _to
+#    def rng_min(rng, fun=(lambda x : x), typeName="float"):
+#        return op._to.Reduce.fromRngFun(rng, op.c_float(float("+inf"), typeName), ( lambda fn : (
+#                lambda res, elm : op.extMethod("std::min", returnType="Float_t")(res, fn(elm))
+#                        ) )(fun) )
+#    if hasattr(b1,'bRegCorr') and hasattr(b2,'bRegCorr'):
+#        bRegCorr = self.HLL.getCorrBp4
+#    else:
+#        def bRegCorr(obj):
+#            return obj.p4
+#
+#    if self.args.Boosted0Btag or self.args.Boosted1Btag:
+#        VBF_tag = op.c_int(op.rng_len(self.VBFJetPairsBoosted)>0)
+#    elif self.args.Resolved0Btag or self.args.Resolved1Btag or self.args.Resolved2Btag:
+#        VBF_tag = op.c_int(op.rng_len(self.VBFJetPairsResolved)>0)
+#    else:
+#        raise RuntimeError("Wrong selection to be used by the DNN")
+#
+#
+#    return {('m_bb',                   'Di-bjet invariant mass [GeV]',            (100,0.,1000.))   : op.invariant_mass(b1.p4,b2.p4),
+#            ('m_bb_bregcorr',          'Di-bjet invariant mass (regcorr) [GeV]',  (100,0.,1000.))   : op.invariant_mass(bRegCorr(b1),bRegCorr(b2)),
+#            ('ht',                     'HT(jets) [GeV]',                          (100,0.,1000.))   : op.rng_sum(jets, lambda j : j.pt),
+#            ('min_dr_jets_lep1',       'Min(#Delta R(lead lepton,jets))',         (25,0.,5.))       : op.switch(l1conept(l1) >= l2conept(l2),
+#                                                                                                                self.HLL.MinDR_part1_partCont(l1,jets),
+#                                                                                                                self.HLL.MinDR_part1_partCont(l2,jets)),
+#            ('min_dr_jets_lep2',       'Min(#Delta R(sublead lepton,jets))',      (25,0.,5.))       : op.switch(l1conept(l1) >= l2conept(l2),
+#                                                                                                                self.HLL.MinDR_part1_partCont(l2,jets),
+#                                                                                                                self.HLL.MinDR_part1_partCont(l1,jets)),
+#            ('m_ll',                   'Dilepton invariant mass [GeV]',           (100,0.,1000.))   : op.invariant_mass(l1.p4,l2.p4),
+#            ('dr_ll',                  'Dilepton #Delta R',                       (25,0.,5.))       : op.deltaR(l1.p4,l2.p4),
+#            ('dphi_ll',                'Dilepton #Delta #Phi',                    (32,-3.2,3.2))    : op.abs(op.deltaPhi(l1.p4,l2.p4)),
+#            ('min_dr_jet',             'Min(#Delta R(jets))',                     (25,0.,5.))       : op.rng_min(dijets,lambda dijet : op.deltaR(dijet[0].p4,dijet[1].p4)),
+#            ('min_dphi_jet',           'Min(#Delta #Phi(jets))',                  (16,0.,3.2))      : rng_min(dijets,lambda dijet : op.abs(op.deltaPhi(dijet[0].p4,dijet[1].p4)),typeName='double'),
+#            ('m_hh_simplemet',         'M_{HH} (simple MET) [GeV]',               (100,0.,1000.))   : op.invariant_mass(b1.p4,b2.p4,l1.p4,l2.p4,met.p4),
+#            ('m_hh_simplemet_bregcorr','M_{HH} (simple MET) (regcorr) [GeV]',     (100,0.,1000.))   : op.invariant_mass(bRegCorr(b1),bRegCorr(b2),l1.p4,l2.p4,met.p4),
+#            ('met_ld',                 'MET_{LD}',                                (100,0.,1000.))   : self.HLL.MET_LD_DL(met,jets,electrons,muons),
+#            ('dr_bb',                  'Di-bjet #Delta R',                        (25,0.,5.))       : op.deltaR(b1.p4,b2.p4),
+#            ('dphi_bb',                'Di-bjet #Delta #Phi',                     (32,-3.2,3.2))    : op.abs(op.deltaPhi(b1.p4,b2.p4)), 
+#            ('min_dr_leps_b1',         'Min(#Delta R(lead bjet,dilepton))',       (25,0.,5.))       : self.HLL.MinDR_part1_dipart(b1,[l1,l2]),
+#            ('min_dr_leps_b2',         'Min(#Delta R(sublead bjet,dilepton))',    (25,0.,5.))       : self.HLL.MinDR_part1_dipart(b2,[l1,l2]),
+#            ('lep1_conept',            'Lead lepton cone-P_T [GeV]',              (40,0.,200.))     : op.switch(l1conept(l1) >= l2conept(l2) , l1conept(l1) , l2conept(l2)),
+#            ('lep2_conept',            'Sublead lepton cone-P_T [GeV]',           (40,0.,200.))     : op.switch(l1conept(l1) >= l2conept(l2) , l2conept(l2) , l1conept(l1)),
+#            ('mww_simplemet',          'M_{WW} (simple MET) [GeV]',               (100,0.,1000.))   : op.invariant_mass(l1.p4,l2.p4,met.p4),
+#            ('n_btag',                 'N_b',                                     (6,0.,5.))        : op.static_cast("UInt_t",op.rng_len(self.ak4BJets)),
+#            ('VBF_tag',                'VBF tag',                                 (2,0.,2.))        : VBF_tag}
 
 def returnHighLevelMVAInputs08(self,l1,l2,met,jets,bjets,electrons,muons,channel):
     if channel == "ElEl":
         l1conept = lambda l1 : self.electron_conept[l1.idx]
         l2conept = lambda l2 : self.electron_conept[l2.idx]
-    if channel == "MuMu":
+    elif channel == "MuMu":
         l1conept = lambda l1 : self.muon_conept[l1.idx]
         l2conept = lambda l2 : self.muon_conept[l2.idx]
     elif channel == "ElMu":
         l1conept = lambda l1 : self.electron_conept[l1.idx]
         l2conept = lambda l2 : self.muon_conept[l2.idx]
+    else:
+        raise RuntimeError('Could not find correct channel %s'%channel)
 
     dijets = op.combine(jets, N=2)
 
@@ -173,18 +175,24 @@ def returnHighLevelMVAInputs08(self,l1,l2,met,jets,bjets,electrons,muons,channel
             ('min_dphi_jet',           'Min(#Delta #Phi(jets))',                  (16,0.,3.2))      : op.switch(op.rng_len(dijets) > 0,
                                                                                                                 rng_min(dijets,lambda dijet : op.abs(op.deltaPhi(dijet[0].p4,dijet[1].p4)),typeName='double'),
                                                                                                                 op.c_float(0.)),
-            ('m_hh_simplemet',         'M_{HH} (simple MET) [GeV]',               (100,0.,1000.))   : op.invariant_mass(op.rng_sum(bjets,
-                                                                                                                                   lambda bjet : bjet.p4,
-                                                                                                                                   start=self.HLL.empty_p4),
-                                                                                                                        l1.p4,
-                                                                                                                        l2.p4,
-                                                                                                                        met.p4),
-            ('m_hh_simplemet_bregcorr','M_{HH} (simple MET) (regcorr) [GeV]',     (100,0.,1000.))   : op.invariant_mass(op.rng_sum(bjets,
-                                                                                                                                   lambda bjet : self.HLL.getCorrBp4(bjet),
-                                                                                                                                   start=self.HLL.empty_p4),
-                                                                                                                        l1.p4,
-                                                                                                                        l2.p4,
-                                                                                                                        met.p4),
+            ('m_hh_simplemet',         'M_{HH} (simple MET) [GeV]',               (100,0.,1000.))   : op.multiSwitch((op.rng_len(bjets) == 0, op.invariant_mass(l1.p4,l2.p4,met.p4)),
+                                                                                                                     (op.rng_len(bjets) == 1, op.invariant_mass(bjets[0].p4,l1.p4,l2.p4,met.p4)),
+                                                                                                                     op.invariant_mass(bjets[0].p4,bjets[1].p4,l1.p4,l2.p4,met.p4)),
+            ('m_hh_simplemet_bregcorr','M_{HH} (simple MET) (regcorr) [GeV]',     (100,0.,1000.))   : op.multiSwitch((op.rng_len(bjets) == 0, op.invariant_mass(l1.p4,l2.p4,met.p4)),
+                                                                                                                     (op.rng_len(bjets) == 1, op.invariant_mass(self.HLL.getCorrBp4(bjets[0]),l1.p4,l2.p4,met.p4)),
+                                                                                                                     op.invariant_mass(self.HLL.getCorrBp4(bjets[0]),self.HLL.getCorrBp4(bjets[1]),l1.p4,l2.p4,met.p4)),
+#            ('m_hh_simplemet',         'M_{HH} (simple MET) [GeV]',               (100,0.,1000.))   : op.invariant_mass(op.rng_sum(bjets,
+#                                                                                                                                   lambda bjet : bjet.p4,
+#                                                                                                                                   start=self.HLL.empty_p4),
+#                                                                                                                        l1.p4,
+#                                                                                                                        l2.p4,
+#                                                                                                                        met.p4),
+#            ('m_hh_simplemet_bregcorr','M_{HH} (simple MET) (regcorr) [GeV]',     (100,0.,1000.))   : op.invariant_mass(op.rng_sum(bjets,
+#                                                                                                                                   lambda bjet : self.HLL.getCorrBp4(bjet),
+#                                                                                                                                   start=self.HLL.empty_p4),
+#                                                                                                                        l1.p4,
+#                                                                                                                        l2.p4,
+#                                                                                                                        met.p4),
             ('met_ld',                 'MET_{LD}',                                (100,0.,1000.))   : self.HLL.MET_LD_DL(met,jets,electrons,muons),
             ('dr_bb',                  'Di-bjet #Delta R',                        (25,0.,5.))       : op.switch(op.rng_len(bjets)>=2,
                                                                                                                 op.deltaR(bjets[0].p4,bjets[1].p4),
@@ -213,7 +221,7 @@ def returnHighLevelMVAInputs08(self,l1,l2,met,jets,bjets,electrons,muons,channel
                                                                                                                      op.deltaR((l1.p4+l2.p4),(jets[0].p4+jets[1].p4))),
             ('dr_dilep_dibjet',        'Dilepton-dibjet #Delta R',                (25,0.,5.))       : op.multiSwitch((op.rng_len(bjets) == 0, op.c_float(0.)),
                                                                                                                      (op.rng_len(bjets) == 1, op.deltaR((l1.p4+l2.p4),bjets[0].p4)),
-                                                                                                                     op.deltaR((l1.p4+l2.p4),(jets[0].p4+bjets[1].p4))),
+                                                                                                                     op.deltaR((l1.p4+l2.p4),(bjets[0].p4+bjets[1].p4))),
             }
 
 def returnParamMVAInputs(self):

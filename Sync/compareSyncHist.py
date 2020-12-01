@@ -10,7 +10,7 @@ gStyle.SetOptStat(0)
 
 def compareSyncHist(dict_files):
     dict_trees = {}
-    list_branches = []
+    list_branches = {}
     rootfiles = []
 
     # Get all trees in dict #
@@ -18,12 +18,18 @@ def compareSyncHist(dict_files):
         rootfile = TFile(f)
         tree = rootfile.Get("syncTree")
         dict_trees[k] = tree
-        list_branches.append([key.GetName() for key in tree.GetListOfBranches()])
+        list_branches[k] = [key.GetName() for key in tree.GetListOfBranches()]
         rootfiles.append(rootfile)
 
     # Find common branches #
-    branches = list(set(list_branches[0]).intersection(*list_branches[1:]))
-    branches.sort()
+    branches = list()
+    for ki in list_branches:
+        for kj in list_branches:
+            if ki==kj:
+                continue
+            branches += [br for br in list_branches[ki] if br in list_branches[kj]]
+
+    branches = sorted(list(set(branches)))
 
     # Loop to get histograms in dict # 
     hist_dict = OrderedDict()
@@ -37,11 +43,14 @@ def compareSyncHist(dict_files):
         nBins = None
         for group,tree in dict_trees.items():
             print ("*",end='')
+            if not branch in list_branches[group]:
+                continue
             # Draw arguments #
+            histname = ("h"+group+branch).replace('(','').replace(')','')
             if aMax is None and aMin is None and nBins is None:
-                branch_str = branch+">>h"+group+branch+"(100)"
+                branch_str = branch+">>"+histname+"(100)"
             else:
-                branch_str = branch+">>h"+group+branch+"("+str(nBins)+","+str(aMin)+","+str(aMax)+")"
+                branch_str = branch+">>"+histname+"("+str(nBins)+","+str(aMin)+","+str(aMax)+")"
             # Draw #
             if group == "UCLA group":
                 tree.Draw(branch_str,branch+"!=-10000")
@@ -49,7 +58,7 @@ def compareSyncHist(dict_files):
                 tree.Draw(branch_str,branch+"!=-9999")
 
             # Recover histo #
-            hist = gROOT.FindObject("h"+group+branch)
+            hist = gROOT.FindObject(histname)
             if aMax is None and aMin is None:
                 aMax = hist.GetXaxis().GetBinUpEdge(hist.GetNbinsX())
                 aMin = hist.GetXaxis().GetBinLowEdge(1)
@@ -90,7 +99,8 @@ def compareSyncHist(dict_files):
             hist.SetLineColor(colors[i])
             hist.SetLineStyle(style[i])
             hist.SetMaximum(hmax*1.1)
-            hist.SetMinimum(hmin*0.9)
+            #hist.SetMinimum(hmin*0.9)
+            hist.SetMinimum(0)
             legend.AddEntry(hist,group+" : %d entries"%hist.GetEntries(),"l")
             if i==0:
                 hist.Draw("hist")
@@ -113,8 +123,11 @@ compareSyncHist({
             #'Tallinn group v8 (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v8.root',
             #'Tallinn group v9 (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v9.root',
             #'UCLA group (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/myNanoProdMc2016_NANO_Friend_20191003_v4.root',
-            'Louvain group (TT sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/Synchronization/results/TTTo2L2Nu.root',
-            'Tallinn group (TT sample)':'/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_ttbar_Tallinn_2016_v1.root',
+            #'Louvain group (TT sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/Synchronization/results/TTTo2L2Nu.root',
+            #'Tallinn group (TT sample)':'/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_ttbar_Tallinn_2016_v1.root',
+            'Louvain group (POG ID)' : '/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Louvain_mva_POGID_2018.root',
+            'Louvain group (TTH ID)' : '/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Louvain_mva_TTHID_2018.root',
+            'Aachen group' : '/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/SyncMulticlassInput_2018_RWTH.root',
             })
 
 

@@ -7,7 +7,7 @@ from bamboo import treefunctions as op
 from bamboo.analysismodules import NanoAODModule, NanoAODHistoModule, NanoAODSkimmerModule
 from bamboo.analysisutils import makeMultiPrimaryDatasetTriggerSelection
 from bamboo.scalefactors import binningVariables_nano, BtagSF
-from bamboo.plots import SelectionWithDataDriven
+from bamboo.plots import SelectionWithDataDriven,CutFlowReport
 
 from METScripts import METFilter, METcorrection
 from scalefactorsbbWW import ScaleFactorsbbWW
@@ -280,8 +280,11 @@ One lepton and and one jet argument must be specified in addition to the require
         self.sampleCfg = sampleCfg
         self.era = era
 
-        # Check if v7 #
-        self.isNanov7 = ('db' in sampleCfg.keys() and 'NanoAODv7' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['NanoAODv7' in f for f in sampleCfg['files']]))
+        # Check if v7#
+        if self.is_MC:
+            self.isNanov7 = ('db' in sampleCfg.keys() and 'NanoAODv7' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['NanoAODv7' in f for f in sampleCfg['files']]))
+        else:
+            self.isNanov7 = ('db' in sampleCfg.keys() and '02Apr2020' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['02Apr2020' in f for f in sampleCfg['files']]))
         if self.isNanov7:
             print ("Using NanoAODv7")
 
@@ -301,7 +304,6 @@ One lepton and and one jet argument must be specified in addition to the require
 
         # Check if basic synchronization is required (no corrections and triggers) #
         self.inclusive_sel = ((self.args.Synchronization 
-                                  and not any([self.args.__dict__[key] for key in['Preselected', 'Fakeable', 'Tight', 'FakeExtrapolation']]) \
                                   and not any([self.args.__dict__[key] for key in['Ak4', 'Ak8', 'Resolved0Btag', 'Resolved1Btag', 'Resolved2Btag', 'Boosted0Btag','Boosted1Btag']]) \
                                   and (self.args.Channel is None or self.args.Channel=='None')) \
                                   # No channel selection
@@ -609,6 +611,9 @@ One lepton and and one jet argument must be specified in addition to the require
 
         era = sampleCfg['era']
         self.era = era
+        self.tree = t
+
+        self.yields = CutFlowReport("yields",printInLog=True,recursive=True)
 
         ###########################################################################
         #                              Pseudo-data                                #
@@ -711,6 +716,8 @@ One lepton and and one jet argument must be specified in addition to the require
             self.corrMET = METcorrection(MET,t.PV,sample,era,self.is_MC) # Flatness correction might not be needed
         else:
             self.corrMET = MET
+        self.rawMET = MET
+
 
         #############################################################################
         #                      Lepton Lambdas Variables                             #
@@ -793,6 +800,31 @@ One lepton and and one jet argument must be specified in addition to the require
         else:
             self.lambda_is_matched = lambda lep : op.c_bool(True)
         
+        # Tight and fake selections 
+        # Tight Dilepton : must also be Gen matched if MC #
+        self.lambda_dilepton_matched = lambda dilep : op.AND(self.lambda_is_matched(dilep[0]),self.lambda_is_matched(dilep[1]))
+        self.lambda_tightpair_ElEl = lambda dilep : op.AND(self.lambda_dilepton_matched(dilep),
+                                                           self.lambda_electronTightSel(dilep[0]),
+                                                           self.lambda_electronTightSel(dilep[1]))
+        self.lambda_tightpair_MuMu = lambda dilep : op.AND(self.lambda_dilepton_matched(dilep),
+                                                           self.lambda_muonTightSel(dilep[0]),
+                                                           self.lambda_muonTightSel(dilep[1]))
+        self.lambda_tightpair_ElMu = lambda dilep : op.AND(self.lambda_dilepton_matched(dilep),
+                                                           self.lambda_electronTightSel(dilep[0]),
+                                                           self.lambda_muonTightSel(dilep[1]))
+             
+        # Fake Extrapolation dilepton #               
+        self.lambda_fakepair_ElEl = lambda dilep : op.AND(self.lambda_dilepton_matched(dilep),
+                                                          op.NOT(op.AND(self.lambda_electronTightSel(dilep[0]),
+                                                                        self.lambda_electronTightSel(dilep[1]))))
+        self.lambda_fakepair_MuMu = lambda dilep : op.AND(self.lambda_dilepton_matched(dilep),
+                                                          op.NOT(op.AND(self.lambda_muonTightSel(dilep[0]),
+                                                                        self.lambda_muonTightSel(dilep[1]))))
+        self.lambda_fakepair_ElMu = lambda dilep : op.AND(self.lambda_dilepton_matched(dilep),
+                                                          op.NOT(op.AND(self.lambda_electronTightSel(dilep[0]),
+                                                                        self.lambda_muonTightSel(dilep[1]))))
+                
+
         #############################################################################
         #                                 Muons                                     #
         #############################################################################
@@ -1033,27 +1065,29 @@ One lepton and and one jet argument must be specified in addition to the require
                 def returnLambdaCleaningWithRespectToLeadingLeptons(DR):
                     return lambda j : op.multiSwitch(
                           (op.AND(op.rng_len(self.electronsFakeSel) >= 2,op.rng_len(self.muonsFakeSel) == 0), 
+                              # Only electrons 
                               op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[1].p4)>=DR)),
                           (op.AND(op.rng_len(self.electronsFakeSel) == 0,op.rng_len(self.muonsFakeSel) >= 2), 
+                              # Only muons  
                               op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[1].p4)>=DR)),
+                          (op.AND(op.rng_len(self.electronsFakeSel) == 1,op.rng_len(self.muonsFakeSel) == 1),
+                              # One electron + one muon
+                              op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR)),
                           (op.AND(op.rng_len(self.electronsFakeSel) >= 1,op.rng_len(self.muonsFakeSel) >= 1),
-                              op.switch(self.electron_conept[self.electronsFakeSel[0].idx] >= self.muon_conept[self.muonsFakeSel[0].idx],
-                                        # Electron is leading #
-                                        op.multiSwitch((op.rng_len(self.electronsFakeSel) >= 2, op.rng_len(self.muonsFakeSel) == 1,
-                                                            op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[1].p4)>=DR)),
-                                                       (op.rng_len(self.electronsFakeSel) == 1, op.rng_len(self.muonsFakeSel) >= 2,
-                                                            op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR)),
-                                                       op.switch(self.electron_conept[self.electronsFakeSel[1].idx] >= self.muon_conept[self.muonsFakeSel[0].idx],
-                                                                 op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[1].p4)>=DR),
-                                                                 op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR))),
-                                        # Muon is leading #
-                                        op.multiSwitch((op.rng_len(self.muonsFakeSel) >= 2, op.rng_len(self.electronsFakeSel) == 1,
-                                                            op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[1].p4)>=DR)),
-                                                       (op.rng_len(self.muonsFakeSel) == 1, op.rng_len(self.electronsFakeSel) >= 2,
-                                                            op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR)),
-                                                       op.switch(self.muon_conept[self.muonsFakeSel[1].idx] >= self.electron_conept[self.electronsFakeSel[0].idx],
-                                                                 op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[1].p4)>=DR),
-                                                                 op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR))))),
+                              # At least one electron + at least one muon
+                           op.switch(self.electron_conept[self.electronsFakeSel[0].idx] > self.muon_conept[self.muonsFakeSel[0].idx],
+                                     # Electron is leading #
+                                     op.switch(op.rng_len(self.electronsFakeSel) == 1,
+                                               op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR),
+                                               op.switch(self.electron_conept[self.electronsFakeSel[1].idx] > self.muon_conept[self.muonsFakeSel[0].idx],
+                                                         op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[1].p4)>=DR),
+                                                         op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR))),
+                                     # Muon is leading #
+                                     op.switch(op.rng_len(self.muonsFakeSel) == 1,
+                                               op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR),
+                                               op.switch(self.muon_conept[self.muonsFakeSel[1].idx] > self.electron_conept[self.electronsFakeSel[0].idx],
+                                                         op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[1].p4)>=DR),
+                                                         op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR))))),
                            op.c_bool(True))
                 self.lambda_cleanAk4Jets = returnLambdaCleaningWithRespectToLeadingLeptons(0.4)
             
@@ -1548,7 +1582,7 @@ One lepton and and one jet argument must be specified in addition to the require
                 trigNames = [trig._parent.name for trig in listTrig]
                 for trig,trigName in zip(listTrig,trigNames):
                     trigRanges = rangeDict[trigName]
-                    list_cond.append(op.AND(trig,op.OR(*[op.in_range(r[0]-1,t.run,r[1]+1) for r in trigRanges])))
+                    list_cond.append(op.AND(trig,op.OR(*[op.in_range(r[0]-1,self.tree.run,r[1]+1) for r in trigRanges])))
                         # BEWARE : op.in_range is boundaries excluded !!! (hence extension via -1 and +1)
             return op.OR(*list_cond)
 
