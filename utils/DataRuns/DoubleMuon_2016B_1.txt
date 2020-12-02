@@ -1,0 +1,5 @@
+/storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/20000/AACB26B2-3924-3F48-9E27-30FAD0AD092F.root
+/storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/20000/B72B4726-39F3-B249-9580-13D2D3ED0CD0.root
+/storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/20000/D3DEED9E-1FE9-9049-AAA2-5D4C662ADD62.root
+/storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/20000/0A5F4F7D-E1A1-1144-A40C-8D5C10DBEB30.root
+/storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/20000/3A399CDD-C821-C543-ACE5-657B3546D757.root
