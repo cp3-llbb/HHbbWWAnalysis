@@ -1,0 +1,12 @@
+/storage/data/cms/store/data/Run2016H/SingleElectron/NANOAOD/02Apr2020-v1/240000/5BC43B4F-DDC6-5D4C-9B1A-E9D37367978E.root
+/storage/data/cms/store/data/Run2016H/SingleElectron/NANOAOD/02Apr2020-v1/240000/E14D141D-1D51-D24A-8EAD-F573C3F4C37A.root
+/storage/data/cms/store/data/Run2016H/SingleElectron/NANOAOD/02Apr2020-v1/240000/65B13A99-63D2-D64F-8738-18BC9322AB45.root
+/storage/data/cms/store/data/Run2016H/SingleElectron/NANOAOD/02Apr2020-v1/240000/FF73DEFA-50A0-FA4E-9AD6-D76005FC05B3.root
+/storage/data/cms/store/data/Run2016H/SingleElectron/NANOAOD/02Apr2020-v1/240000/2509854B-3329-1349-A506-C8CB4EAAAF01.root
+/storage/data/cms/store/data/Run2016H/SingleElectron/NANOAOD/02Apr2020-v1/240000/26344F29-CE04-4E46-B7DA-CBA8A4EB34C3.root
+/storage/data/cms/store/data/Run2016H/SingleElectron/NANOAOD/02Apr2020-v1/240000/601B5FD5-816F-254F-AA78-6A5669F120C6.root
+/storage/data/cms/store/data/Run2016H/SingleElectron/NANOAOD/02Apr2020-v1/240000/3B253AC6-36B6-F84E-98FE-C59A5B4AC077.root
+/storage/data/cms/store/data/Run2016H/SingleElectron/NANOAOD/02Apr2020-v1/240000/45CCBC25-1F1F-F34A-BA7B-191C32A85BA8.root
+/storage/data/cms/store/data/Run2016H/SingleElectron/NANOAOD/02Apr2020-v1/240000/74E7843A-DD98-2B42-A71C-F8DC3B313FEF.root
+/storage/data/cms/store/data/Run2016H/SingleElectron/NANOAOD/02Apr2020-v1/240000/C0C705E9-6FC5-4B44-83F0-2FD577A12804.root
+/storage/data/cms/store/data/Run2016H/SingleElectron/NANOAOD/02Apr2020-v1/240000/CF319A55-F2BD-5B4C-8C89-E86270DBF6C8.root
