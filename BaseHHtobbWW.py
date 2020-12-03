@@ -246,7 +246,7 @@ One lepton and and one jet argument must be specified in addition to the require
 
 
     def prepareTree(self, tree, sample=None, sampleCfg=None):
-        from bamboo.treedecorators import NanoAODDescription, nanoRochesterCalc, nanoJetMETCalc, nanoJetMETCalc_METFixEE2017
+        from bamboo.treedecorators import NanoAODDescription, nanoRochesterCalc, nanoJetMETCalc, nanoJetMETCalc_METFixEE2017, nanoFatJetCalc
         # JEC's Recommendation for Full RunII: https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC
         # JER : -----------------------------: https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
 
@@ -261,7 +261,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                                             tag             = "v7", 
                                                                                             year            = (era if era else "2016"),
                                                                                             isMC            = self.is_MC,
-                                                                                            systVariations  = [ (nanoJetMETCalc_METFixEE2017 if era == "2017" else nanoJetMETCalc)]),
+                                                                                            systVariations  = [ (nanoJetMETCalc_METFixEE2017 if era == "2017" else nanoJetMETCalc), nanoFatJetCalc]),
                                                                                             # will do Jet and MET variations, and not the Rochester correction
                                                                           lazyBackend   = (self.args.backend == "lazy" or self.args.onlypost))
     
@@ -347,17 +347,6 @@ One lepton and and one jet argument must be specified in addition to the require
 #                                         isMC       = self.is_MC,
 #                                         backend    = be, 
 #                                         uName      = sample)
-
-##                self.triggersPerPrimaryDataset = {
-##                    "SingleMuon" :  [ tree.HLT.IsoMu24],
-##                    "SingleElectron":  [ tree.HLT.Ele27_WPTight_Gsf],
-##                    "DoubleMuon" :  [ tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL,
-##                                      tree.HLT.Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ],
-##                    "DoubleEGamma": [ tree.HLT.Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ],
-##                    "MuonEG":       [ tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ,
-##                                      tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ,
-##                                      tree.HLT.Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL,
-##                                      tree.HLT.Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL]}
  
             # SingleMuon #
             addHLTPath("SingleMuon","IsoMu22")
@@ -400,6 +389,17 @@ One lepton and and one jet argument must be specified in addition to the require
                                   backend               = be, 
                                   uName                 = sample,
                                   cachedir              = cachJEC_dir)
+                    configureJets(variProxy             = tree._FatJet, 
+                                  jetType               = "AK8PFPuppi", 
+                                  jec                   = "Summer16_07Aug2017_V11_MC", 
+                                  smear                 = "Summer16_25nsV1_MC", 
+                                  jesUncertaintySources = ["Total"],
+                                  mcYearForFatJets      = era, 
+                                  mayWriteCache         = isNotWorker, 
+                                  isMC                  = self.is_MC,
+                                  backend               = be, 
+                                  uName                 = sample,
+                                  cachedir              = cachJEC_dir)
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Summer16_07Aug2017_V11_MC",
                                       smear                 = "Summer16_25nsV1_MC",
@@ -425,6 +425,16 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jetType               = "AK4PFchs",
                                   jec                   = jecTag,
                                   mayWriteCache         = isNotWorker,
+                                  isMC                  = self.is_MC,
+                                  backend               = be, 
+                                  uName                 = sample,
+                                  cachedir              = cachJEC_dir)
+                    configureJets(variProxy             = tree._FatJet, 
+                                  jetType               = "AK8PFPuppi", 
+                                  jec                   = jecTag,
+                                  jesUncertaintySources = ["Total"],
+                                  mcYearForFatJets      = era, 
+                                  mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
                                   uName                 = sample,
@@ -478,6 +488,17 @@ One lepton and and one jet argument must be specified in addition to the require
                                   backend               = be, 
                                   uName                 = sample,
                                   cachedir              = cachJEC_dir)
+                    configureJets(variProxy             = tree._FatJet, 
+                                  jetType               = "AK8PFPuppi", 
+                                  jec                   = "Fall17_17Nov2017_V32_MC",
+                                  smear                 = "Fall17_V3b_MC",
+                                  jesUncertaintySources = ["Total"],
+                                  mcYearForFatJets      = era, 
+                                  mayWriteCache         = isNotWorker, 
+                                  isMC                  = self.is_MC,
+                                  backend               = be, 
+                                  uName                 = sample,
+                                  cachedir              = cachJEC_dir)
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Fall17_17Nov2017_V32_MC",
                                       smear                 = "Fall17_V3b_MC",
@@ -505,6 +526,16 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jetType               = "AK4PFchs",
                                   jec                   = jecTag,
                                   mayWriteCache         = isNotWorker,
+                                  isMC                  = self.is_MC,
+                                  backend               = be, 
+                                  uName                 = sample,
+                                  cachedir              = cachJEC_dir)
+                    configureJets(variProxy             = tree._FatJet, 
+                                  jetType               = "AK8PFPuppi", 
+                                  jec                   = jecTag,
+                                  jesUncertaintySources = ["Total"],
+                                  mcYearForFatJets      = era, 
+                                  mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
                                   uName                 = sample,
@@ -555,6 +586,17 @@ One lepton and and one jet argument must be specified in addition to the require
                                   backend               = be, 
                                   uName                 = sample,
                                   cachedir              = cachJEC_dir)
+                    configureJets(variProxy             = tree._FatJet, 
+                                  jetType               = "AK8PFPuppi", 
+                                  jec                   = "Autumn18_V19_MC",
+                                  smear                 = "Autumn18_V7b_MC",
+                                  jesUncertaintySources = ["Total"],
+                                  mcYearForFatJets      = era, 
+                                  mayWriteCache         = isNotWorker, 
+                                  isMC                  = self.is_MC,
+                                  backend               = be, 
+                                  uName                 = sample,
+                                  cachedir              = cachJEC_dir)
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Autumn18_V19_MC",
                                       smear                 = "Autumn18_V7b_MC",
@@ -582,6 +624,16 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jetType               = "AK4PFchs",
                                   jec                   = jecTag,
                                   mayWriteCache         = isNotWorker,
+                                  isMC                  = self.is_MC,
+                                  backend               = be, 
+                                  uName                 = sample,
+                                  cachedir              = cachJEC_dir)
+                    configureJets(variProxy             = tree._FatJet, 
+                                  jetType               = "AK8PFPuppi", 
+                                  jec                   = jecTag,
+                                  jesUncertaintySources = ["Total"], 
+                                  mcYearForFatJets      = era, 
+                                  mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
                                   uName                 = sample,
@@ -1029,6 +1081,7 @@ One lepton and and one jet argument must be specified in addition to the require
         if not self.args.Synchronization:
             #forceDefine(t._Muon.calcProd, noSel) # Muons for Rochester corrections
             forceDefine(t._Jet.calcProd, noSel)  # Jets for configureJets
+            forceDefine(t._FatJet.calcProd, noSel)  # FatJets for configureJets
             forceDefine(getattr(t, "_{0}".format("MET" if era != "2017" else "METFixEE2017")).calcProd,noSel) # MET for configureMET
         else:
             print ("No jet corrections applied")

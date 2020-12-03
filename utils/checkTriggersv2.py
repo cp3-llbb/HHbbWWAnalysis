@@ -82,12 +82,14 @@ if not os.path.exists(cacheFile):
                     if trig_missing:
                         tRuns = f.Get("Runs")
                         runs_in_file = [str(run) for run in list(tree2array(tRuns,'run'))]
-                        print(f"File {pfn} is missing {len(trig_missing):d} branches")
+                        print("File {} is missing {} branches".format(pfn,len(trig_missing)))
                         if not any(run in goldenLumis for run in runs_in_file):
-                            print(f"Contains events from runs {', '.join(runs_in_file)}, none of which on golden, so the file can be skipped")
+                            print("Contains events from runs {"+', '.join(runs_in_file)+"} none of which on golden, so the file can be skipped")
+                            missingTriggers[sample][pfn] = ['not golden lumi']
                         else:
-                            print(f"Contains events from runs {', '.join(runs_in_file)}, missing branches are {', '.join(trig_missing)}")
                             missingTriggers[sample][pfn] = trig_missing
+                    else:
+                        missingTriggers[sample][pfn] = []
 
     with open(cacheFile,'w') as f:
         json.dump(missingTriggers,f,indent=4)
@@ -120,9 +122,12 @@ if not os.path.exists(path_out):
 
 for sample in groups.keys():
     idx = 0
-    for files in groups[sample].values():
-        name = os.path.join(path_out,'{}_{}.txt'.format(sample,idx))
-        idx += 1
+    for mistrig,files in groups[sample].items():
+        if mistrig == ('not golden lumi',):
+            name = os.path.join(path_out,'{}_{}.txt'.format(sample,'NotGolden'))
+        else:
+            name = os.path.join(path_out,'{}_{}.txt'.format(sample,idx))
+            idx += 1
         with open(name,'w') as handle:
             for f in files:
                 handle.write(f+'\n')
