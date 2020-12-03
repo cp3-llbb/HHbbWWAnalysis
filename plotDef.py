@@ -1766,6 +1766,138 @@ def makeSingleLeptonMachineLearningPlotsBDTmissReco(sel,lep,met,jets,bJets,lJets
 
     return plots
     '''
+def makeDoubleLeptonSelectedResolvedVariables(sel,l1,l2,b1,b2,met,suffix,channel,HLL):
+    plots = []
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
+    if channel == "ElEl":
+        l1conept = lambda l1 : HLL.electron_conept(l1)
+        l2conept = lambda l2 : HLL.electron_conept(l2)
+    elif channel == "MuMu":
+        l1conept = lambda l1 : HLL.muon_conept(l1)
+        l2conept = lambda l2 : HLL.muon_conept(l2)
+    elif channel == "ElMu":
+        l1conept = lambda l1 : HLL.electron_conept(l1)
+        l2conept = lambda l2 : HLL.muon_conept(l2)
+    else:
+        raise RuntimeError('Could not find correct channel %s'%channel)
+
+    plots.append(Plot.make1D("%s_%s_l1_Pt"%(channel,suffix),
+                             op.switch(l1conept(l1) >= l2conept(l2) , l1.pt , l2.pt),
+                             sel,
+                             EquidistantBinning(60,0.,300.),
+                             xTitle = "Lead lepton P_{T} [GeV]",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_b1_Pt"%(channel,suffix),
+                             HLL.getCorrBp4(b1).Pt(),
+                             sel,
+                             EquidistantBinning(60,0.,300.),
+                             xTitle = "Lead bjet P_{T} [GeV]",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_met_Pt"%(channel,suffix),
+                             met.pt,
+                             sel,
+                             EquidistantBinning(80,0.,400.),
+                             xTitle = "MET P_{T} [GeV]",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_combined_mll"%(channel,suffix),
+                             op.invariant_mass(l1.p4,l2.p4),
+                             sel,
+                             EquidistantBinning(80,0.,400.),
+                             xTitle = "M_{ll} [GeV]",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_combined_DRll"%(channel,suffix),
+                             op.deltaR(l1.p4,l2.p4),
+                             sel,
+                             EquidistantBinning(50,0.,5.),
+                             xTitle = "#Delta R_{ll}",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_combined_DRbb"%(channel,suffix),
+                             op.deltaR(HLL.getCorrBp4(b1),HLL.getCorrBp4(b2)),
+                             sel,
+                             EquidistantBinning(50,0.,5.),
+                             xTitle = "#Delta R_{bb}",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_combined_DRllbb"%(channel,suffix),
+                             op.deltaR((l1.p4+l2.p4),(HLL.getCorrBp4(b1)+HLL.getCorrBp4(b2))),
+                             sel,
+                             EquidistantBinning(50,0.,5.),
+                             xTitle = "#Delta R_{ll,bb}",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_combined_mHH"%(channel,suffix),
+                             op.invariant_mass(l1.p4,l2.p4,met.p4,HLL.getCorrBp4(b1),HLL.getCorrBp4(b2)),
+                             sel,
+                             EquidistantBinning(100,0.,1000.),
+                             xTitle = "M_{HH} [GeV]",
+                             plotopts = channelLabel))
+    return plots
+
+def makeDoubleLeptonSelectedBoostedVariables(sel,l1,l2,B,met,suffix,channel,HLL):
+    plots = []
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
+    if channel == "ElEl":
+        l1conept = lambda l1 : HLL.electron_conept(l1)
+        l2conept = lambda l2 : HLL.electron_conept(l2)
+    elif channel == "MuMu":
+        l1conept = lambda l1 : HLL.muon_conept(l1)
+        l2conept = lambda l2 : HLL.muon_conept(l2)
+    elif channel == "ElMu":
+        l1conept = lambda l1 : HLL.electron_conept(l1)
+        l2conept = lambda l2 : HLL.muon_conept(l2)
+    else:
+        raise RuntimeError('Could not find correct channel %s'%channel)
+
+    plots.append(Plot.make1D("%s_%s_l1_Pt"%(channel,suffix),
+                             op.switch(l1conept(l1) >= l2conept(l2) , l1.pt , l2.pt),
+                             sel,
+                             EquidistantBinning(50,0.,500.),
+                             xTitle = "Lead lepton P_{T} [GeV]",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_B_Pt"%(channel,suffix),
+                             B.pt,
+                             sel,
+                             EquidistantBinning(50,0.,1000.),
+                             xTitle = "B P_{T} [GeV]",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_B_M"%(channel,suffix),
+                             B.msoftdrop,
+                             sel,
+                             EquidistantBinning(30,0.,300.),
+                             xTitle = "B M_{soft drop} [GeV]",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_met_Pt"%(channel,suffix),
+                             met.pt,
+                             sel,
+                             EquidistantBinning(50,0.,500.),
+                             xTitle = "MET P_{T} [GeV]",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_combined_mll"%(channel,suffix),
+                             op.invariant_mass(l1.p4,l2.p4),
+                             sel,
+                             EquidistantBinning(40,0.,400.),
+                             xTitle = "M_{ll} [GeV]",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_combined_DRll"%(channel,suffix),
+                             op.deltaR(l1.p4,l2.p4),
+                             sel,
+                             EquidistantBinning(25,0.,5.),
+                             xTitle = "#Delta R_{ll}",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_combined_DRllB"%(channel,suffix),
+                             op.deltaR((l1.p4+l2.p4),B.p4),
+                             sel,
+                             EquidistantBinning(25,0.,5.),
+                             xTitle = "#Delta R_{ll,B}",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_combined_mHH"%(channel,suffix),
+                             op.invariant_mass(l1.p4,l2.p4,met.p4,B.p4),
+                             sel,
+                             EquidistantBinning(50,0.,1000.),
+                             xTitle = "M_{HH} [GeV]",
+                             plotopts = channelLabel))
+
+    return plots
+
+
 def makeDoubleLeptonMachineLearningInputPlots(sel,suffix,channel,inputs):
     plots = []
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
