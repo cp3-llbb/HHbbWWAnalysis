@@ -730,50 +730,91 @@ samples:
 
 
 ##### era B
-  SingleMuon_2016B:
+  SingleMuon_2016B0:
     db: ["das:/SingleMuon/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/SingleMuon/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: dascache/SingleMuon_2016B.dat
+    files: utils/utils/DataRuns/SingleMuon_2016B_0.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 30
+  SingleMuon_2016B1:
+    db: ["das:/SingleMuon/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/SingleMuon/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
+    files: utils/utils/DataRuns/SingleMuon_2016B_1.txt
+    group: data
+    era: '2016'
+    run_range: [272007, 275376]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 10
 
-  SingleElectron_2016B:
+  SingleElectron_2016B0:
     db: ["das:/SingleElectron/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/SingleElectron/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: dascache/SingleElectron_2016B.dat
+    files: utils/DataRuns/SingleElectron_2016B_0.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 30
+  SingleElectron_2016B1:
+    db: ["das:/SingleElectron/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/SingleElectron/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
+    files: utils/DataRuns/SingleElectron_2016B_1.txt
+    group: data
+    era: '2016'
+    run_range: [272007, 275376]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 5
 
-  DoubleMuon_2016B:
+  DoubleMuon_2016B0:
     db: ["das:/DoubleMuon/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/DoubleMuon/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: dascache/DoubleMuon_2016B.dat
+    files: utils/DataRuns/DoubleMuon_2016B_0.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 30
+  DoubleMuon_2016B1:
+    db: ["das:/DoubleMuon/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/DoubleMuon/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
+    files: utils/DataRuns/DoubleMuon_2016B_1.txt
+    group: data
+    era: '2016'
+    run_range: [272007, 275376]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 5
 
-  DoubleEGamma_2016B:
+  DoubleEGamma_2016B0:
     db: ["das:/DoubleEG/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/DoubleEG/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: dascache/DoubleEG_2016B.dat
+    files: utils/DataRuns/DoubleEGamma_2016B_0.txt
+    group: data
+    era: '2016'
+    run_range: [272007, 275376]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 15
+  DoubleEGamma_2016B1:
+    db: ["das:/DoubleEG/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/DoubleEG/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
+    files: utils/DataRuns/DoubleEGamma_2016B_1.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 30
 
-  MuonEG_2016B:
+  MuonEG_2016B0:
     db: ["das:/MuonEG/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/MuonEG/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: dascache/MuonEG_2016B.dat
+    files: utils/DataRuns/MuonEG_2016B_0.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 30
+  MuonEG_2016B1:
+    db: ["das:/MuonEG/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/MuonEG/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
+    files: utils/DataRuns/MuonEG_2016B_1.txt
+    group: data
+    era: '2016'
+    run_range: [272007, 275376]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 5
+
 
 ###### era C
   SingleMuon_2016C:
@@ -1006,50 +1047,91 @@ samples:
     split: 30
 
 ###### era H
-  SingleMuon_2016H:
+  SingleMuon_2016H0:
     db: das:/SingleMuon/Run2016H-02Apr2020-v1/NANOAOD
-    files: dascache/SingleMuon_2016H.dat
+    files: utils/DataRuns/SingleMuon_2016H_0.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 30
+  SingleMuon_2016H1:
+    db: das:/SingleMuon/Run2016H-02Apr2020-v1/NANOAOD
+    files: utils/DataRuns/SingleMuon_2016H_1.txt
+    group: data
+    era: '2016'
+    run_range: [280919, 284044]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 10
 
-  SingleElectron_2016H:
+  SingleElectron_2016H0:
     db: das:/SingleElectron/Run2016H-02Apr2020-v1/NANOAOD
-    files: dascache/SingleElectron_2016H.dat
+    files: utils/DataRuns/SingleElectron_2016H_0.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 30
+  SingleElectron_2016H1:
+    db: das:/SingleElectron/Run2016H-02Apr2020-v1/NANOAOD
+    files: utils/DataRuns/SingleElectron_2016H_1.txt
+    group: data
+    era: '2016'
+    run_range: [280919, 284044]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 10
 
-  DoubleMuon_2016H:
+  DoubleMuon_2016H0:
     db: das:/DoubleMuon/Run2016H-02Apr2020-v1/NANOAOD
-    files: dascache/DoubleMuon_2016H.dat
+    files: utils/DataRuns/DoubleMuon_2016H_0.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 30
+  DoubleMuon_2016H1:
+    db: das:/DoubleMuon/Run2016H-02Apr2020-v1/NANOAOD
+    files: utils/DataRuns/DoubleMuon_2016H_1.txt
+    group: data
+    era: '2016'
+    run_range: [280919, 284044]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 10
 
-  DoubleEGamma_2016H:
+  DoubleEGamma_2016H0:
     db: das:/DoubleEG/Run2016H-02Apr2020-v1/NANOAOD
-    files: dascache/DoubleEGamma_2016H.dat
+    files: utils/DataRuns/DoubleEGamma_2016H_0.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 30
+  DoubleEGamma_2016H1:
+    db: das:/DoubleEG/Run2016H-02Apr2020-v1/NANOAOD
+    files: utils/DataRuns/DoubleEGamma_2016H_1.txt
+    group: data
+    era: '2016'
+    run_range: [280919, 284044]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 5
 
-  MuonEG_2016H:
+  MuonEG_2016H0:
     db: das:/MuonEG/Run2016H-02Apr2020-v1/NANOAOD
-    files: dascache/MuonEG_2016H.dat
+    files: utils/DataRuns/MuonEG_2016H_0.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 30
+  MuonEG_2016H1:
+    db: das:/MuonEG/Run2016H-02Apr2020-v1/NANOAOD
+    files: utils/DataRuns/MuonEG_2016H_1.txt
+    group: data
+    era: '2016'
+    run_range: [280919, 284044]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 5
+
 
 ### Signal 
   GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8:
