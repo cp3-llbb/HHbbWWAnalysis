@@ -1261,29 +1261,34 @@ plotIt:
       legend: Fake
       order: 9
   systematics:
-      # on the jets
-    - jer
-    - jesTotal
-      # on the lepton id
-    - mu_loose
-    - mu_tightmva
-    - el_looserecoptlt20
-    - el_looserecoptgt20
-    - el_looseid
-    - el_looseeff
-    - el_tightmva
-     # on the lepton trigger 
-    - ttH_singleElectron_trigSF
-    - ttH_singleMuon_trigSF
-    - ttH_doubleElectron_trigSF 
-    - ttH_doubleMuon_trigSF
-    - ttH_electronMuon_trigSF
-     # on the pileup
+    # PS weights
+    - psISR
+    - psFSR
+    # Sample reweighting
+    - ttbarweightsyst
+    - tHWeight
+    # Pre-firing 
+    - L1PreFiring
+    # pileup
     - pileup
-      # on the jet btagging
-    - deepjet
-    #- deepcsv
-    # Btag SF #
+    # JEC/JER : total for ak8, groupes for ak4
+    - jer   
+    - jesTotal 
+    - jms
+    - jmr
+    - unclustEn
+    - jesEC2
+    - jesHF
+    - jesHF_2016
+    - jesRelativeBal
+    - jesAbsolute_2016
+    - jesFlavorQCD
+    - jesBBEC1 
+    - jesEC2_2016
+    - jesAbsolute
+    - jesRelativeSample_2016
+    - jesBBEC1_2016
+    # Btag SF
     - btagSF_lf
     - btagSF_hf
     - btagSF_hfstats1
@@ -1292,14 +1297,28 @@ plotIt:
     - btagSF_lfstats2
     - btagSF_cferr1
     - btagSF_cferr2
-    # Top pt reweighting #
-    - topPtReweighting
-    # Btag reweighting
-    - btag_ratio
-    # DY weight #
-    - dy_reweighting_elel
-    - dy_reweighting_mumu
-    # Fake factor
+    # Jet PU id
+    - jetpuid_eff_sf, 
+    - jetpuid_mistag_sf
+    # Trigger SF
+    - ttH_singleElectron_trigSF
+    - ttH_singleMuon_trigSF
+    - ttH_doubleElectron_trigSF 
+    - ttH_doubleMuon_trigSF
+    - ttH_electronMuon_trigSF
+    # Lepton SF 
+    - el_looseid
+    - el_looseeff
+    - el_loosereco
+    - corrected_el_tightmva
+    - el_tightmva
+    - ttH_doubleMuon_trigSF
+    - mu_loose, 
+    - corrected_mu_tightmva
+    - el_looserecoptlt20
+    - el_looserecoptgt20
+    - mu_tightmva
+    # Fake Factor 
     - el_FR_pt_syst
     - el_FR_barrel_syst
     - el_FR_norm_syst
@@ -1308,4 +1327,8 @@ plotIt:
     - mu_FR_barrel_syst
     - mu_FR_norm_syst
     - muonCorrFR
+    # DY
+    - dy_reweighting_elel
+    - dy_reweighting_mumu
+
 

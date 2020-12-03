@@ -477,25 +477,15 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                                                 met  = self.corrMET)     
             inputsFatjet =  returnFatjetMVAInputs(self      = self,
                                                   fatjets   = self.ak8Jets)
-            inputsHL = returnHighLevelMVAInputs08(self      = self,
-                                                  l1        = l1,
-                                                  l2        = l2,
-                                                  met       = self.corrMET,
-                                                  jets      = self.ak4Jets,
-                                                  bjets     = self.ak4JetsByBtagScore[:op.min(op.rng_len(self.ak4JetsByBtagScore),op.static_cast("std::size_t",op.c_int(2)))],
-                                                  electrons = self.electronsTightSel,
-                                                  muons     = self.muonsTightSel,
-                                                  channel   = self.args.Channel)
-            #inputsHL = returnHighLevelMVAInputs(self      = self,
-            #                                    l1        = l1,
-            #                                    l2        = l2,
-            #                                    b1        = j1,
-            #                                    b2        = j2,
-            #                                    met       = self.corrMET,
-            #                                    jets      = self.ak4Jets,
-            #                                    electrons = self.electronsTightSel,
-            #                                    muons     = self.muonsTightSel,
-            #                                    channel   = self.args.Channel)
+            inputsHL = returnHighLevelMVAInputs(self      = self,
+                                                l1        = l1,
+                                                l2        = l2,
+                                                met       = self.corrMET,
+                                                jets      = self.ak4Jets,
+                                                bjets     = self.ak4JetsByBtagScore[:op.min(op.rng_len(self.ak4JetsByBtagScore),op.static_cast("std::size_t",op.c_int(2)))],
+                                                electrons = self.electronsTightSel,
+                                                muons     = self.muonsTightSel,
+                                                channel   = self.args.Channel)
             inputsParam = returnParamMVAInputs(self)
             inputsEventNr = returnEventNrMVAInputs(self,t)
 

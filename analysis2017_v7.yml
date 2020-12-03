@@ -1042,39 +1042,74 @@ plotIt:
     - 0.91
     - 0.91
   systematics:
-  - jer
-  - jesTotal
-  - mu_loose
-  - mu_tightmva
-  - el_looserecoptlt20
-  - el_looserecoptgt20
-  - el_looseid
-  - el_looseeff
-  - el_tightmva
-  - ttH_singleElectron_trigSF
-  - ttH_singleMuon_trigSF
-  - ttH_doubleElectron_trigSF
-  - ttH_doubleMuon_trigSF
-  - ttH_electronMuon_trigSF
-  - pileup
-  - deepjet
-  - btagSF_lf
-  - btagSF_hf
-  - btagSF_hfstats1
-  - btagSF_hfstats2
-  - btagSF_lfstats1
-  - btagSF_lfstats2
-  - btagSF_cferr1
-  - btagSF_cferr2
-  - topPtReweighting
-  - btag_ratio
-  - dy_reweighting_elel
-  - dy_reweighting_mumu
-  - el_FR_pt_syst
-  - el_FR_barrel_syst
-  - el_FR_norm_syst
-  - electronCorrFR
-  - mu_FR_pt_syst
-  - mu_FR_barrel_syst
-  - mu_FR_norm_syst
-  - muonCorrFR
+    # PS weights
+    - psISR
+    - psFSR
+    # Sample reweighting
+    - ttbarweightsyst
+    - tHWeight
+    # Pre-firing 
+    - L1PreFiring
+    # pileup
+    - pileup
+    # JEC/JER : total for ak8, groupes for ak4
+    - jer   
+    - jesTotal 
+    - jms
+    - jmr
+    - unclustEn
+    - jesEC2
+    - jesHF
+    - jesHF_2017
+    - jesRelativeBal
+    - jesAbsolute_2017
+    - jesFlavorQCD
+    - jesBBEC1 
+    - jesEC2_2017
+    - jesAbsolute
+    - jesRelativeSample_2017
+    - jesBBEC1_2017
+    # Btag SF
+    - btagSF_lf
+    - btagSF_hf
+    - btagSF_hfstats1
+    - btagSF_hfstats2
+    - btagSF_lfstats1
+    - btagSF_lfstats2
+    - btagSF_cferr1
+    - btagSF_cferr2
+    # Jet PU id
+    - jetpuid_eff_sf, 
+    - jetpuid_mistag_sf
+    # Trigger SF
+    - ttH_singleElectron_trigSF
+    - ttH_singleMuon_trigSF
+    - ttH_doubleElectron_trigSF 
+    - ttH_doubleMuon_trigSF
+    - ttH_electronMuon_trigSF
+    # Lepton SF 
+    - el_looseid
+    - el_looseeff
+    - el_loosereco
+    - corrected_el_tightmva
+    - el_tightmva
+    - ttH_doubleMuon_trigSF
+    - mu_loose, 
+    - corrected_mu_tightmva
+    - el_looserecoptlt20
+    - el_looserecoptgt20
+    - mu_tightmva
+    # Fake Factor 
+    - el_FR_pt_syst
+    - el_FR_barrel_syst
+    - el_FR_norm_syst
+    - electronCorrFR
+    - mu_FR_pt_syst
+    - mu_FR_barrel_syst
+    - mu_FR_norm_syst
+    - muonCorrFR
+    # DY
+    - dy_reweighting_elel
+    - dy_reweighting_mumu
+
+
