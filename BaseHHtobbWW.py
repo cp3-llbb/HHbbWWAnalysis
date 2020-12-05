@@ -300,7 +300,6 @@ One lepton and and one jet argument must be specified in addition to the require
             raise RuntimeError("Unknown era {0}".format(era))
 
         # Rochester and JEC corrections (depends on era) #     
-        cachJEC_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),'cacheJEC')
 
         # Check if basic synchronization is required (no corrections and triggers) #
         self.inclusive_sel = ((self.args.Synchronization 
@@ -387,8 +386,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = "Summer16_07Aug2017_V11_MC", 
@@ -398,8 +396,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Summer16_07Aug2017_V11_MC",
                                       smear                 = "Summer16_25nsV1_MC",
@@ -408,8 +405,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
-                                      uName                 = sample,
-                                      cachedir              = cachJEC_dir)
+                                      uName                 = sample)
 
                 else:                   # If data -> extract info from config 
                     jecTag = None
@@ -427,8 +423,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
@@ -437,15 +432,13 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureType1MET(variProxy         = getattr(tree, f"_{metName}"),
                                       jec               = jecTag,
                                       mayWriteCache     = isNotWorker,
                                       isMC              = self.is_MC,
                                       backend           = be, 
-                                      uName             = sample,
-                                      cachedir          = cachJEC_dir)
+                                      uName             = sample)
 
         ############################################################################################
         # ERA 2017 #
@@ -486,8 +479,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = "Fall17_17Nov2017_V32_MC",
@@ -497,8 +489,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Fall17_17Nov2017_V32_MC",
                                       smear                 = "Fall17_V3b_MC",
@@ -507,8 +498,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
-                                      uName                 = sample,
-                                      cachedir              = cachJEC_dir)
+                                      uName                 = sample)
 
                 else:                   # If data -> extract info from config 
                     jecTag = None
@@ -528,8 +518,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
@@ -538,15 +527,13 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureType1MET(variProxy         = getattr(tree, f"_{metName}"),
                                       jec               = jecTag,
                                       mayWriteCache     = isNotWorker,
                                       isMC              = self.is_MC,
                                       backend           = be, 
-                                      uName             = sample,
-                                      cachedir          = cachJEC_dir)
+                                      uName             = sample)
 
         ############################################################################################
         # ERA 2018 #
@@ -584,8 +571,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = "Autumn18_V19_MC",
@@ -595,8 +581,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Autumn18_V19_MC",
                                       smear                 = "Autumn18_V7b_MC",
@@ -605,8 +590,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
-                                      uName                 = sample,
-                                      cachedir              = cachJEC_dir)
+                                      uName                 = sample)
 
                 else:                   # If data -> extract info from config 
                     jecTag = None
@@ -626,8 +610,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
@@ -636,15 +619,13 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureType1MET(variProxy         = getattr(tree, f"_{metName}"),
                                       jec               = jecTag,
                                       mayWriteCache     = isNotWorker,
                                       isMC              = self.is_MC,
                                       backend           = be, 
-                                      uName             = sample,
-                                      cachedir          = cachJEC_dir)
+                                      uName             = sample)
 
         return tree,noSel,be,lumiArgs
 
@@ -656,7 +637,6 @@ One lepton and and one jet argument must be specified in addition to the require
 
     def prepareObjects(self, t, noSel, sample, sampleCfg, channel, forSkimmer=False):
         # Some imports #
-        from bamboo.analysisutils import forceDefine
 
         if channel not in ["DL","SL"]:
             raise RuntimeError('Channel %s not understood'%channel)
@@ -1074,18 +1054,6 @@ One lepton and and one jet argument must be specified in addition to the require
         self.tauCleanSel = op.select(self.tauSel, self.lambda_tauClean)
 
 
-        ##############################################################################
-        #                             Jets forceDefines                              #
-        ##############################################################################
-        # Forcedefine : calculate once per event (for every event) #
-        if not self.args.Synchronization:
-            #forceDefine(t._Muon.calcProd, noSel) # Muons for Rochester corrections
-            forceDefine(t._Jet.calcProd, noSel)  # Jets for configureJets
-            forceDefine(t._FatJet.calcProd, noSel)  # FatJets for configureJets
-            forceDefine(getattr(t, "_{0}".format("MET" if era != "2017" else "METFixEE2017")).calcProd,noSel) # MET for configureMET
-        else:
-            print ("No jet corrections applied")
-
         #############################################################################
         #                                AK4 Jets                                   #
         #############################################################################
@@ -1430,22 +1398,6 @@ One lepton and and one jet argument must be specified in addition to the require
         #                             High level lambdas                            #
         #############################################################################
         self.HLL = highlevelLambdas(self)
-
-        #############################################################################
-        #                           Jet PU ID reweighting                           #
-        #############################################################################
-        if self.is_MC and not self.args.DYStitchingPlots and not self.args.WJetsStitchingPlots:
-            ak4Jets_below50 = op.select(self.ak4Jets, lambda j : j.pt < 50.)
-            wFail = op.extMethod("scalefactorWeightForFailingObject", returnType="double")
-            puid_reweighting = op.rng_product(ak4Jets_below50, lambda j : op.switch(j.genJet.isValid,
-                                                                                    op.switch(((j.puId >> 2) & 1),
-                                                                                              self.jetpuid_sf_eff(j), 
-                                                                                              wFail(self.jetpuid_sf_eff(j), self.jetpuid_mc_eff(j))),
-                                                                                    op.switch(((j.puId >> 2) & 1),
-                                                                                              self.jetpuid_sf_mis(j), 
-                                                                                              wFail(self.jetpuid_sf_mis(j), self.jetpuid_mc_mis(j)))))
-            noSel = noSel.refine("jetPUIDReweighting",weight=puid_reweighting)
-
         
         #############################################################################
         #                             Fake Factors                                  #
@@ -1501,23 +1453,18 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                      self.lambda_FF_mu(dilep[1])),
                                                                      op.c_float(1.)) # Should not happen
 
-
         ###########################################################################
         #                    b-tagging efficiency scale factors                   #
         ###########################################################################
-        if self.is_MC and not self.args.DYStitchingPlots and not self.args.WJetsStitchingPlots:
-            #----- AK4 jets -> using Method 1.d -----#
-            # See https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagShapeCalibration
-            # W_btag = Π_i(all jets) SD(jet_i)  which must be multiplied by r = Σ w(before)/Σ w(after) (before/after using the btag weight, no btag selection for both)
-                
-            if era == '2016':
+        if self.is_MC:
+            if self.era == '2016':
                 if ('db' in sampleCfg.keys() and 'TuneCP5' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['TuneCP5' in f for f in sampleCfg['files']])):
                     csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_2016LegacySF_V1_TuneCP5.csv")
                 else: # With CUETP8M1
                     csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_2016LegacySF_V1.csv")
-            if era == '2017':
+            if self.era == '2017':
                 csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepFlavour_94XSF_V4_B_F.csv")
-            if era == '2018':
+            if self.era == '2018':
                 csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_102XSF_V2.csv")
                 
             if not os.path.exists(csvFileNameAk4):
@@ -1535,54 +1482,102 @@ One lepton and and one jet argument must be specified in addition to the require
                                                  measurementType  = "iterativefit", 
                                                  sel              = noSel, 
                                                  getters          = {'Discri':lambda j : j.btagDeepFlavB},
-                                                 uName            = sample)
+                                                 uName            = self.sample)
+
+#        if self.isNanov7:
+#            if era == '2016':
+#                csvFileNameAk8= os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_2016LegacySF_V1.csv")
+#            if era == '2017':
+#                csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_94XSF_V4_B_F_v2.csv")
+#            if era == '2018':
+#                csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_102XSF_V1.csv")
+#            
+#            #----- Ak8 SF -----# 
+#            if not os.path.exists(csvFileNameAk8):
+#                raise RuntimeError('Could not find Ak8 csv file %s'%csvFileNameAk8)
+#            print ('Btag Ak8 CSV file',csvFileNameAk8)
+#            self.DeepCsvSubjetMediumSF = BtagSF(taggerName       = "deepcsvSubjet", 
+#                                                csvFileName      = csvFileNameAk8,
+#                                                wp               = "medium",
+#                                                sysType          = "central", 
+#                                                otherSysTypes    = ['up','down'],
+#                                                measurementType  = {"B": "lt", "C": "lt", "UDSG": "incl"},
+#                                                getters          = {'Discri':lambda subjet : subjet.btagDeepB,
+#                                                                    'JetFlavour': lambda subjet : op.static_cast("BTagEntry::JetFlavor",
+#                                                                                                        op.multiSwitch((subjet.nBHadrons>0,op.c_int(0)), # B -> flav = 5 -> BTV = 0
+#                                                                                                                       (subjet.nCHadrons>0,op.c_int(1)), # C -> flav = 4 -> BTV = 1
+#                                                                                                                       op.c_int(2)))},                  # UDSG -> flav = 0 -> BTV = 2
+#                                                sel              = sel, 
+#                                                uName            = self.sample)
+
+
+        ###########################################################################
+        #                                 RETURN                                  # 
+        ###########################################################################
+        return noSel
+
+
+
+    def beforeJetselection(self,sel,name=''):
+        ##############################################################################
+        #                             Jets forceDefines                              #
+        ##############################################################################
+        from bamboo.analysisutils import forceDefine
+        # Forcedefine : calculate once per event (for every event) #
+        if not self.args.Synchronization:
+            #forceDefine(t._Muon.calcProd, sel) # Muons for Rochester corrections
+            forceDefine(self.tree._Jet.calcProd, sel)  # Jets for configureJets
+            forceDefine(self.tree._FatJet.calcProd, sel)  # FatJets for configureJets
+            forceDefine(getattr(self.tree, "_{0}".format("MET" if self.era != "2017" else "METFixEE2017")).calcProd,sel) # MET for configureMET
+        else:
+            print ("No jet corrections applied")
+
+        #############################################################################
+        #                           Jet PU ID reweighting                           #
+        #############################################################################
+        if self.is_MC:
+            ak4Jets_below50 = op.select(self.ak4Jets, lambda j : j.pt < 50.)
+            wFail = op.extMethod("scalefactorWeightForFailingObject", returnType="double")
+            puid_reweighting = op.rng_product(ak4Jets_below50, lambda j : op.switch(j.genJet.isValid,
+                                                                                    op.switch(((j.puId >> 2) & 1),
+                                                                                              self.jetpuid_sf_eff(j), 
+                                                                                              wFail(self.jetpuid_sf_eff(j), self.jetpuid_mc_eff(j))),
+                                                                                    op.switch(((j.puId >> 2) & 1),
+                                                                                              self.jetpuid_sf_mis(j), 
+                                                                                              wFail(self.jetpuid_sf_mis(j), self.jetpuid_mc_mis(j)))))
+            sel = sel.refine("jetPUIDReweighting"+name,weight=puid_reweighting)
+
+        ###########################################################################
+        #                    b-tagging efficiency scale factors                   #
+        ###########################################################################
+        if self.is_MC:
+            #----- AK4 jets -> using Method 1.d -----#
+            # See https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagShapeCalibration
+            # W_btag = Π_i(all jets) SD(jet_i)  which must be multiplied by r = Σ w(before)/Σ w(after) (before/after using the btag weight, no btag selection for both)
+                
             self.btagAk4SF = op.rng_product(self.ak4Jets , lambda j : self.DeepJetDiscReshapingSF(j))
 
             if self.args.BtagReweightingOn and self.args.BtagReweightingOff: 
                 raise RuntimeError("Reweighting cannot be both on and off") 
             if self.args.BtagReweightingOn:
-                noSel = noSel.refine("BtagSF" , weight = self.btagAk4SF)
+                sel = sel.refine("BtagSF" , weight = self.btagAk4SF)
             elif self.args.BtagReweightingOff:
                 pass # Do not apply any SF
             else:
-                ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(sample,era))
+                ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(self.sample,self.era))
                 if not os.path.exists(ReweightingFileName):
                     raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
                 print ('Reweighting file',ReweightingFileName)
 
                 self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
                                                                 numJets  = op.rng_len(self.ak4Jets),
-                                                                nameHint = f"bamboo_nJetsWeight{sample}".replace('-','_'))
-                noSel = noSel.refine("BtagAk4SF" , weight = [self.btagAk4SF,self.BtagRatioWeight])
+                                                                nameHint = "bamboo_nJetsWeight_{}".format(self.sample.replace('-','_')))
+                sel = sel.refine("BtagAk4SF"+name , weight = [self.btagAk4SF,self.BtagRatioWeight])
 
 #            if self.isNanov7:
 #                #----- AK8 jets -> using Method 1.a -----#
 #                # See https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagShapeCalibration
 #
-#                if era == '2016':
-#                    csvFileNameAk8= os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_2016LegacySF_V1.csv")
-#                if era == '2017':
-#                    csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_94XSF_V4_B_F_v2.csv")
-#                if era == '2018':
-#                    csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_102XSF_V1.csv")
-#                
-#                #----- Ak8 SF -----# 
-#                if not os.path.exists(csvFileNameAk8):
-#                    raise RuntimeError('Could not find Ak8 csv file %s'%csvFileNameAk8)
-#                print ('Btag Ak8 CSV file',csvFileNameAk8)
-#                self.DeepCsvSubjetMediumSF = BtagSF(taggerName       = "deepcsvSubjet", 
-#                                                    csvFileName      = csvFileNameAk8,
-#                                                    wp               = "medium",
-#                                                    sysType          = "central", 
-#                                                    otherSysTypes    = ['up','down'],
-#                                                    measurementType  = {"B": "lt", "C": "lt", "UDSG": "incl"},
-#                                                    getters          = {'Discri':lambda subjet : subjet.btagDeepB,
-#                                                                        'JetFlavour': lambda subjet : op.static_cast("BTagEntry::JetFlavor",
-#                                                                                                            op.multiSwitch((subjet.nBHadrons>0,op.c_int(0)), # B -> flav = 5 -> BTV = 0
-#                                                                                                                           (subjet.nCHadrons>0,op.c_int(1)), # C -> flav = 4 -> BTV = 1
-#                                                                                                                           op.c_int(2)))},                  # UDSG -> flav = 0 -> BTV = 2
-#                                                    sel              = noSel, 
-#                                                    uName            = sample)
 #
 #                # Reweighting #
 #                wFail = op.extMethod("scalefactorWeightForFailingObject", returnType="double") # 
@@ -1609,10 +1604,10 @@ One lepton and and one jet argument must be specified in addition to the require
 #                                                                                self.DeepCsvSubjetMediumSF(subjet),                                           # Tag : return SF_i
 #                                                                                wFail(self.DeepCsvSubjetMediumSF(subjet),self.Ak8Eff_lightjets(subjet))))     # Not tagged : return (1-SF_jxeff_j)/(1-eff_j)
 #                self.ak8BtagReweighting = op.rng_product(self.ak8Jets, lambda j : lambda_subjetWeight(j.subJet1)*lambda_subjetWeight(j.subJet2))
-#                noSel = noSel.refine("BtagAk8SF" , weight = [self.ak8BtagReweighting])
+#                sel = sel.refine("BtagAk8SF"+name , weight = [self.ak8BtagReweighting])
+        
+        return sel
        
-        # Return #
-        return noSel
 
 
 
