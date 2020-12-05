@@ -57,6 +57,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         #----- Ratio reweighting variables (before lepton and jet selection) -----#
         if self.args.BtagReweightingOff or self.args.BtagReweightingOn:
+            noSel = self.beforeJetselection(noSel)
             plots.append(objectsNumberPlot(channel="NoChannel",suffix='NoSelection',sel=noSel,objCont=self.ak4Jets,objName='Ak4Jets',Nmax=15,xTitle='N(Ak4 jets)'))
             plots.append(CutFlowReport("BtagReweightingCutFlowReport",noSel,printInLog=True,recursive=True))
             return plots
@@ -117,6 +118,10 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             OSMuMuDilepton = self.MuMuFakeSel
             OSElMuDilepton = self.ElMuFakeSel
 
+        #----- Apply jet corrections -----#
+        ElElSelObj.sel = self.beforeJetselection(ElElSelObj.sel,'ElEl')
+        MuMuSelObj.sel = self.beforeJetselection(MuMuSelObj.sel,'MuMu')
+        ElMuSelObj.sel = self.beforeJetselection(ElMuSelObj.sel,'ElMu')
 
         #----- DY reweighting -----#
         if 'DYEstimation' in self.datadrivenContributions:
@@ -504,7 +509,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         #plots.extend(cutFlowPlots)
         plots.append(self.yields)
-
 
         #----- Return -----#
         return plots
