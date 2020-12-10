@@ -181,6 +181,14 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             MuMuSelObjAk4Jets = makeAtLeastTwoAk4JetSelection(self,MuMuSelObj,copy_sel=True)
             ElMuSelObjAk4Jets = makeAtLeastTwoAk4JetSelection(self,ElMuSelObj,copy_sel=True)
 
+            if self.args.onlypost:
+                ElElSelObjAk4Jets.record_yields = True
+                MuMuSelObjAk4Jets.record_yields = True
+                ElMuSelObjAk4Jets.record_yields = True
+                ElElSelObjAk4Jets.yieldTitle = 'Channel $e^{+}e^{-}$'
+                MuMuSelObjAk4Jets.yieldTitle = 'Channel $\mu^{+}\mu^{-}$'
+                ElMuSelObjAk4Jets.yieldTitle = 'Channel $e^{\pm}\mu^{\mp}$'
+
 #            # Jet and lepton plots #
 #            ChannelDictList = []
 #            if "Ak4" in jetplot_level:
@@ -209,6 +217,13 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             MuMuSelObjAk8Jets = makeAtLeastOneAk8JetSelection(self,MuMuSelObj,copy_sel=True)
             ElMuSelObjAk8Jets = makeAtLeastOneAk8JetSelection(self,ElMuSelObj,copy_sel=True)
 
+            if self.args.onlypost:
+                ElElSelObjAk8Jets.record_yields = True
+                MuMuSelObjAk8Jets.record_yields = True
+                ElMuSelObjAk8Jets.record_yields = True
+                ElElSelObjAk8Jets.yieldTitle = 'Channel $e^{+}e^{-}$'
+                MuMuSelObjAk8Jets.yieldTitle = 'Channel $\mu^{+}\mu^{-}$'
+                ElMuSelObjAk8Jets.yieldTitle = 'Channel $e^{\pm}\mu^{\mp}$'
 #            # Fatjets plots #
 #            ChannelDictList = []
 #            if "Ak8" in jetplot_level:
@@ -230,7 +245,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 #                plots.extend(makeDoubleLeptonAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys}))
 #                # MET #
 #                plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
-
+                
                      
         #----- Resolved selection -----#
         if any(item in ["Resolved0Btag","Resolved1Btag","Resolved2Btag"] for item in jetsel_level): # If any of resolved category is asked

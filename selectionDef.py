@@ -15,11 +15,12 @@ class SelectionObject:
         yieldTitle  : Title for the yield table in LateX
         NB : copy() might be useful to be able to branch out the selection
     """
-    def __init__(self,sel,selName,yieldTitle,yieldObj=None):
-        self.sel        = sel
-        self.selName    = selName
-        self.yieldTitle = yieldTitle
-        self.yieldObj   = yieldObj
+    def __init__(self,sel,selName,yieldTitle,yieldObj=None,record_yields=False):
+        self.sel           = sel
+        self.selName       = selName
+        self.yieldTitle    = yieldTitle
+        self.yieldObj      = yieldObj
+        self.record_yields = record_yields
     
     def refine(self,cut=None,weight=None,autoSyst=True):
         """
@@ -29,7 +30,8 @@ class SelectionObject:
                                    cut     = cut,
                                    weight  = weight,
                                    autoSyst= autoSyst)
-        self._makeYield()
+        if self.record_yields:
+            self._makeYield()
 
     def create(self, ddSuffix, cut=None, weight=None, ddCut=None, ddWeight=None, autoSyst=True, enable=True):
         """
@@ -44,7 +46,8 @@ class SelectionObject:
                                                   ddWeight = ddWeight,
                                                   autoSyst = autoSyst,
                                                   enable   = enable)
-        self._makeYield()
+        if self.record_yields:
+            self._makeYield()
 
     def _makeYield(self):
         """
@@ -392,18 +395,21 @@ def makeDoubleLeptonSelection(self,baseSel,use_dd=True):
             ElMuTightSF = lambda dilep : []
 
         #---- Select tight leptons ----#
-        ElElSelObj = SelectionObject(sel          = baseSel,
-                                     selName      = "Has2TightElEl",
-                                     yieldTitle   = "Tightdilepton (channel $e^+e^-$)",
-                                     yieldObj     = self.yields)
-        MuMuSelObj = SelectionObject(sel          = baseSel,
-                                     selName      = "Has2TightMuMu",
-                                     yieldTitle   = "Tight dilepton (channel $\mu^+\mu^-$)",
-                                     yieldObj     = self.yields)
-        ElMuSelObj = SelectionObject(sel          = baseSel,
-                                     selName      = "Has2TightElMu",
-                                     yieldTitle   = "Tight dilepton (channel $e^{\pm}\mu^{\mp}$)",
-                                     yieldObj     = self.yields)
+        ElElSelObj = SelectionObject(sel           = baseSel,
+                                     selName       = "Has2TightElEl",
+                                     yieldTitle    = "Tightdilepton (channel $e^+e^-$)           ",
+                                     yieldObj      = self.yields,
+                                     record_yields = not self.args.onlypost)
+        MuMuSelObj = SelectionObject(sel           = baseSel,
+                                     selName       = "Has2TightMuMu",
+                                     yieldTitle    = "Tight dilepton (channel $\mu^+\mu^-$)      ",
+                                     yieldObj      = self.yields,
+                                     record_yields = not self.args.onlypost)
+        ElMuSelObj = SelectionObject(sel           = baseSel,
+                                     selName       = "Has2TightElMu",
+                                     yieldTitle    = "Tight dilepton (channel $e^{\pm}\mu^{\mp}$)",
+                                     yieldObj      = self.yields,
+                                     record_yields = not self.args.onlypost)
 
         ElElSelObj.refine(cut    = [op.rng_len(self.ElElTightSel) == 1,
                                     op.rng_len(self.muonsTightSel) == 0],
@@ -518,18 +524,21 @@ def makeDoubleLeptonSelection(self,baseSel,use_dd=True):
 
 
         #---- Select fakeables -----# 
-        ElElSelObj = SelectionObject(sel          = baseSel,
-                                     selName      = "Has2FakeableElEl",
-                                     yieldTitle   = "Fakeable dilepton (channel $e^+e^-$)",
-                                     yieldObj     = self.yields)
-        MuMuSelObj = SelectionObject(sel          = baseSel,
-                                     selName      = "Has2FakeableMuMu",
-                                     yieldTitle   = "Fakeable dilepton (channel $\mu^+\mu^-$)",
-                                     yieldObj     = self.yields)
-        ElMuSelObj = SelectionObject(sel          = baseSel,
-                                     selName      = "Has2FakeableElMu",
-                                     yieldTitle   = "Fakeable dilepton (channel $e^{\pm}\mu^{\mp}$)",
-                                     yieldObj     = self.yields)
+        ElElSelObj = SelectionObject(sel           = baseSel,
+                                     selName       = "Has2FakeableElEl",
+                                     yieldTitle    = "Fakeable dilepton (channel $e^+e^-$)          ",
+                                     yieldObj      = self.yields,
+                                     record_yields = not self.args.onlypost)
+        MuMuSelObj = SelectionObject(sel           = baseSel,
+                                     selName       = "Has2FakeableMuMu",
+                                     yieldTitle    = "Fakeable dilepton (channel $\mu^+\mu^-$)      ",
+                                     yieldObj      = self.yields,
+                                     record_yields = not self.args.onlypost)
+        ElMuSelObj = SelectionObject(sel           = baseSel,
+                                     selName       = "Has2FakeableElMu",
+                                     yieldTitle    = "Fakeable dilepton (channel $e^{\pm}\mu^{\mp}$)",
+                                     yieldObj      = self.yields,
+                                     record_yields = not self.args.onlypost)
         ElElSelObj.refine(cut = [op.rng_len(self.ElElFakeSel) >= 1,
                                  op.OR(op.rng_len(self.muonsFakeSel) == 0,
                                        op.AND(op.rng_len(self.muonsFakeSel) == 1,

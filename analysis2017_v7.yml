@@ -806,7 +806,7 @@ samples:
     run_range:
     - 299368
     - 302029
-    split: 50
+    split: 10
   SingleMuon_2017D:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/SingleMuon/Run2017D-02Apr2020-v1/NANOAOD
@@ -1127,7 +1127,7 @@ datadriven:
 plotIt:
   configuration:
     experiment: CMS
-    extra-label: 2017 Data --Work in progress
+    extra-label:  2017 Data -- Preliminary results
     height: 600
     luminosity-label: '%1$.2f fb^{-1} (13 TeV)'
     margin-bottom: 0.13
@@ -1135,6 +1135,9 @@ plotIt:
     margin-right: 0.03
     margin-top: 0.05
     show-overflow: true
+    yields-table-align: 'v'
+    blinded-range-fill-style: 4050
+    blinded-range-fill-color: "#FDFBFB"
     width: 800
   groups:
     DY:

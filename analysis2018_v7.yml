@@ -989,10 +989,17 @@ datadriven:
 plotIt:
   configuration:
     experiment: CMS
-    extra-label: 2018Data --Work in progress
+    extra-label:  2018 Data -- Preliminary results
     height: 600
     luminosity-label: '%1$.2f fb^{-1} (13 TeV)'
     show-overflow: true
+    margin-bottom: 0.13
+    margin-left: 0.15
+    margin-right: 0.03
+    margin-top: 0.05
+    yields-table-align: 'v'
+    blinded-range-fill-style: 4050
+    blinded-range-fill-color: "#FDFBFB"
     width: 800
   groups:
     DY:
