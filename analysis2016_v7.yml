@@ -732,7 +732,7 @@ samples:
 ##### era B
   SingleMuon_2016B0:
     db: ["das:/SingleMuon/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/SingleMuon/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: utils/utils/DataRuns/SingleMuon_2016B_0.txt
+    files: utils/DataRuns/SingleMuon_2016B_0.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
@@ -740,7 +740,7 @@ samples:
     split: 30
   SingleMuon_2016B1:
     db: ["das:/SingleMuon/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/SingleMuon/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: utils/utils/DataRuns/SingleMuon_2016B_1.txt
+    files: utils/DataRuns/SingleMuon_2016B_1.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
@@ -1299,15 +1299,18 @@ datadriven:
 plotIt:
   configuration:
     width: 800
-    height: 599
+    height: 600
     luminosity-label: '%1$.2f fb^{-1} (13 TeV)'  #TODO
     experiment: CMS
-    extra-label: 2016 Data -- Work in progress
+    extra-label: 2016 Data -- Preliminary results
     show-overflow: true
     margin-left: 0.15
     margin-right: 0.03
     margin-top: 0.05 
     margin-bottom: 0.13
+    yields-table-align: 'v'
+    blinded-range-fill-style: 4050
+    blinded-range-fill-color: "#FDFBFB"
   legend:
     position: [0.7, 0.6, 0.91, 0.91]
   groups:

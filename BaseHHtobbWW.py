@@ -645,7 +645,7 @@ One lepton and and one jet argument must be specified in addition to the require
         self.era = era
         self.tree = t
 
-        self.yields = CutFlowReport("yields",printInLog=True,recursive=True)
+        self.yields = CutFlowReport("yields",printInLog=self.args.Events is not None,recursive=True)
 
         ###########################################################################
         #                              Pseudo-data                                #
