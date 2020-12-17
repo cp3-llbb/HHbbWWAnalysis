@@ -76,23 +76,24 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         #----- Machine Learning Model -----#                
         DNNs = {}
         model_nums = ["08"]
-        for model_num in model_nums:
-            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
-            print ("DNN model : %s"%path_model)
-            if not os.path.exists(path_model):
-                raise RuntimeError('Could not find model file %s'%path_model)
-            try:
-                if model_num in ["07"]:
-                    input_names = ["input_1","input_2","input_3","input_4","input_5","input_6"]
-                    output_name = "Identity"
-                elif model_num in ["08"]:
-                    input_names = ["lep","jet","fat","met","hl","param","eventnr"]
-                    output_name = "Identity"
-                else:
-                    raise NotImplementedError
-                DNNs[model_num] = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
-            except:
-                raise RuntimeError('Could not load model %s'%path_model)
+        if not self.args.OnlyYield:
+            for model_num in model_nums:
+                path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
+                print ("DNN model : %s"%path_model)
+                if not os.path.exists(path_model):
+                    raise RuntimeError('Could not find model file %s'%path_model)
+                try:
+                    if model_num in ["07"]:
+                        input_names = ["input_1","input_2","input_3","input_4","input_5","input_6"]
+                        output_name = "Identity"
+                    elif model_num in ["08"]:
+                        input_names = ["lep","jet","fat","met","hl","param","eventnr"]
+                        output_name = "Identity"
+                    else:
+                        raise NotImplementedError
+                    DNNs[model_num] = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
+                except:
+                    raise RuntimeError('Could not load model %s'%path_model)
 
         #----- Dileptons -----#
         ElElSelObj,MuMuSelObj,ElMuSelObj = makeDoubleLeptonSelection(self,noSel)
@@ -430,8 +431,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         #----- Machine Learning plots -----#
         selObjectDictList = []
-        #if not self.args.OnlyYield:
-        if True: # TODO : fix
+        if not self.args.OnlyYield:
             if "Resolved0Btag" in jetplot_level:
                 selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjAk4JetsExclusiveResolvedNoBtag})
                 selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjAk4JetsExclusiveResolvedNoBtag})
