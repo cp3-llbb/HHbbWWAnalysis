@@ -285,7 +285,7 @@ class TemplateLatex:
         logging.info("Log available at %s"%(os.path.join(wd,'plots_compilation.log')))
         os.chdir(cwd)
         
-    def compileYield(self):
+    def compileYield(self,yieldFile):
         # Load tex file and edit content in string #
         text = r"""
 \documentclass{report}
@@ -296,18 +296,17 @@ class TemplateLatex:
 \begin{document}
                 """
         wd = os.path.dirname(self.texfile)
-        for dirpath in self.dirpaths:
-            with open(os.path.join(dirpath,"yields.tex"),"r") as f:
-                while True: 
-                    line = f.readline() 
-                    if not line:
-                        break
-                    if line.startswith(r"\begin{document}"):
-                        continue
-                    if line.startswith(r"\begin{tabular}"):
-                        text += r"\resizebox{\textwidth}{!}{"+"\n"
-                    text += line
-            text += "\n}\n"
+        with open(os.path.join(wd,yieldFile),"r") as f:
+            while True: 
+                line = f.readline() 
+                if not line:
+                    break
+                if line.startswith(r"\begin{document}"):
+                    continue
+                if line.startswith(r"\begin{tabular}"):
+                    text += r"\resizebox*{\textwidth}{!}{"+"\n"
+                text += line
+        text += "\n}\n"
         text += r"\end{document}"
 
         # Save new tex file #
@@ -340,8 +339,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Utility to generate Latex slides on the spot for the HH->bbWW analysis')
     parser.add_argument('-d','--dirnames', action='store', required=False, type=str, default='', nargs='+',
                         help='Path of the directory where the plots are (can be several separated by spaces')
-    parser.add_argument('-y','--yields', action='store_true', required=False, default=False,
-                        help='Wether to compile the yields.tex into yields.pdf')
+    parser.add_argument('-y','--yields', action='store', required=False, default=None,
+                        help='Name of the yield table tex file')
     parser.add_argument('--pdf', action='store_true', required=False, default=False,
                         help='Wether to produce the PDF ')
     parser.add_argument('--log', action='store_true', required=False, default=False,
@@ -356,7 +355,7 @@ if __name__ == "__main__":
 
     instance = TemplateLatex(opt.dirnames,opt.log)
     if opt.yields:
-        instance.compileYield()
+        instance.compileYield(opt.yields)
     if opt.pdf:
         instance.producePDF()
 
