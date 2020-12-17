@@ -58,12 +58,18 @@ class ScaleFactorsbbWW:
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'electron_tightMVA_2016',
                                 base_str    = "TTHSF_EGamma_SF2D_ElectronTight2016.json")
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'electron_tightMVArelaxed_2016',
+                                base_str    = "TTHSF_ElectronRelaxedttHID_2016.json")
 
         # Muons tight #
             # https://gitlab.cern.ch/ttH_leptons/doc/-/blob/master/Legacy/data_to_mc_corrections.md#lepton-id-efficiency-scale-factors-for-tight-lepton-id
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'muon_tightMVA_2016',
                                 base_str    = "TTHSF_EGamma_SF2D_MuonTight2016.json")
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'muon_tightMVArelaxed_2016',
+                                base_str    = "TTHSF_MuonRelaxedttHID_2016.json")
         
         ### POG ID ###
             # https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2016LegacyRereco
@@ -153,11 +159,17 @@ class ScaleFactorsbbWW:
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'electron_tightMVA_2017',
                                 base_str    = "TTHSF_EGamma_SF2D_ElectronTight2017.json")
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'electron_tightMVArelaxed_2017',
+                                base_str    = "TTHSF_ElectronRelaxedttHID_2017.json")
 
         # Muons tight #
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'muon_tightMVA_2017',
                                 base_str    = "TTHSF_EGamma_SF2D_MuonTight2017.json")
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'muon_tightMVArelaxed_2017',
+                                base_str    = "TTHSF_MuonRelaxedttHID_2017.json")
 
         ### POG ID ###
             # https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017
@@ -225,11 +237,17 @@ class ScaleFactorsbbWW:
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'electron_tightMVA_2018',
                                 base_str    = "TTHSF_EGamma_SF2D_ElectronTight2018.json")
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'electron_tightMVArelaxed_2018',
+                                base_str    = "TTHSF_ElectronRelaxedttHID_2018.json")
 
         # Muons tight #
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'muon_tightMVA_2018',
                                 base_str    = "TTHSF_EGamma_SF2D_MuonTight2018.json")
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'muon_tightMVArelaxed_2018',
+                                base_str    = "TTHSF_MuonRelaxedttHID_2018.json")
 
         ### POG ID ###
             # https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017
