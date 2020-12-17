@@ -10,6 +10,9 @@ class highlevelLambdas:
                                              HHself.electron_conept[lep.idx],
                                              HHself.muon_conept[lep.idx])
 
+        self.electron_conept = lambda ele : HHself.electron_conept[ele.idx]
+        self.muon_conept     = lambda mu  : HHself.muon_conept[mu.idx]
+
         # 4-Momentum association #
         self.ll_p4 = lambda l1,l2 : l1.p4+l2.p4
         self.lljj_p4 = lambda l1,l2,j1,j2 : l1.p4+l2.p4+j1.p4+j2.p4
