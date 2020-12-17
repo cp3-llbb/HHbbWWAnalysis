@@ -300,7 +300,6 @@ One lepton and and one jet argument must be specified in addition to the require
             raise RuntimeError("Unknown era {0}".format(era))
 
         # Rochester and JEC corrections (depends on era) #     
-        cachJEC_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),'cacheJEC')
 
         # Check if basic synchronization is required (no corrections and triggers) #
         self.inclusive_sel = ((self.args.Synchronization 
@@ -387,8 +386,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = "Summer16_07Aug2017_V11_MC", 
@@ -398,8 +396,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Summer16_07Aug2017_V11_MC",
                                       smear                 = "Summer16_25nsV1_MC",
@@ -408,8 +405,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
-                                      uName                 = sample,
-                                      cachedir              = cachJEC_dir)
+                                      uName                 = sample)
 
                 else:                   # If data -> extract info from config 
                     jecTag = None
@@ -427,8 +423,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
@@ -437,15 +432,13 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureType1MET(variProxy         = getattr(tree, f"_{metName}"),
                                       jec               = jecTag,
                                       mayWriteCache     = isNotWorker,
                                       isMC              = self.is_MC,
                                       backend           = be, 
-                                      uName             = sample,
-                                      cachedir          = cachJEC_dir)
+                                      uName             = sample)
 
         ############################################################################################
         # ERA 2017 #
@@ -486,8 +479,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = "Fall17_17Nov2017_V32_MC",
@@ -497,8 +489,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Fall17_17Nov2017_V32_MC",
                                       smear                 = "Fall17_V3b_MC",
@@ -507,8 +498,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
-                                      uName                 = sample,
-                                      cachedir              = cachJEC_dir)
+                                      uName                 = sample)
 
                 else:                   # If data -> extract info from config 
                     jecTag = None
@@ -528,8 +518,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
@@ -538,15 +527,13 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureType1MET(variProxy         = getattr(tree, f"_{metName}"),
                                       jec               = jecTag,
                                       mayWriteCache     = isNotWorker,
                                       isMC              = self.is_MC,
                                       backend           = be, 
-                                      uName             = sample,
-                                      cachedir          = cachJEC_dir)
+                                      uName             = sample)
 
         ############################################################################################
         # ERA 2018 #
@@ -584,8 +571,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = "Autumn18_V19_MC",
@@ -595,8 +581,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Autumn18_V19_MC",
                                       smear                 = "Autumn18_V7b_MC",
@@ -605,8 +590,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
-                                      uName                 = sample,
-                                      cachedir              = cachJEC_dir)
+                                      uName                 = sample)
 
                 else:                   # If data -> extract info from config 
                     jecTag = None
@@ -626,8 +610,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
@@ -636,15 +619,13 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample,
-                                  cachedir              = cachJEC_dir)
+                                  uName                 = sample)
                     configureType1MET(variProxy         = getattr(tree, f"_{metName}"),
                                       jec               = jecTag,
                                       mayWriteCache     = isNotWorker,
                                       isMC              = self.is_MC,
                                       backend           = be, 
-                                      uName             = sample,
-                                      cachedir          = cachJEC_dir)
+                                      uName             = sample)
 
         return tree,noSel,be,lumiArgs
 
@@ -665,7 +646,7 @@ One lepton and and one jet argument must be specified in addition to the require
         self.era = era
         self.tree = t
 
-        self.yields = CutFlowReport("yields",printInLog=True,recursive=True)
+        self.yields = CutFlowReport("yields",printInLog=True,recursive=self.args.Events is not None)
 
         ###########################################################################
         #                              Pseudo-data                                #
