@@ -75,7 +75,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         #----- Machine Learning Model -----#                
         DNNs = {}
-        model_nums = ["08"]
+        model_nums = ["09"]
         if not self.args.OnlyYield:
             for model_num in model_nums:
                 path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
@@ -86,7 +86,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     if model_num in ["07"]:
                         input_names = ["input_1","input_2","input_3","input_4","input_5","input_6"]
                         output_name = "Identity"
-                    elif model_num in ["08"]:
+                    elif model_num in ["08","09"]:
                         input_names = ["lep","jet","fat","met","hl","param","eventnr"]
                         output_name = "Identity"
                     else:
@@ -509,7 +509,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     inputs = {**inputsLeps,**inputsJets,**inputsHL,**inputsParam}
                 elif model_num in ["07"]:
                     inputs = {**inputsLeps,**inputsJets,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
-                elif model_num in ["08"]:
+                elif model_num in ["08","09"]:
                     inputs = {**inputsLeps,**inputsJets,**inputsFatjet,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
                 else:
                     raise RuntimeError("Failed to understand model number")

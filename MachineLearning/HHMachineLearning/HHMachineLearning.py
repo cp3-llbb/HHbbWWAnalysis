@@ -285,14 +285,14 @@ def main():
                                                   lumi_dict                 = parameters.lumidict,
                                                   eras                      = era,
                                                   tree_name                 = parameters.tree_name,
-                                                  additional_columns        = {'tag':node,'era':era},
-                                                  stop                      = 300000) # TODO : remove 
-                    data_node_era = data_node_era.sample(frac=1)[:300000] # TODO : remove 
+                                                  additional_columns        = {'tag':node,'era':era})
+                                                  #stop                      = 100000) # TODO : remove 
+                    data_node_era = data_node_era.sample(frac=1)[:500000] # TODO : remove 
                     if data_node is None:
                         data_node = data_node_era
                     else:
                         data_node = pd.concat([data_node,data_node_era],axis=0)
-                    era_str = '{:5s} class in era {} : sample size = {:10d}'.format(node,era,data_node_era.shape[0])
+                    era_str = '{:5s} class in era {}  : sample size = {:10d}'.format(node,era,data_node_era.shape[0])
                     if parameters.weight is not None:
                         era_str += ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_node_era[parameters.weight].sum(),data_node_era['event_weight'].sum())
                     logging.info(era_str)
@@ -349,7 +349,8 @@ def main():
             #logging.info('Current memory usage : %0.3f GB'%(pid.memory_info().rss/(1024**3)))
 
             # Plots #
-            InputPlots(train_all,list_inputs+[inp for inp in parameters.LBN_inputs if inp not in list_inputs])
+            if opt.task != '':
+                InputPlots(train_all,list_inputs+[inp for inp in parameters.LBN_inputs if inp not in list_inputs])
 
             # Randomize order, we don't want only one type per batch #
             random_train = np.arange(0,train_all.shape[0]) # needed to randomize x,y and w in same fashion

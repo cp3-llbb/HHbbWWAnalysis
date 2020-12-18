@@ -185,8 +185,10 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
                         boost_mode  = LBN.PAIRS, 
                         features    = ["E", "px", "py", "pz", "pt", "p", "m", "pair_cos"],
                         name='LBN')(INLBN)
+    BATCHNORM = tf.keras.layers.BatchNormalization(name='BATCHNORM')(FEATURES)
+                # TODO : batch norm 
     # Concatenation of left and right #
-    CONC = tf.keras.layers.Concatenate(axis=-1)([FEATURES, OH])
+    CONC = tf.keras.layers.Concatenate(axis=-1)([BATCHNORM, OH])
     L1 = Dense(params['first_neuron'],
                activation=params['activation'],
                kernel_regularizer=l2(params['l2']))(CONC if params['n_particles'] > 0 else OH)
@@ -198,7 +200,7 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
     out_preprocess = preprocess.predict(x_train,batch_size=params['batch_size'])
     mean_scale = np.mean(out_preprocess[:,[not m for m in parameters.mask_onehot]])
     std_scale = np.std(out_preprocess[:,[not m for m in parameters.mask_onehot]])
-    if abs(mean_scale)>0.01 or abs((std_scale-1)/std_scale)>0.01: # Check that scaling is correct to 1%
+    if abs(mean_scale)>0.01 or abs((std_scale-1)/std_scale)>0.1: # Check that scaling is correct to 1%
         raise RuntimeError("Something is wrong with the preprocessing layer (mean = %0.6f, std = %0.6f), maybe you loaded an incorrect scaler"%(mean_scale,std_scale))
 
     # Tensorboard logs #
