@@ -234,6 +234,7 @@ class DataCard:
                 if hist is None:
                     continue
                 for i in range(1,hist.GetNbinsX()+1):
+                    #hist.SetBinError(i,0.) #TODO : check 
                     if hist.GetBinContent(i) < 0.:
                         hist.SetBinContent(i,0.) 
                 hist.SetTitle(group)

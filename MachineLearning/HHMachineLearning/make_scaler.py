@@ -92,6 +92,6 @@ def MakeScaler(data=None,list_inputs=[],generator=False,batch=5000,list_samples=
             var_scale  = np.var(y[:,[not m for m in parameters.mask_onehot]])
         except ValueError:
             raise ValueError("Problem with the scaler '%s' you imported, has the data changed since it was generated ?"%scaler_name)
-        if abs(mean_scale)>0.01 or abs((var_scale-1)/var_scale)>0.01: # Check that scaling is correct to 1%
+        if abs(mean_scale)>0.01 or abs((var_scale-1)/var_scale)>0.1: # Check that scaling is correct to 1%
             raise RuntimeError("Something is wrong with scaler '%s' (mean = %0.6f, var = %0.6f), maybe you loaded an incorrect scaler"%(scaler_name,mean_scale,var_scale))
 
