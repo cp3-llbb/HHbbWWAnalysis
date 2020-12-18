@@ -28,10 +28,11 @@ class TemplateLatex:
         self.selections = collections.OrderedDict([
                         ('TwoAk4Jets_' , "At least two Ak4 Jets (before Btagging)"),
                         ('OneAk8Jet_' , "At least one Ak8 Jet (before Btagging)"),
-                        ('TwoAk4JetsExclusiveResolvedNoBtag' , "Exclusive Resolved Jets (no Btag)"),
-                        ('TwoAk4JetsExclusiveResolvedOneBtag' , "Exclusive Resolved Jets (1 Btag)"),
-                        ('TwoAk4JetsExclusiveResolvedTwoBtags' , "Exclusive Resolved Jets (2 Btags)"),
-                        ('OneAk8JetInclusiveBoosted' , "Inclusive Boosted Jets"),
+                        ('TwoAk4JetsExclusiveResolvedNoBtag' , "Exclusive Resolved Jets (0 btag)"),
+                        ('TwoAk4JetsExclusiveResolvedOneBtag' , "Exclusive Resolved Jets (1 btag)"),
+                        ('TwoAk4JetsExclusiveResolvedTwoBtags' , "Exclusive Resolved Jets (2 btags)"),
+                        ('OneAk8JetInclusiveBoostedNoBtag' , "Inclusive Boosted Jets (0 btag)"),
+                        ('OneAk8JetInclusiveBoostedOneBtag' , "Inclusive Boosted Jets (1 btag)"),
                         ])
         self.variables = collections.OrderedDict([
                         # Triggers #
@@ -91,15 +92,81 @@ class TemplateLatex:
                         ("_highlevelvariable_mTlljj", "Dilepton-Dijet-MET tranverse mass"),
                         ("_highlevelvariable_HT2.", "$H_{T2}$ (scalar sum of the magnitudes of the HH decay momentas)"),
                         ("_highlevelvariable_HT2R.", "$H_{T2}^R$ (ratio of $H_{T2}$ and scalar sum of the transverse momenta HH decay products"),
-                        # Machine Learning
-                        ("_DNNOutput_DY", "DNN Output DY"),
-                        ("_DNNOutput_ttbar", "DNN Output ttbar"),
-                        ("_DNNOutput_H.", "DNN Output H"),
-                        ("_DNNOutput_HH.", "DNN Output HH"),
-                        ("_DNNOutput_ST", "DNN Output ST"),
-                        ("_DNNOutput_ttVX", "DNN Output ttVX"),
-                        ("_DNNOutput_VVV", "DNN Output VV(V)"),
-                        ("_DNNOutput_Rare", "DNN Output Rare"),
+                        # Machine Learning inputs
+                        ("DNNInput_l1_E","DNN inputs (LL) : l1 E"),
+                        ("DNNInput_l1_Px","DNN inputs (LL) : l1 $P_x$"),
+                        ("DNNInput_l1_Py","DNN inputs (LL) : l1 $P_y$"),
+                        ("DNNInput_l1_Pz","DNN inputs (LL) : l1 $P_z$"),
+                        ("DNNInput_l1_charge","DNN inputs (LL) : l1 charge"),
+                        ("DNNInput_l1_pdgId","DNN inputs (LL) : l1 PDG ID"),
+                        ("DNNInput_l2_E","DNN inputs (LL) : l2 E"),
+                        ("DNNInput_l2_Px","DNN inputs (LL) : l2 $P_x$"),
+                        ("DNNInput_l2_Py","DNN inputs (LL) : l2 $P_y$"),
+                        ("DNNInput_l2_Pz","DNN inputs (LL) : l2 $P_z$"),
+                        ("DNNInput_l2_charge","DNN inputs (LL) : l2 charge"),
+                        ("DNNInput_l2_pdgId","DNN inputs (LL) : l2 PDG ID"),
+                        ("DNNInput_j1_E","DNN inputs (LL) : j1 E"),
+                        ("DNNInput_j1_Px","DNN inputs (LL) : j1 $P_x$"),
+                        ("DNNInput_j1_Py","DNN inputs (LL) : j1 $P_y$"),
+                        ("DNNInput_j1_Pz","DNN inputs (LL) : j1 $P_z$"),
+                        ("DNNInput_j1_btag","DNN inputs (LL) : j1 btag score"),
+                        ("DNNInput_j2_E","DNN inputs (LL) : j2 E"),
+                        ("DNNInput_j2_Px","DNN inputs (LL) : j2 $P_x$"),
+                        ("DNNInput_j2_Py","DNN inputs (LL) : j2 $P_y$"),
+                        ("DNNInput_j2_Pz","DNN inputs (LL) : j2 $P_z$"),
+                        ("DNNInput_j2_btag","DNN inputs (LL) : j2 btag score"),
+                        ("DNNInput_j3_E","DNN inputs (LL) : j3 E"),
+                        ("DNNInput_j3_Px","DNN inputs (LL) : j3 $P_x$"),
+                        ("DNNInput_j3_Py","DNN inputs (LL) : j3 $P_y$"),
+                        ("DNNInput_j3_Pz","DNN inputs (LL) : j3 $P_z$"),
+                        ("DNNInput_j3_btag","DNN inputs (LL) : j3 btag score"),
+                        ("DNNInput_j4_E","DNN inputs (LL) : j4 E"),
+                        ("DNNInput_j4_Px","DNN inputs (LL) : j4 $P_x$"),
+                        ("DNNInput_j4_Py","DNN inputs (LL) : j4 $P_y$"),
+                        ("DNNInput_j4_Pz","DNN inputs (LL) : j4 $P_z$"),
+                        ("DNNInput_j4_btag","DNN inputs (LL) : j4 btag score"),
+                        ("DNNInput_m_bb.","DNN inputs (HL) : $M_{bb}$"),    
+                        ("DNNInput_m_bb_bregcorr","DNN inputs (HL) : $M_{bb}(regcorr)$"),   
+                        ("DNNInput_ht","DNN inputs (HL) : HT"),  
+                        ("DNNInput_min_dr_jets_lep1","DNN inputs (HL) : $Min(\Delta R(jets,l1))$"),    
+                        ("DNNInput_min_dr_jets_lep2","DNN inputs (HL) : $Min(\Delta R(jets,l2))$"),    
+                        ("DNNInput_m_ll","DNN inputs (HL) : $M_{ll}$"),    
+                        ("DNNInput_dr_ll","DNN inputs (HL) : $\Delta R_{ll}$"),   
+                        ("DNNInput_dphi_ll","DNN inputs (HL) : $\Delta \phi_{ll}$"), 
+                        ("DNNInput_min_dr_jet","DNN inputs (HL) : $Min(\Delta R_{jets})$"),  
+                        ("DNNInput_min_dphi_jet","DNN inputs (HL) : $Min(\Delta \phi_{jets})$"),    
+                        ("DNNInput_m_hh_simplemet.","DNN inputs (HL) : $M_{HH}^{simple MET}$"),  
+                        ("DNNInput_m_hh_simplemet_bregcorr","DNN inputs (HL) : $M_{HH}^{simple MET}(regcorr)$"), 
+                        ("DNNInput_met_ld","DNN inputs (HL) : $MET_{LD}$"),  
+                        ("DNNInput_dr_bb","DNN inputs (HL) : $\Delta R_{bb}$"),   
+                        ("DNNInput_dphi_bb","DNN inputs (HL) : $\Delta \phi_{bb}$"), 
+                        ("DNNInput_min_dr_leps_b1","DNN inputs (HL) : $Min(\Delta R(leptons,b1))$"),  
+                        ("DNNInput_min_dr_leps_b2","DNN inputs (HL) : $Min(\Delta R(leptons,b2))$"),  
+                        ("DNNInput_lep1_conept","DNN inputs (HL) : l1 $P_T^{cone}$"), 
+                        ("DNNInput_lep2_conept","DNN inputs (HL) : l2 $P_T^{cone}$"), 
+                        ("DNNInput_mww_simplemet","DNN inputs (HL) : $M_{WW}^{simple MET}$"),   
+                        ("DNNInput_max_m_jj","DNN inputs (HL) : $Max(M_{jj})$"),    
+                        ("DNNInput_n_btag","DNN inputs (HL) : $N_{btag}$"),  
+                        # Selected variables #
+                        ('b1_Pt', 'Lead bjet $P_T$'),
+                        ('B_Pt', 'Fat bjet $P_T$'),
+                        ('l1_Pt', 'Lead lepton $P_T$'),
+                        ('met_Pt', 'MET $P_T$'),
+                        ('B_M', '$M_{B}^{softdrop}$'),
+                        ('combined_DRbb.','$\Delta R_{bb}$'),
+                        ('combined_DRll.','$\Delta R_{ll}$'),
+                        ('combined_DRllbb.','$\Delta R_{ll,bb}$'),
+                        ('combined_DRllB.','$\Delta R_{ll,B}$'),
+                        ('combined_mHH','$M_{HH}$'),
+                        # Machine Learning outputs
+                        ("08GGFnode_DNNOutput_GGF", "DNN 08 Output GGF"),
+                        ("08VBFnode_DNNOutput_VBF", "DNN 08 Output VBF"),
+                        ("08DYnode_DNNOutput_DY", "DNN 08 Output DY"),
+                        ("08Hnode_DNNOutput_H", "DNN 08 Output H"),
+                        ("08STnode_DNNOutput_ST", "DNN 08 Output ST"),
+                        ("08TTVXnode_DNNOutput_TTVX", "DNN 08 Output TTVX"),
+                        ("08TTnode_DNNOutput_TT", "DNN 08 Output TT"),
+                        ("08VVVnode_DNNOutput_VVV", "DNN 08 Output VV(V)"),
                         ])
                 # "_" at beginning is useful to distinguish leading and subleading
                 # "." at end is useful to distinguish "HT2" and "HT2R"
@@ -152,7 +219,7 @@ class TemplateLatex:
     \usetheme{Madrid}
     \usecolortheme{beaver}
     \setbeamertemplate{navigation symbols}{}
-    \setbeamerfont{frametitle}{size=\small}
+    \setbeamerfont{frametitle}{size=\footnotesize}
 }
 \usepackage{graphicx}
 \usepackage[english]{babel}
@@ -221,7 +288,7 @@ class TemplateLatex:
         logging.info("Log available at %s"%(os.path.join(wd,'plots_compilation.log')))
         os.chdir(cwd)
         
-    def compileYield(self):
+    def compileYield(self,yieldFile):
         # Load tex file and edit content in string #
         text = r"""
 \documentclass{report}
@@ -232,18 +299,17 @@ class TemplateLatex:
 \begin{document}
                 """
         wd = os.path.dirname(self.texfile)
-        for dirpath in self.dirpaths:
-            with open(os.path.join(dirpath,"yields.tex"),"r") as f:
-                while True: 
-                    line = f.readline() 
-                    if not line:
-                        break
-                    if line.startswith(r"\begin{document}"):
-                        continue
-                    if line.startswith(r"\begin{tabular}"):
-                        text += r"\resizebox{\textwidth}{!}{"+"\n"
-                    text += line
-            text += "\n}\n"
+        with open(os.path.join(wd,yieldFile),"r") as f:
+            while True: 
+                line = f.readline() 
+                if not line:
+                    break
+                if line.startswith(r"\begin{document}"):
+                    continue
+                if line.startswith(r"\begin{tabular}"):
+                    text += r"\resizebox*{\textwidth}{!}{"+"\n"
+                text += line
+        text += "\n}\n"
         text += r"\end{document}"
 
         # Save new tex file #
@@ -276,8 +342,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Utility to generate Latex slides on the spot for the HH->bbWW analysis')
     parser.add_argument('-d','--dirnames', action='store', required=False, type=str, default='', nargs='+',
                         help='Path of the directory where the plots are (can be several separated by spaces')
-    parser.add_argument('-y','--yields', action='store_true', required=False, default=False,
-                        help='Wether to compile the yields.tex into yields.pdf')
+    parser.add_argument('-y','--yields', action='store', required=False, default=None,
+                        help='Name of the yield table tex file')
     parser.add_argument('--pdf', action='store_true', required=False, default=False,
                         help='Wether to produce the PDF ')
     parser.add_argument('--log', action='store_true', required=False, default=False,
@@ -292,7 +358,7 @@ if __name__ == "__main__":
 
     instance = TemplateLatex(opt.dirnames,opt.log)
     if opt.yields:
-        instance.compileYield()
+        instance.compileYield(opt.yields)
     if opt.pdf:
         instance.producePDF()
 

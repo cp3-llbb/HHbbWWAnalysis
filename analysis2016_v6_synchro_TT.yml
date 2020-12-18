@@ -1,0 +1,13 @@
+tree: Events
+eras:
+  '2016': 
+    luminosity: 1.
+samples:
+  TTTo2L2Nu: 
+    files: [/nfs/scratch/fynu/fbury/NanoAOD/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_NanoAODv6_2016.root]
+    generated-events: 1.
+    cross-section: 1.
+    group: ttbar
+    era: '2016'
+    pufile: 'Synchronization_TTTo2L2Nu_2016.json'
+

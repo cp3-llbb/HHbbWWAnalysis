@@ -1,0 +1,16 @@
+tree: Events
+eras:
+  '2018': 
+    luminosity: 1.
+samples:
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-750:
+    files: [/nfs/scratch/fynu/fbury/NanoAOD/GluGluToRadionToHHTo2B2Tau_M-750_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8_NanoAODv6_2018.root]
+    generated-events: 1.
+    cross-section: 1.
+    era: '2018'
+    pufile: 'Synchronization_GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_2018.json'
+    line-color: "#0f700b"
+    line-type: 1
+    legend: HH (SM) 1 pb
+    order: 1
+    type: signal

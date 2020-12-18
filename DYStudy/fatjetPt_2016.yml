@@ -1,0 +1,49 @@
+path_ZVeto: &path_ZVeto /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_Tight_Fake_AllDNN/
+path_ZPeak: &path_ZPeak /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_Tight_Fake_ZPeak_AllDNN/
+
+era: '2016'
+title: 'Lead fatjet P_{T}'
+xaxis: 'Lead fatjet P_{T}'
+filename: 'weight_fatjetPt_{channel}_{type}_1D'
+category: 'boosted'
+rebin_1D: [0,200,220,240,260,280,300,350,400,500,600]
+
+ElElChannel:
+  ZVeto_0b:
+    path: *path_ZVeto
+    histname: ElEl_HasElElTightOneAk8JetInclusiveBoostedNoBtag_fatjet_pt
+  ZVeto_1b: 
+    path: *path_ZVeto
+    histname: ElEl_HasElElTightOneAk8JetInclusiveBoostedOneBtag_fatjet_pt
+  ZVeto_2b: 
+    path: *path_ZVeto
+    histname: ElEl_HasElElTightOneAk8JetInclusiveBoostedOneBtag_fatjet_pt
+  ZPeak_0b:
+    path: *path_ZPeak
+    histname: ElEl_HasElElTightZPeakOneAk8JetInclusiveBoostedNoBtag_fatjet_pt
+  ZPeak_1b: 
+    path: *path_ZPeak
+    histname: ElEl_HasElElTightZPeakOneAk8JetInclusiveBoostedOneBtag_fatjet_pt
+  ZPeak_2b: 
+    path: *path_ZPeak
+    histname: ElEl_HasElElTightZPeakOneAk8JetInclusiveBoostedOneBtag_fatjet_pt
+
+MuMuChannel:
+  ZVeto_0b:
+    path: *path_ZVeto
+    histname: MuMu_HasMuMuTightOneAk8JetInclusiveBoostedNoBtag_fatjet_pt
+  ZVeto_1b: 
+    path: *path_ZVeto
+    histname: MuMu_HasMuMuTightOneAk8JetInclusiveBoostedOneBtag_fatjet_pt
+  ZVeto_2b: 
+    path: *path_ZVeto
+    histname: MuMu_HasMuMuTightOneAk8JetInclusiveBoostedOneBtag_fatjet_pt
+  ZPeak_0b:
+    path: *path_ZPeak
+    histname: MuMu_HasMuMuTightZPeakOneAk8JetInclusiveBoostedNoBtag_fatjet_pt
+  ZPeak_1b: 
+    path: *path_ZPeak
+    histname: MuMu_HasMuMuTightZPeakOneAk8JetInclusiveBoostedOneBtag_fatjet_pt
+  ZPeak_2b: 
+    path: *path_ZPeak
+    histname: MuMu_HasMuMuTightZPeakOneAk8JetInclusiveBoostedOneBtag_fatjet_pt

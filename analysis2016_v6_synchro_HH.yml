@@ -1,0 +1,16 @@
+tree: Events
+eras:
+  '2016': 
+    luminosity: 1.
+samples:
+  GluGluToRadionToHHTo2B2VTo2L2Nu_M-750:
+    files: [/nfs/scratch/fynu/fbury/NanoAOD/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_narrow_13TeV-madgraph-v2_NanoAODv6_2016.root]
+    generated-events: 1.
+    cross-section: 1.
+    era: '2016'
+    line-color: "#0f700b"
+    line-type: 1
+    legend: HH (SM) 1 pb
+    order: 1
+    type: signal
+

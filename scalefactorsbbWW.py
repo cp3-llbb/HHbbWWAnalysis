@@ -32,6 +32,7 @@ class ScaleFactorsbbWW:
                                 entry_key   = 'singleTrigger_muon_2016',
                                 base_str    = "TTH_trigger_SingleMuon_2016.json")
 
+        ### ttH mva ###
         # Electrons Loose #
            # https://gitlab.cern.ch/ttH_leptons/doc/blob/master/Legacy/data_to_mc_corrections.md#electron-id-efficiency-scale-factors-for-loose-lepton-id 
         instance.AddScaleFactorWithWorkingPoint(path_key        = 'ttH_SF',
@@ -57,63 +58,75 @@ class ScaleFactorsbbWW:
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'electron_tightMVA_2016',
                                 base_str    = "TTHSF_EGamma_SF2D_ElectronTight2016.json")
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'electron_tightMVArelaxed_2016',
+                                base_str    = "TTHSF_ElectronRelaxedttHID_2016.json")
 
         # Muons tight #
             # https://gitlab.cern.ch/ttH_leptons/doc/-/blob/master/Legacy/data_to_mc_corrections.md#lepton-id-efficiency-scale-factors-for-tight-lepton-id
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'muon_tightMVA_2016',
                                 base_str    = "TTHSF_EGamma_SF2D_MuonTight2016.json")
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'muon_tightMVArelaxed_2016',
+                                base_str    = "TTHSF_MuonRelaxedttHID_2016.json")
         
-        # Btagging #
-            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation2016Legacy#Supported_Algorithms_and_Operati
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
-                                                entry_key   = 'btag_2016',
-                                                base_key    = '{algo}_{wp}',
-                                                base_str    = "BTagging_{wp}_{flav}_{calib}_{algo}_2016.json",
-                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "comb"), ("bjets","comb")]})
-            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation2016Legacy#Subjet_b_tagging
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
-                                                entry_key   = 'subjet_btag_2016',
-                                                base_key    = '{algo}_{wp}',
-                                                base_str    = "BTagging_{wp}_{flav}_{calib}_subjet_{algo}_2016.json",
-                                                format_dict = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
-        # Btagging  split #
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
-                                                entry_key   = 'btag_lightjets_2016',
-                                                base_key    = '{algo}_{wp}',
-                                                base_str    = "BTagging_{wp}_lightjets_incl_{algo}_2016.json",
-                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"]})
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
-                                                entry_key   = 'btag_cjets_2016',
-                                                base_key    = '{algo}_{wp}',
-                                                base_str    = "BTagging_{wp}_cjets_comb_{algo}_2016.json",
-                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"]})
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
-                                                entry_key   = 'btag_bjets_2016',
-                                                base_key    = '{algo}_{wp}',
-                                                base_str    = "BTagging_{wp}_bjets_comb_{algo}_2016.json",
-                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"]})
+        ### POG ID ###
+            # https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2016LegacyRereco
+            #   -> SF root in "Systematic uncertainties" : ID + ISO /!\ needs to be lumi reweighted
+        instance.AddScaleFactor(path_key    = 'POG_SF',
+                                entry_key   = 'muon_POGSF_ID_2016',
+                                base_str    = 'Muon_NUM_TightID_DEN_genTracks_pt_eta_statPlusSyst_2016_RunBCDEFGH_ID.json')
+        instance.AddScaleFactor(path_key    = 'POG_SF',
+                                entry_key   = 'muon_POGSF_ISO_2016',
+                                base_str    = 'Muon_NUM_TightRelIso_DEN_TightIDandIPCut_pt_eta_statPlusSyst_2016_RunBCDEFGH_ISO.json')
+        instance.AddScaleFactor(path_key    = 'POG_SF',
+                                entry_key   = 'electron_POGSF_2016',
+                                base_str    = 'Electron_EGamma_SF2D_2016.json')
 
-        # DY weight for 1 and 2 btag # 
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
-                                                entry_key   = 'DY_2016',
-                                                base_key    = '{channel}_{type}_{btag}',
-                                                #base_str    = 'weight_firstLeptonPtVSLeadjetPt_{channel}_{type}_2D_weight_{btag}_2016.json',
-                                                #base_str    = 'weight_firstleptonPtVsEta_{channel}_{type}_2D_weight_{btag}_2016.json',
-                                                base_str    = 'weight_leadjetPt_{channel}_{type}_1D_weight_{btag}_2016.json',
-                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b']})
+
+#        # DY weight  # 
+#        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+#                                                entry_key   = 'DY_resolved_2016',
+#                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+#                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
+#                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['data','mc'],'btag':['1b','2b'],'variable':['leadjetPt']})
+#        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+#                                                entry_key   = 'DY_boosted_2016',
+#                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+#                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
+#                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
+
 
         #  Fake rates #
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
                                                 entry_key   = 'electron_fakerates_2016',
-                                                base_key    = '{syst}_syst',
-                                                base_str    = 'TTHFakeRates_Electron_2016_{syst}Syst.json',
-                                                format_dict = {'syst':['pt','barrel','norm']})
+                                                base_key    = '{wp}_{syst}_syst',
+                                                base_str    = 'TTHFakeRates_{wp}MVA_Electron_2016_{syst}Syst.json',
+                                                format_dict = {'wp':['Loose','Tight'],'syst':['pt','barrel','norm']})
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
                                                 entry_key   = 'muon_fakerates_2016',
-                                                base_key    = '{syst}_syst',
-                                                base_str    = 'TTHFakeRates_Muon_2016_{syst}Syst.json',
-                                                format_dict = {'syst':['pt','barrel','norm']})
+                                                base_key    = '{wp}_{syst}_syst',
+                                                base_str    = 'TTHFakeRates_{wp}MVA_Muon_2016_{syst}Syst.json',
+                                                format_dict = {'wp':['Loose','Tight'],'syst':['pt','barrel','norm']})
+        # PU ID SF #
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'Btag_SF',
+                                                entry_key   = 'jet_puid_eff',
+                                                base_key    = '{eom}_{era}_{wp}',
+                                                base_str    = 'PUID_EFF_h2_{eom}_mc{era}_T.json',
+                                                format_dict = {'eom':["eff", "mistag"],'wp':['L','M','T'],'era':['2016','2017','2018']})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'Btag_SF',
+                                                entry_key   = 'jet_puid_sf',
+                                                base_key    = '{eom}_{era}_{wp}',
+                                                base_str    = 'PUID_SF_h2_{eom}_sf{era}_T.json',
+                                                format_dict = {'eom':["eff", "mistag"],'wp':['L','M','T'],'era':['2016','2017','2018']})
+
+        # Ak8 efficiency btagging #
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'Btag_SF',
+                                                entry_key   = 'ak8btag_eff_2016',
+                                                base_key    = 'eff_{flav}',
+                                                base_str    = 'BtagAk8_{flav}_2016.json',
+                                                format_dict = {'flav':['bjets','cjets','lightjets']})
 
         #----- 2017 -----#
         # Check links of 2016 #
@@ -146,38 +159,56 @@ class ScaleFactorsbbWW:
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'electron_tightMVA_2017',
                                 base_str    = "TTHSF_EGamma_SF2D_ElectronTight2017.json")
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'electron_tightMVArelaxed_2017',
+                                base_str    = "TTHSF_ElectronRelaxedttHID_2017.json")
 
         # Muons tight #
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'muon_tightMVA_2017',
                                 base_str    = "TTHSF_EGamma_SF2D_MuonTight2017.json")
-        # Btagging #
-            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X#Supported_Algorithms_and_Operati
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
-                                                entry_key   = 'btag_2017',
-                                                base_key    = '{algo}_{wp}',
-                                                base_str    = "BTagging_{wp}_{flav}_{calib}_{algo}_2017.json",
-                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "comb"), ("bjets","comb")]})
-            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X#Boosted_event_topologies
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
-                                                entry_key   = 'subjet_btag_2017',
-                                                base_key    = '{algo}_{wp}',
-                                                base_str    = "BTagging_{wp}_{flav}_{calib}_subjet_{algo}_2017.json",
-                                                format_dict = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'muon_tightMVArelaxed_2017',
+                                base_str    = "TTHSF_MuonRelaxedttHID_2017.json")
+
+        ### POG ID ###
+            # https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017
+            #   -> SF root in "Systematic uncertainties" 
+        instance.AddScaleFactor(path_key    = 'POG_SF',
+                                entry_key   = 'muon_POGSF_ID_2017',
+                                base_str    = 'Muon_NUM_TightID_DEN_genTracks_abseta_pt_statPlusSyst_2017_RunBCDEF_ID.json')
+        instance.AddScaleFactor(path_key    = 'POG_SF',
+                                entry_key   = 'muon_POGSF_ISO_2017',
+                                base_str    = 'Muon_NUM_TightRelIso_DEN_TightIDandIPCut_abseta_pt_statPlusSyst_2017_RunBCDEF_ISO.json')
+        instance.AddScaleFactor(path_key    = 'POG_SF',
+                                entry_key   = 'electron_POGSF_2017',
+                                base_str    = 'Electron_EGamma_SF2D_2017.json')
+
+
         #  Fake rates #
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
                                                 entry_key   = 'electron_fakerates_2017',
-                                                base_key    = '{syst}_syst',
-                                                base_str    = 'TTHFakeRates_Electron_2017_{syst}Syst.json',
-                                                format_dict = {'syst':['pt','barrel','norm']})
+                                                base_key    = '{wp}_{syst}_syst',
+                                                base_str    = 'TTHFakeRates_{wp}MVA_Electron_2017_{syst}Syst.json',
+                                                format_dict = {'wp':['Loose','Tight'],'syst':['pt','barrel','norm']})
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
                                                 entry_key   = 'muon_fakerates_2017',
-                                                base_key    = '{syst}_syst',
-                                                base_str    = 'TTHFakeRates_Muon_2017_{syst}Syst.json',
-                                                format_dict = {'syst':['pt','barrel','norm']})
+                                                base_key    = '{wp}_{syst}_syst',
+                                                base_str    = 'TTHFakeRates_{wp}MVA_Muon_2017_{syst}Syst.json',
+                                                format_dict = {'wp':['Loose','Tight'],'syst':['pt','barrel','norm']})
 
-
-
+#        # DY weight  # 
+#        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+#                                                entry_key   = 'DY_resolved_2017',
+#                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+#                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2017.json',
+#                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['mc'],'btag':['1b','2b'],'variable':['leadjetPt']})
+#        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+#                                                entry_key   = 'DY_boosted_2017',
+#                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+#                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2017.json',
+#                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
+#
         #----- 2018 -----#
         # Check links of 2016 #
         # Single Trigger SF # (Double triggers are single numbers and are in Base)
@@ -206,38 +237,54 @@ class ScaleFactorsbbWW:
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'electron_tightMVA_2018',
                                 base_str    = "TTHSF_EGamma_SF2D_ElectronTight2018.json")
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'electron_tightMVArelaxed_2018',
+                                base_str    = "TTHSF_ElectronRelaxedttHID_2018.json")
 
         # Muons tight #
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'muon_tightMVA_2018',
                                 base_str    = "TTHSF_EGamma_SF2D_MuonTight2018.json")
-        # Btagging #
-            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
-                                                entry_key   = 'btag_2018',
-                                                base_key    = '{algo}_{wp}',
-                                                base_str    = "BTagging_{wp}_{flav}_{calib}_{algo}_2018.json",
-                                                format_dict = {'algo':["DeepCSV", "DeepJet"],'wp':["loose", "medium", "tight"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "comb"), ("bjets","comb")]})
-            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X#Boosted_event_topologies
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
-                                                entry_key   = 'subjet_btag_2018',
-                                                base_key    = '{algo}_{wp}',
-                                                base_str    = "BTagging_{wp}_{flav}_{calib}_subjet_{algo}_2018.json",
-                                                format_dict = {'algo':["DeepCSV"],'wp':["loose", "medium"],('flav', 'calib'):[("lightjets", "incl"), ("cjets", "lt"), ("bjets","lt")]})
+        instance.AddScaleFactor(path_key    = 'ttH_SF',
+                                entry_key   = 'muon_tightMVArelaxed_2018',
+                                base_str    = "TTHSF_MuonRelaxedttHID_2018.json")
+
+        ### POG ID ###
+            # https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017
+            #   -> SF root in "Systematic uncertainties" 
+        instance.AddScaleFactor(path_key    = 'POG_SF',
+                                entry_key   = 'muon_POGSF_ID_2018',
+                                base_str    = 'Muon_NUM_TightID_DEN_TrackerMuons_abseta_pt_statPlusSyst_2018_RunABCD_ID.json')
+        instance.AddScaleFactor(path_key    = 'POG_SF',
+                                entry_key   = 'muon_POGSF_ISO_2018',
+                                base_str    = 'Muon_NUM_TightRelIso_DEN_TightIDandIPCut_abseta_pt_statPlusSyst_2018_RunABCD_ISO.json')
+        instance.AddScaleFactor(path_key    = 'POG_SF',
+                                entry_key   = 'electron_POGSF_2018',
+                                base_str    = 'Electron_EGamma_SF2D_2018.json')
 
         #  Fake rates #
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
                                                 entry_key   = 'electron_fakerates_2018',
-                                                base_key    = '{syst}_syst',
-                                                base_str    = 'TTHFakeRates_Electron_2018_{syst}Syst.json',
-                                                format_dict = {'syst':['pt','barrel','norm']})
+                                                base_key    = '{wp}_{syst}_syst',
+                                                base_str    = 'TTHFakeRates_{wp}MVA_Electron_2018_{syst}Syst.json',
+                                                format_dict = {'wp':['Loose','Tight'],'syst':['pt','barrel','norm']})
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
                                                 entry_key   = 'muon_fakerates_2018',
-                                                base_key    = '{syst}_syst',
-                                                base_str    = 'TTHFakeRates_Muon_2018_{syst}Syst.json',
-                                                format_dict = {'syst':['pt','barrel','norm']})
+                                                base_key    = '{wp}_{syst}_syst',
+                                                base_str    = 'TTHFakeRates_{wp}MVA_Muon_2018_{syst}Syst.json',
+                                                format_dict = {'wp':['Loose','Tight'],'syst':['pt','barrel','norm']})
 
-
+#        # DY weight  # 
+#        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+#                                                entry_key   = 'DY_resolved_2018',
+#                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+#                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2018.json',
+#                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['mc'],'btag':['1b','2b'],'variable':['leadjetPt']})
+#        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+#                                                entry_key   = 'DY_boosted_2018',
+#                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+#                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2018.json',
+#                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
 
         # Get full dict #
         self.all_scalefactors = instance.GetScaleFactorsDict()
