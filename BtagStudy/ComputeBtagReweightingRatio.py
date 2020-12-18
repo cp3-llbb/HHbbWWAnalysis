@@ -17,8 +17,11 @@ class BtagReweightingRatio:
         self.path_off   = path_off
         self.list_hists = list_hists
         self.era        = era
-        self.outputname = 'Reweighting_plots/'+outputname
-        self.pdfname    = pdfname.replace('.pdf','_%s.pdf'%self.era)
+        path_output = os.path.join(os.path.abspath(os.path.dirname(__file__)),'Reweighting_plots')
+        if not os.path.exists(path_output):
+            os.makedirs(path_output)
+        self.outputname = os.path.join(path_output,outputname)
+        self.pdfname = pdfname
 
         self.histograms_off = self.getAllHistograms(self.path_off,self.list_hists)
         self.histograms_on = self.getAllHistograms(self.path_on,self.list_hists)
@@ -129,7 +132,7 @@ class BtagReweightingRatio:
         ratio.SetMaximum(ratio.GetMaximum()*1.1)
         ratio.SetMinimum(ratio.GetMinimum()*0.9)
 
-        ratio.GetYaxis().SetRangeUser(0.0,1.5)
+        ratio.GetYaxis().SetRangeUser(0.0,2.)
 
 
         ratio.GetYaxis().SetTitle("#frac{#sum w(before)}{#sum w(after)}")
@@ -189,41 +192,42 @@ class BtagReweightingRatio:
         
 if __name__ == "__main__":
     #---- 2016 ----#
-    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_BtagReweighting_On/',
-                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_BtagReweighting_Off/',
+    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_BtagReweightingOn/',
+                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_BtagReweightingOff/',
                                     list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
                                     outputname  = 'BtagReweightingRatio_jetN',
-                                    pdfname     = 'BtagReweightingRatio.pdf',
+                                    pdfname     = 'BtagReweightingRatio_Background_2016.pdf',
                                     era         = '2016')
-    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_BtagReweighting_On_signal/',
-                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV6_BtagReweighting_Off_signal/',
+    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_BtagReweightingOn_signal/',
+                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_BtagReweightingOff_signal/',
                                     list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
                                     outputname  = 'BtagReweightingRatio_jetN',
-                                    pdfname     = 'BtagReweightingRatio.pdf',
+                                    pdfname     = 'BtagReweightingRatio_Signal_2016.pdf',
                                     era         = '2016')
+
     #---- 2017 ----#
-    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV6_BtagReweighting_On/',
-                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV6_BtagReweighting_Off/',
+    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_BtagReweightingOn/',
+                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_BtagReweightingOff/',
                                     list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
                                     outputname  = 'BtagReweightingRatio_jetN',
-                                    pdfname     = 'BtagReweightingRatio.pdf',
+                                    pdfname     = 'BtagReweightingRatio_Background_2017.pdf',
                                     era         = '2017')
-    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV6_BtagReweighting_On_signal/',
-                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV6_BtagReweighting_Off_signal/',
+    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_BtagReweightingOn_signal/',
+                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_BtagReweightingOff_signal/',
                                     list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
                                     outputname  = 'BtagReweightingRatio_jetN',
-                                    pdfname     = 'BtagReweightingRatio.pdf',
+                                    pdfname     = 'BtagReweightingRatio_Signal_2017.pdf',
                                     era         = '2017')
     #---- 2018 ----#
-    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV6_BtagReweighting_On/',
-                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV6_BtagReweighting_Off/',
+    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_BtagReweightingOn/',
+                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_BtagReweightingOff/',
                                     list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
                                     outputname  = 'BtagReweightingRatio_jetN',
-                                    pdfname     = 'BtagReweightingRatio.pdf',
+                                    pdfname     = 'BtagReweightingRatio_Background_2018.pdf',
                                     era         = '2018')
-    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV6_BtagReweighting_On_signal/',
-                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV6_BtagReweighting_Off_signal/',
+    instance = BtagReweightingRatio(path_on     = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_BtagReweightingOn_signal/',
+                                    path_off    = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_BtagReweightingOff_signal/',
                                     list_hists  = ['NoChannel_NoSelection_Ak4Jets_N'],
                                     outputname  = 'BtagReweightingRatio_jetN',
-                                    pdfname     = 'BtagReweightingRatio.pdf',
+                                    pdfname     = 'BtagReweightingRatio_Signal_2018.pdf',
                                     era         = '2018')

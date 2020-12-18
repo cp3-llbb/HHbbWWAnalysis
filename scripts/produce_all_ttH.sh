@@ -33,10 +33,18 @@ mv Electron_EGamma_SF2D_Loose2016.json Muon_EGamma_SF2D_Loose2016.json  &&
 mv Electron_EGamma_SF2D_Loose2017.json Muon_EGamma_SF2D_Loose2017.json  &&
 mv Electron_EGamma_SF2D_Loose2018.json Muon_EGamma_SF2D_Loose2018.json  &&
 
-# Muon Tight MVA #  &&
+# Muon Tight MVA #  
 python extractTTHTightMVAScaleFactorsFromRoot.py --SF_file ../data/ScaleFactors_ttH/2018/MuonTightMVASF/egammaEffi.txt_EGM2D.root --err_eta ../data/ScaleFactors_ttH/2018/MuonTightMVASF/SFttbar_2018_muon_eta.root --err_pt ../data/ScaleFactors_ttH/2018/MuonTightMVASF/SFttbar_2018_muon_pt.root  --suffix MuonTight2018  &&
 python extractTTHTightMVAScaleFactorsFromRoot.py --SF_file ../data/ScaleFactors_ttH/2017/MuonTightMVASF/egammaEffi.txt_EGM2D.root --err_eta ../data/ScaleFactors_ttH/2017/MuonTightMVASF/SFttbar_2017_muon_eta.root --err_pt ../data/ScaleFactors_ttH/2017/MuonTightMVASF/SFttbar_2017_muon_pt.root  --suffix MuonTight2017  &&
 python extractTTHTightMVAScaleFactorsFromRoot.py --SF_file ../data/ScaleFactors_ttH/2016/MuonTightMVASF/egammaEffi.txt_EGM2D.root --err_eta ../data/ScaleFactors_ttH/2016/MuonTightMVASF/SFttbar_2016_muon_eta.root --err_pt ../data/ScaleFactors_ttH/2016/MuonTightMVASF/SFttbar_2016_muon_pt.root  --suffix MuonTight2016  
+
+# New tight ttH ID SF #
+python extractTTHTightMVACorrectedScaleFactorsFromRoot.py ../data/ScaleFactors_ttH/2016/ElectronTightMVASF/lepMVAEffSF_e_2016_recomp.root -s ElectronRelaxedttHID_2016
+python extractTTHTightMVACorrectedScaleFactorsFromRoot.py ../data/ScaleFactors_ttH/2016/MuonTightMVASF/lepMVAEffSF_m_2016_recomp.root -s MuonRelaxedttHID_2016
+python extractTTHTightMVACorrectedScaleFactorsFromRoot.py ../data/ScaleFactors_ttH/2017/ElectronTightMVASF/lepMVAEffSF_e_2017_recomp.root -s ElectronRelaxedttHID_2017
+python extractTTHTightMVACorrectedScaleFactorsFromRoot.py ../data/ScaleFactors_ttH/2017/MuonTightMVASF/lepMVAEffSF_m_2017_recomp.root -s MuonRelaxedttHID_2017
+python extractTTHTightMVACorrectedScaleFactorsFromRoot.py ../data/ScaleFactors_ttH/2018/ElectronTightMVASF/lepMVAEffSF_e_2018_recomp.root -s ElectronRelaxedttHID_2018
+python extractTTHTightMVACorrectedScaleFactorsFromRoot.py ../data/ScaleFactors_ttH/2018/MuonTightMVASF/lepMVAEffSF_m_2018_recomp.root -s MuonRelaxedttHID_2018
 
 # Single trigger SF #
 python extractTTHSingleLeptonTriggerScaleFactorsFromRoot.py -s SingleElectron_2016 --SF_file ../data/ScaleFactors_ttH/2016/SingleElectronTriggerSF/Electron_Run2016_legacy_Ele25.root
@@ -48,7 +56,11 @@ python extractTTHSingleLeptonTriggerScaleFactorsFromRoot.py -s SingleMuon_2017 -
 python extractTTHSingleLeptonTriggerScaleFactorsFromRoot.py -s SingleMuon_2018 --SF_file ../data/ScaleFactors_ttH/2018/SingleMuonTriggerSF/Muon_Run2018_IsoMu24orIsoMu27.root
 
 # Fake Rates
-python extractTTHFakeRates.py --era 2016 --file ../data/FakeRates/2016/FR_lep_ttH_mva_2016_CERN_2019Jul08.root 
-python extractTTHFakeRates.py --era 2017 --file ../data/FakeRates/2017/FR_lep_ttH_mva_2017_CERN_2019Jul08.root 
-python extractTTHFakeRates.py --era 2018 --file ../data/FakeRates/2018/FR_lep_ttH_mva_2018_CERN_2019Jul08.root 
+python extractTTHFakeRates.py --era 2016 --file ../data/FakeRates/2016/FR_lep_ttH_mva_2016_CERN_2019Jul08.root --wp Tight 
+python extractTTHFakeRates.py --era 2017 --file ../data/FakeRates/2017/FR_lep_ttH_mva_2017_CERN_2019Jul08.root --wp Tight
+python extractTTHFakeRates.py --era 2018 --file ../data/FakeRates/2018/FR_lep_ttH_mva_2018_CERN_2019Jul08.root --wp Tight
+
+python extractTTHFakeRates.py --era 2016 --file ../data/FakeRates/2016/FR_lep_mva_hh_multilepton_2016_KBFI_2020Oct27_woTightCharge_wSysUnc.root --wp Loose
+python extractTTHFakeRates.py --era 2017 --file ../data/FakeRates/2017/FR_lep_mva_hh_multilepton_2017_KBFI_2020Oct27_woTightCharge_wSysUnc.root --wp Loose
+python extractTTHFakeRates.py --era 2018 --file ../data/FakeRates/2018/FR_lep_mva_hh_multilepton_2018_KBFI_2020Oct27_woTightCharge_wSysUnc.root --wp Loose
 
