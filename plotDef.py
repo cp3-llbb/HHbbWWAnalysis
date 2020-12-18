@@ -1891,7 +1891,7 @@ def makeDoubleLeptonSelectedBoostedVariables(sel,l1,l2,B,met,suffix,channel,HLL)
     plots.append(Plot.make1D("%s_%s_combined_mHH"%(channel,suffix),
                              op.invariant_mass(l1.p4,l2.p4,met.p4,B.p4),
                              sel,
-                             EquidistantBinning(50,0.,1000.),
+                             EquidistantBinning(50,0.,1500.),
                              xTitle = "M_{HH} [GeV]",
                              plotopts = channelLabel))
 
@@ -1915,14 +1915,17 @@ def makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,nodes,chan
 
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
     for i,node in enumerate(nodes):
+        plotots = {**channelLabel}
         suffix = selObjNodesDict[node].selName
         sel = selObjNodesDict[node].sel
+        if node in ["GGF","VBF"]:
+            plotots.update({'blinded-range':[0.5,1]})
         plots.append(Plot.make1D("%s_%s_DNNOutput_%s"%(channel,suffix,node),
                                  output[i],
                                  sel,
                                  EquidistantBinning(400,0.,1.),
                                  xTitle = 'DNN output %s'%node,
-                                 plotopts = channelLabel))
+                                 plotopts = plotots))
       
 
     return plots    

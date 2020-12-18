@@ -14,9 +14,9 @@ def compareSyncHist(dict_files):
     rootfiles = []
 
     # Get all trees in dict #
-    for k,f in dict_files.items():
+    for k,(f,t) in dict_files.items():
         rootfile = TFile(f)
-        tree = rootfile.Get("syncTree")
+        tree = rootfile.Get(t)
         dict_trees[k] = tree
         list_branches[k] = [key.GetName() for key in tree.GetListOfBranches()]
         rootfiles.append(rootfile)
@@ -77,6 +77,7 @@ def compareSyncHist(dict_files):
     colors = [1,634,419,601]
     style  = [1,2,3,4]
     width  = [1,2,2,2]
+    group_att = {gr:{'c':colors[i],'s':style[i],'w':width[i]} for i,gr in enumerate(dict_files.keys())}
     # Loop over branches #
     for branch,gHist in hist_dict.items():
         print ("... Branch : %s"%branch,end=' ')
@@ -95,9 +96,9 @@ def compareSyncHist(dict_files):
         for i,(group, hist) in enumerate(gHist.items()):
             print ("*",end='')
             hist.SetTitle(branch)
-            hist.SetLineWidth(width[i])
-            hist.SetLineColor(colors[i])
-            hist.SetLineStyle(style[i])
+            hist.SetLineWidth(group_att[group]['w'])
+            hist.SetLineColor(group_att[group]['c'])
+            hist.SetLineStyle(group_att[group]['s'])
             hist.SetMaximum(hmax*1.1)
             #hist.SetMinimum(hmin*0.9)
             hist.SetMinimum(0)
@@ -117,17 +118,9 @@ def compareSyncHist(dict_files):
 
 
 compareSyncHist({
-            #'Louvain group (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/Synchronization/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root',
-            #'Tallinn group v5 (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v5.root',
-            #'Tallinn group v7 (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v7.root',
-            #'Tallinn group v8 (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v8.root',
-            #'Tallinn group v9 (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_Tallinn_2016_v9.root',
-            #'UCLA group (HH sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/myNanoProdMc2016_NANO_Friend_20191003_v4.root',
-            #'Louvain group (TT sample)':'/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/Synchronization/results/TTTo2L2Nu.root',
-            #'Tallinn group (TT sample)':'/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/utils/sync_bbww_ttbar_Tallinn_2016_v1.root',
-            'Louvain group (POG ID)' : '/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Louvain_mva_POGID_2018.root',
-            'Louvain group (TTH ID)' : '/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Louvain_mva_TTHID_2018.root',
-            'Aachen group' : '/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/SyncMulticlassInput_2018_RWTH.root',
+            'Louvain group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Louvain_2016_v14.root','syncTree_hhbb2l_SR'),
+            'Tallinn group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Tallinn_2016_v14.root','syncTree_hhbb2l_SR'),
+            'Aachen group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_aachen_2016.root','syncTree_hhbb2l_SR'),
             })
 
 

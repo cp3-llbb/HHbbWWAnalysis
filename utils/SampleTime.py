@@ -59,7 +59,10 @@ def getSacctInfo(slurmid):
     out, _ = p.communicate()
     list_job = []
     for line in out.decode("utf-8").splitlines():
-        sid,state,time = line.split()
+        linesplit = line.split()
+        sid = linesplit[0]
+        state = linesplit[1]
+        time = linesplit[-1]
         list_job.append(InfoJob(sid.split('_')[0],sid.split('_')[1],state,time))
 
     return list_job
@@ -92,7 +95,8 @@ for sample in samples:
     sample_time[sample] = [len(jobids),len(jobids)-len(invalid_jobs),sum(times),sum(times)/max(1,len(times)),min(times),max(times)]
     
 table = PrettyTable(["Sample","Sent jobs","Completed jobs","Total time","Mean time","Min time","Max time"])
-for sample, times in sample_time.items():
+for sample in samples:
+    times = sample_time[sample]
     times_str = [convert_time_to_str(t) for t in times[2:]]
     table.add_row([sample]+times[0:2]+times_str)
 table.align = "r"
