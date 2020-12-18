@@ -366,7 +366,6 @@ class HyperModel:
             except Exception as e:
                 logging.warning('Could not load model due to "%s", will try again in 3s'%e)
                 time.sleep(3)
-
         outputs = a.model.predict(inputs,batch_size=parameters.output_batch_size,verbose=verbose)
 #                outputs = a.model.predict_generator(output_generator,
 #                                                    workers=parameters.workers,

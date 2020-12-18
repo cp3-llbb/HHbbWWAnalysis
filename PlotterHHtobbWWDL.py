@@ -75,24 +75,25 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         #----- Machine Learning Model -----#                
         DNNs = {}
-        model_nums = ["08"]
-        for model_num in model_nums:
-            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
-            print ("DNN model : %s"%path_model)
-            if not os.path.exists(path_model):
-                raise RuntimeError('Could not find model file %s'%path_model)
-            try:
-                if model_num in ["07"]:
-                    input_names = ["input_1","input_2","input_3","input_4","input_5","input_6"]
-                    output_name = "Identity"
-                elif model_num in ["08"]:
-                    input_names = ["lep","jet","fat","met","hl","param","eventnr"]
-                    output_name = "Identity"
-                else:
-                    raise NotImplementedError
-                DNNs[model_num] = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
-            except:
-                raise RuntimeError('Could not load model %s'%path_model)
+        model_nums = ["09"]
+        if not self.args.OnlyYield:
+            for model_num in model_nums:
+                path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
+                print ("DNN model : %s"%path_model)
+                if not os.path.exists(path_model):
+                    raise RuntimeError('Could not find model file %s'%path_model)
+                try:
+                    if model_num in ["07"]:
+                        input_names = ["input_1","input_2","input_3","input_4","input_5","input_6"]
+                        output_name = "Identity"
+                    elif model_num in ["08","09"]:
+                        input_names = ["lep","jet","fat","met","hl","param","eventnr"]
+                        output_name = "Identity"
+                    else:
+                        raise NotImplementedError
+                    DNNs[model_num] = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
+                except:
+                    raise RuntimeError('Could not load model %s'%path_model)
 
         #----- Dileptons -----#
         ElElSelObj,MuMuSelObj,ElMuSelObj = makeDoubleLeptonSelection(self,noSel)
@@ -181,6 +182,14 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             MuMuSelObjAk4Jets = makeAtLeastTwoAk4JetSelection(self,MuMuSelObj,copy_sel=True)
             ElMuSelObjAk4Jets = makeAtLeastTwoAk4JetSelection(self,ElMuSelObj,copy_sel=True)
 
+            if self.args.onlypost:
+                ElElSelObjAk4Jets.record_yields = True
+                MuMuSelObjAk4Jets.record_yields = True
+                ElMuSelObjAk4Jets.record_yields = True
+                ElElSelObjAk4Jets.yieldTitle = 'Channel $e^{+}e^{-}$'
+                MuMuSelObjAk4Jets.yieldTitle = 'Channel $\mu^{+}\mu^{-}$'
+                ElMuSelObjAk4Jets.yieldTitle = 'Channel $e^{\pm}\mu^{\mp}$'
+
 #            # Jet and lepton plots #
 #            ChannelDictList = []
 #            if "Ak4" in jetplot_level:
@@ -209,6 +218,13 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             MuMuSelObjAk8Jets = makeAtLeastOneAk8JetSelection(self,MuMuSelObj,copy_sel=True)
             ElMuSelObjAk8Jets = makeAtLeastOneAk8JetSelection(self,ElMuSelObj,copy_sel=True)
 
+            if self.args.onlypost:
+                ElElSelObjAk8Jets.record_yields = True
+                MuMuSelObjAk8Jets.record_yields = True
+                ElMuSelObjAk8Jets.record_yields = True
+                ElElSelObjAk8Jets.yieldTitle = 'Channel $e^{+}e^{-}$'
+                MuMuSelObjAk8Jets.yieldTitle = 'Channel $\mu^{+}\mu^{-}$'
+                ElMuSelObjAk8Jets.yieldTitle = 'Channel $e^{\pm}\mu^{\mp}$'
 #            # Fatjets plots #
 #            ChannelDictList = []
 #            if "Ak8" in jetplot_level:
@@ -230,7 +246,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 #                plots.extend(makeDoubleLeptonAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys}))
 #                # MET #
 #                plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
-
+                
                      
         #----- Resolved selection -----#
         if any(item in ["Resolved0Btag","Resolved1Btag","Resolved2Btag"] for item in jetsel_level): # If any of resolved category is asked
@@ -415,8 +431,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         #----- Machine Learning plots -----#
         selObjectDictList = []
-        #if not self.args.OnlyYield:
-        if True: # TODO : fix
+        if not self.args.OnlyYield:
             if "Resolved0Btag" in jetplot_level:
                 selObjectDictList.append({'channel':'ElEl','selObject':ElElSelObjAk4JetsExclusiveResolvedNoBtag})
                 selObjectDictList.append({'channel':'MuMu','selObject':MuMuSelObjAk4JetsExclusiveResolvedNoBtag})
@@ -494,7 +509,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     inputs = {**inputsLeps,**inputsJets,**inputsHL,**inputsParam}
                 elif model_num in ["07"]:
                     inputs = {**inputsLeps,**inputsJets,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
-                elif model_num in ["08"]:
+                elif model_num in ["08","09"]:
                     inputs = {**inputsLeps,**inputsJets,**inputsFatjet,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
                 else:
                     raise RuntimeError("Failed to understand model number")
@@ -509,6 +524,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         #plots.extend(cutFlowPlots)
         plots.append(self.yields)
+            
 
         #----- Return -----#
         return plots

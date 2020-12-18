@@ -42,7 +42,7 @@ golden = {
     }
 
 #years = ["2016","2017","2018"]
-years = ["2016"]
+years = ["2017"]
 
 cacheFile = "cacheTriggers.json"
 

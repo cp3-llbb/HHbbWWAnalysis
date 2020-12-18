@@ -61,15 +61,46 @@ lumidict = {'2016':35922,'2017':41529.152060112,'2018':59740.565201546}
 eras = ['2016']
 #eras = ['2016','2017','2018'] # To enable or disable eras, add or remove from this list
 
-categories = ['resolved1b3j','resolved2b2j']
+categories = ['resolved2b']
+channels = ['El','Mu']
 
 # Better put them in alphabetical order
-nodes = ['DY', 'H', 'HH', 'Rare', 'ST', 'TT', 'WJets']
-channels = ['El','Mu']
-group_ids = [0,0,1,2,3,4,5,6]
+nodes = ['DY','GGF','H','Rare','ST','TT','VBF','WJets']
+group_ids = [
+        (1.0, [1,6]),           # signals
+        (1.0, [0,2,3,4,5,7]),   # backgrounds
+        (1.0, [1]),             # GGF
+        (1.0, [6]),             # VBF
+        (1.0, [5]),             # TT
+        (1.0, [0]),             # DY
+        (1.0, [7]),             # WJets
+        (1.0, [2,3,4]),       # Other
+            ]
+        
+#    def loss(self): # -> DL
+#        return GroupedXEnt(
+#            group_ids=[
+#                (1.0, [0, 1]),  # Signal
+#                (1.0, [2, 3, 4, 5, 6, 7, 8]),  # Bkg
+#                (1.0, [0]),  # GGF
+#                (1.0, [1]),  # VBF
+#                (1.0, [3]),  # DY
+#                (1.0, [5]),  # ttbar
+#                (1.0, [2, 4, 6, 7, 8]),  # Other
+#            ]
+#        )
 
 # Input plots options #
-node_colors = {'DY':'dodgerblue','H':'mediumaquamarine','HH':'red','Rare':'darkviolet','ST':'firebrick','TT':'darkorange','TTVX':'darkgreen','VVV':'y','WJets':'salmon'}
+node_colors = {
+            'DY'    : 'dodgerblue',
+            'GGF'   : 'green',
+            'H'     : 'mediumaquamarine',
+            'Rare'  : 'darkviolet',
+            'ST'    : 'firebrick',
+            'TT'    : 'darkorange',
+            'VBF'   : 'red',
+            'WJets' : 'salmon',
+             }
 
 # Tree name #
 tree_name = 'Events'
@@ -91,7 +122,7 @@ event_weight_sum_json = os.path.join(main_path,'background_{era}_event_weight_su
 resume_model = ''
 
 # Output #
-output_batch_size = 1000
+output_batch_size = 1
 split_name = 'tag' # 'sample' or 'tag' : criterion for output file splitting
 
 ##############################  Evaluation criterion   ################################
@@ -102,7 +133,7 @@ eval_criterion = "eval_error" # either val_loss or eval_error or val_acc
 # Early stopping to stop learning after some criterion 
 early_stopping_params = {'monitor'   : 'val_loss',  # Value to monitor
                          'min_delta' : 0.001,          # Minimum delta to declare an improvement
-                         'patience'  : 10,          # How much time to wait for an improvement
+                         'patience'  : 15,          # How much time to wait for an improvement
                          'verbose'   : 1,           # Verbosity level
                          'restore_best_weights':True,
                          'mode'      : 'min'}       # Mode : 'auto', 'min', 'max'
@@ -112,7 +143,7 @@ reduceLR_params = {'monitor'    : 'val_loss',   # Value to monitor
                    'factor'     : 0.1,          # Multiplicative factor by which to multiply LR
                    'min_lr'     : 1e-6,         # Minimum value for LR
                    'patience'   : 5,           # How much time to wait for an improvement
-                   'cooldown'   : 5,            # How many epochs before starting again to monitor
+                   'cooldown'   : 0,            # How many epochs before starting again to monitor
                    'verbose'    : 1,            # Verbosity level
                    'mode'      : 'min'}         # Mode : 'auto', 'min', 'max'
 
@@ -137,18 +168,18 @@ grouped_loss = GroupedXEnt(group_ids)
 #    'loss_function' : [grouped_loss] , #  [categorical_crossentropy]
 #}
 p = { 
-    'lr' : [0.01], 
-    'first_neuron' : [64,128,256],
+    'lr' : [0.001], 
+    'first_neuron' : [1024],
     'activation' : [relu],
     'dropout' : [0.1],
-    'hidden_layers' : [2,4], # does not take into account the first layer
+    'hidden_layers' : [6], # does not take into account the first layer
     'output_activation' : [softmax],
     'l2' : [0.001],
     'optimizer' : [Adam],  
-    'epochs' : [1],   
+    'epochs' : [100],   
     'batch_size' : [10000], 
     'n_particles' : [10],
-    'loss_function' : [categorical_crossentropy] 
+    'loss_function' : [grouped_loss] 
 }
 
 
@@ -163,94 +194,141 @@ weight = 'total_weight'
 
 # Input branches (combinations possible just as in ROOT #
 inputs = [
-    # LL variables #
-    '$era@onehot_era',
-    'lep_E',
-    'lep_Px',
-    'lep_Py',
-    'lep_Pz',
-    'lep_charge@onehot_charge',
-    'lep_pid@onehot_pdgid',
-    'j1_E',
-    'j1_Px',
-    'j1_Py',
-    'j1_Pz',
-    'j1_bTagDeepFlavB',
-    'j2_E',
-    'j2_Px',
-    'j2_Py',
-    'j2_Pz',
-    'j2_bTagDeepFlavB',
-    'j3_E',
-    'j3_Px',
-    'j3_Py',
-    'j3_Pz',
-    #'j3_bTagDeepFlavB',
-    'j4_E',
-    'j4_Px',
-    'j4_Py',
-    'j4_Pz',
-    #'j4_bTagDeepFlavB',
-    # HL variables #
-    'nAk4Jets',
-    'nAk4BJets',
-    'METpt',
-    'METphi',
-    'lep_pt',
-    'lep_eta',
-    'lepmet_DPhi',
-    'lepmet_pt',
-    'lep_MT',
-    'MET_LD',
-    'j1_pt',
-    'j2_pt',
-    'j3_pt',
-    'j4_pt',
-    'j1j2_DR',
-    'j2j3_DR',
-    #'j1j4_DR',
-    #'j3j4_DR',
-    'j1j2_M',
-    'j3j4_M',
-    'j1MetDPhi',
-    'j3MetDPhi',
-    'j1LepDR',
-    'j3LepDR',
-    'minJetDR',
-    'minDR_lep_allJets',
-    'w1w2_MT',
-    'HT2_lepJetMet',
-    'HT2R_lepJetMet',
-    'mT_top_3particle',
-    'HWW_Mass',
-    'HWW_Simple_Mass',
-    'HWW_dR',
-    'cosThetaS_Hbb',
-    'cosThetaS_Wjj_simple',
-    'cosThetaS_WW_simple_met',
-    'cosThetaS_HH_simple_met',
-         ]
+            # LL variables #
+            '$era@onehot_era',
+            'METpt',
+            'METpx',
+            'METpy',
+            'METpz',
+            'METenergy',
+            'lep_Px',
+            'lep_Py',
+            'lep_Pz',
+            'lep_E',
+            'lep_pt',
+            'lep_eta',
+            'lep_pdgId@onehot_pdgid',
+            'lep_charge@onehot_charge',
+            'bj1_Px',
+            'bj1_Py',
+            'bj1_Pz',
+            'bj1_E',
+            'bj1_pt',
+            'bj1_eta',
+            'bj1_bTagDeepFlavB',
+            'bj2_Px',
+            'bj2_Py',
+            'bj2_Pz',
+            'bj2_E',
+            'bj2_pt',
+            'bj2_eta',
+            'bj2_bTagDeepFlavB',
+            'wj1_Px',
+            'wj1_Py',
+            'wj1_Pz',
+            'wj1_E',
+            'wj1_pt',
+            'wj1_eta',
+            'wj1_bTagDeepFlavB',
+            'wj2_Px',
+            'wj2_Py',
+            'wj2_Pz',
+            'wj2_E',
+            'wj2_pt',
+            'wj2_eta',
+            'wj2_bTagDeepFlavB ',
+            'nAk4BJets',
+            'nAk8BJets',
+            'VBF_tag',
+            'JPAcat@onehot_resolved_JPAcat',
+            'neuPx',
+            'neuPy',
+            'neuPz',
+            'neuE',
+            'neuPt',
+            # HL variables #
+            'lepmet_DPhi',
+            'lepmet_pt',
+            'lep_MT',
+            'MET_LD',
+            'hT',
+            'bj1LepDR',
+            'bj1LepDPhi',
+            'bj1MetDPhi',
+            'minDR_lep_allJets',
+            'bj2LepDR',
+            'bj2LepDPhi',
+            'bj2MetDPhi',
+            'bj1bj2_pt',
+            'bj1bj2_M',
+            'cosThetaS_Hbb',
+            'mT_top_3particle',
+            'wj1LepDR',
+            'wj1LepDPhi',
+            'wj1MetDPhi',
+            'wj2LepDR',
+            'wj2LepDPhi',
+            'wj2MetDPhi',
+            'wj1wj2_pt',
+            'wj1wj2_M',
+            'w1w2_MT',
+            'HWW_Mass',
+            'HWW_Simple_Mass',
+            'HWW_dR',
+            'cosThetaS_Wjj_simple',
+            'cosThetaS_WW_simple_met ',
+            'cosThetaS_HH_simple_met',
+            'angleBetWWPlane',
+            'angleBetHWPlane',
+            'bj1bj2_DR',
+            'bj1bj2_DPhi',
+            'bj2wj1_DR',
+            'bj2wj1_DPhi',
+            'wj1wj2_DR',
+            'wj1wj2_DPhi',
+            'bj1wj2_DR',
+            'bj1wj2_DPhi',
+            'bj1wj1_DR',
+            'bj1wj1_DPhi',
+            'VBFj1pt',
+            'VBFj2pt',
+            'VBFj1eta',
+            'VBFj2eta',
+            'VBFj1j2dEta',
+            'VBFj1j2dPhi',
+            'VBFj1j2invM',
+            'zeppenfeldVar',
+            'minJetDR',
+            'minLepJetDR',
+            'HT2_lepJetMet',
+            'HT2R_lepJetMet',
+    ]
 onehots = [inp.split('@')[1] if '@' in inp else 'onehot_unit'  for inp  in  inputs]
 mask_onehot = [len(inp.split('@'))==2 for inp  in  inputs]
 inputs = [inp.split('@')[0] for inp  in  inputs]
 
-LBN_inputs = ['lep_E','lep_Px','lep_Py','lep_Pz',
-              'j1_E','j1_Px','j1_Py','j1_Pz',
-              'j2_E','j2_Px','j2_Py','j2_Pz',
-              'j3_E','j3_Px','j3_Py','j3_Pz',
-              'j4_E','j4_Px','j4_Py','j4_Pz']
+LBN_inputs = [
+              'lep_E','lep_Px','lep_Py','lep_Pz',
+              'bj1_E','bj1_Px','bj1_Py','bj1_Pz',
+              'bj2_E','bj2_Px','bj2_Py','bj2_Pz',
+              'wj1_E','wj1_Px','wj1_Py','wj1_Pz',
+              'wj2_E','wj2_Px','wj2_Py','wj2_Pz',
+             ]
 # /!\ format = [E,Px,Py,Pz] per particle
+
 assert len(LBN_inputs)%4 == 0
 
 
 # Output branches #
+
 outputs = [
             '$DY',
+            '$GGF',
             '$H',
-            '$HH',
             '$Rare',
             '$ST',
             '$TT',
+            '$VBF',
             '$WJets',
           ] 
 
