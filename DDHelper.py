@@ -31,10 +31,10 @@ class DataDrivenDY(DataDrivenContribution):
     def usesSample(self, sampleName, sampleConfig):
         if 'group' not in sampleConfig.keys():
             return False # Signal samples not to be used
-        if not self.pseudodata:
-            return sampleConfig['group'] == 'data' # Data driven 
+        if self.pseudodata:
+            return sampleConfig['group'] == 'DY' # Closure
         else:
-            return sampleConfig['group'] != 'data' # Closure
+            return sampleConfig['group'] != 'DY' # Data driven 
     def replacesSample(self, sampleName, sampleConfig):
         if 'group' not in sampleConfig.keys():
             return False # Signal samples not to be used
@@ -44,16 +44,17 @@ class DataDrivenDY(DataDrivenContribution):
         if 'type' in sampleConfig.keys() and sampleConfig["type"]=="signal":
             return {}
         else:
-            if sampleConfig["group"] == "data" and not self.pseudodata:
-                # Data : add as MC with correct normalization so that lumi*Xsec/generated-events = 1
-                modCfg.update({"type": "mc",
-                               "generated-events": lumi,
-                               "cross-section": 1.,
-                               "group": "DYEstimation"})
-            if sampleConfig["group"] != "data" and self.pseudodata:
-                # Closure 
+            if self.pseudodata:
                 modCfg.update({"group": "DYEstimation"})
-
+            else:
+                if sampleConfig["group"] == "data":
+                    # Data : add as MC with correct normalization so that lumi*Xsec/generated-events = 1
+                    modCfg.update({"type": "mc",
+                                   "generated-events": lumi,
+                                   "cross-section": 1.,
+                                   "group": "DYEstimation"})
+                else:
+                    modCfg.update({"group": "DYEstimation","branching-ratio":-1})
         return modCfg
 
 class DataDrivenPseudoData(DataDrivenContribution):

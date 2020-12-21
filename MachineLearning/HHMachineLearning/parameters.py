@@ -169,10 +169,10 @@ grouped_loss = GroupedXEnt(group_ids)
 #}
 p = { 
     'lr' : [0.001], 
-    'first_neuron' : [1024],
+    'first_neuron' : [256],
     'activation' : [relu],
     'dropout' : [0.1],
-    'hidden_layers' : [6], # does not take into account the first layer
+    'hidden_layers' : [3], # does not take into account the first layer
     'output_activation' : [softmax],
     'l2' : [0.001],
     'optimizer' : [Adam],  

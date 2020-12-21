@@ -11,33 +11,30 @@ multiclass:
   ylabel: events
   list_variable:
     - output_DY
+    - output_GGF
     - output_H
-    - output_HH
     - output_Rare
     - output_ST
     - output_TT
-    - output_TTVX
-    - output_VVV
+    - output_VBF
     - output_WJets
   list_color:
-    - 861
-    - 845
-    - 633
-    - 877
-    - 894
-    - 805
-    - 419
-    - 397
-    - 625
+    - "#1a83a1"
+    - "#288a24"
+    - "#06b894"
+    - "#610596"
+    - "#99053d"
+    - "#cc7a16"
+    - "#8f0a1e"
+    - "#d95564"
   list_legend:
     - node DY
+    - node GGF
     - node H
-    - node HH
     - node Rare
     - node ST
     - node TT
-    - node TTVX
-    - node VVV
+    - node VBF
     - node WJets
   list_cut : '1'
   legend_pos:
