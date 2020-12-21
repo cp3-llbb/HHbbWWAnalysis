@@ -76,7 +76,8 @@ class DataCard:
             if self.pseudodata and 'data_real' in groups:
                 continue
             if len(groups) == 0:
-                raise RuntimeError("[WARNING] Could not find sample %s in group list"%sample)
+                print("[WARNING] Could not find sample %s in group list"%sample)
+                continue
 
             hist_dict = self.getHistograms(f)
             for group in groups:
@@ -275,10 +276,12 @@ class DataCard:
         print ('Producing DY estimation')
         with open(self.DYEstimation['yaml'],'r') as handle:
             f = yaml.load(handle,Loader=yaml.FullLoader)
-        with open('DYFits/ZPeak_2016.yml','r') as handle:
-            norm_ZPeak = yaml.load(handle,Loader=yaml.FullLoader)
-        with open('DYFits/ZVeto_2016.yml','r') as handle:
-            norm_ZVeto = yaml.load(handle,Loader=yaml.FullLoader)
+
+        if not self.pseudodata:
+            with open('DYFits/ZPeak_2016.yml','r') as handle:
+                norm_ZPeak = yaml.load(handle,Loader=yaml.FullLoader)
+            with open('DYFits/ZVeto_2016.yml','r') as handle:
+                norm_ZVeto = yaml.load(handle,Loader=yaml.FullLoader)
 
         f['quantiles'] = None
         f['produce_plots'] = False
@@ -299,10 +302,11 @@ class DataCard:
             if proxyName not in ZPeak_datacard.content.keys():
                 raise RuntimeError("Could not find histogram %s in Z Peak datacard"%proxyName)
 
-            proxyPeak_norm = norm_ZPeak[proxyName]
-            proxyVeto_norm = norm_ZVeto[proxyName]
-            histPeak_norm  = norm_ZPeak[histName]
-            #histVeto_norm  = norm_ZVeto[histName]
+            if not self.pseudodata:
+                proxyPeak_norm = norm_ZPeak[proxyName]
+                proxyVeto_norm = norm_ZVeto[proxyName]
+                histPeak_norm  = norm_ZPeak[histName]
+                #histVeto_norm  = norm_ZVeto[histName]
 
             histZVeto = None 
             histZPeak = None 

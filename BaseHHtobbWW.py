@@ -30,7 +30,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                                  "y-axis": "Events",
                                  "log-y"  : "both",
                                  "ratio-y-axis-range" : [0.8,1.2],
-                                 "ratio-y-axis" : '#frac{Data}/{MC}',
+                                 "ratio-y-axis" : '#frac{Data}{MC}',
                                  "sort-by-yields" : True}
 
     #-------------------------------------------------------------------------------------------#
@@ -1191,6 +1191,7 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         self.lambda_VBFJets = lambda j : op.AND(j.jetId & 1 if era == "2016" else j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
                                                 j.pt >= 25.,
+                                                op.OR(((j.puId >> 2) & 1) ,j.pt>=50.), # Jet PU ID bit1 is loose (only to be applied to jets with pt<50)
                                                 op.abs(j.eta) <= 4.7,
                                                 op.OR(j.pt >= 60.,
                                                       op.AND(op.abs(j.eta) < 2.7, 
@@ -1209,7 +1210,7 @@ One lepton and and one jet argument must be specified in addition to the require
 
         if channel == "DL":
             self.lambda_cleanVBFAk4 = lambda j : op.AND(op.NOT(op.rng_any(self.ak4JetsByBtagScore[:2], lambda ak4Jet : op.deltaR(j.p4, ak4Jet.p4) <= 0.8 )))
-            self.lambda_cleanVBFAk8 = lambda j : op.AND(op.NOT(op.rng_any(self.ak8Jets, lambda ak8Jet : op.deltaR(j.p4, ak8Jet.p4) <= 1.2 )))
+            self.lambda_cleanVBFAk8 = lambda j : op.AND(op.NOT(op.rng_any(self.ak8BJets[:1], lambda ak8BJet : op.deltaR(j.p4, ak8BJet.p4) <= 1.2 )))
         if channel == "SL":
             raise NotImplementedError
 
@@ -1517,6 +1518,19 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                                          op.switch(((j.puId >> 2) & 1),
                                                                                                    self.jetpuid_sf_mis(j), 
                                                                                                    wFail(self.jetpuid_sf_mis(j), self.jetpuid_mc_mis(j)))))
+            self.puid_reweighting_efficiency = op.rng_product(ak4Jets_below50, lambda j : op.switch(j.genJet.isValid,
+                                                                                                   op.switch(((j.puId >> 2) & 1),
+                                                                                                             self.jetpuid_sf_eff(j), 
+                                                                                                             wFail(self.jetpuid_sf_eff(j), self.jetpuid_mc_eff(j))),
+                                                                                                   op.c_float(1.)))
+                    # Sync purposes
+            self.puid_reweighting_mistag = op.rng_product(ak4Jets_below50, lambda j : op.switch(j.genJet.isValid,
+                                                                                                op.c_float(1.),
+                                                                                                op.switch(((j.puId >> 2) & 1),
+                                                                                                          self.jetpuid_sf_mis(j), 
+                                                                                                          wFail(self.jetpuid_sf_mis(j), self.jetpuid_mc_mis(j)))))
+                    # Sync purposes
+       
             sel = sel.refine("jetPUIDReweighting"+name,weight=self.puid_reweighting)
 
         ###########################################################################
