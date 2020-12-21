@@ -356,7 +356,6 @@ class HyperModel:
             /home/ucl/cp3/fbury/.local/lib/python3.6/site-packages/talos/commands/restore.py
         """
         logging.info(('Using model %s.zip '%(self.name).center(80,'-')))
-        # Load the preprocessing layer #
         # Restore model #
         loaded = False
         while not loaded:
@@ -366,7 +365,15 @@ class HyperModel:
             except Exception as e:
                 logging.warning('Could not load model due to "%s", will try again in 3s'%e)
                 time.sleep(3)
-        outputs = a.model.predict(inputs,batch_size=parameters.output_batch_size,verbose=verbose)
+        has_LBN = any([l.__class__.__name__ == 'LBNLayer' for l in a.model.layers])
+        if has_LBN:
+            idx = [parameters.inputs.index(inp) for inp in parameters.LBN_inputs]
+            assert [parameters.inputs[i] for i in idx] == parameters.LBN_inputs
+            inputsLBN = inputs[:,idx].reshape(-1,4,len(parameters.LBN_inputs)//4)
+            outputs = a.model.predict([inputs,inputsLBN],batch_size=parameters.output_batch_size,verbose=verbose)
+        else:
+            outputs = a.model.predict(inputs,batch_size=parameters.output_batch_size,verbose=verbose)
+            
 #                outputs = a.model.predict_generator(output_generator,
 #                                                    workers=parameters.workers,
 #                                                    max_queue_size=2*parameters.workers,

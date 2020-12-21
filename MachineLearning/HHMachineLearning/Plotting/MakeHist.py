@@ -85,6 +85,8 @@ def main():
                     #########       TH1 Multi       ###########
                     Template(tpl = 'TH1Multi_class.yml.tpl',
                              class_name = 'Plot_Multi_TH1'),
+                    Template(tpl = 'TH1Multi_class_argmax.yml.tpl',
+                             class_name = 'Plot_Multi_TH1'),
                     ############       TH2       ##############
                     #Template(tpl = '.yml.tpl',
                     #         class_name = 'Plot_TH2'),

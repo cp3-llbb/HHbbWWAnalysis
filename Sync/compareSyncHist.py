@@ -8,7 +8,7 @@ from ROOT import TFile, TH1F, TCanvas, TLegend, gROOT, gStyle
 gROOT.SetBatch(True)
 gStyle.SetOptStat(0)
 
-def compareSyncHist(dict_files):
+def compareSyncHist(dict_files,name):
     dict_trees = {}
     list_branches = {}
     rootfiles = []
@@ -71,7 +71,7 @@ def compareSyncHist(dict_files):
     print ("[INFO] Plotting the histograms")
     # Produce the PDF #
     C = TCanvas("C","C",800,600)
-    outName = "compareSyncHist.pdf"
+    outName = "compareSyncHist_%s.pdf"%name
     C.Print(outName+"[")
     # Line attributes #
     colors = [1,634,419,601]
@@ -116,12 +116,17 @@ def compareSyncHist(dict_files):
     for rootfile in rootfiles:
         rootfile.Close()
 
+compareSyncHist({
+            'Louvain group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Louvain_2016_v17.root','syncTree_hhbb2l_SR'),
+            'Tallinn group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Tallinn_2016_v16.root','syncTree_hhbb2l_SR'),
+            'Aachen group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_aachen_2016.root','syncTree_hhbb2l_SR')},
+             'SR')
 
 compareSyncHist({
-            'Louvain group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Louvain_2016_v14.root','syncTree_hhbb2l_SR'),
-            'Tallinn group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Tallinn_2016_v14.root','syncTree_hhbb2l_SR'),
-            'Aachen group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_aachen_2016.root','syncTree_hhbb2l_SR'),
-            })
+            'Louvain group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Louvain_2016_v17.root','syncTree_hhbb2l_Fake'),
+            'Tallinn group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Tallinn_2016_v16.root','syncTree_hhbb2l_Fake'),
+            'Aachen group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_aachen_2016.root','syncTree_hhbb2l_Fake')},
+            'Fake')
 
 
 
