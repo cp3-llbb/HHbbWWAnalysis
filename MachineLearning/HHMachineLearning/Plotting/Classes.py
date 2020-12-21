@@ -444,6 +444,9 @@ class Plot_Multi_TH1:
         else:
             self.list_color = list_color
 
+        for i in range(len(self.list_color)):
+            if isinstance(self.list_color[i],str):
+                self.list_color[i] = ROOT.TColor.GetColor(self.list_color[i])
         
     def MakeHisto(self):
         self.list_obj = []

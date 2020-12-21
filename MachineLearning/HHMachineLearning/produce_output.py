@@ -32,7 +32,7 @@ class ProduceOutput:
             inputs = data[self.list_inputs].values
             if len(self.model) == 1: # classic training
                 instance = HyperModel(self.model[0])
-                output = instance.HyperRestore(inputs)
+                output = instance.HyperRestore(inputs,verbose=1)
             else:   # cross validation
                 output=None
                 for model_idx,model in enumerate(self.model):

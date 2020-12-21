@@ -159,14 +159,14 @@ class TemplateLatex:
                         ('combined_DRllB.','$\Delta R_{ll,B}$'),
                         ('combined_mHH','$M_{HH}$'),
                         # Machine Learning outputs
-                        ("08GGFnode_DNNOutput_GGF", "DNN 08 Output GGF"),
-                        ("08VBFnode_DNNOutput_VBF", "DNN 08 Output VBF"),
-                        ("08DYnode_DNNOutput_DY", "DNN 08 Output DY"),
-                        ("08Hnode_DNNOutput_H", "DNN 08 Output H"),
-                        ("08STnode_DNNOutput_ST", "DNN 08 Output ST"),
-                        ("08TTVXnode_DNNOutput_TTVX", "DNN 08 Output TTVX"),
-                        ("08TTnode_DNNOutput_TT", "DNN 08 Output TT"),
-                        ("08VVVnode_DNNOutput_VVV", "DNN 08 Output VV(V)"),
+                        ("GGFnode_DNNOutput_GGF", "DNN Output GGF"),
+                        ("VBFnode_DNNOutput_VBF", "DNN Output VBF"),
+                        ("DYnode_DNNOutput_DY", "DNN Output DY"),
+                        ("Hnode_DNNOutput_H", "DNN Output H"),
+                        ("STnode_DNNOutput_ST", "DNN Output ST"),
+                        ("TTVXnode_DNNOutput_TTVX", "DNN Output TTVX"),
+                        ("TTnode_DNNOutput_TT", "DNN Output TT"),
+                        ("VVVnode_DNNOutput_VVV", "DNN Output VV(V)"),
                         ])
                 # "_" at beginning is useful to distinguish leading and subleading
                 # "." at end is useful to distinguish "HT2" and "HT2R"
