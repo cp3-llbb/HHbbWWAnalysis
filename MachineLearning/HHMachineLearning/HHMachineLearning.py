@@ -287,7 +287,7 @@ def main():
                                                   tree_name                 = parameters.tree_name,
                                                   additional_columns        = {'tag':node,'era':era})
                                                   #stop                      = 100000) # TODO : remove 
-                    data_node_era = data_node_era.sample(frac=1)[:500000] # TODO : remove 
+                    data_node_era = data_node_era.sample(frac=1)[:200000] # TODO : remove 
                     if data_node is None:
                         data_node = data_node_era
                     else:
@@ -428,7 +428,6 @@ def main():
         test_all = None
     list_inputs  = [var.replace('$','') for var in parameters.inputs]
     list_outputs = [var.replace('$','') for var in parameters.outputs]
-
 
     #############################################################################################
     # DNN #

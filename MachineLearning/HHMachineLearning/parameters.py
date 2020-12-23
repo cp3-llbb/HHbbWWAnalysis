@@ -122,7 +122,7 @@ event_weight_sum_json = os.path.join(main_path,'background_{era}_event_weight_su
 resume_model = ''
 
 # Output #
-output_batch_size = 1
+output_batch_size = 10000
 split_name = 'tag' # 'sample' or 'tag' : criterion for output file splitting
 
 ##############################  Evaluation criterion   ################################
@@ -142,7 +142,7 @@ early_stopping_params = {'monitor'   : 'val_loss',  # Value to monitor
 reduceLR_params = {'monitor'    : 'val_loss',   # Value to monitor
                    'factor'     : 0.1,          # Multiplicative factor by which to multiply LR
                    'min_lr'     : 1e-6,         # Minimum value for LR
-                   'patience'   : 5,           # How much time to wait for an improvement
+                   'patience'   : 3,           # How much time to wait for an improvement
                    'cooldown'   : 0,            # How many epochs before starting again to monitor
                    'verbose'    : 1,            # Verbosity level
                    'mode'      : 'min'}         # Mode : 'auto', 'min', 'max'
@@ -168,18 +168,18 @@ grouped_loss = GroupedXEnt(group_ids)
 #    'loss_function' : [grouped_loss] , #  [categorical_crossentropy]
 #}
 p = { 
-    'lr' : [0.001], 
+    'lr' : [0.01], 
     'first_neuron' : [256],
     'activation' : [relu],
     'dropout' : [0.1],
-    'hidden_layers' : [3], # does not take into account the first layer
+    'hidden_layers' : [5], # does not take into account the first layer
     'output_activation' : [softmax],
     'l2' : [0.001],
     'optimizer' : [Adam],  
-    'epochs' : [100],   
+    'epochs' : [10],   
     'batch_size' : [10000], 
     'n_particles' : [10],
-    'loss_function' : [grouped_loss] 
+    'loss_function' : [categorical_crossentropy],
 }
 
 
@@ -189,63 +189,63 @@ repetition = 1 # How many times each hyperparameter has to be used
 
 cut = 'MC_weight > 0'
 
-weight = 'total_weight'
-#weight = None
+#weight = 'total_weight'
+weight = None
 
 # Input branches (combinations possible just as in ROOT #
 inputs = [
             # LL variables #
             '$era@onehot_era',
             'METpt',
-            'METpx',
-            'METpy',
-            'METpz',
-            'METenergy',
-            'lep_Px',
-            'lep_Py',
-            'lep_Pz',
-            'lep_E',
+#            'METpx',
+#            'METpy',
+#            'METpz',
+#            'METenergy',
+#            'lep_Px',
+#            'lep_Py',
+#            'lep_Pz',
+#            'lep_E',
             'lep_pt',
-            'lep_eta',
+#            'lep_eta',
             'lep_pdgId@onehot_pdgid',
             'lep_charge@onehot_charge',
-            'bj1_Px',
-            'bj1_Py',
-            'bj1_Pz',
-            'bj1_E',
+#            'bj1_Px',
+#            'bj1_Py',
+#            'bj1_Pz',
+#            'bj1_E',
             'bj1_pt',
-            'bj1_eta',
+#            'bj1_eta',
             'bj1_bTagDeepFlavB',
-            'bj2_Px',
-            'bj2_Py',
-            'bj2_Pz',
-            'bj2_E',
+#            'bj2_Px',
+#            'bj2_Py',
+#            'bj2_Pz',
+#            'bj2_E',
             'bj2_pt',
-            'bj2_eta',
+#            'bj2_eta',
             'bj2_bTagDeepFlavB',
-            'wj1_Px',
-            'wj1_Py',
-            'wj1_Pz',
-            'wj1_E',
+#            'wj1_Px',
+#            'wj1_Py',
+#            'wj1_Pz',
+#            'wj1_E',
             'wj1_pt',
-            'wj1_eta',
+#            'wj1_eta',
             'wj1_bTagDeepFlavB',
-            'wj2_Px',
-            'wj2_Py',
-            'wj2_Pz',
-            'wj2_E',
+#            'wj2_Px',
+#            'wj2_Py',
+#            'wj2_Pz',
+#            'wj2_E',
             'wj2_pt',
-            'wj2_eta',
+#            'wj2_eta',
             'wj2_bTagDeepFlavB ',
             'nAk4BJets',
             'nAk8BJets',
             'VBF_tag',
             'JPAcat@onehot_resolved_JPAcat',
-            'neuPx',
-            'neuPy',
-            'neuPz',
-            'neuE',
-            'neuPt',
+#            'neuPx',
+#            'neuPy',
+#            'neuPz',
+#            'neuE',
+#            'neuPt',
             # HL variables #
             'lepmet_DPhi',
             'lepmet_pt',
