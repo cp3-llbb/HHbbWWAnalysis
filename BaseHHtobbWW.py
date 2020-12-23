@@ -324,11 +324,11 @@ One lepton and and one jet argument must be specified in addition to the require
         if self.is_MC:
             #qcdScaleVariations = { f"qcdScalevar{i}": tree.LHEScaleWeight[i] for i in [0, 1, 3, 5, 7, 8] }
             #qcdScaleSyst = op.systematic(op.c_float(1.), name="qcdScale", **qcdScaleVariations)
-            psISRSyst = op.systematic(op.c_float(1.), name="psISR", up=tree.PSWeight[2], down=tree.PSWeight[0])
-            psFSRSyst = op.systematic(op.c_float(1.), name="psFSR", up=tree.PSWeight[3], down=tree.PSWeight[1])
+            self.psISRSyst = op.systematic(op.c_float(1.), name="psISR", up=tree.PSWeight[2], down=tree.PSWeight[0])
+            self.psFSRSyst = op.systematic(op.c_float(1.), name="psFSR", up=tree.PSWeight[3], down=tree.PSWeight[1])
             #pdfsWeight = op.systematic(op.c_float(1.), name="pdfsWgt", up=tree.LHEPdfWeight, down=tree.LHEPdfWeight)
             #noSel = noSel.refine("theorySystematics", weight = [qcdScaleSyst,psISRSyst,psFSRSyst,pdfsWeight])
-            noSel = noSel.refine("PSweights", weight = [psISRSyst,psFSRSyst])
+            noSel = noSel.refine("PSweights", weight = [self.psISRSyst,self.psFSRSyst])
 
         #----- Triggers and Corrections -----#
         self.triggersPerPrimaryDataset = {}
@@ -1194,8 +1194,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                                 op.OR(((j.puId >> 2) & 1) ,j.pt>=50.), # Jet PU ID bit1 is loose (only to be applied to jets with pt<50)
                                                 op.abs(j.eta) <= 4.7,
                                                 op.OR(j.pt >= 60.,
-                                                      op.AND(op.abs(j.eta) < 2.7, 
-                                                             op.abs(j.eta) > 3.0)))
+                                                      op.abs(j.eta) < 2.7, 
+                                                      op.abs(j.eta) > 3.0))
         self.VBFJetsPreSel = op.select(self.ak4JetsByPt, self.lambda_VBFJets)
         if self.args.POGID:
             self.lambda_cleanVBFLeptons = lambda j : op.AND(op.NOT(op.rng_any(self.electronsTightSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.4 )), 
@@ -1210,7 +1210,9 @@ One lepton and and one jet argument must be specified in addition to the require
 
         if channel == "DL":
             self.lambda_cleanVBFAk4 = lambda j : op.AND(op.NOT(op.rng_any(self.ak4JetsByBtagScore[:2], lambda ak4Jet : op.deltaR(j.p4, ak4Jet.p4) <= 0.8 )))
-            self.lambda_cleanVBFAk8 = lambda j : op.AND(op.NOT(op.rng_any(self.ak8BJets[:1], lambda ak8BJet : op.deltaR(j.p4, ak8BJet.p4) <= 1.2 )))
+            self.lambda_cleanVBFAk8 = lambda j : op.multiSwitch((op.rng_len(self.ak8BJets)>0,op.deltaR(j.p4, self.ak8BJets[0].p4) > 1.2),
+                                                                (op.rng_len(self.ak8Jets)>0,op.deltaR(j.p4, self.ak8Jets[0].p4) > 1.2),
+                                                                op.c_bool(True))
         if channel == "SL":
             raise NotImplementedError
 
@@ -1357,7 +1359,6 @@ One lepton and and one jet argument must be specified in addition to the require
                                                  additionalVariables={'Pt' : lambda obj : self.electron_conept[obj.idx]}) for syst in FRSysts]
             self.muonFRList = [self.SF.get_scalefactor("lepton", ('muon_fakerates_'+era, syst), combine="weight", systName="mu_FR_"+syst, defineOnFirstUse=(not forSkimmer),
                                              additionalVariables={'Pt' : lambda obj : self.muon_conept[obj.idx]}) for syst in FRSysts ] 
-
             def returnFFSF(obj,list_SF,systName):
                 """ Helper when several systematics are present  """
                 args = [ a(obj) for a in list_SF[0]._args ] ## get the things the SF depends on
@@ -1388,8 +1389,12 @@ One lepton and and one jet argument must be specified in addition to the require
                 self.electronCorrFR = op.systematic(op.c_float(1.325), name="electronCorrFR",up=op.c_float(1.325*1.325),down=op.c_float(1.))
                 self.muonCorrFR     = op.systematic(op.c_float(1.067), name="muonCorrFR",up=op.c_float(1.067*1.067),down=op.c_float(1.))
 
-            self.lambda_FF_el = lambda el : self.electronCorrFR*returnFFSF(el,self.electronFRList,"el_FR")/(1-self.electronCorrFR*returnFFSF(el,self.electronFRList,"el_FR"))
-            self.lambda_FF_mu = lambda mu : self.muonCorrFR*returnFFSF(mu,self.muonFRList,"mu_FR")/(1-self.muonCorrFR*returnFFSF(mu,self.muonFRList,"mu_FR"))
+            self.lambda_FR_el       = lambda el : returnFFSF(el,self.electronFRList,"el_FR")
+            self.lambda_FR_mu       = lambda mu : returnFFSF(mu,self.muonFRList,"mu_FR")
+            self.lambda_FRcorr_el   = lambda el : self.lambda_FR_el(el)*self.electronCorrFR
+            self.lambda_FRcorr_mu   = lambda mu : self.lambda_FR_mu(mu)*self.muonCorrFR
+            self.lambda_FF_el       = lambda el : self.lambda_FRcorr_el(el)/(1-self.lambda_FRcorr_el(el))
+            self.lambda_FF_mu       = lambda mu : self.lambda_FRcorr_mu(mu)/(1-self.lambda_FRcorr_mu(mu))
 
             if channel == "SL":
                 self.ElFakeFactor = lambda el : self.lambda_FF_el(el)
@@ -1404,7 +1409,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                     (op.AND(self.lambda_electronTightSel(dilep[0]),op.NOT(self.lambda_electronTightSel(dilep[1]))),
                                                                      # Only subleading electron fails tight -> F2
                                                                      self.lambda_FF_el(dilep[1])),
-                                                                     op.c_float(1.)) # Should not happen
+                                                                     op.c_float(1.)) # Both tight -> SR
                 self.MuMuFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_muonTightSel(dilep[0])),op.NOT(self.lambda_muonTightSel(dilep[1]))),
                                                                      # Both muons fail tight -> -F1*F2
                                                                      -self.lambda_FF_mu(dilep[0])*self.lambda_FF_mu(dilep[1])),
@@ -1414,7 +1419,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                     (op.AND(self.lambda_muonTightSel(dilep[0]),op.NOT(self.lambda_muonTightSel(dilep[1]))),
                                                                      # Only subleading muon fails tight -> F2
                                                                      self.lambda_FF_mu(dilep[1])),
-                                                                     op.c_float(1.)) # Should not happen
+                                                                     op.c_float(1.)) # Both tight -> SR
                 self.ElMuFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),op.NOT(self.lambda_muonTightSel(dilep[1]))),
                                                                      # Both electron and muon fail tight -> -F1*F2
                                                                      -self.lambda_FF_el(dilep[0])*self.lambda_FF_mu(dilep[1])),
@@ -1424,7 +1429,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                     (op.AND(self.lambda_electronTightSel(dilep[0]),op.NOT(self.lambda_muonTightSel(dilep[1]))),
                                                                      # Only subleading electron fails tight -> F2
                                                                      self.lambda_FF_mu(dilep[1])),
-                                                                     op.c_float(1.)) # Should not happen
+                                                                     op.c_float(1.)) # Both tight -> SR
 
         ###########################################################################
         #                    b-tagging efficiency scale factors                   #

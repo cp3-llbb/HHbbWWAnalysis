@@ -308,4 +308,8 @@ if __name__ == "__main__":
     instance = ScaleFactorsbbWW()
     import pprint
     pprint.pprint(instance.all_scalefactors)
+    if len(sys.argv)>1 and sys.argv[1] == 'interactive':
+        import IPython
+        IPython.embed()
+
 

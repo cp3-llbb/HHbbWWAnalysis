@@ -75,7 +75,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         #----- Machine Learning Model -----#                
         DNNs = {}
-        model_nums = ["09"]
+        model_nums = ["08"]
         if not self.args.OnlyYield:
             for model_num in model_nums:
                 path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
