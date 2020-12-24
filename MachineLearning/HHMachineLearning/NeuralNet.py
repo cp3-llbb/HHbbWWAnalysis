@@ -21,7 +21,6 @@ from talos import Scan, Reporting, Predict, Evaluate, Deploy, Restore, Autom8
 from talos.utils.best_model import *
 from talos.model.layers import *
 from talos.model.normalizers import lr_normalizer
-from talos.utils.gpu_utils import parallel_gpu_jobs
 import talos
 from lbn import LBNLayer
 
@@ -81,7 +80,7 @@ class HyperModel:
             
         # Records #
         if not generator:
-            x = data[self.list_inputs+parameters.LBN_inputs].values
+            x = data[[param.replace('$','') for param in parameters.inputs]+parameters.LBN_inputs].values
             y = data[self.list_outputs+['learning_weights']].values
             # Data splitting #
             if model_idx is None:
@@ -101,7 +100,7 @@ class HyperModel:
             logging.info("Evaluation set : %d"%self.x_val.shape[0])
         else:
             # Needs to use dummy inputs to launch talos scan but in Model the generator will be used
-            dummyX = np.ones((1,len(self.list_inputs)))
+            dummyX = np.ones((1,len(parameters.inputs)))
             dummyY = np.ones((1,len(self.list_outputs))) 
             self.x_train = dummyX
             self.y_train = dummyY
@@ -348,7 +347,7 @@ class HyperModel:
     #############################################################################################
     # HyperRestore #
     #############################################################################################
-    def HyperRestore(self,inputs,verbose=0,generator=False,model_idx=None,return_inputs=False):
+    def HyperRestore(self,inputs,verbose=0,generator=False,model_idx=None):
         """
         Retrieve a zip containing the best model, parameters, x and y data, ... and restores it
         Produces an output from the input numpy array
@@ -367,12 +366,12 @@ class HyperModel:
                 time.sleep(3)
         has_LBN = any([l.__class__.__name__ == 'LBNLayer' for l in a.model.layers])
         if has_LBN:
-            idx = [parameters.inputs.index(inp) for inp in parameters.LBN_inputs]
-            assert [parameters.inputs[i] for i in idx] == parameters.LBN_inputs
-            inputsLBN = inputs[:,idx].reshape(-1,4,len(parameters.LBN_inputs)//4)
-            outputs = a.model.predict([inputs,inputsLBN],batch_size=parameters.output_batch_size,verbose=verbose)
+            inputsLL  = inputs[[param.replace('$','') for param in parameters.inputs]].values
+            inputsLBN = inputs[parameters.LBN_inputs].values.reshape(-1,4,len(parameters.LBN_inputs)//4)
+            outputs = a.model.predict([inputsLL,inputsLBN],batch_size=parameters.output_batch_size,verbose=verbose)
         else:
-            outputs = a.model.predict(inputs,batch_size=parameters.output_batch_size,verbose=verbose)
+            inputsLL  = inputs[[param.replace('$','') for param in parameters.inputs]].values
+            outputs = a.model.predict(inputsLL,batch_size=parameters.output_batch_size,verbose=verbose)
             
 #                outputs = a.model.predict_generator(output_generator,
 #                                                    workers=parameters.workers,

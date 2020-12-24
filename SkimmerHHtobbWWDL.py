@@ -382,22 +382,18 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep["weight_l1_ecal_prefiring"] = op.c_float(-9999.)
 
             # Fake rate #
-            varsToKeep["fakeRate"] = op.rng_product(self.electronsFakeSel, lambda el : op.switch(self.lambda_electronTightSel(el),
-                                                                                                 op.c_float(1.),
-                                                                                                 self.lambda_FRcorr_el(el))) *\
-                                     op.rng_product(self.muonsFakeSel, lambda mu : op.switch(self.lambda_muonTightSel(mu),
-                                                                                             op.c_float(1.),
-                                                                                             self.lambda_FRcorr_mu(mu)))
-
             if self.args.Channel == "ElEl":
+                varsToKeep["fakeRate"] = self.ElElFakeFactor(self.ElElFakeSel[0])
                 varsToKeep["weight_fake_electrons"] = op.abs(self.ElElFakeFactor(self.ElElFakeSel[0]))
                 varsToKeep["weight_fake_muons"]     = op.c_float(1.)
                 varsToKeep["weight_fake_two_non_tight"] = op.static_cast("Float_t",op.sign(self.ElElFakeFactor(self.ElElFakeSel[0])))
             if self.args.Channel == "MuMu":
+                varsToKeep["fakeRate"] = self.MuMuFakeFactor(self.MuMuFakeSel[0])
                 varsToKeep["weight_fake_electrons"] = op.c_float(1.)
                 varsToKeep["weight_fake_muons"]     = op.abs(self.MuMuFakeFactor(self.MuMuFakeSel[0]))
                 varsToKeep["weight_fake_two_non_tight"] = op.static_cast("Float_t",op.sign(self.MuMuFakeFactor(self.MuMuFakeSel[0])))
             if self.args.Channel == "ElMu":
+                varsToKeep["fakeRate"] = self.ElMuFakeFactor(self.ElMuFakeSel[0])
                 varsToKeep["weight_fake_electrons"] = op.switch(self.lambda_electronTightSel(self.ElMuFakeSel[0][0]),
                                                                 op.c_float(1.),
                                                                 self.lambda_FF_el(self.ElMuFakeSel[0][0]))
@@ -465,6 +461,19 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             for (varname,_,_),var in inputs.items():
                 varsToKeep[varname] = var
 
+#            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','08','model','model.pb')
+#            nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
+#            if not os.path.exists(path_model):
+#                raise RuntimeError('Could not find model file %s'%path_model)
+#            try:
+#                input_names = ["lep","jet","fat","met","hl","param","eventnr"]
+#                output_name = "Identity"
+#                DNN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
+#            except:
+#                raise RuntimeError('Could not load model %s'%path_model)
+#            outputs = DNN(*inputs.values())
+#            for node, output in zip(nodes,outputs): 
+#                varsToKeep[node] = output
 
             # Return #
            

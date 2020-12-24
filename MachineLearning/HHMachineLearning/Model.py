@@ -24,13 +24,6 @@ from tensorflow.keras.regularizers import l1,l2
 import tensorflow as tf
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # removes annoying warning
 
-from talos import Scan, Reporting, Predict, Evaluate, Deploy, Restore, Autom8
-from talos.utils.best_model import *
-from talos.model.layers import *
-from talos.model.normalizers import lr_normalizer
-from talos.utils.gpu_utils import parallel_gpu_jobs
-import talos
-
 from lbn import LBN, LBNLayer
 
 import matplotlib.pyplot as plt
@@ -176,7 +169,8 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
     # Left branch : classic inputs -> Preprocess -> onehot
     IN = Input(shape=x_train.shape[1:],name='IN')
     L0 = PreprocessLayer(batch_size=params['batch_size'],mean=scaler.mean_,std=scaler.scale_,name='Preprocess')(IN)
-    OH = OneHot.OneHot(onehots=onehots,name="OneHot")(L0)
+    #OH = OneHot.OneHot(onehots=onehots,name="OneHot")(L0)
+        #-> TODO : study OH
 
     # Right branch : LBN 
     INLBN = Input(shape=x_train_lbn.shape[1:],name='INLBN')
@@ -187,10 +181,12 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
                         name='LBN')(INLBN)
     BATCHNORM = tf.keras.layers.BatchNormalization(name='BATCHNORM')(FEATURES)
     # Concatenation of left and right #
-    CONC = tf.keras.layers.Concatenate(axis=-1)([BATCHNORM, OH])
+    CONC = tf.keras.layers.Concatenate(axis=-1)([BATCHNORM, L0])
+    #CONC = tf.keras.layers.Concatenate(axis=-1)([BATCHNORM, OH])
     L1 = Dense(params['first_neuron'],
                activation=params['activation'],
-               kernel_regularizer=l2(params['l2']))(CONC if params['n_particles'] > 0 else OH)
+               #kernel_regularizer=l2(params['l2']))(CONC if params['n_particles'] > 0 else OH)
+               kernel_regularizer=l2(params['l2']))(CONC if params['n_particles'] > 0 else L0)
     HIDDEN = hidden_layers(params,1,batch_normalization=True).API(L1)
     OUT = Dense(y_train.shape[1],activation=params['output_activation'],name='OUT')(HIDDEN)
 
@@ -245,7 +241,8 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
         
     model.compile(optimizer=Adam(lr=params['lr']),
                   loss={'OUT':params['loss_function']},
-                  metrics=['accuracy','AUC'])
+                  metrics=[tf.keras.metrics.CategoricalAccuracy(),
+                           tf.keras.metrics.AUC(multi_label = True)])
     print (model.summary())
     fit_inputs = {'IN':x_train}
     fit_val = ({'IN':x_val},{'OUT':y_val},w_val)
@@ -277,19 +274,37 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
     Keras model for the Neural Network, used to scan the hyperparameter space by Talos
     Uses the generator rather than the input data (which are dummies)
     """
-    onehots = [getattr(OneHot,onehot)() for onehot in parameters.onehots]
-    # Design network #
+    # Scaler #
     scaler_name = 'scaler_'+parameters.suffix+'_'.join(parameters.eras)+'.pkl' 
     with open(os.path.join(parameters.main_path,scaler_name), 'rb') as handle: # Import scaler that was created before
         scaler = pickle.load(handle)
-    IN = Input(shape=(x_train.shape[1],),name='IN')
+
+    # Design network #
+    onehots = [getattr(OneHot,onehot)() for onehot in parameters.onehots]
+
+    # Left branch : classic inputs -> Preprocess -> onehot
+    IN = Input(shape=x_train.shape[1:],name='IN')
     L0 = PreprocessLayer(batch_size=params['batch_size'],mean=scaler.mean_,std=scaler.scale_,name='Preprocess')(IN)
-    OH = OneHot.OneHot(onehots=onehots)(L0)
+    OH = OneHot.OneHot(onehots=onehots,name="OneHot")(L0)
+
+    # Right branch : LBN 
+    x_train_lbn = x_train[:,-len(parameters.LBN_inputs):].reshape(-1,4,len(parameters.LBN_inputs)//4)
+
+    INLBN = Input(shape=(4,len(parameters.LBN_inputs)//4),name='INLBN')
+    FEATURES = LBNLayer(x_train_lbn.shape[1: ], 
+                        n_particles = max(params['n_particles'],1), # Hack so that 0 does not trigger error
+                        boost_mode  = LBN.PAIRS, 
+                        features    = ["E", "px", "py", "pz", "pt", "p", "m", "pair_cos"],
+                        name='LBN')(INLBN)
+    BATCHNORM = tf.keras.layers.BatchNormalization(name='BATCHNORM')(FEATURES)
+    # Concatenation of left and right #
+    CONC = tf.keras.layers.Concatenate(axis=-1)([BATCHNORM, OH])
     L1 = Dense(params['first_neuron'],
                activation=params['activation'],
-               kernel_regularizer=l2(params['l2']))(OH)
+               kernel_regularizer=l2(params['l2']))(CONC if params['n_particles'] > 0 else OH)
     HIDDEN = hidden_layers(params,1,batch_normalization=True).API(L1)
     OUT = Dense(y_train.shape[1],activation=params['output_activation'],name='OUT')(HIDDEN)
+
 
     # Tensorboard logs #
 #    path_board = os.path.join(parameters.main_path,"TensorBoard")
@@ -331,9 +346,10 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
         
     model.compile(optimizer=Adam(lr=params['lr']),
                   loss={'OUT':params['loss_function']},
-                  metrics=['accuracy'])
+                  metrics=[tf.keras.metrics.CategoricalAccuracy(),
+                           tf.keras.metrics.AUC(multi_label = True)])
 
-    utils.print_summary(model=model) #used to print model
+    print (model.summary())
     # Generator #
     training_generator = DataGenerator(path = parameters.config,
                                        inputs = parameters.inputs,
