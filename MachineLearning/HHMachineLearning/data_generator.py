@@ -27,14 +27,18 @@ from generate_mask import GenerateSampleMasks, GenerateSliceIndices
 
 
 class DataGenerator(tf.keras.utils.Sequence):
-    def __init__(self,path,inputs,outputs,weight,cut='',batch_size=32,state_set='',model_idx=None):
+    def __init__(self,path,inputs,outputs,inputsLBN=None,weight=None,cut='',batch_size=32,state_set='',model_idx=None):
         self.path       = path                          # Path to root file : can be single file, list or dir (in which case will take all files inside)
         self.inputs     = inputs                        # List of strings of the variables as inputs
+        self.inputsLBN  = inputsLBN                     # List of inputs of the LBN
         self.outputs    = outputs                       # List of strings of the variables as outputs
         self.cut        = cut                           # Branch expression to use the cut
         self.weight     = weight                        # string for the branch containing the weight
         self.batch_size = batch_size                    # Batch size
-        self.model_idx  = model_idx
+        self.model_idx  = model_idx                     # model Idx for cross validation
+        self.variables  = self.inputs + self.outputs    # List of all variables to be taken from root trees
+        if self.inputsLBN is not None:
+            self.variables += [inp for inp in self.inputsLBN if inp not in self.inputsLBN]
 
         if isinstance(self.path,str):
             if self.path.endswith('.yml'):
@@ -181,7 +185,7 @@ class DataGenerator(tf.keras.utils.Sequence):
             tag_count[i] = {node:0 for node in parameters.nodes}
             era_count[i] = {era:0 for era in parameters.eras}
             for samplepath in indices_sample.keys():
-                sample = samplepath.replace(self.input_dir,'') 
+                sample = samplepath.replace(self.input_dir+'/','') 
                 keySelect = None
                 eraSelect = None
                 for era,keyDict in self.sample_dict.items():
@@ -192,6 +196,8 @@ class DataGenerator(tf.keras.utils.Sequence):
                             break
                     if keySelect is not None:
                         break
+                if keySelect is None:
+                    raise RuntimeError('Could not find sample %s in yaml file'%keySelect)
                 tag = max([node for node in parameters.nodes if node in keySelect], key=len)
                 cont = len([i for i,m in zip(indices_sample[samplepath],masks_sample[samplepath]) if m])
                 tag_count[i][tag] += cont
@@ -259,7 +265,7 @@ class DataGenerator(tf.keras.utils.Sequence):
 
         # Import data #
         data = LoopOverTrees(input_dir             = self.input_dir,
-                             variables             = self.inputs+self.outputs,
+                             variables             = self.variables,
                              weight                = self.weight,
                              list_sample           = samples,
                              start                 = start,
@@ -299,10 +305,20 @@ class DataGenerator(tf.keras.utils.Sequence):
         data = pd.concat([data,cat],axis=1)
 
         if not additional_columns:
-            return data[inputs],data[outputs],data["learning_weight"]
+            if self.inputsLBN is not None:
+                data_input = (data[inputs].values,data[self.inputsLBN].values.reshape(-1,4,len(self.inputsLBN)//4))
+            else:
+                data_input = data[inputs].values
+            data_output = data[outputs].values
+            data_weight = data["learning_weight"].values
+            return data_input,data_output,data_weight
         else:
             addcol = [col for col in data.columns if col not in inputs+outputs+["learning_weight"]]
-            return data[inputs],data[outputs],data["learning_weight"],data[addcol]
+            if self.inputsLBN is not None:
+                return data[inputs+[inp for inp in self.inputsLBN if inp not in inputs]],data[outputs],data["learning_weight"],data[addcol]
+            else:
+                return data[inputs],data[outputs],data["learning_weight"],data[addcol]
+             
 
     def __len__(self): # gets the number of batches
         # return the number of batches in this epoch (do not change in the middle of an epoch)

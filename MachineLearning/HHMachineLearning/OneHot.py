@@ -32,7 +32,8 @@ class onehot_boosted_JPAcat:
         return 2
 class onehot_unit:
     def __call__(self,x):
-        return tf.expand_dims(x,1)
+        #return tf.expand_dims(x,1)
+        return x
     @property
     def add_dim(self):
         return 0

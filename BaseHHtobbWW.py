@@ -1056,14 +1056,17 @@ One lepton and and one jet argument must be specified in addition to the require
 
         #############################################################################
         #                                AK4 Jets                                   #
+
         #############################################################################
         self.ak4JetsByPt = op.sort(t.Jet, lambda jet : -jet.pt)
         # Preselection #
         self.lambda_ak4JetsPreSel = lambda j : op.AND(j.jetId & 1 if era == "2016" else j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
-                                                      op.OR(((j.puId >> 2) & 1) ,j.pt>=50.), # Jet PU ID bit1 is loose (only to be applied to jets with pt<50)
                                                       j.pt >= 25.,
                                                       op.abs(j.eta) <= 2.4)
-        self.ak4JetsPreSel = op.select(self.ak4JetsByPt, self.lambda_ak4JetsPreSel)
+        self.lambda_jetPUID = lambda j : op.OR(((j.puId >> 2) & 1) ,j.pt > 50.) # Jet PU ID bit1 is loose (only to be applied to jets with pt<50)
+
+        self.ak4JetsPreSelForPUID = op.select(self.ak4JetsByPt, lambda j : op.AND(j.pt<=50.,self.lambda_ak4JetsPreSel(j)))
+        self.ak4JetsPreSel        = op.select(self.ak4JetsByPt, lambda j : op.AND(self.lambda_ak4JetsPreSel(j),self.lambda_jetPUID(j)))
         # Cleaning #
         if self.args.POGID:
             self.lambda_cleanAk4Jets = lambda j : op.AND(op.NOT(op.rng_any(self.electronsTightSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.4 )), 
@@ -1114,7 +1117,8 @@ One lepton and and one jet argument must be specified in addition to the require
             
         else:
             self.lambda_cleanAk4Jets = lambda j : op.c_float(True)
-        self.ak4Jets = op.select(self.ak4JetsPreSel,self.lambda_cleanAk4Jets) # Pt ordered
+        self.ak4JetsForPUID     = op.select(self.ak4JetsPreSelForPUID,self.lambda_cleanAk4Jets) # Pt ordered
+        self.ak4Jets            = op.select(self.ak4JetsPreSel,self.lambda_cleanAk4Jets) # Pt ordered
         self.ak4JetsByBtagScore = op.sort(self.ak4Jets, lambda j : -j.btagDeepFlavB) # Btag score ordered
     
         ############     Btagging     #############
@@ -1190,13 +1194,14 @@ One lepton and and one jet argument must be specified in addition to the require
         #                                VBF Jets                                   #
         #############################################################################
         self.lambda_VBFJets = lambda j : op.AND(j.jetId & 1 if era == "2016" else j.jetId & 2, # Jet ID flags bit1 is loose, bit2 is tight, bit3 is tightLepVeto
-                                                j.pt >= 25.,
-                                                op.OR(((j.puId >> 2) & 1) ,j.pt>=50.), # Jet PU ID bit1 is loose (only to be applied to jets with pt<50)
+                                                j.pt >= 30.,
                                                 op.abs(j.eta) <= 4.7,
                                                 op.OR(j.pt >= 60.,
                                                       op.abs(j.eta) < 2.7, 
                                                       op.abs(j.eta) > 3.0))
-        self.VBFJetsPreSel = op.select(self.ak4JetsByPt, self.lambda_VBFJets)
+        self.VBFJetsPreSelForPUID = op.select(self.ak4JetsByPt, lambda j : op.AND(j.pt<=50.,self.lambda_VBFJets(j)))
+        self.VBFJetsPreSel        = op.select(self.ak4JetsByPt, lambda j : op.AND(self.lambda_VBFJets(j),self.lambda_jetPUID(j)))
+
         if self.args.POGID:
             self.lambda_cleanVBFLeptons = lambda j : op.AND(op.NOT(op.rng_any(self.electronsTightSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.4 )), 
                                                             op.NOT(op.rng_any(self.muonsTightSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.4 )))
@@ -1216,9 +1221,10 @@ One lepton and and one jet argument must be specified in addition to the require
         if channel == "SL":
             raise NotImplementedError
 
-        self.VBFJets = op.select(self.VBFJetsPreSel, self.lambda_cleanVBFLeptons)
-        self.VBFJetsResolved = op.select(self.VBFJets, self.lambda_cleanVBFAk4)
-        self.VBFJetsBoosted  = op.select(self.VBFJets, self.lambda_cleanVBFAk8)
+        self.VBFJetsForPUID     = op.select(self.VBFJetsPreSelForPUID, self.lambda_cleanVBFLeptons)
+        self.VBFJets            = op.select(self.VBFJetsPreSel, self.lambda_cleanVBFLeptons)
+        self.VBFJetsResolved    = op.select(self.VBFJets, self.lambda_cleanVBFAk4)
+        self.VBFJetsBoosted     = op.select(self.VBFJets, self.lambda_cleanVBFAk8)
 
         self.lambda_VBFPair = lambda j1,j2 : op.AND(op.invariant_mass(j1.p4,j2.p4) > 500.,
                                                     op.abs(j1.eta - j2.eta) > 3.)
@@ -1514,26 +1520,29 @@ One lepton and and one jet argument must be specified in addition to the require
         #                           Jet PU ID reweighting                           #
         #############################################################################
         if self.is_MC:
-            ak4Jets_below50 = op.select(self.ak4Jets, lambda j : j.pt < 50.)
             wFail = op.extMethod("scalefactorWeightForFailingObject", returnType="double")
-            self.puid_reweighting = op.rng_product(ak4Jets_below50, lambda j : op.switch(j.genJet.isValid,
-                                                                                         op.switch(((j.puId >> 2) & 1),
-                                                                                                   self.jetpuid_sf_eff(j), 
-                                                                                                   wFail(self.jetpuid_sf_eff(j), self.jetpuid_mc_eff(j))),
-                                                                                         op.switch(((j.puId >> 2) & 1),
-                                                                                                   self.jetpuid_sf_mis(j), 
-                                                                                                   wFail(self.jetpuid_sf_mis(j), self.jetpuid_mc_mis(j)))))
-            self.puid_reweighting_efficiency = op.rng_product(ak4Jets_below50, lambda j : op.switch(j.genJet.isValid,
-                                                                                                   op.switch(((j.puId >> 2) & 1),
-                                                                                                             self.jetpuid_sf_eff(j), 
-                                                                                                             wFail(self.jetpuid_sf_eff(j), self.jetpuid_mc_eff(j))),
-                                                                                                   op.c_float(1.)))
+            lambda_puid_weight = lambda j : op.switch(j.genJet.isValid,
+                                                      op.switch(((j.puId >> 2) & 1),
+                                                                self.jetpuid_sf_eff(j), 
+                                                                wFail(self.jetpuid_sf_eff(j), self.jetpuid_mc_eff(j))),
+                                                      op.switch(((j.puId >> 2) & 1),
+                                                                self.jetpuid_sf_mis(j), 
+                                                                wFail(self.jetpuid_sf_mis(j), self.jetpuid_mc_mis(j))))
+            lambda_puid_efficiency = lambda j : op.switch(j.genJet.isValid,
+                                                          op.switch(((j.puId >> 2) & 1),
+                                                                    self.jetpuid_sf_eff(j),
+                                                                    wFail(self.jetpuid_sf_eff(j), self.jetpuid_mc_eff(j))),
+                                                          op.c_float(1.))
+            lambda_puid_mistag     = lambda j : op.switch(j.genJet.isValid,
+                                                          op.c_float(1.),
+                                                          op.switch(((j.puId >> 2) & 1),
+                                                                    self.jetpuid_sf_mis(j), 
+                                                                    wFail(self.jetpuid_sf_mis(j), self.jetpuid_mc_mis(j))))
+
+            self.puid_reweighting = op.rng_product(self.ak4JetsForPUID, lambda j : lambda_puid_weight(j)) * op.rng_product(self.VBFJetsForPUID, lambda j : lambda_puid_weight(j))
+            self.puid_reweighting_efficiency = op.rng_product(self.ak4JetsForPUID, lambda j : lambda_puid_efficiency(j)) * op.rng_product(self.VBFJetsForPUID, lambda j : lambda_puid_efficiency(j))
                     # Sync purposes
-            self.puid_reweighting_mistag = op.rng_product(ak4Jets_below50, lambda j : op.switch(j.genJet.isValid,
-                                                                                                op.c_float(1.),
-                                                                                                op.switch(((j.puId >> 2) & 1),
-                                                                                                          self.jetpuid_sf_mis(j), 
-                                                                                                          wFail(self.jetpuid_sf_mis(j), self.jetpuid_mc_mis(j)))))
+            self.puid_reweighting_mistag = op.rng_product(self.ak4JetsForPUID, lambda j : lambda_puid_mistag(j)) * op.rng_product(self.VBFJetsForPUID, lambda j : lambda_puid_mistag(j))
                     # Sync purposes
        
             sel = sel.refine("jetPUIDReweighting"+name,weight=self.puid_reweighting)
