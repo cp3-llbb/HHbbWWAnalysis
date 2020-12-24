@@ -29,7 +29,7 @@ class ProduceOutput:
                 if not, the samples in the dataframe are used to split into different files with names 'sample'.root
         """
         if not self.generator:
-            inputs = data[self.list_inputs].values
+            inputs = data[self.list_inputs]
             if len(self.model) == 1: # classic training
                 instance = HyperModel(self.model[0])
                 output = instance.HyperRestore(inputs,verbose=1)
@@ -39,7 +39,7 @@ class ProduceOutput:
                     instance = HyperModel(model)
                     apply_idx, _, _ = GenerateSliceIndices(model_idx)
                     apply_mask = GenerateSliceMask(apply_idx,data['mask']) 
-                    model_out = instance.HyperRestore(inputs[apply_mask],generator=self.generator,model_idx=model_idx,return_inputs=True)
+                    model_out = instance.HyperRestore(inputs[apply_mask],generator=self.generator,model_idx=model_idx)
                     if output is None:
                         output = model_out
                     else:

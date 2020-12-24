@@ -235,7 +235,7 @@ def main():
     variables = parameters.inputs+parameters.LBN_inputs+parameters.outputs+parameters.other_variables
     variables = [v for i,v in enumerate(variables) if v not in variables[:i]] # avoid repetitons while keeping order
         
-    list_inputs  = parameters.inputs
+    list_inputs  = parameters.inputs + [inp for inp in parameters.LBN_inputs if inp not in parameters.inputs] 
     list_outputs = parameters.outputs
 
     # Load samples #
@@ -350,7 +350,7 @@ def main():
 
             # Plots #
             if opt.task != '':
-                InputPlots(train_all,list_inputs+[inp for inp in parameters.LBN_inputs if inp not in list_inputs])
+                InputPlots(train_all,list_inputs)
 
             # Randomize order, we don't want only one type per batch #
             random_train = np.arange(0,train_all.shape[0]) # needed to randomize x,y and w in same fashion
@@ -376,10 +376,10 @@ def main():
                 test_cat = pd.DataFrame(test_onehot,columns=label_encoder.classes_,index=test_all.index)
             # Add to full #
             train_all = pd.concat([train_all,train_cat],axis=1)
-            train_all[list_inputs+list_outputs+parameters.LBN_inputs] = train_all[list_inputs+list_outputs+parameters.LBN_inputs].astype('float32')
+            train_all[list_inputs+list_outputs] = train_all[list_inputs+list_outputs].astype('float32')
             if not parameters.crossvalidation:
                 test_all = pd.concat([test_all,test_cat],axis=1)
-                test_all[list_inputs+list_outputs+parameters.LBN_inputs] = test_all[list_inputs+list_outputs+parameters.LBN_inputs].astype('float32')
+                test_all[list_inputs+list_outputs] = test_all[list_inputs+list_outputs].astype('float32')
 
             # Preprocessing #
             # The purpose is to create a scaler object and save it
@@ -426,8 +426,9 @@ def main():
             
         train_all = None
         test_all = None
-    list_inputs  = [var.replace('$','') for var in parameters.inputs]
-    list_outputs = [var.replace('$','') for var in parameters.outputs]
+
+    list_inputs  = [var.replace('$','') for var in list_inputs]
+    list_outputs = [var.replace('$','') for var in list_outputs]
 
     #############################################################################################
     # DNN #
@@ -445,7 +446,7 @@ def main():
             modelIds = list(range(parameters.N_models))
             if opt.modelId != -1:
                 if opt.modelId not in modelIds:
-                    raise RuntimeError("You asked model id %d but only these ids are avilable : ["+','.join([str(m) for m in modelIds])+']')
+                    raise RuntimeError("You asked model id %d but only these ids are available : ["+','.join([str(m) for m in modelIds])+']')
                 modelIds = [opt.modelId]
             for i in modelIds:
                 logging.info("*"*80)
