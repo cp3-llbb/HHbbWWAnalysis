@@ -92,14 +92,14 @@ group_ids = [
 
 # Input plots options #
 node_colors = {
-            'DY'    : 'dodgerblue',
-            'GGF'   : 'green',
-            'H'     : 'mediumaquamarine',
-            'Rare'  : 'darkviolet',
-            'ST'    : 'firebrick',
-            'TT'    : 'darkorange',
-            'VBF'   : 'red',
-            'WJets' : 'salmon',
+            'DY'    : '#1a83a1',
+            'GGF'   : '#288a24',
+            'H'     : '#06b894',
+            'Rare'  : '#610596',
+            'ST'    : '#99053d',
+            'TT'    : '#cc7a16',
+            'VBF'   : '#8f0a1e',
+            'WJets' : '#d95564',
              }
 
 # Tree name #
@@ -122,7 +122,7 @@ event_weight_sum_json = os.path.join(main_path,'background_{era}_event_weight_su
 resume_model = ''
 
 # Output #
-output_batch_size = 10000
+output_batch_size = 5000
 split_name = 'tag' # 'sample' or 'tag' : criterion for output file splitting
 
 ##############################  Evaluation criterion   ################################
@@ -132,8 +132,8 @@ eval_criterion = "eval_error" # either val_loss or eval_error or val_acc
 ##############################  Model callbacks ################################
 # Early stopping to stop learning after some criterion 
 early_stopping_params = {'monitor'   : 'val_loss',  # Value to monitor
-                         'min_delta' : 0.001,          # Minimum delta to declare an improvement
-                         'patience'  : 15,          # How much time to wait for an improvement
+                         'min_delta' : 0.0001,          # Minimum delta to declare an improvement
+                         'patience'  : 20,          # How much time to wait for an improvement
                          'verbose'   : 1,           # Verbosity level
                          'restore_best_weights':True,
                          'mode'      : 'min'}       # Mode : 'auto', 'min', 'max'
@@ -142,7 +142,8 @@ early_stopping_params = {'monitor'   : 'val_loss',  # Value to monitor
 reduceLR_params = {'monitor'    : 'val_loss',   # Value to monitor
                    'factor'     : 0.1,          # Multiplicative factor by which to multiply LR
                    'min_lr'     : 1e-6,         # Minimum value for LR
-                   'patience'   : 3,           # How much time to wait for an improvement
+                   'min_delta'  : 0.0001,       # Minimum delta to declare an improvement
+                   'patience'   : 5,            # How much time to wait for an improvement
                    'cooldown'   : 0,            # How many epochs before starting again to monitor
                    'verbose'    : 1,            # Verbosity level
                    'mode'      : 'min'}         # Mode : 'auto', 'min', 'max'
@@ -168,17 +169,17 @@ grouped_loss = GroupedXEnt(group_ids)
 #    'loss_function' : [grouped_loss] , #  [categorical_crossentropy]
 #}
 p = { 
-    'lr' : [0.01], 
-    'first_neuron' : [256],
+    'lr' : [0.1], 
+    'first_neuron' : [512],
     'activation' : [relu],
-    'dropout' : [0.1],
+    'dropout' : [0.],
     'hidden_layers' : [5], # does not take into account the first layer
     'output_activation' : [softmax],
-    'l2' : [0.001],
+    'l2' : [0.],
     'optimizer' : [Adam],  
     'epochs' : [10],   
     'batch_size' : [10000], 
-    'n_particles' : [10],
+    'n_particles' : [0],
     'loss_function' : [categorical_crossentropy],
 }
 
@@ -195,7 +196,7 @@ weight = None
 # Input branches (combinations possible just as in ROOT #
 inputs = [
             # LL variables #
-            '$era@onehot_era',
+#            '$era@onehot_era',
             'METpt',
 #            'METpx',
 #            'METpy',
@@ -207,8 +208,8 @@ inputs = [
 #            'lep_E',
             'lep_pt',
 #            'lep_eta',
-            'lep_pdgId@onehot_pdgid',
-            'lep_charge@onehot_charge',
+#            'lep_pdgId@onehot_pdgid',
+#            'lep_charge@onehot_charge',
 #            'bj1_Px',
 #            'bj1_Py',
 #            'bj1_Pz',
@@ -222,7 +223,7 @@ inputs = [
 #            'bj2_E',
             'bj2_pt',
 #            'bj2_eta',
-            'bj2_bTagDeepFlavB',
+#           'bj2_bTagDeepFlavB',
 #            'wj1_Px',
 #            'wj1_Py',
 #            'wj1_Pz',
@@ -238,66 +239,66 @@ inputs = [
 #            'wj2_eta',
             'wj2_bTagDeepFlavB ',
             'nAk4BJets',
-            'nAk8BJets',
+#            'nAk8BJets',
             'VBF_tag',
-            'JPAcat@onehot_resolved_JPAcat',
+#            'JPAcat@onehot_resolved_JPAcat',
 #            'neuPx',
 #            'neuPy',
 #            'neuPz',
 #            'neuE',
 #            'neuPt',
             # HL variables #
-            'lepmet_DPhi',
+#            'lepmet_DPhi',
             'lepmet_pt',
             'lep_MT',
             'MET_LD',
             'hT',
             'bj1LepDR',
             'bj1LepDPhi',
-            'bj1MetDPhi',
+#            'bj1MetDPhi',
             'minDR_lep_allJets',
-            'bj2LepDR',
-            'bj2LepDPhi',
-            'bj2MetDPhi',
+#            'bj2LepDR',
+#            'bj2LepDPhi',
+#            'bj2MetDPhi',
             'bj1bj2_pt',
             'bj1bj2_M',
-            'cosThetaS_Hbb',
+#            'cosThetaS_Hbb',
             'mT_top_3particle',
             'wj1LepDR',
             'wj1LepDPhi',
-            'wj1MetDPhi',
-            'wj2LepDR',
-            'wj2LepDPhi',
-            'wj2MetDPhi',
-            'wj1wj2_pt',
-            'wj1wj2_M',
-            'w1w2_MT',
-            'HWW_Mass',
-            'HWW_Simple_Mass',
-            'HWW_dR',
-            'cosThetaS_Wjj_simple',
-            'cosThetaS_WW_simple_met ',
-            'cosThetaS_HH_simple_met',
-            'angleBetWWPlane',
-            'angleBetHWPlane',
+#            'wj1MetDPhi',
+#            'wj2LepDR',
+#            'wj2LepDPhi',
+#            'wj2MetDPhi',
+#            'wj1wj2_pt',
+#            'wj1wj2_M',
+#            'w1w2_MT',
+#            'HWW_Mass',
+#            'HWW_Simple_Mass',
+#            'HWW_dR',
+#            'cosThetaS_Wjj_simple',
+#            'cosThetaS_WW_simple_met ',
+#            'cosThetaS_HH_simple_met',
+#            'angleBetWWPlane',
+#            'angleBetHWPlane',
             'bj1bj2_DR',
             'bj1bj2_DPhi',
-            'bj2wj1_DR',
-            'bj2wj1_DPhi',
-            'wj1wj2_DR',
-            'wj1wj2_DPhi',
-            'bj1wj2_DR',
-            'bj1wj2_DPhi',
+#            'bj2wj1_DR',
+#            'bj2wj1_DPhi',
+#            'wj1wj2_DR',
+#            'wj1wj2_DPhi',
+#            'bj1wj2_DR',
+#            'bj1wj2_DPhi',
             'bj1wj1_DR',
             'bj1wj1_DPhi',
-            'VBFj1pt',
-            'VBFj2pt',
-            'VBFj1eta',
-            'VBFj2eta',
-            'VBFj1j2dEta',
-            'VBFj1j2dPhi',
-            'VBFj1j2invM',
-            'zeppenfeldVar',
+#            'VBFj1pt',
+#            'VBFj2pt',
+#            'VBFj1eta',
+#            'VBFj2eta',
+#            'VBFj1j2dEta',
+#            'VBFj1j2dPhi',
+#            'VBFj1j2invM',
+#            'zeppenfeldVar',
             'minJetDR',
             'minLepJetDR',
             'HT2_lepJetMet',

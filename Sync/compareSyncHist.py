@@ -117,14 +117,14 @@ def compareSyncHist(dict_files,name):
         rootfile.Close()
 
 compareSyncHist({
-            'Louvain group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Louvain_2016_v19.root','syncTree_hhbb2l_SR'),
-            'Tallinn group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Tallinn_2016_v18.root','syncTree_hhbb2l_SR'),
+            'Louvain group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Louvain_2016_v21.root','syncTree_hhbb2l_SR'),
+            'Tallinn group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Tallinn_2016_v19.root','syncTree_hhbb2l_SR'),
             'Aachen group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_aachen_2016.root','syncTree_hhbb2l_SR')},
              'SR')
 
 compareSyncHist({
-            'Louvain group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Louvain_2016_v19.root','syncTree_hhbb2l_Fake'),
-            'Tallinn group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Tallinn_2016_v18.root','syncTree_hhbb2l_Fake'),
+            'Louvain group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Louvain_2016_v21.root','syncTree_hhbb2l_Fake'),
+            'Tallinn group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_Tallinn_2016_v19.root','syncTree_hhbb2l_Fake'),
             'Aachen group' : ('/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/Sync/sync_bbww_aachen_2016.root','syncTree_hhbb2l_Fake')},
             'Fake')
 
