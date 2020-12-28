@@ -21,7 +21,7 @@ path_out = '/home/ucl/cp3/fbury/scratch/HHMachineLearning_output/'
 path_model = os.path.join(main_path,'model')
 
 ##############################  Datasets proportion   #################################
-crossvalidation = True 
+crossvalidation = False
 
 # Classic training #
 # -> For crossvalidation == False
@@ -61,7 +61,8 @@ lumidict = {'2016':35922,'2017':41529.152060112,'2018':59740.565201546}
 eras = ['2016']
 #eras = ['2016','2017','2018'] # To enable or disable eras, add or remove from this list
 
-categories = ['resolved2b']
+#categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj']
+categories = ['resolved2b2Wj']
 channels = ['El','Mu']
 
 # Better put them in alphabetical order
@@ -177,7 +178,7 @@ p = {
     'output_activation' : [softmax],
     'l2' : [0.],
     'optimizer' : [Adam],  
-    'epochs' : [10],   
+    'epochs' : [1],   
     'batch_size' : [10000], 
     'n_particles' : [0],
     'loss_function' : [categorical_crossentropy],
@@ -190,8 +191,8 @@ repetition = 1 # How many times each hyperparameter has to be used
 
 cut = 'MC_weight > 0'
 
-#weight = 'total_weight'
-weight = None
+weight = 'total_weight'
+#weight = None
 
 # Input branches (combinations possible just as in ROOT #
 inputs = [

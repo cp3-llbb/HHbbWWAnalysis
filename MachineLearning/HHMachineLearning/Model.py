@@ -21,11 +21,12 @@ from tensorflow.keras.activations import relu, elu, selu, softmax, tanh
 from tensorflow.keras.models import Model, model_from_json, load_model
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, TensorBoard
 from tensorflow.keras.regularizers import l1,l2
+from tensorflow.keras.layers.experimental import preprocessing
 import tensorflow as tf
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # removes annoying warning
 
 from lbn import LBN, LBNLayer
-
+from talos.model.layers import hidden_layers
 import matplotlib.pyplot as plt
 
 # Personal files #
@@ -238,7 +239,6 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
         model = a.model
         initial_epoch = params['initial_epoch']
 
-        
     model.compile(optimizer=Adam(lr=params['lr']),
                   loss={'OUT':params['loss_function']},
                   metrics=[tf.keras.metrics.CategoricalAccuracy(),
