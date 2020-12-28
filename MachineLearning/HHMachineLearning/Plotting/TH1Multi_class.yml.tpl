@@ -12,30 +12,15 @@ multiclass:
   list_variable:
     - output_DY
     - output_GGF
-    - output_H
-    - output_Rare
     - output_ST
-    - output_TT
-    - output_VBF
-    - output_WJets
   list_color:
     - "#1a83a1"
-    - "#288a24"
-    - "#06b894"
-    - "#610596"
-    - "#99053d"
     - "#cc7a16"
-    - "#8f0a1e"
-    - "#d95564"
+    - "#288a24"
   list_legend:
     - node DY
     - node GGF
-    - node H
-    - node Rare
     - node ST
-    - node TT
-    - node VBF
-    - node WJets
   list_cut : '1'
   legend_pos:
     - 0.4

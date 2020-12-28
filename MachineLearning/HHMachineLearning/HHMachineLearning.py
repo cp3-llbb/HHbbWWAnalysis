@@ -286,8 +286,8 @@ def main():
                                                   eras                      = era,
                                                   tree_name                 = parameters.tree_name,
                                                   additional_columns        = {'tag':node,'era':era})
-                                                  #stop                      = 100000) # TODO : remove 
-                    data_node_era = data_node_era.sample(frac=1)[:200000] # TODO : remove 
+                                                  #stop                      = 200000) # TODO : remove 
+                    #data_node_era = data_node_era.sample(frac=1)[:300000] # TODO : remove 
                     if data_node is None:
                         data_node = data_node_era
                     else:
@@ -349,7 +349,7 @@ def main():
             #logging.info('Current memory usage : %0.3f GB'%(pid.memory_info().rss/(1024**3)))
 
             # Plots #
-            if opt.task != '':
+            if opt.task == '':
                 InputPlots(train_all,list_inputs)
 
             # Randomize order, we don't want only one type per batch #
@@ -366,10 +366,10 @@ def main():
             if not parameters.crossvalidation:
                 test_integers = label_encoder.transform(test_all['tag']).reshape(-1, 1)
             # From labels to strings #
-            onehotobj = onehot_encoder.fit(np.arange(len(list_outputs)).reshape(-1, 1))
-            train_onehot = onehotobj.transform(train_integers)
+            onehot_encoder.fit(np.arange(len(list_outputs)).reshape(-1, 1))
+            train_onehot = onehot_encoder.transform(train_integers)
             if not parameters.crossvalidation:
-                test_onehot = onehotobj.transform(test_integers)
+                test_onehot = onehot_encoder.transform(test_integers)
             # From arrays to pd DF #
             train_cat = pd.DataFrame(train_onehot,columns=label_encoder.classes_,index=train_all.index)
             if not parameters.crossvalidation:
