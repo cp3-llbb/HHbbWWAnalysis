@@ -32,6 +32,7 @@ from split_training import DictSplit
 from plot_scans import PlotScans
 from preprocessing import PreprocessLayer
 import OneHot
+import Operations
 from data_generator import DataGenerator
 from generate_mask import GenerateSliceIndices, GenerateSliceMask
 import Model
@@ -45,19 +46,18 @@ class HyperModel:
     #############################################################################################
     def __init__(self,name,list_inputs=None,list_outputs=None):
         self.name = name
-        self.custom_objects =  {'PreprocessLayer': PreprocessLayer,
-                                'OneHot': OneHot.OneHot,
-                                'LBNLayer':LBNLayer} 
+        self.custom_objects =  {'LBNLayer':LBNLayer} 
+        self.custom_objects.update({name:getattr(Operations,name) for name in dir(Operations) if name.startswith('op')})
                                 # Needs to be specified when saving and restoring
         self.list_inputs = list_inputs
         self.list_outputs = list_outputs
         # Printing #
         if self.list_inputs is not None:
             logging.info('Number of features : %d'%len(self.list_inputs))
-            for name,onehot in zip(self.list_inputs,parameters.onehots):
-                if onehot != 'onehot_unit':
-                    onehot_inst = getattr(OneHot,onehot)()
-                    logging.info('..... %s (onehot encoding : %d bits)'%(name,1+onehot_inst.add_dim))
+            for name,op in zip(self.list_inputs,parameters.operations):
+                if op is not None:
+                    op_inst = getattr(Operations,op)()
+                    logging.info('..... %s (onehot encoding : %d bits)'%(name,op_inst.onehot_dim))
                 else:
                     logging.info('..... %s'%name)
         if self.list_outputs is not None:
@@ -176,9 +176,9 @@ class HyperModel:
                 )
         if not generator:
             # Split for LBN #
-            x_val1 = self.x_val[:,:-len(parameters.LBN_inputs)],
+            x_val1 = self.x_val[:,:-len(parameters.LBN_inputs)]
             x_val2 = self.x_val[:,-len(parameters.LBN_inputs):].reshape(-1,4,len(parameters.LBN_inputs)//4)
-            self.x_val = (x_val1,x_val2)
+            self.x_val = (np.hsplit(x_val1,x_val1.shape[1]),x_val2)
             # Use the save information in DF #
             self.h_with_eval = Autom8(scan_object = self.h,     # the scan object
                                       x_val = self.x_val,       # Evaluation inputs
@@ -347,7 +347,7 @@ class HyperModel:
     #############################################################################################
     # HyperRestore #
     #############################################################################################
-    def HyperRestore(self,inputs,verbose=0,generator=False,model_idx=None):
+    def HyperRestore(self,inputs,verbose=0,generator=False):
         """
         Retrieve a zip containing the best model, parameters, x and y data, ... and restores it
         Produces an output from the input numpy array
@@ -366,12 +366,12 @@ class HyperModel:
                 time.sleep(3)
         has_LBN = any([l.__class__.__name__ == 'LBNLayer' for l in a.model.layers])
         if has_LBN:
-            inputsLL  = inputs[[param.replace('$','') for param in parameters.inputs]].values
-            inputsLBN = inputs[parameters.LBN_inputs].values.reshape(-1,4,len(parameters.LBN_inputs)//4)
-            outputs = a.model.predict([inputsLL,inputsLBN],batch_size=parameters.output_batch_size,verbose=verbose)
+            inputsLL  = inputs[[param.replace('$','') for param in parameters.inputs]].astype(np.float32).values
+            inputsLBN = inputs[parameters.LBN_inputs].astype(np.float32).values.reshape(-1,4,len(parameters.LBN_inputs)//4)
+            outputs = a.model.predict((np.hsplit(inputsLL,inputsLL.shape[1]),inputsLBN),batch_size=parameters.output_batch_size,verbose=verbose)
         else:
-            inputsLL  = inputs[[param.replace('$','') for param in parameters.inputs]].values
-            outputs = a.model.predict(inputsLL,batch_size=parameters.output_batch_size,verbose=verbose)
+            inputsLL  = inputs[[param.replace('$','') for param in parameters.inputs]].astype(np.float32).values
+            outputs = a.model.predict(np.hsplit(inputsLL,inputsLL.shape[1]),batch_size=parameters.output_batch_size,verbose=verbose)
             
 #                outputs = a.model.predict_generator(output_generator,
 #                                                    workers=parameters.workers,

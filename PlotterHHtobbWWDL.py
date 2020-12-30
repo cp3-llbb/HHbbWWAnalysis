@@ -428,7 +428,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         for channelDict in ChannelDictList:
             plots.extend(makeDoubleLeptonSelectedBoostedVariables(**channelDict,HLL=self.HLL))
 
-
         #----- Machine Learning plots -----#
         selObjectDictList = []
         if not self.args.OnlyYield:
@@ -525,6 +524,8 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         #plots.extend(cutFlowPlots)
         plots.append(self.yields)
             
+        for plot in plots:
+            print (plot.name)
 
         #----- Return -----#
         return plots

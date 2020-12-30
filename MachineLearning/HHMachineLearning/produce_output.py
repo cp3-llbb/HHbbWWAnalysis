@@ -15,7 +15,7 @@ import parameters
 
 class ProduceOutput:
     def __init__(self,model,generator=False,list_inputs=None):
-        self.model = model              # Model of the NeuralNet
+        self.model = model 
         self.list_inputs = list_inputs
         self.generator = generator
         if self.list_inputs is None:
@@ -34,18 +34,14 @@ class ProduceOutput:
                 instance = HyperModel(self.model[0])
                 output = instance.HyperRestore(inputs,verbose=1)
             else:   # cross validation
-                output=None
+                output_df = pd.DataFrame(np.zeros((data.shape[0],len(parameters.outputs))),columns=[('output_%s'%o).replace('$','') for o in parameters.outputs],index=data.index)
                 for model_idx,model in enumerate(self.model):
                     instance = HyperModel(model)
                     apply_idx, _, _ = GenerateSliceIndices(model_idx)
                     apply_mask = GenerateSliceMask(apply_idx,data['mask']) 
-                    model_out = instance.HyperRestore(inputs[apply_mask],generator=self.generator,model_idx=model_idx)
-                    if output is None:
-                        output = model_out
-                    else:
-                        output = np.concatenate((output,model_out),axis=0)
-            assert output.shape[0] == data.shape[0]
-            output_df = pd.DataFrame(output,columns=[('output_%s'%o).replace('$','') for o in parameters.outputs],index=pd.RangeIndex(start=0,stop=output.shape[0]))
+                    model_out = instance.HyperRestore(inputs[apply_mask])
+                    output_df[apply_mask] = model_out
+            assert not (output_df.max(1)==0).any()
             full_df = pd.concat([data,output_df],axis=1)
             self.SaveToRoot(full_df,path_output,output_name)
         else:
@@ -53,34 +49,37 @@ class ProduceOutput:
                 output_generator = DataGenerator(path = parameters.config,
                                                  inputs = parameters.inputs,
                                                  outputs = parameters.outputs,
+                                                 other = parameters.other_variables,
                                                  cut = parameters.cut,
                                                  weight  = parameters.weight,
                                                  batch_size = parameters.output_batch_size,
                                                  state_set = 'output')
                 instance = HyperModel(self.model[0])
                 for i in range(len(output_generator)):
-                    inputs,targets,weight,other = output_generator.__getitem__(i,True)
-                    output = instance.HyperRestore(inputs)
-                    output_df = pd.DataFrame(output,columns=[('output_%s'%o).replace('$','') for o in parameters.outputs],index=pd.RangeIndex(start=0,stop=output.shape[0]))
-                    full_df = pd.concat([inputs,targets,other,weight,output_df],axis=1)
+                    data = output_generator.__getitem__(i,True)
+                    output = instance.HyperRestore(data[[inp.replace('$','') for inp in parameters.inputs]])
+                    output_df = pd.DataFrame(output,columns=[('output_%s'%o).replace('$','') for o in parameters.outputs],index=data.index)
+                    full_df = pd.concat([data,output_df],axis=1)
                     self.SaveToRoot(full_df,path_output,output_name,out_idx='_slice%d'%i)
             else:   # cross validation
                 output=None
                 for model_idx,model in enumerate(self.model):
+                    logging.info('Starting generator for model %d'%model_idx)
                     instance = HyperModel(model)
                     output_generator = DataGenerator(path = parameters.config,
                                                      inputs = parameters.inputs,
                                                      outputs = parameters.outputs,
+                                                     other = parameters.other_variables,
                                                      cut = parameters.cut,
                                                      weight  = parameters.weight,
                                                      batch_size = parameters.output_batch_size,
                                                      state_set = 'output',
                                                      model_idx = model_idx)
                     for i in range(len(output_generator)):
-                        inputs,targets,weight,other = output_generator.__getitem__(i,True)
-                        output = instance.HyperRestore(inputs)
-                        output_df = pd.DataFrame(output,columns=[('output_%s'%o).replace('$','') for o in parameters.outputs],index=pd.RangeIndex(start=0,stop=output.shape[0]))
-                        full_df = pd.concat([inputs,targets,other,weight,output_df],axis=1)
+                        data = output_generator.__getitem__(i,True)
+                        output = instance.HyperRestore(data[[inp.replace('$','') for inp in parameters.inputs]])
+                        output_df = pd.DataFrame(output,columns=[('output_%s'%o).replace('$','') for o in parameters.outputs],index=data.index)
+                        full_df = pd.concat([data,output_df],axis=1)
                         self.SaveToRoot(full_df,path_output,output_name,out_idx='_model%d_slice%d'%(model_idx,i))
 
  
