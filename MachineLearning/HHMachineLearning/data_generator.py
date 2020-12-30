@@ -27,7 +27,7 @@ from generate_mask import GenerateSampleMasks, GenerateSliceIndices
 
 
 class DataGenerator(tf.keras.utils.Sequence):
-    def __init__(self,path,inputs,outputs,inputsLBN=None,weight=None,cut='',batch_size=32,state_set='',model_idx=None):
+    def __init__(self,path,inputs,outputs,inputsLBN=None,other=None,weight=None,cut='',batch_size=32,state_set='',model_idx=None):
         self.path       = path                          # Path to root file : can be single file, list or dir (in which case will take all files inside)
         self.inputs     = inputs                        # List of strings of the variables as inputs
         self.inputsLBN  = inputsLBN                     # List of inputs of the LBN
@@ -39,6 +39,8 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.variables  = self.inputs + self.outputs    # List of all variables to be taken from root trees
         if self.inputsLBN is not None:
             self.variables += [inp for inp in self.inputsLBN if inp not in self.inputsLBN]
+        if other is not None and isinstance(other,list):
+            self.variables += other
 
         if isinstance(self.path,str):
             if self.path.endswith('.yml'):
@@ -167,7 +169,7 @@ class DataGenerator(tf.keras.utils.Sequence):
             masks_sample = collections.defaultdict(list)
             counter = 0
             while not filled:
-                if self.state_set == 'training' or self.state_set == 'validation':
+                if self.state_set == 'training':
                     random.shuffle(keys) 
                 for key in keys:
                     rem = self.batch_size-counter
@@ -240,7 +242,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         tags = []
 
         for samplepath,ind in self.indices_per_batch[index].items():
-            sample = samplepath.replace(self.input_dir,'') 
+            sample = samplepath.replace(self.input_dir+'/','') 
             keySelect = None
             eraSelect = None
             for era,keyDict in self.sample_dict.items():
@@ -285,7 +287,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         # weight Equalization #
         weight_per_tag = {tag:data[data['tag']==tag]['event_weight'].sum() for tag in pd.unique(data['tag'])}
         weight_scale = data['tag'].apply(lambda row: weight_per_tag[row])
-        data['learning_weight'] = data['event_weight']*1e3/weight_scale
+        data['learning_weight'] = data['event_weight']*data.shape[0]/weight_scale
 
         inputs  = [var.replace('$','') for var in self.inputs]
         outputs = [var.replace('$','') for var in self.outputs]
@@ -306,18 +308,14 @@ class DataGenerator(tf.keras.utils.Sequence):
 
         if not additional_columns:
             if self.inputsLBN is not None:
-                data_input = (data[inputs].values,data[self.inputsLBN].values.reshape(-1,4,len(self.inputsLBN)//4))
+                data_input = (np.hsplit(data[inputs].astype(np.float32).values,len(inputs)),data[self.inputsLBN].astype(np.float32).values.reshape(-1,len(self.inputsLBN)//4,4))
             else:
-                data_input = data[inputs].values
-            data_output = data[outputs].values
-            data_weight = data["learning_weight"].values
+                data_input = np.hsplit(data[inputs].astype(np.float32).values,len(inputs))
+            data_output = data[outputs].astype(np.float32).values
+            data_weight = data["learning_weight"].astype(np.float32).values
             return data_input,data_output,data_weight
         else:
-            addcol = [col for col in data.columns if col not in inputs+outputs+["learning_weight"]]
-            if self.inputsLBN is not None:
-                return data[inputs+[inp for inp in self.inputsLBN if inp not in inputs]],data[outputs],data["learning_weight"],data[addcol]
-            else:
-                return data[inputs],data[outputs],data["learning_weight"],data[addcol]
+            return data
              
 
     def __len__(self): # gets the number of batches
