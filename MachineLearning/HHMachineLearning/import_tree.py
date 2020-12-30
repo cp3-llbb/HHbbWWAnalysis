@@ -20,13 +20,11 @@ from ROOT import TChain, TFile, TTree
 # Tree2Pandas#
 ###############################################################################
 
-def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_weight_sum=None, luminosity=None, tree_name='tree',start=None,stop=None):
+def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_weight_sum=None, luminosity=None, tree_name='tree',start=None,stop=None,additional_columns={}):
     """
     Convert a ROOT TTree to a pandas DF
     """
-    variables = [var for var in variables if not var.startswith("$")]
-    variables = copy.copy(variables) # Otherwise will add the weight and have a duplicate branch
-
+    variables = copy.copy([var for var in variables if not var.startswith("$")]) # Otherwise will add the weight and have a duplicate branch
     # Check for repetitions in variables -> makes root_numpy crash #
     repeated_var = [item for item, count in collections.Counter(variables).items() if count > 1]
     if len(repeated_var) != 0:
@@ -38,6 +36,7 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
     # Get root tree, check if exists first #
     if not os.path.exists(input_file):
         logging.warning("File %s does not exist"%input_file)
+        print ("File %s does not exist"%input_file)
         return None
     file_handle = TFile.Open(input_file)
     if not file_handle.GetListOfKeys().Contains(tree_name):
@@ -80,7 +79,12 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
     else:
         df['event_weight'] = np.ones(df.shape[0])
 
-    # Only part of tree #
+    # Register additional columns #
+    if len(additional_columns.keys()) != 0:
+        for key,val in additional_columns.items():
+            df[key] = pd.Series([val]*df.shape[0])
+
+    # Slice printout #
     if start is not None or stop is not None:
         ni = start if start is not None else 0
         nf = stop if stop is not None else N
@@ -182,13 +186,13 @@ def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=
                          luminosity                 = luminosity,
                          tree_name                  = tree_name,
                          start                      = ni,
-                         stop                       = nf) 
+                         stop                       = nf)
         if df is None:
             continue
 
         # Register sample name #
         df['sample'] = pd.Series([sample_name.replace('.root','')]*df.shape[0])
-        
+
         # Register additional columns #
         if len(additional_columns.keys()) != 0:
             for key,val in additional_columns.items():
@@ -198,16 +202,17 @@ def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=
                     df[key] = pd.Series([val[i]]*df.shape[0])
                 else:
                     df[key] = pd.Series([val]*df.shape[0])
-
+        
         # Concatenate into full df #
         if first_file:
             all_df = df
             first_file = False
         else:
             all_df = pd.concat([all_df,df])
-        all_df = all_df.reset_index(drop=True) # Otherwise there will be an index repetition for each file
+    all_df = all_df.reset_index(drop=True) # Otherwise there will be an index repetition for each file
 
-    # Remove possible nan #
-    all_df = all_df[~all_df.isnull().any(axis=1)]
+    # Zero pad possible nan #
+    #all_df = all_df[~all_df.isnull().any(axis=1)]
+    all_df = all_df.fillna(0.)
 
     return all_df
