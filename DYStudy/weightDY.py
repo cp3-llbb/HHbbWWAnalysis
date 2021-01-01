@@ -49,8 +49,8 @@ class WeightDY:
 
         self.produceShape(self.histograms)
 
-        if self.cat == 'resolved':
-            self.produceCDFShift(self.histograms)
+#        if self.cat == 'resolved':
+#            self.produceCDFShift(self.histograms)
 
         if self.hist_type == 'TH1':
             self.plotWeights1D()
@@ -1121,8 +1121,8 @@ if __name__ == "__main__":
                             yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
                             rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
                             rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
-    except:
-        print ('[ERROR] Failed to produce ElEl weight in data mode')
+    except Exception as e:
+        print ('[ERROR] Failed to produce ElEl weight in data mode :',e)
     try:
         instance = WeightDY(channel     = 'ElEl',
                             config      = d['ElElChannel'],
@@ -1135,8 +1135,8 @@ if __name__ == "__main__":
                             yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
                             rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
                             rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
-    except:
-        print ('[ERROR] Failed to produce ElEl weight in mc mode')
+    except Exception as e:
+        print ('[ERROR] Failed to produce ElEl weight in mc mode :',e)
     try:
         instance = WeightDY(channel     = 'MuMu',
                             config      = d['MuMuChannel'],
@@ -1149,8 +1149,8 @@ if __name__ == "__main__":
                             yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
                             rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
                             rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
-    except:
-        print ('[ERROR] Failed to produce MuMu weight in data mode')
+    except Exception as e:
+        print ('[ERROR] Failed to produce MuMu weight in data mode :',e)
     try:
         instance = WeightDY(channel     = 'MuMu',
                             config      = d['MuMuChannel'],
@@ -1163,8 +1163,8 @@ if __name__ == "__main__":
                             yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
                             rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
                             rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
-    except:
-        print ('[ERROR] Failed to produce MuMu weight in data mode')
+    except Exception as e:
+        print ('[ERROR] Failed to produce MuMu weight in data mode :',e)
     d["SameSignDLChannel"] = {cat:{'path':d['MuMuChannel'][cat]['path'],
                                  'histname':[d['MuMuChannel'][cat]['histname'],d['ElElChannel'][cat]['histname']]}   
                                  for cat in d['MuMuChannel'].keys()}
@@ -1180,8 +1180,8 @@ if __name__ == "__main__":
                             yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
                             rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
                             rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
-    except:
-        print ('[ERROR] Failed to produce SSDL weight in data mode')
+    except Exception as e:
+        print ('[ERROR] Failed to produce SSDL weight in data mode :',e)
     try:
         instance = WeightDY(channel     = 'SSDL',
                             config      = d['SameSignDLChannel'],
@@ -1194,5 +1194,5 @@ if __name__ == "__main__":
                             yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
                             rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
                             rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
-    except:
-        print ('[ERROR] Failed to produce SSDL weight in mc mode')
+    except Exception as e:
+        print ('[ERROR] Failed to produce SSDL weight in mc mode :',e)

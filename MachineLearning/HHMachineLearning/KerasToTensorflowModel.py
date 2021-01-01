@@ -3,12 +3,15 @@ import os
 import json
 import argparse
 
-from keras.models import model_from_json
-from keras import backend as K
-from tensorflow.python.framework import graph_util
-from tensorflow.python.framework import graph_io
+#from tensorflow.compat.v1.keras.models import model_from_json
+#from tensorflow.compat.v1.keras import backend as K
+#from tensorflow.python.framework import graph_util
+#from tensorflow.python.framework import graph_io
 
 import tensorflow as tf
+#import tensorflow.compat.v1 as tf
+#tf.disable_v2_behavior()
+
 
 def KerasToTensorflowModel(path_to_json,path_to_h5,prefix,name,numout,outdir,use_preprocess):
     # Make output dire #
@@ -22,11 +25,11 @@ def KerasToTensorflowModel(path_to_json,path_to_h5,prefix,name,numout,outdir,use
         custom_objects =  {'PreprocessLayer': PreprocessLayer}
     else:
         custom_objects = {}
-    loaded_model = model_from_json(loaded_model_json,custom_objects=custom_objects)
+    loaded_model = tf.compat.v1.keras.models.model_from_json(loaded_model_json,custom_objects=custom_objects)
     loaded_model.load_weights(path_to_h5)
     
     # Alias the outputs in the model - this sometimes makes them easier to access in TF
-    K.set_learning_phase(0)
+    #K.set_learning_phase(0)
     pred = [None]*numout
     pred_node_names = [None]*numout
     for i in range(numout):
@@ -34,16 +37,20 @@ def KerasToTensorflowModel(path_to_json,path_to_h5,prefix,name,numout,outdir,use
         pred[i] = tf.identity(loaded_model.output[i], name=pred_node_names[i])
     print('Output nodes names are: ', pred_node_names)
 
-    sess = K.get_session()
+    sess = tf.compat.v1.keras.backend.get_session()
+    #sess = K.get_session()
     
     # Write the graph in human readable
     f = 'graph_def_for_reference.pb.ascii'
-    tf.train.write_graph(sess.graph.as_graph_def(), outdir, f, as_text=True)
+    tf.compat.v1.train.write_graph(sess.graph.as_graph_def(), outdir, f, as_text=True)
+    #tf.train.write_graph(sess.graph.as_graph_def(), outdir, f, as_text=True)
     print('Saved the graph definition in ascii format at: ', os.path.join(outdir, f))
 
     # Write the graph in binary .pb file
-    constant_graph = graph_util.convert_variables_to_constants(sess, sess.graph.as_graph_def(), pred_node_names)
-    graph_io.write_graph(constant_graph, outdir, name, as_text=False)
+    constant_graph = tf.compat.v1.graph_util.convert_variables_to_constants(sess, sess.graph.as_graph_def(), pred_node_names)
+    #constant_graph = graph_util.convert_variables_to_constants(sess, sess.graph.as_graph_def(), pred_node_names)
+    tf.compat.v1.graph_io.write_graph(constant_graph, outdir, name, as_text=False)
+    #graph_io.write_graph(constant_graph, outdir, name, as_text=False)
     print('Saved the constant graph (ready for inference) at: ', os.path.join(outdir, name))
 
     

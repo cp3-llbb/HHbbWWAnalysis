@@ -37,6 +37,8 @@ class Evaluate:
         lb = preprocessing.LabelBinarizer()
         lb.fit(arange(y.shape[1]))
         x = lb.transform(model.predict(x).argmax(axis=1))
+        if x.shape[1]==1:
+            y = y.argmax(axis=1)
         kx, ky = kfold(x, y, folds, shuffle)
 
         for i in range(folds):
