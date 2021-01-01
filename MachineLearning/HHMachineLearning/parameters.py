@@ -21,7 +21,7 @@ path_out = '/home/ucl/cp3/fbury/scratch/HHMachineLearning_output/'
 path_model = os.path.join(main_path,'model')
 
 ##############################  Datasets proportion   #################################
-crossvalidation = True 
+crossvalidation = True
 
 # Classic training #
 # -> For crossvalidation == False
@@ -61,7 +61,7 @@ lumidict = {'2016':35922,'2017':41529.152060112,'2018':59740.565201546}
 eras = ['2016']
 #eras = ['2016','2017','2018'] # To enable or disable eras, add or remove from this list
 
-categories = ['resolved2b']
+categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj']
 channels = ['El','Mu']
 
 # Better put them in alphabetical order
@@ -92,14 +92,14 @@ group_ids = [
 
 # Input plots options #
 node_colors = {
-            'DY'    : 'dodgerblue',
-            'GGF'   : 'green',
-            'H'     : 'mediumaquamarine',
-            'Rare'  : 'darkviolet',
-            'ST'    : 'firebrick',
-            'TT'    : 'darkorange',
-            'VBF'   : 'red',
-            'WJets' : 'salmon',
+            'DY'    : '#1a83a1',
+            'GGF'   : '#288a24',
+            'H'     : '#06b894',
+            'Rare'  : '#610596',
+            'ST'    : '#99053d',
+            'TT'    : '#cc7a16',
+            'VBF'   : '#8f0a1e',
+            'WJets' : '#d95564',
              }
 
 # Tree name #
@@ -122,7 +122,7 @@ event_weight_sum_json = os.path.join(main_path,'background_{era}_event_weight_su
 resume_model = ''
 
 # Output #
-output_batch_size = 1
+output_batch_size = 1000000
 split_name = 'tag' # 'sample' or 'tag' : criterion for output file splitting
 
 ##############################  Evaluation criterion   ################################
@@ -132,8 +132,8 @@ eval_criterion = "eval_error" # either val_loss or eval_error or val_acc
 ##############################  Model callbacks ################################
 # Early stopping to stop learning after some criterion 
 early_stopping_params = {'monitor'   : 'val_loss',  # Value to monitor
-                         'min_delta' : 0.001,          # Minimum delta to declare an improvement
-                         'patience'  : 15,          # How much time to wait for an improvement
+                         'min_delta' : 0.0001,          # Minimum delta to declare an improvement
+                         'patience'  : 20,          # How much time to wait for an improvement
                          'verbose'   : 1,           # Verbosity level
                          'restore_best_weights':True,
                          'mode'      : 'min'}       # Mode : 'auto', 'min', 'max'
@@ -142,8 +142,9 @@ early_stopping_params = {'monitor'   : 'val_loss',  # Value to monitor
 reduceLR_params = {'monitor'    : 'val_loss',   # Value to monitor
                    'factor'     : 0.1,          # Multiplicative factor by which to multiply LR
                    'min_lr'     : 1e-6,         # Minimum value for LR
-                   'patience'   : 5,           # How much time to wait for an improvement
-                   'cooldown'   : 0,            # How many epochs before starting again to monitor
+                   'min_delta'  : 0.0001,       # Minimum delta to declare an improvement
+                   'patience'   : 5,            # How much time to wait for an improvement
+                   'cooldown'   : 1,            # How many epochs before starting again to monitor
                    'verbose'    : 1,            # Verbosity level
                    'mode'      : 'min'}         # Mode : 'auto', 'min', 'max'
 
@@ -168,18 +169,18 @@ grouped_loss = GroupedXEnt(group_ids)
 #    'loss_function' : [grouped_loss] , #  [categorical_crossentropy]
 #}
 p = { 
-    'lr' : [0.001], 
-    'first_neuron' : [1024],
+    'lr' : [0.1], 
+    'first_neuron' : [256],
     'activation' : [relu],
-    'dropout' : [0.1],
-    'hidden_layers' : [6], # does not take into account the first layer
+    'dropout' : [0.],
+    'hidden_layers' : [4], # does not take into account the first layer
     'output_activation' : [softmax],
     'l2' : [0.001],
     'optimizer' : [Adam],  
-    'epochs' : [100],   
-    'batch_size' : [10000], 
-    'n_particles' : [10],
-    'loss_function' : [grouped_loss] 
+    'epochs' : [10],   
+    'batch_size' : [200000], 
+    'n_particles' : [16],
+    'loss_function' : [grouped_loss],
 }
 
 
@@ -193,9 +194,14 @@ weight = 'total_weight'
 #weight = None
 
 # Input branches (combinations possible just as in ROOT #
+#/!\ onehot variables need to be at the beginning of the list (checked later)
 inputs = [
+            # Onehot #
+            '$era@op_era',
+            'lep_pdgId@op_pdgid',
+            'lep_charge@op_charge',
+            'JPAcat@op_resolved_JPAcat',
             # LL variables #
-            '$era@onehot_era',
             'METpt',
             'METpx',
             'METpy',
@@ -207,8 +213,6 @@ inputs = [
             'lep_E',
             'lep_pt',
             'lep_eta',
-            'lep_pdgId@onehot_pdgid',
-            'lep_charge@onehot_charge',
             'bj1_Px',
             'bj1_Py',
             'bj1_Pz',
@@ -240,13 +244,12 @@ inputs = [
             'nAk4BJets',
             'nAk8BJets',
             'VBF_tag',
-            'JPAcat@onehot_resolved_JPAcat',
             'neuPx',
             'neuPy',
             'neuPz',
             'neuE',
             'neuPt',
-            # HL variables #
+           # HL variables #
             'lepmet_DPhi',
             'lepmet_pt',
             'lep_MT',
@@ -303,8 +306,11 @@ inputs = [
             'HT2_lepJetMet',
             'HT2R_lepJetMet',
     ]
-onehots = [inp.split('@')[1] if '@' in inp else 'onehot_unit'  for inp  in  inputs]
-mask_onehot = [len(inp.split('@'))==2 for inp  in  inputs]
+operations = [inp.split('@')[1] if '@' in inp else None  for inp  in  inputs]
+check_op = [(o is not None)*1 for o in operations]
+if check_op != sorted(check_op,reverse=True):
+    raise RuntimeError('Onehot inputs need to be at the beginning of the inputs list')
+mask_op = [len(inp.split('@'))==2 for inp  in  inputs]
 inputs = [inp.split('@')[0] for inp  in  inputs]
 
 LBN_inputs = [

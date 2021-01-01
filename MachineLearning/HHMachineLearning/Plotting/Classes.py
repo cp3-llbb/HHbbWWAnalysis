@@ -444,6 +444,9 @@ class Plot_Multi_TH1:
         else:
             self.list_color = list_color
 
+        for i in range(len(self.list_color)):
+            if isinstance(self.list_color[i],str):
+                self.list_color[i] = ROOT.TColor.GetColor(self.list_color[i])
         
     def MakeHisto(self):
         self.list_obj = []
@@ -749,7 +752,7 @@ def MakeMultiROCPlot(list_obj,name,title=None):
     y_pred = y_pred.argmax(axis=1)
     if sample_weight is not None:
         sample_weight = sample_weight.reshape(-1)
-    cm = confusion_matrix(y_true,y_pred,sample_weight=sample_weight)
+    cm = confusion_matrix(y_true,y_pred,sample_weight=sample_weight).T
     accuracy = np.trace(cm) / float(np.sum(cm))                                                      
     misclass = 1 - accuracy
 

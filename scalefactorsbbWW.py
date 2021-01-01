@@ -85,17 +85,17 @@ class ScaleFactorsbbWW:
                                 base_str    = 'Electron_EGamma_SF2D_2016.json')
 
 
-#        # DY weight  # 
-#        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
-#                                                entry_key   = 'DY_resolved_2016',
-#                                                base_key    = '{channel}_{variable}_{type}_{btag}',
-#                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
-#                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['data','mc'],'btag':['1b','2b'],'variable':['leadjetPt']})
-#        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
-#                                                entry_key   = 'DY_boosted_2016',
-#                                                base_key    = '{channel}_{variable}_{type}_{btag}',
-#                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
-#                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
+        # DY weight  # 
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+                                                entry_key   = 'DY_resolved_2016',
+                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
+                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['data','mc'],'btag':['1b','2b'],'variable':['leadjetPt']})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+                                                entry_key   = 'DY_boosted_2016',
+                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
+                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
 
 
         #  Fake rates #
@@ -113,12 +113,12 @@ class ScaleFactorsbbWW:
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'Btag_SF',
                                                 entry_key   = 'jet_puid_eff',
                                                 base_key    = '{eom}_{era}_{wp}',
-                                                base_str    = 'PUID_EFF_h2_{eom}_mc{era}_T.json',
+                                                base_str    = 'PUID_EFF_h2_{eom}_mc{era}_{wp}.json',
                                                 format_dict = {'eom':["eff", "mistag"],'wp':['L','M','T'],'era':['2016','2017','2018']})
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'Btag_SF',
                                                 entry_key   = 'jet_puid_sf',
                                                 base_key    = '{eom}_{era}_{wp}',
-                                                base_str    = 'PUID_SF_h2_{eom}_sf{era}_T.json',
+                                                base_str    = 'PUID_SF_h2_{eom}_sf{era}_{wp}.json',
                                                 format_dict = {'eom':["eff", "mistag"],'wp':['L','M','T'],'era':['2016','2017','2018']})
 
         # Ak8 efficiency btagging #
@@ -308,4 +308,8 @@ if __name__ == "__main__":
     instance = ScaleFactorsbbWW()
     import pprint
     pprint.pprint(instance.all_scalefactors)
+    if len(sys.argv)>1 and sys.argv[1] == 'interactive':
+        import IPython
+        IPython.embed()
+
 
