@@ -1,15 +1,17 @@
 import math
 from bamboo.plots import Plot, EquidistantBinning, SummedPlot, VariableBinning
 from bamboo import treefunctions as op
+from copy import copy
 from bamboo.plots import CutFlowReport
 from highlevelLambdas import highlevelLambdas
+from JPA import bJetCorrPT
 
 ########################   Channel title   #############################
 def SingleLeptonChannelTitleLabel(channel):
     if (channel == "El"):
-        channel = "e^{+,-}"
+        channel = "e^{#pm}"
     elif (channel == "Mu"):
-        channel ="#mu^{+,-}"
+        channel ="#mu^{#pm}"
     channelLabel = {'labels': [{'text': channel, 'position': [0.23, 0.87], 'size': 36}]}
     return channelLabel 
 
@@ -185,8 +187,6 @@ def makeLHEPlots(sel, LHE):
                              xTitle='LHE HT'))
     return plots
 
-
-
 ##########################  MET PLOT #################################
 def makeMETPlots(sel, met, suffix, channel):
     """
@@ -250,16 +250,14 @@ def makeSinleptonPlots(sel, lep, suffix, channel, is_MC=False):
                              title="Pseudorapidity of the lepton (channel %s)"%channel, 
                              xTitle= "#eta (lepton)",
                              plotopts = channelLabel))
-
     # PT-eta plots #
-#    plots.append(Plot.make2D("%s_%s_lepton_ptVSeta"%(channel,suffix), 
-#                             [lep.pt, lep.eta],
-#                             sel, 
-#                             [EquidistantBinning(60,0.,300.),EquidistantBinning(22, -3., 3.)],
-#                             xTitle= "P_{T} (lepton) [GeV]",
-#                             yTitle= "#eta (lepton)",
-#                             plotopts = channelLabel))
-
+    plots.append(Plot.make2D("%s_%s_lepton_ptVSeta"%(channel,suffix), 
+                             [lep.pt, lep.eta],
+                             sel, 
+                             [EquidistantBinning(60,0.,300.),EquidistantBinning(22, -3., 3.)],
+                             xTitle= "P_{T} (lepton) [GeV]",
+                             yTitle= "#eta (lepton)",
+                             plotopts = channelLabel))
     # Phi plot #
     plots.append(Plot.make1D("%s_%s_lepton_phi"%(channel,suffix), 
                              lep.phi, 
@@ -317,13 +315,13 @@ def makeDileptonPlots(sel, dilepton, suffix, channel, is_MC=False):
                              plotopts = channelLabel))
 
     # PT-eta plots #
-#    plots.append(Plot.make2D("%s_%s_firstlepton_ptVSeta"%(channel,suffix), 
-#                             [dilepton[0].eta, dilepton[0].pt],
-#                             sel, 
-#                             [EquidistantBinning(22, -3., 3.),EquidistantBinning(60,0.,300.)],
-#                             xTitle= "P_{T} (first lepton) [GeV]",
-#                             yTitle= "#eta (second lepton)",
-#                             plotopts = channelLabel))
+    #plots.append(Plot.make2D("%s_%s_firstlepton_ptVSeta"%(channel,suffix), 
+    #                         [dilepton[0].eta, dilepton[0].pt],
+    #                         sel, 
+    #                         [EquidistantBinning(22, -3., 3.),EquidistantBinning(60,0.,300.)],
+    #                         xTitle= "P_{T} (first lepton) [GeV]",
+    #                         yTitle= "#eta (second lepton)",
+    #                         plotopts = channelLabel))
 
     # Eta plot #
     plots.append(Plot.make1D("%s_%s_firstlepton_eta"%(channel,suffix), 
@@ -396,6 +394,7 @@ def makeDileptonPlots(sel, dilepton, suffix, channel, is_MC=False):
                              title="Flavour of genParticle (channel %s)"%channel, 
                              xTitle= "GenParticle flavour (second lepton)",
                              plotopts = channelLabel))
+
     # ttH mva plot #
     plots.append(Plot.make1D("%s_%s_firstlepton_ttHmva"%(channel,suffix), 
                              dilepton[0].mvaTTH, 
@@ -411,7 +410,6 @@ def makeDileptonPlots(sel, dilepton, suffix, channel, is_MC=False):
                              title="ttH MVA of the second lepton (channel %s)"%channel, 
                              xTitle= "MVA_{ttH} (second lepton) [GeV]",
                              plotopts = channelLabel))
-
 
     return plots
 
@@ -453,14 +451,29 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,HLL,is_MC=False)
     
     # leadjet plots #
     plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j1_name),
-                             #bJetCorrPt(j1),
-                             HLL.bJetCorrP4(j1).Pt(),
+                             j1.pt,
                              sel,
                              EquidistantBinning(40,0.,200.),
                              title='Transverse momentum of the %s'%j1_name,
                              xTitle="P_{T}(%s) [GeV]"%j1_name,
                              plotopts = channelLabel))
-    
+
+    plots.append(Plot.make1D("%s_%s_btagDeepFlavB_%s"%(channel,suffix,j1_name),
+                             j1.btagDeepFlavB,
+                             sel,
+                             EquidistantBinning(20,0.,1.),
+                             title='btagDeepFlavB of the %s'%j1_name,
+                             xTitle="btagDeepFlavB_%s"%j1_name,
+                             plotopts = channelLabel))
+
+    plots.append(Plot.make1D("%s_%s_RegCorrPt_%s"%(channel,suffix,j1_name),
+                             bJetCorrPT(j1),
+                             sel,
+                             EquidistantBinning(40,0.,200.),
+                             title='Corr p_{T} of the %s'%j1_name,
+                             xTitle="RegCorrP_{T}(%s) [GeV]"%j1_name,
+                             plotopts = channelLabel))
+
     plots.append(Plot.make1D("%s_%s_eta_%s"%(channel,suffix,j1_name),
                              j1.eta,
                              sel,
@@ -475,6 +488,7 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,HLL,is_MC=False)
                              title='Azimutal angle of the %s'%j1_name,
                              xTitle="#phi(%s)"%j1_name,
                              plotopts = channelLabel))
+
     plots.append(Plot.make1D("%s_%s_hadronFlv_%s"%(channel,suffix,j1_name),
                              op.abs(j1.hadronFlavour) if is_MC else op.c_int(-1),
                              sel,
@@ -490,161 +504,219 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,HLL,is_MC=False)
                              xTitle="Parton flavour (%s) [GeV]"%j1_name,
                              plotopts = channelLabel))
 
-
-
-    # subleadjet plots #
-    plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j2_name),
-                             HLL.bJetCorrP4(j2).Pt(),
-                             sel,
-                             EquidistantBinning(40,0.,200.),
-                             title='Transverse momentum of the %s'%j2_name,
-                             xTitle="P_{T}(%s) [GeV]"%j2_name,
-                             plotopts = channelLabel))
+    if nJet > 1 :
+        plots.append(Plot.make1D("%s_%s_btagDeepFlavB_%s"%(channel,suffix,j2_name),
+                                 j2.btagDeepFlavB,
+                                 sel,
+                                 EquidistantBinning(20,0.,1.),
+                                 title='btagDeepFlavB of the %s'%j2_name,
+                                 xTitle="btagDeepFlavB_%s"%j2_name,
+                                 plotopts = channelLabel))
+        plots.append(Plot.make1D("%s_%s_qgDiscr_%s"%(channel,suffix,j2_name),
+                                 j2.qgl,
+                                 sel,
+                                 EquidistantBinning(20,0.,1.),
+                                 title='qgDiscr of the %s'%j2_name,
+                                 xTitle="qgDiscr_%s"%j2_name,
+                                 plotopts = channelLabel))
         
-    plots.append(Plot.make1D("%s_%s_eta_%s"%(channel,suffix,j2_name),
-                             j2.eta,
-                             sel,
-                             EquidistantBinning(22,-3.,3.),
-                             title='Pseudorapidity of the %s'%j2_name,
-                             xTitle="#eta(%s)"%j2_name,
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_phi_%s"%(channel,suffix,j2_name),
-                             j2.phi,
-                             sel,
-                             EquidistantBinning(20,-3.2,3.2),
-                             title='Azimutal angle of the %s'%j2_name,
-                             xTitle="#phi(%s)"%j2_name,
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_hadronFlv_%s"%(channel,suffix,j2_name),
-                             op.abs(j2.hadronFlavour) if is_MC else op.c_int(-1),
-                             sel,
-                             EquidistantBinning(23,-1.,22.),
-                             title='Hadron flavour of the %s'%j2_name,
-                             xTitle="Hadron flavour (%s) [GeV]"%j2_name,
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_partonFlv_%s"%(channel,suffix,j2_name),
-                             op.abs(j2.partonFlavour) if is_MC else op.c_int(-1),
-                             sel,
-                             EquidistantBinning(23,-1.,22.),
-                             title='Parton flavour of the %s'%j2_name,
-                             xTitle="Parton flavour (%s) [GeV]"%j2_name,
-                             plotopts = channelLabel))
-    
-
-    # thirdjet plots #
-    plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j3_name),
-                             j3.pt,
-                             sel,
-                             EquidistantBinning(40,0.,200.),
-                             title='Transverse momentum of the %s'%j3_name,
-                             xTitle="P_{T}(%s) [GeV]"%j3_name,
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_eta_%s"%(channel,suffix,j3_name),
-                             j3.eta,
-                             sel,
-                             EquidistantBinning(22,-3.,3.),
-                             title='Pseudorapidity of the %s'%j3_name,
-                             xTitle="#eta(%s)"%j3_name,
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_phi_%s"%(channel,suffix,j3_name),
-                             j3.phi,
-                             sel,
-                             EquidistantBinning(20,-3.2,3.2),
-                             title='Azimutal angle of the %s'%j3_name,
-                             xTitle="#phi(%s)"%j3_name,
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_hadronFlv_%s"%(channel,suffix,j3_name),
-                             op.abs(j3.hadronFlavour) if is_MC else op.c_int(-1),
-                             sel,
-                             EquidistantBinning(23,-1.,22.),
-                             title='Hadron flavour of the %s'%j3_name,
-                             xTitle="Hadron flavour (%s) [GeV]"%j3_name,
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_partonFlv_%s"%(channel,suffix,j3_name),
-                             op.abs(j3.partonFlavour) if is_MC else op.c_int(-1),
-                             sel,
-                             EquidistantBinning(23,-1.,22.),
-                             title='Parton flavour of the %s'%j3_name,
-                             xTitle="Parton flavour (%s) [GeV]"%j3_name,
-                             plotopts = channelLabel))
-
-    # Dijet Pt plot #
-    plots.append(Plot.make1D("%s_%s_DiJetPT_%s_%s"%(channel,suffix,j1_name,j2_name), 
-                             #(j1.p4+j2.p4).Pt(), 
-                             (HLL.bJetCorrP4(j1)+HLL.bJetCorrP4(j2)).Pt(),
-                             sel, 
-                             EquidistantBinning(80,0.,400.),
-                             title="Transverse momentum of the dijet_[%s_%s] (channel %s)"%(j1_name,j2_name,channel), 
-                             xTitle= "DiJetPT [%s_%s]"%(j1_name, j2_name),
-                             plotopts = channelLabel))
+        plots.append(Plot.make1D("%s_%s_Hbb_massReg_%s_%s"%(channel,suffix,j1_name,j2_name),
+                                 (HLL.bJetCorrP4(j1) + HLL.bJetCorrP4(j2)).M(),
+                                 sel,
+                                 EquidistantBinning(50, 0., 500.), 
+                                 title="Hbb_massReg_[%s_%s] (channel %s)"%(j1_name,j2_name,channel), 
+                                 xTitle= "Hbb_massReg",
+                                 plotopts = channelLabel))
         
-    # DeltaPhi plot #
-    plots.append(Plot.make1D("%s_%s_DeltaPhi_%s_%s"%(channel,suffix,j1_name,j2_name), 
-                             op.abs(op.deltaPhi(j1.p4,j2.p4)), 
-                             sel, 
-                             EquidistantBinning(20,0, 3.2),
-                             title="Azimutal angle difference of the dijet_[%s_%s] (channel %s)"%(j1_name,j2_name,channel),
-                             xTitle= "DeltaPhi [%s_%s]"%(j1_name, j2_name),
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_DeltaPhi_%s_%s"%(channel,suffix,j1_name,j3_name), 
-                             op.abs(op.deltaPhi(j1.p4,j3.p4)), 
-                             sel, 
-                             EquidistantBinning(20,0, 3.2),
-                             title="Azimutal angle difference of the dijet_[%s_%s] (channel %s)"%(j1_name,j3_name,channel),
-                             xTitle= "DeltaPhi [%s_%s]"%(j1_name, j3_name),
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_DeltaPhi_%s_%s"%(channel,suffix,j2_name,j3_name), 
-                             op.abs(op.deltaPhi(j2.p4,j3.p4)), 
-                             sel, 
-                             EquidistantBinning(20,0, 3.2),
-                             title="Azimutal angle difference of the dijet_[%s_%s] (channel %s)"%(j2_name,j3_name,channel),
-                             xTitle= "DeltaPhi [%s_%s]"%(j2_name, j3_name),
-                             plotopts = channelLabel))
+        # subleadjet plots #
+        plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j2_name),
+                                 j2.pt,
+                                 sel,
+                                 EquidistantBinning(40,0.,200.),
+                                 title='Transverse momentum of the %s'%j2_name,
+                                 xTitle="P_{T}(%s) [GeV]"%j2_name,
+                                 plotopts = channelLabel))
 
-    # DeltaR plot #
-    plots.append(Plot.make1D("%s_%s_DeltaR_%s_%s"%(channel,suffix,j1_name,j2_name), 
-                             op.deltaR(j1.p4,j2.p4), 
-                             sel, 
-                             EquidistantBinning(50,0, 5.0),
-                             title="DeltaR of the dijet_[%s_%s] (channel %s)"%(j1_name,j2_name,channel),
-                             xTitle= "DeltaR [%s_%s]"%(j1_name, j2_name),
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_DeltaR_%s_%s"%(channel,suffix,j1_name,j3_name), 
-                             op.deltaR(j1.p4,j3.p4), 
-                             sel, 
-                             EquidistantBinning(50,0, 5.0),
-                             title="DeltaR of the dijet_[%s_%s] (channel %s)"%(j1_name,j3_name,channel),
-                             xTitle= "DeltaR [%s_%s]"%(j1_name, j3_name),
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_DeltaR_%s_%s"%(channel,suffix,j2_name,j3_name), 
-                             op.deltaR(j2.p4,j3.p4), 
-                             sel, 
-                             EquidistantBinning(50,0, 5.0),
-                             title="DeltaR of the dijet_[%s_%s] (channel %s)"%(j2_name,j3_name,channel),
-                             xTitle= "DeltaR [%s_%s]"%(j2_name, j3_name),
-                             plotopts = channelLabel))
-    
-    # minDR
-    plots.append(Plot.make1D("%s_%s_minDeltaR_DiJet"%(channel,suffix), 
-                             HLL.MinDiJetDRLoose(j1,j2,j3), 
-                             sel, 
-                             EquidistantBinning(50,0, 5.0),
-                             title="MinDeltaR between dijet (channel %s)"%channel,
-                             xTitle= "MinDeltaR [Di-Jet]",
-                             plotopts = channelLabel))
-    
-    # invariant mass plot #
-    plots.append(Plot.make1D("%s_%s_InvariantMass_%s_%s"%(channel,suffix,j1_name,j2_name),
-                             #op.invariant_mass(j1.p4,j2.p4),
-                             op.invariant_mass(HLL.bJetCorrP4(j1),HLL.bJetCorrP4(j2)),
-                             sel,
-                             EquidistantBinning(50, 0., 500.), 
-                             title="Invariant Mass of the dijet_[%s_%s] (channel %s)"%(j1_name,j2_name,channel), 
-                             xTitle= "InvariantMass [%s_%s]"%(j1_name, j2_name),
-                             plotopts = channelLabel))
+        plots.append(Plot.make1D("%s_%s_RegCorrPt_%s"%(channel,suffix,j2_name),
+                                 HLL.bJetCorrP4(j2).Pt(),
+                                 sel,
+                                 EquidistantBinning(40,0.,200.),
+                                 title='RegCorr Transverse momentum of the %s'%j2_name,
+                                 xTitle="RegCorr P_{T}(%s) [GeV]"%j2_name,
+                                 plotopts = channelLabel))
         
-    if nJet == 4:
+        plots.append(Plot.make1D("%s_%s_eta_%s"%(channel,suffix,j2_name),
+                                 j2.eta,
+                                 sel,
+                                 EquidistantBinning(22,-3.,3.),
+                                 title='Pseudorapidity of the %s'%j2_name,
+                                 xTitle="#eta(%s)"%j2_name,
+                                 plotopts = channelLabel))
+        plots.append(Plot.make1D("%s_%s_phi_%s"%(channel,suffix,j2_name),
+                                 j2.phi,
+                                 sel,
+                                 EquidistantBinning(20,-3.2,3.2),
+                                 title='Azimutal angle of the %s'%j2_name,
+                                 xTitle="#phi(%s)"%j2_name,
+                                 plotopts = channelLabel))
+
+        plots.append(Plot.make1D("%s_%s_hadronFlv_%s"%(channel,suffix,j2_name),
+                                 op.abs(j2.hadronFlavour) if is_MC else op.c_int(-1),
+                                 sel,
+                                 EquidistantBinning(23,-1.,22.),
+                                 title='Hadron flavour of the %s'%j2_name,
+                                 xTitle="Hadron flavour (%s) [GeV]"%j2_name,
+                                 plotopts = channelLabel))
+        plots.append(Plot.make1D("%s_%s_partonFlv_%s"%(channel,suffix,j2_name),
+                                 op.abs(j2.partonFlavour) if is_MC else op.c_int(-1),
+                                 sel,
+                                 EquidistantBinning(23,-1.,22.),
+                                 title='Parton flavour of the %s'%j2_name,
+                                 xTitle="Parton flavour (%s) [GeV]"%j2_name,
+                                 plotopts = channelLabel))
+
+        # Dijet Pt plot #
+        plots.append(Plot.make1D("%s_%s_DiJetPT_%s_%s"%(channel,suffix,j1_name,j2_name), 
+                                 #(j1.p4+j2.p4).Pt(), 
+                                 (HLL.bJetCorrP4(j1)+HLL.bJetCorrP4(j2)).Pt(),
+                                 sel, 
+                                 EquidistantBinning(80,0.,400.),
+                                 title="Transverse momentum of the dijet_[%s_%s] (channel %s)"%(j1_name,j2_name,channel), 
+                                 xTitle= "DiJetPT [%s_%s]"%(j1_name, j2_name),
+                                 plotopts = channelLabel))
+        
+        # DeltaPhi plot #
+        plots.append(Plot.make1D("%s_%s_DeltaPhi_%s_%s"%(channel,suffix,j1_name,j2_name), 
+                                 op.abs(op.deltaPhi(j1.p4,j2.p4)), 
+                                 sel, 
+                                 EquidistantBinning(20,0, 3.2),
+                                 title="Azimutal angle difference of the dijet_[%s_%s] (channel %s)"%(j1_name,j2_name,channel),
+                                 xTitle= "DeltaPhi [%s_%s]"%(j1_name, j2_name),
+                                 plotopts = channelLabel))
+        
+        # DeltaR plot #
+        plots.append(Plot.make1D("%s_%s_DeltaR_%s_%s"%(channel,suffix,j1_name,j2_name), 
+                                 op.deltaR(j1.p4,j2.p4), 
+                                 sel, 
+                                 EquidistantBinning(50,0, 5.0),
+                                 title="DeltaR of the dijet_[%s_%s] (channel %s)"%(j1_name,j2_name,channel),
+                                 xTitle= "DeltaR [%s_%s]"%(j1_name, j2_name),
+                                 plotopts = channelLabel))
+
+        # invariant mass plot #
+        plots.append(Plot.make1D("%s_%s_InvariantMass_%s_%s"%(channel,suffix,j1_name,j2_name),
+                                 #op.invariant_mass(j1.p4,j2.p4),
+                                 op.invariant_mass(HLL.bJetCorrP4(j1),HLL.bJetCorrP4(j2)),
+                                 sel,
+                                 EquidistantBinning(50, 0., 500.), 
+                                 title="Invariant Mass of the dijet_[%s_%s] (channel %s)"%(j1_name,j2_name,channel), 
+                                 xTitle= "InvariantMass [%s_%s]"%(j1_name, j2_name),
+                                 plotopts = channelLabel))
+        
+        if nJet > 2 :
+            # thirdjet plots #
+        
+            plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j3_name),
+                                     j3.pt,
+                                     sel,
+                                     EquidistantBinning(40,0.,200.),
+                                     title='Transverse momentum of the %s'%j3_name,
+                                     xTitle="P_{T}(%s) [GeV]"%j3_name,
+                                     plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_eta_%s"%(channel,suffix,j3_name),
+                                     j3.eta,
+                                     sel,
+                                     EquidistantBinning(22,-3.,3.),
+                                     title='Pseudorapidity of the %s'%j3_name,
+                                     xTitle="#eta(%s)"%j3_name,
+                                     plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_phi_%s"%(channel,suffix,j3_name),
+                                     j3.phi,
+                                     sel,
+                                     EquidistantBinning(20,-3.2,3.2),
+                                     title='Azimutal angle of the %s'%j3_name,
+                                     xTitle="#phi(%s)"%j3_name,
+                                     plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_hadronFlv_%s"%(channel,suffix,j3_name),
+                                     op.abs(j3.hadronFlavour) if is_MC else op.c_int(-1),
+                                     sel,
+                                     EquidistantBinning(23,-1.,22.),
+                                     title='Hadron flavour of the %s'%j3_name,
+                                     xTitle="Hadron flavour (%s) [GeV]"%j3_name,
+                                     plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_partonFlv_%s"%(channel,suffix,j3_name),
+                                     op.abs(j3.partonFlavour) if is_MC else op.c_int(-1),
+                                     sel,
+                                     EquidistantBinning(23,-1.,22.),
+                                     title='Parton flavour of the %s'%j3_name,
+                                     xTitle="Parton flavour (%s) [GeV]"%j3_name,
+                                     plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_DeltaPhi_%s_%s"%(channel,suffix,j1_name,j3_name), 
+                                     op.abs(op.deltaPhi(j1.p4,j3.p4)), 
+                                     sel, 
+                                     EquidistantBinning(20,0, 3.2),
+                                     title="Azimutal angle difference of the dijet_[%s_%s] (channel %s)"%(j1_name,j3_name,channel),
+                                     xTitle= "DeltaPhi [%s_%s]"%(j1_name, j3_name),
+                                     plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_DeltaPhi_%s_%s"%(channel,suffix,j2_name,j3_name), 
+                                     op.abs(op.deltaPhi(j2.p4,j3.p4)), 
+                                     sel, 
+                                     EquidistantBinning(20,0, 3.2),
+                                     title="Azimutal angle difference of the dijet_[%s_%s] (channel %s)"%(j2_name,j3_name,channel),
+                                     xTitle= "DeltaPhi [%s_%s]"%(j2_name, j3_name),
+                                     plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_DeltaR_%s_%s"%(channel,suffix,j1_name,j3_name), 
+                                     op.deltaR(j1.p4,j3.p4), 
+                                     sel, 
+                                     EquidistantBinning(50,0, 5.0),
+                                     title="DeltaR of the dijet_[%s_%s] (channel %s)"%(j1_name,j3_name,channel),
+                                     xTitle= "DeltaR [%s_%s]"%(j1_name, j3_name),
+                                     plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_DeltaR_%s_%s"%(channel,suffix,j2_name,j3_name), 
+                                     op.deltaR(j2.p4,j3.p4), 
+                                     sel, 
+                                     EquidistantBinning(50,0, 5.0),
+                                     title="DeltaR of the dijet_[%s_%s] (channel %s)"%(j2_name,j3_name,channel),
+                                     xTitle= "DeltaR [%s_%s]"%(j2_name, j3_name),
+                                     plotopts = channelLabel))
+            '''
+            # minDR
+            plots.append(Plot.make1D("%s_%s_minDeltaR_DiJet_3Jets"%(channel,suffix), 
+                                     HLL.MinDiJetDRLoose(j1,j2,j3), 
+                                     sel, 
+                                     EquidistantBinning(50,0, 5.0),
+                                     title="MinDeltaR between dijet (channel %s)"%channel,
+                                     xTitle= "MinDeltaR [Di-Jet]",
+                                     plotopts = channelLabel))
+        
+            '''
+    if nJet > 3 :
         # fourthjet plots #
+        plots.append(Plot.make1D("%s_%s_maxWjetbtagCSV"%(channel,suffix), 
+                                 op.max(j3.btagDeepFlavB, j4.btagDeepFlavB), 
+                                 sel, 
+                                 EquidistantBinning(20, 0, 1.0),
+                                 title=" maxWjetbtagCSV (channel %s)"%channel,
+                                 xTitle= "max-Wjet_btagCSV",
+                                 plotopts = channelLabel))
+
+        plots.append(Plot.make1D("%s_%s_RegCorrPt_%s"%(channel,suffix,j4_name),
+                                 bJetCorrPT(j4),
+                                 #j4.pt*j4.bRegCorr,
+                                 sel,
+                                 EquidistantBinning(40,0.,200.),
+                                 title='wjet2_ptReg of the %s'%j4_name,
+                                 xTitle="RegCorrP_{T}(%s) [GeV]"%j4_name,
+                                 plotopts = channelLabel))
+
+        plots.append(Plot.make1D("%s_%s_qgDiscr_%s"%(channel,suffix,j4_name),
+                                 j4.qgl,
+                                 sel,
+                                 EquidistantBinning(20,0.,1.),
+                                 title='qgDiscr of the %s'%j4_name,
+                                 xTitle="qgDiscr_%s"%j4_name,
+                                 plotopts = channelLabel))
+        
         plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j4_name),
                                  j4.pt,
                                  sel,
@@ -720,13 +792,6 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,HLL,is_MC=False)
                                  title="DeltaR of the dijet_[%s_%s] (channel %s)"%(j1_name,j4_name,channel),
                                  xTitle= "DeltaR [%s_%s]"%(j1_name, j4_name),
                                  plotopts = channelLabel))
-        plots.append(Plot.make1D("%s_%s_DeltaR_%s_%s"%(channel,suffix,j3_name,j4_name), 
-                                 op.deltaR(j3.p4,j4.p4), 
-                                 sel, 
-                                 EquidistantBinning(20,0, 3.2),
-                                 title="DeltaR of the dijet_[%s_%s] (channel %s)"%(j3_name,j4_name,channel),
-                                 xTitle= "DeltaR [%s_%s]"%(j3_name, j4_name),
-                                 plotopts = channelLabel))        
         plots.append(Plot.make1D("%s_%s_DeltaR_%s_%s"%(channel,suffix,'Hbb','Wjj'), 
                                  op.deltaR((j1.p4+j2.p4),(j3.p4+j4.p4)), 
                                  sel, 
@@ -744,7 +809,47 @@ def makeAk4JetsPlots (sel,j1,j2,j3,j4,channel,suffix,nJet,nbJet,HLL,is_MC=False)
                                  xTitle= "InvariantMass [%s_%s]"%(j3_name, j4_name),
                                  plotopts = channelLabel))
 
-    
+
+        plots.append(Plot.make1D("%s_%s_HadW_mass_%s_%s"%(channel,suffix,j3_name,j4_name),
+                                 HLL.Wjj_simple(j3.p4, j4.p4).M(),
+                                 sel,
+                                 EquidistantBinning(25, 0., 250.), 
+                                 title="Invariant Mass of the dijet_[%s_%s] (channel %s)"%(j3_name,j4_name,channel), 
+                                 xTitle= "HadW_mass",
+                                 plotopts = channelLabel))
+        plots.append(Plot.make1D("%s_%s_maxDeltaR_%s_%s"%(channel,suffix,'HadW','bJet'), 
+                                 op.max(HLL.dR_HadW_bjet(j1.p4, j3.p4, j4.p4),   
+                                        HLL.dR_HadW_bjet(j2.p4, j3.p4, j4.p4)),
+                                 sel, 
+                                 EquidistantBinning(50,0, 5.0),
+                                 title="maxDeltaR_[%s_%s] (channel %s)"%('HadW','bJet',channel),
+                                 xTitle= "maxDeltaR [%s_%s]"%('HadW', 'bJet'),
+                                 plotopts = channelLabel))
+
+        plots.append(Plot.make1D("%s_%s_DeltaR_%s_%s"%(channel,suffix,j3_name,j4_name), 
+                                 op.deltaR(j3.p4,j4.p4), 
+                                 sel, 
+                                 EquidistantBinning(50,0, 5.0),
+                                 title="DeltaR of the dijet_[%s_%s] (channel %s)"%(j3_name,j4_name,channel),
+                                 xTitle= "DeltaR [%s_%s]"%(j3_name, j4_name),
+                                 plotopts = channelLabel))        
+
+        plots.append(Plot.make1D("%s_%s_mTop1"%(channel,suffix), 
+                                 (HLL.bJetCorrP4(j1) + HLL.Wjj_simple(j3.p4, j4.p4)).M(), 
+                                 sel, 
+                                 EquidistantBinning(50,0, 500.0),
+                                 title="mTop1 (channel %s)"%channel,
+                                 xTitle= "mTop1",
+                                 plotopts = channelLabel))        
+        
+        plots.append(Plot.make1D("%s_%s_nBJetMedium"%(channel,suffix), 
+                                 op.c_int(nbJet),
+                                 sel, 
+                                 EquidistantBinning(10,-0.5, 9.5),
+                                 title="nBJetMedium (channel %s)"%channel,
+                                 xTitle= "nBJetMedium",
+                                 plotopts = channelLabel))        
+
     return plots
 
 
@@ -890,7 +995,7 @@ def makeTwoAk4JetsPlots(sel, leadjet, subleadjet, suffix, channel, lead_is_b=Fal
     return plots
 
 ##########################  JETS (AK4) PLOT #################################
-def makeSingleLeptonAk8JetsPlots(sel,j1,j2,j3,suffix,channel,has1fat=False,has2fat=False,has1fat1slim=False,has1fat2slim=False):
+def makeSingleLeptonAk8JetsPlots(sel,j1,j2,j3,suffix,channel,nMedBJets,HLL,has1fat=False,has2fat=False,has1fat1slim=False,has1fat2slim=False):
     """
     Make fatjet subjet basic plots
     sel         = refine selection 
@@ -907,13 +1012,28 @@ def makeSingleLeptonAk8JetsPlots(sel,j1,j2,j3,suffix,channel,has1fat=False,has2f
 
     channelLabel = SingleLeptonChannelTitleLabel(channel)
 
-    #j1_name = "Ak8Jet" if has1fat else "Ak8bJet"
-    #j2_name = "Ak8Jet" if has2fat else "Ak4Jet"
     j1_name = "Ak8BJet"
     j2_name = "Ak8LSJet" if has2fat else "LeadAk4NonBJet"
     j3_name = "SubLeadAk4NonBJet"
 
+    plots.append(Plot.make1D("%s_%s_Hbb_Pt"%(channel,suffix),
+                             (j1.subJet1.p4 + j1.subJet2.p4).Pt(),
+                             sel,
+                             EquidistantBinning(50,0.,500.),
+                             title='Hbb_Pt',
+                             xTitle="Hbb_P_{T} [GeV]",
+                             plotopts = channelLabel))
+
+    
     # 1st-jet : FatJet #
+    plots.append(Plot.make1D("%s_%s_nMedSubBjets_%s"%(channel,suffix,j1_name),
+                             nMedBJets,
+                             sel,
+                             EquidistantBinning(6,-0.5,5.5),
+                             title='nMediumBtagged SubJets of %s'%j1_name,
+                             xTitle="nSubJets_MediumBTagged%s"%j1_name,
+                             plotopts = channelLabel))
+
     plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j1_name),
                              j1.p4.pt(),
                              sel,
@@ -981,7 +1101,7 @@ def makeSingleLeptonAk8JetsPlots(sel,j1,j2,j3,suffix,channel,has1fat=False,has2f
                              title='Soft Drop mass of the %s'%j1_name,
                              xTitle="M_{Soft Drop} %s[GeV]"%j1_name,
                              plotopts = channelLabel))
-    '''
+
     plots.append(Plot.make1D("%s_%s_btagDDBvL_%s"%(channel,suffix,j1_name),
                              j1.btagDDBvL,
                              sel,
@@ -1032,9 +1152,23 @@ def makeSingleLeptonAk8JetsPlots(sel,j1,j2,j3,suffix,channel,has1fat=False,has2f
                              xTitle="btagDeepB %s[GeV]"%j1_name,
                              plotopts = channelLabel))        
 
-    '''
     if has2fat or has1fat1slim or has1fat2slim:
         # 2nd-jet : Fat or Slim Jet #
+        plots.append(Plot.make1D("%s_%s_btagDeepB_%s"%(channel,suffix,j2_name),
+                                 j2.btagDeepB,
+                                 sel,
+                                 EquidistantBinning(20,0.,1.),
+                                 title='btagDeepB of %s'%j2_name,
+                                 xTitle="btagDeepB %s[GeV]"%j2_name,
+                                 plotopts = channelLabel))        
+        plots.append(Plot.make1D("%s_%s_qgDiscr_%s"%(channel,suffix,j2_name),
+                                 j2.qgl,
+                                 sel,
+                                 EquidistantBinning(20,0.,1.),
+                                 title='qgDiscr of the %s'%j2_name,
+                                 xTitle="qgDiscr_%s"%j2_name,
+                                 plotopts = channelLabel))
+        
         plots.append(Plot.make1D("%s_%s_pT_%s"%(channel,suffix,j2_name),
                                  j2.p4.pt(),
                                  sel,
@@ -1072,8 +1206,6 @@ def makeSingleLeptonAk8JetsPlots(sel,j1,j2,j3,suffix,channel,has1fat=False,has2f
                                      xTitle="M_{Soft Drop} %s[GeV]"%j2_name,
                                      plotopts = channelLabel))        
 
-        # Di-Jet Plots #
-        # pT Sum #
         plots.append(Plot.make1D("%s_%s_DijetPT_%s_%s"%(channel,suffix,j1_name,j2_name), 
                                  (j1.p4+j2.p4).Pt(), 
                                  sel, 
@@ -1107,10 +1239,53 @@ def makeSingleLeptonAk8JetsPlots(sel,j1,j2,j3,suffix,channel,has1fat=False,has2f
                                  title="Dijet invariant mass_%s_%s (channel %s)"%(j1_name,j2_name,channel), 
                                  xTitle= "InvariantMass [%s_%s] [GeV]"%(j1_name,j2_name),
                                  plotopts = channelLabel))
-
         if has1fat2slim:
             # Di-Jet Plots #
             # pT Sum #
+            plots.append(Plot.make1D("%s_%s_btagDeepB_%s"%(channel,suffix,j3_name),
+                                     j3.btagDeepB,
+                                     sel,
+                                     EquidistantBinning(20,0.,1.),
+                                     title='btagDeepB of %s'%j3_name,
+                                     xTitle="btagDeepB %s[GeV]"%j3_name,
+                                     plotopts = channelLabel))        
+            plots.append(Plot.make1D("%s_%s_qgDiscr_%s"%(channel,suffix,j3_name),
+                                     j3.qgl,
+                                     sel,
+                                     EquidistantBinning(20,0.,1.),
+                                     title='qgDiscr of the %s'%j3_name,
+                                     xTitle="qgDiscr_%s"%j3_name,
+                                     plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_HadW_mass"%(channel,suffix),
+                                     HLL.Wjj_simple(j2.p4, j3.p4).M(), 
+                                     sel,
+                                     EquidistantBinning(25, 0., 250.), 
+                                     title="HadW_mass (channel %s)"%channel, 
+                                     xTitle= "HadW_mass [GeV]",
+                                     plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_HadW_cosTheta"%(channel,suffix), 
+                                     HLL.comp_cosThetaS(j2.p4, j3.p4),
+                                     sel, 
+                                     EquidistantBinning(20,0.,1.),
+                                     title="HadW_cosTheta (channel %s)"%channel, 
+                                     xTitle= "HadW_cosTheta",
+                                     plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_min_dR_HadW_bjet"%(channel,suffix), 
+                                     op.min(HLL.dR_HadW_bjet(j1.subJet1.p4, j2.p4, j3.p4), 
+                                            HLL.dR_HadW_bjet(j1.subJet2.p4, j2.p4, j3.p4)),
+                                     sel, 
+                                     EquidistantBinning(50,0.,5.),
+                                     title="min_dR_HadW_bjet (channel %s)"%channel, 
+                                     xTitle= "min_dR_HadW_bjet",
+                                     plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_dR_wjet1wjet2"%(channel,suffix), 
+                                     op.deltaR(j2.p4, j3.p4),
+                                     sel, 
+                                     EquidistantBinning(50,0.,5.),
+                                     title="dR_wjet1wjet2 (channel %s)"%channel, 
+                                     xTitle= "dR_wjet1wjet2",
+                                     plotopts = channelLabel))
+
             plots.append(Plot.make1D("%s_%s_DijetPT_%s_%s"%(channel,suffix,j2_name,j3_name), 
                                      (j2.p4+j3.p4).Pt(), 
                                      sel, 
@@ -1159,9 +1334,7 @@ def makeSingleLeptonAk8JetsPlots(sel,j1,j2,j3,suffix,channel,has1fat=False,has2f
                                      xTitle= "InvariantMass [%s_%s] [GeV]"%(j2_name,j3_name),
                                      plotopts = channelLabel))
             
-
     return plots
-
 
 def makeDoubleLeptonAk8JetsPlots(sel, fatjet, suffix, channel):
     """
@@ -1252,7 +1425,7 @@ def makeHighLevelPlotsResolved(sel,met,lep,j1,j2,j3,j4,channel,suffix,nJet,nbJet
     plots.append(Plot.make1D("%s_%s_highlevelvariable_MT"%(channel,suffix),
                              HLL.MT(lep,met),
                              sel,
-                             EquidistantBinning(50,0.,1000.),
+                             EquidistantBinning(25,0.,250.),
                              title='Transverse mass of lepton and MET (%s channel)'%channel,
                              xTitle="M_{T}(lep,MET) [GeV]",
                              plotopts = channelLabel))
@@ -1280,21 +1453,6 @@ def makeHighLevelPlotsResolved(sel,met,lep,j1,j2,j3,j4,channel,suffix,nJet,nbJet
                              title='Azimutal angle between %s and MET (%s channel)'%(j1_name,channel),
                              xTitle="|#Delta \phi (%s,MET)|"%j1_name,
                              plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_%s_METdeltaPhi"%(channel,suffix,j2_name),
-                             op.abs(HLL.SinglepMet_dPhi(j2, met)),
-                             sel,
-                             EquidistantBinning(20,0.,3.2),
-                             title='Azimutal angle between %s and MET (%s channel)'%(j2_name,channel),
-                             xTitle="|#Delta \phi (%s,MET)|"%j2_name,
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_%s_METdeltaPhi"%(channel,suffix,j3_name),
-                             op.abs(HLL.SinglepMet_dPhi(j3, met)),
-                             sel,
-                             EquidistantBinning(20,0.,3.2),
-                             title='Azimutal angle between %s and MET (%s channel)'%(j3_name,channel),
-                             xTitle="|#Delta \phi (%s,MET)|"%j3_name,
-                             plotopts = channelLabel))
-    
 
     # lepton_Jet DeltaR plots #
     plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaR_lep_%s"%(channel,suffix,j1_name),
@@ -1304,30 +1462,7 @@ def makeHighLevelPlotsResolved(sel,met,lep,j1,j2,j3,j4,channel,suffix,nJet,nbJet
                              title="DeltaR_%s_%s (channel %s)"%(channel,j1_name,channel),
                              xTitle="DeltaR [%s_%s]"%(channel,j1_name),
                              plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaR_lep_%s"%(channel,suffix,j2_name),
-                             op.deltaR(lep.p4,j2.p4),
-                             sel,
-                             EquidistantBinning(50,0.,5.),
-                             title="DeltaR_%s_%s (channel %s)"%(channel,j2_name,channel),
-                             xTitle="DeltaR [%s_%s]"%(channel,j2_name),
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaR_lep_%s"%(channel,suffix,j3_name),
-                             op.deltaR(lep.p4,j3.p4),
-                             sel,
-                             EquidistantBinning(50,0.,5.),
-                             title="DeltaR_%s_%s (channel %s)"%(channel,j3_name,channel),
-                             xTitle="DeltaR [%s_%s]"%(channel,j3_name),
-                             plotopts = channelLabel))
-    
-    # min-DR
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_minDeltaR_lep_jet"%(channel,suffix),
-                             HLL.MinDR_lep3j(lep,j1,j2,j3),
-                             sel,
-                             EquidistantBinning(50,0.,5.),
-                             title="minDeltaR_lep_jet (channel %s)"%channel,
-                             xTitle="minDeltaR [%s_Jet]"%channel,
-                             plotopts = channelLabel))
-    
+
     # lepton_Jet DeltaPhi plots #
     plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaPhi_lep_%s"%(channel,suffix,j1_name),
                              op.abs(op.deltaPhi(lep.p4,j1.p4)),
@@ -1336,43 +1471,99 @@ def makeHighLevelPlotsResolved(sel,met,lep,j1,j2,j3,j4,channel,suffix,nJet,nbJet
                              title="DeltaPhi_%s_%s (channel %s)"%(channel,j1_name,channel),
                              xTitle="DeltaPhi [%s_%s]"%(channel,j1_name),
                              plotopts=channelLabel))
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaPhi_lep_%s"%(channel,suffix,j2_name),
-                             op.abs(op.deltaPhi(lep.p4,j2.p4)),
-                             sel,
-                             EquidistantBinning(20,0.,3.2),
-                             title="DeltaPhi_%s_%s (channel %s)"%(channel,j2_name,channel),
-                             xTitle="DeltaPhi [%s_%s]"%(channel,j2_name),
-                             plotopts=channelLabel))
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaPhi_lep_%s"%(channel,suffix,j3_name),
-                             op.abs(op.deltaPhi(lep.p4,j3.p4)),
-                             sel,
-                             EquidistantBinning(20,0.,3.2),
-                             title="DeltaPhi_%s_%s (channel %s)"%(channel,j3_name,channel),
-                             xTitle="DeltaPhi [%s_%s]"%(channel,j3_name),
-                             plotopts=channelLabel))
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_MT_lep_%s"%(channel,suffix,j3_name),
-                             HLL.MT_W1W2_lj(lep,j3,met),
-                             sel,
-                             EquidistantBinning(50,0.,1000.),
-                             title='Transverse mass of lepton+jet and MET (%s channel)'%channel,
-                             xTitle="M_{T}(lepj,MET) [GeV]",
-                             plotopts = channelLabel))
-    # Scalar magnitude sum #
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2_l3jmet"%(channel,suffix),
-                             HLL.HT2_l3jmet(lep,j1,j2,j3,met),
-                             sel,
-                             EquidistantBinning(60,0.,600.),
-                             title='Di-Higgs magnitude_l3jmet (%s channel)'%channel,
-                             xTitle="H_{T2} [GeV]",
-                             plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2R_l3jmet"%(channel,suffix),
-                             HLL.HT2R_l3jmet(lep,j1,j2,j3,met),
-                             sel,
-                             EquidistantBinning(40,0.,1.),
-                             title='Di-Higgs magnitude_Ratio_l3jmet (%s channel)'%channel,
-                             xTitle="H_{T2}_Ratio [GeV]",
-                             plotopts = channelLabel))
-    if nJet == 4:
+
+    if nJet > 1 :
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_%s_METdeltaPhi"%(channel,suffix,j2_name),
+                                 op.abs(HLL.SinglepMet_dPhi(j2, met)),
+                                 sel,
+                                 EquidistantBinning(20,0.,3.2),
+                                 title='Azimutal angle between %s and MET (%s channel)'%(j2_name,channel),
+                                 xTitle="|#Delta \phi (%s,MET)|"%j2_name,
+                                 plotopts = channelLabel))
+
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaR_lep_%s"%(channel,suffix,j2_name),
+                                 op.deltaR(lep.p4,j2.p4),
+                                 sel,
+                                 EquidistantBinning(50,0.,5.),
+                                 title="DeltaR_%s_%s (channel %s)"%(channel,j2_name,channel),
+                                 xTitle="DeltaR [%s_%s]"%(channel,j2_name),
+                                 plotopts = channelLabel))
+        
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaPhi_lep_%s"%(channel,suffix,j2_name),
+                                 op.abs(op.deltaPhi(lep.p4,j2.p4)),
+                                 sel,
+                                 EquidistantBinning(20,0.,3.2),
+                                 title="DeltaPhi_%s_%s (channel %s)"%(channel,j2_name,channel),
+                                 xTitle="DeltaPhi [%s_%s]"%(channel,j2_name),
+                                 plotopts=channelLabel))
+
+    if nJet > 2 :
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_%s_METdeltaPhi"%(channel,suffix,j3_name),
+                                 op.abs(HLL.SinglepMet_dPhi(j3, met)),
+                                 sel,
+                                 EquidistantBinning(20,0.,3.2),
+                                 title='Azimutal angle between %s and MET (%s channel)'%(j3_name,channel),
+                                 xTitle="|#Delta \phi (%s,MET)|"%j3_name,
+                                 plotopts = channelLabel))
+    
+
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaR_lep_%s"%(channel,suffix,j3_name),
+                                 op.deltaR(lep.p4,j3.p4),
+                                 sel,
+                                 EquidistantBinning(50,0.,5.),
+                                 title="DeltaR_%s_%s (channel %s)"%(channel,j3_name,channel),
+                                 xTitle="DeltaR [%s_%s]"%(channel,j3_name),
+                                 plotopts = channelLabel))
+        
+        # min-DR
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_minDeltaR_lep_jets123"%(channel,suffix),
+                                 HLL.MinDR_lep3j(lep,j1,j2,j3),
+                                 sel,
+                                 EquidistantBinning(50,0.,5.),
+                                 title="minDeltaR_lep_jet (channel %s)"%channel,
+                                 xTitle="minDeltaR [%s_Jet]"%channel,
+                                 plotopts = channelLabel))
+
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaPhi_lep_%s"%(channel,suffix,j3_name),
+                                 op.abs(op.deltaPhi(lep.p4,j3.p4)),
+                                 sel,
+                                 EquidistantBinning(20,0.,3.2),
+                                 title="DeltaPhi_%s_%s (channel %s)"%(channel,j3_name,channel),
+                                 xTitle="DeltaPhi [%s_%s]"%(channel,j3_name),
+                                 plotopts=channelLabel))
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_MT_lep_%s"%(channel,suffix,j3_name),
+                                 HLL.MT_W1W2_lj(lep,j3,met),
+                                 sel,
+                                 EquidistantBinning(50,0.,1000.),
+                                 title='Transverse mass of lepton+jet and MET (%s channel)'%channel,
+                                 xTitle="M_{T}(lepj,MET) [GeV]",
+                                 plotopts = channelLabel))
+        
+    
+        # Scalar magnitude sum #
+        #plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2_l3jmet"%(channel,suffix),
+        #                         HLL.HT2_l3jmet(lep,j1,j2,j3,met),
+        #                         sel,
+        #                         EquidistantBinning(60,0.,600.),
+        #                         title='Di-Higgs magnitude_l3jmet (%s channel)'%channel,
+        #                         xTitle="H_{T2} [GeV]",
+        #                         plotopts = channelLabel))
+        #plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2R_l3jmet"%(channel,suffix),
+        #                         HLL.HT2R_l3jmet(lep,j1,j2,j3,met),
+        #                         sel,
+        #                         EquidistantBinning(40,0.,1.),
+        #                         title='Di-Higgs magnitude_Ratio_l3jmet (%s channel)'%channel,
+        #                         xTitle="H_{T2}_Ratio [GeV]",
+        #                         plotopts = channelLabel))
+    if nJet > 3:
+        plots.append(Plot.make1D("%s_%s_DeltaR_lep_%s"%(channel,suffix,'HadW'),
+                                 HLL.Wjj_simple(j3.p4, j4.p4).M(),
+                                 sel,
+                                 EquidistantBinning(50,0.,5.),
+                                 title="DeltaR_%s_%s (channel %s)"%(channel,j4_name,channel),
+                                 xTitle="dR_HadW_%s"%channel,
+                                 plotopts=channelLabel))
+
         plots.append(Plot.make1D("%s_%s_highlevelvariable_%s_METdeltaPhi"%(channel,suffix,j4_name),
                                  op.abs(HLL.SinglepMet_dPhi(j4, met)),
                                  sel,
@@ -1395,34 +1586,88 @@ def makeHighLevelPlotsResolved(sel,met,lep,j1,j2,j3,j4,channel,suffix,nJet,nbJet
                                  title="DeltaPhi_%s_%s (channel %s)"%(channel,j4_name,channel),
                                  xTitle="DeltaPhi [%s_%s]"%(channel,j4_name),
                                  plotopts=channelLabel))
-        plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2_l4jmet"%(channel,suffix),
-                                 HLL.HT2_l4jmet(lep,j1,j2,j3,j4,met),
-                                 sel,
-                                 EquidistantBinning(60,0.,600.),
-                                 title='Di-Higgs magnitude_l4jmet (%s channel)'%channel,
-                                 xTitle="H_{T2} [GeV]",
-                                 plotopts = channelLabel))
-        plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2R_l4jmet"%(channel,suffix),
-                                 HLL.HT2R_l4jmet(lep,j1,j2,j3,j4,met),
-                                 sel,
-                                 EquidistantBinning(40,0.,1.),
-                                 title='Di-Higgs magnitude_Ratio_l4jmet (%s channel)'%channel,
-                                 xTitle="H_{T2}_Ratio [GeV]",
-                                 plotopts = channelLabel))
-        # Transverse mass plots #
-        if nbJet == 2:
-            plots.append(Plot.make1D("%s_%s_highlevelvariable_MT_lep_%s_%s"%(channel,suffix,j3_name,j4_name),
-                                     HLL.MT_W1W2_ljj(lep,j3,j4,met),
-                                     sel,
-                                     EquidistantBinning(50,0.,1000.),
-                                     title='Transverse mass of lepton+dijet and MET (%s channel)'%channel,
-                                     xTitle="M_{T}(lepjj,MET) [GeV]",
-                                     plotopts = channelLabel))
+        #plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2_l4jmet"%(channel,suffix),
+        #                         HLL.HT2_l4jmet(lep,j1,j2,j3,j4,met),
+        #                         sel,
+        #                         EquidistantBinning(60,0.,600.),
+        #                         title='Di-Higgs magnitude_l4jmet (%s channel)'%channel,
+        #                         xTitle="H_{T2} [GeV]",
+        #                         plotopts = channelLabel))
+        #plots.append(Plot.make1D("%s_%s_highlevelvariable_HT2R_l4jmet"%(channel,suffix),
+        #                         HLL.HT2R_l4jmet(lep,j1,j2,j3,j4,met),
+        #                         sel,
+        #                         EquidistantBinning(40,0.,1.),
+        #                         title='Di-Higgs magnitude_Ratio_l4jmet (%s channel)'%channel,
+        #                         xTitle="H_{T2}_Ratio [GeV]",
+        #                         plotopts = channelLabel))
 
+
+        # cosThetaS variables
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_Wjj_simple"%(channel,suffix),
+                                 HLL.comp_cosThetaS(j3.p4, j4.p4),
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 title='cosThetaS_Wjj_simple (%s channel)'%channel,
+                                 xTitle="cosThetaS_Wjj_simple",
+                                 plotopts = channelLabel))
+
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_WW_simple_met"%(channel,suffix),
+                                 HLL.comp_cosThetaS(HLL.Wjj_simple(j3.p4,j4.p4),HLL.Wlep_met_simple(lep.p4,met.p4)),
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 title='cosThetaS_WW_simple_met (%s channel)'%channel,
+                                 xTitle="cosThetaS_WW_simple_met",
+                                 plotopts = channelLabel))
+        #####################
+
+        # Transverse mass plots #
+        #if nbJet == 2:
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_MT_lep_%s_%s"%(channel,suffix,j3_name,j4_name),
+                                 HLL.MT_W1W2_ljj(lep,j3,j4,met),
+                                 sel,
+                                 EquidistantBinning(50,0.,1000.),
+                                 title='Transverse mass of lepton+dijet and MET (%s channel)'%channel,
+                                 xTitle="M_{T}(lepjj,MET) [GeV]",
+                                 plotopts = channelLabel))
+        
+        # BDT variables
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_mHH_simple_met"%(channel,suffix),
+                                 HLL.HHP4_simple_met(HLL.bJetCorrP4(j1)+HLL.bJetCorrP4(j2), j3.p4, j4.p4, lep.p4, met.p4).M(),
+                                 sel,
+                                 EquidistantBinning(50,0.,1000.),
+                                 title='mHH_simple_met (%s channel)'%channel,
+                                 xTitle="mHH_simple_met [GeV]",
+                                 plotopts = channelLabel))
+        
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_mT_top_3particle"%(channel,suffix),
+                                 op.min(HLL.mT2(HLL.bJetCorrP4(j1),lep.p4,met.p4), HLL.mT2(HLL.bJetCorrP4(j2),lep.p4,met.p4)),
+                                 sel,
+                                 EquidistantBinning(50,0.,1000.),
+                                 title='mT_top_3particle (%s channel)'%channel,
+                                 xTitle="mT_top_3particle [GeV]",
+                                 plotopts = channelLabel))
+        
+        # cosThetaS variables
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_Hbb"%(channel,suffix),
+                                 HLL.comp_cosThetaS(HLL.bJetCorrP4(j1),HLL.bJetCorrP4(j2)),
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 title='cosThetaS_Hbb (%s channel)'%channel,
+                                 xTitle="cosThetaS_Hbb",
+                                 plotopts = channelLabel))
+        
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_HH_simple_met"%(channel,suffix),
+                                 HLL.comp_cosThetaS(HLL.bJetCorrP4(j1)+HLL.bJetCorrP4(j2), HLL.HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4)),
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 title='cosThetaS_HH_simple_met (%s channel)'%channel,
+                                 xTitle="cosThetaS_HH_simple_met",
+                                 plotopts = channelLabel))
+        #####################
     return plots 
 
 # Make HighLevel plots for semi boosted and boosted categories
-def makeHighLevelPlotsBoosted(sel,met,lep,j1,j2,channel,suffix,HLL,bothAreFat=False):
+def makeHighLevelPlotsBoosted(sel,met,lep,j1,j2,j3,channel,suffix,HLL,has1fat2slim,bothAreFat):
     #print ("===============>>>HighLevel Plots for Boosted__channel:%s__sel:%s"%(channel,suffix))
     if bothAreFat:
         j1_name   = "Ak8BJet"
@@ -1430,12 +1675,13 @@ def makeHighLevelPlotsBoosted(sel,met,lep,j1,j2,channel,suffix,HLL,bothAreFat=Fa
         
     else:
         j1_name   = "Ak8BJet"
-        j2_name   = "Ak4NonbJet"
+        j2_name   = "Ak4LeadingNonbJet"
+        j3_name   = "Ak4SubLeadingNonbJet"
     
     plots = []
     channelLabel = SingleLeptonChannelTitleLabel(channel)
 
-    # lepton_Jet DeltaR plots #
+    # dR between lepton and fat-bJet
     plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaR_%s_%s"%(channel,suffix,channel,j1_name),
                              op.deltaR(lep.p4,j1.p4),
                              sel,
@@ -1443,15 +1689,24 @@ def makeHighLevelPlotsBoosted(sel,met,lep,j1,j2,channel,suffix,HLL,bothAreFat=Fa
                              title="DeltaR_(%s_%s)"%(channel, j1_name),
                              xTitle="DeltaR [%s_%s]"%(channel, j1_name),
                              plotopts=channelLabel))
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaR_%s_%s"%(channel,suffix,channel,j2_name),
-                             op.deltaR(lep.p4,j2.p4),
+    # dR between lepton and fat-bSubJet1
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaR_%s_%s_SubJet1"%(channel,suffix,channel,j1_name),
+                             op.deltaR(lep.p4,j1.subJet1.p4),
                              sel,
                              EquidistantBinning(50,0.,5.),
-                             title="DeltaR_(%s_%s)"%(channel,j1_name),
-                             xTitle="DeltaR [%s_%s]"%(channel, j2_name),
+                             title="DeltaR_(%s_%s)_SubJet1"%(channel, j1_name),
+                             xTitle="DeltaR [%s_%s]_SubJet1"%(channel, j1_name),
+                             plotopts=channelLabel))
+    # dR between lepton and fat-bSubJet2
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaR_%s_%s_SubJet2"%(channel,suffix,channel,j1_name),
+                             op.deltaR(lep.p4,j1.subJet2.p4),
+                             sel,
+                             EquidistantBinning(50,0.,5.),
+                             title="DeltaR_(%s_%s)_SubJet1"%(channel, j1_name),
+                             xTitle="DeltaR [%s_%s]_SubJet1"%(channel, j1_name),
                              plotopts=channelLabel))
 
-    # lepton_Jet DeltaPhi plots #
+    # dPhi between lepton and fat-bJet
     plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaPhi_%s_%s"%(channel,suffix,channel,j1_name),
                              op.abs(op.deltaPhi(lep.p4,j1.p4)),
                              sel,
@@ -1459,22 +1714,32 @@ def makeHighLevelPlotsBoosted(sel,met,lep,j1,j2,channel,suffix,HLL,bothAreFat=Fa
                              title="DeltaPhi_(%s_%s)"%(channel, j1_name),
                              xTitle="DeltaPhi [%s_%s]"%(channel, j1_name),
                              plotopts=channelLabel))
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaPhi_%s_%s"%(channel,suffix,channel,j2_name),
-                             op.abs(op.deltaPhi(lep.p4,j2.p4)),
+    # dPhi between lepton and fat-b-SubJet1
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaPhi_%s_%s_SubJet1"%(channel,suffix,channel,j1_name),
+                             op.abs(op.deltaPhi(lep.p4,j1.subJet1.p4)),
                              sel,
                              EquidistantBinning(20,0.,3.2),
-                             title="DeltaPhi(%s %s)"%(channel, j2_name),
-                             xTitle="DeltaPhi [%s_%s]"%(channel, j2_name),
+                             title="DeltaPhi_(%s_%s)_SubJet1"%(channel, j1_name),
+                             xTitle="DeltaPhi [%s_%s]_SubJet1"%(channel, j1_name),
                              plotopts=channelLabel))
-    
-    # lepton-MET plots #
+    # dPhi between lepton and fat-b-SubJet2
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaPhi_%s_%s_SubJet2"%(channel,suffix,channel,j1_name),
+                             op.abs(op.deltaPhi(lep.p4,j1.subJet2.p4)),
+                             sel,
+                             EquidistantBinning(20,0.,3.2),
+                             title="DeltaPhi_(%s_%s)_SubJet2"%(channel, j1_name),
+                             xTitle="DeltaPhi [%s_%s]_SubJet2"%(channel, j1_name),
+                             plotopts=channelLabel))
+
+    # Resultant pT of Lepton and MET
     plots.append(Plot.make1D("%s_%s_highlevelvariable_SinglepMET_Pt"%(channel,suffix),
                              op.abs(HLL.SinglepMet_Pt(lep, met)),
                              sel,
                              EquidistantBinning(20,0.,3.2),
-                             title='Reultant pT of lepton and MET (%s channel)'%channel,
+                             title='Resultant pT of lepton and MET (%s channel)'%channel,
                              xTitle="|Pt (lep,MET)|",
                              plotopts = channelLabel))
+    # DPhi between Lepton and MET
     plots.append(Plot.make1D("%s_%s_highlevelvariable_SinglepMETdeltaPhi"%(channel,suffix),
                              op.abs(HLL.SinglepMet_dPhi(lep, met)),
                              sel,
@@ -1482,7 +1747,7 @@ def makeHighLevelPlotsBoosted(sel,met,lep,j1,j2,channel,suffix,HLL,bothAreFat=Fa
                              title='Azimutal angle between lepton and MET (%s channel)'%channel,
                              xTitle="|#Delta \phi (lep,MET)|",
                              plotopts = channelLabel))
-    # jet-MET plots
+    # DPhi between fat-bJet and MET
     plots.append(Plot.make1D("%s_%s_highlevelvariable_%s_METdeltaPhi"%(channel,suffix,j1_name),
                              op.abs(HLL.SinglepMet_dPhi(j1, met)),
                              sel,
@@ -1490,14 +1755,22 @@ def makeHighLevelPlotsBoosted(sel,met,lep,j1,j2,channel,suffix,HLL,bothAreFat=Fa
                              title='Azimutal angle between %s and MET (%s channel)'%(j1_name,channel),
                              xTitle="|#Delta \phi (%s,MET)|"%j1_name,
                              plotopts = channelLabel))
-    plots.append(Plot.make1D("%s_%s_highlevelvariable_%s_METdeltaPhi"%(channel,suffix,j2_name),
-                             op.abs(HLL.SinglepMet_dPhi(j2, met)),
+    # DPhi between fat-b_SubJet1 and MET 
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_%s_SubJet1_METdeltaPhi"%(channel,suffix,j1_name),
+                             op.abs(HLL.SinglepMet_dPhi(j1.subJet1, met)),
                              sel,
                              EquidistantBinning(20,0.,3.2),
-                             title='Azimutal angle between %s and MET (%s channel)'%(j2_name,channel),
-                             xTitle="|#Delta \phi (%s,MET)|"%j2_name,
+                             title='Azimutal angle between %s SubJet1 and MET (%s channel)'%(j1_name,channel),
+                             xTitle="|#Delta \phi (%s SubJet1, MET)|"%j1_name,
                              plotopts = channelLabel))
-
+    # DPhi between fat-b_SubJet2 and MET 
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_%s_SubJet2_METdeltaPhi"%(channel,suffix,j1_name),
+                             op.abs(HLL.SinglepMet_dPhi(j1.subJet2, met)),
+                             sel,
+                             EquidistantBinning(20,0.,3.2),
+                             title='Azimutal angle between %s SubJet2 and MET (%s channel)'%(j1_name,channel),
+                             xTitle="|#Delta \phi (%s SubJet2, MET)|"%j1_name,
+                             plotopts = channelLabel))
 
     # Transverse mass plots #
     # mT for Single lepton #
@@ -1508,7 +1781,87 @@ def makeHighLevelPlotsBoosted(sel,met,lep,j1,j2,channel,suffix,HLL,bothAreFat=Fa
                              title='Transverse mass of lepton and MET (%s channel)'%channel,
                              xTitle="M_{T}(lep,MET) [GeV]",
                              plotopts = channelLabel))
+ 
+    # cosThetaS
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_Hbb"%(channel,suffix),
+                             HLL.comp_cosThetaS(j1.subJet1.p4, j1.subJet2.p4),
+                             sel,
+                             EquidistantBinning(50,0.,1.),
+                             title='cosThetaS_Hbb (%s channel)'%channel,
+                             xTitle="cosThetaS_Hbb",
+                             plotopts = channelLabel))
     
+   
+
+    if bothAreFat:
+        # dR between lepton and the 2nd Jet
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaR_%s_%s"%(channel,suffix,channel,j2_name),
+                                 op.deltaR(lep.p4,j2.p4),
+                                 sel,
+                                 EquidistantBinning(50,0.,5.),
+                                 title="DeltaR_(%s_%s)"%(channel,j1_name),
+                                 xTitle="DeltaR [%s_%s]"%(channel, j2_name),
+                                 plotopts=channelLabel))
+
+        # dPhi between lepton and 2nd jet
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_DeltaPhi_%s_%s"%(channel,suffix,channel,j2_name),
+                                 op.abs(op.deltaPhi(lep.p4,j2.p4)),
+                                 sel,
+                                 EquidistantBinning(20,0.,3.2),
+                                 title="DeltaPhi(%s %s)"%(channel, j2_name),
+                                 xTitle="DeltaPhi [%s_%s]"%(channel, j2_name),
+                                 plotopts=channelLabel))
+    
+        # DPhi between 2ndJet and MET 
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_%s_METdeltaPhi"%(channel,suffix,j2_name),
+                                 op.abs(HLL.SinglepMet_dPhi(j2, met)),
+                                 sel,
+                                 EquidistantBinning(20,0.,3.2),
+                                 title='Azimutal angle between %s and MET (%s channel)'%(j2_name,channel),
+                                 xTitle="|#Delta \phi (%s,MET)|"%j2_name,
+                                 plotopts = channelLabel))
+
+    if has1fat2slim:
+        # cosThetaS variables
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_Wjj_simple"%(channel,suffix),
+                                 HLL.comp_cosThetaS(j2.p4, j3.p4),
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 title='cosThetaS_Wjj_simple (%s channel)'%channel,
+                                 xTitle="cosThetaS_Wjj_simple",
+                                 plotopts = channelLabel))
+
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_WW_simple_met"%(channel,suffix),
+                                 HLL.comp_cosThetaS(HLL.Wjj_simple(j2.p4,j3.p4),HLL.Wlep_met_simple(lep.p4,met.p4)),
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 title='cosThetaS_WW_simple_met (%s channel)'%channel,
+                                 xTitle="cosThetaS_WW_simple_met",
+                                 plotopts = channelLabel))
+
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_HH_simple_met"%(channel,suffix),
+                                 HLL.comp_cosThetaS(j1.subJet1.p4 + j1.subJet2.p4, HLL.HWW_met_simple(j2.p4,j3.p4,lep.p4,met.p4)),
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 title='cosThetaS_HH_simple_met (%s channel)'%channel,
+                                 xTitle="cosThetaS_HH_simple_met",
+                                 plotopts = channelLabel))
+
+        plots.append(Plot.make1D("%s_%s_Hww_mass"%(channel,suffix), 
+                                 HLL.HWW_simple(j2.p4, j3.p4, lep.p4, met).M(),
+                                 sel, 
+                                 EquidistantBinning(50,0.,500.),
+                                 title="Hww_mass (channel %s)"%channel, 
+                                 xTitle= "Hww_mass",
+                                 plotopts = channelLabel))
+        plots.append(Plot.make1D("%s_%s_dR_HadW_lep"%(channel,suffix), 
+                                 op.deltaR(HLL.Wjj_simple(j2.p4, j3.p4), lep.p4),
+                                 sel, 
+                                 EquidistantBinning(50,0.,5.),
+                                 title="dR_HadW_lep (channel %s)"%channel, 
+                                 xTitle= "dR_HadW_lep",
+                                 plotopts = channelLabel))
+        
     return plots
 
 def makeBtagDDplots(sel,jet,channel,suffix):
@@ -1569,30 +1922,29 @@ def makeBtagDDplots(sel,jet,channel,suffix):
 
     return plots
 
-
 def makeDoubleLeptonHighLevelQuantities (sel,met,l1,l2,j1,j2,suffix,channel,HLL):
     plots = []
 
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
 
     # Bjets corr mass #
-#    plots.append(Plot.make2D("%s_%s_highlevelvariable_bbRegcorrMass"%(channel,suffix),
-#                             op.invariant_mass(HLL.bJetCorrP4(j1), HLL.bJetCorrP4(j2)),
-#                             sel,
-#                             EquidistantBinning(60,0.,300.),
-#                             xTitle="m_{bb}^{Regcorr}",
-#                             plotopts = channelLabel))
-
-
+    #    plots.append(Plot.make2D("%s_%s_highlevelvariable_bbRegcorrMass"%(channel,suffix),
+    #                             op.invariant_mass(HLL.bJetCorrP4(j1), HLL.bJetCorrP4(j2)),
+    #                             sel,
+    #                             EquidistantBinning(60,0.,300.),
+    #                             xTitle="m_{bb}^{Regcorr}",
+    #                             plotopts = channelLabel))
+    
+    
     # Lepton PT versus Jet Pt #
-#    plots.append(Plot.make2D("%s_%s_highlevelvariable_firstLeptonPtVSLeadjetPt"%(channel,suffix),
-#                             [l1.pt,j1.pt],
-#                             sel,
-#                             [EquidistantBinning(60,0.,300.),EquidistantBinning(60,0.,300.)],
-#                             xTitle="First lepton P_{T}",
-#                             yTitle="Leading jet P_{T}",
-#                             plotopts = channelLabel))
-#
+    #    plots.append(Plot.make2D("%s_%s_highlevelvariable_firstLeptonPtVSLeadjetPt"%(channel,suffix),
+    #                             [l1.pt,j1.pt],
+    #                             sel,
+    #                             [EquidistantBinning(60,0.,300.),EquidistantBinning(60,0.,300.)],
+    #                             xTitle="First lepton P_{T}",
+    #                             yTitle="Leading jet P_{T}",
+    #                             plotopts = channelLabel))
+    #
     # dilepton-MET plots #
     plots.append(Plot.make1D("%s_%s_highlevelvariable_DilepMETdeltaPhi"%(channel,suffix),
                              op.abs(HLL.DilepMET_deltaPhi(l1,l2,met)),
@@ -1662,110 +2014,285 @@ def makeDoubleLeptonHighLevelQuantities (sel,met,l1,l2,j1,j2,suffix,channel,HLL)
                              title='Di-Higgs magnitude ratio (%s channel)'%channel,
                              xTitle="H_{T2}^{R} [GeV]",
                              plotopts = channelLabel))
-
+    
     return plots 
 
-#########################  Machine Learning  ################################
-def makeSingleLeptonMachineLearningPlotsBDT(sel,fakeLepColl,lep,met,jets,bJets,lJets,j1,j2,j3,j4,suffix,channel,model_even,model_odd,event,HLL):
+
+####################################  Machine Learning [BDT implementation :: Single Lepton] #####################################
+def makeSingleLeptonMachineLearningPlotsBDTfullRecoResolved(sel,fakeLepColl,lep,met,jets,bJets,lJets,j1,j2,j3,j4,suffix,channel,model_even,model_odd,nBins,event,HLL):
     plots = []
     channelLabel = SingleLeptonChannelTitleLabel(channel)
 
-    #output_odd = model_even(op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.))
-    #output_even = model_odd(op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.))
-    inputs = [op.c_float(0.)]*21 
-    # TODO : 
+    #inputs = [op.c_float(0.)]*21
+    inputs = [HLL.mindr_lep1_jet(lep,jets),                                                                  # mindr_lep1_jet
+              op.invariant_mass(HLL.bJetCorrP4(j1), HLL.bJetCorrP4(j2)),                                     # m_Hbb_regCorr 
+              HLL.HHP4_simple_met(HLL.bJetCorrP4(j1)+HLL.bJetCorrP4(j2), j3.p4, j4.p4, lep.p4, met.p4).M(),  # mHH_simple_met 
+              HLL.Wlep_met_simple(lep.p4, met.p4).M(),                                                       # mWlep_met_simple
+              HLL.HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4).M(),                                             # mWW_simple_met
+              HLL.Wjj_simple(j3.p4, j4.p4).M(),                                                              # mWjj_simple
+              HLL.comp_cosThetaS(HLL.bJetCorrP4(j1),HLL.bJetCorrP4(j2)),                                     # cosThetaS_Hbb                   
+              HLL.comp_cosThetaS(j3.p4, j4.p4),                                                                          # cosThetaS_Wjj_simple     
+              HLL.comp_cosThetaS(HLL.Wjj_simple(j3.p4,j4.p4),HLL.Wlep_met_simple(lep.p4,met.p4)),                        # cosThetaS_WW_simple_met  
+              HLL.comp_cosThetaS(HLL.bJetCorrP4(j1)+HLL.bJetCorrP4(j2), HLL.HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4)),  # cosThetaS_HH_simple_met     
+              op.rng_len(jets),                                                                       # nJet
+              op.rng_len(bJets),                                                                      # nBJetMedium
+              op.deltaR(j1.p4, lep.p4),                                                               # dR_b1lep
+              op.deltaR(j2.p4, lep.p4),                                                               # dR_b2lep
+              HLL.lambdaConePt(lep),                                                                  # lep_conePt
+              HLL.bJetCorrP4(j1).Pt(),                                                                # selJet1_Hbb_pT
+              HLL.bJetCorrP4(j2).Pt(),                                                                # selJet2_Hbb_pT 
+              HLL.MET_LD(met,jets,fakeLepColl),                                                       # met_LD
+              HLL.HTfull(fakeLepColl,HLL.bJetCorrP4(j1),HLL.bJetCorrP4(j2),j3.p4,j4.p4),              # HT
+              op.min(HLL.mT2(HLL.bJetCorrP4(j1),lep.p4 ,met.p4), HLL.mT2(HLL.bJetCorrP4(j2), lep.p4, met.p4)), # mT_top_3particle
+              HLL.MT(lep,met)                                                                         # mT_W
+          ]
+
     output = op.switch(event%2,model_odd(*inputs),model_even(*inputs))
 
-    '''
-    output_odd = model_even(
-        mindr_lep1_jet(lep,jets),                             # mindr_lep1_jet
-        op.invariant_mass(bJetCorrP4(j1), bJetCorrP4(j2)),    # m_Hbb_regCorr
-        HHP4_simple_met(bJetCorrP4(j1)+bJetCorrP4(j2), j3.p4, j4.p4, lep.p4, met.p4).M(),   # mHH_simple_met
-        Wlep_met_simple(lep.p4, met.p4).M(),           # mWlep_met_simple
-        HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4).M(), # mWW_simple_met
-        Wjj_simple(j3.p4, j4.p4).M(),                  # mWjj_simple
-        comp_cosThetaS(bJetCorrP4(j1),bJetCorrP4(j2)), # cosThetaS_Hbb
-        comp_cosThetaS(j3.p4, j4.p4),                  # cosThetaS_Wjj_simple
-        comp_cosThetaS(Wjj_simple(j3.p4,j4.p4),Wlep_met_simple(lep.p4,met.p4)),                      # cosThetaS_WW_simple_met
-        comp_cosThetaS(bJetCorrP4(j1)+bJetCorrP4(j2), HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4)), # cosThetaS_HH_simple_met
-        op.rng_len(jets),         # nJet
-        op.rng_len(bJets),        # nBJetMedium
-        op.deltaR(j1.p4, lep.p4), # dR_b1lep
-        op.deltaR(j2.p4, lep.p4), # dR_b2lep
-        op.switch(op.abs(lep.pdgId)==11, lambda_conept_electron(lep), lambda_conept_muon(lep)),          # lep_conePt
-        #lepConePt(lep),           # lep_conePt
-        #op.c_float(1.0),
-        bJetCorrP4(j1).Pt(),      # selJet1_Hbb_pT
-        bJetCorrP4(j2).Pt(),      # selJet2_Hbb_pT 
-        MET_LD(met,jets,fakeLepColl), # met_LD
-        HT(jets),                     # HT
-        op.min(mT2(j3,lep,met), mT2(j4,lep,met)),       # mT_top_3particle
-        MT(lep,met)                   # mT_W
-    )
-    output_even = model_odd(
-        mindr_lep1_jet(lep,jets),                             # mindr_lep1_jet
-        op.invariant_mass(bJetCorrP4(j1), bJetCorrP4(j2)),    # m_Hbb_regCorr
-        HHP4_simple_met(bJetCorrP4(j1)+bJetCorrP4(j2), j3.p4, j4.p4, lep.p4, met.p4).M(),   # mHH_simple_met
-        Wlep_met_simple(lep.p4, met.p4).M(),           # mWlep_met_simple
-        HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4).M(), # mWW_simple_met
-        Wjj_simple(j3.p4, j4.p4).M(),                  # mWjj_simple
-        comp_cosThetaS(bJetCorrP4(j1),bJetCorrP4(j2)), # cosThetaS_Hbb
-        comp_cosThetaS(j3.p4, j4.p4),                  # cosThetaS_Wjj_simple
-        comp_cosThetaS(Wjj_simple(j3.p4,j4.p4),Wlep_met_simple(lep.p4,met.p4)),                      # cosThetaS_WW_simple_met
-        comp_cosThetaS(bJetCorrP4(j1)+bJetCorrP4(j2), HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4)), # cosThetaS_HH_simple_met
-        op.rng_len(jets),         # nJet
-        op.rng_len(bJets),        # nBJetMedium
-        op.deltaR(j1.p4, lep.p4), # dR_b1lep
-        op.deltaR(j2.p4, lep.p4), # dR_b2lep
-        op.switch(op.abs(lep.pdgId)==11, lambda_conept_electron(lep), lambda_conept_muon(lep)),          # lep_conePt
-        #lepConePt(lep),           # lep_conePt
-        #op.c_float(1.0),
-        bJetCorrP4(j1).Pt(),      # selJet1_Hbb_pT
-        bJetCorrP4(j2).Pt(),      # selJet2_Hbb_pT
-        MET_LD(met,jets,fakeLepColl), # met_LD 
-        HT(jets),                 # HT
-        op.min(mT2(j3,lep,met), mT2(j4,lep,met)),       # mT_top_3particle
-        MT(lep,met)               # mT_W
-    )
-    '''
-    for i in range(10):
+    plots.append(Plot.make1D("%s_%s_nClasses"%(channel,suffix),
+                             op.rng_len(output),
+                             sel,
+                             EquidistantBinning(10,-0.5,9.5),
+                             xTitle = 'nClasses (nBDT outputs)',
+                             plotopts = channelLabel))
+
+    plots.append(Plot.make1D("%s_%s_BDTOutput"%(channel,suffix),
+                             output[0],
+                             sel,
+                             EquidistantBinning(nBins,0.,1.),
+                             xTitle = 'BDT Response',
+                             plotopts = channelLabel))
+
+    return plots
+
+
+def makeSingleLeptonMachineLearningPlotsBDTfullRecoBoosted(sel,fakeLepColl,lep,met,jets,bJets,lJets,j1,j2,j3,j4,suffix,channel,model_even,model_odd,nBins,nMedBJets,event,HLL):
+    plots = []
+    channelLabel = SingleLeptonChannelTitleLabel(channel)
+
+    #inputs = [op.c_float(0.)]*21
+    inputs = [HLL.mindr_lep1_jet(lep,jets),                                                                  # mindr_lep1_jet
+              op.invariant_mass(j1.p4, j2.p4),                                                               # m_Hbb_regCorr 
+              HLL.HHP4_simple_met(j1.p4+j2.p4, j3.p4, j4.p4, lep.p4, met.p4).M(),                            # mHH_simple_met 
+              HLL.Wlep_met_simple(lep.p4, met.p4).M(),                                                       # mWlep_met_simple
+              HLL.HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4).M(),                                             # mWW_simple_met
+              HLL.Wjj_simple(j3.p4, j4.p4).M(),                                                              # mWjj_simple
+              HLL.comp_cosThetaS(j1.p4, j2.p4),                                                              # cosThetaS_Hbb                   
+              HLL.comp_cosThetaS(j3.p4, j4.p4),                                                                          # cosThetaS_Wjj_simple     
+              HLL.comp_cosThetaS(HLL.Wjj_simple(j3.p4,j4.p4),HLL.Wlep_met_simple(lep.p4,met.p4)),                        # cosThetaS_WW_simple_met  
+              HLL.comp_cosThetaS(j1.p4+j2.p4, HLL.HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4)),         # cosThetaS_HH_simple_met     
+              op.rng_len(jets),                                                                       # nJet
+              #op.rng_len(bJets),                                                                      # nBJetMedium
+              nMedBJets,
+              op.deltaR(j1.p4, lep.p4),                                                               # dR_b1lep
+              op.deltaR(j2.p4, lep.p4),                                                               # dR_b2lep
+              HLL.lambdaConePt(lep),                                                                  # lep_conePt
+              j1.pt,                                                                                  # selJet1_Hbb_pT
+              j2.pt,                                                                                  # selJet2_Hbb_pT 
+              HLL.MET_LD(met,jets,fakeLepColl),                                                       # met_LD
+              HLL.HTfull(fakeLepColl,j1.p4,j2.p4,j3.p4,j4.p4),                                        # HT
+              op.min(HLL.mT2(j1.p4, lep.p4 ,met.p4), HLL.mT2(j2.p4, lep.p4, met.p4)),                 # mT_top_3particle
+              HLL.MT(lep,met)                                                                         # mT_W
+          ]
+
+    output = op.switch(event%2,model_odd(*inputs),model_even(*inputs))
+
+    plots.append(Plot.make1D("%s_%s_nClasses"%(channel,suffix),
+                             op.rng_len(output),
+                             sel,
+                             EquidistantBinning(10,-0.5,9.5),
+                             xTitle = 'nClasses (nBDT outputs)',
+                             plotopts = channelLabel))
+
+    plots.append(Plot.make1D("%s_%s_BDTOutput"%(channel,suffix),
+                             output[0],
+                             sel,
+                             EquidistantBinning(nBins,0.,1.),
+                             xTitle = 'BDT Response',
+                             plotopts = channelLabel))
+
+    return plots
+
+def makeSingleLeptonMachineLearningPlotsBDTmissRecoResolved(sel,fakeLepColl,lep,met,jets,bJets,lJets,j1,j2,j3,j4,suffix,channel,model_even,model_odd,nBins,event,HLL):
+    plots = []
+    channelLabel = SingleLeptonChannelTitleLabel(channel)
+
+    #inputs = [op.c_float(0.)]*13
+    inputs = [op.min(HLL.mT2(HLL.bJetCorrP4(j1),lep.p4 ,met.p4), HLL.mT2(HLL.bJetCorrP4(j2), lep.p4, met.p4)),# mT_top_3particle
+              HLL.MT(lep,met),                                                                        # mT_W
+              HLL.mindr_lep1_jet(lep,jets),                                                           # mindr_lep1_jet
+              op.deltaR(j1.p4, lep.p4),                                                               # dR_b1lep
+              op.deltaR(j2.p4, lep.p4),                                                               # dR_b2lep             
+              op.invariant_mass(HLL.bJetCorrP4(j1), HLL.bJetCorrP4(j2)),                              # m_Hbb_regCorr 
+              HLL.bJetCorrP4(j1).Pt(),                                                                # selJet1_Hbb_pT
+              HLL.bJetCorrP4(j2).Pt(),                                                                # selJet2_Hbb_pT 
+              op.deltaR(j3.p4, HLL.Wlep_simple(j1.p4,j2.p4,lep.p4,met)),                              # dr_Wj1_lep_simple
+              op.rng_len(bJets),                                                                      # nBJetMedium
+              HLL.lambdaConePt(lep),                                                                  # lep_conePt
+              HLL.MET_LD(met,jets,fakeLepColl),                                                       # met_LD
+              HLL.HTmiss(fakeLepColl,HLL.bJetCorrP4(j1),HLL.bJetCorrP4(j2),j3.p4)                     # HT
+          ]
+
+    output = op.switch(event%2,model_odd(*inputs),model_even(*inputs))
+
+    plots.append(Plot.make1D("%s_%s_nClasses"%(channel,suffix),
+                                 op.rng_len(output),
+                                 sel,
+                                 EquidistantBinning(10,-0.5,9.5),
+                                 xTitle = 'nClasses (nBDT outputs)',
+                                 plotopts = channelLabel))
+
+    for i in range(1):
         plots.append(Plot.make1D("%s_%s_BDTOutput_%d"%(channel,suffix,i),
                                  output[i],
                                  sel,
-                                 EquidistantBinning(50,0.,1.),
+                                 EquidistantBinning(nBins,0.,1.),
                                  xTitle = 'BDT output %d'%i,
                                  plotopts = channelLabel))
-    
+        
     return plots
 
-'''
-def makeSingleLeptonMachineLearningPlotsBDTmissReco(sel,lep,met,jets,bJets,lJets,j1,j2,j3,j4,suffix,channel,model):
+
+def makeSingleLeptonMachineLearningPlotsBDTmissRecoBoosted(sel,fakeLepColl,lep,met,jets,bJets,lJets,j1,j2,j3,j4,suffix,channel,model_even,model_odd,nBins,nMedBJets,event,HLL):
     plots = []
     channelLabel = SingleLeptonChannelTitleLabel(channel)
-    output = model(op.c_float(0.),
-                   MT(lep, met),
-                   op.sort(jets, lambda j : op.deltaR(lep.p4, j.p4))[0],
-                   op.deltaR(j1.p4, lep.p4),
-                   op.deltaR(j2.p4, lep.p4),
-                   op.invariant_mass(bJetCorrP4(j1),bJetCorrP4(j2)),
-                   bJetCorrP4(j1).Pt(),
-                   bJetCorrP4(j2).Pt(),
-                   op.deltaR(lep.p4, j3.p4),
-                   op.rng_len(bJets),
-                   lep.pt,
-                   met.pt,
-                   op.rng_sum(jets, lambda j : j.pt))
 
-    for i,node in enumerate(['HH', 'H', 'DY', 'ST', 'ttbar', 'ttVX', 'VVV', 'Rare']):
-        plots.append(Plot.make1D("%s_%s_BDTOutput_%s"%(channel,suffix,node),
+    #inputs = [op.c_float(0.)]*13
+    inputs = [op.min(HLL.mT2(j1.p4, lep.p4 ,met.p4), HLL.mT2(j2.p4, lep.p4, met.p4)),                 # mT_top_3particle
+              HLL.MT(lep,met),                                                                        # mT_W
+              HLL.mindr_lep1_jet(lep,jets),                                                           # mindr_lep1_jet
+              op.deltaR(j1.p4, lep.p4),                                                               # dR_b1lep
+              op.deltaR(j2.p4, lep.p4),                                                               # dR_b2lep             
+              op.invariant_mass(j1.p4, j2.p4),                                                        # m_Hbb_regCorr 
+              j1.pt,                                                                                  # selJet1_Hbb_pT
+              j2.pt,                                                                                  # selJet2_Hbb_pT 
+              op.deltaR(j3.p4, HLL.Wlep_simple(j1.p4,j2.p4,lep.p4,met)),                              # dr_Wj1_lep_simple
+              nMedBJets,
+              #op.rng_len(bJets),                                                                      # nBJetMedium
+              HLL.lambdaConePt(lep),                                                                  # lep_conePt
+              HLL.MET_LD(met,jets,fakeLepColl),                                                       # met_LD
+              HLL.HTmiss(fakeLepColl,j1.p4,j2.p4,j3.p4)                                               # HT
+          ]
+
+    output = op.switch(event%2,model_odd(*inputs),model_even(*inputs))
+
+    plots.append(Plot.make1D("%s_%s_nClasses"%(channel,suffix),
+                                 op.rng_len(output),
+                                 sel,
+                                 EquidistantBinning(10,-0.5,9.5),
+                                 xTitle = 'nClasses (nBDT outputs)',
+                                 plotopts = channelLabel))
+
+    for i in range(1):
+        plots.append(Plot.make1D("%s_%s_BDTOutput_%d"%(channel,suffix,i),
+                                 output[i],
+                                 sel,
+                                 EquidistantBinning(nBins,0.,1.),
+                                 xTitle = 'BDT output %d'%i,
+                                 plotopts = channelLabel))
+        
+    return plots
+
+####################################  Machine Learning [BDT implementation :: Single Lepton] #####################################
+def plotSingleLeptonBDTResponse(channel,sel,suffix,nBins,output):
+    plots = []
+
+    channelLabel = SingleLeptonChannelTitleLabel(channel)
+    plots.append(Plot.make1D("%s_%s_Output"%(channel,suffix),
+                             output,
+                             sel,
+                             EquidistantBinning(nBins,0.,1.),
+                             xTitle = 'BDT Response',
+                             plotopts = channelLabel))
+    
+    return plots    
+
+
+####################################  Machine Learning [DNN implementation :: Single Lepton] #####################################
+def plotSingleLeptonDNNResponse(selObjNodesDict,output,nodes,channel):
+    plots = []
+
+    channelLabel = SingleLeptonChannelTitleLabel(channel)
+
+    for i,node in enumerate(nodes):
+        suffix = selObjNodesDict[node].selName
+        sel = selObjNodesDict[node].sel
+        plots.append(Plot.make1D("%s_%s_DNNOutput_%s"%(channel,suffix,node),
                                  output[i],
                                  sel,
                                  EquidistantBinning(50,0.,1.),
-                                 xTitle = 'BDT output %s'%node,
+                                 xTitle = 'DNN output %s'%node,
                                  plotopts = channelLabel))
+        
+    return plots    
+
+
+
+####################################  Machine Learning [DNN implementation :: Double Lepton] #####################################
+def makeDoubleLeptonMachineLearningPlots(selObjNodesDict,output,nodes,channel):
+    plots = []
+
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
+    
+    for i,node in enumerate(nodes):
+        suffix = selObjNodesDict[node].selName
+        sel = selObjNodesDict[node].sel
+        plots.append(Plot.make1D("%s_%s_DNNOutput_%s"%(channel,suffix,node),
+                                 output[i],
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 xTitle = 'DNN output %s'%node,
+                                 plotopts = channelLabel))
+        
+    return plots    
+
+
+
+def makeJPAtestPlots(sel, JPAscorePerCat, JPAjetIdxsPerCat, JPAnodeList, channel):
+    plots = []
+    channelLabel = SingleLeptonChannelTitleLabel(channel)
+    suffix = sel.selName
+    plots.append(Plot.make1D("%s_%s_nBDTMaxScores"%(channel,suffix),
+                             op.rng_len(JPAscorePerCat),
+                             sel.sel,
+                             EquidistantBinning(10, 0.0, 10.0),
+                             xTitle = 'BDT output nNodes',
+                             plotopts = channelLabel))
+    
 
     return plots
-    '''
+
+
+
+def plotBDTout(channel, out, jets, sel, suffix):
+    plots = []
+    channelLabel = SingleLeptonChannelTitleLabel(channel)
+
+    plots.append(Plot.make1D("%s_%s_BDTout"%(channel,suffix),
+                             out,
+                             sel,
+                             EquidistantBinning(100, -1.0, 1.0),
+                             xTitle = 'BDT output',
+                             plotopts = channelLabel))
+    
+    return plots
+
+
+def makeTestPlot(channel, var, sel, suffix):
+    print(type(var))
+    plots = []
+    channelLabel = SingleLeptonChannelTitleLabel(channel)
+
+    plots.append(Plot.make1D("%s_%s_BDT-MaxOut"%(channel,suffix),
+                             var,
+                             sel,
+                             EquidistantBinning(10, -0.5, 9.5),
+                             xTitle = 'BDT MaxIntVal',
+                             plotopts = channelLabel))
+
+    return plots
+
+
 def makeDoubleLeptonSelectedResolvedVariables(sel,l1,l2,b1,b2,met,suffix,channel,HLL):
     plots = []
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
@@ -1929,4 +2456,3 @@ def makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,nodes,chan
       
 
     return plots    
-
