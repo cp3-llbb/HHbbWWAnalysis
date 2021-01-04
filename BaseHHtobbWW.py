@@ -404,6 +404,7 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Summer16_07Aug2017_V11_MC",
                                       smear                 = "Summer16_25nsV1_MC",
+                                      isT1Smear               = True,
                                       jesUncertaintySources = "Merged",
                                       regroupTag            = "V2",
                                       mayWriteCache         = isNotWorker,
@@ -497,6 +498,7 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Fall17_17Nov2017_V32_MC",
                                       smear                 = "Fall17_V3b_MC",
+                                      isT1Smear               = True,
                                       jesUncertaintySources = "Merged",
                                       regroupTag            = "V2",
                                       mayWriteCache         = isNotWorker,
@@ -589,6 +591,7 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Autumn18_V19_MC",
                                       smear                 = "Autumn18_V7b_MC",
+                                      isT1Smear               = True,
                                       jesUncertaintySources = "Merged",
                                       regroupTag            = "V2",
                                       mayWriteCache         = isNotWorker,
@@ -1052,7 +1055,6 @@ One lepton and and one jet argument must be specified in addition to the require
         else:
             self.lambda_tauClean = lambda ta : op.c_float(True)
         self.tauCleanSel = op.select(self.tauSel, self.lambda_tauClean)
-
 
         #############################################################################
         #                                AK4 Jets                                   #
