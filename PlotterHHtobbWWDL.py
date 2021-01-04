@@ -111,11 +111,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             OSMuMuDilepton = self.MuMuFakeSel
             OSElMuDilepton = self.ElMuFakeSel
 
-        #----- Apply jet corrections -----#
-#        ElElSelObj.sel = self.beforeJetselection(ElElSelObj.sel,'ElEl')
-#        MuMuSelObj.sel = self.beforeJetselection(MuMuSelObj.sel,'MuMu')
-#        ElMuSelObj.sel = self.beforeJetselection(ElMuSelObj.sel,'ElMu')
-
         #----- DY reweighting -----#
         if 'DYEstimation' in self.datadrivenContributions:
             mode = 'mc' if "PseudoData" in self.datadrivenContributions else 'data'
