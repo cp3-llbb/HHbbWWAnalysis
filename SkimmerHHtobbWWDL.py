@@ -61,8 +61,6 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                 selObj = ElMuSelObj
                 dilepton = self.ElMuFakeSel[0]
 
-            selObj.sel = self.beforeJetselection(selObj.sel,self.args.Channel)
-
             #----- Jet selection -----#
             # Since the selections in one line, we can use the non copy option of the selection to modify the selection object internally
             if any([self.args.__dict__[item] for item in ["Ak4","Resolved0Btag","Resolved1Btag","Resolved2Btag"]]):

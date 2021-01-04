@@ -178,6 +178,10 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
     ElSelObject.yieldTitle += " + Tight selection"
     MuSelObject.yieldTitle += " + Tight selection"
 
+    #----- Apply jet corrections -----#
+    ElSelObj.sel = self.beforeJetselection(ElSelObj.sel,'El')
+    MuSelObj.sel = self.beforeJetselection(MuSelObj.sel,'Mu')
+
     if use_dd:
         enable = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg)
         ElSelObject.create(cut      = [lambda_tight_ele(self.electronsFakeSel[0]),
@@ -619,6 +623,7 @@ def makeDoubleLeptonSelection(self,baseSel,use_dd=True,fake_selection=False):
                                               self.muon_conept[self.ElMuFakeSel[0][1].idx] > self.electron_conept[self.electronsFakeSel[1].idx],
                                               self.electron_conept[self.ElMuFakeSel[0][0].idx] > self.muon_conept[self.muonsFakeSel[1].idx]))])
 
+
         #---- Opposite sign ----#
         ElElSelObj.selName += "OS"
         MuMuSelObj.selName += "OS"
@@ -707,6 +712,11 @@ def makeDoubleLeptonSelection(self,baseSel,use_dd=True,fake_selection=False):
 #            ElElSelObj.refine(cut = [op.rng_len(self.tauCleanSel) == 0])
 #            MuMuSelObj.refine(cut = [op.rng_len(self.tauCleanSel) == 0])
 #            ElMuSelObj.refine(cut = [op.rng_len(self.tauCleanSel) == 0])
+
+        #----- Apply jet corrections -----#
+        ElElSelObj.sel = self.beforeJetselection(ElElSelObj.sel,'ElEl')
+        MuMuSelObj.sel = self.beforeJetselection(MuMuSelObj.sel,'MuMu')
+        ElMuSelObj.sel = self.beforeJetselection(ElMuSelObj.sel,'ElMu')
 
         
         #---- Tight selection ----#
