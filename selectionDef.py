@@ -176,6 +176,10 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
     ElSelObject.yieldTitle += " + Tight selection"
     MuSelObject.yieldTitle += " + Tight selection"
 
+    #----- Apply jet corrections -----#
+    ElSelObj.sel = self.beforeJetselection(ElSelObj.sel,'El')
+    MuSelObj.sel = self.beforeJetselection(MuSelObj.sel,'Mu')
+
     if use_dd:
         enable = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg)
         ElSelObject.create(cut      = [lambda_tight_ele(self.electronsFakeSel[0]),
