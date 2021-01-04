@@ -5,6 +5,14 @@ class highlevelLambdas:
         # All the attributes of the BaseHH are contained in HHself object
         # All the lambdas will be saved in the highlevelLambdas object to avoid confusions of all the attributes of HH base object
 
+        # conept #
+        self.conept = lambda lep : op.switch(op.abs(lep.pdgId)==11,
+                                             HHself.electron_conept[lep.idx],
+                                             HHself.muon_conept[lep.idx])
+
+        self.electron_conept = lambda ele : HHself.electron_conept[ele.idx]
+        self.muon_conept     = lambda mu  : HHself.muon_conept[mu.idx]
+
         # 4-Momentum association #
         self.ll_p4 = lambda l1,l2 : l1.p4+l2.p4
         self.lljj_p4 = lambda l1,l2,j1,j2 : l1.p4+l2.p4+j1.p4+j2.p4
@@ -31,9 +39,21 @@ class highlevelLambdas:
         self.MT_W1W2_ljj = lambda lep,j1,j2,met : op.sqrt(2*self.lep2j_p4(lep,j1,j2).Pt()*met.pt*(1-op.cos(self.lep2j_p4(lep,j1,j2).Phi()-met.phi)))
         self.MT_W1W2_lj  = lambda lep,j1,met : op.sqrt(2*self.lep1j_p4(lep,j1).Pt()*met.pt*(1-op.cos(self.lep1j_p4(lep,j1).Phi()-met.phi)))
         # TODO : clean different versions (eg MT)
-        
+
         # dilep + dijet #
         self.M_lljj = lambda l1,l2,j1,j2 : op.invariant_mass(self.lljj_p4(l1,l2,j1,j2))
+        self.M_HH = lambda l1,l2,j1,j2,met : op.invariant_mass(l1.p4,l2.p4,j1.p4,j2.p4,met.p4)
+        self.MinDR_lj = lambda l1,l2,j1,j2 : op.min(op.min(op.deltaR(l1.p4,j1.p4),op.deltaR(l1.p4,j2.p4)),
+                                               op.min(op.deltaR(l2.p4,j1.p4),op.deltaR(l2.p4,j2.p4)))
+        self.MinDR_part1_partCont = lambda part1,partCont : op.rng_min(partCont, lambda part2 : op.deltaR(part1.p4, part2.p4))
+        self.MinDR_part1_dipart = lambda part1,dipart: op.min(*(op.deltaR(part1.p4, dipart[i2].p4) for i2 in range(2)))
+
+        self.JetsMinDR = lambda l,j1,j2 : op.min(op.deltaR(l.p4,j1.p4),op.deltaR(l.p4,j2.p4))
+        self.LepsMinDR = lambda j,l1,l2 : op.min(op.deltaR(j.p4,l1.p4),op.deltaR(j.p4,l2.p4))
+        
+        self.MinDR_lep3j = lambda lep,j1,j2,j3 : op.min(op.min(op.deltaR(lep.p4,j1.p4),op.deltaR(lep.p4,j2.p4)),op.deltaR(lep.p4,j3.p4))
+        
+
         self.MinDR_lj = lambda l1,l2,j1,j2 : op.min(op.min(op.deltaR(l1.p4,j1.p4),op.deltaR(l1.p4,j2.p4)),
                                                op.min(op.deltaR(l2.p4,j1.p4),op.deltaR(l2.p4,j2.p4)))
         
@@ -195,3 +215,11 @@ class highlevelLambdas:
         self.angleWWplane = lambda lp4, met, j3p4, j4p4 : op.acos(aDotB(j3p4+j4p4, self.neuP4(j3p4+j4p4+lp4, met)+lp4)/aMagB(j3p4+j4p4, self.neuP4(j3p4+j4p4+lp4, met)+lp4))
         #self.angleWWplane = lambda lp4, met, j3p4, j4p4 : ((j3p4+j4p4).Vect().Unit()).Angle((self.neuP4(j3p4+j4p4+lp4, met)+lp4).Vect().Unit())
         self.angleBetPlanes = lambda j1p4,j2p4,j3p4,j4p4 : op.acos(op.c_float(aDotB(j1p4+j2p4, j3p4+j4p4)/aMagB(j1p4+j2p4, j3p4+j4p4)))
+
+        self.empty_p4 = op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >",([op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.)]))
+        self.MET_LD_DL = lambda met, jets, electrons, muons : 0.6 * met.pt +\
+                    0.4* (op.rng_sum(jets, (lambda j : j.p4), start=self.empty_p4) + op.rng_sum(electrons, (lambda e : e.p4), start=self.empty_p4) + op.rng_sum(muons, (lambda m : m.p4), start=self.empty_p4)).Pt()
+
+    def getCorrBp4(self,j):
+        return  op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >", (j.pt*j.bRegCorr, j.eta, j.phi, j.mass*j.bRegCorr)) 
+

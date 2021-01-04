@@ -164,5 +164,8 @@ def returnParamMVAInputs(self):
     return {('year',     'Year',         (3,2016.,2019.))    : op.c_int(int(self.era))}
 
 def returnEventNrMVAInputs(self,t):
-    return {('eventnr',  'Event number', (int(1e6+1),0.,1e6))     : op.c_int(t.event)}
+    return {('eventnr',  'Event number', (int(1e6+1),0.,1e6))     : t.event}
 
+def inputStaticCast(inputDict,cast='float'):
+    return [op.static_cast(cast,v) for v in inputDict.values()]
+    
