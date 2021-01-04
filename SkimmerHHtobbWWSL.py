@@ -92,12 +92,10 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
             ElSelObj, MuSelObj = makeSingleLeptonSelection(self,noSel,use_dd=False)
             if self.args.Channel == "El":
                 selObj = ElSelObj
-                selObj.sel = self.beforeJetselection(selObj.sel, 'El')
                 lep = self.electronsTightSel[0]
                 
             if self.args.Channel == "Mu":
                 selObj = MuSelObj
-                selObj.sel = self.beforeJetselection(selObj.sel, 'Mu')
                 lep = self.muonsTightSel[0]
             
             #----- Jet selection -----#
@@ -188,7 +186,8 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
             if self.args.Hbb0Wj:
                 print("...... Hbb0Wj")
                 selObj = selObjAndJetsPerJpaCatDict.get('Hbb0Wj')[0]
-
+        else:
+            noSel = self.beforeJetselection(noSel)
             
         #---------------------------------------------------------------------------------------# 
         #                                 Synchronization tree                                  #
