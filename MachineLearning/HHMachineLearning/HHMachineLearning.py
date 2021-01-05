@@ -133,7 +133,7 @@ def main():
     from generate_mask import GenerateMask, GenerateSampleMasks, GenerateSliceIndices, GenerateSliceMask
     from split_training import DictSplit
     from concatenate_csv import ConcatenateCSV
-    from threadGPU import utilizationGPU
+    #from threadGPU import utilizationGPU
     from input_plots import InputPlots
     import parameters
 
@@ -286,7 +286,7 @@ def main():
                                                   eras                      = era,
                                                   tree_name                 = parameters.tree_name,
                                                   additional_columns        = {'tag':node,'era':era},
-                                                  stop                      = 500000) # TODO : remove 
+                                                  stop                      = 50000) # TODO : remove 
                     data_node_era = data_node_era.sample(frac=1)[:500000] # TODO : remove 
                     if data_node is None:
                         data_node = data_node_era
@@ -439,11 +439,11 @@ def main():
     # DNN #
     #############################################################################################
     # Start the GPU monitoring thread #
-    if opt.GPU:
-        thread = utilizationGPU(print_time = 900,
-                                print_current = False,
-                                time_step=0.01)
-        thread.start()
+    #if opt.GPU:
+    #    thread = utilizationGPU(print_time = 900,
+    #                            print_current = False,
+    #                            time_step=0.01)
+    #    thread.start()
 
     if opt.scan != '':
         instance = HyperModel(opt.scan,list_inputs,list_outputs)
@@ -469,10 +469,10 @@ def main():
                                resume=opt.resume)
             instance.HyperDeploy(best='eval_error')
 
-    if opt.GPU:
-        # Closing monitor thread #
-        thread.stopLoop()
-        thread.join()
+    #if opt.GPU:
+    #    # Closing monitor thread #
+    #    thread.stopLoop()
+    #    thread.join()
         
     if len(opt.model) != 0: 
         # Make path #
