@@ -74,26 +74,18 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             return plots
 
         #----- Machine Learning Model -----#                
-        DNNs = {}
-        model_nums = ["08"]
+        model_num = "08"
         if not self.args.OnlyYield:
-            for model_num in model_nums:
-                path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
-                print ("DNN model : %s"%path_model)
-                if not os.path.exists(path_model):
-                    raise RuntimeError('Could not find model file %s'%path_model)
-                try:
-                    if model_num in ["07"]:
-                        input_names = ["input_1","input_2","input_3","input_4","input_5","input_6"]
-                        output_name = "Identity"
-                    elif model_num in ["08","09"]:
-                        input_names = ["lep","jet","fat","met","hl","param","eventnr"]
-                        output_name = "Identity"
-                    else:
-                        raise NotImplementedError
-                    DNNs[model_num] = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
-                except:
-                    raise RuntimeError('Could not load model %s'%path_model)
+            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
+            print ("DNN model : %s"%path_model)
+            if not os.path.exists(path_model):
+                raise RuntimeError('Could not find model file %s'%path_model)
+            try:
+                input_names = ["lep","jet","fat","met","hl","param","eventnr"]
+                output_name = "Identity"
+                DNN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
+            except:
+                raise RuntimeError('Could not load model %s'%path_model)
 
         #----- Dileptons -----#
         ElElSelObj,MuMuSelObj,ElMuSelObj = makeDoubleLeptonSelection(self,noSel)
@@ -118,11 +110,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             OSElElDilepton = self.ElElFakeSel
             OSMuMuDilepton = self.MuMuFakeSel
             OSElMuDilepton = self.ElMuFakeSel
-
-        #----- Apply jet corrections -----#
-        ElElSelObj.sel = self.beforeJetselection(ElElSelObj.sel,'ElEl')
-        MuMuSelObj.sel = self.beforeJetselection(MuMuSelObj.sel,'MuMu')
-        ElMuSelObj.sel = self.beforeJetselection(ElMuSelObj.sel,'ElMu')
 
         #----- DY reweighting -----#
         if 'DYEstimation' in self.datadrivenContributions:
@@ -499,24 +486,18 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam))
             #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsEventNr))
             
-            for model_num,DNN in DNNs.items():
-                if model_num in ["01","02"]:
-                    inputs = {**inputsLeps,**inputsJets}
-                elif model_num in ["03","04"]:
-                    inputs = {**inputsLeps,**inputsJets,**inputsHL}
-                elif model_num in ["05","06"]:
-                    inputs = {**inputsLeps,**inputsJets,**inputsHL,**inputsParam}
-                elif model_num in ["07"]:
-                    inputs = {**inputsLeps,**inputsJets,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
-                elif model_num in ["08","09"]:
-                    inputs = {**inputsLeps,**inputsJets,**inputsFatjet,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
-                else:
-                    raise RuntimeError("Failed to understand model number")
+            inputs = [op.array("double",*inputStaticCast(inputsLeps,"float")),
+                      op.array("double",*inputStaticCast(inputsJets,"float")),
+                      op.array("double",*inputStaticCast(inputsFatjet,"float")),
+                      op.array("double",*inputStaticCast(inputsMET,"float")),
+                      op.array("double",*inputStaticCast(inputsHL,"float")),
+                      op.array("double",*inputStaticCast(inputsParam,"float")),
+                      op.array("long",*inputStaticCast(inputsEventNr,"long"))]
 
-                output = DNN(*inputs.values())
-                selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,suffix=model_num)
+            output = DNN(*inputs)
+            selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,suffix=model_num)
 
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
+            plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
             
     
         #----- Add the Yield plots -----#
