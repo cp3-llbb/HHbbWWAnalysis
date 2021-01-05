@@ -90,12 +90,12 @@ class ScaleFactorsbbWW:
                                                 entry_key   = 'DY_resolved_2016',
                                                 base_key    = '{channel}_{variable}_{type}_{btag}',
                                                 base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
-                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['data','mc'],'btag':['1b','2b'],'variable':['leadjetPt']})
+                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b'],'variable':['leadjetPt']})
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
                                                 entry_key   = 'DY_boosted_2016',
                                                 base_key    = '{channel}_{variable}_{type}_{btag}',
                                                 base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
-                                                format_dict = {'channel':['ElEl','MuMu','SSDL'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
+                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
 
 
         #  Fake rates #
@@ -170,6 +170,20 @@ class ScaleFactorsbbWW:
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'muon_tightMVArelaxed_2017',
                                 base_str    = "TTHSF_MuonRelaxedttHID_2017.json")
+
+        # DY weight  # 
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+                                                entry_key   = 'DY_resolved_2017',
+                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2017.json',
+                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b'],'variable':['leadjetPt']})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+                                                entry_key   = 'DY_boosted_2017',
+                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2017.json',
+                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
+
+
 
         ### POG ID ###
             # https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017
@@ -248,6 +262,18 @@ class ScaleFactorsbbWW:
         instance.AddScaleFactor(path_key    = 'ttH_SF',
                                 entry_key   = 'muon_tightMVArelaxed_2018',
                                 base_str    = "TTHSF_MuonRelaxedttHID_2018.json")
+
+        # DY weight  # 
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+                                                entry_key   = 'DY_resolved_2018',
+                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2018.json',
+                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b'],'variable':['leadjetPt']})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+                                                entry_key   = 'DY_boosted_2018',
+                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2018.json',
+                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
 
         ### POG ID ###
             # https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017

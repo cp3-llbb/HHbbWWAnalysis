@@ -1,5 +1,5 @@
 path_ZVeto: &path_ZVeto /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_Fake_DNN09/
-path_ZPeak: &path_ZPeak /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_ZPeak_Fake_DNN09/
+path_ZPeak: &path_ZPeak /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_Fake_ZPeak_DNN09/
 
 
 era: '2016'

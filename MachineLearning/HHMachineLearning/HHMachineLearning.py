@@ -353,14 +353,11 @@ def main():
                 InputPlots(train_all,list_inputs)
 
             # Randomize order, we don't want only one type per batch #
-            print ('before random')
             random_train = np.arange(0,train_all.shape[0]) # needed to randomize x,y and w in same fashion
             np.random.shuffle(random_train) # Not needed for testing
             train_all = train_all.iloc[random_train]
-            print ('after random')
               
             # Add target #
-            print ('beforeonehot')
             label_encoder = LabelEncoder()
             onehot_encoder = OneHotEncoder(sparse=False)
             label_encoder.fit(parameters.nodes)
@@ -383,7 +380,6 @@ def main():
             if not parameters.crossvalidation:
                 test_all = pd.concat([test_all,test_cat],axis=1)
                 test_all[list_inputs+list_outputs] = test_all[list_inputs+list_outputs].astype('float32')
-            print ('after onehot')
 
             # Preprocessing #
             # The purpose is to create a scaler object and save it

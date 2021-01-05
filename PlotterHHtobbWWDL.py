@@ -74,7 +74,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             return plots
 
         #----- Machine Learning Model -----#                
-        model_num = "08"
+        model_num = "09"
         if not self.args.OnlyYield:
             path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
             print ("DNN model : %s"%path_model)
@@ -131,11 +131,11 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             # Boosted : ElEl #
             self.BoostedDYReweighting1bElEl  =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'ElEl_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
                                                                    systName="dy_ee_boosted_reweighting_1b", 
-                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
+                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
             # Boosted : MuMu #
             self.BoostedDYReweighting1bMuMu  =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'MuMu_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
                                                                    systName="dy_mm_boosted_reweighting_1b", 
-                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
+                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
         else:
             self.ResolvedDYReweighting1bElEl = lambda dilep : None
             self.ResolvedDYReweighting2bElEl = lambda dilep : None
@@ -505,8 +505,5 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         #plots.extend(cutFlowPlots)
         plots.append(self.yields)
             
-        for plot in plots:
-            print (plot.name)
-
         #----- Return -----#
         return plots
