@@ -130,7 +130,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
     ElSelObject.refine(cut    = self.returnTriggers(["SingleElectron"]),
                        weight = ElLooseSF(self.electronsFakeSel[0]))    
     MuSelObject.refine(cut    = self.returnTriggers(["SingleMuon"]),
-                       weight = ElLooseSF(self.muonsFakeSel[0]))    
+                       weight = MuLooseSF(self.muonsFakeSel[0]))    
 
     #---- PT cuts ----#
     ElSelObject.selName += "PtCuts"
