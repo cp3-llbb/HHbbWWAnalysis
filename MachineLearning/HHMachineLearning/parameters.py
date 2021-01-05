@@ -170,16 +170,16 @@ grouped_loss = GroupedXEnt(group_ids)
 #}
 p = { 
     'lr' : [0.1], 
-    'first_neuron' : [256],
+    'first_neuron' : [128],
     'activation' : [relu],
     'dropout' : [0.],
     'hidden_layers' : [4], # does not take into account the first layer
     'output_activation' : [softmax],
     'l2' : [0.001],
     'optimizer' : [Adam],  
-    'epochs' : [10],   
-    'batch_size' : [200000], 
-    'n_particles' : [16],
+    'epochs' : [100],   
+    'batch_size' : [20000], 
+    'n_particles' : [0],
     'loss_function' : [grouped_loss],
 }
 
@@ -306,6 +306,7 @@ inputs = [
             'HT2_lepJetMet',
             'HT2R_lepJetMet',
     ]
+
 operations = [inp.split('@')[1] if '@' in inp else None  for inp  in  inputs]
 check_op = [(o is not None)*1 for o in operations]
 if check_op != sorted(check_op,reverse=True):

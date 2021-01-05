@@ -1,49 +1,51 @@
-path_ZVeto: &path_ZVeto /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV6_Tight_Fake_AllDNN/
-path_ZPeak: &path_ZPeak /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV6_Tight_Fake_ZPeak_AllDNN/
+path_ZVeto: &path_ZVeto /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_DNN09/
+path_ZPeak: &path_ZPeak /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_ZPeak_DNN09/
 
 era: '2018'
 title: 'Lead fatjet M soft drop'
 xaxis: 'Lead fatjet '
 filename: 'weight_fatjetsoftDropmass_{channel}_{type}_1D'
 category: 'boosted'
-rebin_1D: [0,30,40,50,60,70,80,90,100,120,160,200]
+rebin_1D: [0,30,50,70,100,150,300]
+
 
 ElElChannel:
   ZVeto_0b:
     path: *path_ZVeto
-    histname: ElEl_HasElElTightOneAk8JetInclusiveBoostedNoBtag_fatjet_softdropmass
+    histname: ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedNoBtag_B_M
   ZVeto_1b: 
     path: *path_ZVeto
-    histname: ElEl_HasElElTightOneAk8JetInclusiveBoostedOneBtag_fatjet_softdropmass
+    histname: ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag_B_M
   ZVeto_2b: 
     path: *path_ZVeto
-    histname: ElEl_HasElElTightOneAk8JetInclusiveBoostedOneBtag_fatjet_softdropmass
+    histname: ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag_B_M
   ZPeak_0b:
     path: *path_ZPeak
-    histname: ElEl_HasElElTightZPeakOneAk8JetInclusiveBoostedNoBtag_fatjet_softdropmass
+    histname: ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutZPeakTightSelectedOneAk8JetInclusiveBoostedNoBtag_B_M
   ZPeak_1b: 
     path: *path_ZPeak
-    histname: ElEl_HasElElTightZPeakOneAk8JetInclusiveBoostedOneBtag_fatjet_softdropmass
+    histname: ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutZPeakTightSelectedOneAk8JetInclusiveBoostedOneBtag_B_M
   ZPeak_2b: 
     path: *path_ZPeak
-    histname: ElEl_HasElElTightZPeakOneAk8JetInclusiveBoostedOneBtag_fatjet_softdropmass
+    histname: ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutZPeakTightSelectedOneAk8JetInclusiveBoostedOneBtag_B_M
 
 MuMuChannel:
   ZVeto_0b:
     path: *path_ZVeto
-    histname: MuMu_HasMuMuTightOneAk8JetInclusiveBoostedNoBtag_fatjet_softdropmass
+    histname: MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedNoBtag_B_M
   ZVeto_1b: 
     path: *path_ZVeto
-    histname: MuMu_HasMuMuTightOneAk8JetInclusiveBoostedOneBtag_fatjet_softdropmass
+    histname: MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag_B_M
   ZVeto_2b: 
     path: *path_ZVeto
-    histname: MuMu_HasMuMuTightOneAk8JetInclusiveBoostedOneBtag_fatjet_softdropmass
+    histname: MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag_B_M
   ZPeak_0b:
     path: *path_ZPeak
-    histname: MuMu_HasMuMuTightZPeakOneAk8JetInclusiveBoostedNoBtag_fatjet_softdropmass
+    histname: MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutZPeakTightSelectedOneAk8JetInclusiveBoostedNoBtag_B_M
   ZPeak_1b: 
     path: *path_ZPeak
-    histname: MuMu_HasMuMuTightZPeakOneAk8JetInclusiveBoostedOneBtag_fatjet_softdropmass
+    histname: MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutZPeakTightSelectedOneAk8JetInclusiveBoostedOneBtag_B_M
   ZPeak_2b: 
     path: *path_ZPeak
-    histname: MuMu_HasMuMuTightZPeakOneAk8JetInclusiveBoostedOneBtag_fatjet_softdropmass
+    histname: MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutZPeakTightSelectedOneAk8JetInclusiveBoostedOneBtag_B_M
+

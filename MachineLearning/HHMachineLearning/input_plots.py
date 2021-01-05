@@ -8,10 +8,11 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 import parameters
 
-def InputPlots(data,list_inputs):
-    if os.path.exists('inputs.pdf'):
+def InputPlots(data,list_inputs,path='.'):
+    pdf_path = os.path.join(os.path.abspath(path),'inputs.pdf')
+    if os.path.exists(pdf_path):
         return
-    pp = PdfPages('inputs.pdf')
+    pp = PdfPages(pdf_path)
     for inp in list_inputs:
         logging.info("\tPlotting %s"%inp)
         data[inp] = data[inp].astype(float)
@@ -69,5 +70,6 @@ def InputPlots(data,list_inputs):
         axs.set_ylabel("Events",fontsize=18)
         axs.legend(loc="upper right",fontsize=18)
         pp.savefig(fig)
+        plt.close(fig)
     pp.close()
-    logging.info('Produced inputs.pdf')
+    logging.info('Produced %s'%pdf_path)
