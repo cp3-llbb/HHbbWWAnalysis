@@ -179,8 +179,8 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
     MuSelObject.yieldTitle += " + Tight selection"
 
     #----- Apply jet corrections -----#
-    ElSelObj.sel = self.beforeJetselection(ElSelObj.sel,'El')
-    MuSelObj.sel = self.beforeJetselection(MuSelObj.sel,'Mu')
+    ElSelObject.sel = self.beforeJetselection(ElSelObject.sel,'El')
+    MuSelObject.sel = self.beforeJetselection(MuSelObject.sel,'Mu')
 
     if use_dd:
         enable = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg)
@@ -305,7 +305,7 @@ def makeCoarseBoostedSelection(self,selObject,copy_sel=False):
         selObject = copy(selObject)
     selObject.selName += "Ak8BJets"
     selObject.yieldTitle += " + Ak8 bJets $\geq 1$"
-    selObject.refine(cut=[op.rng_len(self.ak8BJets) >= 1])
+    selObject.refine(cut=[op.rng_len(self.ak8BJets) >= 1, op.rng_len()])
     if copy_sel:
         return selObject
 
@@ -332,7 +332,7 @@ def makeExclusiveLooseResolvedJetComboSelection(self,selObject,nbJet,copy_sel=Fa
         AppliedSF = None
         selObject.selName += "ExclusiveResolved2b1j"
         selObject.yieldTitle += " + Exclusive Resolved (nbJet = 2, nAk4LightJet = 1)"
-        selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 2],
+        selObject.refine(cut    = [op.rng_len(self.ak4BJets) >= 2],
                          weight = None)
     else: raise RuntimeError ("Error in Jet Selection!!!")
     
@@ -369,6 +369,65 @@ def makeExclusiveTightResolvedJetComboSelection(self,selObject,nbJet,copy_sel=Fa
 
     if copy_sel:
         return selObject
+
+
+def makeExclusiveResolvedJetComboSelection(self,selObject,nbJet,nJet,copy_sel=False):
+    if copy_sel:
+        selObject = copy(selObject)
+
+    if nJet == 4 : 
+        if nbJet == 0:
+            AppliedSF = None
+            selObject.selName += "ExclusiveResolved0b4j"
+            selObject.yieldTitle += " + Exclusive Resolved (nbJet = 0, nAk4LightJets $\geq 4$)"
+            selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 0, op.rng_len(self.ak4LightJetsByPt) >= 4],
+                             weight = AppliedSF)
+            
+        elif nbJet == 1:
+            AppliedSF = None
+            selObject.selName += "ExclusiveResolved1b3j"
+            selObject.yieldTitle += " + Exclusive Resolved (nbjet = 1, nAk4LightJets $\geq 3$)"
+            selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 1, op.rng_len(self.ak4LightJetsByPt) >= 3],
+                             weight = AppliedSF)
+            
+        elif nbJet == 2:
+            AppliedSF = None
+            selObject.selName += "ExclusiveResolved2b2j"
+            selObject.yieldTitle += " + Exclusive Resolved (nbjet $\geq 2$, nAk4LightJets $\geq 2$)"
+            selObject.refine(cut   = [op.rng_len(self.ak4BJets) >= 2,op.rng_len(self.ak4LightJetsByPt) >= 2],
+                             weight = AppliedSF)
+
+        else: raise RuntimeError ("Error in Jet Selection!!!")
+
+    if nJet == 3 : 
+        if nbJet == 0:
+            AppliedSF = None
+            selObject.selName += "ExclusiveResolved0b3j"
+            selObject.yieldTitle += " + Exclusive Resolved (nbJet = 0, nAk4LightJet = 3)"
+            selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 0, op.rng_len(self.ak4LightJetsByPt) == 3],
+                             weight = AppliedSF)
+        
+        elif nbJet == 1:
+            AppliedSF = None
+            selObject.selName += "ExclusiveResolved1b2j"
+            selObject.yieldTitle += " + Exclusive Resolved (nbJet = 1, nAk4LightJet = 2)"
+            selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 1, op.rng_len(self.ak4LightJetsByPt) == 2],
+                             weight = AppliedSF)
+            
+        elif nbJet == 2:
+            AppliedSF = None
+            selObject.selName += "ExclusiveResolved2b1j"
+            selObject.yieldTitle += " + Exclusive Resolved (nbJet = 2, nAk4LightJet = 1)"
+            selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 2, op.rng_len(self.ak4LightJetsByPt) == 1],
+                             weight = None)
+
+        else: raise RuntimeError ("Error in Jet Selection!!!")
+        
+
+    if copy_sel:
+        return selObject
+
+
 
 
 def makeSemiBoostedHbbSelection(self,selObject,nNonb,copy_sel=False):
