@@ -2,57 +2,52 @@ ROC_multi:
   tree: tree
   classes:
     - DY
+    - GGF
     - H
-    - HH
     - Rare
     - ST
     - TT
-    - TTVX
-    - VVV
+    - VBF
     - WJets
   prob_branches:
     - output_DY
+    - output_GGF
     - output_H
-    - output_HH
     - output_Rare
     - output_ST
     - output_TT
-    - output_TTVX
-    - output_VVV
+    - output_VBF
     - output_WJets
   labels:
     - P(DY)
+    - P(GGF)
     - P(H)
-    - P(HH)
     - P(Rare)
     - P(ST)
     - P(TT)
-    - P(TTVX)
-    - P(VVV)
+    - P(VBF)
     - P(WJets)
   colors:
-    - dodgerblue
-    - mediumaquamarine
-    - red
-    - darkviolet
-    - firebrick
-    - darkorange
-    - darkgreen
-    - y
-    - salmon 
+    - "#1a83a1"
+    - "#288a24"
+    - "#06b894"
+    - "#610596"
+    - "#99053d"
+    - "#cc7a16"
+    - "#8f0a1e"
+    - "#d95564"
 
   weight : 'event_weight'
   title : Multiclass
   cut : ''
   selector :
-    'DY' : 'DY'
-    'H' : 'H'
-    'HH' : 'HH'
-    'Rare' : 'Rare'
-    'ST' : 'ST'
-    'TT' : 'TT'
-    'TTVX' : 'TTVX'
-    'VVV': 'VVV'
-    'WJets': 'WJets'
+    'DY'    : 'DY'
+    'GGF'   : 'GGF'
+    'H'     : 'H'
+    'Rare'  : 'Rare'
+    'ST'    : 'ST'
+    'TT'    : 'TT'
+    'VBF'   : 'VBF'
+    'WJets' : 'WJets'
  
 

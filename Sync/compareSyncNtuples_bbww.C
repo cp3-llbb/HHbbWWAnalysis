@@ -118,16 +118,17 @@ NtupleMetaData
 /* *************************** EDIT THIS ***************************************/
 
 const std::string inputbase_dir = ".";
-//const std::string base_dir = "./sync_Tallinn_Louvain_2016";
-const std::string base_dir = "./sync_Tallinn_Louvain_2017";
+const std::string base_dir = "./sync_Tallinn_Louvain_2016";
+//const std::string base_dir = "./sync_Tallinn_Louvain_2017";
 //const std::string base_dir = "./sync_Tallinn_Louvain_2018";
 
 const std::vector<NtupleMetaData> ntupleMetadataMap = {
-//  { { "sync_bbww_Tallinn_2016_v11.root" }, "Tallinn",  "", inputbase_dir },
-//  { { "sync_bbww_Louvain_2016_v9.root" }, "Louvain", "", inputbase_dir },
+ { {"sync_bbww_Tallinn_2016_v14.root"} , "Tallinn",  "", inputbase_dir },
+ { {"sync_bbww_Louvain_2016_v14.root"} , "Louvain", "", inputbase_dir },
+ { {"sync_bbww_aachen_2016.root"} , "Aachen", "", inputbase_dir },
 
-  { { "sync_bbww_Tallinn_2017_v9.root" }, "Tallinn",  "", inputbase_dir },
-  { { "sync_bbww_Louvain_2017_v1.root" }, "Louvain", "", inputbase_dir },
+//  { { "sync_bbww_Tallinn_2017_v9.root" }, "Tallinn",  "", inputbase_dir },
+//  { { "sync_bbww_Louvain_2017_v1.root" }, "Louvain", "", inputbase_dir },
 
 //  { { "sync_bbww_Tallinn_2018_v8.root" }, "Tallinn",  "", inputbase_dir },
 //  { { "sync_bbww_Louvain_2018_v3.root" }, "Louvain", "", inputbase_dir },
@@ -646,6 +647,20 @@ void compareSyncNtuples(const std::string & base_dir,
   branchesToCompare.push_back(new branchEntryType("ak4Jet4_E", "F", "n_presel_ak4Jet >= 4", 100, 0., 250.));
   branchesToCompare.push_back(new branchEntryType("ak4Jet4_CSV", "F", "n_presel_ak4Jet >= 4", 100, 0., +1.));
   branchesToCompare.push_back(new branchEntryType("ak4Jet4_btagSF", "F", "n_presel_ak4Jet >= 4", 50, 0.5, +2.));
+
+  branchesToCompare.push_back(new branchEntryType("ak4JetVBF1_pt", "F", "n_presel_ak4Jet >= 1", 100, 0., 250.));
+  branchesToCompare.push_back(new branchEntryType("ak4JetVBF1_eta", "F", "n_presel_ak4Jet >= 1", 100, -3., +3.));
+  branchesToCompare.push_back(new branchEntryType("ak4JetVBF1_phi", "F", "n_presel_ak4Jet >= 1", 36, -TMath::Pi(), +TMath::Pi()));
+  branchesToCompare.push_back(new branchEntryType("ak4JetVBF1_E", "F", "n_presel_ak4Jet >= 1", 100, 0., 250.));
+  branchesToCompare.push_back(new branchEntryType("ak4JetVBF1_CSV", "F", "n_presel_ak4Jet >= 1", 100, 0., +1.));
+  branchesToCompare.push_back(new branchEntryType("ak4JetVBF1_btagSF", "F", "n_presel_ak4Jet >= 1", 50, 0.5, +2.));
+
+  branchesToCompare.push_back(new branchEntryType("ak4JetVBF2_pt", "F", "n_presel_ak4Jet >= 1", 100, 0., 250.));
+  branchesToCompare.push_back(new branchEntryType("ak4JetVBF2_eta", "F", "n_presel_ak4Jet >= 1", 100, -3., +3.));
+  branchesToCompare.push_back(new branchEntryType("ak4JetVBF2_phi", "F", "n_presel_ak4Jet >= 1", 36, -TMath::Pi(), +TMath::Pi()));
+  branchesToCompare.push_back(new branchEntryType("ak4JetVBF2_E", "F", "n_presel_ak4Jet >= 1", 100, 0., 250.));
+  branchesToCompare.push_back(new branchEntryType("ak4JetVBF2_CSV", "F", "n_presel_ak4Jet >= 1", 100, 0., +1.));
+  branchesToCompare.push_back(new branchEntryType("ak4JetVBF2_btagSF", "F", "n_presel_ak4Jet >= 1", 50, 0.5, +2.));
   
   branchesToCompare.push_back(new branchEntryType("ak8Jet1_pt", "F", "n_presel_ak8Jet >= 1", 100, 150., 650.));
   branchesToCompare.push_back(new branchEntryType("ak8Jet1_eta", "F", "n_presel_ak8Jet >= 1", 100, -3., +3.));
@@ -721,11 +736,22 @@ void compareSyncNtuples(const std::string & base_dir,
 
   branchesToCompare.push_back(new branchEntryType("PFMET", "F", "", 100, 0., 250.));
   branchesToCompare.push_back(new branchEntryType("PFMETphi", "F", "", 36, -TMath::Pi(), +TMath::Pi()));
+
+  branchesToCompare.push_back(new branchEntryType("vbf_m_jj", "F", "", 100, 0., 5000.));
+  branchesToCompare.push_back(new branchEntryType("vbf_dEta_jj", "F", "", 100, 3., 9.));
+
   branchesToCompare.push_back(new branchEntryType("PU_weight", "F", "", 100, 0., 2.));
   branchesToCompare.push_back(new branchEntryType("MC_weight", "F", "", 3, -1.5, 1.5));
   branchesToCompare.push_back(new branchEntryType("btag_SF", "F", "", 50, 0.5, 2.));
+  branchesToCompare.push_back(new branchEntryType("btag_ratio_SF", "F", "", 50, 0.5, 2.));
   branchesToCompare.push_back(new branchEntryType("trigger_SF", "F", "", 50, 0.5, 2.));
   branchesToCompare.push_back(new branchEntryType("lepton_IDSF", "F", "", 50, 0.5, 2.));
+  branchesToCompare.push_back(new branchEntryType("lepton_IDSF_recoToLoose", "F", "", 50, 0.5, 2.));
+  branchesToCompare.push_back(new branchEntryType("lepton_IDSF_looseToTight", "F", "", 50, 0.5, 2.));
+  branchesToCompare.push_back(new branchEntryType("L1prefire", "F", "", 50, 0.5, 2.));
+  branchesToCompare.push_back(new branchEntryType("fakeRate", "F", "", 50, 0.5, 2.));
+  branchesToCompare.push_back(new branchEntryType("topPt_wgt", "F", "", 50, 0.5, 2.));
+  branchesToCompare.push_back(new branchEntryType("PU_jetID_SF", "F", "", 50, 0.5, 2.));
 
   for ( std::vector<branchEntryType*>::const_iterator branch = branchesToCompare.begin();
         branch != branchesToCompare.end(); ++branch ) {
@@ -752,7 +778,7 @@ void compareSyncNtuples(const std::string & base_dir,
                    NULL, "",
                    NULL, "",
                    (*branch)->branchName_, 1.10,
-                   true, 1.e-4, 1.e+1, "N", 1.30,
+                   false, 1.e-4, 1.e+0, "N", 1.30,
                    0.16, 0.80,
                    outputFilePath, outputFileName);
 

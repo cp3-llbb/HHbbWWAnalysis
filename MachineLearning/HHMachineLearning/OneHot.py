@@ -18,9 +18,22 @@ class onehot_era:
     @property
     def add_dim(self):
         return 2
+class onehot_resolved_JPAcat:
+    def __call__(self,x):
+        return tf.one_hot(tf.cast(x - 1, "int32"),7)
+    @property
+    def add_dim(self):
+        return 6
+class onehot_boosted_JPAcat:
+    def __call__(self,x):
+        return tf.one_hot(tf.cast(x - 1, "int32"),3)
+    @property
+    def add_dim(self):
+        return 2
 class onehot_unit:
     def __call__(self,x):
-        return tf.expand_dims(x,1)
+        #return tf.expand_dims(x,1)
+        return x
     @property
     def add_dim(self):
         return 0
