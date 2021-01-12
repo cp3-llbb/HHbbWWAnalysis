@@ -1,5 +1,5 @@
-path_ZVeto: &path_ZVeto /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV6_Tight_Fake_AllDNN/
-path_ZPeak: &path_ZPeak /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV6_Tight_Fake_ZPeak_AllDNN/
+path_ZVeto: &path_ZVeto /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_DNN09/
+path_ZPeak: &path_ZPeak /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_ZPeak_DNN09/
 
 
 era: '2017'
@@ -9,42 +9,45 @@ filename: 'weight_leadjetPt_{channel}_{type}_1D'
 category: 'resolved'
 rebin_1D: [0,5,10,15,20,25,30,35,40,45,50,60,70,80,90,100,120,140,160,200]
 
+
+
 ElElChannel:
   ZVeto_0b:
     path: *path_ZVeto
-    histname: ElEl_HasElElTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt
+    histname: ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedNoBtag_b1_Pt
   ZVeto_1b: 
     path: *path_ZVeto
-    histname: ElEl_HasElElTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt
+    histname: ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag_b1_Pt
   ZVeto_2b: 
     path: *path_ZVeto
-    histname: ElEl_HasElElTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt
+    histname: ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags_b1_Pt
   ZPeak_0b:
     path: *path_ZPeak
-    histname: ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt
+    histname: ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutZPeakTightSelectedTwoAk4JetsExclusiveResolvedNoBtag_b1_Pt
   ZPeak_1b: 
     path: *path_ZPeak
-    histname: ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt
+    histname: ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutZPeakTightSelectedTwoAk4JetsExclusiveResolvedOneBtag_b1_Pt
   ZPeak_2b: 
     path: *path_ZPeak
-    histname: ElEl_HasElElTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt
+    histname: ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutZPeakTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags_b1_Pt
 
 MuMuChannel:
   ZVeto_0b:
     path: *path_ZVeto
-    histname: MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt
+    histname: MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedNoBtag_b1_Pt
   ZVeto_1b: 
     path: *path_ZVeto
-    histname: MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt
+    histname: MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag_b1_Pt
   ZVeto_2b: 
     path: *path_ZVeto
-    histname: MuMu_HasMuMuTightTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt
+    histname: MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags_b1_Pt
   ZPeak_0b:
     path: *path_ZPeak
-    histname: MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedNoBtag_leadjet_pt
+    histname: MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutZPeakTightSelectedTwoAk4JetsExclusiveResolvedNoBtag_b1_Pt
   ZPeak_1b: 
     path: *path_ZPeak
-    histname: MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedOneBtag_leadbjet_pt
+    histname: MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutZPeakTightSelectedTwoAk4JetsExclusiveResolvedOneBtag_b1_Pt
   ZPeak_2b: 
     path: *path_ZPeak
-    histname: MuMu_HasMuMuTightZPeakTwoAk4JetsExclusiveResolvedTwoBtags_leadbjet_pt
+    histname: MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutZPeakTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags_b1_Pt
+

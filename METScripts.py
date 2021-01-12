@@ -31,7 +31,7 @@ def METFilter(flags, era, isMC):
 
 
 class METcorrection:
-    # https://lathomas.web.cern.ch/lathomas/METStuff/XYCorrections/XYMETCorrection.h
+    # https://lathomas.web.cern.ch/lathomas/METStuff/XYCorrections/XYMETCorrection_withUL17andUL18.h
     def __init__(self,rawMET,pv,sample,era,isMC):
         if(era=='2016'):
             if isMC:
@@ -100,8 +100,8 @@ class METcorrection:
                     xcorr = (-0.531151,  1.37568)
                     ycorr = (-0.0884639, 1.57089)
         
-        METxcorr = xcorr[0] *pv.npvs+xcorr[1]
-        METycorr = ycorr[0] *pv.npvs+ycorr[1]
+        METxcorr = xcorr[0] *op.min(pv.npvs,op.c_int(100))+xcorr[1]
+        METycorr = ycorr[0] *op.min(pv.npvs,op.c_int(100))+ycorr[1]
         
         corrMETx = rawMET.pt*op.cos(rawMET.phi) +METxcorr
         corrMETy = rawMET.pt*op.sin(rawMET.phi) +METycorr
@@ -111,8 +111,11 @@ class METcorrection:
         self.pt  = op.sqrt(corrMETx**2 +corrMETy**2)
         self.eta = op.c_float(0.)
         self.phi = op.multiSwitch((corrMETx> 0,atan),(corrMETy> 0,atan+math.pi),atan-math.pi)
+        self.M   = op.c_float(0.)
 
-        self.p4 = op.construct("ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", 
-                        (corrMETx,corrMETy,op.c_float(0.),op.sqrt(corrMETx**2 +corrMETy**2)))
+        #self.p4 = op.construct("ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> >", 
+        #                (corrMETx,corrMETy,op.c_float(0.),op.sqrt(corrMETx**2 +corrMETy**2)))
+        self.p4 = op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >", 
+                        (self.pt,self.eta,self.phi,self.M))
 
 

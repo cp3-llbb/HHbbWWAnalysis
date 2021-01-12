@@ -235,7 +235,7 @@ def main():
     variables = parameters.inputs+parameters.LBN_inputs+parameters.outputs+parameters.other_variables
     variables = [v for i,v in enumerate(variables) if v not in variables[:i]] # avoid repetitons while keeping order
         
-    list_inputs  = parameters.inputs
+    list_inputs  = parameters.inputs + [inp for inp in parameters.LBN_inputs if inp not in parameters.inputs] 
     list_outputs = parameters.outputs
 
     # Load samples #
@@ -286,13 +286,13 @@ def main():
                                                   eras                      = era,
                                                   tree_name                 = parameters.tree_name,
                                                   additional_columns        = {'tag':node,'era':era},
-                                                  stop                      = 300000) # TODO : remove 
-                    data_node_era = data_node_era.sample(frac=1)[:300000] # TODO : remove 
+                                                  stop                      = 500000) # TODO : remove 
+                    data_node_era = data_node_era.sample(frac=1)[:500000] # TODO : remove 
                     if data_node is None:
                         data_node = data_node_era
                     else:
                         data_node = pd.concat([data_node,data_node_era],axis=0)
-                    era_str = '{:5s} class in era {} : sample size = {:10d}'.format(node,era,data_node_era.shape[0])
+                    era_str = '{:5s} class in era {}  : sample size = {:10d}'.format(node,era,data_node_era.shape[0])
                     if parameters.weight is not None:
                         era_str += ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_node_era[parameters.weight].sum(),data_node_era['event_weight'].sum())
                     logging.info(era_str)
@@ -311,7 +311,7 @@ def main():
                     sum_weights = data['event_weight'].sum()
                     logging.info('Sum of weight for %s samples : %.2e'%(node,sum_weights))
                     data['learning_weights'] = data['event_weight']/sum_weights*N
-                    logging.info('\t -> After equalization : %0.2e (factor %0.2e)'%(data['learning_weights'].sum(),1.e5/sum_weights))
+                    logging.info('\t -> After equalization : %0.2e (factor %0.2e)'%(data['learning_weights'].sum(),N/sum_weights))
                 else:
                     data['learning_weights'] = pd.Series([1.]*data.shape[0],index=data.index)
 
@@ -349,7 +349,8 @@ def main():
             #logging.info('Current memory usage : %0.3f GB'%(pid.memory_info().rss/(1024**3)))
 
             # Plots #
-            InputPlots(train_all,list_inputs+[inp for inp in parameters.LBN_inputs if inp not in list_inputs])
+            if opt.task == '':
+                InputPlots(train_all,list_inputs)
 
             # Randomize order, we don't want only one type per batch #
             random_train = np.arange(0,train_all.shape[0]) # needed to randomize x,y and w in same fashion
@@ -365,20 +366,20 @@ def main():
             if not parameters.crossvalidation:
                 test_integers = label_encoder.transform(test_all['tag']).reshape(-1, 1)
             # From labels to strings #
-            onehotobj = onehot_encoder.fit(np.arange(len(list_outputs)).reshape(-1, 1))
-            train_onehot = onehotobj.transform(train_integers)
+            onehot_encoder.fit(np.arange(len(list_outputs)).reshape(-1, 1))
+            train_onehot = onehot_encoder.transform(train_integers)
             if not parameters.crossvalidation:
-                test_onehot = onehotobj.transform(test_integers)
+                test_onehot = onehot_encoder.transform(test_integers)
             # From arrays to pd DF #
             train_cat = pd.DataFrame(train_onehot,columns=label_encoder.classes_,index=train_all.index)
             if not parameters.crossvalidation:
                 test_cat = pd.DataFrame(test_onehot,columns=label_encoder.classes_,index=test_all.index)
             # Add to full #
             train_all = pd.concat([train_all,train_cat],axis=1)
-            train_all[list_inputs+list_outputs+parameters.LBN_inputs] = train_all[list_inputs+list_outputs+parameters.LBN_inputs].astype('float32')
+            train_all[list_inputs+list_outputs] = train_all[list_inputs+list_outputs].astype('float32')
             if not parameters.crossvalidation:
                 test_all = pd.concat([test_all,test_cat],axis=1)
-                test_all[list_inputs+list_outputs+parameters.LBN_inputs] = test_all[list_inputs+list_outputs+parameters.LBN_inputs].astype('float32')
+                test_all[list_inputs+list_outputs] = test_all[list_inputs+list_outputs].astype('float32')
 
             # Preprocessing #
             # The purpose is to create a scaler object and save it
@@ -420,14 +421,15 @@ def main():
         # Produce scaler #
         MakeScaler(list_inputs  = list_inputs,
                    generator    = True,
-                   batch        = parameters.output_batch_size,
-                   list_samples = list_samples) 
+                   batch        = 100000,
+                   list_samples = list_samples,
+                   additional_columns={'era':0.,'tag':''}) 
             
         train_all = None
         test_all = None
-    list_inputs  = [var.replace('$','') for var in parameters.inputs]
-    list_outputs = [var.replace('$','') for var in parameters.outputs]
 
+    list_inputs  = [var.replace('$','') for var in list_inputs]
+    list_outputs = [var.replace('$','') for var in list_outputs]
 
     #############################################################################################
     # DNN #
@@ -445,7 +447,7 @@ def main():
             modelIds = list(range(parameters.N_models))
             if opt.modelId != -1:
                 if opt.modelId not in modelIds:
-                    raise RuntimeError("You asked model id %d but only these ids are avilable : ["+','.join([str(m) for m in modelIds])+']')
+                    raise RuntimeError("You asked model id %d but only these ids are available : ["+','.join([str(m) for m in modelIds])+']')
                 modelIds = [opt.modelId]
             for i in modelIds:
                 logging.info("*"*80)
@@ -473,6 +475,8 @@ def main():
         output_name = "test" 
         model_name = opt.model[0]
         if parameters.crossvalidation:
+            if parameters.N_models != len(opt.model):
+                raise RuntimeError('Cross validation requires %d models but you provided %d'%(parameters.N_models,len(opt.model)))
             model_name = model_name[:-1]
         path_output = os.path.join(parameters.path_out,model_name,output_name)
         if not os.path.exists(path_output):

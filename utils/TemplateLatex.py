@@ -147,23 +147,26 @@ class TemplateLatex:
                         ("DNNInput_mww_simplemet","DNN inputs (HL) : $M_{WW}^{simple MET}$"),   
                         ("DNNInput_max_m_jj","DNN inputs (HL) : $Max(M_{jj})$"),    
                         ("DNNInput_n_btag","DNN inputs (HL) : $N_{btag}$"),  
+                        # Selected variables #
+                        ('b1_Pt', 'Lead bjet $P_T$'),
+                        ('B_Pt', 'Fat bjet $P_T$'),
+                        ('l1_Pt', 'Lead lepton $P_T$'),
+                        ('met_Pt', 'MET $P_T$'),
+                        ('B_M', '$M_{B}^{softdrop}$'),
+                        ('combined_DRbb.','$\Delta R_{bb}$'),
+                        ('combined_DRll.','$\Delta R_{ll}$'),
+                        ('combined_DRllbb.','$\Delta R_{ll,bb}$'),
+                        ('combined_DRllB.','$\Delta R_{ll,B}$'),
+                        ('combined_mHH','$M_{HH}$'),
                         # Machine Learning outputs
-                        ("07DYnode_DNNOutput_DY", "DNN 07 Output DY"),
-                        ("07DYnode_DNNOutputRebin_DY", "DNN 07 Output DY"),
-                        ("07GGFnode_DNNOutput_GGF.", "DNN 07 Output GGF"),
-                        ("07GGFnode_DNNOutputRebin_GGF.", "DNN 07 Output GGF"),
-                        ("07Hnode_DNNOutput_H", "DNN 07 Output H"),
-                        ("07Hnode_DNNOutputRebin_H", "DNN 07 Output H"),
-                        ("07STnode_DNNOutput_ST", "DNN 07 Output ST"),
-                        ("07STnode_DNNOutputRebin_ST", "DNN 07 Output ST"),
-                        ("07TTVXnode_DNNOutput_TTVX", "DNN 07 Output TTVX"),
-                        ("07TTVXnode_DNNOutputRebin_TTVX", "DNN 07 Output TTVX"),
-                        ("07TTnode_DNNOutput_TT", "DNN 07 Output TT"),
-                        ("07TTnode_DNNOutputRebin_TT", "DNN 07 Output TT"),
-                        ("07VBFnode_DNNOutput_VBF.", "DNN 07 Output VBF"),
-                        ("07VBFnode_DNNOutputRebin_VBF.", "DNN 07 Output VBF"),
-                        ("07VVVnode_DNNOutput_VVV", "DNN 07 Output VV(V)"),
-                        ("07VVVnode_DNNOutputRebin_VVV", "DNN 07 Output VV(V)"),
+                        ("GGFnode_DNNOutput_GGF", "DNN Output GGF"),
+                        ("VBFnode_DNNOutput_VBF", "DNN Output VBF"),
+                        ("DYnode_DNNOutput_DY", "DNN Output DY"),
+                        ("Hnode_DNNOutput_H", "DNN Output H"),
+                        ("STnode_DNNOutput_ST", "DNN Output ST"),
+                        ("TTVXnode_DNNOutput_TTVX", "DNN Output TTVX"),
+                        ("TTnode_DNNOutput_TT", "DNN Output TT"),
+                        ("VVVnode_DNNOutput_VVV", "DNN Output VV(V)"),
                         ])
                 # "_" at beginning is useful to distinguish leading and subleading
                 # "." at end is useful to distinguish "HT2" and "HT2R"
@@ -285,7 +288,7 @@ class TemplateLatex:
         logging.info("Log available at %s"%(os.path.join(wd,'plots_compilation.log')))
         os.chdir(cwd)
         
-    def compileYield(self):
+    def compileYield(self,yieldFile):
         # Load tex file and edit content in string #
         text = r"""
 \documentclass{report}
@@ -296,18 +299,17 @@ class TemplateLatex:
 \begin{document}
                 """
         wd = os.path.dirname(self.texfile)
-        for dirpath in self.dirpaths:
-            with open(os.path.join(dirpath,"yields.tex"),"r") as f:
-                while True: 
-                    line = f.readline() 
-                    if not line:
-                        break
-                    if line.startswith(r"\begin{document}"):
-                        continue
-                    if line.startswith(r"\begin{tabular}"):
-                        text += r"\resizebox{\textwidth}{!}{"+"\n"
-                    text += line
-            text += "\n}\n"
+        with open(os.path.join(wd,yieldFile),"r") as f:
+            while True: 
+                line = f.readline() 
+                if not line:
+                    break
+                if line.startswith(r"\begin{document}"):
+                    continue
+                if line.startswith(r"\begin{tabular}"):
+                    text += r"\resizebox*{\textwidth}{!}{"+"\n"
+                text += line
+        text += "\n}\n"
         text += r"\end{document}"
 
         # Save new tex file #
@@ -340,8 +342,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Utility to generate Latex slides on the spot for the HH->bbWW analysis')
     parser.add_argument('-d','--dirnames', action='store', required=False, type=str, default='', nargs='+',
                         help='Path of the directory where the plots are (can be several separated by spaces')
-    parser.add_argument('-y','--yields', action='store_true', required=False, default=False,
-                        help='Wether to compile the yields.tex into yields.pdf')
+    parser.add_argument('-y','--yields', action='store', required=False, default=None,
+                        help='Name of the yield table tex file')
     parser.add_argument('--pdf', action='store_true', required=False, default=False,
                         help='Wether to produce the PDF ')
     parser.add_argument('--log', action='store_true', required=False, default=False,
@@ -356,7 +358,7 @@ if __name__ == "__main__":
 
     instance = TemplateLatex(opt.dirnames,opt.log)
     if opt.yields:
-        instance.compileYield()
+        instance.compileYield(opt.yields)
     if opt.pdf:
         instance.producePDF()
 

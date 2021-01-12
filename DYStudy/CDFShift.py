@@ -6,6 +6,8 @@ import ROOT
 from pprint import pprint
 from array import array
 
+ROOT.gROOT.SetBatch(True)
+
 #####
 # Loosely based on 
 # https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit/blob/102x/interface/th1fmorph.h
@@ -56,55 +58,52 @@ class CDFShift:
         edges1,cont1,err1 = self.getArray(self.cdf1)
         edges2,cont2,err2 = self.getArray(self.cdf2)
         edges3,cont3,err3 = self.getArray(self.cdf3)
-        cont1_up          = [cont1[i]+err1[i] for i in range(len(cont1))]
-        cont2_up          = [cont2[i]+err2[i] for i in range(len(cont2))]
-        cont1_down        = [max(cont1[i]-err1[i],0.) for i in range(len(cont1))]
-        cont2_down        = [max(cont2[i]-err2[i],0.) for i in range(len(cont2))]
-        if not cont1_up == sorted(cont1_up):
-            print (cont1_up)
-            cont1_up.sort()
-            print ('[Warning] Had to sort cont1_up')
-        if not cont1_down == sorted(cont1_down):
-            print (cont1_down)
-            cont1_down.sort()
-            print ('[Warning] Had to sort cont1_down')
-        if not cont2_up == sorted(cont2_up):
-            print (cont2_up)
-            cont2_up.sort()
-            print ('[Warning] Had to sort cont2_up')
-        if not cont2_down == sorted(cont2_down):
-            print (cont2_down)
-            cont2_down.sort()
-            print ('[Warning] Had to sort cont2_down')
+#        cont1_up          = [min(cont1[i]+err1[i],1.) for i in range(len(cont1))]
+#        cont2_up          = [min(cont2[i]+err2[i],1.) for i in range(len(cont2))]
+#        cont1_down        = [max(cont1[i]-err1[i],0.) for i in range(len(cont1))]
+#        cont2_down        = [max(cont2[i]-err2[i],0.) for i in range(len(cont2))]
+        cont1_up          = [cont1[i] for i in range(len(cont1))]
+        cont2_up          = [cont2[i] for i in range(len(cont2))]
+        cont1_down        = [cont1[i] for i in range(len(cont1))]
+        cont2_down        = [cont2[i] for i in range(len(cont2))]
 
-        if cont1_down[-1]<2:
-            cont1_down[-1] = 1
-            print ('[Warning] cdf 1 down variation does not reach 1, artificially fix that')
-        if cont2_down[-1]<1:
-            cont2_down[-1] = 1
-            print ('[Warning] cdf 2 down variation does not reach 1, artificially fix that')
+        def monotonize(cont):
+            for i in range(len(cont)-1):
+                if cont[i+1]<cont[i]:
+                    cont[i+1] = cont[i]
+            return cont
+        if cont1_down != sorted(cont1_down):
+            cont1_down = monotonize(cont1_down)
+        if cont2_down != sorted(cont2_down):
+            cont2_down = monotonize(cont2_down)
+        if cont1_up != sorted(cont1_up):
+            cont1_up = monotonize(cont1_up)
+        if cont2_up != sorted(cont2_up):
+            cont2_up = monotonize(cont2_up)
 
-        if self.verbose:
-            print ("Producing the nominal shift")
+        #if self.verbose:
+        print ("Producing the nominal shift")
         shift, ypos             = self.getShiftFromBinning(edges1,cont1,edges2,cont2)
-        if self.verbose:
-            print ("Producing the up shift")
+        #if self.verbose:
+        print ("Producing the up shift")
         shift_up, ypos_up       = self.getShiftFromBinning(edges1,cont1_up,edges2,cont2_up)
-        if self.verbose:
-            print ("Producing the down shift")
+        #if self.verbose:
+        print ("Producing the down shift")
         shift_down, ypos_down   = self.getShiftFromBinning(edges1,cont1_down,edges2,cont2_down)
 
         self.g,self.ginv              = self.plotShift(shift,ypos)
         self.g_up,self.ginv_up        = self.plotShift(shift_up,ypos_up)
         self.g_down,self.ginv_down    = self.plotShift(shift_down,ypos_down)
         
-        self.rootsave['g']          = self.g
-        self.rootsave['ginv']       = self.ginv
-        self.rootsave['g_up']       = self.g_up
-        self.rootsave['ginv_up']    = self.ginv_up
-        self.rootsave['g_down']     = self.g_down
-        self.rootsave['ginv_down']  = self.ginv_down
+        self.rootsave['shift']           = self.g
+        self.rootsave['shift_inv']       = self.ginv
+        self.rootsave['shift_up']        = self.g_up
+        self.rootsave['shift_inv_up']    = self.ginv_up
+        self.rootsave['shift_down']      = self.g_down
+        self.rootsave['shift_inv_down']  = self.ginv_down
 
+        #if self.verbose:
+        print ("Applying shift")
         nedges3,ncont3,nerr3 = self.applyShift(edges3,cont3,err3,shift,ypos,shift_up,ypos_up,shift_down,ypos_down)
 
         nh3raw,ncdf3raw = self.makeHistAndCDF(nedges3,ncont3,nerr3,'nh3raw')
@@ -174,10 +173,14 @@ class CDFShift:
         iil = len(cdf)-1
         while(cdf[iil-1] >= cdf[iil]):
             iil -= 1
+            if iil == 0:
+                break
         # Find beginning of curves (non-zero) #
         iif = 0
         while (cdf[iif+1] <= cdf[iif]):
             iif += 1
+            if iif == len(cdf)-1:
+                break
         return iif,iil
 
 
@@ -247,7 +250,7 @@ class CDFShift:
 
                 i1 += 1
 
-            # Tak e point in h2, find corresponding in h1 #
+            # Take point in h2, find corresponding in h1 #
             elif select12 == 2:
                 x2 = e2[i2+1]
                 y = c2[i2]
@@ -302,7 +305,6 @@ class CDFShift:
     def assertMonoticallyIncreasing(cdf,name):
         for i in range(len(cdf)-1):
             if cdf[i]>cdf[i+1]+1e-6 and cdf[i]<1: # Sometimes errors at edge
-                print (cdf)
                 raise RuntimeError("CDF %s not monotically increasing : cdf[%d]=%.10f -> cdf[%d]=%.10f"%(name,i,cdf[i],i+1,cdf[i+1]))
 
     def applyShift(self,e3,c3,err3,sn,yn,su,yu,sd,yd):
@@ -315,6 +317,9 @@ class CDFShift:
         iuf,iul = self.getFirstAndLastBins(yu)
         idf,idl = self.getFirstAndLastBins(yd)
 
+
+#        import IPython
+#        IPython.embed()
         ne3 = []
         nc3 = []
         nerr3 = []
@@ -343,8 +348,8 @@ class CDFShift:
 
             up_var = su[iiu] + (y-yu[iiu])/(yu[iiu+1]-yu[iiu]) * (su[iiu+1]-su[iiu])
             down_var = sd[iid] + (y-yd[iid])/(yd[iid+1]-yd[iid]) * (sd[iid+1]-sd[iid])
-            shift_var[i] = max(shift_var[i-1],math.sqrt(0.5*((sn[iin]-up_var)**2+(sn[iin]-down_var)**2)))
-            #shift_var[i] = math.sqrt(0.5*((sn[iin]-up_var)**2+(sn[iin]-down_var)**2))
+            #shift_var[i] = max(shift_var[i-1],math.sqrt(0.5*((sn[iin]-up_var)**2+(sn[iin]-down_var)**2)))
+            shift_var[i] = math.sqrt(0.5*((sn[iin]-up_var)**2+(sn[iin]-down_var)**2))
 
             assert y>=yu[iiu] and y<=yu[iiu+1]
             assert y>=yd[iid] and y<=yd[iid+1]
@@ -368,14 +373,17 @@ class CDFShift:
                 print ("-> Shift is %0.10f"%x)
             
             if len(ne3)>0 and e3[i]+x < ne3[-1]:
-                print ('Warning : idx %d %.10f [y = %.10f] < %.10f]'%(i,ne3[-1],y,e3[i]+x))
+                print ('Warning : idx %d x[i-1]=%.10f [y = %.10f] > x[i]=%.10f'%(i,ne3[-1],y,e3[i]+x))
             elif e3[i]+x > e3[-1]:
                 print ('Warning : idx %d %.10f after last bin %.10f'%(i,e3[i]+x,e3[-1]))
             else:
                 kept_idx.append(i)
                 nc3.append(y)
                 ne3.append(e3[i]+x)
-                #nerr3.append(math.sqrt(err3[i]**2+shift_var[i]**2))
+                #if len(nerr3) == 0:
+                #    nerr3.append(math.sqrt(err3[i]**2+shift_var[i]**2))
+                #else:
+                #    nerr3.append(max(nerr3[-1],math.sqrt(err3[i]**2+shift_var[i]**2)))
                 nerr3.append(err3[i])
             ngc3.append(y)
             nge3.append(e3[i]+x)
@@ -390,7 +398,7 @@ class CDFShift:
         self.gncdf3 = ROOT.TGraph(len(ngc3))
         for i in range(len(ngc3)):
             self.gncdf3.SetPoint(i,nge3[i+1],ngc3[i])
-        self.rootsave['gncdf3'] = self.gncdf3
+        self.rootsave['ncdf3_graph'] = self.gncdf3
     
         self.cdf_bin_err = ROOT.TGraph(len(kept_idx))
         for i,ik in enumerate(kept_idx):
@@ -411,6 +419,8 @@ class CDFShift:
 
     @staticmethod
     def makeHistAndCDF(edges,cdfcont,cdferr,name):
+        assert cdfcont == sorted(cdfcont)
+        assert cdferr == sorted(cdferr)
         hcont = []
         herr = []
         for i in range(len(cdfcont)-2,-1,-1):
@@ -506,6 +516,20 @@ class CDFShift:
 
 
     def returnHist(self):
-        print ("\nWeight 2b integral : %0.5f\n"%self.weight_2b.Integral())
+        """ return hist with bin errors """
         return self.nh3
+
+    def returnHistAndSyst(self):
+        """ returns hist + up fluctuation + down fluctuation """
+        nh3 = deepcopy(self.nh3)
+        nh3Up = deepcopy(self.nh3)
+        nh3Down = deepcopy(self.nh3)
+        for i in range(1,nh3.GetNbinsX()+1):
+            nh3Up.SetBinContent(i,nh3Up.GetBinContent(i)+nh3Up.GetBinError(i))
+            nh3Down.SetBinContent(i,nh3Down.GetBinContent(i)-nh3Down.GetBinError(i))
+            nh3Up.SetBinError(i,0.)
+            nh3Down.SetBinError(i,0.)
+            nh3.SetBinError(i,0.)
+        return nh3,nh3Up,nh3Down
+
         

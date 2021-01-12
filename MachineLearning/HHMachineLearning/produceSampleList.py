@@ -47,7 +47,8 @@ for era in ['2016','2017','2018']:
     
     samplesBack = {k:v['group'] for k,v in yamlBack['samples'].items()}
     samplesSig= [k for k in yamlSig['samples'].keys()]
-    conv_dict = {'DY':'DY','ttbar':'TT','ST':'ST','VVV':'VVV','ttVX':'TTVX','SM':'H','Rares':'Rare','Wjets':'Rares'}
+    #conv_dict = {'DY':'DY','ttbar':'TT','ST':'ST','VVV':'VVV','ttVX':'TTVX','SM':'H','Rares':'Rare','Wjets':'Rares'} # DL
+    conv_dict = {'DY':'DY','ttbar':'TT','ST':'ST','VVV':'Rare','ttVX':'Rare','SM':'H','Rares':'Rare','Wjets':'WJets'} # SL
     
     nodeDict = {}
     dirDict = defaultdict(list) 

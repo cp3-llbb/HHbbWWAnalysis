@@ -67,16 +67,16 @@ def finalize(path,force=False,verbose=False,onlyFailed=False):
         print (sbatch_cmd)
         return sbatch_cmd
     else:
-        samples = sorted(list(set([item for sublist in content.values() for item in sublist])))
         if force:
             print ("Careful ! Force hadding the output")
             content  = {k:v for k,v in content.items() if v is not None}
         else:
             print ("All the outputs are present, will hadd them now") 
-            samples = [sample for sample in samples if sample not in [os.path.basename(f) for f in glob.glob(os.path.join(path,'results','*.root'))]]
-            if len(samples) == 0:
-                print ('All root files are in results dir, if you want to force hadd, use --force')
-                return 0
+        samples = sorted(list(set([item for sublist in content.values() for item in sublist])))
+        samples = [sample for sample in samples if sample not in [os.path.basename(f) for f in glob.glob(os.path.join(path,'results','*.root'))]]
+        if len(samples) == 0:
+            print ('All root files are in results dir, remove them to hadd again')
+            return 0
         for sample in samples:
             if sample is '':
                 continue

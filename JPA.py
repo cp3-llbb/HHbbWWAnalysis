@@ -15,7 +15,7 @@ from itertools import chain
 ###################################################################################################################
 
 ###################################################################################################################
-#                                    Jet-Parton Assignment BDTs (1st stage)                                       #
+#               Jet-Parton Assignment BDTs (input variables for each of the JPA categories)                       #
 ###################################################################################################################
 # Resolved 2b2Wj :: JPA_4jet
 
@@ -24,11 +24,11 @@ def bJetCorrPT(j):
 
 def evaluateJPA_2b2Wj(lepton, muons, electrons, ak4jets, jets, bJetsL, bJetsM, met, model, HLL):
     #invars = [op.c_float(0.)]*14
-    invars = [jets[0].btagDeepFlavB,                                                      # bjet1_btagCSV
+    invars = [jets[0].btagDeepFlavB,                                                  # bjet1_btagCSV
               bJetCorrPT(jets[1]),                                                    # bjet2_ptReg
-              jets[1].btagDeepFlavB,                                                      # bjet2_btagCSV
+              jets[1].btagDeepFlavB,                                                  # bjet2_btagCSV
               jets[1].qgl,                                                            # bjet2_qgDiscr
-              op.max(jets[2].btagDeepFlavB,jets[3].btagDeepFlavB),                            # maxwjetbtagCSV
+              op.max(jets[2].btagDeepFlavB,jets[3].btagDeepFlavB),                    # maxwjetbtagCSV
               bJetCorrPT(jets[3]),                                                    # wjet2_ptReg
               jets[3].qgl,                                                            # wjet2_qgDiscr
               HLL.Wjj_simple(jets[2].p4, jets[3].p4).M(),                             # HadW_mass
@@ -45,13 +45,13 @@ def evaluateJPA_2b2Wj(lepton, muons, electrons, ak4jets, jets, bJetsL, bJetsM, m
 # Resolved 2b1Wj :: JPA_MissingWjet
 def evaluateJPA_2b1Wj(lepton, muons, electrons, ak4jets, jets, bJetsL, bJetsM, met, model, HLL):
     #invars = [op.c_float(0.)]*13
-    invars = [jets[0].btagDeepFlavB,                                                      # bjet1_btagCSV
+    invars = [jets[0].btagDeepFlavB,                                                  # bjet1_btagCSV
               bJetCorrPT(jets[1]),                                                    # bjet2_ptReg
-              jets[1].btagDeepFlavB,                                                      # bjet2_btagCSV
+              jets[1].btagDeepFlavB,                                                  # bjet2_btagCSV
               jets[1].qgl,                                                            # bjet2_qgDiscr
               op.abs(lepton.eta - jets[1].eta),                                       # dEta_bjet2_lep
               bJetCorrPT(jets[2]),                                                    # wjet1_ptReg
-              jets[2].btagDeepFlavB,                                                      # wjet1_btagCSV
+              jets[2].btagDeepFlavB,                                                  # wjet1_btagCSV
               jets[2].qgl,                                                            # wjet1_qgDiscr
               op.abs(lepton.eta - jets[2].eta),                                       # dEta_wjet1_lep
               op.deltaR(jets[0].p4, jets[1].p4),                                      # dR_bjet1bjet2 
@@ -65,9 +65,9 @@ def evaluateJPA_2b1Wj(lepton, muons, electrons, ak4jets, jets, bJetsL, bJetsM, m
 def evaluateJPA_2b0Wj(lepton, muons, electrons, ak4jets, jets, bJetsL, bJetsM, met, model, HLL):
     #invars = [op.c_float(0.)]*9
     invars = [bJetCorrPT(jets[0]),                                                    # bjet1_ptReg
-              jets[0].btagDeepFlavB,                                                      # bjet1_btagCSV
+              jets[0].btagDeepFlavB,                                                  # bjet1_btagCSV
               bJetCorrPT(jets[1]),                                                    # bjet2_ptReg
-              jets[1].btagDeepFlavB,                                                      # bjet2_btagCSV
+              jets[1].btagDeepFlavB,                                                  # bjet2_btagCSV
               jets[1].qgl,                                                            # bjet2_qgDiscr
               op.abs(lepton.eta - jets[1].eta),                                       # dEta_bjet2_lep
               (HLL.bJetCorrP4(jets[0]) + HLL.bJetCorrP4(jets[1])).M(),                # Hbb_massReg
@@ -80,10 +80,10 @@ def evaluateJPA_2b0Wj(lepton, muons, electrons, ak4jets, jets, bJetsL, bJetsM, m
 def evaluateJPA_1b2Wj(lepton, muons, electrons, ak4jets, jets, bJetsL, bJetsM, met, model, HLL):
     #invars = [op.c_float(0.)]*12
     invars = [bJetCorrPT(jets[0]),                                                    # bjet1_ptReg
-              jets[0].btagDeepFlavB,                                                      # bjet1_btagCSV
+              jets[0].btagDeepFlavB,                                                  # bjet1_btagCSV
               bJetCorrPT(jets[1]),                                                    # wjet1_ptReg
-              jets[1].btagDeepFlavB,                                                      # wjet1_btagCSV
-              jets[2].btagDeepFlavB,                                                      # wjet2_btagCSV
+              jets[1].btagDeepFlavB,                                                  # wjet1_btagCSV
+              jets[2].btagDeepFlavB,                                                  # wjet2_btagCSV
               jets[2].qgl,                                                            # wjet2_qgDiscr
               HLL.Wjj_simple(jets[1].p4, jets[2].p4).M(),                             # HadW_mass
               op.deltaR(HLL.Wjj_simple(jets[1].p4, jets[2].p4), lepton.p4),           # dR_HadW_lep
@@ -98,11 +98,11 @@ def evaluateJPA_1b2Wj(lepton, muons, electrons, ak4jets, jets, bJetsL, bJetsM, m
 def evaluateJPA_1b1Wj(lepton, muons, electrons, ak4jets, jets, bJetsL, bJetsM, met, model, HLL):
     #invars = [op.c_float(0.)]*12
     invars = [bJetCorrPT(jets[0]),                                                    # bjet1_ptReg
-              jets[0].btagDeepFlavB,                                                      # bjet1_btagCSV
+              jets[0].btagDeepFlavB,                                                  # bjet1_btagCSV
               jets[0].qgl,                                                            # bjet1_qgDiscr
               op.abs(lepton.eta - jets[0].eta),                                       # dEta_bjet1_lep              
               bJetCorrPT(jets[1]),                                                    # wjet1_ptReg
-              jets[1].btagDeepFlavB,                                                      # wjet1_btagCSV
+              jets[1].btagDeepFlavB,                                                  # wjet1_btagCSV
               jets[1].qgl,                                                            # wjet1_qgDiscr
               op.abs(lepton.eta - jets[1].eta),                                       # dEta_wjet1_lep
               op.rng_len(ak4jets),                                                    # nJets
@@ -117,7 +117,7 @@ def evaluateJPA_1b0Wj(lepton, muons, electrons, ak4jets, jets, bJetsL, bJetsM, m
     #invars = [op.c_float(0.)]*8
     invars = [lepton.pt,                                                              # leptonPt                                         
               bJetCorrPT(jets[0]),                                                    # bjet1_ptReg
-              jets[0].btagDeepFlavB,                                                      # bjet1_btagCSV
+              jets[0].btagDeepFlavB,                                                  # bjet1_btagCSV
               jets[0].qgl,                                                            # bjet1_qgDiscr
               op.abs(lepton.eta - jets[0].eta),                                       # dEta_bjet1_lep
               op.rng_len(ak4jets),                                                    # nJets
@@ -140,7 +140,7 @@ def evaluateJPA_Hbb2Wj(lepton, muons, electrons, fatJets, jets, bJetsL, bJetsM, 
               op.min(HLL.dR_HadW_bjet(fatJets[0].subJet1.p4, jets[0].p4, jets[1].p4), # min_dR_HadW_bjet
                      HLL.dR_HadW_bjet(fatJets[0].subJet2.p4, jets[0].p4, jets[1].p4)),
               op.deltaR(jets[0].p4, jets[1].p4),                                      # dR_wjet1wjet2
-              HLL.HWW_simple(jets[0].p4, jets[1].p4, lepton.p4, met).M()               # Hww_mass 
+              HLL.HWW_simple(jets[0].p4, jets[1].p4, lepton.p4, met).M()              # Hww_mass 
           ]
     
     return model(*invars, defineOnFirstUse=False)[0]
@@ -162,7 +162,7 @@ def evaluateJPA_Hbb1Wj(lepton, muons, electrons, fatJets, jets, bJetsL, bJetsM, 
     return model(*invars, defineOnFirstUse=False)[0]
     
 ###################################################################################################################
-#                                        Jet-Parton Assignment BDTs (2nd stage)                                   #
+#                            Jet-Parton Assignment BDTs (asiign categories and jets)                              #
 ###################################################################################################################
 def toJetIndices(jpaJetList):
     #maxJPAJets = tojetIndices(JPAJetList)[maxIdx]
@@ -230,8 +230,8 @@ def findJPACategoryResolved (self, selObj, lepton, muons, electrons, jets, bJets
             best = op.rng_max_element_by(combo2_1b0W_1Wj, lambdaFunc)            ## hack: index of best is first in a pair, with the maximum value as second
             maxScore = best.idx.op.this.result.second
             
-        #JPAMaxScoreList.append(op.pow((1.0 + op.sqrt((1 - maxScore)/(1 + maxScore))), -1))
-        JPAMaxScoreList.append(maxScore)
+        JPAMaxScoreList.append(op.pow((1.0 + op.sqrt((1 - maxScore)/(1 + maxScore))), -1))
+        #JPAMaxScoreList.append(maxScore)
         bestCombo_per_cat.append(best)
 
     evtCat = makeOddEvenEvaluator(event%2, modelPathDict.get('evCat')[1], modelPathDict.get('evCat')[0], mvaType="TMVA")
@@ -250,12 +250,12 @@ def findJPACategoryResolved (self, selObj, lepton, muons, electrons, jets, bJets
         outSelObj.yieldTitle += " in %s node"%node 
         outSelObj.refine(cut = (maxIdx == i)) 
         #outSelObj.refine(cut = [maxVal == op.c_int(i)]) 
-        if plot_yield:
-            outSelObj.makeYield(self.yieldPlots)
+        #if plot_yield:
+        #    outSelObj.makeYield(self.yieldPlots)
         if i < 6:
             selObjJPAjetsIdxDict[node] = [outSelObj, bestCombo_per_cat[i]]
         else:
-            selObjJPAjetsIdxDict[node] = [outSelObj, bestCombo_per_cat[i-1]]
+            selObjJPAjetsIdxDict[node] = [outSelObj, bestCombo_per_cat[i-1]] # bestCombo_per_cat[i-1] :: Obsolete. 
     return JPAMaxScoreList, evtCatOutList, selObjJPAjetsIdxDict
     
 # ----------------------------------- Boosted -------------------------------------- #
@@ -266,10 +266,8 @@ def findJPACategoryBoosted (self, selObj, lepton, muons, electrons, fatJets, jet
     JPAMaxScoreList = []
     bestCombo_per_cat = []
     
-    print (nodeList)
-        
     combo2     = op.combine(jets, N=2, pred=lambda j1,j2 : j1.pt > j2.pt, samePred=lambda j1,j2 : j1.idx != j2.idx)
-    fakeCombo2 = op.combine(jets, N=2, pred=lambda j1,j2 : j1.pt > j2.pt, samePred=None)
+    fakeCombo2 = op.combine(jets, N=2, pred=lambda j1,j2 : j1.pt >= j2.pt, samePred=None)
 
     funckeys = [k for k in JPAfuncDict.keys()]
     for idx, func in enumerate(funckeys):
@@ -283,10 +281,12 @@ def findJPACategoryBoosted (self, selObj, lepton, muons, electrons, fatJets, jet
             maxScore = op.switch(best.idx != -1, best.idx.op.this.result.second, op.c_float(-1.))
         else:
             best = op.rng_max_element_by(fakeCombo2, lambdaFunc)
-            #maxScore = best.idx.op.this.result.second
-            maxScore = op.switch(best.idx != -1, best.idx.op.this.result.second, op.c_float(-1.))
+            #best = op.rng_max_element_by(combo2, lambdaFunc)
+            maxScore = best.idx.op.this.result.second
+            #maxScore = op.switch(best.idx != -1, best.idx.op.this.result.second, op.c_float(-1.))
 
         JPAMaxScoreList.append(op.pow((1.0 + op.sqrt((1 - maxScore)/(1 + maxScore))), -1))
+        #JPAMaxScoreList.append(maxScore)
         bestCombo_per_cat.append(best)
 
     evtCat = makeOddEvenEvaluator(event%2, modelPathDict.get('evCat')[1], modelPathDict.get('evCat')[0], mvaType="TMVA")
@@ -303,12 +303,12 @@ def findJPACategoryBoosted (self, selObj, lepton, muons, electrons, fatJets, jet
         outSelObj.selName += '%s'%node
         outSelObj.yieldTitle += " in %s node"%node 
         outSelObj.refine(cut = [maxIdx == op.c_int(i)])
-        if plot_yield:
-            outSelObj.makeYield(self.yieldPlots)
+        #if plot_yield:
+        #    outSelObj.makeYield(self.yieldPlots)
         if i < 2:
             selObjJPAjetsIdxDict[node] = [outSelObj, bestCombo_per_cat[i]]
         else:
-            selObjJPAjetsIdxDict[node] = [outSelObj, bestCombo_per_cat[i-1]]
+            selObjJPAjetsIdxDict[node] = [outSelObj, bestCombo_per_cat[i-1]] # bestCombo_per_cat[i-1] : Obsolete
 
     return JPAMaxScoreList, JPAL2outList, selObjJPAjetsIdxDict
     
