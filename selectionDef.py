@@ -58,7 +58,7 @@ class SelectionObject:
 #===============================================================================================#
 #                                        Selections                                             #
 #===============================================================================================#
-def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True): 
+def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_selection=False): 
     """
     Produces the requested lepton selection (encapsulated in SelectionObject class objects)
     Will produce a dict :
@@ -203,18 +203,35 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                            ddWeight = [self.MuFakeFactor(self.muonsFakeSel[0])]+MuTightSF(self.muonsFakeSel[0]),
                            enable   = enable)
     else:
-        ElSelObject.refine(cut    = [lambda_tight_ele(self.electronsFakeSel[0]),
-                                     op.rng_len(self.electronsTightSel) == 1,
-                                     op.rng_len(self.muonsTightSel) == 0,
-                                     self.electronsTightSel[0].idx == self.electronsFakeSel[0].idx],
-                           weight = ElTightSF(self.electronsTightSel[0]))
-        MuSelObject.refine(cut    = [lambda_tight_mu(self.muonsFakeSel[0]),
-                                     op.rng_len(self.muonsTightSel) == 1,
-                                     op.rng_len(self.electronsTightSel) == 0,
-                                     self.muonsTightSel[0].idx == self.muonsFakeSel[0].idx],
-                           weight = MuTightSF(self.muonsTightSel[0]))
-        # -> in SR : lead lepton is self.electronsTightSel[0] or self.muonsTightSel[0]
-        # -> in Fake CR : lead lepton is self.electronsFakeSel[0] or self.muonsFakeSel[0]
+        if not fake_selection:
+            ElSelObject.refine(cut    = [lambda_tight_ele(self.electronsFakeSel[0]),
+                                         op.rng_len(self.electronsTightSel) == 1,
+                                         op.rng_len(self.muonsTightSel) == 0,
+                                         self.electronsTightSel[0].idx == self.electronsFakeSel[0].idx],
+                               weight = ElTightSF(self.electronsTightSel[0]))
+            MuSelObject.refine(cut    = [lambda_tight_mu(self.muonsFakeSel[0]),
+                                         op.rng_len(self.muonsTightSel) == 1,
+                                         op.rng_len(self.electronsTightSel) == 0,
+                                         self.muonsTightSel[0].idx == self.muonsFakeSel[0].idx],
+                               weight = MuTightSF(self.muonsTightSel[0]))
+        else :
+            '''
+            ElSelObject.create(cut    = [lambda_fake_ele(self.electronsFakeSel[0]), 
+                                         op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel)<=1],
+                               weight = ElTightSF(self.electronsFakeSel[0]))
+            MuSelObject.create(cut    = [lambda_fake_mu(self.muonsFakeSel[0]), 
+                                         op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel)<=1],
+                               weight = MuTightSF(self.muonsFakeSel[0]))
+
+            '''
+            ElSelObject.refine(cut    = [op.rng_len(self.electronsFakeSel) == 1,
+                                         op.rng_len(self.muonsFakeSel) == 0],
+                               weight = ElTightSF(self.electronsFakeSel[0]))
+            MuSelObject.refine(cut    = [op.rng_len(self.electronsFakeSel) == 0,
+                                         op.rng_len(self.muonsFakeSel) == 1],
+                               weight = MuTightSF(self.muonsFakeSel[0]))
+            # -> in SR : lead lepton is self.electronsTightSel[0] or self.muonsTightSel[0]
+            # -> in Fake CR : lead lepton is self.electronsFakeSel[0] or self.muonsFakeSel[0]
 
     # Return # 
     return [ElSelObject,MuSelObject]

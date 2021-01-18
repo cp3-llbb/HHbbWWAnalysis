@@ -1235,7 +1235,8 @@ One lepton and and one jet argument must be specified in addition to the require
         # Ak4 Jet Collection cleaned from Ak8b #
         #self.lambda_cleanAk4FromAk8b = lambda ak4j : op.NOT(op.AND(op.rng_len(self.ak8BJets) > 0, op.deltaR(ak4j.p4,self.ak8BJets[0].p4) <= 0.8))
         self.lambda_cleanAk4FromAk8b = lambda ak4j : op.AND(op.rng_len(self.ak8BJets) > 0, op.deltaR(ak4j.p4,self.ak8BJets[0].p4) > 1.2)
-        self.ak4JetsCleanedFromAk8b  = op.select(self.ak4LightJetsByPt, self.lambda_cleanAk4FromAk8b)
+        #self.ak4JetsCleanedFromAk8b  = op.select(self.ak4LightJetsByPt, self.lambda_cleanAk4FromAk8b)
+        self.ak4JetsCleanedFromAk8b  = op.select(self.ak4Jets, self.lambda_cleanAk4FromAk8b)
         
         # used as a BDT input for SemiBoosted category
         self.lambda_btaggedSubJets = lambda fjet : op.switch(self.lambda_ak8Btag_bothSubJets(fjet), op.c_float(2.0), op.c_float(1.0))
@@ -1294,7 +1295,7 @@ One lepton and and one jet argument must be specified in addition to the require
             #def cleanVBFwithJPA_Boosted(self, jpaJets, nJpaJets):
             #    return lambda j : op.AND(op.rng_len(self.ak8BJets) >= 1, op.OR(op.OR(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets))),
             #                                                                   op.deltaR(self.ak8Jets[0].p4, j.p4) > 1.2))
-            print('VBF <<>> ak4/8-jets  cleaning is in Skimmer now!!!')
+            print('VBF <<>> ak4/8-jets  cleaning is in Plotter and Skimmer now!!! Would need to move them here')
 
         #############################################################################
         #                             Scalefactors                                  #
