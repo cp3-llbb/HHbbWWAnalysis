@@ -607,17 +607,15 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
         varsToKeep['nfakeableElectrons'] = op.static_cast("UInt_t",op.rng_len(self.electronsFakeSel))
         varsToKeep['hT'] = op.static_cast("Float_t", self.HLL.HT_SL(self.ak4Jets)) # highlevelLambdas.py : L-53
 
+        varsToKeep['nAk4Jets']  = op.static_cast("UInt_t",op.rng_len(self.ak4Jets))
+        varsToKeep['nAk4BJets'] = op.static_cast("UInt_t",op.rng_len(self.ak4BJets))
+        varsToKeep['nAk4BJetsLoose'] = op.static_cast("UInt_t",op.rng_len(self.ak4BJetsLoose))
+        varsToKeep['nAk8Jets']  = op.static_cast("UInt_t",op.rng_len(self.ak8Jets))
+        varsToKeep['nAk8BJets'] = op.static_cast("UInt_t",op.rng_len(self.ak8BJets))
+        varsToKeep['nAk4JetsCleandWithAk8b'] = op.static_cast("UInt_t",op.rng_len(self.ak4JetsCleanedFromAk8b))
+        
         #----- Jet variables -----#
         if any([self.args.__dict__[item] for item in ["Ak4","Res2b2Wj","Res2b1Wj","Res2b0Wj","Res1b2Wj","Res1b1Wj","Res1b0Wj","Res0b"]]):
-
-            varsToKeep['nAk4Jets']  = op.static_cast("UInt_t",op.rng_len(self.ak4Jets))
-            varsToKeep['nAk4BJets'] = op.static_cast("UInt_t",op.rng_len(self.ak4BJets))
-            varsToKeep['nAk4BJetsLoose'] = op.static_cast("UInt_t",op.rng_len(self.ak4BJetsLoose))
-            varsToKeep['nAk8Jets']  = op.static_cast("UInt_t",op.rng_len(self.ak8Jets))
-            varsToKeep['nAk8BJets'] = op.static_cast("UInt_t",op.rng_len(self.ak8BJets))
-            varsToKeep['nAk4JetsCleandWithAk8b'] = op.static_cast("UInt_t",op.rng_len(self.ak4JetsCleanedFromAk8b))
-
-            
             varsToKeep['L1_2b2Wj'] = L1out[0]
             varsToKeep['L1_2b1Wj'] = L1out[1]
             varsToKeep['L1_1b2Wj'] = L1out[2]
@@ -713,6 +711,8 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep['cosThetaS_HH_simple_met'] = op.static_cast("Float_t", self.HLL.comp_cosThetaS(self.HLL.bJetCorrP4(jet1)+self.HLL.bJetCorrP4(jet2), 
                                                                                                       self.HLL.HWW_met_simple(jet3.p4,jet4.p4,lepton.p4,MET.p4))) \
                 if self.args.Res2b2Wj else op.static_cast("Float_t",op.c_float(0.))
+
+            varsToKeep['mHH']    = (jet3.p4+jet4.p4+lepton.p4+MET.p4+self.HLL.bJetCorrP4(jet1)+self.HLL.bJetCorrP4(jet2)).M() if self.args.Res2b2Wj else op.static_cast("Float_t",op.c_float(0.))
 
             # neu p4 only for 1b2Wj and 2b2Wj
             varsToKeep["neuPx"] = self.HLL.neuP4(jet3.p4+jet4.p4+lepton.p4, MET).Px()  if any([self.args.Res2b2Wj, self.args.Res1b2Wj]) else op.static_cast("Float_t",op.c_float(0.))
@@ -821,11 +821,13 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
 
         #----- Fatjet variables -----#
         if any([self.args.__dict__[item] for item in ["Ak8","Hbb2Wj","Hbb1Wj","Hbb0Wj"]]):
-                
-            varsToKeep['nAk8BJets'] = op.static_cast("UInt_t",op.rng_len(self.ak8BJets))
-            varsToKeep['nAk4JetsCleandWithAk8b'] = op.static_cast("UInt_t",op.rng_len(self.ak4JetsCleanedFromAk8b))
-            #varsToKeep['HT'] = op.static_cast("Float_t", self.HLL.HT(self.ak4JetsCleanedFromAk8b))
+            varsToKeep['L1_Hbb2Wj'] = L1out[0]
+            varsToKeep['L1_Hbb1Wj'] = L1out[1]
 
+            varsToKeep['L2_Hbb2Wj'] = L2out[0]
+            varsToKeep['L2_Hbb1Wj'] = L2out[1]
+            varsToKeep['L2_Hbb0Wj'] = L2out[2]
+                
             varsToKeep['fatbj_Px']             = fatjet.p4.Px()
             varsToKeep['fatbj_Py']             = fatjet.p4.Py()
             varsToKeep['fatbj_Pz']             = fatjet.p4.Pz()
