@@ -17,7 +17,7 @@ from grouped_entropy import GroupedXEnt
 ##################################  Path variables ####################################
 
 main_path = os.path.abspath(os.path.dirname(__file__))
-path_out = '/home/ucl/cp3/fbury/scratch/HHMachineLearning_output/'
+path_out = '/nfs/scratch/fynu/gsaha/HHMachineLearning_output/'
 path_model = os.path.join(main_path,'model')
 
 ##############################  Datasets proportion   #################################
@@ -53,7 +53,6 @@ time = '0-18:00:00' # days-hh:mm:ss
 mem = '9000' # ram in MB
 tasks = '1' # Number of threads(as a string) (not parallel training for classic mode)
 workers = 20
-
 ##################################  Naming ######################################
 # Physics Config #
 config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL.yml')
@@ -61,7 +60,7 @@ lumidict = {'2016':35922,'2017':41529.152060112,'2018':59740.565201546}
 eras = ['2016']
 #eras = ['2016','2017','2018'] # To enable or disable eras, add or remove from this list
 
-categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj']
+categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj']
 channels = ['El','Mu']
 
 # Better put them in alphabetical order
@@ -177,8 +176,8 @@ p = {
     'output_activation' : [softmax],
     'l2' : [0.001],
     'optimizer' : [Adam],  
-    'epochs' : [10],   
-    'batch_size' : [200000], 
+    'epochs' : [100],   
+    'batch_size' : [20000], 
     'n_particles' : [16],
     'loss_function' : [grouped_loss],
 }

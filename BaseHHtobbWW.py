@@ -154,6 +154,10 @@ One lepton and and one jet argument must be specified in addition to the require
                                 action      = "store_true",
                                 default     = False,
                                 help        = "Produce the plots/skim for the exclusive 2b2Wj JPA category")
+        parser.add_argument("--Res1b3Wj", 
+                                action      = "store_true",
+                                default     = False,
+                                help        = "Produce the plots/skim for the exclusive 1b3Wj JPA category") # for basic reco only
         parser.add_argument("--Res2b1Wj", 
                                 action      = "store_true",
                                 default     = False,
@@ -1093,8 +1097,6 @@ One lepton and and one jet argument must be specified in addition to the require
         self.ak4JetsPreSelForPUID = op.select(self.ak4JetsByPt, lambda j : op.AND(j.pt<=50.,self.lambda_ak4JetsPreSel(j)))
         self.ak4JetsPreSel        = op.select(self.ak4JetsByPt, lambda j : op.AND(self.lambda_ak4JetsPreSel(j),self.lambda_jetPUID(j)))
 
-
-
         # Cleaning #
         if self.args.POGID:
             self.lambda_cleanAk4Jets = lambda j : op.AND(op.NOT(op.rng_any(self.electronsTightSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.4 )), 
@@ -1174,7 +1176,9 @@ One lepton and and one jet argument must be specified in addition to the require
         # Doesn't contain the leading bTag scored Light Jet
         self.remainingJets = op.select(self.ak4LightJetsByPt, lambda jet : jet.idx != self.ak4LightJetsByBtagScore[0].idx)
         self.remainingJetPairs = lambda jets : op.combine(jets, N=2)
-        # Wjj selection for resolved2b2j
+        #self.remainingJets = op.select(self.ak4Jets, lambda jet : op.NOT(op.OR(jet.idx == self.ak4JetsByBtagScore[0].idx,
+        #                                                                       jet.idx == self.ak4JetsByBtagScore[1].idx)))
+        #self.remainingJetPairs = lambda jets : op.combine(jets, N=2)
 
         #############################################################################
         #                                AK8 Jets                                   #
@@ -1190,7 +1194,11 @@ One lepton and and one jet argument must be specified in addition to the require
                                                              # Fatjet subjets must exist before checking Pt and eta 
                                                       op.AND(j.msoftdrop >= 30, j.msoftdrop <= 210),
                                                       j.tau2/j.tau1 <= 0.75)
-        self.ak8JetsPreSel = op.select(self.ak8JetsByDeepB, self.lambda_ak8JetsPreSel) if channel == 'SL' else op.select(self.ak8JetsByPt, self.lambda_ak8JetsPreSel)
+
+        if channel == 'SL':
+            self.ak8JetsPreSel = op.select(self.ak8JetsByDeepB, self.lambda_ak8JetsPreSel)
+        if channel == 'DL':
+            self.ak8JetsPreSel = op.select(self.ak8JetsByPt, self.lambda_ak8JetsPreSel)
 
         # Cleaning #
         if self.args.POGID:
@@ -1225,9 +1233,11 @@ One lepton and and one jet argument must be specified in addition to the require
         self.ak8BJets = op.select(self.ak8Jets, self.lambda_ak8Btag)
         self.ak8nonBJets = op.select(self.ak8Jets, self.lambda_ak8noBtag)
         # Ak4 Jet Collection cleaned from Ak8b #
-        self.lambda_cleanAk4FromAk8b = lambda ak4j : op.NOT(op.AND(op.rng_len(self.ak8BJets) > 0, op.deltaR(ak4j.p4,self.ak8BJets[0].p4) <= 0.8))
-        self.ak4JetsCleanedFromAk8b  = op.select(self.ak4LightJetsByPt, self.lambda_cleanAk4FromAk8b)
-
+        #self.lambda_cleanAk4FromAk8b = lambda ak4j : op.NOT(op.AND(op.rng_len(self.ak8BJets) > 0, op.deltaR(ak4j.p4,self.ak8BJets[0].p4) <= 0.8))
+        self.lambda_cleanAk4FromAk8b = lambda ak4j : op.AND(op.rng_len(self.ak8BJets) > 0, op.deltaR(ak4j.p4,self.ak8BJets[0].p4) > 1.2)
+        #self.ak4JetsCleanedFromAk8b  = op.select(self.ak4LightJetsByPt, self.lambda_cleanAk4FromAk8b)
+        self.ak4JetsCleanedFromAk8b  = op.select(self.ak4Jets, self.lambda_cleanAk4FromAk8b)
+        
         # used as a BDT input for SemiBoosted category
         self.lambda_btaggedSubJets = lambda fjet : op.switch(self.lambda_ak8Btag_bothSubJets(fjet), op.c_float(2.0), op.c_float(1.0))
         self.nMediumBTaggedSubJets = op.rng_sum(self.ak8BJets, self.lambda_btaggedSubJets)
@@ -1285,7 +1295,7 @@ One lepton and and one jet argument must be specified in addition to the require
             #def cleanVBFwithJPA_Boosted(self, jpaJets, nJpaJets):
             #    return lambda j : op.AND(op.rng_len(self.ak8BJets) >= 1, op.OR(op.OR(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets))),
             #                                                                   op.deltaR(self.ak8Jets[0].p4, j.p4) > 1.2))
-            print('VBF <<>> ak4/8-jets  cleaning is in Skimmer now!!!')
+            print('VBF <<>> ak4/8-jets  cleaning is in Plotter and Skimmer now!!! Would need to move them here')
 
         #############################################################################
         #                             Scalefactors                                  #
