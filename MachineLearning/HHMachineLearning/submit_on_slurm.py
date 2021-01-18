@@ -27,7 +27,7 @@ def submit_on_slurm(name,args,debug=False):
     config.sbatch_time = parameters.time
     config.sbatch_memPerCPU= parameters.mem
     #config.sbatch_additionalOptions = ['-n '+str(parameters.tasks)]
-    config.sbatch_additionalOptions = ['--exclude=mb-sab[001-005,007-009,011-021,081-084,087-088,090,101-103],mb-opt[015-018,021,024-025,031,042,051-052,054,056-064,067-079,111,114-116],mb-ivy[201-208,211-212,214-217,219,220-222,224-227],mb-wes[001-002,003,005-019,021-051,053-055,057-074,076-086,251-252]']
+    config.sbatch_additionalOptions = ['--exclude=mb-sab[001-005,007-021,081-084,087-088,090,101-103],mb-opt[015-018,021,024-025,031,042,051-052,054,056-064,067-079,111,114-116],mb-ivy[201-208,211-212,214-217,219,220-222,224-227],mb-wes[001-002,003,005-019,021-051,053-055,057-074,076-086,251-252]']
     if GPU:
         config.sbatch_additionalOptions += ['--gres gpu:1','--export=NONE']
     config.inputSandboxContent = []

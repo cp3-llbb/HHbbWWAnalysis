@@ -873,15 +873,15 @@ def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,use_dd=T
             selObject.create(ddSuffix  = "DYEstimation",
                              cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0], 
                              weight    = AppliedSF,
-                             ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-                             ddWeight  = self.ResolvedDYReweighting1bElEl(self.ak4LightJetsByBtagScore[0]), 
+                             ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0,(self.tree.event//5)%2==0],
+                             ddWeight  = 2*self.ResolvedDYReweighting1bElEl(self.ak4LightJetsByBtagScore[0]), 
                              enable    = enable)
         elif "MuMu" in selObject.selName:
             selObject.create(ddSuffix  = "DYEstimation",
                              cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
                              weight    = AppliedSF,
-                             ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-                             ddWeight  = self.ResolvedDYReweighting1bMuMu(self.ak4LightJetsByBtagScore[0]), 
+                             ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0,(self.tree.event//5)%2==0],
+                             ddWeight  = 2*self.ResolvedDYReweighting1bMuMu(self.ak4LightJetsByBtagScore[0]), 
                              enable    = enable)
         elif "ElMu" in selObject.selName:
             selObject.refine(cut    = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0], 
@@ -917,15 +917,15 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,use_dd=
             selObject.create(ddSuffix  = "DYEstimation",
                              cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
                              weight    = AppliedSF,
-                             ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-                             ddWeight  = self.ResolvedDYReweighting2bElEl(self.ak4LightJetsByBtagScore[0]), 
+                             ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0,(self.tree.event//5)%2==1],
+                             ddWeight  = 2*self.ResolvedDYReweighting2bElEl(self.ak4LightJetsByBtagScore[0]), 
                              enable    = enable)
         elif "MuMu" in selObject.selName:
             selObject.create(ddSuffix  = "DYEstimation",
                              cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
                              weight    = AppliedSF,
-                             ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0],
-                             ddWeight  = self.ResolvedDYReweighting2bMuMu(self.ak4LightJetsByBtagScore[0]), 
+                             ddCut     = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0,(self.tree.event//5)%2==1],
+                             ddWeight  = 2*self.ResolvedDYReweighting2bMuMu(self.ak4LightJetsByBtagScore[0]), 
                              enable    = enable)
         elif "ElMu" in selObject.selName:
             selObject.refine(cut    = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],

@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 import json
 import argparse
 import talos
@@ -34,6 +34,7 @@ class KerasToTensorflowModel:
 
         if len(models) == 1:
             self.save_model_to_protobuf(models[0])
+            self.makeInputList(models[0])
         elif len(models) > 1 :
             print ("Will stitch models :")
             for i in range(len(models)):
@@ -45,6 +46,7 @@ class KerasToTensorflowModel:
             stitch_model = self.stich_models(models)
             if self.test_stich(stitch_model,models):
                 self.save_model_to_protobuf(stitch_model)
+                self.makeInputList(stitch_model)
             else:
                 raise RuntimeError("Stitching test failed")
         else:
@@ -119,6 +121,17 @@ class KerasToTensorflowModel:
         model_path = os.path.join(self.outdir,self.name)
         model.save(model_path)
         print ("Saved model as {}".format(model_path))
+
+    def makeInputList(self,model):
+        txtfile = os.path.join(self.outdir,self.name,'inputs.txt')
+        with open(txtfile,"w") as f:
+            for layer in model.layers:
+                if 'InputLayer' in  str(type(layer)):
+                    f.write("{:50} -> {}\n".format(layer.name,str(layer.input_shape)))
+
+        print ("Saved input txt file as {}".format(txtfile))
+                    
+         
         
     
 if __name__ == '__main__':

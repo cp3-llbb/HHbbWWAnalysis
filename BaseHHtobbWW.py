@@ -22,16 +22,16 @@ from DDHelper import DataDrivenPseudoData
 class BaseNanoHHtobbWW(NanoAODModule):
     """ Base module: HH->bbW(->e/µ nu)W(->e/µ nu) histograms from NanoAOD """
     def __init__(self, args):
-            super(BaseNanoHHtobbWW, self).__init__(args)
-            # Set plots options #
-            self.plotDefaults = {"show-ratio": True,
-                                 "y-axis-show-zero" : True,
-                                 #"normalized": True,
-                                 "y-axis": "Events",
-                                 "log-y"  : "both",
-                                 "ratio-y-axis-range" : [0.8,1.2],
-                                 "ratio-y-axis" : '#frac{Data}/{MC}',
-                                 "sort-by-yields" : True}
+        super(BaseNanoHHtobbWW, self).__init__(args)
+        # Set plots options #
+        self.plotDefaults = {"show-ratio": True,
+                             "y-axis-show-zero" : True,
+                             #"normalized": True,
+                             "y-axis": "Events",
+                             "log-y"  : "both",
+                             "ratio-y-axis-range" : [0.8,1.2],
+                             "ratio-y-axis" : '#frac{Data}{MC}',
+                             "sort-by-yields" : True}
 
     #-------------------------------------------------------------------------------------------#
     #                                       addArgs                                             #
@@ -658,9 +658,9 @@ One lepton and and one jet argument must be specified in addition to the require
 
         return tree,noSel,be,lumiArgs
 
-    def initialize(self,forSkimmer=False):
+    def initialize(self):
         super(BaseNanoHHtobbWW, self).initialize()
-        if not forSkimmer and "PseudoData" in self.datadrivenContributions:
+        if "PseudoData" in self.datadrivenContributions:
             contrib = self.datadrivenContributions["PseudoData"]
             self.datadrivenContributions["PseudoData"] = DataDrivenPseudoData(contrib.name, contrib.config)
 
@@ -1294,8 +1294,8 @@ One lepton and and one jet argument must be specified in addition to the require
         if self.is_MC:
             #---- PU ID SF ----#
             # Efficiency and mistags do not have uncertainties, the systematics are in the SF 
-            self.jetpuid_mc_eff = self.SF.get_scalefactor("lepton", ('jet_puid_eff','eff_{}_L'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer))
-            self.jetpuid_mc_mis = self.SF.get_scalefactor("lepton", ('jet_puid_eff','mistag_{}_L'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer))
+            self.jetpuid_mc_eff = self.SF.get_scalefactor("lepton", ('jet_puid_eff','eff_{}_L'.format(era)),combine="weight", systName="jetpuid_eff", defineOnFirstUse=(not forSkimmer))
+            self.jetpuid_mc_mis = self.SF.get_scalefactor("lepton", ('jet_puid_eff','mistag_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag", defineOnFirstUse=(not forSkimmer))
             self.jetpuid_sf_eff = self.SF.get_scalefactor("lepton", ('jet_puid_sf','eff_{}_L'.format(era)),combine="weight", systName="jetpuid_eff_sf", defineOnFirstUse=(not forSkimmer))
             self.jetpuid_sf_mis = self.SF.get_scalefactor("lepton", ('jet_puid_sf','mistag_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag_sf", defineOnFirstUse=(not forSkimmer))
 

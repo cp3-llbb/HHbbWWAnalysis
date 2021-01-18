@@ -37,7 +37,7 @@ ROC_multi:
     - "#8f0a1e"
     - "#d95564"
 
-  weight : 'event_weight'
+  weight : '1'
   title : Multiclass
   cut : ''
   selector :

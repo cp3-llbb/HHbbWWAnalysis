@@ -34,6 +34,9 @@ class DataCard:
         
         self.yaml_dict = self.loadYaml(os.path.join(self.path,yamlName))
 
+        with open('systematics.yml','r') as handle:
+            self.systematics = yaml.load(handle,Loader=yaml.FullLoader)
+
         if self.pseudodata:
             print ('Will use pseudodata')
             self.groups = self.generatePseudoData(self.groups)
@@ -42,13 +45,13 @@ class DataCard:
         self.content = {k:{g:None for g in self.groups.keys()} for k in self.hist_conv.keys()}
 
         self.loopOverFiles()
-#        if self.pseudodata:
-#            self.roundFakeData()
+        if self.pseudodata:
+            self.roundFakeData()
         if self.DYEstimation is not None:
             self.produceDYShit()
         if self.quantiles is not None:
             self.rebinInQuantile()
-            #self.rebinClassic()
+            #self.rebinClassic(8)
         if self.datacardName is not None:
             self.saveDatacard()
         if self.produce_plots:
@@ -89,6 +92,8 @@ class DataCard:
             for group,hist in self.content[histName].items():
                 if self.pseudodata and group == 'data_real':
                     continue
+                if hist is None:
+                    continue
                 hist.SetName(hist.GetName()+'_'+group)
 
     def addSampleToGroup(self,hist_dict,group):
@@ -103,7 +108,7 @@ class DataCard:
                     if systName == 'nominal':
                         continue
                     hist = hists[systName]
-                    groupsyst = group + '_' + systName
+                    groupsyst = group + '__' + systName
                     if groupsyst not in self.content[histname].keys():
                         self.content[histname][groupsyst] = copy.deepcopy(hist)
                     else:
@@ -159,8 +164,14 @@ class DataCard:
                     hist_dict[datacardname]['nominal'].Add(h)
                 # Systematic histograms #
                 for syst in listsyst:
-                    h = self.getHistogram(f,syst,lumi,br,xsec,sumweight)
-                    systName = syst.split('__')[-1].replace('up','Up').replace('down','Down')
+                    h = self.getHistogram(f,syst,lumi,br,xsec,sumweight) 
+                    systName = syst.split('__')[-1]
+                    if systName.endswith('up'):
+                        systName = systName[:-2]+"Up"
+                    elif systName.endswith('down'):
+                        systName = systName[:-4]+"Down"
+                    else:
+                        raise RuntimeError("Could not understand systematics {}".format(systName))
                     if not systName in hist_dict[datacardname].keys():
                         hist_dict[datacardname][systName] = copy.deepcopy(h)
                     else:
@@ -197,7 +208,7 @@ class DataCard:
 
         # Get data per sample #
         sample_dict = {}
-        info_to_keep = ['cross-section','generated-events','group','type','era']
+        info_to_keep = ['cross-section','generated-events','group','type','era','branching-ratio']
         for sample,data in full_dict['files'].items():
             sample_dict[sample] = {k:data[k] for k in data.keys() & info_to_keep}
 
@@ -238,6 +249,16 @@ class DataCard:
                     #hist.SetBinError(i,0.) #TODO : check 
                     if hist.GetBinContent(i) < 0.:
                         hist.SetBinContent(i,0.) 
+                
+                if '__' in group:
+                    systName = group.split('__')[1].replace("Down","").replace("Up","")
+                    if systName not in self.systematics.keys():
+                        raise RuntimeError("Could not find {} is systematic dict".format(systName))
+                    CMSName = self.systematics[systName]
+                    if '{era}' in CMSName:
+                        CMSName = CMSName.format(era=self.era)
+                    group = group.replace('__'+systName,'_'+CMSName)
+                    
                 hist.SetTitle(group)
                 hist.SetName(group)
                 hist.Write(group)
@@ -262,15 +283,14 @@ class DataCard:
             for group,hist in gDict.items():
                 if hist is None:
                     continue
-                self.content[histName][group] = qObj(hist)
+                self.content[histName][group] = qObj(hist) 
 
-    def rebinClassic(self):
+    def rebinClassic(self,factor):
         for histName,gDict in self.content.items():
-            print (histName)
             for group in gDict.keys():
                 if self.pseudodata and group=='data_real':
                     continue
-                self.content[histName][group].Rebin(8)
+                self.content[histName][group].Rebin(factor)
 
     def produceDYShit(self):
         print ('Producing DY estimation')
@@ -403,82 +423,6 @@ class DataCard:
 
             #C.cd(0)
             C.Print(pdfname,'Title:Test')
-#            C.Clear()
-#            
-#            legH = ROOT.TLegend(0.7,0.7,0.9,0.9)
-#            legH.AddEntry(shiftObj.rootsave['h1'],'h1')
-#            legH.AddEntry(shiftObj.rootsave['h2'],'h2')
-#            legH.AddEntry(shiftObj.rootsave['h3'],'h3')
-#            legH.AddEntry(shiftObj.rootsave['nh3'],'nh3')                                                                                                                                                      
-#            shiftObj.rootsave['h1'].SetLineColor(601)
-#            shiftObj.rootsave['h2'].SetLineColor(418)
-#            shiftObj.rootsave['h3'].SetLineColor(634)
-#            shiftObj.rootsave['nh3'].SetLineColor(619)
-#            
-#            shiftObj.rootsave['h1'].DrawClone()
-#            shiftObj.rootsave['h2'].DrawClone()
-#            shiftObj.rootsave['h3'].DrawClone()
-#            shiftObj.rootsave['nh3'].DrawClone()
-#            legH.Draw()
-#            
-#            C.Print(pdfname)
-#            C.Clear()
-#            
-#            legC = ROOT.TLegend(0.7,0.7,0.9,0.9)
-#            legC.AddEntry(shiftObj.rootsave['cdf1'],'cdf1')
-#            legC.AddEntry(shiftObj.rootsave['cdf2'],'cdf2')
-#            legC.AddEntry(shiftObj.rootsave['cdf3'],'cdf3')
-#            legC.AddEntry(shiftObj.rootsave['ncdf3'],'ncdf3')
-#            shiftObj.rootsave['cdf1'].SetLineColor(601)
-#            shiftObj.rootsave['cdf2'].SetLineColor(418)
-#            shiftObj.rootsave['cdf3'].SetLineColor(634)
-#            shiftObj.rootsave['ncdf3'].SetLineColor(619)
-#            
-#            shiftObj.rootsave['cdf1'].Draw("H")
-#            shiftObj.rootsave['cdf2'].Draw("same H")
-#            shiftObj.rootsave['cdf3'].Draw("same H")
-#            shiftObj.rootsave['ncdf3'].Draw("same H")
-#            legC.Draw()
-#            
-#            C.Print(pdfname)
-#            C.Clear()
-#
-#            legS = ROOT.TLegend(0.7,0.7,0.9,0.9)
-#            legS.AddEntry(shiftObj.rootsave['shift'],'shift (nominal)')
-#            legS.AddEntry(shiftObj.rootsave['shift_up'],'shift (up)')
-#            legS.AddEntry(shiftObj.rootsave['shift'],'shift (down)')
-#            shiftObj.rootsave['shift'].SetLineStyle(1)
-#            shiftObj.rootsave['shift'].SetLineWidth(2)
-#            shiftObj.rootsave['shift_up'].SetLineStyle(10)
-#            shiftObj.rootsave['shift_down'].SetLineStyle(5)
-#            legS.Draw()
-#     
-#            shiftObj.rootsave['shift'].Draw()
-#            shiftObj.rootsave['shift_up'].Draw("same")
-#            shiftObj.rootsave['shift_down'].Draw("same")
-#     
-#            C.Print(pdfname)
-#            C.Clear()
-#     
-#            legE = ROOT.TLegend(0.7,0.7,0.9,0.9)
-#            legE.AddEntry(shiftObj.rootsave['cdf_tot_err'],'Error (tot)')
-#            legE.AddEntry(shiftObj.rootsave['cdf_bin_err'],'Error (bin)')
-#            legE.AddEntry(shiftObj.rootsave['cdf_shift_err'],'Error (shift)')
-#            shiftObj.rootsave['cdf_tot_err'].SetLineStyle(1)
-#            shiftObj.rootsave['cdf_tot_err'].SetLineWidth(2)
-#            shiftObj.rootsave['cdf_bin_err'].SetLineStyle(10)
-#            shiftObj.rootsave['cdf_shift_err'].SetLineStyle(5)
-#            legE.Draw()
-#     
-#            shiftObj.rootsave['cdf_tot_err'].Draw()
-#            shiftObj.rootsave['cdf_bin_err'].Draw("same")
-#            shiftObj.rootsave['cdf_shift_err'].Draw("same")
-#     
-#            C.Print(pdfname)
-#            C.Clear()
-#     
-#            C.Print(pdfname+']')
-
 
  
     def preparePlotIt(self,suffix=''):
@@ -494,6 +438,8 @@ class DataCard:
             rootfile = ROOT.TFile(os.path.join(path_rootfiles,group+'.root'),'recreate')
             for histName,gDict in self.content.items():
                 for gr,hist in gDict.items():
+                    if hist is None:
+                        continue
                     if gr.split("__")[0] == group:
                         if len(gr.split("__")) == 1:
                             hist.Write(histName)
@@ -537,7 +483,6 @@ class DataCard:
                 config['files'][group+'.root'].update({'group':group})
             else:
                 config['files'][group+'.root'].update({k:v for k,v in gconfig.items() if k not in ['files','type']})
-            #config['files'][group+'.root'].update({k:v for k,v in gconfig.items() if k not in ['files','type']})
         config['groups'] = {}
         for group,gconfig in self.groups.items():
             if self.pseudodata and group == 'data_real':

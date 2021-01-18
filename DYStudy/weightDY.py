@@ -227,23 +227,30 @@ class WeightDY:
         d = d[int(self.era)][self.cat]
 
         if self.channel == "ElEl":
-            self.factor_ZVeto = d['ZVeto_0b']['ElEl']['S+B'] / d['ZVeto_0b']['ElEl']['prefit']
-            self.factor_1b    = d['ZPeak_1b']['ElEl']['S+B'] / d['ZPeak_0b']['ElEl']['S+B']
+            factor_ZVeto = d['ZVeto_0b']['ElEl']['S+B'] / d['ZVeto_0b']['ElEl']['prefit']
+            factor_1b    = d['ZPeak_1b']['ElEl']['S+B'] / d['ZPeak_0b']['ElEl']['S+B']
             if self.cat == 'resolved':
-                self.factor_2b  = d['ZPeak_2b']['ElEl']['S+B'] / d['ZPeak_0b']['ElEl']['S+B']
-
+                factor_2b  = d['ZPeak_2b']['ElEl']['S+B'] / d['ZPeak_0b']['ElEl']['S+B']
+            else:
+                factor_2b = 0.
         elif self.channel == "MuMu":
-            self.factor_ZVeto = d['ZVeto_0b']['MuMu']['S+B'] / d['ZVeto_0b']['MuMu']['prefit']
-            self.factor_1b    = d['ZPeak_1b']['MuMu']['S+B'] / d['ZPeak_0b']['MuMu']['S+B']
+            factor_ZVeto = d['ZVeto_0b']['MuMu']['S+B'] / d['ZVeto_0b']['MuMu']['prefit']
+            factor_1b    = d['ZPeak_1b']['MuMu']['S+B'] / d['ZPeak_0b']['MuMu']['S+B']
             if self.cat == 'resolved':
-                self.factor_2b  = d['ZPeak_2b']['MuMu']['S+B'] / d['ZPeak_0b']['MuMu']['S+B']
+                factor_2b  = d['ZPeak_2b']['MuMu']['S+B'] / d['ZPeak_0b']['MuMu']['S+B']
+            else:
+                factor_2b = 0.
         elif self.channel == "SSDL":
-            self.factor_ZVeto = (d['ZVeto_0b']['ElEl']['S+B']+d['ZVeto_0b']['MuMu']['S+B']) / (d['ZVeto_0b']['ElEl']['prefit']+d['ZVeto_0b']['MuMu']['prefit'])
-            self.factor_1b    = (d['ZPeak_1b']['ElEl']['S+B']+d['ZPeak_1b']['MuMu']['S+B']) / (d['ZPeak_0b']['ElEl']['S+B']+d['ZPeak_0b']['MuMu']['S+B'])
+            factor_ZVeto = (d['ZVeto_0b']['ElEl']['S+B']+d['ZVeto_0b']['MuMu']['S+B']) / (d['ZVeto_0b']['ElEl']['prefit']+d['ZVeto_0b']['MuMu']['prefit'])
+            factor_1b    = (d['ZPeak_1b']['ElEl']['S+B']+d['ZPeak_1b']['MuMu']['S+B']) / (d['ZPeak_0b']['ElEl']['S+B']+d['ZPeak_0b']['MuMu']['S+B'])
             if self.cat == 'resolved':
-                self.factor_2b    = (d['ZPeak_2b']['ElEl']['S+B']+d['ZPeak_2b']['MuMu']['S+B']) / (d['ZPeak_0b']['ElEl']['S+B']+d['ZPeak_0b']['MuMu']['S+B'])
+                factor_2b  = (d['ZPeak_2b']['ElEl']['S+B']+d['ZPeak_2b']['MuMu']['S+B']) / (d['ZPeak_0b']['ElEl']['S+B']+d['ZPeak_0b']['MuMu']['S+B'])
+            else:
+                factor_2b = 0.
         else:
             raise RuntimeError("Channel '%s' not understood"%self.channel)
+        return factor_ZVeto,factor_1b,factor_2b
+
         
     def produceShape(self,hist_dict):
         hist_dict = copy.deepcopy(hist_dict)
@@ -274,21 +281,14 @@ class WeightDY:
                 hist_dict['ZVeto_2b'] = self.rebinWeights2D(hist_dict['ZVeto_2b'])
                 hist_dict['ZPeak_2b'] = self.rebinWeights2D(hist_dict['ZPeak_2b'])
 
-#        if self.mode == "data":
-#            self.getNumericalFactors()
-#
-#        elif self.mode == "mc":
-#            #self.factor_1b = self.N_ZPeak1b/self.N_ZPeak0b
-#            #self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
-#            self.factor_ZVeto = 1.
-#            self.factor_1b = self.N_ZVeto1b/self.N_ZVeto0b
-#            if self.cat == 'resolved':
-#                self.factor_2b = self.N_ZVeto2b/self.N_ZVeto0b
-#
-        self.factor_ZVeto = 1.
-        self.factor_1b = self.N_ZVeto1b/self.N_ZVeto0b
-        if self.cat == 'resolved':
-            self.factor_2b = self.N_ZVeto2b/self.N_ZVeto0b
+        if self.mode == "data":
+            self.factor_ZVeto,self.factor_1b,self.factor_2b = self.getNumericalFactors()
+        elif self.mode == "mc":
+            self.factor_ZVeto = 1.
+            self.factor_1b = self.N_ZPeak1b/self.N_ZPeak0b
+            if self.cat == 'resolved':
+                self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
+
 
         print ("Factor in Z peak : 1b/0b")
         print ("%0.5f / %0.5f -> %0.5f"%(self.N_ZPeak1b,self.N_ZPeak0b,self.N_ZPeak1b/self.N_ZPeak0b))

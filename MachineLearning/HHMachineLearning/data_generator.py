@@ -38,7 +38,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.model_idx  = model_idx                     # model Idx for cross validation
         self.variables  = self.inputs + self.outputs    # List of all variables to be taken from root trees
         if self.inputsLBN is not None:
-            self.variables += [inp for inp in self.inputsLBN if inp not in self.inputsLBN]
+            self.variables += [inp for inp in self.inputsLBN if inp not in self.variables]
         if other is not None and isinstance(other,list):
             self.variables += other
 
