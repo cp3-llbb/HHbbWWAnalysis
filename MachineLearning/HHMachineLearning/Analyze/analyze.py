@@ -4,6 +4,7 @@ import yaml
 import math
 import copy
 import argparse
+import enlighten
 import random
 import logging
 import numpy as np
@@ -16,6 +17,7 @@ from sklearn.metrics import f1_score
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
 sys.path.append('..')
+import talos
 import parameters
 import Operations
 from import_tree import LoopOverTrees
@@ -74,6 +76,7 @@ class Analyze:
                         data_node = data_node_era
                     else:
                         data_node = pd.concat([data_node,data_node_era],axis=0)
+                    logging.info('{:5s} class in era {}  : sample size = {:10d}'.format(node,era,data_node_era.shape[0]))
                 data_dict[node] = data_node
             self.data = pd.concat(data_dict.values(),copy=True).reset_index(drop=True)
             self.saveDF()
@@ -176,6 +179,7 @@ class Analyze:
         f1_scores = np.zeros(len(self.inputs))
         f1_scores_err = np.zeros(len(self.inputs))
         logging.info("Producing output for permutation scores")
+        pbar = enlighten.Counter(total=len(self.inputs), desc='Permutations', unit='Input') 
         for idxPerm,inputName in enumerate(self.inputs):
             logging.info("Looking at input %d/%d"%(idxPerm,len(self.inputs)))
             inputs_perm = copy.deepcopy(inputsLL)
@@ -191,6 +195,7 @@ class Analyze:
             perm_f1_scores = np.array(perm_f1_scores)
             f1_scores[idxPerm] = abs(perm_f1_scores.mean()-true_F1_score)
             f1_scores_err[idxPerm] = perm_f1_scores.std()
+            pbar.update()
         
         idxSort = np.flip(np.argsort(f1_scores))
         inputNames = np.array(self.inputs,dtype=object)[idxSort]

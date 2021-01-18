@@ -49,8 +49,8 @@ if N_apply != N_slices/N_models: # Otherwise the same slice can be applied on se
 ############################### Slurm parameters ######################################
 partition = 'Def'  # Def, cp3 or cp3-gpu
 QOS = 'normal' # cp3 or normal
-time = '0-18:00:00' # days-hh:mm:ss
-mem = '9000' # ram in MB
+time = '0-08:00:00' # days-hh:mm:ss
+mem = '30000' # ram in MB
 tasks = '1' # Number of threads(as a string) (not parallel training for classic mode)
 workers = 20
 
@@ -122,7 +122,7 @@ event_weight_sum_json = os.path.join(main_path,'background_{era}_event_weight_su
 resume_model = ''
 
 # Output #
-output_batch_size = 1000000
+output_batch_size = 50000
 split_name = 'tag' # 'sample' or 'tag' : criterion for output file splitting
 
 ##############################  Evaluation criterion   ################################
@@ -169,17 +169,17 @@ grouped_loss = GroupedXEnt(group_ids)
 #    'loss_function' : [grouped_loss] , #  [categorical_crossentropy]
 #}
 p = { 
-    'lr' : [0.1], 
+    'lr' : [0.01], 
     'first_neuron' : [128],
     'activation' : [relu],
     'dropout' : [0.],
-    'hidden_layers' : [4], # does not take into account the first layer
+    'hidden_layers' : [5], # does not take into account the first layer
     'output_activation' : [softmax],
-    'l2' : [0.001],
+    'l2' : [0.],
     'optimizer' : [Adam],  
     'epochs' : [100],   
     'batch_size' : [20000], 
-    'n_particles' : [0],
+    'n_particles' : [10],
     'loss_function' : [grouped_loss],
 }
 
@@ -200,55 +200,49 @@ inputs = [
             '$era@op_era',
             'lep_pdgId@op_pdgid',
             'lep_charge@op_charge',
-            'JPAcat@op_resolved_JPAcat',
+            'JPAcat@op_resolved_jpacat',
             # LL variables #
-            'METpt',
-            'METpx',
-            'METpy',
-            'METpz',
-            'METenergy',
-            'lep_Px',
-            'lep_Py',
-            'lep_Pz',
-            'lep_E',
-            'lep_pt',
-            'lep_eta',
-            'bj1_Px',
-            'bj1_Py',
-            'bj1_Pz',
-            'bj1_E',
-            'bj1_pt',
-            'bj1_eta',
-            'bj1_bTagDeepFlavB',
-            'bj2_Px',
-            'bj2_Py',
-            'bj2_Pz',
-            'bj2_E',
-            'bj2_pt',
-            'bj2_eta',
-            'bj2_bTagDeepFlavB',
-            'wj1_Px',
-            'wj1_Py',
-            'wj1_Pz',
-            'wj1_E',
-            'wj1_pt',
-            'wj1_eta',
-            'wj1_bTagDeepFlavB',
-            'wj2_Px',
-            'wj2_Py',
-            'wj2_Pz',
-            'wj2_E',
-            'wj2_pt',
-            'wj2_eta',
-            'wj2_bTagDeepFlavB ',
-            'nAk4BJets',
+            'METpt',               
+#            'METpx',               # discard               
+#            'METpy',               # discard
+#            'METenergy',           # discard
+#            'lep_Px',              # discard
+#            'lep_Py',              # discard
+#            'lep_Pz',              # discard
+#            'lep_E',               # discard     
+           'lep_pt',
+#            'lep_eta',             # discard
+#            'bj1_Px',              # discard
+#            'bj1_Py',              # discard
+#            'bj1_Pz',              # discard
+#            'bj1_E',               # discard
+           'bj1_pt',
+#            'bj1_eta',             # discard
+           'bj1_bTagDeepFlavB',
+#            'bj2_Px',              # discard
+#            'bj2_Py',              # discard
+#            'bj2_Pz',              # discard
+#            'bj2_E',               # discard
+           'bj2_pt',
+#            'bj2_eta',             # discard
+           'bj2_bTagDeepFlavB',
+#            'wj1_Px',              # discard
+#            'wj1_Py',              # discard
+#            'wj1_Pz',              # discard
+#            'wj1_E',               # discard
+           'wj1_pt',
+#            'wj1_eta',             # discard
+           'wj1_bTagDeepFlavB',
+#            'wj2_Px',              # discard
+#            'wj2_Py',              # discard
+#            'wj2_Pz',              # discard
+#            'wj2_E',               # discard
+           'wj2_pt',
+#            'wj2_eta',             # discard
+           'wj2_bTagDeepFlavB ',
+#            'nAk4BJets',           # discard
             'nAk8BJets',
             'VBF_tag',
-            'neuPx',
-            'neuPy',
-            'neuPz',
-            'neuE',
-            'neuPt',
            # HL variables #
             'lepmet_DPhi',
             'lepmet_pt',
@@ -293,13 +287,13 @@ inputs = [
             'bj1wj2_DPhi',
             'bj1wj1_DR',
             'bj1wj1_DPhi',
-            'VBFj1pt',
-            'VBFj2pt',
-            'VBFj1eta',
-            'VBFj2eta',
-            'VBFj1j2dEta',
-            'VBFj1j2dPhi',
-            'VBFj1j2invM',
+#            'VBFj1pt',
+#            'VBFj2pt',
+#            'VBFj1eta',
+#            'VBFj2eta',
+#            'VBFj1j2dEta',
+#            'VBFj1j2dPhi',
+#            'VBFj1j2invM',
             'zeppenfeldVar',
             'minJetDR',
             'minLepJetDR',

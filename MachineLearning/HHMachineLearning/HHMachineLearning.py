@@ -20,6 +20,8 @@ import matplotlib.pyplot as plt
 if plt.rcParams['backend'] == 'TkAgg':
     raise ImportError("Change matplotlib backend to 'Agg' in ~/.config/matplotlib/matplotlibrc")
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
 import argparse
 import numpy as np
 import pandas as pd
@@ -287,7 +289,7 @@ def main():
                                                   tree_name                 = parameters.tree_name,
                                                   additional_columns        = {'tag':node,'era':era},
                                                   stop                      = 500000) # TODO : remove 
-                    data_node_era = data_node_era.sample(frac=1)[:500000] # TODO : remove 
+                    data_node_era = data_node_era.sample(n=500000,axis=0) # TODO : remove 
                     if data_node is None:
                         data_node = data_node_era
                     else:

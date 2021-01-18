@@ -10,11 +10,18 @@ class OperationBase(tf.keras.layers.Layer):
         raise NotImplementedError
     def compute_output_shape(self,input_shape):
         return input_shape
+    def get_config(self):
+        config = super(OperationBase, self).get_config()
+        return config
+    @classmethod
+    def from_config(cls, config):
+        return cls(**config)
     @property
     def onehot_dim(self):
         raise NotImplementedError
 
 class op_pdgid(OperationBase):
+    @tf.function
     def operation(self,x):
         return tf.cast(tf.abs(x) > 11 , "int32")
     @property
@@ -22,6 +29,7 @@ class op_pdgid(OperationBase):
         return 2
 
 class op_charge(OperationBase):
+    @tf.function
     def operation(self,x):
         return tf.cast(tf.abs(x) > 0, "int32")
     @property
@@ -29,21 +37,30 @@ class op_charge(OperationBase):
         return 2
 
 class op_era(OperationBase):
+    @tf.function
     def operation(self,x):
+        x = tf.math.maximum(x,2016.)
+        x = tf.math.minimum(x,2018.)
         return tf.cast(x - 2016 , "int32")
     @property
     def onehot_dim(self):
         return 3
 
-class op_resolved_JPAcat(OperationBase):
+class op_resolved_jpacat(OperationBase):
+    @tf.function
     def operation(self,x):
+        x = tf.math.maximum(x,1.)
+        x = tf.math.minimum(x,7.)
         return tf.cast(x - 1, "int32")
     @property
     def onehot_dim(self):
         return 7
 
-class op_boosted_JPAcat(OperationBase):
+class op_boosted_jpacat(OperationBase):
+    @tf.function
     def operation(self,x):
+        x = tf.math.maximum(x,1.)
+        x = tf.math.minimum(x,3.)
         return tf.cast(x - 1, "int32")
     @property
     def onehot_dim(self):

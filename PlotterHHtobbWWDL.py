@@ -36,15 +36,14 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         super(PlotterNanoHHtobbWWDL, self).__init__(args)
 
     def initialize(self):
-        super(PlotterNanoHHtobbWWDL, self).initialize()
         # Change the way the FakeExtrapolation is postProcessed (avoids overriding the `postProcess` method) 
+        super(PlotterNanoHHtobbWWDL, self).initialize()
         if "FakeExtrapolation" in self.datadrivenContributions:
             contrib = self.datadrivenContributions["FakeExtrapolation"]
             self.datadrivenContributions["FakeExtrapolation"] = DataDrivenFake(contrib.name, contrib.config)
         if "DYEstimation" in self.datadrivenContributions: 
             contrib = self.datadrivenContributions["DYEstimation"]
             self.datadrivenContributions["DYEstimation"] = DataDrivenDY(contrib.name, contrib.config,"PseudoData" in self.datadrivenContributions)
-
 
     def definePlots(self, t, noSel, sample=None, sampleCfg=None): 
         noSel = super(PlotterNanoHHtobbWWDL,self).prepareObjects(t, noSel, sample, sampleCfg, 'DL')
