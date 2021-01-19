@@ -561,7 +561,7 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
         
         #----- EVT variables -----#
         varsToKeep["event"]     = None # Already in tree                                               
-        varsToKeep["run"]       = None # Already in tree                                                                                                                                        
+        varsToKeep["run"]       = None # Already in tree             
         varsToKeep["ls"]        = t.luminosityBlock
 
         #----- MET variables -----#
