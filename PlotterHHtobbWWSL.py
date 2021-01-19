@@ -18,6 +18,7 @@ from BaseHHtobbWW import BaseNanoHHtobbWW
 from plotDef import *
 from selectionDef import *
 from JPA import *
+from mvaEvaluatorSL import *
 from DDHelper import DataDrivenFake, DataDrivenDY
 from bamboo.root import gbl
 import ROOT
@@ -82,26 +83,10 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         ResolvedJPANodeList = ['2b2Wj','2b1Wj','1b2Wj','2b0Wj','1b1Wj','1b0Wj','0b']
         BoostedJPANodeList  = ['Hbb2Wj','Hbb1Wj']
 
-        '''
+        
         # ---------- LBN+DNN models ----------- #
-        basepathDNN = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','DNNSL')
-        resolvedDNNmodelList = []
-        boostedDNNmodelList = []
-        resolvedDNNmodelList.append(os.path.join(basepathDNN, 'model1.pb'))
-        resolvedDNNmodelList.append(os.path.join(basepathDNN, 'model2.pb'))
-        resolvedDNNmodelList.append(os.path.join(basepathDNN, 'model3.pb'))
-        resolvedDNNmodelList.append(os.path.join(basepathDNN, 'model4.pb'))
-        resolvedDNNmodelList.append(os.path.join(basepathDNN, 'model5.pb'))
+        path_model = '/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/MachineLearning/HHMachineLearning/TFModels/AllJPAVarReg_crossval/saved_model.pb'
 
-        boostedDNNmodelList.append(os.path.join(basepathDNN, 'model1.pb'))
-        boostedDNNmodelList.append(os.path.join(basepathDNN, 'model2.pb'))
-        boostedDNNmodelList.append(os.path.join(basepathDNN, 'model3.pb'))
-        boostedDNNmodelList.append(os.path.join(basepathDNN, 'model4.pb'))
-        boostedDNNmodelList.append(os.path.join(basepathDNN, 'model5.pb'))
-
-        model_input_names = ['in1','in2','in3','in4','in5']
-        model_input_names = 'Identity'
-        '''
 
         plots = []
         cutFlowPlots = []
@@ -258,9 +243,16 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 
 
         print('jetSel_Level: {}'.format(jetsel_level))
+        
+        leptonCont = {'El':ElColl[0],'Mu':MuColl[0]}
+        self.nodes = ['DY','GGF','H','Rare','ST','TT','VBF','WJets']
+        inputsEventNr    = returnEventNr(self, t)
         # ========================== JPA Resolved Categories ========================= #
         if any(item in resolved_args for item in jetsel_level):
+            def cleanVBFwithJPA_Resolved(jpaJets, nJpaJets):
+                return lambda j : op.OR(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets)))
             ChannelDictList = []
+            selObjectDNNDictList = []
             # dict = {'key':'Node', 'value' : [refined selObj, [JPAjetIndices]]}
             elL1OutList, elL2OutList, ElResolvedSelObjJetsIdxPerJpaNodeDict = findJPACategoryResolved (self, ElSelObjResolved, ElColl[0],self.muonsPreSel, self.electronsPreSel, 
                                                                                                        self.ak4Jets, self.ak4BJetsLoose,self.ak4BJets, self.corrMET, 
@@ -270,24 +262,6 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                                                                                                        self.ak4Jets, self.ak4BJetsLoose,self.ak4BJets, self.corrMET, 
                                                                                                        resolvedModelDict, t.event,self.HLL, ResolvedJPANodeList,
                                                                                                        plot_yield=True)
-
-            '''
-            plots.append(Plot.make1D("El_2b2WjMaxScore_%s"%ElSelObjResolved.selName, elL1OutList[0], ElSelObjResolved.sel, EquidistantBinning(50, -1.0, 1.0)))
-            plots.append(Plot.make1D("El_2b1WjMaxScore_%s"%ElSelObjResolved.selName, elL1OutList[1], ElSelObjResolved.sel, EquidistantBinning(50, -1.0, 1.0)))
-            plots.append(Plot.make1D("El_1b2WjMaxScore_%s"%ElSelObjResolved.selName, elL1OutList[2], ElSelObjResolved.sel, EquidistantBinning(50, -1.0, 1.0)))
-            plots.append(Plot.make1D("El_2b0WjMaxScore_%s"%ElSelObjResolved.selName, elL1OutList[3], ElSelObjResolved.sel, EquidistantBinning(50, -1.0, 1.0)))
-            plots.append(Plot.make1D("El_1b1WjMaxScore_%s"%ElSelObjResolved.selName, elL1OutList[4], ElSelObjResolved.sel, EquidistantBinning(50, -1.0, 1.0)))
-            plots.append(Plot.make1D("El_1b0WjMaxScore_%s"%ElSelObjResolved.selName, elL1OutList[5], ElSelObjResolved.sel, EquidistantBinning(50, -1.0, 1.0)))
-            
-            plots.append(Plot.make1D("El_2b2WjL2Score_%s"%ElSelObjResolved.selName, elL2OutList[0], ElSelObjResolved.sel, EquidistantBinning(50, 0.0, 1.0)))
-            plots.append(Plot.make1D("El_2b1WjL2Score_%s"%ElSelObjResolved.selName, elL2OutList[1], ElSelObjResolved.sel, EquidistantBinning(50, 0.0, 1.0)))
-            plots.append(Plot.make1D("EL_1b2WjL2Score_%s"%ElSelObjResolved.selName, elL2OutList[2], ElSelObjResolved.sel, EquidistantBinning(50, 0.0, 1.0)))
-            plots.append(Plot.make1D("El_2b0WjL2Score_%s"%ElSelObjResolved.selName, elL2OutList[3], ElSelObjResolved.sel, EquidistantBinning(50, 0.0, 1.0)))
-            plots.append(Plot.make1D("El_1b1WjL2Score_%s"%ElSelObjResolved.selName, elL2OutList[4], ElSelObjResolved.sel, EquidistantBinning(50, 0.0, 1.0)))
-            plots.append(Plot.make1D("El_1b0WjL2Score_%s"%ElSelObjResolved.selName, elL2OutList[5], ElSelObjResolved.sel, EquidistantBinning(50, 0.0, 1.0)))
-            plots.append(Plot.make1D("El_0bnWjL2Score_%s"%ElSelObjResolved.selName, elL2OutList[6], ElSelObjResolved.sel, EquidistantBinning(50, 0.0, 1.0)))
-            '''
-
             
             if "Res2b2Wj" in jetsel_level or "Resolved" in jetsel_level:
                 print ('...... JPA : 2b2Wj Node Selection')
@@ -296,6 +270,11 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 MuSelObjResolved2b2Wj        = MuResolvedSelObjJetsIdxPerJpaNodeDict.get('2b2Wj')[0]
                 MuSelObjResolved2b2WjJets    = MuResolvedSelObjJetsIdxPerJpaNodeDict.get('2b2Wj')[1]
                 print('...... ', ElSelObjResolved2b2Wj.selName)
+                ElSelObjResolved2b2WjVBFJets = op.sort(op.combine(op.select(self.VBFJets, cleanVBFwithJPA_Resolved(ElSelObjResolved2b2WjJets, 4)), N=2, pred=self.lambda_VBFPair),
+                                                       lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
+                MuSelObjResolved2b2WjVBFJets = op.sort(op.combine(op.select(self.VBFJets, cleanVBFwithJPA_Resolved(MuSelObjResolved2b2WjJets, 4)), N=2, pred=self.lambda_VBFPair),
+                                                       lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
+                print(type(ElSelObjResolved2b2WjVBFJets[0]))
 
                 if self.args.onlypost:
                     ElSelObjResolved2b2Wj.record_yields = True
@@ -303,6 +282,36 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     ElSelObjResolved2b2Wj.yieldTitle = 'Resolved2b2Wj Channel $e^{\pm}$'
                     MuSelObjResolved2b2Wj.yieldTitle = 'Resolved2b2Wj Channel $\mu^{\pm}$'
                 
+
+                inputsClassic_2b2Wj_El = returnClassicInputs_2b2Wj(self, ElColl[0], ElSelObjResolved2b2WjJets[0], ElSelObjResolved2b2WjJets[1], 
+                                                                   ElSelObjResolved2b2WjJets[2], ElSelObjResolved2b2WjJets[3], ElSelObjResolved2b2WjVBFJets)
+                inputsLBN_2b2Wj_El     = returnLBNInputs_2b2Wj(self, ElColl[0], ElSelObjResolved2b2WjJets[0], ElSelObjResolved2b2WjJets[1], 
+                                                               ElSelObjResolved2b2WjJets[2], ElSelObjResolved2b2WjJets[3])
+
+                inputsClassic_2b2Wj_Mu = returnClassicInputs_2b2Wj(self, MuColl[0], MuSelObjResolved2b2WjJets[0], MuSelObjResolved2b2WjJets[1], 
+                                                                   MuSelObjResolved2b2WjJets[2], MuSelObjResolved2b2WjJets[3], MuSelObjResolved2b2WjVBFJets)
+                inputsLBN_2b2Wj_Mu     = returnLBNInputs_2b2Wj(self, MuColl[0], MuSelObjResolved2b2WjJets[0], MuSelObjResolved2b2WjJets[1], 
+                                                               MuSelObjResolved2b2WjJets[2], MuSelObjResolved2b2WjJets[3])
+
+                input_names_2b2Wj = [key[0] for key in inputsClassic_2b2Wj_El.keys()] + ['LBN_inputs','eventnr']
+                output_name = "out"
+
+                DNN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names_2b2Wj, output_name))
+
+                inputs_array_2b2Wj_El = [op.array("double",val) for val in inputsClassic_2b2Wj_El.values()]
+                inputs_array_2b2Wj_El.append(op.array("double",*inputStaticCast(inputsLBN_2b2Wj_El,"double")))
+                inputs_array_2b2Wj_El.append(op.array("long",*inputStaticCast(inputsEventNr,"long")))
+
+                inputs_array_2b2Wj_Mu = [op.array("double",val) for val in inputsClassic_2b2Wj_Mu.values()]
+                inputs_array_2b2Wj_Mu.append(op.array("double",*inputStaticCast(inputsLBN_2b2Wj_Mu,"double")))
+                inputs_array_2b2Wj_Mu.append(op.array("long",*inputStaticCast(inputsEventNr,"long")))
+                
+                DNNScore_2b2Wj_El = DNN(*inputs_array_2b2Wj_El)
+                DNNScore_2b2Wj_Mu = DNN(*inputs_array_2b2Wj_Mu)
+
+                selObjectDNNDictList.append({'channel':'El','selObject':ElSelObjResolved2b2Wj,'DNN_Inputs':inputs_array_2b2Wj_El,'DNN_Score':DNNScore_2b2Wj_El})
+                selObjectDNNDictList.append({'channel':'Mu','selObject':MuSelObjResolved2b2Wj,'DNN_Inputs':inputs_array_2b2Wj_Mu,'DNN_Score':DNNScore_2b2Wj_Mu})
+
                 if not self.args.OnlyYield:
                     ChannelDictList.append({'channel':'El','sel':ElSelObjResolved2b2Wj.sel,'lep':ElColl[0],'met':self.corrMET,
                                             'j1':ElSelObjResolved2b2WjJets[0],'j2':ElSelObjResolved2b2WjJets[1],
@@ -444,7 +453,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                                             'j3':None,'j4':None,
                                             'nJet':1,'nbJet':1,'suffix':MuSelObjResolved1b0Wj.selName,
                                             'is_MC':self.is_MC})
-                    
+            '''        
             for channelDict in ChannelDictList:
                 # Singlelepton #
                 plots.extend(makeSinleptonPlots(**{k:channelDict[k] for k in LeptonKeys}))
@@ -457,11 +466,23 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
                 # High level #
                 plots.extend(makeHighLevelPlotsResolved(**{k:channelDict[k] for k in ResolvedKeys},HLL=self.HLL))
+            ''' 
                 
+        
+            # ML
+            for selObjectDNNDict in selObjectDNNDictList:
+                lepton = leptonCont[selObjectDNNDict['channel']]
+                inputs = selObjectDNNDict['DNN_Inputs']
+                output = selObjectDNNDict['DNN_Score']
+                selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDNNDict['selObject'],output,suffix='_v1')
+                plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDNNDict['selObject'].sel,selObjectDNNDict['selObject'].selName,selObjectDNNDict['channel'],inputs))
+                plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
                 
-            
         # ========================== JPA Boosted Categories ========================= #
         if any(item in boosted_args for item in jetsel_level):
+            def cleanVBFwithJPA_Boosted(jpaJets, nJpaJets):
+                return lambda j : op.AND(op.rng_len(self.ak8BJets) >= 1, op.OR(op.OR(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets))),
+                                                                               op.deltaR(self.ak8Jets[0].p4, j.p4) > 1.2))
             ChannelDictList = []
             # dict = {'key':'Node', 'value' : [refined selObj, [JPAjetIndices]]}    
             foo,bar,ElBoostedSelObjJetsIdxPerJpaNodeDict = findJPACategoryBoosted (self, ElSelObjBoosted, ElColl[0], self.muonsPreSel, self.electronsPreSel, 
