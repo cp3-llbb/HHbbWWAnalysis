@@ -282,7 +282,11 @@ class WeightDY:
                 hist_dict['ZPeak_2b'] = self.rebinWeights2D(hist_dict['ZPeak_2b'])
 
         if self.mode == "data":
-            self.factor_ZVeto,self.factor_1b,self.factor_2b = self.getNumericalFactors()
+            #self.factor_ZVeto,self.factor_1b,self.factor_2b = self.getNumericalFactors()
+            self.factor_ZVeto = 1.
+            self.factor_1b = self.N_ZPeak1b/self.N_ZPeak0b
+            if self.cat == 'resolved':
+                self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
         elif self.mode == "mc":
             self.factor_ZVeto = 1.
             self.factor_1b = self.N_ZPeak1b/self.N_ZPeak0b

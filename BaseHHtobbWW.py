@@ -1278,7 +1278,6 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                                                               op.deltaR(j.p4, self.ak4JetsByBtagScore[1].p4)>0.8)),
                                                                 (op.rng_len(self.ak4JetsByBtagScore)==1,op.deltaR(j.p4, self.ak4JetsByBtagScore[0].p4)>0.8),
                                                                 op.c_bool(True))
-            #op.AND(op.NOT(op.rng_any(self.ak4JetsByBtagScore[:2], lambda ak4Jet : op.deltaR(j.p4, ak4Jet.p4) <= 0.8 )))
             self.lambda_cleanVBFAk8 = lambda j : op.multiSwitch((op.rng_len(self.ak8BJets)>0,op.deltaR(j.p4, self.ak8BJets[0].p4) > 1.2),
                                                                 (op.rng_len(self.ak8Jets)>0,op.deltaR(j.p4, self.ak8Jets[0].p4) > 1.2),
                                                                 op.c_bool(True))

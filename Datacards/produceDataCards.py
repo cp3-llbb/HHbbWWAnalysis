@@ -120,7 +120,7 @@ class DataCard:
         for group in self.groups.keys():
             files = self.groups[group]['files']
             if not isinstance(files,list):
-                raise RuntimeError("Group %s does not consist in a list"%key)
+                raise RuntimeError("Group %s does not consist in a list"%group)
             if sample in files:
                 group_of_sample.append(group)
         return group_of_sample

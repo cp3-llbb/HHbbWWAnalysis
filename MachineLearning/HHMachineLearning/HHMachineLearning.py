@@ -267,39 +267,59 @@ def main():
                     event_weight_sum_dict[era] = json.load(handle)
 
             for node in parameters.nodes:
-                logging.info('Starting data importation for class %s'%node)
-                strSelect = [f'{cat}_{channel}_{node}' for channel in parameters.channels for cat in parameters.categories]
+                logging.info('Starting data importation for class {}'.format(node))
                 data_node = None
+                for cat in parameters.categories:
+                    logging.info('... Starting data importation for jet category {}'.format(cat))
+                    strSelect = [f'{cat}_{channel}_{node}' for channel in parameters.channels]
+                    data_cat = None
+                    for era in parameters.eras:
+                        samples_dict = sampleConfig['sampleDict'][int(era)]
+                        if len(samples_dict.keys())==0:
+                            logging.info('\tSample dict for era {} is empty'.format(era))
+                            continue
+                        list_sample = [sample for key in strSelect for sample in samples_dict[key]]
+                        data_cat_era = LoopOverTrees(input_dir                 = sampleConfig['sampleDir'],
+                                                      variables                 = variables,
+                                                      weight                    = parameters.weight,
+                                                      list_sample               = list_sample,
+                                                      cut                       = parameters.cut,
+                                                      xsec_dict                 = xsec_dict,
+                                                      event_weight_sum_dict     = event_weight_sum_dict,
+                                                      lumi_dict                 = parameters.lumidict,
+                                                      eras                      = era,
+                                                      tree_name                 = parameters.tree_name,
+                                                      additional_columns        = {'tag':node,'era':era},
+                                                      stop                      = 100000) # TODO : remove 
 
-                for era in parameters.eras:
-                    samples_dict = sampleConfig['sampleDict'][era]
-                    if len(samples_dict.keys())==0:
-                        logging.info('\tSample dict for era {} is empty'.format(era))
-                        continue
-                    list_sample = [sample for key in strSelect for sample in samples_dict[key]]
-                    data_node_era = LoopOverTrees(input_dir                 = sampleConfig['sampleDir'],
-                                                  variables                 = variables,
-                                                  weight                    = parameters.weight,
-                                                  list_sample               = list_sample,
-                                                  cut                       = parameters.cut,
-                                                  xsec_dict                 = xsec_dict,
-                                                  event_weight_sum_dict     = event_weight_sum_dict,
-                                                  lumi_dict                 = parameters.lumidict,
-                                                  eras                      = era,
-                                                  tree_name                 = parameters.tree_name,
-                                                  additional_columns        = {'tag':node,'era':era},
-                                                  stop                      = 500000) # TODO : remove 
-                    data_node_era = data_node_era.sample(n=500000,axis=0) # TODO : remove 
-                    if data_node is None:
-                        data_node = data_node_era
-                    else:
-                        data_node = pd.concat([data_node,data_node_era],axis=0)
-                    era_str = '{:5s} class in era {}  : sample size = {:10d}'.format(node,era,data_node_era.shape[0])
+                        #if data_node_era.shape[0]>1000000:
+                        #    data_node_era = data_node_era.sample(n=1000000,axis=0) # TODO : remove 
+                        era_str = '{:5s} class - {:15s} category - era {}  : sample size = {:10d}'.format(node,cat,era,data_cat_era.shape[0])
+                        if data_cat_era.shape[0] == 0:
+                            logging.info(era_str)
+                            continue
+                        if data_cat is None:
+                            data_cat = data_cat_era
+                        else:
+                            data_cat = pd.concat([data_cat,data_cat_era],axis=0)
+                        if parameters.weight is not None:
+                            era_str += ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_cat_era[parameters.weight].sum(),data_cat_era['event_weight'].sum())
+
+                        if data_cat_era[parameters.weight].sum()>1e10:
+                            invalid_df = data_cat_era[data_cat_era[parameters.weight]>1e5]
+                            prob_samples = pd.unique(invalid_df["sample"])
+                            print ("samples with too high weights")
+                            print (prob_samples)
+                        logging.info(era_str)
+                    cat_str = '{:5s} class - {:15s} category : sample size = {:10d}'.format(node,cat,data_cat.shape[0])
                     if parameters.weight is not None:
-                        era_str += ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_node_era[parameters.weight].sum(),data_node_era['event_weight'].sum())
-                    logging.info(era_str)
+                        era_str += ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_cat[parameters.weight].sum(),data_cat['event_weight'].sum())
+                    if data_node is None:
+                        data_node = data_cat
+                    else:
+                        data_node = pd.concat([data_node,data_cat],axis=0)
                 data_dict[node] = data_node
-                all_eras_str = '{:5s} class for all eras : sample size = {:10d}'.format(node,data_node.shape[0])
+                all_eras_str = '{:5s} class - all categories : sample size = {:10d}'.format(node,data_node.shape[0])
                 if parameters.weight is not None:
                     all_eras_str +=  ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_node[parameters.weight].sum(),data_node['event_weight'].sum())
                 logging.info(all_eras_str)

@@ -49,8 +49,8 @@ if N_apply != N_slices/N_models: # Otherwise the same slice can be applied on se
 ############################### Slurm parameters ######################################
 partition = 'Def'  # Def, cp3 or cp3-gpu
 QOS = 'normal' # cp3 or normal
-time = '0-08:00:00' # days-hh:mm:ss
-mem = '30000' # ram in MB
+time = '0-2:00:00' # days-hh:mm:ss
+mem = '60000' # ram in MB
 tasks = '1' # Number of threads(as a string) (not parallel training for classic mode)
 workers = 20
 
@@ -58,23 +58,21 @@ workers = 20
 # Physics Config #
 config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL.yml')
 lumidict = {'2016':35922,'2017':41529.152060112,'2018':59740.565201546}
-eras = ['2016']
-#eras = ['2016','2017','2018'] # To enable or disable eras, add or remove from this list
+eras = ['2016','2017','2018'] # To enable or disable eras, add or remove from this list
 
-categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj']
+categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj','resolved0b']
 channels = ['El','Mu']
 
 # Better put them in alphabetical order
-nodes = ['DY','GGF','H','Rare','ST','TT','VBF','WJets']
+nodes = ['GGF','H','Rare','ST','TT','VBF','WJets']
 group_ids = [
-        (1.0, [1,6]),           # signals
-        (1.0, [0,2,3,4,5,7]),   # backgrounds
-        (1.0, [1]),             # GGF
-        (1.0, [6]),             # VBF
-        (1.0, [5]),             # TT
-        (1.0, [0]),             # DY
-        (1.0, [7]),             # WJets
-        (1.0, [2,3,4]),       # Other
+        (1.0, [0,5]),           # signals
+        (1.0, [1,2,3,4,6]),     # backgrounds
+        (1.0, [0]),             # GGF
+        (1.0, [4]),             # TT
+        (1.0, [5]),             # VBF
+        (1.0, [6]),             # WJets
+        (1.0, [1,2,3]),         # rest : H + Rare + ST       
             ]
         
 #    def loss(self): # -> DL
@@ -92,7 +90,6 @@ group_ids = [
 
 # Input plots options #
 node_colors = {
-            'DY'    : '#1a83a1',
             'GGF'   : '#288a24',
             'H'     : '#06b894',
             'Rare'  : '#610596',
@@ -170,12 +167,12 @@ grouped_loss = GroupedXEnt(group_ids)
 #}
 p = { 
     'lr' : [0.01], 
-    'first_neuron' : [128],
+    'first_neuron' : [256],
     'activation' : [relu],
     'dropout' : [0.],
     'hidden_layers' : [5], # does not take into account the first layer
     'output_activation' : [softmax],
-    'l2' : [0.],
+    'l2' : [0.01],
     'optimizer' : [Adam],  
     'epochs' : [100],   
     'batch_size' : [20000], 
@@ -188,7 +185,8 @@ repetition = 1 # How many times each hyperparameter has to be used
 
 ###################################  Variables   ######################################
 
-cut = 'MC_weight > 0'
+cut = 'MC_weight > 0 && abs(total_weight)<1e5'
+#cut = 'MC_weight > 0'
 
 weight = 'total_weight'
 #weight = None
@@ -201,6 +199,14 @@ inputs = [
             'lep_pdgId@op_pdgid',
             'lep_charge@op_charge',
             'JPAcat@op_resolved_jpacat',
+            # JPA values #
+            'L2_2b2Wj',
+            'L2_2b1Wj',
+            'L2_2b0Wj',
+            'L2_1b2Wj',
+            'L2_1b1Wj',
+            'L2_1b0Wj',
+            'L2_0b',
             # LL variables #
             'METpt',               
 #            'METpx',               # discard               
@@ -240,8 +246,8 @@ inputs = [
            'wj2_pt',
 #            'wj2_eta',             # discard
            'wj2_bTagDeepFlavB ',
-#            'nAk4BJets',           # discard
-            'nAk8BJets',
+            'nAk4BJets',           
+#            'nAk8BJets',           # discard
             'VBF_tag',
            # HL variables #
             'lepmet_DPhi',
@@ -298,7 +304,7 @@ inputs = [
             'minJetDR',
             'minLepJetDR',
             'HT2_lepJetMet',
-            'HT2R_lepJetMet',
+#            'HT2R_lepJetMet',
     ]
 
 operations = [inp.split('@')[1] if '@' in inp else None  for inp  in  inputs]
@@ -323,7 +329,6 @@ assert len(LBN_inputs)%4 == 0
 # Output branches #
 
 outputs = [
-            '$DY',
             '$GGF',
             '$H',
             '$Rare',
@@ -338,6 +343,7 @@ other_variables = [
                     'event',
                     'ls',
                     'run',
+                    'MC_weight',
                  ]
 
 

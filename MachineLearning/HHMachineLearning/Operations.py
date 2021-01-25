@@ -9,6 +9,7 @@ class OperationBase(tf.keras.layers.Layer):
     def operation(self,x):
         raise NotImplementedError
     def compute_output_shape(self,input_shape):
+        input_shape[1] = self.onehot_dim
         return input_shape
     def get_config(self):
         config = super(OperationBase, self).get_config()
@@ -23,7 +24,9 @@ class OperationBase(tf.keras.layers.Layer):
 class op_pdgid(OperationBase):
     @tf.function
     def operation(self,x):
-        return tf.cast(tf.abs(x) > 11 , "int32")
+        x = tf.cast(tf.abs(x) > 11 , "int32") 
+        x = tf.one_hot(tf.cast(tf.abs(x) > 11 , "int32"),2)
+        return tf.reshape(x,(tf.shape(x)[0],2))
     @property
     def onehot_dim(self):
         return 2
@@ -31,7 +34,9 @@ class op_pdgid(OperationBase):
 class op_charge(OperationBase):
     @tf.function
     def operation(self,x):
-        return tf.cast(tf.abs(x) > 0, "int32")
+        x = tf.cast(tf.abs(x) > 0, "int32")
+        x = tf.one_hot(tf.cast(x > 0 , "int32"),2)
+        return tf.reshape(x,(tf.shape(x)[0],2))
     @property
     def onehot_dim(self):
         return 2
@@ -41,7 +46,8 @@ class op_era(OperationBase):
     def operation(self,x):
         x = tf.math.maximum(x,2016.)
         x = tf.math.minimum(x,2018.)
-        return tf.cast(x - 2016 , "int32")
+        x = tf.one_hot(tf.cast(x - 2016 , "int32"),3)
+        return tf.reshape(x,(tf.shape(x)[0],3))
     @property
     def onehot_dim(self):
         return 3
@@ -51,7 +57,8 @@ class op_resolved_jpacat(OperationBase):
     def operation(self,x):
         x = tf.math.maximum(x,1.)
         x = tf.math.minimum(x,7.)
-        return tf.cast(x - 1, "int32")
+        x = tf.one_hot(tf.cast(x - 1, "int32"),7) 
+        return tf.reshape(x,(tf.shape(x)[0],7))
     @property
     def onehot_dim(self):
         return 7
@@ -61,7 +68,8 @@ class op_boosted_jpacat(OperationBase):
     def operation(self,x):
         x = tf.math.maximum(x,1.)
         x = tf.math.minimum(x,3.)
-        return tf.cast(x - 1, "int32")
+        x = tf.one_hot(tf.cast(x - 1, "int32"),3)
+        return tf.reshape(x,(tf.shape(x)[0],3))
     @property
     def onehot_dim(self):
         return 3
