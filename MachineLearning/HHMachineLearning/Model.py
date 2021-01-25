@@ -178,8 +178,7 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
         # Categorical inputs #
         if parameters.mask_op[idx]:
             operation = getattr(Operations,parameters.operations[idx])()
-            categorizer = preprocessing.CategoryEncoding(max_tokens=operation.onehot_dim,name='category_'+inpName)
-            encoded_all.append(categorizer(operation(input_layer)))
+            encoded_all.append(operation(input_layer))
         # Numerical inputs #
         else:
             inputs_numeric.append(input_layer)
@@ -318,8 +317,7 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
         # Categorical inputs #
         if parameters.mask_op[idx]:
             operation = getattr(Operations,parameters.operations[idx])()
-            categorizer = preprocessing.CategoryEncoding(max_tokens=operation.onehot_dim,name='category_'+inpName)
-            encoded_all.append(categorizer(operation(input_layer)))
+            encoded_all.append(operation(input_layer))
         # Numerical inputs #
         else:
             inputs_numeric.append(input_layer)

@@ -50,7 +50,11 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
     # Read the tree and convert it to a numpy structured array
     if weight is not None:
         variables += [weight]
-    data = tree2array(tree, branches=variables, selection=cut, start=start, stop=stop)
+    try:
+        data = tree2array(tree, branches=variables, selection=cut, start=start, stop=stop)
+    except ValueError as e:
+        logging.error("Issue with file {}".format(input_file))
+        raise e
 
     # Convert to pandas dataframe #
     df = pd.DataFrame(data)

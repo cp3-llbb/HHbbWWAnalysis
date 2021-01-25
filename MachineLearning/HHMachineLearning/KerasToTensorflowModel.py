@@ -15,6 +15,17 @@ class WhereEquals(tf.keras.layers.Layer):
     def call(self, inp):
         return tf.where(inp[:, 0] == self.value)
 
+def import_tf():
+    import tensorflow as tf
+    # keep a reference to the v1 API as long as v2 provides compatibility
+    tf1 = None
+    tf_version = tf.__version__.split(".", 2)
+    if tf_version[0] == "1":
+        tf1 = tf
+    elif getattr(tf, "compat", None) is not None and getattr(tf.compat, "v1", None) is not None:
+        tf1 = tf.compat.v1
+
+    return tf, tf1, tf_version
 
 class KerasToTensorflowModel:
     def __init__(self,name,outdir,paths_zip,paths_json,paths_h5):
@@ -118,12 +129,44 @@ class KerasToTensorflowModel:
 
 
     def save_model_to_protobuf(self,model):
-        model_path = os.path.join(self.outdir,self.name)
-        model.save(model_path)
-        print ("Saved model as {}".format(model_path))
+ #       model_path = os.path.join(self.outdir,self.name)
+ #       model.save(model_path)
+ #       print ("Saved model as {}".format(model_path))
+
+        # convert keras models and polymorphic functions to concrete functions
+
+        tf, tf1, tf_version = import_tf()
+
+        assert tf_version[0] != "1"
+
+        from tensorflow.python.keras.saving import saving_utils
+        from tensorflow.python.eager.def_function import Function
+        from tensorflow.python.eager.function import ConcreteFunction
+
+        assert isinstance(model, tf.keras.Model)
+        learning_phase_orig = tf.keras.backend.learning_phase()
+        tf.keras.backend.set_learning_phase(False)
+        model_func = saving_utils.trace_model_call(model)
+        if model_func.function_spec.arg_names and not model_func.input_signature:
+            raise ValueError("when model is a keras model callable accepting arguments, its "
+                             "input signature must be frozen by building the model")
+        model = model_func.get_concrete_function()
+        tf.keras.backend.set_learning_phase(learning_phase_orig)
+
+        # convert variables to constants
+        assert isinstance(model, ConcreteFunction)
+
+        from tensorflow.python.framework import convert_to_constants
+
+        model = convert_to_constants.convert_variables_to_constants_v2(model)
+        graph = model.graph
+
+        tf.io.write_graph(graph, self.outdir, self.name+'.pb',as_text=False)
+        tf.io.write_graph(graph, self.outdir, self.name+'.pb.txt',as_text=True)
+        print ("Saved model as {}".format(os.path.join(self.outdir,self.name+'.pb')))
 
     def makeInputList(self,model):
-        txtfile = os.path.join(self.outdir,self.name,'inputs.txt')
+        txtfile = os.path.join(self.outdir,self.name+'_inputs.txt')
         with open(txtfile,"w") as f:
             for layer in model.layers:
                 if 'InputLayer' in  str(type(layer)):
@@ -144,9 +187,35 @@ if __name__ == '__main__':
                         help='The h5 model(s) model weights file you wish to convert to .pb')
     parser.add_argument('--outdir','-o', dest='outdir', required=False, default='TFModels/', 
                         help='The directory to place the output files - default("TFModels/")')
-    parser.add_argument('--name', required=False, default='output_graph.pb', 
-                        help='The name of the resulting output graph - default("output_graph.pb") (MUST NOT forget .pb)')
+    parser.add_argument('--name', required=False, default='output_graph', 
+                        help='The name of the resulting output - default("output_graph") (no .pb)')
+    parser.add_argument('--test', required=False, default=None,
+                        help='Test pb file')
     args = parser.parse_args()
+
+    if args.test:
+        tf, tf1, tf_version = import_tf()
+
+        graph = tf.Graph()
+        with graph.as_default():
+            graph_def = graph.as_graph_def()
+
+            # as text #
+            if args.test.endswith("txt"):
+                print ('using txt file')
+                from google.protobuf import text_format
+                with open(args.test, "rb") as f:
+                    text_format.Merge(f.read(), graph_def)
+            else:
+                print ('using pb file')
+                from google.protobuf import text_format
+                with tf.io.gfile.GFile(args.test, "rb") as f:
+                    graph_def.ParseFromString(f.read())
+                
+            tf.import_graph_def(graph_def, name="")
+
+        sys.exit()
+
 
     instance = KerasToTensorflowModel(name          = args.name, 
                                       outdir        = args.outdir,
