@@ -5,6 +5,8 @@ from copy import copy
 from bamboo.plots import CutFlowReport
 from highlevelLambdas import highlevelLambdas
 from JPA import bJetCorrPT
+from bamboo.root import loadHeader
+loadHeader("jpa.h")
 
 ########################   Channel title   #############################
 def SingleLeptonChannelTitleLabel(channel):
@@ -1270,6 +1272,13 @@ def makeSingleLeptonAk8JetsPlots(sel,j1,j2,j3,suffix,channel,nMedBJets,HLL,has1f
                                      title="HadW_cosTheta (channel %s)"%channel, 
                                      xTitle= "HadW_cosTheta",
                                      plotopts = channelLabel))
+            plots.append(Plot.make1D("%s_%s_HadW_cosTheta_pDavid"%(channel,suffix), 
+                                     op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(j2.p4, j3.p4),
+                                     sel, 
+                                     EquidistantBinning(20,0.,1.),
+                                     title="HadW_cosTheta (channel %s)"%channel, 
+                                     xTitle= "HadW_cosTheta",
+                                     plotopts = channelLabel))
             plots.append(Plot.make1D("%s_%s_min_dR_HadW_bjet"%(channel,suffix), 
                                      op.min(HLL.dR_HadW_bjet(j1.subJet1.p4, j2.p4, j3.p4), 
                                             HLL.dR_HadW_bjet(j1.subJet2.p4, j2.p4, j3.p4)),
@@ -1619,6 +1628,22 @@ def makeHighLevelPlotsResolved(sel,met,lep,j1,j2,j3,j4,channel,suffix,nJet,nbJet
                                  xTitle="cosThetaS_WW_simple_met",
                                  plotopts = channelLabel))
         #####################
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_Wjj_simple_pDavid"%(channel,suffix),
+                                 op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(j3.p4, j4.p4),
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 title='cosThetaS_Wjj_simple (%s channel)'%channel,
+                                 xTitle="cosThetaS_Wjj_simple",
+                                 plotopts = channelLabel))
+
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_WW_simple_met_pDavid"%(channel,suffix),
+                                 op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(HLL.Wjj_simple(j3.p4,j4.p4), HLL.Wlep_met_simple(lep.p4,met.p4)),
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 title='cosThetaS_WW_simple_met (%s channel)'%channel,
+                                 xTitle="cosThetaS_WW_simple_met",
+                                 plotopts = channelLabel))
+        #####################
 
         # Transverse mass plots #
         #if nbJet == 2:
@@ -1658,6 +1683,22 @@ def makeHighLevelPlotsResolved(sel,met,lep,j1,j2,j3,j4,channel,suffix,nJet,nbJet
         
         plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_HH_simple_met"%(channel,suffix),
                                  HLL.comp_cosThetaS(HLL.bJetCorrP4(j1)+HLL.bJetCorrP4(j2), HLL.HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4)),
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 title='cosThetaS_HH_simple_met (%s channel)'%channel,
+                                 xTitle="cosThetaS_HH_simple_met",
+                                 plotopts = channelLabel))
+        #####################
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_Hbb_pDavid"%(channel,suffix),
+                                 op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(j1.p4, j2.p4),
+                                 sel,
+                                 EquidistantBinning(50,0.,1.),
+                                 title='cosThetaS_Hbb (%s channel)'%channel,
+                                 xTitle="cosThetaS_Hbb",
+                                 plotopts = channelLabel))
+        
+        plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_HH_simple_met_pDavid"%(channel,suffix),
+                                 op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(HLL.bJetCorrP4(j1)+HLL.bJetCorrP4(j2), HLL.HWW_met_simple(j3.p4,j4.p4,lep.p4,met.p4)),
                                  sel,
                                  EquidistantBinning(50,0.,1.),
                                  title='cosThetaS_HH_simple_met (%s channel)'%channel,
@@ -1785,6 +1826,14 @@ def makeHighLevelPlotsBoosted(sel,met,lep,j1,j2,j3,channel,suffix,HLL,has1fat2sl
     # cosThetaS
     plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_Hbb"%(channel,suffix),
                              HLL.comp_cosThetaS(j1.subJet1.p4, j1.subJet2.p4),
+                             sel,
+                             EquidistantBinning(50,0.,1.),
+                             title='cosThetaS_Hbb (%s channel)'%channel,
+                             xTitle="cosThetaS_Hbb",
+                             plotopts = channelLabel))
+    # cosThetaS
+    plots.append(Plot.make1D("%s_%s_highlevelvariable_cosThetaS_Hbb_pDavid"%(channel,suffix),
+                             op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(j1.subJet1.p4, j1.subJet2.p4),
                              sel,
                              EquidistantBinning(50,0.,1.),
                              title='cosThetaS_Hbb (%s channel)'%channel,
