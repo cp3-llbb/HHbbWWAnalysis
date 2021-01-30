@@ -110,12 +110,12 @@ class ScaleFactorsbbWW:
                                                 base_str    = 'TTHFakeRates_{wp}MVA_Muon_2016_{syst}Syst.json',
                                                 format_dict = {'wp':['Loose','Tight'],'syst':['pt','barrel','norm']})
         # PU ID SF #
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'Btag_SF',
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
                                                 entry_key   = 'jet_puid_eff',
                                                 base_key    = '{eom}_{era}_{wp}',
                                                 base_str    = 'PUID_EFF_h2_{eom}_mc{era}_{wp}.json',
                                                 format_dict = {'eom':["eff", "mistag"],'wp':['L','M','T'],'era':['2016','2017','2018']})
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'Btag_SF',
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
                                                 entry_key   = 'jet_puid_sf',
                                                 base_key    = '{eom}_{era}_{wp}',
                                                 base_str    = 'PUID_SF_h2_{eom}_sf{era}_{wp}.json',
