@@ -53,7 +53,7 @@ for key in f.GetListOfKeys():
     for i in range(0,obj_MC.GetN()):
         pt_bin = [x[i]-obj_MC.GetErrorXlow(i),x[i]+obj_MC.GetErrorXhigh(i)]
         # The curves are interpolation but we are using binned SF, needs a really fine binning #
-        split_bins = [pt_bin[0]+i*(pt_bin[1]-pt_bin[0])/split for i in range(split+1)]
+        split_bins = [round(pt_bin[0]+i*(pt_bin[1]-pt_bin[0])/split,2) for i in range(split+1)]
         sub_bins = [[a,b] for a,b in zip(split_bins[:-1],split_bins[1:])]
         for sub_bin in sub_bins:
             if sub_bin[0] not in pt_binning:
@@ -72,7 +72,9 @@ for key in f.GetListOfKeys():
     json_content['data'].append(eta_dict)
 
 if 2.5 not in eta_binning:
-    json_content['data'].append({'bin':[max(eta_binning),2.5],'values':[{'bin':[min(pt_binning),max(pt_binning)],'value':1.,'error_low':0.02,'error_high':0.02}]})
+    last_bin = {'bin':[max(eta_binning),2.5]}
+    last_bin['values'] = [{'bin':[pt_binning[i],pt_binning[i+1]],'values':1.,'error_low':0.02,'error_high':0.02} for i in range(len(pt_binning)-1)] 
+    json_content['data'].append(last_bin)
     eta_binning += [2.5]
 json_content['binning'] = {'x':sorted(eta_binning),'y':sorted(pt_binning)}
 
