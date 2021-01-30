@@ -73,7 +73,7 @@ for key in f.GetListOfKeys():
 
 if 2.5 not in eta_binning:
     last_bin = {'bin':[max(eta_binning),2.5]}
-    last_bin['values'] = [{'bin':[pt_binning[i],pt_binning[i+1]],'values':1.,'error_low':0.02,'error_high':0.02} for i in range(len(pt_binning)-1)] 
+    last_bin['values'] = [{'bin':[pt_binning[i],pt_binning[i+1]],'value':1.,'error_low':0.02,'error_high':0.02} for i in range(len(pt_binning)-1)] 
     json_content['data'].append(last_bin)
     eta_binning += [2.5]
 json_content['binning'] = {'x':sorted(eta_binning),'y':sorted(pt_binning)}
