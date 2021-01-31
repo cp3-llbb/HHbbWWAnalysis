@@ -73,7 +73,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             return plots
 
         #----- Machine Learning Model -----#                
-        model_num = "09"
+        model_num = "10"
         if not self.args.OnlyYield:
             path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
             print ("DNN model : %s"%path_model)
@@ -432,6 +432,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         dileptonsCont = {'ElEl':OSElElDilepton[0],'MuMu':OSMuMuDilepton[0],'ElMu':OSElMuDilepton[0]}
         self.nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
+        #self.nodes = ['GGF','VBF','Top','DY','Higgs','Other']
         
         for selObjectDict in selObjectDictList:
             dilepton = dileptonsCont[selObjectDict['channel']]

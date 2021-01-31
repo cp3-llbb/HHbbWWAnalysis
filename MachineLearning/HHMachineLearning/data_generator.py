@@ -10,7 +10,7 @@ import collections
 import random
 import yaml
 import tensorflow as tf
-#import enlighten
+import enlighten
 
 from prettytable import PrettyTable
 import numpy as np
@@ -51,7 +51,7 @@ class DataGenerator(tf.keras.utils.Sequence):
                 self.sample_dict = sampleConfig["sampleDict"]
 
                 strSelect = [f'{cat}_{channel}_{node}' for channel in parameters.channels for cat in parameters.categories for node in parameters.nodes]
-                self.list_files = [os.path.join(self.input_dir,sample) for key in strSelect  for era in parameters.eras for sample in self.sample_dict[era][key]]
+                self.list_files = [os.path.join(self.input_dir,sample) for key in strSelect  for era in parameters.eras for sample in self.sample_dict[int(era)][key]]
 
             elif os.path.isdir(path):
                 self.list_files = glob.glob(path+'/*.root') 
@@ -98,9 +98,10 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.indices = dict()
         self.masks = dict()
         self.n_tot = 0
-        #pbar = enlighten.Counter(total=len(self.list_files), desc='Indices', unit='File')
         logging.info('Starting indices importation')
+        pbar = enlighten.Counter(total=len(self.list_files), desc='Indices', unit='File')
         for i,f in enumerate(self.list_files):
+            pbar.update()
             rootFile = ROOT.TFile(f)
             tree_exists = rootFile.GetListOfKeys().Contains(parameters.tree_name)
             if not tree_exists:
@@ -109,7 +110,7 @@ class DataGenerator(tf.keras.utils.Sequence):
             rootFile.Close()
             if self.cut != '':
                 indices_slice = np.zeros((n,1))
-                incn = 100000
+                incn = 500000
                 p = 0
                 while p < n:
                     indices_slice[p:p+incn] = rec2array(root2array(f,parameters.tree_name,branches=[self.cut],start=p,stop=p+incn))
@@ -137,7 +138,8 @@ class DataGenerator(tf.keras.utils.Sequence):
             self.masks[f] = list(self.masks[f])
             assert len(self.masks[f]) == len(self.indices[f])
             self.n_tot += sum(self.masks[f])
-            #pbar.update()
+            #if i > 500: #TODO : remove
+            #    break
         logging.info("Number of events in %s set: %d"%(self.state_set,self.n_tot))
 
         if self.n_tot<self.batch_size:
@@ -163,6 +165,8 @@ class DataGenerator(tf.keras.utils.Sequence):
         keys = list(self.indices.keys())
         tag_count = [{}]*self.n_batches
         era_count = [{}]*self.n_batches
+        logging.info('Starting batches preparation')
+        pbar = enlighten.Counter(total=self.n_batches, desc='Batches', unit='Batch')
         for i in range(self.n_batches):
             filled = False
             indices_sample = collections.defaultdict(list)
@@ -187,7 +191,9 @@ class DataGenerator(tf.keras.utils.Sequence):
             tag_count[i] = {node:0 for node in parameters.nodes}
             era_count[i] = {era:0 for era in parameters.eras}
             for samplepath in indices_sample.keys():
-                sample = samplepath.replace(self.input_dir+'/','') 
+                sample = samplepath.replace(self.input_dir,'') 
+                if sample.startswith("/"):
+                    sample = sample[1:]
                 keySelect = None
                 eraSelect = None
                 for era,keyDict in self.sample_dict.items():
@@ -199,7 +205,7 @@ class DataGenerator(tf.keras.utils.Sequence):
                     if keySelect is not None:
                         break
                 if keySelect is None:
-                    raise RuntimeError('Could not find sample %s in yaml file'%keySelect)
+                    raise RuntimeError('Could not find sample %s in yaml file'%sample)
                 tag = max([node for node in parameters.nodes if node in keySelect], key=len)
                 cont = len([i for i,m in zip(indices_sample[samplepath],masks_sample[samplepath]) if m])
                 tag_count[i][tag] += cont
@@ -221,10 +227,10 @@ class DataGenerator(tf.keras.utils.Sequence):
         for line in pt_tag.get_string().split('\n'):
             logging.info(line)
 
-        pt_era = PrettyTable(["Batch"]+parameters.eras) 
+        pt_era = PrettyTable(["Batch"]+[str(era) for era in parameters.eras]) 
         for i in range(len(era_count)):
             pt_era.add_row(['Batch %d'%i]+["%d [%3.2f%%]"%(era_count[i][era],era_count[i][era]*100/self.batch_size) for era in parameters.eras])  
-        pt_era.add_row(['Total']+["%d [%3.2f%%]"%(era_count_all[era],era_count_all[era]*100/self.n_tot)for era in parameters.eras])  
+        pt_era.add_row(['Total']+["%d [%3.2f%%]"%(era_count_all[era],era_count_all[era]*100/self.n_tot) for era in parameters.eras])  
         logging.info("Era content per batch")
         for line in pt_era.get_string().split('\n'):
             logging.info(line)
@@ -242,7 +248,9 @@ class DataGenerator(tf.keras.utils.Sequence):
         tags = []
 
         for samplepath,ind in self.indices_per_batch[index].items():
-            sample = samplepath.replace(self.input_dir+'/','') 
+            sample = samplepath.replace(self.input_dir,'') 
+            if sample.startswith("/"):
+                sample = sample[1:]
             keySelect = None
             eraSelect = None
             for era,keyDict in self.sample_dict.items():

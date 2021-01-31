@@ -658,35 +658,35 @@ class WeightDY:
 
         amax = max([histograms[k].GetMaximum() for k in ['ZVeto_0b','ZPeak_0b','ZPeak_1b','ZPeak_2b']])
 
-        C = ROOT.TCanvas("c1", "c1", 600, 900)
+        C = ROOT.TCanvas("c1", "c1", 600, 700)
 
-        pad1 = ROOT.TPad("pad1", "pad1", 0., 0.0, 1., 1.0)
+        pad1 = ROOT.TPad("pad1", "pad1", 0., 0., 1., 1.0)
         pad1.SetTopMargin(0.08)
-        pad1.SetBottomMargin(0.61)
+        pad1.SetBottomMargin(0.51)
         pad1.SetLeftMargin(0.12)
         pad1.SetRightMargin(0.1)
         pad1.SetGridx()
         pad1.SetGridy()
         
-        pad2 = ROOT.TPad("pad2", "pad2", 0, 0.0, 1, 0.6)
+        pad2 = ROOT.TPad("pad2", "pad2", 0, 0.0, 1., 0.5)
         pad2.SetTopMargin(0.)
-        pad2.SetBottomMargin(0.56)
+        pad2.SetBottomMargin(0.20)
         pad2.SetLeftMargin(0.12)
         pad2.SetRightMargin(0.1)
         pad2.SetGridx()
         pad2.SetGridy()
 
-        pad3 = ROOT.TPad("pad3", "pad3", 0, 0.0, 1, 0.33)
-        pad3.SetTopMargin(0.02)
-        pad3.SetBottomMargin(0.18)
-        pad3.SetLeftMargin(0.12)
-        pad3.SetRightMargin(0.1)
-        pad3.SetGridx()
-        pad3.SetGridy()
+#        pad3 = ROOT.TPad("pad3", "pad3", 0, 0.0, 1, 0.33)
+#        pad3.SetTopMargin(0.02)
+#        pad3.SetBottomMargin(0.18)
+#        pad3.SetLeftMargin(0.12)
+#        pad3.SetRightMargin(0.1)
+#        pad3.SetGridx()
+#        pad3.SetGridy()
 
         pad1.Draw()
         pad2.Draw()
-        pad3.Draw()
+        #pad3.Draw()
 
         ##########  PAD 1 ##########
         amax = max([histograms[k].GetMaximum() for k in ['ZVeto_0b','ZPeak_0b','ZPeak_2b','ZPeak_1b','ZPeak_1b']])
@@ -722,7 +722,7 @@ class WeightDY:
         if self.cat == 'resolved':
             histograms['ZPeak_2b'].Draw("same hist")
 
-        leg1 = ROOT.TLegend(0.50,0.73,0.89,0.91)
+        leg1 = ROOT.TLegend(0.50,0.70,0.89,0.91)
         leg1.SetTextSize(0.02)
         mode = "DY data estimation" if self.mode == "data" else "DY MC"
         leg1.AddEntry(histograms['ZVeto_0b'],"#splitline{Z Veto 0 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZVeto0b))
@@ -732,12 +732,12 @@ class WeightDY:
             leg1.AddEntry(histograms['ZPeak_2b'],"#splitline{Z Peak 2 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak2b))
         leg1.Draw()
 
-        text = ROOT.TPaveText(0.6,0.65,0.85,0.72,"NB NDC")
+        text = ROOT.TPaveText(0.6,0.60,0.85,0.68,"NB NDC")
         #text.SetFillStyle(1001)
         text.AddText("N_{Z peak}^{1b}/N_{Z peak}^{0b} = %0.5f"%self.factor_1b)
         if self.cat == 'resolved':
             text.AddText("N_{Z peak}^{2b}/N_{Z peak}^{0b} = %0.5f"%self.factor_2b)
-        text.AddText("N_{Z veto}^{0b} = %0.5f"%self.factor_ZVeto)
+        #text.AddText("N_{Z veto}^{0b} = %0.5f"%self.factor_ZVeto)
         text.SetBorderSize(0)
         text.Draw()
 
@@ -760,19 +760,20 @@ class WeightDY:
             self.weight_2b.SetLineColor(600)
 
         self.weight_1b.GetYaxis().SetTitle("Weight")
-        self.weight_1b.GetYaxis().SetTitleSize(0.035)
-        self.weight_1b.GetYaxis().SetTitleOffset(1.30)
-        self.weight_1b.GetYaxis().SetLabelSize(0.02)
+        self.weight_1b.GetYaxis().SetTitleSize(0.07)
+        self.weight_1b.GetYaxis().SetTitleOffset(0.8)
+        self.weight_1b.GetYaxis().SetLabelSize(0.035)
 
-        self.weight_1b.GetXaxis().SetTitleSize(0.)
-        self.weight_1b.GetXaxis().SetLabelSize(0.)
+        self.weight_1b.GetXaxis().SetTitleSize(0.07)
+        self.weight_1b.GetXaxis().SetTitleOffset(1.15)
+        self.weight_1b.GetXaxis().SetLabelSize(0.05)
 
         self.weight_1b.Draw("ep")
         if self.cat == 'resolved':
             self.weight_2b.Draw("ep same")
 
-        leg2 = ROOT.TLegend(0.65,0.65,0.89,0.75)
-        leg2.SetTextSize(0.03)
+        leg2 = ROOT.TLegend(0.65,0.55,0.89,0.75)
+        leg2.SetTextSize(0.05)
         leg2.AddEntry(self.weight_1b,"Weight (1b)")
         if self.cat == 'resolved':
             leg2.AddEntry(self.weight_2b,"Weight (2b)")
@@ -780,55 +781,55 @@ class WeightDY:
 
         leg2.Draw()
 
-        ##########  PAD 3 ##########
-        pad3.cd()
-
-        max_shape = max([h.GetMaximum() for h in [histograms['ZVeto_1b'],self.shape_1b]])
-
-        self.shape_1b.SetLineWidth(2) 
-        self.shape_1b.SetLineColor(602) 
-        if self.cat == 'resolved':
-            self.shape_2b.SetLineWidth(2) 
-            self.shape_2b.SetLineColor(600) 
-
-        if self.rebin_1D is not None:
-            histograms['ZVeto_1b'] = self.rebinWeights1D(histograms['ZVeto_1b'])
-            if self.cat == 'resolved':
-                histograms['ZVeto_2b'] = self.rebinWeights1D(histograms['ZVeto_2b'])
-
-        histograms['ZVeto_1b'].SetLineWidth(1)
-        histograms['ZVeto_1b'].SetLineColor(602)
-        if self.cat == 'resolved':
-            histograms['ZVeto_2b'].SetLineWidth(1)
-            histograms['ZVeto_2b'].SetLineColor(600)
-
-        self.shape_1b.SetMinimum(0)
-        self.shape_1b.SetMaximum(max_shape*1.1)
-        self.shape_1b.SetTitle("")
-        self.shape_1b.GetYaxis().SetTitle("DY shape")
-        self.shape_1b.GetYaxis().SetTitleSize(0.08)
-        self.shape_1b.GetYaxis().SetTitleOffset(0.7)
-        self.shape_1b.GetYaxis().SetLabelSize(0.05)
-
-        self.shape_1b.GetXaxis().SetTitleSize(0.08)
-        self.shape_1b.GetXaxis().SetTitleOffset(1.15)
-        self.shape_1b.GetXaxis().SetLabelSize(0.05)
-
-        self.shape_1b.Draw("H")
-        histograms['ZVeto_1b'].Draw("H same")
-        if self.cat == 'resolved':
-            self.shape_2b.Draw("H same")
-            histograms['ZVeto_2b'].Draw("H same")
-
-        leg3 = ROOT.TLegend(0.5,0.40,0.89,0.93)
-        leg3.SetTextSize(0.04)
-        leg3.AddEntry(self.shape_1b,"#splitline{DY shape from data (1b)}{Integral = %0.2f}"%self.shape_1b.Integral() if self.mode == 'data' else "#splitline{DY shape from MC (1b)}{Integral = %0.2f}"%self.shape_1b.Integral())
-        leg3.AddEntry(histograms['ZVeto_1b'],"#splitline{Z Veto (1b) (DY MC)}{Integral = %0.2f}"%self.N_ZVeto1b)
-        if self.cat == 'resolved':
-            leg3.AddEntry(self.shape_2b,"#splitline{DY shape from data (2b)}{Integral = %0.2f}"%self.shape_2b.Integral() if self.mode == 'data' else "#splitline{DY shape from MC (2b)}{Integral = %0.2f}"%self.shape_2b.Integral())
-            leg3.AddEntry(histograms['ZVeto_2b'],"#splitline{Z Veto (2b) (DY MC)}{Integral = %0.2f}"%self.N_ZVeto2b)
-        leg3.Draw()
-
+#        ##########  PAD 3 ##########
+#        pad3.cd()
+#
+#        max_shape = max([h.GetMaximum() for h in [histograms['ZVeto_1b'],self.shape_1b]])
+#
+#        self.shape_1b.SetLineWidth(2) 
+#        self.shape_1b.SetLineColor(602) 
+#        if self.cat == 'resolved':
+#            self.shape_2b.SetLineWidth(2) 
+#            self.shape_2b.SetLineColor(600) 
+#
+#        if self.rebin_1D is not None:
+#            histograms['ZVeto_1b'] = self.rebinWeights1D(histograms['ZVeto_1b'])
+#            if self.cat == 'resolved':
+#                histograms['ZVeto_2b'] = self.rebinWeights1D(histograms['ZVeto_2b'])
+#
+#        histograms['ZVeto_1b'].SetLineWidth(1)
+#        histograms['ZVeto_1b'].SetLineColor(602)
+#        if self.cat == 'resolved':
+#            histograms['ZVeto_2b'].SetLineWidth(1)
+#            histograms['ZVeto_2b'].SetLineColor(600)
+#
+#        self.shape_1b.SetMinimum(0)
+#        self.shape_1b.SetMaximum(max_shape*1.1)
+#        self.shape_1b.SetTitle("")
+#        self.shape_1b.GetYaxis().SetTitle("DY shape")
+#        self.shape_1b.GetYaxis().SetTitleSize(0.08)
+#        self.shape_1b.GetYaxis().SetTitleOffset(0.7)
+#        self.shape_1b.GetYaxis().SetLabelSize(0.05)
+#
+#        self.shape_1b.GetXaxis().SetTitleSize(0.08)
+#        self.shape_1b.GetXaxis().SetTitleOffset(1.15)
+#        self.shape_1b.GetXaxis().SetLabelSize(0.05)
+#
+#        self.shape_1b.Draw("H")
+#        histograms['ZVeto_1b'].Draw("H same")
+#        if self.cat == 'resolved':
+#            self.shape_2b.Draw("H same")
+#            histograms['ZVeto_2b'].Draw("H same")
+#
+#        leg3 = ROOT.TLegend(0.5,0.40,0.89,0.93)
+#        leg3.SetTextSize(0.04)
+#        leg3.AddEntry(self.shape_1b,"#splitline{DY shape from data (1b)}{Integral = %0.2f}"%self.shape_1b.Integral() if self.mode == 'data' else "#splitline{DY shape from MC (1b)}{Integral = %0.2f}"%self.shape_1b.Integral())
+#        leg3.AddEntry(histograms['ZVeto_1b'],"#splitline{Z Veto (1b) (DY MC)}{Integral = %0.2f}"%self.N_ZVeto1b)
+#        if self.cat == 'resolved':
+#            leg3.AddEntry(self.shape_2b,"#splitline{DY shape from data (2b)}{Integral = %0.2f}"%self.shape_2b.Integral() if self.mode == 'data' else "#splitline{DY shape from MC (2b)}{Integral = %0.2f}"%self.shape_2b.Integral())
+#            leg3.AddEntry(histograms['ZVeto_2b'],"#splitline{Z Veto (2b) (DY MC)}{Integral = %0.2f}"%self.N_ZVeto2b)
+#        leg3.Draw()
+#
 
 
         C.Print(self.outputname_pdf+'_%s.pdf'%self.era)
@@ -1106,8 +1107,10 @@ class WeightDY:
             
     def saveToRoot(self):
         root_file = ROOT.TFile(self.outputname_root+'_%s.root'%self.era,"recreate")
+        self.weight_1b.SetTitle("Weight 0b->1b : {};{}".format(self.title,self.xaxis))
         self.weight_1b.Write("Weight1B")
         if self.cat == 'resolved':
+            self.weight_2b.SetTitle("Weight 0b->2b : {};{}".format(self.title,self.xaxis))
             self.weight_2b.Write("Weight2B")
         root_file.Write()
         root_file.Close()
