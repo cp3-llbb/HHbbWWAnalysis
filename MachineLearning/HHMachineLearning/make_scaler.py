@@ -15,10 +15,8 @@ import parameters
 def MakeScaler(data=None,list_inputs=[],generator=False,batch=5000,list_samples=None,additional_columns={}):
     logging.info('Starting computation for the scaler')
     # Generate scaler #
-    scaler_name = 'scaler_'+parameters.suffix+'_'.join(parameters.eras)+'.pkl'
-    scaler_path = os.path.join(parameters.main_path,scaler_name)
     scaler = preprocessing.StandardScaler()
-    if not os.path.exists(scaler_path):
+    if not os.path.exists(parameters.scaler_path):
         # Not generator #
         if data is not None:
             scaler.fit(data[list_inputs])
@@ -84,14 +82,14 @@ def MakeScaler(data=None,list_inputs=[],generator=False,batch=5000,list_samples=
         scaler.var_ =  scaler.scale_**2
 
         # Save #
-        with open(scaler_path, 'wb') as handle:
+        with open(parameters.scaler_path, 'wb') as handle:
             pickle.dump(scaler, handle)
-        logging.info('Scaler %s has been created'%scaler_name)
+        logging.info('Scaler %s has been created'%parameters.scaler_name)
     # If exists, will import it #
     else:
-        with open(scaler_path, 'rb') as handle:
+        with open(parameters.scaler_path, 'rb') as handle:
             scaler = pickle.load(handle)
-        logging.info('Scaler %s has been imported'%scaler_name)
+        logging.info('Scaler %s has been imported'%parameters.scaler_name)
     # Test the scaler #
     if data is not None:
         try:
@@ -100,7 +98,7 @@ def MakeScaler(data=None,list_inputs=[],generator=False,batch=5000,list_samples=
             mean_scale = np.mean(y[:,[not m for m in parameters.mask_op]])
             var_scale  = np.var(y[:,[not m for m in parameters.mask_op]])
         except ValueError:
-            logging.warning("Problem with the scaler '%s' you imported, has the data changed since it was generated ?"%scaler_name)
+            logging.warning("Problem with the scaler '%s' you imported, has the data changed since it was generated ?"%parameters.scaler_name)
         if abs(mean_scale)>0.01 or abs((var_scale-1)/var_scale)>0.1: # Check that scaling is correct to 1%
-            logging.warning("Something is wrong with scaler '%s' (mean = %0.6f, var = %0.6f), maybe you loaded an incorrect scaler"%(scaler_name,mean_scale,var_scale))
+            logging.warning("Something is wrong with scaler '%s' (mean = %0.6f, var = %0.6f), maybe you loaded an incorrect scaler"%(parameters.scaler_name,mean_scale,var_scale))
 
