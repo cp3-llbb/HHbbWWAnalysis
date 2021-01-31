@@ -1,7 +1,6 @@
 ROC_multi:
   tree: tree
   classes:
-    - DY
     - GGF
     - H
     - Rare
@@ -10,7 +9,6 @@ ROC_multi:
     - VBF
     - WJets
   prob_branches:
-    - output_DY
     - output_GGF
     - output_H
     - output_Rare
@@ -19,7 +17,6 @@ ROC_multi:
     - output_VBF
     - output_WJets
   labels:
-    - P(DY)
     - P(GGF)
     - P(H)
     - P(Rare)
@@ -28,7 +25,6 @@ ROC_multi:
     - P(VBF)
     - P(WJets)
   colors:
-    - "#1a83a1"
     - "#288a24"
     - "#06b894"
     - "#610596"
@@ -37,11 +33,10 @@ ROC_multi:
     - "#8f0a1e"
     - "#d95564"
 
-  weight : 'event_weight'
+  weight : '1'
   title : Multiclass
   cut : ''
   selector :
-    'DY'    : 'DY'
     'GGF'   : 'GGF'
     'H'     : 'H'
     'Rare'  : 'Rare'

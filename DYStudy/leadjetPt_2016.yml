@@ -1,13 +1,13 @@
 path_ZVeto: &path_ZVeto /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_Fake_DNN09/
-path_ZPeak: &path_ZPeak /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_ZPeak_Fake_DNN09/
+path_ZPeak: &path_ZPeak /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_Fake_ZPeak_DNN09/
 
 
 era: '2016'
-title: 'Lead Jet P_{T}'
-xaxis: 'Lead jet P_{T}'
+title: 'Resolved DY weight 2016'
+xaxis: 'Lead jet P_{T} (b regression corrected) [GeV]'
 filename: 'weight_leadjetPt_{channel}_{type}_1D'
 category: 'resolved'
-rebin_1D: [0,5,10,15,20,25,30,35,40,45,50,60,70,80,90,100,120,140,160,200]
+rebin_1D: [0,5,10,15,20,25,30,35,40,45,50,60,70,80,90,100,120,150,200,300]
 
 ElElChannel:
   ZVeto_0b:

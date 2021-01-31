@@ -36,15 +36,14 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         super(PlotterNanoHHtobbWWDL, self).__init__(args)
 
     def initialize(self):
-        super(PlotterNanoHHtobbWWDL, self).initialize()
         # Change the way the FakeExtrapolation is postProcessed (avoids overriding the `postProcess` method) 
+        super(PlotterNanoHHtobbWWDL, self).initialize()
         if "FakeExtrapolation" in self.datadrivenContributions:
             contrib = self.datadrivenContributions["FakeExtrapolation"]
             self.datadrivenContributions["FakeExtrapolation"] = DataDrivenFake(contrib.name, contrib.config)
         if "DYEstimation" in self.datadrivenContributions: 
             contrib = self.datadrivenContributions["DYEstimation"]
             self.datadrivenContributions["DYEstimation"] = DataDrivenDY(contrib.name, contrib.config,"PseudoData" in self.datadrivenContributions)
-
 
     def definePlots(self, t, noSel, sample=None, sampleCfg=None): 
         noSel = super(PlotterNanoHHtobbWWDL,self).prepareObjects(t, noSel, sample, sampleCfg, 'DL')
@@ -74,7 +73,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             return plots
 
         #----- Machine Learning Model -----#                
-        model_num = "08"
+        model_num = "10"
         if not self.args.OnlyYield:
             path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
             print ("DNN model : %s"%path_model)
@@ -131,11 +130,11 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             # Boosted : ElEl #
             self.BoostedDYReweighting1bElEl  =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'ElEl_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
                                                                    systName="dy_ee_boosted_reweighting_1b", 
-                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
+                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
             # Boosted : MuMu #
             self.BoostedDYReweighting1bMuMu  =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'MuMu_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
                                                                    systName="dy_mm_boosted_reweighting_1b", 
-                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.pt})
+                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
         else:
             self.ResolvedDYReweighting1bElEl = lambda dilep : None
             self.ResolvedDYReweighting2bElEl = lambda dilep : None
@@ -441,6 +440,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         dileptonsCont = {'ElEl':OSElElDilepton[0],'MuMu':OSMuMuDilepton[0],'ElMu':OSElMuDilepton[0]}
         self.nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
+        #self.nodes = ['GGF','VBF','Top','DY','Higgs','Other']
         
         for selObjectDict in selObjectDictList:
             dilepton = dileptonsCont[selObjectDict['channel']]
@@ -505,8 +505,5 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         #plots.extend(cutFlowPlots)
         plots.append(self.yields)
             
-        for plot in plots:
-            print (plot.name)
-
         #----- Return -----#
         return plots

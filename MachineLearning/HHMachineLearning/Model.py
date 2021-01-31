@@ -35,6 +35,13 @@ import parameters
 from data_generator import DataGenerator
 import Operations
 import OneHot
+<<<<<<< HEAD
+
+import IPython
+tf_version = tf.__version__.split('.')
+assert tf_version[0] == '2'
+=======
+>>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
 
 #################################################################################################
 # LossHistory #
@@ -186,7 +193,19 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
         inputs_all.append(input_layer)
 
     # Concatenate all numerical inputs #
-    normalizer = preprocessing.Normalization(mean=means,variance=variances,name='Normalization')
+    if int(tf_version[1]) < 4:
+        x_dummy = x = np.random.normal(loc=scaler.mean_, scale=scaler.scale_, size=(int(10e6),scaler.mean_.shape[0]))
+        normalizer = preprocessing.Normalization(name='Normalization')
+        normalizer.adapt(x_dummy)
+        #m1 = scaler.mean_
+        #s1 = scaler.scale_
+        #m2 = normalizer.mean.numpy()
+        #s2 = normalizer.variance.numpy()
+        #IPython.embed()
+        del x_dummy
+        print('done')
+    else:
+        normalizer = preprocessing.Normalization(mean=means,variance=variances,name='Normalization')
     encoded_all.append(normalizer(tf.keras.layers.concatenate(inputs_numeric,name='Numerics')))
 
     if len(encoded_all) > 1:
