@@ -17,9 +17,10 @@ from grouped_entropy import GroupedXEnt
 ##################################  Path variables ####################################
 
 main_path = os.path.abspath(os.path.dirname(__file__))
-path_out = '/nfs/scratch/fynu/gsaha/HHMachineLearning_output/'
+path_out = '/nfs/scratch/fynu/gsaha/HHMachineLearning_Boosted_output/'
 path_model = os.path.join(main_path,'model')
 
+scaler_path = '/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/HHMachineLearning/scaler_boosted2016_2017_2018.pkl'
 ##############################  Datasets proportion   #################################
 crossvalidation = True
 
@@ -55,25 +56,24 @@ tasks = '1' # Number of threads(as a string) (not parallel training for classic 
 workers = 20
 ##################################  Naming ######################################
 # Physics Config #
-config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL.yml')
+config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL_Boosted.yml')
 lumidict = {'2016':35922,'2017':41529.152060112,'2018':59740.565201546}
-eras = ['2016']
-#eras = ['2016','2017','2018'] # To enable or disable eras, add or remove from this list
+#eras = ['2016']
+eras = ['2016','2017','2018'] # To enable or disable eras, add or remove from this list
 
-categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj']
+categories = ['boosted2b2Wj','boosted2b1Wj', 'boosted2b0Wj']
 channels = ['El','Mu']
 
 # Better put them in alphabetical order
-nodes = ['DY','GGF','H','Rare','ST','TT','VBF','WJets']
+nodes = ['GGF','H','Rare','ST','TT','VBF','WJets']
 group_ids = [
-        (1.0, [1,6]),           # signals
-        (1.0, [0,2,3,4,5,7]),   # backgrounds
-        (1.0, [1]),             # GGF
-        (1.0, [6]),             # VBF
-        (1.0, [5]),             # TT
-        (1.0, [0]),             # DY
-        (1.0, [7]),             # WJets
-        (1.0, [2,3,4]),       # Other
+        (1.0, [0,5]),           # signals
+        (1.0, [1,2,3,4,6]),     # backgrounds
+        (1.0, [0]),             # GGF
+        (1.0, [4]),             # TT
+        (1.0, [5]),             # VBF
+        (1.0, [6]),             # WJets
+        (1.0, [1,2,3]),         # rest : H + Rare + ST       
             ]
         
 #    def loss(self): # -> DL
@@ -91,7 +91,6 @@ group_ids = [
 
 # Input plots options #
 node_colors = {
-            'DY'    : '#1a83a1',
             'GGF'   : '#288a24',
             'H'     : '#06b894',
             'Rare'  : '#610596',
@@ -105,7 +104,7 @@ node_colors = {
 tree_name = 'Events'
 
 # scaler and mask names #
-suffix = 'resolved' 
+suffix = 'boosted' 
 # scaler_name -> 'scaler_{suffix}.pkl'  If does not exist will be created 
 # mask_name -> 'mask_{suffix}_{sample}.npy'  If does not exist will be created 
 
@@ -121,7 +120,7 @@ event_weight_sum_json = os.path.join(main_path,'background_{era}_event_weight_su
 resume_model = ''
 
 # Output #
-output_batch_size = 1000000
+output_batch_size = 50000
 split_name = 'tag' # 'sample' or 'tag' : criterion for output file splitting
 
 ##############################  Evaluation criterion   ################################
@@ -146,8 +145,6 @@ reduceLR_params = {'monitor'    : 'val_loss',   # Value to monitor
                    'cooldown'   : 1,            # How many epochs before starting again to monitor
                    'verbose'    : 1,            # Verbosity level
                    'mode'      : 'min'}         # Mode : 'auto', 'min', 'max'
-
-
     
 #################################  Scan dictionary   ##################################
 # /!\ Lists must always contain something (even if 0), otherwise 0 hyperparameters #
@@ -169,16 +166,16 @@ grouped_loss = GroupedXEnt(group_ids)
 #}
 p = { 
     'lr' : [0.1], 
-    'first_neuron' : [256],
+    'first_neuron' : [128],
     'activation' : [relu],
     'dropout' : [0.],
-    'hidden_layers' : [4], # does not take into account the first layer
+    'hidden_layers' : [3], # does not take into account the first layer
     'output_activation' : [softmax],
-    'l2' : [0.001],
+    'l2' : [0.0001],
     'optimizer' : [Adam],  
-    'epochs' : [100],   
-    'batch_size' : [20000], 
-    'n_particles' : [16],
+    'epochs' : [2],   
+    'batch_size' : [100000], 
+    'n_particles' : [10],
     'loss_function' : [grouped_loss],
 }
 
@@ -199,112 +196,44 @@ inputs = [
             '$era@op_era',
             'lep_pdgId@op_pdgid',
             'lep_charge@op_charge',
-            'JPAcat@op_resolved_JPAcat',
+            'JPAcat@op_boosted_JPAcat',
+            # JPA values #
+            'L2_Hbb2Wj',
+            'L2_Hbb1Wj',
+            'L2_Hbb0Wj',
             # LL variables #
-            'METpt',
-            'METpx',
-            'METpy',
-            'METpz',
-            'METenergy',
-            'lep_Px',
-            'lep_Py',
-            'lep_Pz',
-            'lep_E',
+            'METpt',               
             'lep_pt',
-            'lep_eta',
-            'bj1_Px',
-            'bj1_Py',
-            'bj1_Pz',
-            'bj1_E',
-            'bj1_pt',
-            'bj1_eta',
-            'bj1_bTagDeepFlavB',
-            'bj2_Px',
-            'bj2_Py',
-            'bj2_Pz',
-            'bj2_E',
-            'bj2_pt',
-            'bj2_eta',
-            'bj2_bTagDeepFlavB',
-            'wj1_Px',
-            'wj1_Py',
-            'wj1_Pz',
-            'wj1_E',
+            'fatbj_pt',
+            'fatbj_softdropMass',
+            'fatbj_btagDeepB',
+            'cosThetaS_Hbb',
+            'mT_top_3particle',
             'wj1_pt',
-            'wj1_eta',
             'wj1_bTagDeepFlavB',
-            'wj2_Px',
-            'wj2_Py',
-            'wj2_Pz',
-            'wj2_E',
             'wj2_pt',
-            'wj2_eta',
             'wj2_bTagDeepFlavB ',
-            'nAk4BJets',
-            'nAk8BJets',
+            'nAk8Jets',
+            'nAk4JetsCleandWithAk8b',           
             'VBF_tag',
-            'neuPx',
-            'neuPy',
-            'neuPz',
-            'neuE',
-            'neuPt',
-           # HL variables #
+            # HL variables #
             'lepmet_DPhi',
             'lepmet_pt',
             'lep_MT',
             'MET_LD',
-            'hT',
-            'bj1LepDR',
-            'bj1LepDPhi',
-            'bj1MetDPhi',
-            'minDR_lep_allJets',
-            'bj2LepDR',
-            'bj2LepDPhi',
-            'bj2MetDPhi',
-            'bj1bj2_pt',
-            'bj1bj2_M',
-            'cosThetaS_Hbb',
-            'mT_top_3particle',
-            'wj1LepDR',
-            'wj1LepDPhi',
-            'wj1MetDPhi',
-            'wj2LepDR',
-            'wj2LepDPhi',
-            'wj2MetDPhi',
+            'fatbj_lepDR',
+            'fatbj_Wj1DR',
+            'fatbj_wj2DR',
             'wj1wj2_pt',
-            'wj1wj2_M',
-            'w1w2_MT',
-            'HWW_Mass',
+            'wj1wj2DR',
+            'wj1wj2invM',
+            'WWplaneAngle_withMET', 
+            'HWplaneAngle',
             'HWW_Simple_Mass',
             'HWW_dR',
-            'cosThetaS_Wjj_simple',
-            'cosThetaS_WW_simple_met ',
-            'cosThetaS_HH_simple_met',
-            'angleBetWWPlane',
-            'angleBetHWPlane',
-            'bj1bj2_DR',
-            'bj1bj2_DPhi',
-            'bj2wj1_DR',
-            'bj2wj1_DPhi',
-            'wj1wj2_DR',
-            'wj1wj2_DPhi',
-            'bj1wj2_DR',
-            'bj1wj2_DPhi',
-            'bj1wj1_DR',
-            'bj1wj1_DPhi',
-            'VBFj1pt',
-            'VBFj2pt',
-            'VBFj1eta',
-            'VBFj2eta',
-            'VBFj1j2dEta',
-            'VBFj1j2dPhi',
-            'VBFj1j2invM',
             'zeppenfeldVar',
-            'minJetDR',
-            'minLepJetDR',
-            'HT2_lepJetMet',
-            'HT2R_lepJetMet',
     ]
+
 operations = [inp.split('@')[1] if '@' in inp else None  for inp  in  inputs]
 check_op = [(o is not None)*1 for o in operations]
 if check_op != sorted(check_op,reverse=True):
@@ -314,8 +243,7 @@ inputs = [inp.split('@')[0] for inp  in  inputs]
 
 LBN_inputs = [
               'lep_E','lep_Px','lep_Py','lep_Pz',
-              'bj1_E','bj1_Px','bj1_Py','bj1_Pz',
-              'bj2_E','bj2_Px','bj2_Py','bj2_Pz',
+              'fatbj_E','fatbj_Px','fatbj_Py','fatbj_Pz',
               'wj1_E','wj1_Px','wj1_Py','wj1_Pz',
               'wj2_E','wj2_Px','wj2_Py','wj2_Pz',
              ]
@@ -327,7 +255,6 @@ assert len(LBN_inputs)%4 == 0
 # Output branches #
 
 outputs = [
-            '$DY',
             '$GGF',
             '$H',
             '$Rare',
@@ -339,10 +266,11 @@ outputs = [
 
 # Other variables you might want to save in the tree #
 other_variables = [
-                    'event',
-                    'ls',
-                    'run',
-                 ]
+    'event',
+    'ls',
+    'run',
+    'MC_weight',
+]
 
 
 ################################  dtype operation ##############################
@@ -350,11 +278,3 @@ other_variables = [
 def make_dtype(list_names): # root_numpy does not like . and ()
     list_dtype = [(name.replace('.','_').replace('(','').replace(')','').replace('-','_minus_').replace('*','_times_')) for name in list_names]
     return list_dtype
-        
-
-
-
-                                
-
-
-
