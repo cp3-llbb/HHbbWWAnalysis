@@ -124,7 +124,7 @@ class highlevelLambdas:
         # https://github.com/HEP-KBFI/hh-bbww/blob/f4ab60f81a920268a3f2187b97a58ec449b26883/src/comp_metP4_B2G_18_008.cc
         # some necessary constants (visP4 = lepP4 + Wjj_simple)
         # - - - - - used to compute neuP4 - - - - - #
-        ax = lambda visP4, met : (125.18 - op.pow(visP4.M(), 2) + 2.*visP4.Px()*met.p4.Px() + 2.*visP4.Py()*met.p4.Py())
+        ax = lambda visP4, met : 125.18*125.18 - op.pow(visP4.M(), 2) + 2.*visP4.Px()*met.p4.Px() + 2.*visP4.Py()*met.p4.Py()
         A  = lambda visP4 : 4.0 * op.pow(visP4.E(), 2) - op.pow(visP4.Pz(), 2)
         B  = lambda visP4, met : -4.0 * ax(visP4, met) * visP4.Pz()
         C  = lambda visP4, met : 4.0*op.pow(visP4.E(), 2)*(op.pow(met.p4.Px(), 2) + op.pow(met.p4.Py(), 2)) - op.pow(ax(visP4, met), 2)

@@ -13,7 +13,7 @@ import time
 import array
 import numpy as np
 import itertools
-import plotille # For plots in terminal
+#import plotille # For plots in terminal
 
 from sklearn.model_selection import train_test_split
 
@@ -313,25 +313,25 @@ class HyperModel:
         # Hist in terminal #
         eval_mean_arr = r.data['eval_mean'].values
         val_loss_arr = r.data['val_loss'].values
-        fig1 = plotille.Figure()
-        fig1.width = 150
-        fig1.height = 50
-        fig1.set_x_limits(min_=np.amin(eval_mean_arr),max_=np.amax(eval_mean_arr))
-        fig1.color_mode = 'byte'
-        fig1.histogram(eval_mean_arr, bins=200, lc=25)
+        #fig1 = plotille.Figure()
+        #fig1.width = 150
+        #fig1.height = 50
+        #fig1.set_x_limits(min_=np.amin(eval_mean_arr),max_=np.amax(eval_mean_arr))
+        #fig1.color_mode = 'byte'
+        #fig1.histogram(eval_mean_arr, bins=200, lc=25)
         print ('  Evaluation error  '.center(80,'-'))
         print ('Best model : ',sorted_data.iloc[0][['eval_mean']])
-        print(fig1.show(legend=True))
+        #print(fig1.show(legend=True))
 
-        fig2 = plotille.Figure()
-        fig2.width = 150
-        fig2.height = 50
-        fig2.set_x_limits(min_=np.amin(val_loss_arr),max_=np.amax(val_loss_arr))
-        fig2.color_mode = 'byte'
-        fig2.histogram(val_loss_arr, bins=200, lc=100)
+        #fig2 = plotille.Figure()
+        #fig2.width = 150
+        #fig2.height = 50
+        #fig2.set_x_limits(min_=np.amin(val_loss_arr),max_=np.amax(val_loss_arr))
+        #fig2.color_mode = 'byte'
+        #fig2.histogram(val_loss_arr, bins=200, lc=100)
         print ('  Val loss  '.center(80,'-'))
         print ('Best model : ',sorted_data.iloc[0][['val_loss']])
-        print(fig2.show(legend=True))
+        #print(fig2.show(legend=True))
 
         logging.info('='*80)
 

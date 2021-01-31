@@ -3,7 +3,10 @@ import sys
 from copy import copy, deepcopy
 from bamboo import treefunctions as op
 from itertools import chain
-
+import random
+from bamboo.root import loadHeader
+loadHeader("/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/jpa.h")
+#loadHeader("jpa.h")
 
 ###################################################################################################################
 # ModelPathDict is from Plotter. Keep the order same for function List in Stage-2
@@ -135,13 +138,17 @@ def evaluateJPA_Hbb2Wj(lepton, muons, electrons, fatJets, jets, bJetsL, bJetsM, 
               jets[1].qgl,                                                            # wjet2_qgDiscr
               (fatJets[0].subJet1.p4 + fatJets[0].subJet2.p4).Pt(),                   # Hbb_Pt
               HLL.Wjj_simple(jets[0].p4, jets[1].p4).M(),                             # HadW_mass
-              HLL.comp_cosThetaS(jets[0].p4, jets[1].p4),                             # HadW_cosTheta
+              #HLL.comp_cosThetaS(jets[0].p4, jets[1].p4),                             # HadW_cosTheta
+              op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(jets[0].p4, jets[1].p4),
+              #op.c_float(random.choice([0,1])),
               op.deltaR(HLL.Wjj_simple(jets[0].p4, jets[1].p4), lepton.p4),           # dR_HadW_lep
               op.min(HLL.dR_HadW_bjet(fatJets[0].subJet1.p4, jets[0].p4, jets[1].p4), # min_dR_HadW_bjet
                      HLL.dR_HadW_bjet(fatJets[0].subJet2.p4, jets[0].p4, jets[1].p4)),
               op.deltaR(jets[0].p4, jets[1].p4),                                      # dR_wjet1wjet2
-              HLL.HWW_simple(jets[0].p4, jets[1].p4, lepton.p4, met).M()              # Hww_mass 
-          ]
+              #HLL.HWW_simple(jets[0].p4, jets[1].p4, lepton.p4, met).M()              # Hww_mass 
+              #(jets[0].p4+jets[1].p4+lepton.p4+met.p4).M()                            # Hww_mass 
+              op.extMethod("HHbbWWJPA::HWW_SimpleMassWithRecoNeutrino", returnType="float")(jets[0].p4, jets[1].p4, lepton.p4, met.p4)
+    ]
     
     return model(*invars, defineOnFirstUse=False)[0]
     
@@ -292,9 +299,6 @@ def findJPACategoryBoosted (self, selObj, lepton, muons, electrons, fatJets, jet
     evtCat = makeOddEvenEvaluator(event%2, modelPathDict.get('evCat')[1], modelPathDict.get('evCat')[0], mvaType="TMVA")
     JPAL2outList = evtCat(*JPAMaxScoreList)
     maxIdx = op.rng_max_element_index(JPAL2outList)
-    #jetIdxPerCat = toJetIndices(JPAJetList)
-
-    #print(type(JPAMaxScoreList), type(JPAJetList[0]))
 
     newSelObj  = copy(selObj)
     selObjJPAjetsIdxDict = {}
