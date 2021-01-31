@@ -22,16 +22,16 @@ from DDHelper import DataDrivenPseudoData
 class BaseNanoHHtobbWW(NanoAODModule):
     """ Base module: HH->bbW(->e/µ nu)W(->e/µ nu) histograms from NanoAOD """
     def __init__(self, args):
-            super(BaseNanoHHtobbWW, self).__init__(args)
-            # Set plots options #
-            self.plotDefaults = {"show-ratio": True,
-                                 "y-axis-show-zero" : True,
-                                 #"normalized": True,
-                                 "y-axis": "Events",
-                                 "log-y"  : "both",
-                                 "ratio-y-axis-range" : [0.8,1.2],
-                                 "ratio-y-axis" : '#frac{Data}/{MC}',
-                                 "sort-by-yields" : True}
+        super(BaseNanoHHtobbWW, self).__init__(args)
+        # Set plots options #
+        self.plotDefaults = {"show-ratio": True,
+                             "y-axis-show-zero" : True,
+                             #"normalized": True,
+                             "y-axis": "Events",
+                             "log-y"  : "both",
+                             "ratio-y-axis-range" : [0.8,1.2],
+                             "ratio-y-axis" : '#frac{Data}{MC}',
+                             "sort-by-yields" : True}
 
     #-------------------------------------------------------------------------------------------#
     #                                       addArgs                                             #
@@ -348,12 +348,60 @@ One lepton and and one jet argument must be specified in addition to the require
 
         #----- Theory uncertainties -----#
         if self.is_MC:
-            #qcdScaleVariations = { f"qcdScalevar{i}": tree.LHEScaleWeight[i] for i in [0, 1, 3, 5, 7, 8] }
-            #qcdScaleSyst = op.systematic(op.c_float(1.), name="qcdScale", **qcdScaleVariations)
+            # PDF #
+            # Twiki: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopSystematics#Factorization_and_renormalizatio 
+            # len(LHEScaleWeight) == 9
+            #   -> nominal = LHEScaleWeight[4]
+            #   -> Fact     : up = LHEScaleWeight[5] and down = LHEScaleWeight[3]
+            #   -> Renorm   : up = LHEScaleWeight[7] and down = LHEScaleWeight[1]
+            #   -> Mixed    : up = LHEScaleWeight[8] and down = LHEScaleWeight[0]
+            # len(LHEScaleWeight) == 8
+            #   -> nominal = 1.
+            #   -> Fact     : up = LHEScaleWeight[4] and down = LHEScaleWeight[3]
+            #   -> Renorm   : up = LHEScaleWeight[6] and down = LHEScaleWeight[1]
+            #   -> Mixed    : up = LHEScaleWeight[7] and down = LHEScaleWeight[0]
+            # len(LHEScaleWeight) different (usually 44 ?!)
+            #   -> nominal = up = down = 1.
+            self.scaleWeight_Fact = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.systematic(tree.LHEScaleWeight[4],
+                                                                                                        name = "ScaleWeight_Fact",
+                                                                                                        up   = tree.LHEScaleWeight[5],
+                                                                                                        down = tree.LHEScaleWeight[3])),
+                                                   (op.rng_len(tree.LHEScaleWeight) == 8, op.systematic(op.c_float(1.),
+                                                                                                        name = "ScaleWeight_Fact",
+                                                                                                        up   = tree.LHEScaleWeight[4],
+                                                                                                        down = tree.LHEScaleWeight[3])),
+                                                   op.systematic(op.c_float(1.),
+                                                                 name = "ScaleWeight_Fact",
+                                                                 up   = op.c_float(1.),
+                                                                 down = op.c_float(1.)))
+            self.scaleWeight_Renorm = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.systematic(tree.LHEScaleWeight[4],
+                                                                                                          name = "ScaleWeight_Renorm",
+                                                                                                          up   = tree.LHEScaleWeight[7],
+                                                                                                          down = tree.LHEScaleWeight[1])),
+                                                     (op.rng_len(tree.LHEScaleWeight) == 8, op.systematic(op.c_float(1.),
+                                                                                                          name = "ScaleWeight_Renorm",
+                                                                                                          up   = tree.LHEScaleWeight[6],
+                                                                                                          down = tree.LHEScaleWeight[1])),
+                                                     op.systematic(op.c_float(1.),
+                                                                   name = "ScaleWeight_Renorm",
+                                                                   up   = op.c_float(1.),
+                                                                   down = op.c_float(1.)))
+            self.scaleWeight_Mixed = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.systematic(tree.LHEScaleWeight[4],
+                                                                                                         name = "ScaleWeight_Mixed",
+                                                                                                         up   = tree.LHEScaleWeight[8],
+                                                                                                         down = tree.LHEScaleWeight[0])),
+                                                    (op.rng_len(tree.LHEScaleWeight) == 8, op.systematic(op.c_float(1.),
+                                                                                                         name = "ScaleWeight_Mixed",
+                                                                                                         up   = tree.LHEScaleWeight[7],
+                                                                                                         down = tree.LHEScaleWeight[0])),
+                                                    op.systematic(op.c_float(1.),
+                                                                  name = "ScaleWeight_Mixed",
+                                                                  up   = op.c_float(1.),
+                                                                  down = op.c_float(1.)))
+            noSel = noSel.refine("PDFweights", weight = [self.scaleWeight_Fact,self.scaleWeight_Renorm,self.scaleWeight_Mixed])
+            # PS weights #
             self.psISRSyst = op.systematic(op.c_float(1.), name="psISR", up=tree.PSWeight[2], down=tree.PSWeight[0])
             self.psFSRSyst = op.systematic(op.c_float(1.), name="psFSR", up=tree.PSWeight[3], down=tree.PSWeight[1])
-            #pdfsWeight = op.systematic(op.c_float(1.), name="pdfsWgt", up=tree.LHEPdfWeight, down=tree.LHEPdfWeight)
-            #noSel = noSel.refine("theorySystematics", weight = [qcdScaleSyst,psISRSyst,psFSRSyst,pdfsWeight])
             noSel = noSel.refine("PSweights", weight = [self.psISRSyst, self.psFSRSyst])
 
         #----- Triggers and Corrections -----#
@@ -421,8 +469,9 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = "Summer16_07Aug2017_V11_MC", 
                                   smear                 = "Summer16_25nsV1_MC", 
-                                  jesUncertaintySources = ["Total"],
-                                  mcYearForFatJets      = era, 
+                                  jesUncertaintySources = "Merged",
+                                  uncertaintiesFallbackJetType = "AK4PFchs",
+                                  regroupTag            = "V2",
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -458,8 +507,7 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
-                                  jesUncertaintySources = ["Total"],
-                                  mcYearForFatJets      = era, 
+                                  regroupTag            = "V2",
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -515,7 +563,9 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = "Fall17_17Nov2017_V32_MC",
                                   smear                 = "Fall17_V3b_MC",
-                                  jesUncertaintySources = ["Total"],
+                                  jesUncertaintySources = "Merged",
+                                  regroupTag            = "V2",
+                                  uncertaintiesFallbackJetType = "AK4PFchs",
                                   mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
@@ -554,7 +604,6 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
-                                  jesUncertaintySources = ["Total"],
                                   mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
@@ -608,7 +657,9 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = "Autumn18_V19_MC",
                                   smear                 = "Autumn18_V7b_MC",
-                                  jesUncertaintySources = ["Total"],
+                                  jesUncertaintySources = "Merged",
+                                  regroupTag            = "V2",
+                                  uncertaintiesFallbackJetType = "AK4PFchs",
                                   mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
@@ -647,7 +698,6 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
-                                  jesUncertaintySources = ["Total"], 
                                   mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
@@ -662,9 +712,9 @@ One lepton and and one jet argument must be specified in addition to the require
 
         return tree,noSel,be,lumiArgs
 
-    def initialize(self,forSkimmer=False):
+    def initialize(self):
         super(BaseNanoHHtobbWW, self).initialize()
-        if not forSkimmer and "PseudoData" in self.datadrivenContributions:
+        if "PseudoData" in self.datadrivenContributions:
             contrib = self.datadrivenContributions["PseudoData"]
             self.datadrivenContributions["PseudoData"] = DataDrivenPseudoData(contrib.name, contrib.config)
 
@@ -1276,7 +1326,6 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                                                               op.deltaR(j.p4, self.ak4JetsByBtagScore[1].p4)>0.8)),
                                                                 (op.rng_len(self.ak4JetsByBtagScore)==1,op.deltaR(j.p4, self.ak4JetsByBtagScore[0].p4)>0.8),
                                                                 op.c_bool(True))
-            #op.AND(op.NOT(op.rng_any(self.ak4JetsByBtagScore[:2], lambda ak4Jet : op.deltaR(j.p4, ak4Jet.p4) <= 0.8 )))
             self.lambda_cleanVBFAk8 = lambda j : op.multiSwitch((op.rng_len(self.ak8BJets)>0,op.deltaR(j.p4, self.ak8BJets[0].p4) > 1.2),
                                                                 (op.rng_len(self.ak8Jets)>0,op.deltaR(j.p4, self.ak8Jets[0].p4) > 1.2),
                                                                 op.c_bool(True))
@@ -1306,8 +1355,9 @@ One lepton and and one jet argument must be specified in addition to the require
             # Efficiency and mistags do not have uncertainties, the systematics are in the SF 
             self.jetpuid_mc_eff = self.SF.get_scalefactor("lepton", ('jet_puid_eff','eff_{}_L'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer))
             self.jetpuid_mc_mis = self.SF.get_scalefactor("lepton", ('jet_puid_eff','mistag_{}_L'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer))
-            self.jetpuid_sf_eff = self.SF.get_scalefactor("lepton", ('jet_puid_sf','eff_{}_L'.format(era)),combine="weight", systName="jetpuid_eff_sf", defineOnFirstUse=(not forSkimmer))
-            self.jetpuid_sf_mis = self.SF.get_scalefactor("lepton", ('jet_puid_sf','mistag_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag_sf", defineOnFirstUse=(not forSkimmer))
+                # Eff and mistag do not have systematics, only the SF do
+            self.jetpuid_sf_eff = self.SF.get_scalefactor("lepton", ('jet_puid_sf','eff_{}_L'.format(era)),combine="weight", systName="jetpuid_eff", defineOnFirstUse=(not forSkimmer))
+            self.jetpuid_sf_mis = self.SF.get_scalefactor("lepton", ('jet_puid_sf','mistag_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag", defineOnFirstUse=(not forSkimmer))
 
             #---- Object SF -----# (Will take as argument the era)
             ####  Muons ####
@@ -1506,15 +1556,16 @@ One lepton and and one jet argument must be specified in addition to the require
         #                    b-tagging efficiency scale factors                   #
         ###########################################################################
         if self.is_MC:
-            if self.era == '2016':
-                if ('db' in sampleCfg.keys() and 'TuneCP5' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['TuneCP5' in f for f in sampleCfg['files']])):
-                    csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_2016LegacySF_V1_TuneCP5.csv")
-                else: # With CUETP8M1
-                    csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_2016LegacySF_V1.csv")
-            if self.era == '2017':
-                csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepFlavour_94XSF_V4_B_F.csv")
-            if self.era == '2018':
-                csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_102XSF_V2.csv")
+            #if self.era == '2016':
+            #    if ('db' in sampleCfg.keys() and 'TuneCP5' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['TuneCP5' in f for f in sampleCfg['files']])):
+            #        csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_2016LegacySF_V1_TuneCP5.csv")
+            #    else: # With CUETP8M1
+            #        csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_2016LegacySF_V1.csv")
+            #if self.era == '2017':
+            #    csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepFlavour_94XSF_V4_B_F.csv")
+            #if self.era == '2018':
+            #    csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_102XSF_V2.csv")
+            csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "deepjet_{}.csv".format(self.era))
                 
             if not os.path.exists(csvFileNameAk4):
                 raise RuntimeError('Could not find Ak4 csv file %s'%csvFileNameAk4)

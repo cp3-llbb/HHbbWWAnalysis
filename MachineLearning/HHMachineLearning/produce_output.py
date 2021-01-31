@@ -48,6 +48,7 @@ class ProduceOutput:
             if len(self.model) == 1: # classic training
                 output_generator = DataGenerator(path = parameters.config,
                                                  inputs = parameters.inputs,
+                                                 inputsLBN = parameters.LBN_inputs,
                                                  outputs = parameters.outputs,
                                                  other = parameters.other_variables,
                                                  cut = parameters.cut,
@@ -57,7 +58,7 @@ class ProduceOutput:
                 instance = HyperModel(self.model[0])
                 for i in range(len(output_generator)):
                     data = output_generator.__getitem__(i,True)
-                    output = instance.HyperRestore(data[[inp.replace('$','') for inp in parameters.inputs]])
+                    output = instance.HyperRestore(data[self.list_inputs])
                     output_df = pd.DataFrame(output,columns=[('output_%s'%o).replace('$','') for o in parameters.outputs],index=data.index)
                     full_df = pd.concat([data,output_df],axis=1)
                     self.SaveToRoot(full_df,path_output,output_name,out_idx='_slice%d'%i)
@@ -68,6 +69,7 @@ class ProduceOutput:
                     instance = HyperModel(model)
                     output_generator = DataGenerator(path = parameters.config,
                                                      inputs = parameters.inputs,
+                                                     inputsLBN = parameters.LBN_inputs,
                                                      outputs = parameters.outputs,
                                                      other = parameters.other_variables,
                                                      cut = parameters.cut,
@@ -77,7 +79,7 @@ class ProduceOutput:
                                                      model_idx = model_idx)
                     for i in range(len(output_generator)):
                         data = output_generator.__getitem__(i,True)
-                        output = instance.HyperRestore(data[[inp.replace('$','') for inp in parameters.inputs]])
+                        output = instance.HyperRestore(data[self.list_inputs])
                         output_df = pd.DataFrame(output,columns=[('output_%s'%o).replace('$','') for o in parameters.outputs],index=data.index)
                         full_df = pd.concat([data,output_df],axis=1)
                         self.SaveToRoot(full_df,path_output,output_name,out_idx='_model%d_slice%d'%(model_idx,i))

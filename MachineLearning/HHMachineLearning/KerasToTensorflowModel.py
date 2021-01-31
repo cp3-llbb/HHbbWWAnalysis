@@ -1,74 +1,224 @@
-import sys
 import os
+import sys
 import json
 import argparse
-
-#from tensorflow.compat.v1.keras.models import model_from_json
-#from tensorflow.compat.v1.keras import backend as K
-#from tensorflow.python.framework import graph_util
-#from tensorflow.python.framework import graph_io
-
+import talos
+import numpy as np
 import tensorflow as tf
-#import tensorflow.compat.v1 as tf
-#tf.disable_v2_behavior()
+from lbn import LBNLayer
+import Operations
 
+class WhereEquals(tf.keras.layers.Layer):
+    def __init__(self, value=0):
+        super(WhereEquals, self).__init__()
+        self.value = value
+    def call(self, inp):
+        return tf.where(inp[:, 0] == self.value)
 
-def KerasToTensorflowModel(path_to_json,path_to_h5,prefix,name,numout,outdir,use_preprocess):
-    # Make output dire #
-    os.makedirs(outdir,exist_ok=True)
+def import_tf():
+    import tensorflow as tf
+    # keep a reference to the v1 API as long as v2 provides compatibility
+    tf1 = None
+    tf_version = tf.__version__.split(".", 2)
+    if tf_version[0] == "1":
+        tf1 = tf
+    elif getattr(tf, "compat", None) is not None and getattr(tf.compat, "v1", None) is not None:
+        tf1 = tf.compat.v1
 
-    # Import model and weights #
-    with open(path_to_json,"r") as f:
-        loaded_model_json = f.read()
-    if use_preprocess:
-        from preprocessing import PreprocessLayer
-        custom_objects =  {'PreprocessLayer': PreprocessLayer}
-    else:
+    return tf, tf1, tf_version
+
+class KerasToTensorflowModel:
+    def __init__(self,name,outdir,paths_zip,paths_json,paths_h5):
+        self.name       = name
+        self.outdir     = outdir
+        if paths_zip is None and paths_json is None and paths_h5 is None:
+            raise RuntimeError('Either zip paths or json+h5 paths need to be provided')
+        if paths_zip is not None and (paths_json is not None or paths_h5 is not None):
+            raise RuntimeError('Zip paths cannot be used with either json or h5 paths')
+        if paths_zip is None and not (paths_json is not None and paths_h5 is not None):
+            raise RuntimeError('Json and h5 paths need to be used together')
+
+        if paths_zip is not None:
+            models = [self.load_model_talos(path_zip) for path_zip in paths_zip] 
+        else:
+            models = [self.load_model_keras(path_json,path_h5) for path_json,path_h5 in zip(paths_json,paths_h5)]
+
+        if len(models) == 1:
+            self.save_model_to_protobuf(models[0])
+            self.makeInputList(models[0])
+        elif len(models) > 1 :
+            print ("Will stitch models :")
+            for i in range(len(models)):
+                if paths_zip is not None:
+                    path = paths_zip[i]
+                else:
+                    path = paths_json[i]
+                print ("... model {} applied on events with eventnr % {} == {}".format(path,len(models),i))
+            stitch_model = self.stich_models(models)
+            if self.test_stich(stitch_model,models):
+                self.save_model_to_protobuf(stitch_model)
+                self.makeInputList(stitch_model)
+            else:
+                raise RuntimeError("Stitching test failed")
+        else:
+            raise RuntimeError("No model has been loaded")
+            
+
+    @staticmethod
+    def load_model_keras(path_to_json,path_to_h5):
+        with open(path_to_json,"r") as f:
+            loaded_model_json = f.read()
         custom_objects = {}
-    loaded_model = tf.compat.v1.keras.models.model_from_json(loaded_model_json,custom_objects=custom_objects)
-    loaded_model.load_weights(path_to_h5)
-    
-    # Alias the outputs in the model - this sometimes makes them easier to access in TF
-    #K.set_learning_phase(0)
-    pred = [None]*numout
-    pred_node_names = [None]*numout
-    for i in range(numout):
-        pred_node_names[i] = prefix+'_'+str(i)
-        pred[i] = tf.identity(loaded_model.output[i], name=pred_node_names[i])
-    print('Output nodes names are: ', pred_node_names)
 
-    sess = tf.compat.v1.keras.backend.get_session()
-    #sess = K.get_session()
-    
-    # Write the graph in human readable
-    f = 'graph_def_for_reference.pb.ascii'
-    tf.compat.v1.train.write_graph(sess.graph.as_graph_def(), outdir, f, as_text=True)
-    #tf.train.write_graph(sess.graph.as_graph_def(), outdir, f, as_text=True)
-    print('Saved the graph definition in ascii format at: ', os.path.join(outdir, f))
+        if 'LBNLayer' in loaded_model_json:
+            custom_objects.update({'LBNLayer':LBNLayer})
+        if 'CategoryEncoding' in loaded_model_json:
+            custom_objects.update({name:getattr(Operations,name) for name in dir(Operations) if name.startswith('op')})
 
-    # Write the graph in binary .pb file
-    constant_graph = tf.compat.v1.graph_util.convert_variables_to_constants(sess, sess.graph.as_graph_def(), pred_node_names)
-    #constant_graph = graph_util.convert_variables_to_constants(sess, sess.graph.as_graph_def(), pred_node_names)
-    tf.compat.v1.graph_io.write_graph(constant_graph, outdir, name, as_text=False)
-    #graph_io.write_graph(constant_graph, outdir, name, as_text=False)
-    print('Saved the constant graph (ready for inference) at: ', os.path.join(outdir, name))
+        model = tf.keras.models.model_from_json(loaded_model_json,custom_objects=custom_objects)
+        model.load_weights(path_to_h5)
+        return model
+            
+    @staticmethod
+    def load_model_talos(path_to_zip):
+        custom_objects = {'LBNLayer':LBNLayer}
+        custom_objects.update({name:getattr(Operations,name) for name in dir(Operations) if name.startswith('op')})
+        model = talos.Restore(path_to_zip,custom_objects=custom_objects).model
+        return model
 
+    @staticmethod
+    def stich_models(models):
+        inputs = [tf.keras.Input(inp.shape[1:], name=inp.name) for inp in models[0].inputs]
+        eventnr = tf.keras.Input((1,), dtype=tf.int64, name="eventnr")
+        const = len(models)
+        model_idx = tf.keras.layers.Lambda(lambda x: x % const)(eventnr)
+
+        output = tf.zeros(
+            shape=tf.concat((tf.shape(inputs[0])[:1], tf.shape(models[0](inputs))[1:]), axis=0)
+        )
+        for i, model in enumerate(models):
+            print ("Stitching model {}".format(i),end=' ... ')
+            model._name += str(i)
+            idx = WhereEquals(value=i)(model_idx)
+            inp_gathered = [tf.gather_nd(a, idx) for a in inputs]
+            out = model(inp_gathered)
+            output = tf.tensor_scatter_nd_update(output, idx, out)
+            print ('done')
+
+        stitched_model = tf.keras.Model(inputs + [eventnr], output)
+
+        return stitched_model
+
+    @staticmethod
+    def test_stich(stitched_model,models):
+        batch = 100
+        success = True
+        for idx,model in enumerate(models):
+            print ('Testing model {}'.format(idx),end=" ... ")
+            input_list = [np.random.rand(batch,*tuple(inp.shape[1:])) for inp in models[0].inputs]
+            output_true = model.predict(input_list)
+            input_list.append(np.ones((batch,1))*idx)
+            output_stitched = stitched_model.predict(input_list)
+            if not (output_true == output_stitched).all():
+                print("model not producing same output as stitched model")
+                success = False    
+            else:
+                print ("success")
+                
+        return success
+
+
+    def save_model_to_protobuf(self,model):
+ #       model_path = os.path.join(self.outdir,self.name)
+ #       model.save(model_path)
+ #       print ("Saved model as {}".format(model_path))
+
+        # convert keras models and polymorphic functions to concrete functions
+
+        tf, tf1, tf_version = import_tf()
+
+        assert tf_version[0] != "1"
+
+        from tensorflow.python.keras.saving import saving_utils
+        from tensorflow.python.eager.def_function import Function
+        from tensorflow.python.eager.function import ConcreteFunction
+
+        assert isinstance(model, tf.keras.Model)
+        learning_phase_orig = tf.keras.backend.learning_phase()
+        tf.keras.backend.set_learning_phase(False)
+        model_func = saving_utils.trace_model_call(model)
+        if model_func.function_spec.arg_names and not model_func.input_signature:
+            raise ValueError("when model is a keras model callable accepting arguments, its "
+                             "input signature must be frozen by building the model")
+        model = model_func.get_concrete_function()
+        tf.keras.backend.set_learning_phase(learning_phase_orig)
+
+        # convert variables to constants
+        assert isinstance(model, ConcreteFunction)
+
+        from tensorflow.python.framework import convert_to_constants
+
+        model = convert_to_constants.convert_variables_to_constants_v2(model)
+        graph = model.graph
+
+        tf.io.write_graph(graph, self.outdir, self.name+'.pb',as_text=False)
+        tf.io.write_graph(graph, self.outdir, self.name+'.pb.txt',as_text=True)
+        print ("Saved model as {}".format(os.path.join(self.outdir,self.name+'.pb')))
+
+    def makeInputList(self,model):
+        txtfile = os.path.join(self.outdir,self.name+'_inputs.txt')
+        with open(txtfile,"w") as f:
+            for layer in model.layers:
+                if 'InputLayer' in  str(type(layer)):
+                    f.write("{:50} -> {}\n".format(layer.name,str(layer.input_shape)))
+
+        print ("Saved input txt file as {}".format(txtfile))
+                    
+         
+        
     
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--json',required=True, type=str,help='REQUIRED: The json model file you wish to convert to .pb')
-    parser.add_argument('--h5',required=True, type=str,help='REQUIRED: The h5 model model weights file you wish to convert to .pb')
-    parser.add_argument('--numout', type=int, required=True, help='REQUIRED: The number of outputs in the model.')
-    parser.add_argument('--outdir','-o', dest='outdir', required=False, default='./', help='The directory to place the output files - default("./")')
-    parser.add_argument('--prefix','-p', dest='prefix', required=False, default='k2tfout', help='The prefix for the output aliasing - default("k2tfout")')
-    parser.add_argument('--name', required=False, default='output_graph.pb', help='The name of the resulting output graph - default("output_graph.pb") (MUST NOT forget .pb)')
-    parser.add_argument('--preprocess', action='store_true', required=False, default=False, help='Whether to save the preprocessing layer in the model')
+    parser = argparse.ArgumentParser('tf.keras model converter to protobuf format\nNote that in case of stitched model (when doing cross-validation) several models can be provided but no check can be done on the correct ordering')
+    parser.add_argument('--zip',required=False, type=str, nargs='+', default=None,
+                        help='The zip model(s) file you wish to convert to .pb')
+    parser.add_argument('--json',required=False, type=str, nargs='+', default=None,
+                        help='The json model(s) file you wish to convert to .pb')
+    parser.add_argument('--h5',required=False, type=str,  nargs='+', default=None,
+                        help='The h5 model(s) model weights file you wish to convert to .pb')
+    parser.add_argument('--outdir','-o', dest='outdir', required=False, default='TFModels/', 
+                        help='The directory to place the output files - default("TFModels/")')
+    parser.add_argument('--name', required=False, default='output_graph', 
+                        help='The name of the resulting output - default("output_graph") (no .pb)')
+    parser.add_argument('--test', required=False, default=None,
+                        help='Test pb file')
     args = parser.parse_args()
 
-    KerasToTensorflowModel(path_to_json     = args.json,
-                           path_to_h5       = args.h5,
-                           prefix           = args.prefix,
-                           name             = args.name,
-                           numout           = args.numout,
-                           outdir           = args.outdir,
-                           use_preprocess   = args.preprocess)
+    if args.test:
+        tf, tf1, tf_version = import_tf()
+
+        graph = tf.Graph()
+        with graph.as_default():
+            graph_def = graph.as_graph_def()
+
+            # as text #
+            if args.test.endswith("txt"):
+                print ('using txt file')
+                from google.protobuf import text_format
+                with open(args.test, "rb") as f:
+                    text_format.Merge(f.read(), graph_def)
+            else:
+                print ('using pb file')
+                from google.protobuf import text_format
+                with tf.io.gfile.GFile(args.test, "rb") as f:
+                    graph_def.ParseFromString(f.read())
+                
+            tf.import_graph_def(graph_def, name="")
+
+        sys.exit()
+
+
+    instance = KerasToTensorflowModel(name          = args.name, 
+                                      outdir        = args.outdir,
+                                      paths_zip     = args.zip,
+                                      paths_json    = args.json,
+                                      paths_h5      = args.h5)

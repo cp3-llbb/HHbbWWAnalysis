@@ -237,8 +237,13 @@ def main():
     variables = parameters.inputs+parameters.LBN_inputs+parameters.outputs+parameters.other_variables
     variables = [v for i,v in enumerate(variables) if v not in variables[:i]] # avoid repetitons while keeping order
         
+<<<<<<< HEAD
     list_inputs  = [var.replace('$','') for var in parameters.inputs]
     list_outputs = [var.replace('$','') for var in parameters.outputs]
+=======
+    list_inputs  = parameters.inputs + [inp for inp in parameters.LBN_inputs if inp not in parameters.inputs] 
+    list_outputs = parameters.outputs
+>>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
 
     # Load samples #
     with open (parameters.config,'r') as f:
@@ -289,8 +294,8 @@ def main():
                                                       lumi_dict                 = parameters.lumidict,
                                                       eras                      = era,
                                                       tree_name                 = parameters.tree_name,
-                                                      additional_columns        = {'tag':node,'era':era})
-                                                      #stop                      = 200000) # TODO : remove 
+                                                      additional_columns        = {'tag':node,'era':era},
+                                                      stop                      = 1000) # TODO : remove 
 
                         #if data_node_era.shape[0]>1000000:
                         #    data_node_era = data_node_era.sample(n=1000000,axis=0) # TODO : remove 
@@ -447,11 +452,11 @@ def main():
     # DNN #
     #############################################################################################
     # Start the GPU monitoring thread #
-    #if opt.GPU:
-    #    thread = utilizationGPU(print_time = 60,
-    #                            print_current = False,
-    #                            time_step=0.01)
-    #    thread.start()
+    if opt.GPU:
+        thread = utilizationGPU(print_time = 60,
+                                print_current = False,
+                                time_step=0.01)
+        thread.start()
 
     if opt.scan != '':
         instance = HyperModel(opt.scan,list_inputs,list_outputs)
@@ -477,10 +482,6 @@ def main():
                                resume=opt.resume)
             instance.HyperDeploy(best='eval_error')
 
-    #if opt.GPU:
-    #    # Closing monitor thread #
-    #    thread.stopLoop()
-    #    thread.join()
         
     if len(opt.model) != 0: 
         # Make path #
@@ -508,6 +509,10 @@ def main():
                 inst_out.OutputFromTraining(data=test_all,path_output=path_output)
             logging.info('')
              
+    if opt.GPU:
+        # Closing monitor thread #
+        thread.stopLoop()
+        thread.join()
    
 if __name__ == "__main__":
     main()
