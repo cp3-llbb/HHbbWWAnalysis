@@ -105,9 +105,9 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
         BoostedJPANodeList  = ['Hbb2Wj','Hbb1Wj','Hbb0Wj']
 
         def cleanVBFwithJPA_Resolved(jpaJets, nJpaJets):
-            return lambda j : op.OR(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets)))
+            return lambda j : op.AND(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets)))
         def cleanVBFwithJPA_Boosted(jpaJets, nJpaJets):
-            return lambda j : op.AND(op.rng_len(self.ak8BJets) >= 1, op.AND(op.OR(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets))),
+            return lambda j : op.AND(op.rng_len(self.ak8BJets) >= 1, op.AND(op.AND(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets))),
                                                                             op.deltaR(self.ak8Jets[0].p4, j.p4) > 1.2))
         def cleanVBFwithJPA_Boosted_rest():
             return lambda j : op.AND(op.rng_len(self.ak8BJets) >= 1, op.deltaR(self.ak8Jets[0].p4, j.p4) > 1.2)

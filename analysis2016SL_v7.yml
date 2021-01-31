@@ -764,6 +764,58 @@ samples:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 5
 
+  DoubleMuon_2016B0:
+    db: ["das:/DoubleMuon/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/DoubleMuon/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
+    files: utils/DataRuns/DoubleMuon_2016B_0.txt
+    group: data
+    era: '2016'
+    run_range: [272007, 275376]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+  DoubleMuon_2016B1:
+    db: ["das:/DoubleMuon/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/DoubleMuon/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
+    files: utils/DataRuns/DoubleMuon_2016B_1.txt
+    group: data
+    era: '2016'
+    run_range: [272007, 275376]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 5
+
+  DoubleEGamma_2016B0:
+    db: ["das:/DoubleEG/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/DoubleEG/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
+    files: utils/DataRuns/DoubleEGamma_2016B_0.txt
+    group: data
+    era: '2016'
+    run_range: [272007, 275376]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 15
+  DoubleEGamma_2016B1:
+    db: ["das:/DoubleEG/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/DoubleEG/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
+    files: utils/DataRuns/DoubleEGamma_2016B_1.txt
+    group: data
+    era: '2016'
+    run_range: [272007, 275376]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
+  MuonEG_2016B0:
+    db: ["das:/MuonEG/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/MuonEG/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
+    files: utils/DataRuns/MuonEG_2016B_0.txt
+    group: data
+    era: '2016'
+    run_range: [272007, 275376]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+  MuonEG_2016B1:
+    db: ["das:/MuonEG/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/MuonEG/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
+    files: utils/DataRuns/MuonEG_2016B_1.txt
+    group: data
+    era: '2016'
+    run_range: [272007, 275376]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 5
+
+
 ###### era C
   SingleMuon_2016C:
     db: das:/SingleMuon/Run2016C-02Apr2020-v1/NANOAOD
@@ -777,6 +829,33 @@ samples:
   SingleElectron_2016C:
     db: das:/SingleElectron/Run2016C-02Apr2020-v1/NANOAOD
     files: dascache/SingleElectron_2016C.dat
+    group: data
+    era: '2016'
+    run_range: [275657, 276283]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
+  DoubleMuon_2016C:
+    db: das:/DoubleMuon/Run2016C-02Apr2020-v1/NANOAOD
+    files: dascache/DoubleMuon_2016C.dat
+    group: data
+    era: '2016'
+    run_range: [275657, 276283]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
+  DoubleEGamma_2016C:
+    db: das:/DoubleEG/Run2016C-02Apr2020-v1/NANOAOD
+    files: dascache/DoubleEGamma_2016C.dat
+    group: data
+    era: '2016'
+    run_range: [275657, 276283]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
+  MuonEG_2016C:
+    db: das:/MuonEG/Run2016C-02Apr2020-v1/NANOAOD
+    files: dascache/MuonEG_2016C.dat
     group: data
     era: '2016'
     run_range: [275657, 276283]
@@ -802,6 +881,33 @@ samples:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 30
 
+  DoubleMuon_2016D:
+    db: das:/DoubleMuon/Run2016D-02Apr2020-v1/NANOAOD
+    files: dascache/DoubleMuon_2016D.dat
+    group: data
+    era: '2016'
+    run_range: [276315, 276811]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
+  DoubleEGamma_2016D:
+    db: das:/DoubleEG/Run2016D-02Apr2020-v1/NANOAOD
+    files: dascache/DoubleEGamma_2016D.dat
+    group: data
+    era: '2016'
+    run_range: [276315, 276811]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
+  MuonEG_2016D:
+    db: das:/MuonEG/Run2016D-02Apr2020-v1/NANOAOD
+    files: dascache/MuonEG_2016D.dat
+    group: data
+    era: '2016'
+    run_range: [276315, 276811]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
 ######### era E
   SingleMuon_2016E:
     db: das:/SingleMuon/Run2016E-02Apr2020-v1/NANOAOD
@@ -815,6 +921,33 @@ samples:
   SingleElectron_2016E:
     db: das:/SingleElectron/Run2016E-02Apr2020-v1/NANOAOD
     files: dascache/SingleElectron_2016E.dat
+    group: data
+    era: '2016'
+    run_range: [276831, 277420]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
+  DoubleMuon_2016E:
+    db: das:/DoubleMuon/Run2016E-02Apr2020-v1/NANOAOD
+    files: dascache/DoubleMuon_2016E.dat
+    group: data
+    era: '2016'
+    run_range: [276831, 277420]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
+  DoubleEGamma_2016E:
+    db: das:/DoubleEG/Run2016E-02Apr2020-v1/NANOAOD
+    files: dascache/DoubleEGamma_2016E.dat
+    group: data
+    era: '2016'
+    run_range: [276831, 277420]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
+  MuonEG_2016E:
+    db: das:/MuonEG/Run2016E-02Apr2020-v2/NANOAOD
+    files: dascache/MuonEG_2016E.dat
     group: data
     era: '2016'
     run_range: [276831, 277420]
@@ -840,6 +973,33 @@ samples:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 30
 
+  DoubleMuon_2016F:
+    db: das:/DoubleMuon/Run2016F-02Apr2020-v1/NANOAOD
+    files: dascache/DoubleMuon_2016F.dat
+    group: data
+    era: '2016'
+    run_range: [277772, 278808]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
+  DoubleEGamma_2016F:
+    db: das:/DoubleEG/Run2016F-02Apr2020-v1/NANOAOD
+    files: dascache/DoubleEGamma_2016F.dat
+    group: data
+    era: '2016'
+    run_range: [277772, 278808]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
+  MuonEG_2016F:
+    db: das:/MuonEG/Run2016F-02Apr2020-v1/NANOAOD
+    files: dascache/MuonEG_2016F.dat
+    group: data
+    era: '2016'
+    run_range: [277772, 278808]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
 ###### era G
   SingleMuon_2016G:
     db: das:/SingleMuon/Run2016G-02Apr2020-v1/NANOAOD
@@ -853,6 +1013,33 @@ samples:
   SingleElectron_2016G:
     db: das:/SingleElectron/Run2016G-02Apr2020-v1/NANOAOD
     files: dascache/SingleElectron_2016G.dat
+    group: data
+    era: '2016'
+    run_range: [278820, 280385]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
+  DoubleMuon_2016G:
+    db: das:/DoubleMuon/Run2016G-02Apr2020-v1/NANOAOD
+    files: dascache/DoubleMuon_2016G.dat
+    group: data
+    era: '2016'
+    run_range: [278820, 280385]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
+  DoubleEGamma_2016G:
+    db: das:/DoubleEG/Run2016G-02Apr2020-v1/NANOAOD
+    files: dascache/DoubleEGamma_2016G.dat
+    group: data
+    era: '2016'
+    run_range: [278820, 280385]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+
+  MuonEG_2016G:
+    db: das:/MuonEG/Run2016G-02Apr2020-v1/NANOAOD
+    files: dascache/MuonEG_2016G.dat
     group: data
     era: '2016'
     run_range: [278820, 280385]
@@ -894,154 +1081,324 @@ samples:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
     split: 10
 
+  DoubleMuon_2016H0:
+    db: das:/DoubleMuon/Run2016H-02Apr2020-v1/NANOAOD
+    files: utils/DataRuns/DoubleMuon_2016H_0.txt
+    group: data
+    era: '2016'
+    run_range: [280919, 284044]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+  DoubleMuon_2016H1:
+    db: das:/DoubleMuon/Run2016H-02Apr2020-v1/NANOAOD
+    files: utils/DataRuns/DoubleMuon_2016H_1.txt
+    group: data
+    era: '2016'
+    run_range: [280919, 284044]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 10
+
+  DoubleEGamma_2016H0:
+    db: das:/DoubleEG/Run2016H-02Apr2020-v1/NANOAOD
+    files: utils/DataRuns/DoubleEGamma_2016H_0.txt
+    group: data
+    era: '2016'
+    run_range: [280919, 284044]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+  DoubleEGamma_2016H1:
+    db: das:/DoubleEG/Run2016H-02Apr2020-v1/NANOAOD
+    files: utils/DataRuns/DoubleEGamma_2016H_1.txt
+    group: data
+    era: '2016'
+    run_range: [280919, 284044]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 5
+
+  MuonEG_2016H0:
+    db: das:/MuonEG/Run2016H-02Apr2020-v1/NANOAOD
+    files: utils/DataRuns/MuonEG_2016H_0.txt
+    group: data
+    era: '2016'
+    run_range: [280919, 284044]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 30
+  MuonEG_2016H1:
+    db: das:/MuonEG/Run2016H-02Apr2020-v1/NANOAOD
+    files: utils/DataRuns/MuonEG_2016H_1.txt
+    group: data
+    era: '2016'
+    run_range: [280919, 284044]
+    certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+    split: 5
+
 ### Signal : GGF
   GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8:
-    cross-section: 0.01
+    cross-section: 0.007625759252
     scale: 100
     db: das:/GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
     era: '2016'
     files: dascache/GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8_2016.dat
     generated-events: genEventSumw
     legend: HH GGF (cHHH0) (x100)
-    line-type: 1
-    line-color: "#288a24"
-    split: 1
     order: 10
+    line-color: "#288a24"
+    line-type: 1
+    split: 1
     type: signal
   GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8:
-    cross-section: 0.01
+    cross-section: 0.003395581893
     scale: 100
     db: das:/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
-    files: dascache/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8_2016.dat
     era: '2016'
+    files: dascache/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8_2016.dat
     generated-events: genEventSumw
     legend: HH GGF (cHHH1) (x100)
-    line-type: 1
-    line-color: "#288a24"
-    split: 1
     order: 10
+    line-color: "#288a24"
+    line-type: 1
+    split: 1
     type: signal
-  GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8:
-    cross-section: 0.01
+  GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8:   
+    cross-section: 0.001435359834
     scale: 100
     db: das:/GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
     era: '2016'
     files: dascache/GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8_2016.dat
     generated-events: genEventSumw
     legend: HH GGF (cHHH2p45) (x100)
-    line-type: 1
-    line-color: "#288a24"
-    split: 1
     order: 10
+    line-color: "#288a24"
+    line-type: 1
+    split: 1
     type: signal
   GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8:
-    cross-section: 0.01
+    cross-section: 0.009971397957
     scale: 100
     db: das:/GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
     era: '2016'
     files: dascache/GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8_2016.dat
     generated-events: genEventSumw
     legend: HH GGF (cHHH5) (x100)
-    line-type: 1
-    line-color: "#288a24"
-    split: 1
     order: 10
+    line-color: "#288a24"
+    line-type: 1
+    split: 1
+    type: signal
+  GluGluToHHTo2B2Tau_node_cHHH0_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8:
+    cross-section: 0.00509384745
+    scale: 100
+    db: das:/GluGluToHHTo2B2Tau_node_cHHH0_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+    era: '2016'
+    files: dascache/GluGluToHHTo2B2Tau_node_cHHH0_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8_2016.dat
+    generated-events: genEventSumw
+    legend: HH
+    line-type: 1
+    split: 1
+    type: signal
+  GluGluToHHTo2B2Tau_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8:
+    cross-section: 0.00226817758
+    scale: 100
+    db: das:/GluGluToHHTo2B2Tau_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+    era: '2016'
+    files: dascache/GluGluToHHTo2B2Tau_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8_2016.dat
+    generated-events: genEventSumw
+    legend: HH
+    line-type: 1
+    split: 1
+    type: signal
+  GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8:
+    cross-section: 0.0009587903037
+    scale: 100
+    db: das:/GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+    era: '2016'
+    files: dascache/GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8_2016.dat
+    generated-events: genEventSumw
+    legend: HH
+    line-type: 1
+    split: 1
+    type: signal
+  GluGluToHHTo2B2Tau_node_cHHH5_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8:
+    cross-section: 0.006660684972
+    scale: 100
+    db: das:/GluGluToHHTo2B2Tau_node_cHHH5_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+    era: '2016'
+    files: dascache/GluGluToHHTo2B2Tau_node_cHHH5_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8_2016.dat
+    generated-events: genEventSumw
+    legend: HH
+    line-type: 1
+    split: 1
     type: signal
 
 ### Signal : VBF
   VBFHHTo2B2WToLNu2J_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8:
-    cross-section: 0.01
+    cross-section: 0.001189695002
     scale: 100
     db: das:/VBFHHTo2B2WToLNu2J_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
     era: '2016'
     files: dascache/VBFHHTo2B2WToLNu2J_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.dat
     generated-events: genEventSumw
-    legend: 'HH VBF (CV 0.5 - C2V 1 - C3 1) (x100)'
-    line-type: 1
+    legend: HH VBF (CV 0.5 - C2V 1 - C3 1) (x100)
+    order: 10
     line-color: "#8f0a1e"
+    line-type: 1
     split: 1
     type: signal
-    order: 10
-  VBFHHTo2B2WToLNu2J_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8:
-    cross-section: 0.01
+  VBFHHTo2B2WToLNu2J_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8: 
+    cross-section: 0.007254888695
     scale: 100
     db: das:/VBFHHTo2B2WToLNu2J_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
     era: '2016'
     files: dascache/VBFHHTo2B2WToLNu2J_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.dat
     generated-events: genEventSumw
-    legend: 'HH VBF (CV 1.5 - C2V 1 - C3 1) (x100)'
-    line-type: 1
-    line-color: "#8f0a1e"
-    split: 1
+    legend: HH VBF (CV 1.5 - C2V 1 - C3 1) (x100)
     order: 10
+    line-color: "#8f0a1e"
+    line-type: 1
+    split: 1
     type: signal
   VBFHHTo2B2WToLNu2J_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8:
-    cross-section: 0.01
+    cross-section: 0.002978360719
     scale: 100
     db: das:/VBFHHTo2B2WToLNu2J_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
     era: '2016'
     files: dascache/VBFHHTo2B2WToLNu2J_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.dat
     generated-events: genEventSumw
-    legend: 'HH VBF (CV 1 - C2V 1 - C3 1) (x100)'
-    line-type: 1
-    line-color: "#8f0a1e"
-    split: 1
+    legend: HH VBF (CV 1 - C2V 0 - C3 1) (x100)
     order: 10
+    line-color: "#8f0a1e"
+    line-type: 1
+    split: 1
     type: signal
-  VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8:
-    cross-section: 0.01
+  VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8: 
+    cross-section: 0.0005021681407
     scale: 100
     db: das:/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
     era: '2016'
-    files: dascache/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.dat
+    files: dascache/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.json
     generated-events: genEventSumw
-    legend: 'HH VBF (CV 1 - C2V 1 - C3 0) (x100)'
-    line-type: 1
-    line-color: "#8f0a1e"
-    split: 1
+    legend: HH VBF (CV 1 - C2V 1 - C3 0) (x100)
     order: 10
+    line-color: "#8f0a1e"
+    line-type: 1
+    split: 1
     type: signal
   VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8:
-    cross-section: 0.01
+    cross-section: 0.0001887710358
     scale: 100
     db: das:/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
     era: '2016'
     files: dascache/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.dat
     generated-events: genEventSumw
-    legend: 'HH VBF (CV 1 - C2V 1 - C3 1) (x100)'
-    line-type: 1
-    line-color: "#8f0a1e"
-    split: 1
+    legend: HH VBF (CV 1 - C2V 1 - C3 1) (x100)
     order: 10
+    line-color: "#8f0a1e"
+    line-type: 1
+    split: 1
     type: signal
   VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8:
-    cross-section: 3.76156405357959e-05
+    cross-section: 0.0001564634089
     scale: 100
     db: das:/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
     era: '2016'
     files: dascache/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.dat
     generated-events: genEventSumw
-    legend: 'HH VBF (CV 1 - C2V 1 - C3 2) (x100)'
-    line-type: 1
-    line-color: "#8f0a1e"
-    split: 1
+    legend: HH VBF (CV 1 - C2V 1 - C3 2) (x100)
     order: 10
+    line-color: "#8f0a1e"
+    line-type: 1
+    split: 1
     type: signal
   VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8:
-    cross-section: 0.000375886740237
+    cross-section: 0.001574072641
     scale: 100
     db: das:/VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
     era: '2016'
     files: dascache/VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.dat
     generated-events: genEventSumw
-    legend: 'HH VBF (CV 1 - C2V 2 - C3 1) (x100)'
-    line-type: 1
-    line-color: "#8f0a1e"
-    split: 1
+    legend: HH VBF (CV 1 - C2V 2 - C3 1) (x100)
     order: 10
+    line-color: "#8f0a1e"
+    line-type: 1
+    split: 1
     type: signal
-
-
+  VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8:
+    cross-section: 0.0007946913415
+    scale: 100
+    db: das:/VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+    era: '2016'
+    files: dascache/VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.dat
+    generated-events: genEventSumw
+    legend: HH
+    line-type: 1
+    split: 1
+    type: signal
+  VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8:
+    cross-section: 0.004846113686
+    scale: 100
+    db: das:/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+    era: '2016'
+    files: dascache/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.dat
+    generated-events: genEventSumw
+    legend: HH
+    line-type: 1
+    split: 1
+    type: signal
+  VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8:
+    cross-section: 0.001989482575
+    scale: 100
+    db: das:/VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM
+    era: '2016'
+    files: dascache/VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.dat
+    generated-events: genEventSumw
+    legend: HH
+    line-type: 1
+    split: 1
+    type: signal
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8:
+    cross-section: 0.0003354377994
+    scale: 100
+    db: das:/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+    era: '2016'
+    files: dascache/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.dat
+    generated-events: genEventSumw
+    legend: HH
+    line-type: 1
+    split: 1
+    type: signal
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8:
+    cross-section: 0.0001260950979
+    scale: 100
+    db: das:/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+    era: '2016'
+    files: dascache/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.dat
+    generated-events: genEventSumw
+    legend: HH
+    line-type: 1
+    split: 1
+    type: signal
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8:
+    cross-section: 0.0001045142798
+    scale: 100
+    db: das:/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+    era: '2016'
+    files: dascache/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.dat
+    generated-events: genEventSumw
+    legend: HH
+    line-type: 1
+    split: 1
+    type: signal
+  VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8:
+    cross-section: 0.001051447553
+    scale: 100
+    db: das:/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+    era: '2016'
+    files: dascache/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8_2016.dat
+    generated-events: genEventSumw
+    legend: HH
+    line-type: 1
+    split: 1
+    type: signal
 
 #### Data Driven : uses and replaces are overriden anyway
 datadriven:
@@ -1077,7 +1434,7 @@ plotIt:
   groups:
     data:
       legend: data
-    ttbar:
+    tt+jets:
       fill-color: "#cc7a16"
       legend: tt
       order: 1
@@ -1101,11 +1458,11 @@ plotIt:
       fill-color: "#174704"
       legend: tt+VX
       order: 6
-    SM:
+    Single_H:
       fill-color: "#06b894"
       legend: SM Higgs (ggH, qqH, VH)
       order: 7
-    Rares:
+    Other:
       fill-color: "#610596"
       legend: Rares
       order: 8
@@ -1113,7 +1470,7 @@ plotIt:
       fill-color: "#1a83a1"
       legend: Drell-Yan (from data)
       order: 3
-    Fake:
+    Fakes:
       fill-color: "#6e3303"
       legend: Fake
       order: 9
