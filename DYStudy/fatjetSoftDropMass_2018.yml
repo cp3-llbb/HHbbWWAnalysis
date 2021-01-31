@@ -9,7 +9,6 @@ category: 'boosted'
 rebin_1D: [0,30,50,70,100,150,300]
 
 
-
 ElElChannel:
   ZVeto_0b:
     path: *path_ZVeto

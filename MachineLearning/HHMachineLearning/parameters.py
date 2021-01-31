@@ -49,7 +49,6 @@ if N_apply != N_slices/N_models: # Otherwise the same slice can be applied on se
 ############################### Slurm parameters ######################################
 partition = 'gpu'  # Def, cp3 or cp3-gpu
 QOS = 'normal' # cp3 or normal
-<<<<<<< HEAD
 time = '0-06:00:00' # days-hh:mm:ss
 mem = '50000' # ram in MB
 tasks = 1 # Number of threads(as a string) (not parallel training for classic mode)
@@ -57,12 +56,6 @@ cpus = 1
 gpus = 1
 workers = 7
 
-=======
-time = '0-18:00:00' # days-hh:mm:ss
-mem = '9000' # ram in MB
-tasks = '1' # Number of threads(as a string) (not parallel training for classic mode)
-workers = 20
->>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
 ##################################  Naming ######################################
 # Physics Config #
 config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL.yml')
@@ -70,7 +63,6 @@ lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
 #eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
 eras = [2016]
 
-<<<<<<< HEAD
 categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj','resolved0b']
 channels = ['El','Mu']
 
@@ -84,22 +76,6 @@ group_ids = [
         (1.0, [5]),             # VBF
         (1.0, [6]),             # WJets
         (1.0, [1,2,3]),         # rest : H + Rare + ST       
-=======
-categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj']
-channels = ['El','Mu']
-
-# Better put them in alphabetical order
-nodes = ['DY','GGF','H','Rare','ST','TT','VBF','WJets']
-group_ids = [
-        (1.0, [1,6]),           # signals
-        (1.0, [0,2,3,4,5,7]),   # backgrounds
-        (1.0, [1]),             # GGF
-        (1.0, [6]),             # VBF
-        (1.0, [5]),             # TT
-        (1.0, [0]),             # DY
-        (1.0, [7]),             # WJets
-        (1.0, [2,3,4]),       # Other
->>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
             ]
         
 #    def loss(self): # -> DL
@@ -117,10 +93,6 @@ group_ids = [
 
 # Input plots options #
 node_colors = {
-<<<<<<< HEAD
-=======
-            'DY'    : '#1a83a1',
->>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
             'GGF'   : '#288a24',
             'H'     : '#06b894',
             'Rare'  : '#610596',
@@ -152,11 +124,7 @@ event_weight_sum_json = os.path.join(main_path,'background_{era}_event_weight_su
 resume_model = ''
 
 # Output #
-<<<<<<< HEAD
 output_batch_size = 50000
-=======
-output_batch_size = 1000000
->>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
 split_name = 'tag' # 'sample' or 'tag' : criterion for output file splitting
 
 ##############################  Evaluation criterion   ################################
@@ -167,11 +135,7 @@ eval_criterion = "eval_error" # either val_loss or eval_error or val_acc
 # Early stopping to stop learning after some criterion 
 early_stopping_params = {'monitor'   : 'val_loss',  # Value to monitor
                          'min_delta' : 0.0001,          # Minimum delta to declare an improvement
-<<<<<<< HEAD
                          'patience'  : 10,          # How much time to wait for an improvement
-=======
-                         'patience'  : 20,          # How much time to wait for an improvement
->>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
                          'verbose'   : 1,           # Verbosity level
                          'restore_best_weights':True,
                          'mode'      : 'min'}       # Mode : 'auto', 'min', 'max'
@@ -346,6 +310,8 @@ inputs = [
             'minLepJetDR',
             'HT2_lepJetMet',
 #            'HT2R_lepJetMet',
+    ]
+
 operations = [inp.split('@')[1] if '@' in inp else None  for inp  in  inputs]
 check_op = [(o is not None)*1 for o in operations]
 if check_op != sorted(check_op,reverse=True):

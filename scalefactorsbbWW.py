@@ -183,6 +183,20 @@ class ScaleFactorsbbWW:
                                                 format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
 
 
+        # DY weight  # 
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+                                                entry_key   = 'DY_resolved_2017',
+                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2017.json',
+                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b'],'variable':['leadjetPt']})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
+                                                entry_key   = 'DY_boosted_2017',
+                                                base_key    = '{channel}_{variable}_{type}_{btag}',
+                                                base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2017.json',
+                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
+
+
+
         ### POG ID ###
             # https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017
             #   -> SF root in "Systematic uncertainties" 

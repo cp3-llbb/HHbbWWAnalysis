@@ -728,7 +728,6 @@ samples:
     era: '2016'
     split: 10
 
-
 ### Signal : GGF
   GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8:
     cross-section: 0.001929282841388
