@@ -293,7 +293,6 @@ class WeightDY:
             if self.cat == 'resolved':
                 self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
 
-
         print ("Factor in Z peak : 1b/0b")
         print ("%0.5f / %0.5f -> %0.5f"%(self.N_ZPeak1b,self.N_ZPeak0b,self.N_ZPeak1b/self.N_ZPeak0b))
         print ("Factor in Z veto: 1b/0b")
@@ -1208,4 +1207,3 @@ if __name__ == "__main__":
 #                            rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
 #    except Exception as e:
 #        print ('[ERROR] Failed to produce SSDL weight in mc mode :',e)
-
