@@ -1247,8 +1247,6 @@ samples:
     line-type: 1
     line-color: "#8f0a1e"
     split: 1
-    order: 10
-    type: signal
 
 
 

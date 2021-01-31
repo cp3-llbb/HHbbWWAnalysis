@@ -58,7 +58,7 @@ class SelectionObject:
 #===============================================================================================#
 #                                        Selections                                             #
 #===============================================================================================#
-def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True): 
+def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_selection=False): 
     """
     Produces the requested lepton selection (encapsulated in SelectionObject class objects)
     Will produce a dict :
@@ -130,7 +130,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
     ElSelObject.refine(cut    = self.returnTriggers(["SingleElectron"]),
                        weight = ElLooseSF(self.electronsFakeSel[0]))    
     MuSelObject.refine(cut    = self.returnTriggers(["SingleMuon"]),
-                       weight = ElLooseSF(self.muonsFakeSel[0]))    
+                       weight = MuLooseSF(self.muonsFakeSel[0]))    
 
     #---- PT cuts ----#
     ElSelObject.selName += "PtCuts"
@@ -179,8 +179,8 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
     MuSelObject.yieldTitle += " + Tight selection"
 
     #----- Apply jet corrections -----#
-    ElSelObj.sel = self.beforeJetselection(ElSelObj.sel,'El')
-    MuSelObj.sel = self.beforeJetselection(MuSelObj.sel,'Mu')
+    ElSelObject.sel = self.beforeJetselection(ElSelObject.sel,'El')
+    MuSelObject.sel = self.beforeJetselection(MuSelObject.sel,'Mu')
 
     if use_dd:
         enable = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg)
@@ -203,18 +203,35 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True):
                            ddWeight = [self.MuFakeFactor(self.muonsFakeSel[0])]+MuTightSF(self.muonsFakeSel[0]),
                            enable   = enable)
     else:
-        ElSelObject.refine(cut    = [lambda_tight_ele(self.electronsFakeSel[0]),
-                                     op.rng_len(self.electronsTightSel) == 1,
-                                     op.rng_len(self.muonsTightSel) == 0,
-                                     self.electronsTightSel[0].idx == self.electronsFakeSel[0].idx],
-                           weight = ElTightSF(self.electronsTightSel[0]))
-        MuSelObject.refine(cut    = [lambda_tight_mu(self.muonsFakeSel[0]),
-                                     op.rng_len(self.muonsTightSel) == 1,
-                                     op.rng_len(self.electronsTightSel) == 0,
-                                     self.muonsTightSel[0].idx == self.muonsFakeSel[0].idx],
-                           weight = MuTightSF(self.muonsTightSel[0]))
-        # -> in SR : lead lepton is self.electronsTightSel[0] or self.muonsTightSel[0]
-        # -> in Fake CR : lead lepton is self.electronsFakeSel[0] or self.muonsFakeSel[0]
+        if not fake_selection:
+            ElSelObject.refine(cut    = [lambda_tight_ele(self.electronsFakeSel[0]),
+                                         op.rng_len(self.electronsTightSel) == 1,
+                                         op.rng_len(self.muonsTightSel) == 0,
+                                         self.electronsTightSel[0].idx == self.electronsFakeSel[0].idx],
+                               weight = ElTightSF(self.electronsTightSel[0]))
+            MuSelObject.refine(cut    = [lambda_tight_mu(self.muonsFakeSel[0]),
+                                         op.rng_len(self.muonsTightSel) == 1,
+                                         op.rng_len(self.electronsTightSel) == 0,
+                                         self.muonsTightSel[0].idx == self.muonsFakeSel[0].idx],
+                               weight = MuTightSF(self.muonsTightSel[0]))
+        else :
+            '''
+            ElSelObject.create(cut    = [lambda_fake_ele(self.electronsFakeSel[0]), 
+                                         op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel)<=1],
+                               weight = ElTightSF(self.electronsFakeSel[0]))
+            MuSelObject.create(cut    = [lambda_fake_mu(self.muonsFakeSel[0]), 
+                                         op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel)<=1],
+                               weight = MuTightSF(self.muonsFakeSel[0]))
+
+            '''
+            ElSelObject.refine(cut    = [op.rng_len(self.electronsFakeSel) == 1,
+                                         op.rng_len(self.muonsFakeSel) == 0],
+                               weight = ElTightSF(self.electronsFakeSel[0]))
+            MuSelObject.refine(cut    = [op.rng_len(self.electronsFakeSel) == 0,
+                                         op.rng_len(self.muonsFakeSel) == 1],
+                               weight = MuTightSF(self.muonsFakeSel[0]))
+            # -> in SR : lead lepton is self.electronsTightSel[0] or self.muonsTightSel[0]
+            # -> in Fake CR : lead lepton is self.electronsFakeSel[0] or self.muonsFakeSel[0]
 
     # Return # 
     return [ElSelObject,MuSelObject]
@@ -332,7 +349,7 @@ def makeExclusiveLooseResolvedJetComboSelection(self,selObject,nbJet,copy_sel=Fa
         AppliedSF = None
         selObject.selName += "ExclusiveResolved2b1j"
         selObject.yieldTitle += " + Exclusive Resolved (nbJet = 2, nAk4LightJet = 1)"
-        selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 2],
+        selObject.refine(cut    = [op.rng_len(self.ak4BJets) >= 2],
                          weight = None)
     else: raise RuntimeError ("Error in Jet Selection!!!")
     
@@ -370,6 +387,59 @@ def makeExclusiveTightResolvedJetComboSelection(self,selObject,nbJet,copy_sel=Fa
     if copy_sel:
         return selObject
 
+
+def makeExclusiveResolvedJetComboSelection(self,selObject,nbJet,nJet,copy_sel=False):
+    if copy_sel:
+        selObject = copy(selObject)
+
+    if nJet == 4 : 
+        if nbJet == 0:
+            AppliedSF = None
+            selObject.selName += "ExclusiveResolved0b4j"
+            selObject.yieldTitle += " + Exclusive Resolved (nbJet = 0, nAk4LightJets $\geq 4$)"
+            selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 0, op.rng_len(self.ak4LightJetsByPt) >= 4],
+                             weight = AppliedSF)
+            
+        elif nbJet == 1:
+            AppliedSF = None
+            selObject.selName += "ExclusiveResolved1b3j"
+            selObject.yieldTitle += " + Exclusive Resolved (nbjet = 1, nAk4LightJets $\geq 3$)"
+            selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 1, op.rng_len(self.ak4LightJetsByPt) >= 3],
+                             weight = AppliedSF)
+            
+        elif nbJet == 2:
+            AppliedSF = None
+            selObject.selName += "ExclusiveResolved2b2j"
+            selObject.yieldTitle += " + Exclusive Resolved (nbjet $\geq 2$, nAk4LightJets $\geq 2$)"
+            selObject.refine(cut   = [op.rng_len(self.ak4BJets) >= 2,op.rng_len(self.ak4LightJetsByPt) >= 2],
+                             weight = AppliedSF)
+
+        else: raise RuntimeError ("Error in Jet Selection!!!")
+
+    if nJet == 3 : 
+        if nbJet == 0:
+            AppliedSF = None
+            selObject.selName += "ExclusiveResolved0b3j"
+            selObject.yieldTitle += " + Exclusive Resolved (nbJet = 0, nAk4LightJet = 3)"
+            selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 0, op.rng_len(self.ak4LightJetsByPt) == 3],
+                             weight = AppliedSF)
+        
+        elif nbJet == 1:
+            AppliedSF = None
+            selObject.selName += "ExclusiveResolved1b2j"
+            selObject.yieldTitle += " + Exclusive Resolved (nbJet = 1, nAk4LightJet = 2)"
+            selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 1, op.rng_len(self.ak4LightJetsByPt) == 2],
+                             weight = AppliedSF)
+            
+        elif nbJet == 2:
+            AppliedSF = None
+            selObject.selName += "ExclusiveResolved2b1j"
+            selObject.yieldTitle += " + Exclusive Resolved (nbJet = 2, nAk4LightJet = 1)"
+            selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 2, op.rng_len(self.ak4LightJetsByPt) == 1],
+                             weight = None)
+
+        else: raise RuntimeError ("Error in Jet Selection!!!")
+        
 
 def makeSemiBoostedHbbSelection(self,selObject,nNonb,copy_sel=False):
     """

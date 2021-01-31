@@ -135,7 +135,7 @@ def main():
     from generate_mask import GenerateMask, GenerateSampleMasks, GenerateSliceIndices, GenerateSliceMask
     from split_training import DictSplit
     from concatenate_csv import ConcatenateCSV
-    from threadGPU import utilizationGPU
+    #from threadGPU import utilizationGPU
     from input_plots import InputPlots
     import parameters
 
@@ -237,8 +237,13 @@ def main():
     variables = parameters.inputs+parameters.LBN_inputs+parameters.outputs+parameters.other_variables
     variables = [v for i,v in enumerate(variables) if v not in variables[:i]] # avoid repetitons while keeping order
         
+<<<<<<< HEAD
     list_inputs  = [var.replace('$','') for var in parameters.inputs]
     list_outputs = [var.replace('$','') for var in parameters.outputs]
+=======
+    list_inputs  = parameters.inputs + [inp for inp in parameters.LBN_inputs if inp not in parameters.inputs] 
+    list_outputs = parameters.outputs
+>>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
 
     # Load samples #
     with open (parameters.config,'r') as f:
@@ -367,11 +372,14 @@ def main():
                 InputPlots(train_all,list_inputs)
 
             # Randomize order, we don't want only one type per batch #
+            print ('before random')
             random_train = np.arange(0,train_all.shape[0]) # needed to randomize x,y and w in same fashion
             np.random.shuffle(random_train) # Not needed for testing
             train_all = train_all.iloc[random_train]
+            print ('after random')
               
             # Add target #
+            print ('beforeonehot')
             label_encoder = LabelEncoder()
             onehot_encoder = OneHotEncoder(sparse=False)
             label_encoder.fit(parameters.nodes)
@@ -477,10 +485,6 @@ def main():
                                resume=opt.resume)
             instance.HyperDeploy(best='eval_error')
 
-    if opt.GPU:
-        # Closing monitor thread #
-        thread.stopLoop()
-        thread.join()
         
     if len(opt.model) != 0: 
         # Make path #
@@ -508,6 +512,10 @@ def main():
                 inst_out.OutputFromTraining(data=test_all,path_output=path_output)
             logging.info('')
              
+    if opt.GPU:
+        # Closing monitor thread #
+        thread.stopLoop()
+        thread.join()
    
 if __name__ == "__main__":
     main()

@@ -566,6 +566,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jesUncertaintySources = "Merged",
                                   regroupTag            = "V2",
                                   uncertaintiesFallbackJetType = "AK4PFchs",
+                                  mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -603,6 +604,7 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
+                                  mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -658,6 +660,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jesUncertaintySources = "Merged",
                                   regroupTag            = "V2",
                                   uncertaintiesFallbackJetType = "AK4PFchs",
+                                  mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -695,6 +698,7 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
+                                  mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -1142,8 +1146,6 @@ One lepton and and one jet argument must be specified in addition to the require
 
         self.ak4JetsPreSelForPUID = op.select(self.ak4JetsByPt, lambda j : op.AND(j.pt<=50.,self.lambda_ak4JetsPreSel(j)))
         self.ak4JetsPreSel        = op.select(self.ak4JetsByPt, lambda j : op.AND(self.lambda_ak4JetsPreSel(j),self.lambda_jetPUID(j)))
-
-
 
         # Cleaning #
         if self.args.POGID:
