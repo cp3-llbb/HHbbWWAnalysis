@@ -47,33 +47,35 @@ if N_apply != N_slices/N_models: # Otherwise the same slice can be applied on se
     raise RuntimeError("You have asked {} models that should be applied {} times, the number of slices should be {} but is {}+{}+{}".format(N_models,N_apply,N_models*N_apply,N_train,N_eval,N_apply))
 
 ############################### Slurm parameters ######################################
-partition = 'Def'  # Def, cp3 or cp3-gpu
+partition = 'gpu'  # Def, cp3 or cp3-gpu
 QOS = 'normal' # cp3 or normal
-time = '0-18:00:00' # days-hh:mm:ss
-mem = '9000' # ram in MB
-tasks = '1' # Number of threads(as a string) (not parallel training for classic mode)
-workers = 20
+time = '0-06:00:00' # days-hh:mm:ss
+mem = '50000' # ram in MB
+tasks = 1 # Number of threads(as a string) (not parallel training for classic mode)
+cpus = 1
+gpus = 1
+workers = 7
+
 ##################################  Naming ######################################
 # Physics Config #
 config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL.yml')
-lumidict = {'2016':35922,'2017':41529.152060112,'2018':59740.565201546}
-eras = ['2016']
-#eras = ['2016','2017','2018'] # To enable or disable eras, add or remove from this list
+lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
+#eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
+eras = [2016]
 
-categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj']
+categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj','resolved0b']
 channels = ['El','Mu']
 
 # Better put them in alphabetical order
-nodes = ['DY','GGF','H','Rare','ST','TT','VBF','WJets']
+nodes = ['GGF','H','Rare','ST','TT','VBF','WJets']
 group_ids = [
-        (1.0, [1,6]),           # signals
-        (1.0, [0,2,3,4,5,7]),   # backgrounds
-        (1.0, [1]),             # GGF
-        (1.0, [6]),             # VBF
-        (1.0, [5]),             # TT
-        (1.0, [0]),             # DY
-        (1.0, [7]),             # WJets
-        (1.0, [2,3,4]),       # Other
+        (1.0, [0,5]),           # signals
+        (1.0, [1,2,3,4,6]),     # backgrounds
+        (1.0, [0]),             # GGF
+        (1.0, [4]),             # TT
+        (1.0, [5]),             # VBF
+        (1.0, [6]),             # WJets
+        (1.0, [1,2,3]),         # rest : H + Rare + ST       
             ]
         
 #    def loss(self): # -> DL
@@ -91,7 +93,6 @@ group_ids = [
 
 # Input plots options #
 node_colors = {
-            'DY'    : '#1a83a1',
             'GGF'   : '#288a24',
             'H'     : '#06b894',
             'Rare'  : '#610596',
@@ -108,10 +109,12 @@ tree_name = 'Events'
 suffix = 'resolved' 
 # scaler_name -> 'scaler_{suffix}.pkl'  If does not exist will be created 
 # mask_name -> 'mask_{suffix}_{sample}.npy'  If does not exist will be created 
+scaler_name = 'scaler_'+suffix+'_'.join([str(era) for era in eras])+'.pkl'
+scaler_path = os.path.join(main_path,scaler_name)
 
 # Data cache #
-train_cache = os.path.join(path_out,'train_cache.pkl' )
-test_cache = os.path.join(path_out,'test_cache.pkl' )
+train_cache = os.path.join(path_out,'train_cache_'+'_'.join([str(era) for era in eras])+'.pkl')
+test_cache = os.path.join(path_out,'test_cache_'+'_'.join([str(era) for era in eras])+'.pkl')
 
 # Meta config info #
 xsec_json = os.path.join(main_path,'background_{era}_xsec.json')
@@ -121,7 +124,7 @@ event_weight_sum_json = os.path.join(main_path,'background_{era}_event_weight_su
 resume_model = ''
 
 # Output #
-output_batch_size = 1000000
+output_batch_size = 50000
 split_name = 'tag' # 'sample' or 'tag' : criterion for output file splitting
 
 ##############################  Evaluation criterion   ################################
@@ -132,7 +135,7 @@ eval_criterion = "eval_error" # either val_loss or eval_error or val_acc
 # Early stopping to stop learning after some criterion 
 early_stopping_params = {'monitor'   : 'val_loss',  # Value to monitor
                          'min_delta' : 0.0001,          # Minimum delta to declare an improvement
-                         'patience'  : 20,          # How much time to wait for an improvement
+                         'patience'  : 10,          # How much time to wait for an improvement
                          'verbose'   : 1,           # Verbosity level
                          'restore_best_weights':True,
                          'mode'      : 'min'}       # Mode : 'auto', 'min', 'max'
@@ -168,17 +171,17 @@ grouped_loss = GroupedXEnt(group_ids)
 #    'loss_function' : [grouped_loss] , #  [categorical_crossentropy]
 #}
 p = { 
-    'lr' : [0.1], 
-    'first_neuron' : [256],
+    'lr' : [0.001], 
+    'first_neuron' : [128],
     'activation' : [relu],
     'dropout' : [0.],
-    'hidden_layers' : [4], # does not take into account the first layer
+    'hidden_layers' : [3], # does not take into account the first layer
     'output_activation' : [softmax],
-    'l2' : [0.001],
+    'l2' : [1e-5],
     'optimizer' : [Adam],  
-    'epochs' : [100],   
-    'batch_size' : [20000], 
-    'n_particles' : [16],
+    'epochs' : [1],   
+    'batch_size' : [100000], 
+    'n_particles' : [10],
     'loss_function' : [grouped_loss],
 }
 
@@ -187,7 +190,8 @@ repetition = 1 # How many times each hyperparameter has to be used
 
 ###################################  Variables   ######################################
 
-cut = 'MC_weight > 0'
+cut = 'MC_weight > 0 && abs(total_weight)<1e5'
+#cut = 'MC_weight > 0'
 
 weight = 'total_weight'
 #weight = None
@@ -196,58 +200,60 @@ weight = 'total_weight'
 #/!\ onehot variables need to be at the beginning of the list (checked later)
 inputs = [
             # Onehot #
-            '$era@op_era',
+            #'$era@op_era',
             'lep_pdgId@op_pdgid',
             'lep_charge@op_charge',
-            'JPAcat@op_resolved_JPAcat',
+            'JPAcat@op_resolved_jpacat',
+            # JPA values #
+            'L2_2b2Wj',
+            'L2_2b1Wj',
+            'L2_2b0Wj',
+            'L2_1b2Wj',
+            'L2_1b1Wj',
+            'L2_1b0Wj',
+            'L2_0b',
             # LL variables #
-            'METpt',
-            'METpx',
-            'METpy',
-            'METpz',
-            'METenergy',
-            'lep_Px',
-            'lep_Py',
-            'lep_Pz',
-            'lep_E',
-            'lep_pt',
-            'lep_eta',
-            'bj1_Px',
-            'bj1_Py',
-            'bj1_Pz',
-            'bj1_E',
-            'bj1_pt',
-            'bj1_eta',
-            'bj1_bTagDeepFlavB',
-            'bj2_Px',
-            'bj2_Py',
-            'bj2_Pz',
-            'bj2_E',
-            'bj2_pt',
-            'bj2_eta',
-            'bj2_bTagDeepFlavB',
-            'wj1_Px',
-            'wj1_Py',
-            'wj1_Pz',
-            'wj1_E',
-            'wj1_pt',
-            'wj1_eta',
-            'wj1_bTagDeepFlavB',
-            'wj2_Px',
-            'wj2_Py',
-            'wj2_Pz',
-            'wj2_E',
-            'wj2_pt',
-            'wj2_eta',
-            'wj2_bTagDeepFlavB ',
-            'nAk4BJets',
-            'nAk8BJets',
+            'METpt',               
+#            'METpx',               # discard               
+#            'METpy',               # discard
+#            'METenergy',           # discard
+#            'lep_Px',              # discard
+#            'lep_Py',              # discard
+#            'lep_Pz',              # discard
+#            'lep_E',               # discard     
+           'lep_pt',
+#            'lep_eta',             # discard
+#            'bj1_Px',              # discard
+#            'bj1_Py',              # discard
+#            'bj1_Pz',              # discard
+#            'bj1_E',               # discard
+           'bj1_pt',
+#            'bj1_eta',             # discard
+           'bj1_bTagDeepFlavB',
+#            'bj2_Px',              # discard
+#            'bj2_Py',              # discard
+#            'bj2_Pz',              # discard
+#            'bj2_E',               # discard
+           'bj2_pt',
+#            'bj2_eta',             # discard
+           'bj2_bTagDeepFlavB',
+#            'wj1_Px',              # discard
+#            'wj1_Py',              # discard
+#            'wj1_Pz',              # discard
+#            'wj1_E',               # discard
+           'wj1_pt',
+#            'wj1_eta',             # discard
+           'wj1_bTagDeepFlavB',
+#            'wj2_Px',              # discard
+#            'wj2_Py',              # discard
+#            'wj2_Pz',              # discard
+#            'wj2_E',               # discard
+           'wj2_pt',
+#            'wj2_eta',             # discard
+           'wj2_bTagDeepFlavB ',
+            'nAk4BJets',           
+#            'nAk8BJets',           # discard
             'VBF_tag',
-            'neuPx',
-            'neuPy',
-            'neuPz',
-            'neuE',
-            'neuPt',
            # HL variables #
             'lepmet_DPhi',
             'lepmet_pt',
@@ -292,19 +298,20 @@ inputs = [
             'bj1wj2_DPhi',
             'bj1wj1_DR',
             'bj1wj1_DPhi',
-            'VBFj1pt',
-            'VBFj2pt',
-            'VBFj1eta',
-            'VBFj2eta',
-            'VBFj1j2dEta',
-            'VBFj1j2dPhi',
-            'VBFj1j2invM',
+#            'VBFj1pt',
+#            'VBFj2pt',
+#            'VBFj1eta',
+#            'VBFj2eta',
+#            'VBFj1j2dEta',
+#            'VBFj1j2dPhi',
+#            'VBFj1j2invM',
             'zeppenfeldVar',
             'minJetDR',
             'minLepJetDR',
             'HT2_lepJetMet',
-            'HT2R_lepJetMet',
+#            'HT2R_lepJetMet',
     ]
+
 operations = [inp.split('@')[1] if '@' in inp else None  for inp  in  inputs]
 check_op = [(o is not None)*1 for o in operations]
 if check_op != sorted(check_op,reverse=True):
@@ -327,7 +334,6 @@ assert len(LBN_inputs)%4 == 0
 # Output branches #
 
 outputs = [
-            '$DY',
             '$GGF',
             '$H',
             '$Rare',
@@ -342,6 +348,7 @@ other_variables = [
                     'event',
                     'ls',
                     'run',
+                    'MC_weight',
                  ]
 
 

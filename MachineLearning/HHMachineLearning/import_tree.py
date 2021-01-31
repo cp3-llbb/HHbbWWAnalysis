@@ -50,7 +50,11 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
     # Read the tree and convert it to a numpy structured array
     if weight is not None:
         variables += [weight]
-    data = tree2array(tree, branches=variables, selection=cut, start=start, stop=stop)
+    try:
+        data = tree2array(tree, branches=variables, selection=cut, start=start, stop=stop)
+    except ValueError as e:
+        logging.error("Issue with file {}".format(input_file))
+        raise e
 
     # Convert to pandas dataframe #
     df = pd.DataFrame(data)
@@ -138,12 +142,14 @@ def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=
         sample_name = os.path.basename(sample)
 
         # Get era if given #
-        if isinstance(eras,str):
+        if isinstance(eras,int):
             era = eras
         elif isinstance(eras,list):
             if len(eras) != len(list_sample):
                 raise RuntimeError("List of eras has length %d and sample list has length %d"(len(eras),len(list_sample)))
             era = eras[i]
+        else:
+            raise RuntimeError("Could not understand eras format")
 
         # Cross section #
         xsec = None
