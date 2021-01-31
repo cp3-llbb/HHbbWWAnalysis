@@ -12,33 +12,27 @@ produceSampleList.py name_of_yaml.yml
 """
 
 dict_dir = {
-'SkimDL{era}_Background_Resolved1Btag_ElEl' : 'resolved_1b_ElEl_{node}',
-'SkimDL{era}_Background_Resolved1Btag_ElMu' : 'resolved_1b_ElMu_{node}',
-'SkimDL{era}_Background_Resolved1Btag_MuMu' : 'resolved_1b_MuMu_{node}',
-'SkimDL{era}_Signal_Resolved1Btag_ElEl' : 'resolved_1b_ElEl_HH',
-'SkimDL{era}_Signal_Resolved1Btag_ElMu' : 'resolved_1b_ElMu_HH',
-'SkimDL{era}_Signal_Resolved1Btag_MuMu' : 'resolved_1b_MuMu_HH',
-'SkimDL{era}_Background_Resolved2Btag_ElEl' : 'resolved_2b_ElEl_{node}',
-'SkimDL{era}_Background_Resolved2Btag_ElMu' : 'resolved_2b_ElMu_{node}',
-'SkimDL{era}_Background_Resolved2Btag_MuMu' : 'resolved_2b_MuMu_{node}',
-'SkimDL{era}_Signal_Resolved2Btag_ElEl' : 'resolved_2b_ElEl_HH',
-'SkimDL{era}_Signal_Resolved2Btag_ElMu' : 'resolved_2b_ElMu_HH',
-'SkimDL{era}_Signal_Resolved2Btag_MuMu' : 'resolved_2b_MuMu_HH',
-'SkimDL{era}_Background_Boosted_ElEl' : 'boosted_ElEl_{node}',
-'SkimDL{era}_Background_Boosted_ElMu' : 'boosted_ElMu_{node}',
-'SkimDL{era}_Background_Boosted_MuMu' : 'boosted_MuMu_{node}',
-'SkimDL{era}_Signal_Boosted_ElEl' : 'boosted_ElEl_HH',
-'SkimDL{era}_Signal_Boosted_ElMu' : 'boosted_ElMu_HH',
-'SkimDL{era}_Signal_Boosted_MuMu' : 'boosted_MuMu_HH',
+    'Skim{era}_SLBackground_BoostedHbb2Wj_El' : 'boostedHbb2Wj_El_{node}',
+    'Skim{era}_SLBackground_BoostedHbb2Wj_Mu' : 'boostedHbb2Wj_Mu_{node}',
+    'Skim{era}_SLSignal_BoostedHbb2Wj_El' : 'boostedHbb2Wj_El_HH',
+    'Skim{era}_SLSignal_BoostedHbb2Wj_Mu' : 'boostedHbb2Wj_Mu_HH',
+    'Skim{era}_SLBackground_BoostedHbb1Wj_El' : 'boostedHbb1Wj_El_{node}',
+    'Skim{era}_SLBackground_BoostedHbb1Wj_Mu' : 'boostedHbb1Wj_Mu_{node}',
+    'Skim{era}_SLSignal_BoostedHbb1Wj_El' : 'boostedHbb1Wj_El_HH',
+    'Skim{era}_SLSignal_BoostedHbb1Wj_Mu' : 'boostedHbb1Wj_Mu_HH',
+    'Skim{era}_SLBackground_BoostedHbb0Wj_El' : 'boostedHbb0Wj_El_{node}',
+    'Skim{era}_SLBackground_BoostedHbb0Wj_Mu' : 'boostedHbb0Wj_Mu_{node}',
+    'Skim{era}_SLSignal_BoostedHbb0Wj_El' : 'boostedHbb0Wj_El_HH',
+    'Skim{era}_SLSignal_BoostedHbb0Wj_Mu' : 'boostedHbb0Wj_Mu_HH',
 }
 
 
-base_path = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/'
+base_path = '/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/'
 
 sampleDict = {} 
 for era in ['2016','2017','2018']:
-    back_yaml = '/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/analysis{era}_v6.yml'.format(era=era)
-    sig_yaml = '/home/users/f/b/fbury/bamboodev/HHbbWWAnalysis/analysis{era}_v6_signal.yml'.format(era=era)
+    back_yaml = '/home/users/g/s/gsaha/bamboodev/HHbbWWAnalysis/analysis{era}_v7_MC.yml'.format(era=era)
+    sig_yaml = '/home/users/g/s/gsaha/bamboodev/HHbbWWAnalysis/analysis{era}_v7_signal_SL.yml'.format(era=era)
     
     with open(back_yaml,'r') as f:
         yamlBack = yaml.load(f)
