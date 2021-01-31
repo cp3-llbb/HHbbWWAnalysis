@@ -237,13 +237,8 @@ def main():
     variables = parameters.inputs+parameters.LBN_inputs+parameters.outputs+parameters.other_variables
     variables = [v for i,v in enumerate(variables) if v not in variables[:i]] # avoid repetitons while keeping order
         
-<<<<<<< HEAD
     list_inputs  = [var.replace('$','') for var in parameters.inputs]
     list_outputs = [var.replace('$','') for var in parameters.outputs]
-=======
-    list_inputs  = parameters.inputs + [inp for inp in parameters.LBN_inputs if inp not in parameters.inputs] 
-    list_outputs = parameters.outputs
->>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
 
     # Load samples #
     with open (parameters.config,'r') as f:

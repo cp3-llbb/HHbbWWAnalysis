@@ -35,13 +35,10 @@ import parameters
 from data_generator import DataGenerator
 import Operations
 import OneHot
-<<<<<<< HEAD
 
 import IPython
 tf_version = tf.__version__.split('.')
 assert tf_version[0] == '2'
-=======
->>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
 
 #################################################################################################
 # LossHistory #
