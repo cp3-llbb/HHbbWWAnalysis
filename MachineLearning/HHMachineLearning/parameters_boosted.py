@@ -59,21 +59,12 @@ workers = 7
 
 ##################################  Naming ######################################
 # Physics Config #
-<<<<<<< HEAD:MachineLearning/HHMachineLearning/parameters_boosted.py
 config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL_Boosted.yml')
 lumidict = {'2016':35922,'2017':41529.152060112,'2018':59740.565201546}
 #eras = ['2016']
 eras = ['2016','2017','2018'] # To enable or disable eras, add or remove from this list
 
 categories = ['boosted2b2Wj','boosted2b1Wj', 'boosted2b0Wj']
-=======
-config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL.yml')
-lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
-#eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
-eras = [2016]
-
-categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj','resolved0b']
->>>>>>> fd35d2cb6e4f979520e37c17eeacb7ff1354f9dd:MachineLearning/HHMachineLearning/parameters.py
 channels = ['El','Mu']
 
 # Better put them in alphabetical order
@@ -179,25 +170,15 @@ grouped_loss = GroupedXEnt(group_ids)
 #    'loss_function' : [grouped_loss] , #  [categorical_crossentropy]
 #}
 p = { 
-<<<<<<< HEAD:MachineLearning/HHMachineLearning/parameters_boosted.py
-    'lr' : [0.1], 
-=======
     'lr' : [0.001], 
->>>>>>> fd35d2cb6e4f979520e37c17eeacb7ff1354f9dd:MachineLearning/HHMachineLearning/parameters.py
     'first_neuron' : [128],
     'activation' : [relu],
     'dropout' : [0.],
     'hidden_layers' : [3], # does not take into account the first layer
     'output_activation' : [softmax],
-<<<<<<< HEAD:MachineLearning/HHMachineLearning/parameters_boosted.py
-    'l2' : [0.0001],
-    'optimizer' : [Adam],  
-    'epochs' : [2],   
-=======
     'l2' : [1e-5],
     'optimizer' : [Adam],  
     'epochs' : [1],   
->>>>>>> fd35d2cb6e4f979520e37c17eeacb7ff1354f9dd:MachineLearning/HHMachineLearning/parameters.py
     'batch_size' : [100000], 
     'n_particles' : [10],
     'loss_function' : [grouped_loss],
@@ -221,7 +202,6 @@ inputs = [
             #'$era@op_era',
             'lep_pdgId@op_pdgid',
             'lep_charge@op_charge',
-<<<<<<< HEAD:MachineLearning/HHMachineLearning/parameters_boosted.py
             'JPAcat@op_boosted_JPAcat',
             # JPA values #
             'L2_Hbb2Wj',
@@ -243,60 +223,6 @@ inputs = [
             'nAk4JetsCleandWithAk8b',           
             'VBF_tag',
             # HL variables #
-=======
-            'JPAcat@op_resolved_jpacat',
-            # JPA values #
-            'L2_2b2Wj',
-            'L2_2b1Wj',
-            'L2_2b0Wj',
-            'L2_1b2Wj',
-            'L2_1b1Wj',
-            'L2_1b0Wj',
-            'L2_0b',
-            # LL variables #
-            'METpt',               
-#            'METpx',               # discard               
-#            'METpy',               # discard
-#            'METenergy',           # discard
-#            'lep_Px',              # discard
-#            'lep_Py',              # discard
-#            'lep_Pz',              # discard
-#            'lep_E',               # discard     
-           'lep_pt',
-#            'lep_eta',             # discard
-#            'bj1_Px',              # discard
-#            'bj1_Py',              # discard
-#            'bj1_Pz',              # discard
-#            'bj1_E',               # discard
-           'bj1_pt',
-#            'bj1_eta',             # discard
-           'bj1_bTagDeepFlavB',
-#            'bj2_Px',              # discard
-#            'bj2_Py',              # discard
-#            'bj2_Pz',              # discard
-#            'bj2_E',               # discard
-           'bj2_pt',
-#            'bj2_eta',             # discard
-           'bj2_bTagDeepFlavB',
-#            'wj1_Px',              # discard
-#            'wj1_Py',              # discard
-#            'wj1_Pz',              # discard
-#            'wj1_E',               # discard
-           'wj1_pt',
-#            'wj1_eta',             # discard
-           'wj1_bTagDeepFlavB',
-#            'wj2_Px',              # discard
-#            'wj2_Py',              # discard
-#            'wj2_Pz',              # discard
-#            'wj2_E',               # discard
-           'wj2_pt',
-#            'wj2_eta',             # discard
-           'wj2_bTagDeepFlavB ',
-            'nAk4BJets',           
-#            'nAk8BJets',           # discard
-            'VBF_tag',
-           # HL variables #
->>>>>>> fd35d2cb6e4f979520e37c17eeacb7ff1354f9dd:MachineLearning/HHMachineLearning/parameters.py
             'lepmet_DPhi',
             'lepmet_pt',
             'lep_MT',
@@ -311,9 +237,6 @@ inputs = [
             'HWplaneAngle',
             'HWW_Simple_Mass',
             'HWW_dR',
-<<<<<<< HEAD:MachineLearning/HHMachineLearning/parameters_boosted.py
-            'zeppenfeldVar',
-=======
             'cosThetaS_Wjj_simple',
             'cosThetaS_WW_simple_met ',
             'cosThetaS_HH_simple_met',
@@ -341,7 +264,6 @@ inputs = [
             'minLepJetDR',
             'HT2_lepJetMet',
 #            'HT2R_lepJetMet',
->>>>>>> fd35d2cb6e4f979520e37c17eeacb7ff1354f9dd:MachineLearning/HHMachineLearning/parameters.py
     ]
 
 operations = [inp.split('@')[1] if '@' in inp else None  for inp  in  inputs]
@@ -376,19 +298,11 @@ outputs = [
 
 # Other variables you might want to save in the tree #
 other_variables = [
-<<<<<<< HEAD:MachineLearning/HHMachineLearning/parameters_boosted.py
     'event',
     'ls',
     'run',
     'MC_weight',
 ]
-=======
-                    'event',
-                    'ls',
-                    'run',
-                    'MC_weight',
-                 ]
->>>>>>> fd35d2cb6e4f979520e37c17eeacb7ff1354f9dd:MachineLearning/HHMachineLearning/parameters.py
 
 
 ################################  dtype operation ##############################
