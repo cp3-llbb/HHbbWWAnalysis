@@ -362,42 +362,48 @@ One lepton and and one jet argument must be specified in addition to the require
             #   -> Mixed    : up = LHEScaleWeight[7] and down = LHEScaleWeight[0]
             # len(LHEScaleWeight) different (usually 44 ?!)
             #   -> nominal = up = down = 1.
-            self.scaleWeight_Fact = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.systematic(tree.LHEScaleWeight[4],
-                                                                                                        name = "ScaleWeight_Fact",
-                                                                                                        up   = tree.LHEScaleWeight[5],
-                                                                                                        down = tree.LHEScaleWeight[3])),
-                                                   (op.rng_len(tree.LHEScaleWeight) == 8, op.systematic(op.c_float(1.),
-                                                                                                        name = "ScaleWeight_Fact",
-                                                                                                        up   = tree.LHEScaleWeight[4],
-                                                                                                        down = tree.LHEScaleWeight[3])),
-                                                   op.systematic(op.c_float(1.),
-                                                                 name = "ScaleWeight_Fact",
-                                                                 up   = op.c_float(1.),
-                                                                 down = op.c_float(1.)))
-            self.scaleWeight_Renorm = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.systematic(tree.LHEScaleWeight[4],
-                                                                                                          name = "ScaleWeight_Renorm",
-                                                                                                          up   = tree.LHEScaleWeight[7],
-                                                                                                          down = tree.LHEScaleWeight[1])),
-                                                     (op.rng_len(tree.LHEScaleWeight) == 8, op.systematic(op.c_float(1.),
-                                                                                                          name = "ScaleWeight_Renorm",
-                                                                                                          up   = tree.LHEScaleWeight[6],
-                                                                                                          down = tree.LHEScaleWeight[1])),
-                                                     op.systematic(op.c_float(1.),
-                                                                   name = "ScaleWeight_Renorm",
-                                                                   up   = op.c_float(1.),
-                                                                   down = op.c_float(1.)))
-            self.scaleWeight_Mixed = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.systematic(tree.LHEScaleWeight[4],
-                                                                                                         name = "ScaleWeight_Mixed",
-                                                                                                         up   = tree.LHEScaleWeight[8],
-                                                                                                         down = tree.LHEScaleWeight[0])),
-                                                    (op.rng_len(tree.LHEScaleWeight) == 8, op.systematic(op.c_float(1.),
-                                                                                                         name = "ScaleWeight_Mixed",
-                                                                                                         up   = tree.LHEScaleWeight[7],
-                                                                                                         down = tree.LHEScaleWeight[0])),
-                                                    op.systematic(op.c_float(1.),
-                                                                  name = "ScaleWeight_Mixed",
-                                                                  up   = op.c_float(1.),
-                                                                  down = op.c_float(1.)))
+            if hasattr(tree,"LHEScaleWeight"):
+                self.scaleWeight_Fact = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.systematic(tree.LHEScaleWeight[4],
+                                                                                                            name = "ScaleWeight_Fact",
+                                                                                                            up   = tree.LHEScaleWeight[5],
+                                                                                                            down = tree.LHEScaleWeight[3])),
+                                                       (op.rng_len(tree.LHEScaleWeight) == 8, op.systematic(op.c_float(1.),
+                                                                                                            name = "ScaleWeight_Fact",
+                                                                                                            up   = tree.LHEScaleWeight[4],
+                                                                                                            down = tree.LHEScaleWeight[3])),
+                                                       op.systematic(op.c_float(1.),
+                                                                     name = "ScaleWeight_Fact",
+                                                                     up   = op.c_float(1.),
+                                                                     down = op.c_float(1.)))
+                self.scaleWeight_Renorm = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.systematic(tree.LHEScaleWeight[4],
+                                                                                                              name = "ScaleWeight_Renorm",
+                                                                                                              up   = tree.LHEScaleWeight[7],
+                                                                                                              down = tree.LHEScaleWeight[1])),
+                                                         (op.rng_len(tree.LHEScaleWeight) == 8, op.systematic(op.c_float(1.),
+                                                                                                              name = "ScaleWeight_Renorm",
+                                                                                                              up   = tree.LHEScaleWeight[6],
+                                                                                                              down = tree.LHEScaleWeight[1])),
+                                                         op.systematic(op.c_float(1.),
+                                                                       name = "ScaleWeight_Renorm",
+                                                                       up   = op.c_float(1.),
+                                                                       down = op.c_float(1.)))
+                self.scaleWeight_Mixed = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.systematic(tree.LHEScaleWeight[4],
+                                                                                                             name = "ScaleWeight_Mixed",
+                                                                                                             up   = tree.LHEScaleWeight[8],
+                                                                                                             down = tree.LHEScaleWeight[0])),
+                                                        (op.rng_len(tree.LHEScaleWeight) == 8, op.systematic(op.c_float(1.),
+                                                                                                             name = "ScaleWeight_Mixed",
+                                                                                                             up   = tree.LHEScaleWeight[7],
+                                                                                                             down = tree.LHEScaleWeight[0])),
+                                                        op.systematic(op.c_float(1.),
+                                                                      name = "ScaleWeight_Mixed",
+                                                                      up   = op.c_float(1.),
+                                                                      down = op.c_float(1.)))
+            else:
+                self.scaleWeight_Fact = op.systematic(op.c_float(1.), name = "ScaleWeight_Fact", up = op.c_float(1.), down = op.c_float(1.))
+                self.scaleWeight_Renorm = op.systematic(op.c_float(1.), name = "ScaleWeight_Renorm", up = op.c_float(1.), down = op.c_float(1.))
+                self.scaleWeight_Mixed = op.systematic(op.c_float(1.), name = "ScaleWeight_Mixed", up = op.c_float(1.), down = op.c_float(1.))
+
             noSel = noSel.refine("PDFweights", weight = [self.scaleWeight_Fact,self.scaleWeight_Renorm,self.scaleWeight_Mixed])
             # PS weights #
             self.psISRSyst = op.systematic(op.c_float(1.), name="psISR", up=tree.PSWeight[2], down=tree.PSWeight[0])
