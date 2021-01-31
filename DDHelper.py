@@ -32,9 +32,13 @@ class DataDrivenDY(DataDrivenContribution):
         if 'group' not in sampleConfig.keys():
             return False # Signal samples not to be used
         if self.pseudodata:
-            return sampleConfig['group'] == 'DY' # Closure
+            return sampleConfig['group'] == 'DY' 
+            # Closure : data = sum(MC) -> DY Estimation = weight(data) - weight(bkg except DY) 
+            #                                           = weight(sum(MC) - bkg except DY) 
+            #                                           = weight(DY)
         else:
-            return sampleConfig['group'] != 'DY' # Data driven 
+            return sampleConfig['group'] != 'DY' 
+            # Data driven -> DY estimation = weight(data) - weight(bkg except DY)  
     def replacesSample(self, sampleName, sampleConfig):
         if 'group' not in sampleConfig.keys():
             return False # Signal samples not to be used

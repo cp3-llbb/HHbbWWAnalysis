@@ -35,6 +35,13 @@ import parameters
 from data_generator import DataGenerator
 import Operations
 import OneHot
+<<<<<<< HEAD
+
+import IPython
+tf_version = tf.__version__.split('.')
+assert tf_version[0] == '2'
+=======
+>>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
 
 #################################################################################################
 # LossHistory #
@@ -160,8 +167,7 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
     x_val = x_val[:,:-len(parameters.LBN_inputs)]
 
     # Scaler #
-    scaler_name = 'scaler_'+parameters.suffix+'_'.join(parameters.eras)+'.pkl' 
-    with open(os.path.join(parameters.main_path,scaler_name), 'rb') as handle: # Import scaler that was created before
+    with open(parameters.scaler_path, 'rb') as handle: # Import scaler that was created before
         scaler = pickle.load(handle)
 
     # Design network #
@@ -173,13 +179,12 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
     inputs_all = []
     encoded_all = []
     for idx in range(x_train.shape[1]):
-        inpName = parameters.inputs[idx].replace('$','')
+        inpName = parameters.inputs[idx].replace('$','').replace(' ','')
         input_layer = tf.keras.Input(shape=(1,), name=inpName)
         # Categorical inputs #
         if parameters.mask_op[idx]:
             operation = getattr(Operations,parameters.operations[idx])()
-            categorizer = preprocessing.CategoryEncoding(max_tokens=operation.onehot_dim,name='category_'+inpName)
-            encoded_all.append(categorizer(operation(input_layer)))
+            encoded_all.append(operation(input_layer))
         # Numerical inputs #
         else:
             inputs_numeric.append(input_layer)
@@ -188,7 +193,19 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
         inputs_all.append(input_layer)
 
     # Concatenate all numerical inputs #
-    normalizer = preprocessing.Normalization(mean=means,variance=variances,name='Normalization')
+    if int(tf_version[1]) < 4:
+        x_dummy = x = np.random.normal(loc=scaler.mean_, scale=scaler.scale_, size=(int(10e6),scaler.mean_.shape[0]))
+        normalizer = preprocessing.Normalization(name='Normalization')
+        normalizer.adapt(x_dummy)
+        #m1 = scaler.mean_
+        #s1 = scaler.scale_
+        #m2 = normalizer.mean.numpy()
+        #s2 = normalizer.variance.numpy()
+        #IPython.embed()
+        del x_dummy
+        print('done')
+    else:
+        normalizer = preprocessing.Normalization(mean=means,variance=variances,name='Normalization')
     encoded_all.append(normalizer(tf.keras.layers.concatenate(inputs_numeric,name='Numerics')))
 
     if len(encoded_all) > 1:
@@ -300,8 +317,7 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
     Uses the generator rather than the input data (which are dummies)
     """
     # Scaler #
-    scaler_name = 'scaler_'+parameters.suffix+'_'.join(parameters.eras)+'.pkl' 
-    with open(os.path.join(parameters.main_path,scaler_name), 'rb') as handle: # Import scaler that was created before
+    with open(parameters.scaler_path, 'rb') as handle: # Import scaler that was created before
         scaler = pickle.load(handle)
 
     # Design network #
@@ -318,8 +334,7 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
         # Categorical inputs #
         if parameters.mask_op[idx]:
             operation = getattr(Operations,parameters.operations[idx])()
-            categorizer = preprocessing.CategoryEncoding(max_tokens=operation.onehot_dim,name='category_'+inpName)
-            encoded_all.append(categorizer(operation(input_layer)))
+            encoded_all.append(operation(input_layer))
         # Numerical inputs #
         else:
             inputs_numeric.append(input_layer)
@@ -426,14 +441,15 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
     # Some verbose logging #
     logging.info("Will use %d workers"%parameters.workers)
     logging.warning("Tensorflow location "+ tf.__file__)
-    logging.warning("GPU ")
+    if len(tf.config.experimental.list_physical_devices('XLA_GPU')) > 0:
+        logging.info("GPU detected")
     #logging.warning(K.tensorflow_backend._get_available_gpus())
     # Fit #
     history = model.fit_generator(generator             = training_generator,   # Training data from generator instance
                                   validation_data       = validation_generator, # Validation data from generator instance
                                   epochs                = params['epochs'],     # Number of epochs
                                   verbose               = 1,
-                                  max_queue_size        = parameters.workers*2, # Length of batch queue
+                                  max_queue_size        = parameters.workers*2,   # Length of batch queue
                                   callbacks             = Callback_list,        # Callbacks
                                   initial_epoch         = initial_epoch,        # In case of resumed training will be different from 0
                                   workers               = parameters.workers,   # Number of threads for batch generation (0 : all in same)

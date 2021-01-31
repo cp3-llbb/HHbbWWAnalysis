@@ -15,13 +15,13 @@ import sklearn.metrics as performance
 
 from .utils.connection_check import is_connected
 
-if is_connected() is True:
-	import astetik as plots
-else:
-	print("NO INTERNET CONNECTION: Reporting plots will not work.")
-	
-from kerasplotlib import TrainingLog as live
-
+#if is_connected() is True:
+#	import astetik as plots
+#else:
+#	print("NO INTERNET CONNECTION: Reporting plots will not work.")
+#	
+#from kerasplotlib import TrainingLog as live
+#
 __version__ = "0.4.6"
 
 print ('Talos correctly imported from local version')

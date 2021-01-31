@@ -20,6 +20,8 @@ import matplotlib.pyplot as plt
 if plt.rcParams['backend'] == 'TkAgg':
     raise ImportError("Change matplotlib backend to 'Agg' in ~/.config/matplotlib/matplotlibrc")
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
 import argparse
 import numpy as np
 import pandas as pd
@@ -235,8 +237,13 @@ def main():
     variables = parameters.inputs+parameters.LBN_inputs+parameters.outputs+parameters.other_variables
     variables = [v for i,v in enumerate(variables) if v not in variables[:i]] # avoid repetitons while keeping order
         
+<<<<<<< HEAD
+    list_inputs  = [var.replace('$','') for var in parameters.inputs]
+    list_outputs = [var.replace('$','') for var in parameters.outputs]
+=======
     list_inputs  = parameters.inputs + [inp for inp in parameters.LBN_inputs if inp not in parameters.inputs] 
     list_outputs = parameters.outputs
+>>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
 
     # Load samples #
     with open (parameters.config,'r') as f:
@@ -265,44 +272,56 @@ def main():
                     event_weight_sum_dict[era] = json.load(handle)
 
             for node in parameters.nodes:
-                logging.info('Starting data importation for class %s'%node)
-                strSelect = [f'{cat}_{channel}_{node}' for channel in parameters.channels for cat in parameters.categories]
+                logging.info('Starting data importation for class {}'.format(node))
                 data_node = None
+                for cat in parameters.categories:
+                    logging.info('... Starting data importation for jet category {}'.format(cat))
+                    strSelect = [f'{cat}_{channel}_{node}' for channel in parameters.channels]
+                    data_cat = None
+                    for era in parameters.eras:
+                        samples_dict = sampleConfig['sampleDict'][int(era)]
+                        if len(samples_dict.keys())==0:
+                            logging.info('\tSample dict for era {} is empty'.format(era))
+                            continue
+                        list_sample = [sample for key in strSelect for sample in samples_dict[key]]
+                        data_cat_era = LoopOverTrees(input_dir                 = sampleConfig['sampleDir'],
+                                                      variables                 = variables,
+                                                      weight                    = parameters.weight,
+                                                      list_sample               = list_sample,
+                                                      cut                       = parameters.cut,
+                                                      xsec_dict                 = xsec_dict,
+                                                      event_weight_sum_dict     = event_weight_sum_dict,
+                                                      lumi_dict                 = parameters.lumidict,
+                                                      eras                      = era,
+                                                      tree_name                 = parameters.tree_name,
+                                                      additional_columns        = {'tag':node,'era':era},
+                                                      stop                      = 1000) # TODO : remove 
 
-                for era in parameters.eras:
-                    samples_dict = sampleConfig['sampleDict'][era]
-                    if len(samples_dict.keys())==0:
-                        logging.info('\tSample dict for era {} is empty'.format(era))
-                        continue
-                    list_sample = [sample for key in strSelect for sample in samples_dict[key]]
-                    data_node_era = LoopOverTrees(input_dir                 = sampleConfig['sampleDir'],
-                                                  variables                 = variables,
-                                                  weight                    = parameters.weight,
-                                                  list_sample               = list_sample,
-                                                  cut                       = parameters.cut,
-                                                  xsec_dict                 = xsec_dict,
-                                                  event_weight_sum_dict     = event_weight_sum_dict,
-                                                  lumi_dict                 = parameters.lumidict,
-                                                  eras                      = era,
-                                                  tree_name                 = parameters.tree_name,
-                                                  additional_columns        = {'tag':node,'era':era},
-                                                  stop                      = 50000) # TODO : remove 
-                    data_node_era = data_node_era.sample(frac=1)[:500000] # TODO : remove 
-                    if data_node is None:
-                        data_node = data_node_era
-                    else:
-                        data_node = pd.concat([data_node,data_node_era],axis=0)
-                    era_str = '{:5s} class in era {}  : sample size = {:10d}'.format(node,era,data_node_era.shape[0])
+                        #if data_node_era.shape[0]>1000000:
+                        #    data_node_era = data_node_era.sample(n=1000000,axis=0) # TODO : remove 
+                        era_str = '{:5s} class - {:15s} category - era {}  : sample size = {:10d}'.format(node,cat,era,data_cat_era.shape[0])
+                        if data_cat_era.shape[0] == 0:
+                            logging.info(era_str)
+                            continue
+                        if data_cat is None:
+                            data_cat = data_cat_era
+                        else:
+                            data_cat = pd.concat([data_cat,data_cat_era],axis=0)
+                        if parameters.weight is not None:
+                            era_str += ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_cat_era[parameters.weight].sum(),data_cat_era['event_weight'].sum())
+                        logging.info(era_str)
+                    cat_str = '{:5s} class - {:15s} category : sample size = {:10d}'.format(node,cat,data_cat.shape[0])
                     if parameters.weight is not None:
-                        era_str += ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_node_era[parameters.weight].sum(),data_node_era['event_weight'].sum())
-                    logging.info(era_str)
+                        era_str += ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_cat[parameters.weight].sum(),data_cat['event_weight'].sum())
+                    if data_node is None:
+                        data_node = data_cat
+                    else:
+                        data_node = pd.concat([data_node,data_cat],axis=0)
                 data_dict[node] = data_node
-                all_eras_str = '{:5s} class for all eras : sample size = {:10d}'.format(node,data_node.shape[0])
+                all_eras_str = '{:5s} class - all categories : sample size = {:10d}'.format(node,data_node.shape[0])
                 if parameters.weight is not None:
                     all_eras_str +=  ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_node[parameters.weight].sum(),data_node['event_weight'].sum())
                 logging.info(all_eras_str)
-            list_inputs  = [var.replace('$','') for var in parameters.inputs]
-            list_outputs = [var.replace('$','') for var in parameters.outputs]
 
             # Weight equalization #
             N = sum([data.shape[0] for data in data_dict.values()])/len(data_dict)
@@ -353,14 +372,11 @@ def main():
                 InputPlots(train_all,list_inputs)
 
             # Randomize order, we don't want only one type per batch #
-            print ('before random')
             random_train = np.arange(0,train_all.shape[0]) # needed to randomize x,y and w in same fashion
             np.random.shuffle(random_train) # Not needed for testing
             train_all = train_all.iloc[random_train]
-            print ('after random')
               
             # Add target #
-            print ('beforeonehot')
             label_encoder = LabelEncoder()
             onehot_encoder = OneHotEncoder(sparse=False)
             label_encoder.fit(parameters.nodes)
@@ -383,13 +399,11 @@ def main():
             if not parameters.crossvalidation:
                 test_all = pd.concat([test_all,test_cat],axis=1)
                 test_all[list_inputs+list_outputs] = test_all[list_inputs+list_outputs].astype('float32')
-            print ('after onehot')
 
             # Preprocessing #
             # The purpose is to create a scaler object and save it
             # The preprocessing will be implemented in the network with a custom layer
-            if opt.scan!='': # If we don't scan we don't need to scale the data
-                MakeScaler(train_all,list_inputs) 
+            MakeScaler(train_all,list_inputs) 
 
           # Caching #
             if not opt.nocache:
@@ -417,7 +431,7 @@ def main():
             logging.info("Sample size for the output  : %d"%test_all.shape[0])
     else:
         logging.info("You asked for generator so no data input has been done")
-        list_samples = [os.path.join(sampleConfig['sampleDir'],sample) for era in parameters.eras for samples in sampleConfig['sampleDict'][era].values() for sample in samples ]
+        list_samples = [os.path.join(sampleConfig['sampleDir'],sample) for era in parameters.eras for samples in sampleConfig['sampleDict'][int(era)].values() for sample in samples ]
         # Produce mask if not cross val #
         if not parameters.crossvalidation:
             logging.info("Will generate masks for each sample")
@@ -432,18 +446,17 @@ def main():
         train_all = None
         test_all = None
 
-    list_inputs  = [var.replace('$','') for var in list_inputs]
-    list_outputs = [var.replace('$','') for var in list_outputs]
+    list_inputs += [inp for inp in parameters.LBN_inputs if inp not in list_inputs]
 
     #############################################################################################
     # DNN #
     #############################################################################################
     # Start the GPU monitoring thread #
-    #if opt.GPU:
-    #    thread = utilizationGPU(print_time = 900,
-    #                            print_current = False,
-    #                            time_step=0.01)
-    #    thread.start()
+    if opt.GPU:
+        thread = utilizationGPU(print_time = 60,
+                                print_current = False,
+                                time_step=0.01)
+        thread.start()
 
     if opt.scan != '':
         instance = HyperModel(opt.scan,list_inputs,list_outputs)
@@ -469,10 +482,6 @@ def main():
                                resume=opt.resume)
             instance.HyperDeploy(best='eval_error')
 
-    #if opt.GPU:
-    #    # Closing monitor thread #
-    #    thread.stopLoop()
-    #    thread.join()
         
     if len(opt.model) != 0: 
         # Make path #
@@ -500,6 +509,10 @@ def main():
                 inst_out.OutputFromTraining(data=test_all,path_output=path_output)
             logging.info('')
              
+    if opt.GPU:
+        # Closing monitor thread #
+        thread.stopLoop()
+        thread.join()
    
 if __name__ == "__main__":
     main()
