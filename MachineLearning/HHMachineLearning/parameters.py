@@ -47,18 +47,21 @@ if N_apply != N_slices/N_models: # Otherwise the same slice can be applied on se
     raise RuntimeError("You have asked {} models that should be applied {} times, the number of slices should be {} but is {}+{}+{}".format(N_models,N_apply,N_models*N_apply,N_train,N_eval,N_apply))
 
 ############################### Slurm parameters ######################################
-partition = 'Def'  # Def, cp3 or cp3-gpu
+partition = 'gpu'  # Def, cp3 or cp3-gpu
 QOS = 'normal' # cp3 or normal
-time = '0-2:00:00' # days-hh:mm:ss
-mem = '60000' # ram in MB
-tasks = '1' # Number of threads(as a string) (not parallel training for classic mode)
-workers = 20
+time = '0-06:00:00' # days-hh:mm:ss
+mem = '50000' # ram in MB
+tasks = 1 # Number of threads(as a string) (not parallel training for classic mode)
+cpus = 1
+gpus = 1
+workers = 7
 
 ##################################  Naming ######################################
 # Physics Config #
 config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL.yml')
-lumidict = {'2016':35922,'2017':41529.152060112,'2018':59740.565201546}
-eras = ['2016','2017','2018'] # To enable or disable eras, add or remove from this list
+lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
+#eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
+eras = [2016]
 
 categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj','resolved0b']
 channels = ['El','Mu']
@@ -106,10 +109,12 @@ tree_name = 'Events'
 suffix = 'resolved' 
 # scaler_name -> 'scaler_{suffix}.pkl'  If does not exist will be created 
 # mask_name -> 'mask_{suffix}_{sample}.npy'  If does not exist will be created 
+scaler_name = 'scaler_'+suffix+'_'.join([str(era) for era in eras])+'.pkl'
+scaler_path = os.path.join(main_path,scaler_name)
 
 # Data cache #
-train_cache = os.path.join(path_out,'train_cache.pkl' )
-test_cache = os.path.join(path_out,'test_cache.pkl' )
+train_cache = os.path.join(path_out,'train_cache_'+'_'.join([str(era) for era in eras])+'.pkl')
+test_cache = os.path.join(path_out,'test_cache_'+'_'.join([str(era) for era in eras])+'.pkl')
 
 # Meta config info #
 xsec_json = os.path.join(main_path,'background_{era}_xsec.json')
@@ -130,7 +135,7 @@ eval_criterion = "eval_error" # either val_loss or eval_error or val_acc
 # Early stopping to stop learning after some criterion 
 early_stopping_params = {'monitor'   : 'val_loss',  # Value to monitor
                          'min_delta' : 0.0001,          # Minimum delta to declare an improvement
-                         'patience'  : 20,          # How much time to wait for an improvement
+                         'patience'  : 10,          # How much time to wait for an improvement
                          'verbose'   : 1,           # Verbosity level
                          'restore_best_weights':True,
                          'mode'      : 'min'}       # Mode : 'auto', 'min', 'max'
@@ -166,16 +171,16 @@ grouped_loss = GroupedXEnt(group_ids)
 #    'loss_function' : [grouped_loss] , #  [categorical_crossentropy]
 #}
 p = { 
-    'lr' : [0.01], 
-    'first_neuron' : [256],
+    'lr' : [0.001], 
+    'first_neuron' : [128],
     'activation' : [relu],
     'dropout' : [0.],
-    'hidden_layers' : [5], # does not take into account the first layer
+    'hidden_layers' : [3], # does not take into account the first layer
     'output_activation' : [softmax],
-    'l2' : [0.01],
+    'l2' : [1e-5],
     'optimizer' : [Adam],  
-    'epochs' : [100],   
-    'batch_size' : [20000], 
+    'epochs' : [1],   
+    'batch_size' : [100000], 
     'n_particles' : [10],
     'loss_function' : [grouped_loss],
 }
@@ -195,7 +200,7 @@ weight = 'total_weight'
 #/!\ onehot variables need to be at the beginning of the list (checked later)
 inputs = [
             # Onehot #
-            '$era@op_era',
+            #'$era@op_era',
             'lep_pdgId@op_pdgid',
             'lep_charge@op_charge',
             'JPAcat@op_resolved_jpacat',

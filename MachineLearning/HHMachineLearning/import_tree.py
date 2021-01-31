@@ -142,12 +142,14 @@ def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=
         sample_name = os.path.basename(sample)
 
         # Get era if given #
-        if isinstance(eras,str):
+        if isinstance(eras,int):
             era = eras
         elif isinstance(eras,list):
             if len(eras) != len(list_sample):
                 raise RuntimeError("List of eras has length %d and sample list has length %d"(len(eras),len(list_sample)))
             era = eras[i]
+        else:
+            raise RuntimeError("Could not understand eras format")
 
         # Cross section #
         xsec = None

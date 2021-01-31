@@ -2,11 +2,12 @@ path_ZVeto: &path_ZVeto /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018Nan
 path_ZPeak: &path_ZPeak /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_ZPeak_DNN09/
 
 era: '2018'
-title: 'Lead fatjet M soft drop'
-xaxis: 'Lead fatjet '
+title: 'Boosted DY weights 2018'
+xaxis: 'Lead fatjet softdrop mass [GeV]'
 filename: 'weight_fatjetsoftDropmass_{channel}_{type}_1D'
 category: 'boosted'
 rebin_1D: [0,30,50,70,100,150,300]
+
 
 
 ElElChannel:

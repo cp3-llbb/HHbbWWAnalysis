@@ -10,7 +10,6 @@ multiclass:
   xlabel: DNN output
   ylabel: events
   list_variable:
-    - output_DY
     - output_GGF
     - output_H
     - output_Rare
@@ -19,7 +18,6 @@ multiclass:
     - output_VBF
     - output_WJets
   list_color:
-    - "#1a83a1"
     - "#288a24"
     - "#06b894"
     - "#610596"
@@ -28,7 +26,6 @@ multiclass:
     - "#8f0a1e"
     - "#d95564"
   list_legend:
-    - node DY
     - node GGF
     - node H
     - node Rare

@@ -12,6 +12,8 @@ import numpy as np
 import enlighten
 import ROOT
 
+from IPython import embed
+
 ROOT.gROOT.SetBatch(True)
 
 sys.path.append(os.path.abspath('../DYStudy'))
@@ -35,14 +37,15 @@ class DataCard:
         self.yaml_dict = self.loadYaml(os.path.join(self.path,yamlName))
 
         with open('systematics.yml','r') as handle:
-            self.systematics = yaml.load(handle,Loader=yaml.FullLoader)
+            self.systConvention = yaml.load(handle,Loader=yaml.FullLoader)
 
         if self.pseudodata:
             print ('Will use pseudodata')
             self.groups = self.generatePseudoData(self.groups)
             if self.datacardName is not None:
                 self.datacardName += "_pseudodata"
-        self.content = {k:{g:None for g in self.groups.keys()} for k in self.hist_conv.keys()}
+        self.content = {histName:{g:{} for g in self.groups.keys()} for histName in self.hist_conv.keys()}
+        self.systMissing = {histName:{group:[] for group in self.groups.keys()} for histName in self.hist_conv.keys()}
 
         self.loopOverFiles()
         if self.pseudodata:
@@ -83,41 +86,61 @@ class DataCard:
                 continue
 
             hist_dict = self.getHistograms(f)
+            for histName in hist_dict.keys():
+                for group in groups:
+                    self.systMissing[histName][group].append({'systematics': [systname for systname in hist_dict[histName].keys() if systname != 'nominal'],
+                                                              'nominal': copy.deepcopy(hist_dict[histName]['nominal'])})
+
             for group in groups:
                 self.addSampleToGroup(copy.deepcopy(hist_dict),group)
                 # deepcopy is needed so that if the histogram is in two groups
                 # acting on one version will not change the other
 
-        for histName in self.content.keys():
-            for group,hist in self.content[histName].items():
-                if self.pseudodata and group == 'data_real':
-                    continue
-                if hist is None:
-                    continue
-                hist.SetName(hist.GetName()+'_'+group)
+        for histName in self.content.keys(): # renaming to avoid overwritting ROOT warnings
+            for group in self.content[histName].keys():
+                for systName,hist in self.content[histName][group].items():
+                    if self.pseudodata and group == 'data_real':
+                        continue
+                    if hist is None:
+                        continue
+                    hist.SetName(hist.GetName()+'_'+group+'__'+systName)
+
+        self.correctMissingSystematics()
 
     def addSampleToGroup(self,hist_dict,group):
         for histname,hists in hist_dict.items():
             nominal = hists['nominal']
-            if self.content[histname][group] is None:
-                self.content[histname][group] = copy.deepcopy(nominal)
+            if not 'nominal' in self.content[histname][group].keys():
+                self.content[histname][group]['nominal'] = copy.deepcopy(nominal)
             else:
-                self.content[histname][group].Add(nominal)
+                self.content[histname][group]['nominal'].Add(nominal)
             if self.use_syst:
                 for systName in hists.keys():
                     if systName == 'nominal':
                         continue
                     hist = hists[systName]
-                    groupsyst = group + '__' + systName
-                    if groupsyst not in self.content[histname].keys():
-                        self.content[histname][groupsyst] = copy.deepcopy(hist)
+                    #groupsyst = group + '__' + systName
+                    #if groupsyst not in self.content[histname].keys():
+                    if systName not in self.content[histname][group].keys():
+                        self.content[histname][group][systName] = copy.deepcopy(hist)
                     else:
-                        self.content[histname][groupsyst].Add(hist)
+                        self.content[histname][group][systName].Add(hist)
 
+    def correctMissingSystematics(self):
+        for histName in self.systMissing.keys():
+            for group in self.systMissing[histName].keys():
+                for sampleDict in self.systMissing[histName][group]:
+                    for systName in self.content[histName][group].keys():
+                        if systName == "nominal":
+                            continue
+                        if systName not in sampleDict['systematics']:
+                            self.content[histName][group][systName].Add(sampleDict['nominal'])
 
     def findGroup(self,sample):
         group_of_sample = []
         for group in self.groups.keys():
+            if 'files' not in self.groups[group]:
+                raise RuntimeError("No 'files' item in group {}".format(group))
             files = self.groups[group]['files']
             if not isinstance(files,list):
                 raise RuntimeError("Group %s does not consist in a list"%group)
@@ -139,7 +162,6 @@ class DataCard:
             xsec = None
             sumweight = None
             br = None
-
         # Get list of hist names #
         list_histnames = self.getHistList(f)
 
@@ -155,7 +177,7 @@ class DataCard:
                     print ("Could not find hist %s in %s"%(histname,rootfile))
                     continue
                 listsyst = [hn for hn in list_histnames if histname in hn and '__' in hn] if self.use_syst else []
-                
+
                 # Nominal histogram #
                 h = self.getHistogram(f,histname,lumi,br,xsec,sumweight)
                 if not 'nominal' in hist_dict[datacardname].keys():
@@ -233,42 +255,52 @@ class DataCard:
 
         if not os.path.exists(path_datacard):
             os.makedirs(path_datacard)
-        for histName, gdict in self.content.items():
+        for histName in self.content.keys():
             filename = os.path.join(path_datacard,histName+'_'+self.era+'.root')
-
             f = ROOT.TFile(filename,'recreate')
             if self.root_subdir is not None:
                 d = f.mkdir(self.root_subdir,self.root_subdir)
                 d.cd()
-            for group,hist in gdict.items():
-                if self.pseudodata and group == 'data_real':
-                    continue
-                if hist is None:
-                    continue
-                for i in range(1,hist.GetNbinsX()+1):
-                    #hist.SetBinError(i,0.) #TODO : check 
-                    if hist.GetBinContent(i) < 0.:
-                        hist.SetBinContent(i,0.) 
-                
-                if '__' in group:
-                    systName = group.split('__')[1].replace("Down","").replace("Up","")
-                    if systName not in self.systematics.keys():
-                        raise RuntimeError("Could not find {} is systematic dict".format(systName))
-                    CMSName = self.systematics[systName]
-                    if '{era}' in CMSName:
-                        CMSName = CMSName.format(era=self.era)
-                    group = group.replace('__'+systName,'_'+CMSName)
+            for group in self.content[histName].keys():
+                for systName,hist in self.content[histName][group].items():
+                    if self.pseudodata and group == 'data_real':
+                        continue
+                    if hist is None:
+                        continue
+                    for i in range(1,hist.GetNbinsX()+1):
+                        #hist.SetBinError(i,0.) #TODO : check 
+                        if hist.GetBinContent(i) < 0.:
+                            hist.SetBinContent(i,0.) 
                     
-                hist.SetTitle(group)
-                hist.SetName(group)
-                hist.Write(group)
+                    if systName ==  "nominal":
+                        save_name = group
+                    else:
+                        if systName.endswith('Up'):
+                            baseSyst = systName[:-2]
+                        elif systName.endswith('Down'):
+                            baseSyst = systName[:-4]
+                        else:
+                            raise RuntimeError("Problem with syst {} : cannot find if Up or Down".format(systName))
+                        if baseSyst not in self.systConvention.keys():
+                            raise RuntimeError("Could not find {} is systematic dict".format(baseSyst))
+                        CMSName = self.systConvention[baseSyst]
+                        systName = systName.replace(baseSyst,CMSName)
+                        if '{era}' in systName:
+                            systName = systName.format(era=self.era)
+                        save_name = '{}_{}'.format(group,systName)
+                        
+                    hist.SetTitle(save_name)
+                    hist.SetName(save_name)
+                    hist.Write(save_name)
             f.Write()
             f.Close()
             print ("Saved file %s"%filename)
 
     def rebinInQuantile(self,qObjects=None):
         from QuantileBinning import Quantile
-        for histName,gDict in self.content.items():
+        print ("Producing quantile binning")
+        pbar = enlighten.Counter(total=len(self.content.keys()), desc='Progress', unit='histograms')
+        for histName in self.content.keys():
             nodes = [node for node in self.quantiles.keys() if node in histName]
             if len(nodes) != 1:
                 raise RuntimeError("For histogram {} : found matches in quantile dict : "+','.join(nodes))
@@ -277,20 +309,20 @@ class DataCard:
             groups_for_binning = self.quantiles[node]['groups']
             if not set(groups_for_binning).issubset(set(self.groups.keys())):
                 raise RuntimeError('Groups {'+','.join([g for g in groups_for_binning if g not in self.groups.keys()])+'} for quantile are not in group dict')
-            hists_for_binning = [hist for group,hist in gDict.items() if group in groups_for_binning if hist is not None]
+            hists_for_binning = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in groups_for_binning if histDict['nominal'] is not None]
             quantiles = np.array(self.quantiles[node]['quantile'])
             qObj = Quantile(hists_for_binning,quantiles)
-            for group,hist in gDict.items():
-                if hist is None:
-                    continue
-                self.content[histName][group] = qObj(hist) 
+
+            for group in self.content[histName].keys():
+                for systName,hist in self.content[histName][group].items():
+                    self.content[histName][group][systName] = qObj(hist) 
+
 
     def rebinClassic(self,factor):
-        for histName,gDict in self.content.items():
-            for group in gDict.keys():
-                if self.pseudodata and group=='data_real':
-                    continue
-                self.content[histName][group].Rebin(factor)
+        for histName in self.content.keys():
+            for group in self.content[histName].keys():
+                for systName in self.content[histName][group].keys():
+                    self.content[histName][group][systName].Rebin(factor)
 
     def produceDYShit(self):
         print ('Producing DY estimation')
@@ -426,6 +458,7 @@ class DataCard:
 
  
     def preparePlotIt(self,suffix=''):
+        print ("Preparing plotIt root files")
         # Make new directory with root files for plotIt #
         path_plotIt = os.path.join(os.path.abspath(os.path.dirname(__file__)),self.datacardName,'plotit')
         path_rootfiles = os.path.join(path_plotIt,'root')
@@ -436,19 +469,17 @@ class DataCard:
             if self.pseudodata and group == 'data_real':
                 continue
             rootfile = ROOT.TFile(os.path.join(path_rootfiles,group+'.root'),'recreate')
-            for histName,gDict in self.content.items():
-                for gr,hist in gDict.items():
+            for histName in self.content.keys():
+                for systName,hist in self.content[histName][group].items():
                     if hist is None:
                         continue
-                    if gr.split("__")[0] == group:
-                        if len(gr.split("__")) == 1:
-                            hist.Write(histName)
-                        else:
-                            syst = gr.split('__')[1]
-                            systName = syst.replace('Up','').replace('Down','') 
-                            if systName not in systematics:
-                                systematics.append(systName)
-                            hist.Write(histName+'__'+syst.replace('Up','up').replace('Down','down'))
+                    if systName == "nominal":
+                        hist.Write(histName)
+                    else:
+                        baseSyst = systName.replace('Up','').replace('Down','')
+                        if baseSyst not in systematics:
+                            systematics.append(baseSyst)
+                        hist.Write(histName+'__'+systName.replace('Up','up').replace('Down','down'))
             rootfile.Close()
 
         # Create yaml file #

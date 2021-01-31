@@ -59,7 +59,7 @@ class Analyze:
                 data_node = None
 
                 for era in parameters.eras:
-                    samples_dict = sampleConfig['sampleDict'][era]
+                    samples_dict = sampleConfig['sampleDict'][int(era)]
                     if len(samples_dict.keys())==0:
                         logging.info('\tSample dict for era {} is empty'.format(era))
                         continue
@@ -162,7 +162,10 @@ class Analyze:
             raise RuntimeError('Could not find the suitable format for %s'%basemodel)
 
     def PerformutationFeatureImportance(self):
-        data = self.data.sample(n=100000,axis=0)
+        if self.data.shape[0]>100000:
+            data = self.data.sample(n=100000,axis=0)
+        else:
+            data = self.data
         inputsLL = np.hsplit(data[self.inputs].astype(np.float32).values,len(self.inputs))
         has_LBN = any([l.__class__.__name__ == 'LBNLayer' for l in self.model.layers])
         if has_LBN:
