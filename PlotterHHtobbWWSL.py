@@ -599,14 +599,14 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 # Singlelepton #
                 plots.extend(makeSinleptonPlots(**{k:channelDict[k] for k in LeptonKeys}))
                 # Number of jets #
-                plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**JetsN))
-                plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**FatJetsN))
+                #plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**JetsN))
+                #plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**FatJetsN))
                 # Ak4 Jets #
                 plots.extend(makeAk4JetsPlots(**{k:channelDict[k] for k in JetKeys},HLL=self.HLL))
                 # MET #
                 plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
                 # High level #
-                plots.extend(makeHighLevelPlotsResolved(**{k:channelDict[k] for k in ResolvedKeys},HLL=self.HLL))
+                #plots.extend(makeHighLevelPlotsResolved(**{k:channelDict[k] for k in ResolvedKeys},HLL=self.HLL))
 
             # ML
             for selObjectDNNDict in selObjectDNNDictListResolved:

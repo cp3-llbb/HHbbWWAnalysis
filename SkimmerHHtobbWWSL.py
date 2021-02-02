@@ -20,6 +20,7 @@ from highlevelLambdas import *
 from JPA import *
 from bamboo.root import gbl
 import ROOT
+from DDHelper import DataDrivenFake, DataDrivenDY
 #from bamboo.root import loadHeader
 #loadHeader("jpa.h")
 
@@ -51,31 +52,6 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
         # JPA Models
         #basepath = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','JPA')
         basepath = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','JPA_Loose_ttH')
-        '''
-        resolvedModelDict = dict()
-        resolvedModelDict['2b2Wj'] = [os.path.join(basepath, 'bb1l_jpa_4jet_resolved_even.xml'), 
-                                      os.path.join(basepath, 'bb1l_jpa_4jet_resolved_odd.xml')]
-        resolvedModelDict['2b1Wj'] = [os.path.join(basepath, 'bb1l_jpa_missingWJet_resolved_even.xml'), 
-                                      os.path.join(basepath, 'bb1l_jpa_missingWJet_resolved_odd.xml')]
-        resolvedModelDict['2b0Wj'] = [os.path.join(basepath, 'bb1l_jpa_missingAllWJet_even.xml'), 
-                                      os.path.join(basepath, 'bb1l_jpa_missingAllWJet_odd.xml')]
-        resolvedModelDict['1b2Wj'] = [os.path.join(basepath, 'bb1l_jpa_missingBJet_even.xml'), 
-                                      os.path.join(basepath, 'bb1l_jpa_missingBJet_odd.xml')]
-        resolvedModelDict['1b1Wj'] = [os.path.join(basepath, 'bb1l_jpa_missingBJet_missingWJet_even.xml'), 
-                                      os.path.join(basepath, 'bb1l_jpa_missingBJet_missingWJet_odd.xml')]
-        resolvedModelDict['1b0Wj'] = [os.path.join(basepath, 'bb1l_jpa_missingBJet_missingAllWJet_even.xml'), 
-                                      os.path.join(basepath, 'bb1l_jpa_missingBJet_missingAllWJet_odd.xml')]
-        resolvedModelDict['evCat'] = [os.path.join(basepath, 'bb1l_jpa_evtCat_resolved_even.xml'), 
-                                      os.path.join(basepath, 'bb1l_jpa_evtCat_resolved_odd.xml')]
-        
-        boostedModelDict  = dict()
-        boostedModelDict['Hbb2Wj'] = [os.path.join(basepath, 'bb1l_jpa_4jet_boosted_even.xml'), 
-                                      os.path.join(basepath, 'bb1l_jpa_4jet_boosted_odd.xml')]
-        boostedModelDict['Hbb1Wj'] = [os.path.join(basepath, 'bb1l_jpa_missingWJet_boosted_even.xml'), 
-                                      os.path.join(basepath, 'bb1l_jpa_missingWJet_boosted_odd.xml')]
-        boostedModelDict['evCat']  = [os.path.join(basepath, 'bb1l_jpa_evtCat_boosted_even.xml'), 
-                                      os.path.join(basepath, 'bb1l_jpa_evtCat_boosted_odd.xml')]
-        '''
         resolvedModelDict = dict()
         resolvedModelDict['2b2Wj'] = [os.path.join(basepath, 'bb1l_jpa_4jet_resolved_even_all_mass_all_node_'+str(era)+'.xml'), 
                                       os.path.join(basepath, 'bb1l_jpa_4jet_resolved_odd_all_mass_all_node_'+str(era)+'.xml')]
@@ -292,7 +268,6 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
         #                                 Synchronization tree                                  #
         #---------------------------------------------------------------------------------------#
         if self.args.Synchronization:
-
             # Event variables #
             varsToKeep["event"]             = None # Already in tree
             varsToKeep["run"]               = None # Already in tree 
@@ -588,12 +563,6 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
         #---------------------------------------------------------------------------------------# 
         #                                    Selection tree                                     #
         #---------------------------------------------------------------------------------------#
-        
-        def cleanVBFwithJPA_Resolved(jpaJets, nJpaJets):
-            return lambda j : op.OR(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets)))
-        def cleanVBFwithJPA_Boosted(jpaJets, nJpaJets):
-            return lambda j : op.AND(op.rng_len(self.ak8BJets) >= 1, op.AND(op.OR(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets))),
-                                                                           op.deltaR(self.ak8Jets[0].p4, j.p4) > 1.2))
         
         #----- EVT variables -----#
         varsToKeep["event"]     = None # Already in tree                                               
