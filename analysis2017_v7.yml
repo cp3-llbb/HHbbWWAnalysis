@@ -348,7 +348,7 @@ samples:
     files: dascache/ZZTo4L_2017.dat
     generated-events: 'genEventSumw'
     group: VVV
-    split: 50
+    split: 70
   WWTo2L2Nu:
     cross-section: 12.2
     db: das:/WWTo2L2Nu_NNPDF31_TuneCP5_13TeV-powheg-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
@@ -398,7 +398,7 @@ samples:
     files: dascache/ZGToLLG_2017.dat
     generated-events: 'genEventSumw'
     group: VVV
-    split: 10
+    split: 20
   WWW:
     cross-section: 0.2086
     db: das:/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_EXT_102X_mc2017_realistic_v8-v1/NANOAODSIM
@@ -638,7 +638,7 @@ samples:
     files: dascache/tZq_ll_2017.dat
     generated-events: 'genEventSumw'
     group: Rares
-    split: 10
+    split: 20
   WpWpJJ:
     cross-section: 0.04926
     db: das:/WpWpJJ_EWK-QCD_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
@@ -1247,6 +1247,8 @@ samples:
     line-type: 1
     line-color: "#8f0a1e"
     split: 1
+    order: 10
+    type: signal
 
 
 

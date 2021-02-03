@@ -12,11 +12,7 @@ import numpy as np
 import enlighten
 import ROOT
 
-<<<<<<< HEAD
 from IPython import embed
-
-=======
->>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
 ROOT.gROOT.SetBatch(True)
 
 sys.path.append(os.path.abspath('../DYStudy'))
@@ -24,7 +20,7 @@ from CDFShift import CDFShift
 
 
 class DataCard:
-    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,pseudodata=False,quantiles=None,DYEstimation=None,produce_plots=False,**kwargs):
+    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,pseudodata=False,quantiles=None,rebin_factor=None,DYEstimation=None,produce_plots=False,**kwargs):
         self.datacardName   = datacardName
         self.path           = path
         self.groups         = groups
@@ -34,6 +30,7 @@ class DataCard:
         self.root_subdir    = root_subdir
         self.pseudodata     = pseudodata
         self.quantiles      = quantiles
+        self.rebin_factor   = rebin_factor
         self.DYEstimation   = DYEstimation
         self.produce_plots  = produce_plots
         
@@ -47,29 +44,21 @@ class DataCard:
             self.groups = self.generatePseudoData(self.groups)
             if self.datacardName is not None:
                 self.datacardName += "_pseudodata"
-<<<<<<< HEAD
         self.content = {histName:{g:{} for g in self.groups.keys()} for histName in self.hist_conv.keys()}
         self.systMissing = {histName:{group:[] for group in self.groups.keys()} for histName in self.hist_conv.keys()}
+
+        if self.quantiles is not None and self.rebin_factor is not None:
+            raise RuntimeError("Cannot apply both quantile and classic rebinning")
 
         self.loopOverFiles()
         if self.pseudodata:
             self.roundFakeData()
-=======
-        self.content = {k:{g:None for g in self.groups.keys()} for k in self.hist_conv.keys()}
-
-        self.loopOverFiles()
-#        if self.pseudodata:
-#            self.roundFakeData()
->>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
         if self.DYEstimation is not None:
             self.produceDYShit()
         if self.quantiles is not None:
             self.rebinInQuantile()
-<<<<<<< HEAD
-            #self.rebinClassic(8)
-=======
-            #self.rebinClassic()
->>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
+        if self.rebin_factor is not None:
+            self.rebinClassic()
         if self.datacardName is not None:
             self.saveDatacard()
         if self.produce_plots:
@@ -111,7 +100,6 @@ class DataCard:
                 # deepcopy is needed so that if the histogram is in two groups
                 # acting on one version will not change the other
 
-<<<<<<< HEAD
         for histName in self.content.keys(): # renaming to avoid overwritting ROOT warnings
             for group in self.content[histName].keys():
                 for systName,hist in self.content[histName][group].items():
@@ -122,13 +110,6 @@ class DataCard:
                     hist.SetName(hist.GetName()+'_'+group+'__'+systName)
 
         self.correctMissingSystematics()
-=======
-        for histName in self.content.keys():
-            for group,hist in self.content[histName].items():
-                if self.pseudodata and group == 'data_real':
-                    continue
-                hist.SetName(hist.GetName()+'_'+group)
->>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
 
     def addSampleToGroup(self,hist_dict,group):
         for histname,hists in hist_dict.items():
@@ -163,17 +144,11 @@ class DataCard:
     def findGroup(self,sample):
         group_of_sample = []
         for group in self.groups.keys():
-<<<<<<< HEAD
             if 'files' not in self.groups[group]:
                 raise RuntimeError("No 'files' item in group {}".format(group))
             files = self.groups[group]['files']
             if not isinstance(files,list):
                 raise RuntimeError("Group %s does not consist in a list"%group)
-=======
-            files = self.groups[group]['files']
-            if not isinstance(files,list):
-                raise RuntimeError("Group %s does not consist in a list"%key)
->>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
             if sample in files:
                 group_of_sample.append(group)
         return group_of_sample
@@ -207,11 +182,6 @@ class DataCard:
                     print ("Could not find hist %s in %s"%(histname,rootfile))
                     continue
                 listsyst = [hn for hn in list_histnames if histname in hn and '__' in hn] if self.use_syst else []
-<<<<<<< HEAD
-
-=======
-                
->>>>>>> 438822d8b87cdd343cf39a1689eab2d22a3257c1
                 # Nominal histogram #
                 h = self.getHistogram(f,histname,lumi,br,xsec,sumweight)
                 if not 'nominal' in hist_dict[datacardname].keys():
@@ -352,11 +322,12 @@ class DataCard:
                     self.content[histName][group][systName] = qObj(hist) 
 
 
-    def rebinClassic(self,factor):
+    def rebinClassic(self):
+        assert isinstance(self.rebin_factor,int)
         for histName in self.content.keys():
             for group in self.content[histName].keys():
                 for systName in self.content[histName][group].keys():
-                    self.content[histName][group][systName].Rebin(factor)
+                    self.content[histName][group][systName].Rebin(self.rebin_factor)
 
     def produceDYShit(self):
         print ('Producing DY estimation')
