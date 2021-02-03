@@ -718,11 +718,11 @@ One lepton and and one jet argument must be specified in addition to the require
 
         return tree,noSel,be,lumiArgs
 
-    def initialize(self,forSkimmer=False):                                                       
-        super(BaseNanoHHtobbWW, self).initialize()                           
-        if not forSkimmer:                                                          
-            if "PseudoData" in self.datadrivenContributions:                                                                                                                     
-                contrib = self.datadrivenContributions["PseudoData"]         
+    def initialize(self,forSkimmer=False):
+        super(BaseNanoHHtobbWW, self).initialize()
+        if not forSkimmer:
+            if "PseudoData" in self.datadrivenContributions:
+                contrib = self.datadrivenContributions["PseudoData"]
                 self.datadrivenContributions["PseudoData"] = DataDrivenPseudoData(contrib.name, contrib.config)
 
     def prepareObjects(self, t, noSel, sample, sampleCfg, channel, forSkimmer=False):

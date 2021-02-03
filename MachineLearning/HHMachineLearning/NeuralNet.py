@@ -20,6 +20,7 @@ from sklearn.model_selection import train_test_split
 from talos import Scan, Reporting, Predict, Evaluate, Deploy, Restore, Autom8
 from talos.utils.best_model import *
 from talos.model.layers import *
+from tensorflow.keras.optimizers import Adam
 from talos.model.normalizers import lr_normalizer
 import talos
 from lbn import LBNLayer

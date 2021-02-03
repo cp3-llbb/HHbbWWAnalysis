@@ -135,7 +135,7 @@ def main():
     from generate_mask import GenerateMask, GenerateSampleMasks, GenerateSliceIndices, GenerateSliceMask
     from split_training import DictSplit
     from concatenate_csv import ConcatenateCSV
-    #from threadGPU import utilizationGPU
+    from threadGPU import utilizationGPU
     from input_plots import InputPlots
     import parameters
 
@@ -290,7 +290,7 @@ def main():
                                                       eras                      = era,
                                                       tree_name                 = parameters.tree_name,
                                                       additional_columns        = {'tag':node,'era':era})
-                                                      #stop                      = 1000) # TODO : remove 
+                                                      #stop                      = 500000) # TODO : remove 
 
                         #if data_node_era.shape[0]>1000000:
                         #    data_node_era = data_node_era.sample(n=1000000,axis=0) # TODO : remove 
@@ -448,7 +448,7 @@ def main():
     #############################################################################################
     # Start the GPU monitoring thread #
     if opt.GPU:
-        thread = utilizationGPU(print_time = 60,
+        thread = utilizationGPU(print_time = 900,
                                 print_current = False,
                                 time_step=0.01)
         thread.start()

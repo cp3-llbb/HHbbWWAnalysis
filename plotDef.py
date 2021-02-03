@@ -2346,7 +2346,7 @@ def makeTestPlot(channel, var, sel, suffix):
     return plots
 
 
-def makeDoubleLeptonSelectedResolvedVariables(sel,l1,l2,b1,b2,met,suffix,channel,HLL):
+def makeDoubleLeptonSelectedResolvedVariables(sel,l1,l2,b1,b2,jets,met,suffix,channel,HLL):
     plots = []
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
     if channel == "ElEl":
@@ -2409,9 +2409,16 @@ def makeDoubleLeptonSelectedResolvedVariables(sel,l1,l2,b1,b2,met,suffix,channel
                              EquidistantBinning(100,0.,1000.),
                              xTitle = "M_{HH} [GeV]",
                              plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_combined_HT"%(channel,suffix),
+                             op.rng_sum(jets, lambda j : j.pt),
+                             sel,
+                             EquidistantBinning(1000,0.,1000.),
+                             xTitle = "H_{T} [GeV]",
+                             plotopts = channelLabel))
+
     return plots
 
-def makeDoubleLeptonSelectedBoostedVariables(sel,l1,l2,B,met,suffix,channel,HLL):
+def makeDoubleLeptonSelectedBoostedVariables(sel,l1,l2,B,jets,met,suffix,channel,HLL):
     plots = []
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
     if channel == "ElEl":
@@ -2473,6 +2480,12 @@ def makeDoubleLeptonSelectedBoostedVariables(sel,l1,l2,B,met,suffix,channel,HLL)
                              sel,
                              EquidistantBinning(50,0.,1500.),
                              xTitle = "M_{HH} [GeV]",
+                             plotopts = channelLabel))
+    plots.append(Plot.make1D("%s_%s_combined_HT"%(channel,suffix),
+                             op.rng_sum(jets, lambda j : j.pt),
+                             sel,
+                             EquidistantBinning(100,0.,1000.),
+                             xTitle = "H_{T} [GeV]",
                              plotopts = channelLabel))
 
     return plots
