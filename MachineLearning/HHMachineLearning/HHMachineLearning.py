@@ -289,8 +289,8 @@ def main():
                                                       lumi_dict                 = parameters.lumidict,
                                                       eras                      = era,
                                                       tree_name                 = parameters.tree_name,
-                                                      additional_columns        = {'tag':node,'era':era},
-                                                      stop                      = 1000) # TODO : remove 
+                                                      additional_columns        = {'tag':node,'era':era})
+                                                      #stop                      = 1000) # TODO : remove 
 
                         #if data_node_era.shape[0]>1000000:
                         #    data_node_era = data_node_era.sample(n=1000000,axis=0) # TODO : remove 

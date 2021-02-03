@@ -17,9 +17,10 @@ from grouped_entropy import GroupedXEnt
 ##################################  Path variables ####################################
 
 main_path = os.path.abspath(os.path.dirname(__file__))
-path_out = '/nfs/scratch/fynu/gsaha/HHMachineLearning_output/'
+path_out = '/nfs/scratch/fynu/gsaha/HHMachineLearning_Boosted_output/'
 path_model = os.path.join(main_path,'model')
 
+scaler_path = '/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/HHMachineLearning/scaler_boosted2016_2017_2018.pkl'
 ##############################  Datasets proportion   #################################
 crossvalidation = True
 
@@ -60,10 +61,10 @@ workers = 7
 # Physics Config #
 config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL.yml')
 lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
-#eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
-eras = [2016]
+#eras = ['2016']
+eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
 
-categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj','resolved0b']
+categories = ['boosted2b2Wj','boosted2b1Wj', 'boosted2b0Wj']
 channels = ['El','Mu']
 
 # Better put them in alphabetical order
@@ -106,7 +107,7 @@ node_colors = {
 tree_name = 'Events'
 
 # scaler and mask names #
-suffix = 'resolved' 
+suffix = 'boosted' 
 # scaler_name -> 'scaler_{suffix}.pkl'  If does not exist will be created 
 # mask_name -> 'mask_{suffix}_{sample}.npy'  If does not exist will be created 
 scaler_name = 'scaler_'+suffix+'_'.join([str(era) for era in eras])+'.pkl'
@@ -149,8 +150,6 @@ reduceLR_params = {'monitor'    : 'val_loss',   # Value to monitor
                    'cooldown'   : 1,            # How many epochs before starting again to monitor
                    'verbose'    : 1,            # Verbosity level
                    'mode'      : 'min'}         # Mode : 'auto', 'min', 'max'
-
-
     
 #################################  Scan dictionary   ##################################
 # /!\ Lists must always contain something (even if 0), otherwise 0 hyperparameters #
@@ -200,116 +199,45 @@ weight = 'total_weight'
 #/!\ onehot variables need to be at the beginning of the list (checked later)
 inputs = [
             # Onehot #
-            #'$era@op_era',
+            '$era@op_era',
             'lep_pdgId@op_pdgid',
             'lep_charge@op_charge',
-            'JPAcat@op_resolved_jpacat',
+            'JPAcat@op_boosted_JPAcat',
             # JPA values #
-            'L2_2b2Wj',
-            'L2_2b1Wj',
-            'L2_2b0Wj',
-            'L2_1b2Wj',
-            'L2_1b1Wj',
-            'L2_1b0Wj',
-            'L2_0b',
+            'L2_Hbb2Wj',
+            'L2_Hbb1Wj',
+            'L2_Hbb0Wj',
             # LL variables #
             'METpt',               
-#            'METpx',               # discard               
-#            'METpy',               # discard
-#            'METenergy',           # discard
-#            'lep_Px',              # discard
-#            'lep_Py',              # discard
-#            'lep_Pz',              # discard
-#            'lep_E',               # discard     
-           'lep_pt',
-#            'lep_eta',             # discard
-#            'bj1_Px',              # discard
-#            'bj1_Py',              # discard
-#            'bj1_Pz',              # discard
-#            'bj1_E',               # discard
-           'bj1_pt',
-#            'bj1_eta',             # discard
-           'bj1_bTagDeepFlavB',
-#            'bj2_Px',              # discard
-#            'bj2_Py',              # discard
-#            'bj2_Pz',              # discard
-#            'bj2_E',               # discard
-           'bj2_pt',
-#            'bj2_eta',             # discard
-           'bj2_bTagDeepFlavB',
-#            'wj1_Px',              # discard
-#            'wj1_Py',              # discard
-#            'wj1_Pz',              # discard
-#            'wj1_E',               # discard
-           'wj1_pt',
-#            'wj1_eta',             # discard
-           'wj1_bTagDeepFlavB',
-#            'wj2_Px',              # discard
-#            'wj2_Py',              # discard
-#            'wj2_Pz',              # discard
-#            'wj2_E',               # discard
-           'wj2_pt',
-#            'wj2_eta',             # discard
-           'wj2_bTagDeepFlavB ',
-            'nAk4BJets',           
-#            'nAk8BJets',           # discard
+            'lep_pt',
+            'fatbj_pt',
+            'fatbj_softdropMass',
+            'fatbj_btagDeepB',
+            'cosThetaS_Hbb',
+            'mT_top_3particle',
+            'wj1_pt',
+            'wj1_bTagDeepFlavB',
+            'wj2_pt',
+            'wj2_bTagDeepFlavB ',
+            'nAk8Jets',
+            'nAk4JetsCleandWithAk8b',           
             'VBF_tag',
-           # HL variables #
+            # HL variables #
             'lepmet_DPhi',
             'lepmet_pt',
             'lep_MT',
             'MET_LD',
-            'hT',
-            'bj1LepDR',
-            'bj1LepDPhi',
-            'bj1MetDPhi',
-            'minDR_lep_allJets',
-            'bj2LepDR',
-            'bj2LepDPhi',
-            'bj2MetDPhi',
-            'bj1bj2_pt',
-            'bj1bj2_M',
-            'cosThetaS_Hbb',
-            'mT_top_3particle',
-            'wj1LepDR',
-            'wj1LepDPhi',
-            'wj1MetDPhi',
-            'wj2LepDR',
-            'wj2LepDPhi',
-            'wj2MetDPhi',
+            'fatbj_lepDR',
+            'fatbj_Wj1DR',
+            'fatbj_wj2DR',
             'wj1wj2_pt',
-            'wj1wj2_M',
-            'w1w2_MT',
-            'HWW_Mass',
+            'wj1wj2DR',
+            'wj1wj2invM',
+            'WWplaneAngle_withMET', 
+            'HWplaneAngle',
             'HWW_Simple_Mass',
             'HWW_dR',
-            'cosThetaS_Wjj_simple',
-            'cosThetaS_WW_simple_met ',
-            'cosThetaS_HH_simple_met',
-            'angleBetWWPlane',
-            'angleBetHWPlane',
-            'bj1bj2_DR',
-            'bj1bj2_DPhi',
-            'bj2wj1_DR',
-            'bj2wj1_DPhi',
-            'wj1wj2_DR',
-            'wj1wj2_DPhi',
-            'bj1wj2_DR',
-            'bj1wj2_DPhi',
-            'bj1wj1_DR',
-            'bj1wj1_DPhi',
-#            'VBFj1pt',
-#            'VBFj2pt',
-#            'VBFj1eta',
-#            'VBFj2eta',
-#            'VBFj1j2dEta',
-#            'VBFj1j2dPhi',
-#            'VBFj1j2invM',
             'zeppenfeldVar',
-            'minJetDR',
-            'minLepJetDR',
-            'HT2_lepJetMet',
-#            'HT2R_lepJetMet',
     ]
 
 operations = [inp.split('@')[1] if '@' in inp else None  for inp  in  inputs]
@@ -321,8 +249,7 @@ inputs = [inp.split('@')[0] for inp  in  inputs]
 
 LBN_inputs = [
               'lep_E','lep_Px','lep_Py','lep_Pz',
-              'bj1_E','bj1_Px','bj1_Py','bj1_Pz',
-              'bj2_E','bj2_Px','bj2_Py','bj2_Pz',
+              'fatbj_E','fatbj_Px','fatbj_Py','fatbj_Pz',
               'wj1_E','wj1_Px','wj1_Py','wj1_Pz',
               'wj2_E','wj2_Px','wj2_Py','wj2_Pz',
              ]
@@ -345,11 +272,11 @@ outputs = [
 
 # Other variables you might want to save in the tree #
 other_variables = [
-                    'event',
-                    'ls',
-                    'run',
-                    'MC_weight',
-                 ]
+    'event',
+    'ls',
+    'run',
+    'MC_weight',
+]
 
 
 ################################  dtype operation ##############################
@@ -357,11 +284,3 @@ other_variables = [
 def make_dtype(list_names): # root_numpy does not like . and ()
     list_dtype = [(name.replace('.','_').replace('(','').replace(')','').replace('-','_minus_').replace('*','_times_')) for name in list_names]
     return list_dtype
-        
-
-
-
-                                
-
-
-
