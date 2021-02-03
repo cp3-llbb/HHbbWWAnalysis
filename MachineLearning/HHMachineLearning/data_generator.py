@@ -148,15 +148,13 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.n_batches = self.n_tot//self.batch_size
         logging.info("Will use %d batches of %d events (%d events will be lost for truncation purposes)"%(self.n_batches,self.batch_size,self.n_tot%self.batch_size))
 
-        total_in_batch = 0
         for f in self.indices.keys():
-            #size_in_batch = math.ceil((len(self.indices[f])/self.n_tot)*self.batch_size)
             if self.state_set == 'training' or self.state_set == 'validation': 
-                size_in_batch = max(math.ceil((sum(self.masks[f])/self.n_tot)*self.batch_size),1)
+                #size_in_batch = max(math.ceil((sum(self.masks[f])/self.n_tot)*self.batch_size),1)
+                size_in_batch = max(math.floor((sum(self.masks[f])/self.n_tot)*self.batch_size),1)
             else:
                 size_in_batch = self.batch_size
             self.batch_sample[f] = size_in_batch 
-            total_in_batch += size_in_batch
 
     def get_fractions(self):
         self.indices_per_batch = []
