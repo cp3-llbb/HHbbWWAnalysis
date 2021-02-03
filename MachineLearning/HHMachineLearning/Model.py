@@ -10,6 +10,7 @@ import logging
 import random
 import csv
 import itertools
+from collections import defaultdict 
 
 import numpy as np
 
@@ -46,96 +47,75 @@ assert tf_version[0] == '2'
 class LossHistory(tf.keras.callbacks.Callback):
     """ Records the history of the training per epoch and per batch """
     def on_train_begin(self, logs={}):
-        self.batch_loss         = {'batch':[], 'loss':[]}
-        self.batch_acc          = {'batch':[], 'acc':[]}
-        self.epoch_loss         = {'epoch':[], 'loss':[]}
-        self.epoch_acc          = {'epoch':[], 'acc':[]}
-        self.epoch_val_loss     = {'epoch':[], 'loss':[]}
-        self.epoch_val_acc      = {'epoch':[], 'acc':[]}
-        self.epoch_lr           = {'epoch':[], 'lr':[]}
-        self.epoch_counter      = 0
-        self.batch_counter      = 0
-        self.epoch_to_batch     = 0
+        self.epochs  = defaultdict(list) 
+        self.batches = defaultdict(list) 
+        self.pre_batch = 0
 
     def on_batch_end(self, batch, logs={}):
-        # X value #
-        self.batch_loss['batch'].append(batch + self.epoch_to_batch)
-        self.batch_acc['batch'].append(batch + self.epoch_to_batch)
-        # Y value #
-        self.batch_loss['loss'].append(logs.get('loss'))
-        self.batch_acc['acc'].append(logs.get('acc'))
-        self.batch_counter += 1
+        self.batches['batch'].append(batch+self.pre_batch)
+        for key,val in logs.items():
+            self.batches[key].append(val)
+        self.batches['lr'].append(tf.keras.backend.eval(self.model.optimizer.lr))
 
     def on_epoch_end(self, epoch, logs={}):
-        # X value #
-        self.epoch_loss['epoch'].append(epoch)
-        self.epoch_acc['epoch'].append(epoch)
-        self.epoch_val_loss['epoch'].append(epoch)
-        self.epoch_val_acc['epoch'].append(epoch)
-        self.epoch_lr['epoch'].append(epoch)
-        # Y value #
-        self.epoch_loss['loss'].append(logs.get('loss'))
-        self.epoch_acc['acc'].append(logs.get('acc'))
-        self.epoch_val_loss['loss'].append(logs.get('val_loss'))
-        self.epoch_val_acc['acc'].append(logs.get('val_acc'))
-        self.epoch_lr['lr'].append(tf.keras.backend.eval(self.model.optimizer.lr))
+        self.epochs['epoch'].append(epoch)
+        for key,val in logs.items():
+            self.epochs[key].append(val)
+        self.epochs['lr'].append(tf.keras.backend.eval(self.model.optimizer.lr))
+        self.pre_batch = self.batches['batch'][-1] 
 
-        # Batch counting #
-        self.epoch_counter += 1
-        self.epoch_to_batch += self.batch_counter
-        self.batch_counter = 0
+        
 
 #################################################################################################
 # PlotHistory #
 #################################################################################################
-def PlotHistory(history):
+def PlotHistory(history,params):
     """ Takes history from Keras training and makes loss plots (batch and epoch) and learning rate plots """
     #----- Figure -----#
-    fig = plt.figure(figsize=(6,9))
-    ax1 = plt.subplot(311)
-    ax2 = plt.subplot(312)
-    ax3 = plt.subplot(313)
-    plt.subplots_adjust(hspace=0.4)
+    variables = sorted([key for key in history.epochs.keys() if 'val' not in key and 'val_'+key in history.epochs.keys()])
+    variables += ["lr"]
+    N = len(variables)
+    fig, ax = plt.subplots(N,2,figsize=(12,N*2),sharex='col')
+    plt.subplots_adjust(left    = 0.1,
+                        right   = 0.6,
+                        top     = 0.9,
+                        bottom  = 0.1,
+                        hspace  = 0.5,
+                        wspace  = 0.4)
+    
+    #----- Batch Plots -----#
+    for i,var in enumerate(variables):
+        ax[i,0].plot(history.batches['batch'],history.batches[var],'k')
+        ax[i,0].set_title(var)
+        ax[i,0].set_xlabel('Batch')
+        
+    #----- Epoch Plots -----#
+    for i,var in enumerate(variables):
+        ax[i,1].plot(history.epochs['epoch'],history.epochs[var],'b')
+        if 'val_'+var in history.epochs.keys():
+            ax_twin = ax[i,1].twinx()
+            ax_twin.plot(history.epochs['epoch'],history.epochs['val_'+var],'g')
+            ax[i,1].set_ylabel("Training",color='b')
+            ax[i,1].tick_params(axis='y', labelcolor='b')
+            ax_twin.set_ylabel("Validation",color='g')
+            ax_twin.tick_params(axis='y', labelcolor='g')
+        ax[i,1].set_title(var)
+        ax[i,1].set_xlabel('Epoch')
 
-    #----- Plots -----#
-    # Per epoch #
-    line1 = ax1.plot(history.epoch_loss['epoch'],history.epoch_loss['loss'],'r',label='Loss train')
-    line2 = ax1.plot(history.epoch_val_loss['epoch'],history.epoch_val_loss['loss'],'g',label='Loss test')
-    ax1.set_xlabel('epoch')
-    ax1.set_ylabel('loss')
-    ax1.set_title('Loss over epochs')
+    #----- Print parameters -----#
+    paramStr = "Parameters\n"
+    for paramName in sorted(list(params.keys())):
+        line = "- {} : ".format(paramName)
+        if isinstance(params[paramName],(int,float,str)):
+            value = str(params[paramName])
+        else:
+            value = params[paramName].__name__
+        line += "{}\n".format(value)
+        if len(line)>25:
+            line = "{}:\n    {}".format(*line.split(':'))
+        paramStr += line
 
-    ax1_2 = ax1.twinx()
-    line3 = ax1_2.plot(history.epoch_acc['epoch'],history.epoch_acc['acc'],'r--',label='Accuracy train')
-    line4 = ax1_2.plot(history.epoch_val_acc['epoch'],history.epoch_val_acc['acc'],'g--',label='Accuracy test')
-    ax1_2.set_ylabel("Accuracy")
-    ax1_2.set_ylim(0,1)
-
-    lines = line1+line2+line3+line4
-    labels = [l.get_label() for l in lines]
-    ax1_2.legend(lines, labels, loc='center right')
-
-    # Per batch #
-    line1 = ax2.plot(history.batch_loss['batch'],history.batch_loss['loss'],'b',label='Loss train')
-    ax2.set_xlabel('batch')
-    ax2.set_ylabel('loss')
-    ax2.set_title('Loss over batches')
-    #ax2.set_yscale("log")
-
-    ax2_2 = ax2.twinx()
-    line2 = ax2_2.plot(history.batch_acc['batch'],history.batch_acc['acc'],'c',label='Accuracy train')
-    ax2_2.set_ylabel("Accuracy")
-    ax2_2.set_ylim(0,1)
-
-    lines = line1+line2
-    labels = [l.get_label() for l in lines]
-    ax2_2.legend(lines, labels, loc='center right')
-
-    # LR #
-    ax3.plot(history.epoch_lr['epoch'],history.epoch_lr['lr'])
-    ax3.set_xlabel('epoch')
-    ax3.set_ylabel('LR')
-    ax3.set_title('Learning rate over epochs')
+    plt.gcf().text(0.7, 0.5, paramStr, fontsize=14)
 
     # Save #
     rand_hash = ''.join(random.choice(string.ascii_uppercase) for _ in range(10)) # avoids overwritting
@@ -176,7 +156,7 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
     inputs_all = []
     encoded_all = []
     for idx in range(x_train.shape[1]):
-        inpName = parameters.inputs[idx].replace('$','').replace(' ','')
+        inpName = parameters.inputs[idx].replace('$','').replace(' ','').replace('_','')
         input_layer = tf.keras.Input(shape=(1,), name=inpName)
         # Categorical inputs #
         if parameters.mask_op[idx]:
@@ -191,16 +171,11 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
 
     # Concatenate all numerical inputs #
     if int(tf_version[1]) < 4:
-        x_dummy = x = np.random.normal(loc=scaler.mean_, scale=scaler.scale_, size=(int(10e6),scaler.mean_.shape[0]))
         normalizer = preprocessing.Normalization(name='Normalization')
+        x_dummy = np.ones((10,len(means)))
+        # Needs a dummy to call the adapt method before setting the weights
         normalizer.adapt(x_dummy)
-        #m1 = scaler.mean_
-        #s1 = scaler.scale_
-        #m2 = normalizer.mean.numpy()
-        #s2 = normalizer.variance.numpy()
-        #IPython.embed()
-        del x_dummy
-        print('done')
+        normalizer.set_weights([np.array(means),np.array(variances)])
     else:
         normalizer = preprocessing.Normalization(mean=means,variance=variances,name='Normalization')
     encoded_all.append(normalizer(tf.keras.layers.concatenate(inputs_numeric,name='Numerics')))
@@ -228,13 +203,13 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
     out = Dense(y_train.shape[1],activation=params['output_activation'],name='out')(hidden)
 
     # Check preprocessing #
-    #preprocess = Model(inputs=inputs_numeric,outputs=encoded_all[-1])
-    #x_numeric = x_train[:,[not m for m in parameters.mask_op]]
-    #out_preprocess = preprocess.predict(np.hsplit(x_numeric,x_numeric.shape[1]),batch_size=params['batch_size'])
-    #mean_scale = np.mean(out_preprocess[:,[not m for m in parameters.mask_op]])
-    #std_scale = np.std(out_preprocess[:,[not m for m in parameters.mask_op]])
-    #if abs(mean_scale)>0.01 or abs((std_scale-1)/std_scale)>0.1: # Check that scaling is correct to 1%
-    #    raise RuntimeError("Something is wrong with the preprocessing layer (mean = %0.6f, std = %0.6f), maybe you loaded an incorrect scaler"%(mean_scale,std_scale))
+    preprocess = Model(inputs=inputs_numeric,outputs=encoded_all[-1])
+    x_numeric = x_train[:,[not m for m in parameters.mask_op]]
+    out_preprocess = preprocess.predict(np.hsplit(x_numeric,x_numeric.shape[1]),batch_size=params['batch_size'])
+    mean_scale = np.mean(out_preprocess)
+    std_scale = np.std(out_preprocess)
+    if abs(mean_scale)>0.01 or abs((std_scale-1)/std_scale)>0.1: # Check that scaling is correct to 1%
+        raise RuntimeError("Something is wrong with the preprocessing layer (mean = %0.6f, std = %0.6f), maybe you loaded an incorrect scaler"%(mean_scale,std_scale))
 
     # Tensorboard logs #
     #path_board = os.path.join(parameters.main_path,"TensorBoard")
@@ -282,7 +257,7 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
                            tf.keras.metrics.AUC(multi_label=True),
                            tf.keras.metrics.Precision(),
                            tf.keras.metrics.Recall()])
-    print (model.summary())
+    model.summary()
     fit_inputs = np.hsplit(x_train,x_train.shape[1])
     fit_val = (np.hsplit(x_val,x_val.shape[1]),y_val,w_val)
     if params['n_particles'] > 0:
@@ -299,7 +274,7 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
                         callbacks       = Callback_list)
 
     # Plot history #
-    PlotHistory(loss_history)
+    PlotHistory(loss_history,params)
 
     return history,model
 
@@ -326,7 +301,7 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
     inputs_all = []
     encoded_all = []
     for idx in range(x_train.shape[1]):
-        inpName = parameters.inputs[idx].replace('$','')
+        inpName = parameters.inputs[idx].replace('$','').replace(' ','').replace('_','')
         input_layer = tf.keras.Input(shape=(1,), name=inpName)
         # Categorical inputs #
         if parameters.mask_op[idx]:
@@ -340,7 +315,14 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
         inputs_all.append(input_layer)
 
     # Concatenate all numerical inputs #
-    normalizer = preprocessing.Normalization(mean=means,variance=variances,name='Normalization')
+    if int(tf_version[1]) < 4:
+        normalizer = preprocessing.Normalization(name='Normalization')
+        x_dummy = np.ones((10,len(means)))
+        # Needs a dummy to call the adapt method before setting the weights
+        normalizer.adapt(x_dummy)
+        normalizer.set_weights([np.array(means),np.array(variances)])
+    else:
+        normalizer = preprocessing.Normalization(mean=means,variance=variances,name='Normalization')
     encoded_all.append(normalizer(tf.keras.layers.concatenate(inputs_numeric,name='Numerics')))
 
     if len(encoded_all) > 1:
@@ -413,7 +395,7 @@ def NeuralNetGeneratorModel(x_train,y_train,x_val,y_val,params):
                            tf.keras.metrics.AUC(multi_label=True),
                            tf.keras.metrics.Precision(),
                            tf.keras.metrics.Recall()])
-    print (model.summary())
+    model.summary()
 
     # Generator #
     training_generator = DataGenerator(path = parameters.config,

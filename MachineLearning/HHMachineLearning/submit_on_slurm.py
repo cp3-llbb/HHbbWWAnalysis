@@ -26,10 +26,13 @@ def submit_on_slurm(name,args,debug=False):
     config.sbatch_chdir = parameters.main_path
     config.sbatch_time = parameters.time
     config.sbatch_memPerCPU= parameters.mem
-    #config.sbatch_additionalOptions = ['-n '+str(parameters.tasks)]
-    config.sbatch_additionalOptions = ['-c '+str(parameters.cpus)]#'--exclude=mb-sab[001-005,007-021,081-084,087-088,090,101-103],mb-opt[015-018,021,024-025,031,042,051-052,054,056-064,067-079,111,114-116],mb-ivy[201-208,211-212,214-217,219,220-222,224-227],mb-wes[001-002,003,005-019,021-051,053-055,057-074,076-086,251-252]']
+    config.sbatch_additionalOptions = [parameters.additional_options]
+    if parameters.tasks > 1:
+        parameters.additional_options += ["-n {}".format(parameters.tasks)]
+    if parameters.cpus > 1:
+        parameters.additional_options += ["-n {}".format(parameters.cpus)]
     if parameters.partition == 'cp3-gpu':
-        config.sbatch_additionalOptions += ['--gres gpu:1','--export=NONE']
+        config.sbatch_additionalOptions += ['--export=NONE']
     if parameters.partition == 'gpu':
         config.sbatch_additionalOptions += ['--gres=gpu:TeslaV100:'+str(parameters.gpus),'--export=NONE']
         
@@ -42,7 +45,7 @@ def submit_on_slurm(name,args,debug=False):
         config.inputParams += [[""]]
     if not output:
         config.inputParamsNames += ['scan','task']
-        if parameters.crossvalidation:
+        if parameters.crossvalidation and parameters.split_per_model:
             config.inputParamsNames += ['modelId']
 
     config.payload = ""
@@ -54,14 +57,17 @@ def submit_on_slurm(name,args,debug=False):
         config.payload += "module load python/python36_sl7_gcc73\n" 
         config.payload += "module load slurm/slurm_utils\n"
     if parameters.partition == 'gpu':
+        config.payload += "module load releases/2019b_test \n"
+        config.payload += "module load cp3\n" # needed on gpu to load slurm_utils
         config.payload += "module load root/6.12.04-sl7_gcc73 \n"
         config.payload += "module load root_numpy \n"
         config.payload += "module load TensorFlow \n"
+        config.payload += "module load slurm/slurm_utils\n"
         
     config.payload += "python3 {script} "
     if not output:
         config.payload += "--scan ${{scan}} --task ${{task}} "
-    if parameters.crossvalidation:
+    if parameters.crossvalidation and parameters.split_per_model:
         config.payload += "--modelId ${{modelId}}"
     config.payload += args
 
@@ -82,7 +88,7 @@ def submit_on_slurm(name,args,debug=False):
     if not output:
         for f in glob.glob(os.path.join(parameters.main_path,'split',name,'*.pkl')):
             task = os.path.basename(f)
-            if parameters.crossvalidation:
+            if parameters.crossvalidation and parameters.split_per_model:
                 for N in range(parameters.N_models):
                     slurm_config.inputParams.append([name,task,N])
             else:
