@@ -17,7 +17,7 @@ from grouped_entropy import GroupedXEnt
 ##################################  Path variables ####################################
 
 main_path = os.path.abspath(os.path.dirname(__file__))
-path_out = '/nfs/scratch/fynu/fbury/HHMachineLearning_output/'
+path_out = '/nfs/scratch/fynu/gsaha/HHMachineLearning_output_boosted/'
 path_model = os.path.join(main_path,'model')
 
 ##############################  Datasets proportion   #################################
@@ -70,7 +70,8 @@ categories = ['boosted2b2Wj','boosted2b1Wj', 'boosted2b0Wj']
 channels = ['El','Mu']
 
 # Better put them in alphabetical order
-nodes = ['GGF','H','Rare','ST','TT','VBF','WJets']
+#nodes = ['GGF','H','Rare','ST','TT','VBF','WJets']
+nodes = ['Ewk','GGF','H','Top','VBF','WJets']
 group_ids = [
         (1.0, [0,5]),           # signals
         (1.0, [1,2,3,4,6]),     # backgrounds
@@ -116,11 +117,10 @@ grouped_loss_4 = GroupedXEnt([(1.0, [0]),               # GGF
 
 # Input plots options #
 node_colors = {
+            'Ewk'   : '#610596',
             'GGF'   : '#288a24',
             'H'     : '#06b894',
-            'Rare'  : '#610596',
-            'ST'    : '#99053d',
-            'TT'    : '#cc7a16',
+            'Top'   : '#cc7a16',
             'VBF'   : '#8f0a1e',
             'WJets' : '#d95564',
              }
@@ -193,27 +193,43 @@ reduceLR_params = {'monitor'    : 'val_categorical_accuracy',   # Value to monit
 #    'n_particles' : [16],
 #    'loss_function' : [grouped_loss] , #  [categorical_crossentropy]
 #}
+# Set By Florian
+
 p = { 
     'lr' : [0.01], 
-    'first_neuron' : [512],
+    'first_neuron' : [256],
     'activation' : [relu],
-    'dropout' : [0.],
-    'hidden_layers' : [6], # does not take into account the first layer
+    'dropout' : [0.2],
+    'hidden_layers' : [5], # does not take into account the first layer
     'output_activation' : [softmax],
-    'l2' : [1e-8],
+    'l2' : [1e-4],
     'optimizer' : [Adam],  
     'epochs' : [500],   
-    'batch_size' : [20000], 
-    'n_particles' : [0],
+    'batch_size' : [25000], 
+    'n_particles' : [10],
     'loss_function' : [categorical_crossentropy],
 }
-
-
+'''
+p = { 
+    'lr' : [0.01], 
+    'first_neuron' : [256],
+    'activation' : [relu],
+    'dropout' : [0.2],
+    'hidden_layers' : [5], # does not take into account the first layer
+    'output_activation' : [softmax],
+    'l2' : [1e-5],
+    'optimizer' : [Adam],  
+    'epochs' : [500],   
+    'batch_size' : [30000], 
+    'n_particles' : [10],
+    'loss_function' : [categorical_crossentropy],
+}
+'''
 repetition = 1 # How many times each hyperparameter has to be used 
 
 ###################################  Variables   ######################################
 
-cut = 'MC_weight > 0 && abs(total_weight)<1e5'
+cut = 'MC_weight > 0 && abs(total_weight)<1e5 && (total_weight/MC_weight)<100 && learning_weights>=0'
 #cut = 'MC_weight > 0'
 
 weight = 'total_weight'
@@ -354,17 +370,17 @@ inputs = [
             'lep_pt',
             'fatbj_pt',
             'fatbj_softdropMass',
-            'fatbj_btagDeepB',
+            #'fatbj_btagDeepB',
             'wj1_pt',
             'wj1_bTagDeepFlavB',
             'wj2_pt',
-            'wj2_bTagDeepFlavB ',
+            #'wj2_bTagDeepFlavB ',
             'nAk8Jets',
             'nAk8BJets',
             'VBF_tag',
             # HL variables #
             'hT',
-            'lepmet_DPhi',
+            #'lepmet_DPhi',
             'lepmet_pt',
             'lep_MT',
             'MET_LD',
@@ -373,27 +389,27 @@ inputs = [
             'fatbj_wj2DR',
             'wj1_lepDR',
             'wj1_lepDPhi',
-            'wj2_lepDR',
-            'wj2_lepDPhi',
+            #'wj2_lepDR',
+            #'wj2_lepDPhi',
             'wj1wj2_pt',
-            'wj1wj2DR',
+            #'wj1wj2DR',
             'wj1wj2invM',
             'mT_top_3particle',
-            'WWplaneAngle_withMET', 
+            #'WWplaneAngle_withMET', 
             'HWplaneAngle',
             'HWW_Simple_Mass',
-            'HWW_dR',
-            'cosThetaS_Hbb',
-            'cosThetaS_Wjj_simple',
+            #'HWW_dR',
+            #'cosThetaS_Hbb',
+            #'cosThetaS_Wjj_simple',
             'cosThetaS_WW_simple_met ',
             'cosThetaS_HH_simple_met',
             'MT_W1W2',
-#            'VBFj1pt',
-#            'VBFj2pt',
+            'VBFj1pt',
+            'VBFj2pt',
 #            'VBFj1eta',
 #            'VBFj2eta',
 #            'VBFj1j2dEta',
-#            'VBFj1j2dPhi',
+            'VBFj1j2dPhi',
 #            'VBFj1j2invM',
             'zeppenfeldVar',
             #'HT2_lepJetMet',
@@ -432,11 +448,10 @@ assert len(LBN_inputs)%4 == 0
 # Output branches #
 
 outputs = [
+            '$Ewk',
             '$GGF',
             '$H',
-            '$Rare',
-            '$ST',
-            '$TT',
+            '$Top',
             '$VBF',
             '$WJets',
           ] 

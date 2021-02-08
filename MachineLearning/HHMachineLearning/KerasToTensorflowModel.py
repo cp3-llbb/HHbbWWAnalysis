@@ -97,7 +97,7 @@ class KerasToTensorflowModel:
             shape=tf.concat((tf.shape(inputs[0])[:1], tf.shape(models[0](inputs))[1:]), axis=0)
         )
         for i, model in enumerate(models):
-            print ("Stitching model {}".format(i),end=' ... ')
+            #print ("Stitching model {}".format(i),end=' ... ')
             model._name += str(i)
             idx = WhereEquals(value=i)(model_idx)
             inp_gathered = [tf.gather_nd(a, idx) for a in inputs]

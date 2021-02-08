@@ -1,27 +1,24 @@
 ROC_multi:
   tree: tree
   classes:
+    - Ewk
     - GGF
     - H
-    - Rare
-    - ST
-    - TT
+    - Top
     - VBF
     - WJets
   prob_branches:
+    - output_Ewk
     - output_GGF
     - output_H
-    - output_Rare
-    - output_ST
-    - output_TT
+    - output_Top
     - output_VBF
     - output_WJets
   labels:
+    - P(Ewk)
     - P(GGF)
     - P(H)
-    - P(Rare)
-    - P(ST)
-    - P(TT)
+    - P(Top)
     - P(VBF)
     - P(WJets)
   colors:
@@ -29,7 +26,6 @@ ROC_multi:
     - "#06b894"
     - "#610596"
     - "#99053d"
-    - "#cc7a16"
     - "#8f0a1e"
     - "#d95564"
 
@@ -37,11 +33,10 @@ ROC_multi:
   title : Multiclass
   cut : ''
   selector :
+    'Ewk'   : 'Ewk'
     'GGF'   : 'GGF'
     'H'     : 'H'
-    'Rare'  : 'Rare'
-    'ST'    : 'ST'
-    'TT'    : 'TT'
+    'Top'   : 'Top'
     'VBF'   : 'VBF'
     'WJets' : 'WJets'
  

@@ -293,7 +293,8 @@ def main():
                                                       #stop                      = 500000) # TODO : remove 
 
                         #if data_node_era.shape[0]>1000000:
-                        #    data_node_era = data_node_era.sample(n=1000000,axis=0) # TODO : remove 
+                        #    data_node_era = data_node_era.sample(n=1000000,axis=0) # TODO : remove
+                        #data_cat_era = data_cat_era.sample(frac=1)[:50000] # TODO : remove 
                         era_str = '{:5s} class - {:15s} category - era {}  : sample size = {:10d}'.format(node,cat,era,data_cat_era.shape[0])
                         if data_cat_era.shape[0] == 0:
                             logging.info(era_str)

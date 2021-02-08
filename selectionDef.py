@@ -333,22 +333,24 @@ def makeExclusiveLooseResolvedJetComboSelection(self,selObject,nbJet,copy_sel=Fa
 
     if nbJet == 0:
         AppliedSF = None
-        selObject.selName += "ExclusiveResolved0b3j"
-        selObject.yieldTitle += " + Exclusive Resolved (nbJet = 0, nAk4LightJet = 3)"
+        selObject.selName += "has0bJets"
+        selObject.yieldTitle += " + Exclusive Resolved (nbJet = 0)"
         selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 0],
                          weight = AppliedSF)
         
     elif nbJet == 1:
         AppliedSF = None
-        selObject.selName += "ExclusiveResolved1b2j"
-        selObject.yieldTitle += " + Exclusive Resolved (nbJet = 1, nAk4LightJet = 2)"
+        #selObject.selName += "ExclusiveResolved1b2j"
+        #selObject.yieldTitle += " + Exclusive Resolved (nbJet = 1, nAk4LightJet = 2)"
+        selObject.selName += "has1bJets"
+        selObject.yieldTitle += " + Exclusive Resolved (nbJet = 1)"
         selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 1],
                          weight = AppliedSF)
 
     elif nbJet == 2:
         AppliedSF = None
-        selObject.selName += "ExclusiveResolved2b1j"
-        selObject.yieldTitle += " + Exclusive Resolved (nbJet = 2, nAk4LightJet = 1)"
+        selObject.selName += "has2bJets"
+        selObject.yieldTitle += " + Exclusive Resolved (nbJet = 2)"
         selObject.refine(cut    = [op.rng_len(self.ak4BJets) >= 2],
                          weight = None)
     else: raise RuntimeError ("Error in Jet Selection!!!")
