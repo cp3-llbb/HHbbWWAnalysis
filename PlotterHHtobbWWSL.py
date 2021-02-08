@@ -82,7 +82,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         #path_model_resolved = '/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Resolved/ModelOneEpoch.pb'
         #path_model_resolved = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Resolved','Model'+str(era)+'_5x256_crossval.pb')
         path_model_resolved = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Resolved','Resolved'+str(era)+'.pb')
-        path_model_boosted  = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Resolved','Boosted_allEras_v2.pb')
+        path_model_boosted  = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Boosted','Boosted_allEras_v2.pb')
         logger.info('DNN_Model_Resolved {}'.format(path_model_resolved))
         logger.info('DNN_Model_Boosted {}'.format(path_model_boosted))
         plots = []
@@ -664,16 +664,17 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                                                        lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
                 MuSelObjBoostedHbb2WjVBFJets = op.sort(op.combine(op.select(self.VBFJets, cleanVBFwithJPA_Boosted(MuSelObjBoostedHbb2WjJets, 2)), N=2, pred=self.lambda_VBFPair), 
                                                        lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
-
+                # features
                 inputsClassic_Hbb2Wj_El = returnClassicInputs_Hbb2Wj(self, ElColl[0], self.ak8BJets[0], ElSelObjBoostedHbb2WjJets[0], ElSelObjBoostedHbb2WjJets[1], 
                                                                      ElSelObjBoostedHbb2WjVBFJets, elL2OutList, self.era)
                 inputsLBN_Hbb2Wj_El     = returnLBNInputs_Hbb2Wj(self, ElColl[0], self.ak8BJets[0], ElSelObjBoostedHbb2WjJets[0], ElSelObjBoostedHbb2WjJets[1])
-                inputsClassic_Hbb2Wj_Mu = returnClassicInputs_Hbb2Wj(self, ElColl[0], self.ak8BJets[0], MuSelObjBoostedHbb2WjJets[0], MuSelObjBoostedHbb2WjJets[1], 
+                inputsClassic_Hbb2Wj_Mu = returnClassicInputs_Hbb2Wj(self, MuColl[0], self.ak8BJets[0], MuSelObjBoostedHbb2WjJets[0], MuSelObjBoostedHbb2WjJets[1], 
                                                                      MuSelObjBoostedHbb2WjVBFJets, muL2OutList, self.era)
                 inputsLBN_Hbb2Wj_Mu     = returnLBNInputs_Hbb2Wj(self, MuColl[0], self.ak8BJets[0], MuSelObjBoostedHbb2WjJets[0], MuSelObjBoostedHbb2WjJets[1])
 
                 input_names_Hbb2Wj      = [key[0] for key in inputsClassic_Hbb2Wj_El.keys()] + ['LBN_inputs','eventnr']
-                DNN_Hbb2Wj   = op.mvaEvaluator(path_model_resolved,mvaType='Tensorflow',otherArgs=(input_names_Hbb2Wj, output_name))
+                DNN_Hbb2Wj   = op.mvaEvaluator(path_model_boosted,mvaType='Tensorflow',otherArgs=(input_names_Hbb2Wj, output_name))
+                
                 inputs_array_Hbb2Wj_El = [op.array("double",val) for val in inputStaticCast(inputsClassic_Hbb2Wj_El,"float")]
                 inputs_array_Hbb2Wj_El.append(op.array("double",*inputStaticCast(inputsLBN_Hbb2Wj_El,"float")))
                 inputs_array_Hbb2Wj_El.append(op.array("long",*inputStaticCast(inputsEventNr,"long")))
@@ -711,13 +712,13 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 MuSelObjBoostedHbb1WjVBFJets = op.sort(op.combine(op.select(self.VBFJets, cleanVBFwithJPA_Boosted(MuSelObjBoostedHbb1WjJets, 1)), N=2, pred=self.lambda_VBFPair), 
                                                        lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
 
-                inputsClassic_Hbb1Wj_El = returnClassicInputs_Hbb1Wj(self, ElColl[0], self.ak8BJets[0], ElSelObjBoostedHbb1WjJets[1], None, ElSelObjBoostedHbb1WjVBFJets, elL2OutList, self.era)
-                inputsLBN_Hbb1Wj_El     = returnLBNInputs_Hbb1Wj(self, ElColl[0], self.ak8BJets[0], ElSelObjBoostedHbb2WjJets[1], None)
-                inputsClassic_Hbb1Wj_Mu = returnClassicInputs_Hbb1Wj(self, ElColl[0], self.ak8BJets[0], MuSelObjBoostedHbb1WjJets[1], None, MuSelObjBoostedHbb1WjVBFJets, muL2OutList, self.era)
-                inputsLBN_Hbb1Wj_Mu     = returnLBNInputs_Hbb1Wj(self, MuColl[0], self.ak8BJets[0], MuSelObjBoostedHbb1WjJets[1], None)
+                inputsClassic_Hbb1Wj_El = returnClassicInputs_Hbb1Wj(self, ElColl[0], self.ak8BJets[0], ElSelObjBoostedHbb1WjJets[0], None, ElSelObjBoostedHbb1WjVBFJets, elL2OutList, self.era)
+                inputsLBN_Hbb1Wj_El     = returnLBNInputs_Hbb1Wj(self, ElColl[0], self.ak8BJets[0], ElSelObjBoostedHbb1WjJets[0], None)
+                inputsClassic_Hbb1Wj_Mu = returnClassicInputs_Hbb1Wj(self, MuColl[0], self.ak8BJets[0], MuSelObjBoostedHbb1WjJets[0], None, MuSelObjBoostedHbb1WjVBFJets, muL2OutList, self.era)
+                inputsLBN_Hbb1Wj_Mu     = returnLBNInputs_Hbb1Wj(self, MuColl[0], self.ak8BJets[0], MuSelObjBoostedHbb1WjJets[0], None)
 
                 input_names_Hbb1Wj      = [key[0] for key in inputsClassic_Hbb1Wj_El.keys()] + ['LBN_inputs','eventnr']
-                DNN_Hbb1Wj   = op.mvaEvaluator(path_model_resolved,mvaType='Tensorflow',otherArgs=(input_names_Hbb1Wj, output_name))
+                DNN_Hbb1Wj   = op.mvaEvaluator(path_model_boosted,mvaType='Tensorflow',otherArgs=(input_names_Hbb1Wj, output_name))
                 inputs_array_Hbb1Wj_El = [op.array("double",val) for val in inputStaticCast(inputsClassic_Hbb1Wj_El,"float")]
                 inputs_array_Hbb1Wj_El.append(op.array("double",*inputStaticCast(inputsLBN_Hbb1Wj_El,"float")))
                 inputs_array_Hbb1Wj_El.append(op.array("long",*inputStaticCast(inputsEventNr,"long")))
@@ -745,8 +746,8 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         
             if "Hbb0Wj" in jetplot_level or "Boosted" in jetplot_level:
                 print ('...... JPA : Hbb0Wj Node Selection')
-                ElSelObjBoostedHbb0Wj        = ElBoostedSelObjJetsIdxPerJpaNodeDict.get('Hbb1Wj')[0]
-                MuSelObjBoostedHbb0Wj        = MuBoostedSelObjJetsIdxPerJpaNodeDict.get('Hbb1Wj')[0]
+                ElSelObjBoostedHbb0Wj        = ElBoostedSelObjJetsIdxPerJpaNodeDict.get('Hbb0Wj')[0]
+                MuSelObjBoostedHbb0Wj        = MuBoostedSelObjJetsIdxPerJpaNodeDict.get('Hbb0Wj')[0]
                 
                 # VBF Jets
                 ElSelObjBoostedHbb0WjVBFJets = op.sort(op.combine(op.select(self.VBFJets, cleanVBFwithJPA_Boosted_rest()), N=2, pred=self.lambda_VBFPair),
@@ -756,11 +757,11 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
                 inputsClassic_Hbb0Wj_El = returnClassicInputs_Hbb0Wj(self, ElColl[0], self.ak8BJets[0], None, None, ElSelObjBoostedHbb0WjVBFJets, elL2OutList, self.era)
                 inputsLBN_Hbb0Wj_El     = returnLBNInputs_Hbb0Wj(self, ElColl[0], self.ak8BJets[0], None, None)
-                inputsClassic_Hbb0Wj_Mu = returnClassicInputs_Hbb0Wj(self, ElColl[0], self.ak8BJets[0], None, None, MuSelObjBoostedHbb0WjVBFJets, muL2OutList, self.era)
+                inputsClassic_Hbb0Wj_Mu = returnClassicInputs_Hbb0Wj(self, MuColl[0], self.ak8BJets[0], None, None, MuSelObjBoostedHbb0WjVBFJets, muL2OutList, self.era)
                 inputsLBN_Hbb0Wj_Mu     = returnLBNInputs_Hbb0Wj(self, MuColl[0], self.ak8BJets[0], None, None)
 
                 input_names_Hbb0Wj      = [key[0] for key in inputsClassic_Hbb0Wj_El.keys()] + ['LBN_inputs','eventnr']
-                DNN_Hbb0Wj   = op.mvaEvaluator(path_model_resolved,mvaType='Tensorflow',otherArgs=(input_names_Hbb0Wj, output_name))
+                DNN_Hbb0Wj   = op.mvaEvaluator(path_model_boosted,mvaType='Tensorflow',otherArgs=(input_names_Hbb0Wj, output_name))
                 inputs_array_Hbb0Wj_El = [op.array("double",val) for val in inputStaticCast(inputsClassic_Hbb0Wj_El,"float")]
                 inputs_array_Hbb0Wj_El.append(op.array("double",*inputStaticCast(inputsLBN_Hbb0Wj_El,"float")))
                 inputs_array_Hbb0Wj_El.append(op.array("long",*inputStaticCast(inputsEventNr,"long")))
@@ -782,7 +783,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 # Ak8 Jets #
                 ##plots.extend(makeSingleLeptonAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys},nMedBJets=self.nMediumBTaggedSubJets, HLL=self.HLL))
                 # MET #
-                plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
+                #plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
                 # HighLevel #
                 ##plots.extend(makeHighLevelPlotsBoosted(**{k:channelDict[k] for k in BoostedKeys}, HLL=self.HLL))
                 
