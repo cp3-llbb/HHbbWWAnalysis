@@ -2517,8 +2517,8 @@ def makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,nodes,chan
         plots.append(Plot.make1D("%s_%s_DNNOutput_%s"%(channel,suffix,node),
                                  output[i],
                                  sel,
-                                 #EquidistantBinning(400,0.,1.),
-                                 EquidistantBinning(10,0.,1.),
+                                 EquidistantBinning(400,0.,1.),
+                                 #EquidistantBinning(10,0.,1.),
                                  xTitle = 'DNN output %s'%node,
                                  plotopts = plotots))
     return plots    
