@@ -9,9 +9,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--file', required=True, type=str, help='ROOT file containing fake rates')
 parser.add_argument('--era', required=True, type=str, help='Era')
 parser.add_argument('--wp', required=True, type=str, help='WP for the lepton selection : Loose | Tight')
-
+parser.add_argument('--channel', required=True, type=str, help='Lepton channel : DL | SL')
 
 args = parser.parse_args()
+
+assert args.wp == "Loose" or args.wp == "Tight"
+assert args.channel == "DL" or args.channel == "SL"
 
 f = ROOT.TFile.Open(args.file)
 
@@ -53,6 +56,8 @@ for cat,h_nom,h_ups,h_downs in zip(["Electron","Muon"],[el_nom,mu_nom],[el_hist_
             ydict = {'bin':[yMin,yMax],'values':[]}
             for x in range(1,h_nom.GetNbinsX()+1):
                 nom = h_nom.GetBinContent(x,y)
+                if args.channel == "SL":
+                    nom = min(nom,0.8) # clipping
                 xMin = xAxis.GetBinLowEdge(x)
                 xMax = xAxis.GetBinUpEdge(x)
                 if xMin not in xbinning:
@@ -70,7 +75,7 @@ for cat,h_nom,h_ups,h_downs in zip(["Electron","Muon"],[el_nom,mu_nom],[el_hist_
         json_content = {'dimension': 2, 'variables': ['AbsEta', 'Pt'], 'binning': {'x': ybinning, 'y': xbinning}, 'data': data, 'error_type': 'relative'}
             # Inverted binning because it is clearer to have eta bins containing conept bins
 
-        filename = 'TTHFakeRates_%sMVA_%s_%s_%s.json'%(args.wp,cat,args.era,syst_suffix)
+        filename = 'TTHFakeRates_%sMVA_%s_%s_%s_%s.json'%(args.wp,args.channel,cat,args.era,syst_suffix)
         with open(filename, 'w') as j:                                                                   
             json.dump(json_content, j, indent=2)
         print ("Created file %s"%filename)

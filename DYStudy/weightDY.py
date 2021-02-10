@@ -16,7 +16,7 @@ ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 
 class WeightDY:
-    def __init__(self, channel, config, title, outputname, mode, cat, era, xaxis, yaxis, rebin_1D=None, rebin_2D=None):
+    def __init__(self, channel, config, title, outputname, mode, cat, era, xaxis, yaxis, normalize=True, rebin_1D=None, rebin_2D=None):
         self.channel    = channel
         self.config     = config
         self.mode       = mode
@@ -25,6 +25,7 @@ class WeightDY:
         self.title      = title
         self.xaxis      = xaxis
         self.yaxis      = yaxis
+        self.normalize  = normalize
         self.rebin_1D   = rebin_1D
         self.rebin_2D   = rebin_2D
         path_out_root = os.path.join(os.path.abspath(os.path.dirname(__file__)),'weights','root')
@@ -90,7 +91,6 @@ class WeightDY:
         path_file = os.path.abspath(os.path.join(directory, 'results','*root'))
         for f in glob.glob(path_file):
             name = os.path.basename(f)
-            #print ("Looking at %s"%name)
             # Check if in YAML #
             if name not in yaml_dict['samples'].keys():
                 print ("[WARNING] File %s will be ignored"%(name))
@@ -145,7 +145,7 @@ class WeightDY:
 
         # Get data per sample #
         sample_dict = {}
-        info_to_keep = ['cross-section','generated-events','group','type','era']
+        info_to_keep = ['cross-section','generated-events','group','type','era','branching-ratio']
         for sample,data in full_dict['files'].items():
             sample_dict[sample] = {k:data[k] for k in data.keys() & info_to_keep}
 
@@ -179,6 +179,8 @@ class WeightDY:
         dist = None
         # Loop over hist per sample #
         for sample, data_dict in samp_dict.items():
+            if "Fake" in sample:
+                continue
             # Get hist #
             h = hist_dict[sample]
             if h is None:
@@ -281,17 +283,23 @@ class WeightDY:
                 hist_dict['ZVeto_2b'] = self.rebinWeights2D(hist_dict['ZVeto_2b'])
                 hist_dict['ZPeak_2b'] = self.rebinWeights2D(hist_dict['ZPeak_2b'])
 
-        if self.mode == "data":
-            #self.factor_ZVeto,self.factor_1b,self.factor_2b = self.getNumericalFactors()
+        if self.normalize:
+            if self.mode == "data":
+                #self.factor_ZVeto,self.factor_1b,self.factor_2b = self.getNumericalFactors()
+                self.factor_ZVeto = 1.
+                self.factor_1b = self.N_ZPeak1b/self.N_ZPeak0b
+                if self.cat == 'resolved':
+                    self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
+            elif self.mode == "mc":
+                self.factor_ZVeto = 1.
+                self.factor_1b = self.N_ZPeak1b/self.N_ZPeak0b
+                if self.cat == 'resolved':
+                    self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
+        else:
             self.factor_ZVeto = 1.
-            self.factor_1b = self.N_ZPeak1b/self.N_ZPeak0b
+            self.factor_1b = 1.
             if self.cat == 'resolved':
-                self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
-        elif self.mode == "mc":
-            self.factor_ZVeto = 1.
-            self.factor_1b = self.N_ZPeak1b/self.N_ZPeak0b
-            if self.cat == 'resolved':
-                self.factor_2b = self.N_ZPeak2b/self.N_ZPeak0b
+                self.factor_2b = 1.
 
         print ("Factor in Z peak : 1b/0b")
         print ("%0.5f / %0.5f -> %0.5f"%(self.N_ZPeak1b,self.N_ZPeak0b,self.N_ZPeak1b/self.N_ZPeak0b))
@@ -652,7 +660,7 @@ class WeightDY:
     def plotWeights1D(self):
         histograms = copy.deepcopy(self.histograms)
 
-        for name in ['ZVeto_0b','ZPeak_0b','ZPeak_1b','ZPeak_2b']:
+        for name in ['ZVeto_0b','ZVeto_1b','ZVeto_2b','ZPeak_0b','ZPeak_1b','ZPeak_2b']:
             histograms[name].Scale(1./ histograms[name].Integral()) 
 
         amax = max([histograms[k].GetMaximum() for k in ['ZVeto_0b','ZPeak_0b','ZPeak_1b','ZPeak_2b']])
@@ -703,48 +711,64 @@ class WeightDY:
         histograms['ZVeto_0b'].SetTitle(self.title)
 
         histograms['ZVeto_0b'].SetLineWidth(2) 
+        histograms['ZVeto_0b'].SetLineStyle(2) 
         histograms['ZVeto_0b'].SetLineColor(418) 
         histograms['ZVeto_1b'].SetLineWidth(2) 
-        histograms['ZPeak_0b'].SetLineWidth(2) 
-        histograms['ZPeak_0b'].SetLineColor(602)
-        histograms['ZPeak_1b'].SetLineWidth(2) 
-        histograms['ZPeak_1b'].SetLineColor(619)
+        histograms['ZVeto_1b'].SetLineColor(602) 
+        histograms['ZVeto_1b'].SetLineStyle(2) 
         if self.cat == 'resolved':
             histograms['ZVeto_2b'].SetLineWidth(2) 
+            histograms['ZVeto_2b'].SetLineColor(634) 
+            histograms['ZVeto_2b'].SetLineStyle(2) 
+        histograms['ZPeak_0b'].SetLineWidth(2) 
+        histograms['ZPeak_0b'].SetLineColor(418) 
+        histograms['ZPeak_1b'].SetLineWidth(2) 
+        histograms['ZPeak_1b'].SetLineColor(602) 
+        if self.cat == 'resolved':
             histograms['ZPeak_2b'].SetLineWidth(2) 
-            histograms['ZPeak_2b'].SetLineColor(634)
+            histograms['ZPeak_2b'].SetLineColor(634) 
 
 
         histograms['ZVeto_0b'].Draw("hist")
+        histograms['ZVeto_1b'].Draw("same hist")
+        if self.cat == 'resolved':
+            histograms['ZVeto_2b'].Draw("hist same")
         histograms['ZPeak_0b'].Draw("same hist")
         histograms['ZPeak_1b'].Draw("same hist")
         if self.cat == 'resolved':
-            histograms['ZPeak_2b'].Draw("same hist")
+            histograms['ZPeak_2b'].Draw("hist same")
 
-        leg1 = ROOT.TLegend(0.50,0.70,0.89,0.91)
-        leg1.SetTextSize(0.02)
+        leg1 = ROOT.TLegend(0.65,0.70,0.95,0.95)
+        leg1.SetTextSize(0.015)
         mode = "DY data estimation" if self.mode == "data" else "DY MC"
         leg1.AddEntry(histograms['ZVeto_0b'],"#splitline{Z Veto 0 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZVeto0b))
+        leg1.AddEntry(histograms['ZVeto_1b'],"#splitline{Z Veto 1 btag (DY MC)}{Integral = %0.2f}"%(self.N_ZVeto1b))
+        if self.cat == 'resolved':
+            leg1.AddEntry(histograms['ZVeto_2b'],"#splitline{Z Veto 2 btag (DY MC)}{Integral = %0.2f}"%(self.N_ZVeto2b))
         leg1.AddEntry(histograms['ZPeak_0b'],"#splitline{Z Peak 0 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak0b))
         leg1.AddEntry(histograms['ZPeak_1b'],"#splitline{Z Peak 1 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak1b))
         if self.cat == 'resolved':
             leg1.AddEntry(histograms['ZPeak_2b'],"#splitline{Z Peak 2 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak2b))
         leg1.Draw()
 
-        text = ROOT.TPaveText(0.6,0.60,0.85,0.68,"NB NDC")
-        #text.SetFillStyle(1001)
-        text.AddText("N_{Z peak}^{1b}/N_{Z peak}^{0b} = %0.5f"%self.factor_1b)
-        if self.cat == 'resolved':
-            text.AddText("N_{Z peak}^{2b}/N_{Z peak}^{0b} = %0.5f"%self.factor_2b)
-        #text.AddText("N_{Z veto}^{0b} = %0.5f"%self.factor_ZVeto)
-        text.SetBorderSize(0)
-        text.Draw()
+        if self.normalize:
+            text = ROOT.TPaveText(0.6,0.60,0.85,0.68,"NB NDC")
+            #text.SetFillStyle(1001)
+            text.AddText("N_{Z peak}^{1b}/N_{Z peak}^{0b} = %0.5f"%self.factor_1b)
+            if self.cat == 'resolved':
+                text.AddText("N_{Z peak}^{2b}/N_{Z peak}^{0b} = %0.5f"%self.factor_2b)
+            #text.AddText("N_{Z veto}^{0b} = %0.5f"%self.factor_ZVeto)
+            text.SetBorderSize(0)
+            text.Draw()
 
 
         ##########  PAD 2 ##########
         pad2.cd()
 
-        self.weight_1b.SetMaximum(self.weight_1b.GetMaximum()*1.1)
+        if self.cat == 'resolved': 
+            self.weight_1b.SetMaximum(max([self.weight_1b.GetMaximum(),self.weight_2b.GetMaximum()])*1.1)
+        else:
+            self.weight_1b.SetMaximum(self.weight_1b.GetMaximum()*1.1)
 
         #content_w1b = np.ravel(hist2array(self.weight_1b))
         #self.weight_1b.SetMaximum(np.percentile(content_w1b,99))
@@ -1128,6 +1152,7 @@ if __name__ == "__main__":
                             mode        = 'data',
                             cat         = d['category'],
                             era         = d['era'],
+                            normalize   = d['normalize'] if 'normalize' in d.keys() else True,
                             xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
                             yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
                             rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
@@ -1142,6 +1167,7 @@ if __name__ == "__main__":
                             mode        = 'mc',
                             cat         = d['category'],
                             era         = d['era'],
+                            normalize   = d['normalize'] if 'normalize' in d.keys() else True,
                             xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
                             yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
                             rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
@@ -1156,6 +1182,7 @@ if __name__ == "__main__":
                             mode        = 'data',
                             cat         = d['category'],
                             era         = d['era'],
+                            normalize   = d['normalize'] if 'normalize' in d.keys() else True,
                             xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
                             yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
                             rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
@@ -1170,6 +1197,7 @@ if __name__ == "__main__":
                             mode        = 'mc',
                             cat         = d['category'],
                             era         = d['era'],
+                            normalize   = d['normalize'] if 'normalize' in d.keys() else True,
                             xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
                             yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
                             rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
@@ -1187,6 +1215,7 @@ if __name__ == "__main__":
 #                            mode        = 'mc',
 #                            cat         = d['category'],
 #                            era         = d['era'],
+#                            normalize   = d['normalize'] if 'normalize' in d.keys() else True,
 #                            xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
 #                            yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
 #                            rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
@@ -1201,6 +1230,7 @@ if __name__ == "__main__":
 #                            mode        = 'data',
 #                            cat         = d['category'],
 #                            era         = d['era'],
+#                            normalize   = d['normalize'] if 'normalize' in d.keys() else True,
 #                            xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
 #                            yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
 #                            rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
