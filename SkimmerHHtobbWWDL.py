@@ -312,8 +312,8 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                                                      op.rng_product(self.muonsFakeSel, lambda mu : reduce(mul,self.lambda_MuonTightSF(mu)))
 
             if not self.inclusive_sel:
-                if era == "2016" or era == "2017": 
-                    if self.args.Channel == "ElEl":
+                if self.args.Channel == "ElEl":
+                    if era == "2016" or era == "2017": 
                         varsToKeep["weight_electron_reco_low"] = op.multiSwitch((op.AND(self.lambda_is_matched(dilepton[0]),dilepton[0].pt<=20.,self.lambda_is_matched(dilepton[1]),dilepton[1].pt<=20.),
                                                                                  self.elLooseRecoPtLt20(dilepton[0])*self.elLooseRecoPtLt20(dilepton[1])),
                                                                                 (op.AND(self.lambda_is_matched(dilepton[0]),dilepton[0].pt<=20.),self.elLooseRecoPtLt20(dilepton[0])),
@@ -324,52 +324,66 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                                                                                  (op.AND(self.lambda_is_matched(dilepton[0]),dilepton[0].pt>20.),self.elLooseRecoPtGt20(dilepton[0])),
                                                                                  (op.AND(self.lambda_is_matched(dilepton[1]),dilepton[1].pt>20.),self.elLooseRecoPtGt20(dilepton[1])),
                                                                                  op.c_float(1.))
-                        varsToKeep["weight_muon_idiso_loose"] = op.c_float(1.)
-                        varsToKeep["weight_electron_id_loose_01"] = op.multiSwitch((op.AND(self.lambda_is_matched(dilepton[0]),self.lambda_is_matched(dilepton[1])),
-                                                                                    self.elLooseEff(dilepton[0])*self.elLooseEff(dilepton[1])),
-                                                                                   (self.lambda_is_matched(dilepton[0]),self.elLooseEff(dilepton[0])),
-                                                                                   (self.lambda_is_matched(dilepton[1]),self.elLooseEff(dilepton[1])),
-                                                                                   op.c_float(1.))
-                        varsToKeep["weight_electron_id_loose_02"] = op.multiSwitch((op.AND(self.lambda_is_matched(dilepton[0]),self.lambda_is_matched(dilepton[1])),
-                                                                                    self.elLooseId(dilepton[0])*self.elLooseId(dilepton[1])),
-                                                                                   (self.lambda_is_matched(dilepton[0]),self.elLooseId(dilepton[0])),
-                                                                                   (self.lambda_is_matched(dilepton[1]),self.elLooseId(dilepton[1])),
-                                                                                   op.c_float(1.))
-                        varsToKeep["weight_electron_tth_loose"] = self.lambda_ElectronTightSF(dilepton[0])[0] * self.lambda_ElectronTightSF(dilepton[1])[0]
-                        varsToKeep["weight_muon_tth_loose"] = op.c_float(1.)
-
-                    if self.args.Channel == "MuMu":
-                        varsToKeep["weight_muon_idiso_loose"] = op.multiSwitch((op.AND(self.lambda_is_matched(dilepton[0]),self.lambda_is_matched(dilepton[1])),
-                                                                                self.muLooseId(dilepton[0])*self.muLooseId(dilepton[1])),
-                                                                                (self.lambda_is_matched(dilepton[0]),self.muLooseId(dilepton[0])),
-                                                                                (self.lambda_is_matched(dilepton[1]),self.muLooseId(dilepton[1])),
+                    else:
+                       varsToKeep["weight_electron_reco_low"] = op.multiSwitch((op.AND(self.lambda_is_matched(dilepton[0]),self.lambda_is_matched(dilepton[1])),
+                                                                                 self.elLooseReco(dilepton[0])*self.elLooseReco(dilepton[1])),
+                                                                                (self.lambda_is_matched(dilepton[0]),self.elLooseReco(dilepton[0])),
+                                                                                (self.lambda_is_matched(dilepton[1]),self.elLooseReco(dilepton[1])),
                                                                                 op.c_float(1.))
+
+                    varsToKeep["weight_muon_idiso_loose"] = op.c_float(1.)
+                    varsToKeep["weight_electron_id_loose_01"] = op.multiSwitch((op.AND(self.lambda_is_matched(dilepton[0]),self.lambda_is_matched(dilepton[1])),
+                                                                                self.elLooseEff(dilepton[0])*self.elLooseEff(dilepton[1])),
+                                                                               (self.lambda_is_matched(dilepton[0]),self.elLooseEff(dilepton[0])),
+                                                                               (self.lambda_is_matched(dilepton[1]),self.elLooseEff(dilepton[1])),
+                                                                               op.c_float(1.))
+                    varsToKeep["weight_electron_id_loose_02"] = op.multiSwitch((op.AND(self.lambda_is_matched(dilepton[0]),self.lambda_is_matched(dilepton[1])),
+                                                                                self.elLooseId(dilepton[0])*self.elLooseId(dilepton[1])),
+                                                                               (self.lambda_is_matched(dilepton[0]),self.elLooseId(dilepton[0])),
+                                                                               (self.lambda_is_matched(dilepton[1]),self.elLooseId(dilepton[1])),
+                                                                               op.c_float(1.))
+                    varsToKeep["weight_electron_tth_loose"] = self.lambda_ElectronTightSF(dilepton[0])[0] * self.lambda_ElectronTightSF(dilepton[1])[0]
+                    varsToKeep["weight_muon_tth_loose"] = op.c_float(1.)
+
+                if self.args.Channel == "MuMu":
+                    varsToKeep["weight_muon_idiso_loose"] = op.multiSwitch((op.AND(self.lambda_is_matched(dilepton[0]),self.lambda_is_matched(dilepton[1])),
+                                                                            self.muLooseId(dilepton[0])*self.muLooseId(dilepton[1])),
+                                                                            (self.lambda_is_matched(dilepton[0]),self.muLooseId(dilepton[0])),
+                                                                            (self.lambda_is_matched(dilepton[1]),self.muLooseId(dilepton[1])),
+                                                                            op.c_float(1.))
+                    if era == "2016" or era == "2017": 
                         varsToKeep["weight_electron_reco_low"] = op.c_float(1.)
                         varsToKeep["weight_electron_reco_high"] = op.c_float(1.)
-                        varsToKeep["weight_electron_id_loose_01"] = op.c_float(1.)
-                        varsToKeep["weight_electron_id_loose_02"] = op.c_float(1.)
-                        varsToKeep["weight_electron_tth_loose"] = op.c_float(1.)
-                        varsToKeep["weight_muon_tth_loose"] = self.lambda_MuonTightSF(dilepton[0])[0] * self.lambda_MuonTightSF(dilepton[1])[0]
-                    if self.args.Channel == "ElMu":
+                    else:
+                        varsToKeep["weight_electron_reco"] = op.c_float(1.)
+                    varsToKeep["weight_electron_id_loose_01"] = op.c_float(1.)
+                    varsToKeep["weight_electron_id_loose_02"] = op.c_float(1.)
+                    varsToKeep["weight_electron_tth_loose"] = op.c_float(1.)
+                    varsToKeep["weight_muon_tth_loose"] = self.lambda_MuonTightSF(dilepton[0])[0] * self.lambda_MuonTightSF(dilepton[1])[0]
+                if self.args.Channel == "ElMu":
+                    if era == "2016" or era == "2017": 
                         varsToKeep["weight_electron_reco_low"] = op.switch(op.AND(self.lambda_is_matched(dilepton[0]),dilepton[0].pt<=20.),
                                                                            self.elLooseRecoPtLt20(dilepton[0]),
                                                                            op.c_float(1.))
                         varsToKeep["weight_electron_reco_high"] = op.switch(op.AND(self.lambda_is_matched(dilepton[0]),dilepton[0].pt>20.),
                                                                             self.elLooseRecoPtGt20(dilepton[0]),
                                                                             op.c_float(1.))
-                        varsToKeep["weight_muon_idiso_loose"] = op.switch(self.lambda_is_matched(dilepton[1]),
-                                                                          self.muLooseId(dilepton[1]),
+                    else:
+                        varsToKeep["weight_electron_reco_high"] = op.switch(self.lambda_is_matched(dilepton[0]),                                                                                        
+                                                                            self.elLooseReco(dilepton[0]),
+                                                                        op.c_float(1.))
+
+                    varsToKeep["weight_muon_idiso_loose"] = op.switch(self.lambda_is_matched(dilepton[1]),
+                                                                      self.muLooseId(dilepton[1]),
+                                                                      op.c_float(1.))
+                    varsToKeep["weight_electron_id_loose_01"] = op.switch(self.lambda_is_matched(dilepton[0]),
+                                                                          self.elLooseEff(dilepton[0]),
                                                                           op.c_float(1.))
-                        varsToKeep["weight_electron_id_loose_01"] = op.switch(self.lambda_is_matched(dilepton[0]),
-                                                                              self.elLooseEff(dilepton[0]),
-                                                                              op.c_float(1.))
-                        varsToKeep["weight_electron_id_loose_02"] = op.switch(self.lambda_is_matched(dilepton[0]),
-                                                                              self.elLooseId(dilepton[0]),
-                                                                              op.c_float(1.))
-                        varsToKeep["weight_electron_tth_loose"] = self.lambda_ElectronTightSF(dilepton[0])[0]
-                        varsToKeep["weight_muon_tth_loose"] = self.lambda_MuonTightSF(dilepton[1])[0]
-                else:
-                    raise NotImplementedError
+                    varsToKeep["weight_electron_id_loose_02"] = op.switch(self.lambda_is_matched(dilepton[0]),
+                                                                          self.elLooseId(dilepton[0]),
+                                                                          op.c_float(1.))
+                    varsToKeep["weight_electron_tth_loose"] = self.lambda_ElectronTightSF(dilepton[0])[0]
+                    varsToKeep["weight_muon_tth_loose"] = self.lambda_MuonTightSF(dilepton[1])[0]
 
             # L1 Prefire #
             if era in ["2016","2017"]:
@@ -459,6 +473,19 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             for (varname,_,_),var in inputs.items():
                 varsToKeep[varname] = var
 
+
+            # DEBUG #
+            varsToKeep["btagSF_nominal"] = op.map(self.ak4Jets , lambda j : self.DeepJetDiscReshapingSF(j))
+            for varName in self.DeepJetDiscReshapingSF.varNames:
+                varsToKeep["btagSF_{}".format(varName)] = op.map(self.ak4Jets , lambda j : self.DeepJetDiscReshapingSF(j,nomVar=varName,systVars=[]))
+
+            # AK4 Jets #
+            for i in range(1,5): # 4 leading jets 
+                varsToKeep["ak4Jet{}_btagSF_nominal".format(i)]     = op.switch(op.rng_len(self.ak4Jets) >= i, self.DeepJetDiscReshapingSF(self.ak4Jets[i-1]), op.c_float(-9999.))
+                for varName in self.DeepJetDiscReshapingSF.varNames:
+                    varsToKeep["ak4Jet{}_btagSF_{}".format(i,varName)] = op.switch(op.rng_len(self.ak4Jets) >= i, self.DeepJetDiscReshapingSF(self.ak4Jets[i-1],nomVar=varName,systVars=[]), op.c_float(-9999.))
+
+            
 #            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','08','model','model.pb')
 #            nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
 #            if not os.path.exists(path_model):
@@ -704,21 +731,21 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             for (varname,_,_),var in inputs.items():
                 varsToKeep[varname] = var
 
-            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','08','model','model.pb')
-            nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
-            print ("DNN model : %s"%path_model)
-            if not os.path.exists(path_model):
-                raise RuntimeError('Could not find model file %s'%path_model)
-            try:
-                #input_names = ["input_1","input_2","input_3","input_4","input_5","input_6"]
-                input_names = ["lep","jet","fat","met","hl","param","eventnr"]
-                output_name = "Identity"
-                DNN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
-            except:
-                raise RuntimeError('Could not load model %s'%path_model)
-            outputs = DNN(*inputs.values())
-            for node, output in zip(nodes,outputs): 
-                varsToKeep[node] = output
+#            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','10','model','model.pb')
+#            nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
+#            print ("DNN model : %s"%path_model)
+#            if not os.path.exists(path_model):
+#                raise RuntimeError('Could not find model file %s'%path_model)
+#            try:
+#                #input_names = ["input_1","input_2","input_3","input_4","input_5","input_6"]
+#                input_names = ["lep","jet","fat","met","hl","param","eventnr"]
+#                output_name = "Identity"
+#                DNN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
+#            except:
+#                raise RuntimeError('Could not load model %s'%path_model)
+#            outputs = DNN(*inputs.values())
+#            for node, output in zip(nodes,outputs): 
+#                varsToKeep[node] = output
 
         #----- Additional variables -----#
         varsToKeep["MC_weight"]         = t.genWeight
