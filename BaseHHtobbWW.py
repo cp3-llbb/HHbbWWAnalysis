@@ -405,9 +405,14 @@ One lepton and and one jet argument must be specified in addition to the require
                 self.scaleWeight_Mixed = op.systematic(op.c_float(1.), name = "ScaleWeight_Mixed", up = op.c_float(1.), down = op.c_float(1.))
 
             noSel = noSel.refine("PDFweights", weight = [self.scaleWeight_Fact,self.scaleWeight_Renorm,self.scaleWeight_Mixed])
+
             # PS weights #
-            self.psISRSyst = op.systematic(op.c_float(1.), name="psISR", up=tree.PSWeight[2], down=tree.PSWeight[0])
-            self.psFSRSyst = op.systematic(op.c_float(1.), name="psFSR", up=tree.PSWeight[3], down=tree.PSWeight[1])
+            self.psISRSyst = op.switch(op.rng_len(tree.PSWeight) == 4,
+                                       op.systematic(op.c_float(1.), name="psISR", up=tree.PSWeight[2], down=tree.PSWeight[0]),
+                                       op.systematic(op.c_float(1.), name="psISR", up=op.c_float(1.), down=op.c_float(1.)))
+            self.psFSRSyst = op.switch(op.rng_len(tree.PSWeight) == 4,
+                                       op.systematic(op.c_float(1.), name="psFSR", up=tree.PSWeight[3], down=tree.PSWeight[1]),
+                                       op.systematic(op.c_float(1.), name="psFSR", up=op.c_float(1.), down=op.c_float(1.)))
             noSel = noSel.refine("PSweights", weight = [self.psISRSyst, self.psFSRSyst])
 
         #----- Triggers and Corrections -----#
@@ -467,6 +472,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   smear                 = "Summer16_25nsV1_MC",
                                   jesUncertaintySources = "Merged",
                                   regroupTag            = "V2",
+                                  enableSystematics     = lambda v : not "jesTotal" in v,
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -478,6 +484,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jesUncertaintySources = "Merged",
                                   uncertaintiesFallbackJetType = "AK4PFchs",
                                   regroupTag            = "V2",
+                                  enableSystematics     = lambda v : not "jesTotal" in v,
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -488,6 +495,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                       isT1Smear             = True,
                                       jesUncertaintySources = "Merged",
                                       regroupTag            = "V2",
+                                      enableSystematics     = lambda v : not "jesTotal" in v,
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
@@ -561,6 +569,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   smear                 = "Fall17_V3b_MC",
                                   jesUncertaintySources = "Merged",
                                   regroupTag            = "V2",
+                                  enableSystematics     = lambda v : not "jesTotal" in v,
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -571,6 +580,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   smear                 = "Fall17_V3b_MC",
                                   jesUncertaintySources = "Merged",
                                   regroupTag            = "V2",
+                                  enableSystematics     = lambda v : not "jesTotal" in v,
                                   uncertaintiesFallbackJetType = "AK4PFchs",
                                   mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
@@ -583,6 +593,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                       isT1Smear             = True,
                                       jesUncertaintySources = "Merged",
                                       regroupTag            = "V2",
+                                      enableSystematics     = lambda v : not "jesTotal" in v,
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
@@ -655,6 +666,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                   smear                 = "Autumn18_V7b_MC",
                                   jesUncertaintySources = "Merged",
                                   regroupTag            = "V2",
+                                  enableSystematics     = lambda v : not "jesTotal" in v,
+                                  addHEM2018Issue       = True,
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
@@ -665,6 +678,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                   smear                 = "Autumn18_V7b_MC",
                                   jesUncertaintySources = "Merged",
                                   regroupTag            = "V2",
+                                  enableSystematics     = lambda v : not "jesTotal" in v,
+                                  addHEM2018Issue       = True,
                                   uncertaintiesFallbackJetType = "AK4PFchs",
                                   mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
@@ -677,6 +692,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                       isT1Smear             = True,
                                       jesUncertaintySources = "Merged",
                                       regroupTag            = "V2",
+                                      enableSystematics     = lambda v : not "jesTotal" in v,
+                                      addHEM2018Issue       = True,
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
                                       backend               = be,
@@ -1481,7 +1498,7 @@ One lepton and and one jet argument must be specified in addition to the require
             if self.args.TTHIDTight:
                 FRSysts = ['Tight_pt_syst','Tight_barrel_syst','Tight_norm_syst']
             if self.args.TTHIDLoose:
-                FRSysts = ['Loose_pt_syst','Loose_barrel_syst','Loose_norm_syst']
+                FRSysts = [f'Loose_{channel}_pt_syst',f'Loose_{channel}_barrel_syst',f'Loose_{channel}_norm_syst']
             self.electronFRList = [self.SF.get_scalefactor("lepton", ('electron_fakerates_'+era, syst), combine="weight", systName="el_FR_"+syst, defineOnFirstUse=(not forSkimmer),
                                                  additionalVariables={'Pt' : lambda obj : self.electron_conept[obj.idx]}) for syst in FRSysts]
             self.muonFRList = [self.SF.get_scalefactor("lepton", ('muon_fakerates_'+era, syst), combine="weight", systName="mu_FR_"+syst, defineOnFirstUse=(not forSkimmer),
@@ -1519,15 +1536,19 @@ One lepton and and one jet argument must be specified in addition to the require
 
             self.lambda_FR_el       = lambda el : returnFFSF(el,self.electronFRList,"el_FR")
             self.lambda_FR_mu       = lambda mu : returnFFSF(mu,self.muonFRList,"mu_FR")
+
+            # Correction factor only for DL #
             self.lambda_FRcorr_el   = lambda el : self.lambda_FR_el(el)*self.electronCorrFR
             self.lambda_FRcorr_mu   = lambda mu : self.lambda_FR_mu(mu)*self.muonCorrFR
-            self.lambda_FF_el       = lambda el : self.lambda_FRcorr_el(el)/(1-self.lambda_FRcorr_el(el))
-            self.lambda_FF_mu       = lambda mu : self.lambda_FRcorr_mu(mu)/(1-self.lambda_FRcorr_mu(mu))
 
             if channel == "SL":
+                self.lambda_FF_el = lambda el : self.lambda_FR_el(el)/(1-self.lambda_FR_el(el))
+                self.lambda_FF_mu = lambda mu : self.lambda_FR_mu(mu)/(1-self.lambda_FR_mu(mu))
                 self.ElFakeFactor = lambda el : self.lambda_FF_el(el)
                 self.MuFakeFactor = lambda mu : self.lambda_FF_mu(mu)
             if channel == "DL":
+                self.lambda_FF_el   = lambda el : self.lambda_FRcorr_el(el)/(1-self.lambda_FRcorr_el(el))
+                self.lambda_FF_mu   = lambda mu : self.lambda_FRcorr_mu(mu)/(1-self.lambda_FRcorr_mu(mu))
                 self.ElElFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),op.NOT(self.lambda_electronTightSel(dilep[1]))),
                                                                      # Both electrons fail tight -> -F1*F2
                                                                      -self.lambda_FF_el(dilep[0])*self.lambda_FF_el(dilep[1])),
@@ -1579,13 +1600,22 @@ One lepton and and one jet argument must be specified in addition to the require
             print ('Btag Ak4 CSV file',csvFileNameAk4)
 
             #----- Ak4 SF -----# 
-            systTypes = ["jes", "lf", "hf", "hfstats1", "hfstats2","lfstats1", "lfstats2", "cferr1", "cferr2"]
+            self.systTypes = ["hf","lf","hfstats1", "hfstats2","lfstats1", "lfstats2", "cferr1", "cferr2"]
+            if era == "2016":
+                self.systTypes += ['jesBBEC1','jesFlavorQCD','jesHF_2016','jesRelativeSample_2016','jesEC2','jesAbsolute_2016','jesAbsolute','jesRelativeBal','jesEC2_2016','jesBBEC1_2016','jesHF']
+            if era == "2017":
+                self.systTypes += ['jesBBEC1','jesHF_2017','jesFlavorQCD','jesEC2_2017','jesBBEC1_2017','jesEC2','jesAbsolute','jesRelativeBal','jesAbsolute_2017','jesRelativeSample_2017','jesHF']
+            if era == "2018":
+                self.systTypes += ['jesRelativeSample_2018','jesHEMIssue','jesBBEC1','jesAbsolute_2018','jesAbsolute','jesFlavorQCD','jesRelativeBal','jesEC2_2018','jesBBEC1_2018','jesEC2','jesHF_2018','jesHF'] 
+                
+            self.systTypes = ['up_'+s for s in self.systTypes]+['down_'+s for s in self.systTypes]
+
                 # From https://twiki.cern.ch/twiki/bin/view/CMS/BTagShapeCalibration#Systematic_uncertainties
             self.DeepJetDiscReshapingSF = BtagSF(taggerName       = "deepjet", 
                                                  csvFileName      = csvFileNameAk4,
                                                  wp               = "reshaping",  # "loose", "medium", "tight" or "reshaping"
                                                  sysType          = "central", 
-                                                 otherSysTypes    = ['up_'+s for s in systTypes]+['down_'+s for s in systTypes], 
+                                                 otherSysTypes    = self.systTypes,
                                                  measurementType  = "iterativefit", 
                                                  sel              = noSel, 
                                                  getters          = {'Discri':lambda j : j.btagDeepFlavB},
@@ -1678,7 +1708,9 @@ One lepton and and one jet argument must be specified in addition to the require
             # See https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagShapeCalibration
             # W_btag = Π_i(all jets) SD(jet_i)  which must be multiplied by r = Σ w(before)/Σ w(after) (before/after using the btag weight, no btag selection for both)
                 
-            self.btagAk4SF = op.rng_product(self.ak4Jets , lambda j : self.DeepJetDiscReshapingSF(j))
+            self.btagAk4SF = op.rng_product(self.ak4Jets , lambda j : op.switch(j.hadronFlavour == 4,
+                                                                                self.DeepJetDiscReshapingSF(j, systVars = [systType for systType in self.systTypes if "cferr" in systType]),
+                                                                                self.DeepJetDiscReshapingSF(j, systVars = [systType for systType in self.systTypes if not "cferr" in systType])))
 
             if self.args.BtagReweightingOn and self.args.BtagReweightingOff: 
                 raise RuntimeError("Reweighting cannot be both on and off") 
