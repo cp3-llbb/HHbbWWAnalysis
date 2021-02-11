@@ -82,7 +82,8 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         #path_model_resolved = '/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Resolved/ModelOneEpoch.pb'
         #path_model_resolved = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Resolved','Model'+str(era)+'_5x256_crossval.pb')
         path_model_resolved = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Resolved','Resolved'+str(era)+'.pb')
-        path_model_boosted  = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Boosted','Boosted_allEras_v2.pb')
+        #path_model_boosted  = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Boosted','Boosted_allEras_v2.pb')
+        path_model_boosted  = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Boosted','Boosted_allEras_x512.pb')
         logger.info('DNN_Model_Resolved {}'.format(path_model_resolved))
         logger.info('DNN_Model_Boosted {}'.format(path_model_boosted))
         plots = []
@@ -610,7 +611,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 #plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**JetsN))
                 #plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**FatJetsN))
                 # Ak4 Jets #
-                plots.extend(makeAk4JetsPlots(**{k:channelDict[k] for k in JetKeys},HLL=self.HLL))
+                #plots.extend(makeAk4JetsPlots(**{k:channelDict[k] for k in JetKeys},HLL=self.HLL))
                 # MET #
                 plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
                 # High level #
@@ -781,9 +782,9 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 ##plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**FatJetsN))
                 ##plots.append(objectsNumberPlot(**{k:channelDict[k] for k in commonItems},**SlimJetsN))
                 # Ak8 Jets #
-                ##plots.extend(makeSingleLeptonAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys},nMedBJets=self.nMediumBTaggedSubJets, HLL=self.HLL))
+                #plots.extend(makeSingleLeptonAk8JetsPlots(**{k:channelDict[k] for k in FatJetKeys},nMedBJets=self.nMediumBTaggedSubJets, HLL=self.HLL))
                 # MET #
-                #plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
+                plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
                 # HighLevel #
                 ##plots.extend(makeHighLevelPlotsBoosted(**{k:channelDict[k] for k in BoostedKeys}, HLL=self.HLL))
                 
