@@ -147,7 +147,10 @@ def returnHighLevelMVAInputs(self,l1,l2,met,jets,bjets,electrons,muons,channel):
             ('mww_simplemet',          'M_{WW} (simple MET) [GeV]',               (100,0.,1000.))   : op.invariant_mass(l1.p4,l2.p4,met.p4),
             #('n_btag',                 'N_b',                                     (6,0.,5.))        : op.static_cast("UInt_t",op.rng_len(self.ak4BJets)),
             ('vbf_tag',                'VBF tag',                                 (2,0.,2.))        : VBF_tag,
-            ('boosted_tag',            'Boosted tag',                             (2,0.,2.))        : op.c_int(op.rng_len(self.ak8BJets) > 0),
+            ('boosted_tag',            'Boosted tag',                             (2,0.,2.))        : op.c_int(op.OR(op.rng_len(self.ak8BJets) > 0,           # Boosted 1B
+                                                                                                                     op.AND(op.rng_len(self.ak8BJets) == 0,   # Boosted 0B
+                                                                                                                            op.rng_len(self.ak8Jets) > 0,
+                                                                                                                            op.rng_len(self.ak4BJets) == 0))),
             ('dphi_met_dilep',         'Dilepton-MET #Delta #Phi',                (32,-3.2,3.2))    : op.abs(op.deltaPhi(met.p4,(l1.p4+l2.p4))),
             ('dphi_met_dibjet',        'Dibjet-MET #Delta #Phi',                  (32,-3.2,3.2))    : op.multiSwitch((op.rng_len(bjets) == 0, op.c_float(0.)),
                                                                                                                      (op.rng_len(bjets) == 1, op.abs(op.deltaPhi(met.p4,bjets[0].p4))),

@@ -184,6 +184,7 @@ class Analyze:
         logging.info("Producing output for permutation scores")
         pbar = enlighten.Counter(total=len(self.inputs), desc='Permutations', unit='Input') 
         for idxPerm,inputName in enumerate(self.inputs):
+            pbar.update()
             logging.info("Looking at input %d/%d"%(idxPerm,len(self.inputs)))
             inputs_perm = copy.deepcopy(inputsLL)
             perm_f1_scores = []
@@ -198,7 +199,6 @@ class Analyze:
             perm_f1_scores = np.array(perm_f1_scores)
             f1_scores[idxPerm] = abs(perm_f1_scores.mean()-true_F1_score)
             f1_scores_err[idxPerm] = perm_f1_scores.std()
-            pbar.update()
         
         idxSort = np.flip(np.argsort(f1_scores))
         inputNames = np.array(self.inputs,dtype=object)[idxSort]
