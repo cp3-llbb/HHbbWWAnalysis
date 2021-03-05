@@ -105,9 +105,19 @@ def returnClassicInputs_2b2Wj(self, lep, jet1, jet2, jet3, jet4, VBFJetPairs, L2
            ('bj1wj2DPhi',              'bj1wj2_DPhi',              (50,0.,4.)):    op.abs(op.deltaPhi(jet1.p4,jet4.p4)),
            ('bj1wj1DR',                'bj1wj1_DR',                (50,0.,5.)):    op.deltaR(jet1.p4,jet3.p4),
            ('bj1wj1DPhi',              'bj1wj1_DPhi',              (50,0.,4.)):    op.abs(op.deltaPhi(jet1.p4,jet3.p4)),
+           ('VBFj1pt',                 'VBFj1pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][0].pt, VBFJetPairs[0][1].pt),op.c_float(0.)),
+           ('VBFj2pt',                 'VBFj2pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt),op.c_float(0.)),
+           ('VBFj1j2dEta',             'VBFj1j2dEta',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta),op.c_float(0.)),
+           ('VBFj1j2invM',             'VBFj1j2invM',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.invariant_mass(VBFJetPairs[0][0].p4,  VBFJetPairs[0][1].p4),op.c_float(0.)),
            ('zeppenfeldVar',            'zeppenfeldVar',            (50,0.,5.)):    op.switch(op.rng_len(VBFJetPairs) > 0, op.abs(lep.eta - (VBFJetPairs[0][0].eta + VBFJetPairs[0][1].eta)/2.0)/op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta), op.c_float(0.)),
            ('minJetDR',                 'minJetDR',                 (50,0.,5.)):    self.HLL.MinDiJetDRTight(jet1,jet2,jet3,jet4),
-           ('minLepJetDR',              'minLepJetDR',              (50,0.,5.)):    self.HLL.MinDR_lep4j(lep,jet1,jet2,jet3,jet4)}
+           ('minLepJetDR',              'minLepJetDR',              (50,0.,5.)):    self.HLL.MinDR_lep4j(lep,jet1,jet2,jet3,jet4),
+           ('HbbLepDR',                 'HbbLepDR',                 (50,0.,5.)):    op.deltaR(jet1.p4+jet2.p4, lep.p4), 
+           ('HbbLepDPhi',               'HbbLepDPhi',               (50,0.,5.)):    op.abs(op.deltaPhi(jet1.p4+jet2.p4, lep.p4)),
+           ('HbbMetDPhi',               'HbbMetDPhi',               (50,0.,5.)):    op.abs(op.deltaPhi(jet1.p4+jet2.p4, self.corrMET.p4)),
+           ('HWWLepDR',                 'HWWLepDR',                 (50,0.,5.)):    op.deltaR(jet3.p4+jet4.p4, lep.p4), 
+           ('HWWLepDPhi',               'HWWLepDPhi',               (50,0.,5.)):    op.abs(op.deltaPhi(jet3.p4+jet4.p4, lep.p4)),
+           ('HWWMetDPhi',               'HWWMetDPhi',               (50,0.,5.)):    op.abs(op.deltaPhi(jet3.p4+jet4.p4, self.corrMET.p4))}
 
 
 def returnLBNInputs_2b2Wj(self,lep,jet1,jet2,jet3,jet4):
@@ -228,9 +238,20 @@ def returnClassicInputs_2b1Wj(self, lep, jet1, jet2, jet3, jet4, VBFJetPairs, L2
            ('bj1wj2DPhi',              'bj1wj2_DPhi',              (50,0.,4.)):    op.c_float(0.),
            ('bj1wj1DR',                'bj1wj1_DR',                (50,0.,5.)):    op.deltaR(jet1.p4,jet3.p4),
            ('bj1wj1DPhi',              'bj1wj1_DPhi',              (50,0.,4.)):    op.abs(op.deltaPhi(jet1.p4,jet3.p4)),
+           ('VBFj1pt',                 'VBFj1pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][0].pt, VBFJetPairs[0][1].pt),op.c_float(0.)),
+           ('VBFj2pt',                 'VBFj2pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt),op.c_float(0.)),
+           ('VBFj1j2dEta',             'VBFj1j2dEta',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta),op.c_float(0.)),
+           ('VBFj1j2invM',             'VBFj1j2invM',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.invariant_mass(VBFJetPairs[0][0].p4,  VBFJetPairs[0][1].p4),op.c_float(0.)),
            ('zeppenfeldVar',            'zeppenfeldVar',            (50,0.,5.)):    op.switch(op.rng_len(VBFJetPairs) > 0, op.abs(lep.eta - (VBFJetPairs[0][0].eta + VBFJetPairs[0][1].eta)/2.0)/op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta),op.static_cast("Float_t",op.c_float(0.))),
            ('minJetDR',                 'minJetDR',                 (50,0.,5.)):    self.HLL.MinDiJetDRLoose(jet1,jet2,jet3),
-           ('minLepJetDR',              'minLepJetDR',              (50,0.,5.)):    self.HLL.MinDR_lep3j(lep,jet1,jet2,jet3)}
+           ('minLepJetDR',              'minLepJetDR',              (50,0.,5.)):    self.HLL.MinDR_lep3j(lep,jet1,jet2,jet3),
+           ('HbbLepDR',                 'HbbLepDR',                 (50,0.,5.)):    op.deltaR(jet1.p4+jet2.p4, lep.p4), 
+           ('HbbLepDPhi',               'HbbLepDPhi',               (50,0.,5.)):    op.abs(op.deltaPhi(jet1.p4+jet2.p4, lep.p4)),
+           ('HbbMetDPhi',               'HbbMetDPhi',               (50,0.,5.)):    op.abs(op.deltaPhi(jet1.p4+jet2.p4, self.corrMET.p4)),
+           ('HWWLepDR',                 'HWWLepDR',                 (50,0.,5.)):    op.c_float(0.), 
+           ('HWWLepDPhi',               'HWWLepDPhi',               (50,0.,5.)):    op.c_float(0.),
+           ('HWWMetDPhi',               'HWWMetDPhi',               (50,0.,5.)):    op.c_float(0.)}
+
            #('HT2_lepJetMet',            'HT2_lepJetMet',            (50,0.,500.)):  self.HLL.HT2_2b1Wj(lep,jet1,jet2,jet3,self.corrMET)}
 
 def returnLBNInputs_2b1Wj(self,lep,jet1,jet2,jet3,jet4):
@@ -351,9 +372,20 @@ def returnClassicInputs_2b0Wj(self, lep, jet1, jet2, jet3, jet4, VBFJetPairs, L2
            ('bj1wj2DPhi',              'bj1wj2_DPhi',              (50,0.,4.)):    op.c_float(0.),
            ('bj1wj1DR',                'bj1wj1_DR',                (50,0.,5.)):    op.c_float(0.),
            ('bj1wj1DPhi',              'bj1wj1_DPhi',              (50,0.,4.)):    op.c_float(0.),
+           ('VBFj1pt',                 'VBFj1pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][0].pt, VBFJetPairs[0][1].pt),op.c_float(0.)),
+           ('VBFj2pt',                 'VBFj2pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt),op.c_float(0.)),
+           ('VBFj1j2dEta',             'VBFj1j2dEta',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta),op.c_float(0.)),
+           ('VBFj1j2invM',             'VBFj1j2invM',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.invariant_mass(VBFJetPairs[0][0].p4,  VBFJetPairs[0][1].p4),op.c_float(0.)),
            ('zeppenfeldVar',            'zeppenfeldVar',            (50,0.,5.)):    op.switch(op.rng_len(VBFJetPairs) > 0, op.abs(lep.eta - (VBFJetPairs[0][0].eta + VBFJetPairs[0][1].eta)/2.0)/op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta),op.static_cast("Float_t",op.c_float(0.))),
            ('minJetDR',                 'minJetDR',                 (50,0.,5.)):    op.deltaR(jet1.p4,jet2.p4),
-           ('minLepJetDR',              'minLepJetDR',              (50,0.,5.)):    self.HLL.MinDR_lep2j(lep,jet1,jet2)}
+           ('minLepJetDR',              'minLepJetDR',              (50,0.,5.)):    self.HLL.MinDR_lep2j(lep,jet1,jet2),
+           ('HbbLepDR',                 'HbbLepDR',                 (50,0.,5.)):    op.deltaR(jet1.p4+jet2.p4, lep.p4), 
+           ('HbbLepDPhi',               'HbbLepDPhi',               (50,0.,5.)):    op.abs(op.deltaPhi(jet1.p4+jet2.p4, lep.p4)),
+           ('HbbMetDPhi',               'HbbMetDPhi',               (50,0.,5.)):    op.abs(op.deltaPhi(jet1.p4+jet2.p4, self.corrMET.p4)),
+           ('HWWLepDR',                 'HWWLepDR',                 (50,0.,5.)):    op.c_float(0.), 
+           ('HWWLepDPhi',               'HWWLepDPhi',               (50,0.,5.)):    op.c_float(0.),
+           ('HWWMetDPhi',               'HWWMetDPhi',               (50,0.,5.)):    op.c_float(0.)}
+
            #('HT2_lepJetMet',            'HT2_lepJetMet',            (50,0.,500.)):  self.HLL.HT2_2b0Wj(lep,jet1,jet2,self.corrMET)}
 
 def returnLBNInputs_2b0Wj(self,lep,jet1,jet2,jet3,jet4):
@@ -477,9 +509,20 @@ def returnClassicInputs_1b2Wj(self, lep, jet1, jet2, jet3, jet4, VBFJetPairs, L2
            ('bj1wj2DPhi',              'bj1wj2_DPhi',              (50,0.,4.)):    op.abs(op.deltaPhi(jet1.p4,jet4.p4)),
            ('bj1wj1DR',                'bj1wj1_DR',                (50,0.,5.)):    op.deltaR(jet1.p4,jet3.p4),
            ('bj1wj1DPhi',              'bj1wj1_DPhi',              (50,0.,4.)):    op.abs(op.deltaPhi(jet1.p4,jet3.p4)),
+           ('VBFj1pt',                 'VBFj1pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][0].pt, VBFJetPairs[0][1].pt),op.c_float(0.)),
+           ('VBFj2pt',                 'VBFj2pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt),op.c_float(0.)),
+           ('VBFj1j2dEta',             'VBFj1j2dEta',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta),op.c_float(0.)),
+           ('VBFj1j2invM',             'VBFj1j2invM',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.invariant_mass(VBFJetPairs[0][0].p4,  VBFJetPairs[0][1].p4),op.c_float(0.)),
            ('zeppenfeldVar',            'zeppenfeldVar',            (50,0.,5.)):    op.switch(op.rng_len(VBFJetPairs) > 0, op.abs(lep.eta - (VBFJetPairs[0][0].eta + VBFJetPairs[0][1].eta)/2.0)/op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta),op.static_cast("Float_t",op.c_float(0.))),
            ('minJetDR',                 'minJetDR',                 (50,0.,5.)):    self.HLL.MinDiJetDRLoose(jet1,jet3,jet4),
-           ('minLepJetDR',              'minLepJetDR',              (50,0.,5.)):    self.HLL.MinDR_lep3j(lep,jet1,jet3,jet4)}
+           ('minLepJetDR',              'minLepJetDR',              (50,0.,5.)):    self.HLL.MinDR_lep3j(lep,jet1,jet3,jet4),
+           ('HbbLepDR',                 'HbbLepDR',                 (50,0.,5.)):    op.c_float(0.),
+           ('HbbLepDPhi',               'HbbLepDPhi',               (50,0.,5.)):    op.c_float(0.),
+           ('HbbMetDPhi',               'HbbMetDPhi',               (50,0.,5.)):    op.c_float(0.),
+           ('HWWLepDR',                 'HWWLepDR',                 (50,0.,5.)):    op.deltaR(jet3.p4+jet4.p4, lep.p4), 
+           ('HWWLepDPhi',               'HWWLepDPhi',               (50,0.,5.)):    op.abs(op.deltaPhi(jet3.p4+jet4.p4, lep.p4)),
+           ('HWWMetDPhi',               'HWWMetDPhi',               (50,0.,5.)):    op.abs(op.deltaPhi(jet3.p4+jet4.p4, self.corrMET.p4))}
+
            #('HT2_lepJetMet',            'HT2_lepJetMet',            (50,0.,500.)):  self.HLL.HT2_1b2Wj(lep,jet1,jet3,jet4,self.corrMET)}
 
 def returnLBNInputs_1b2Wj(self,lep,jet1,jet2,jet3,jet4):
@@ -599,9 +642,20 @@ def returnClassicInputs_1b1Wj(self, lep, jet1, jet2, jet3, jet4, VBFJetPairs, L2
            ('bj1wj2DPhi',              'bj1wj2_DPhi',              (50,0.,4.)):    op.c_float(0.),
            ('bj1wj1DR',                'bj1wj1_DR',                (50,0.,5.)):    op.deltaR(jet1.p4,jet3.p4),
            ('bj1wj1DPhi',              'bj1wj1_DPhi',              (50,0.,4.)):    op.abs(op.deltaPhi(jet1.p4,jet3.p4)),
+           ('VBFj1pt',                 'VBFj1pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][0].pt, VBFJetPairs[0][1].pt),op.c_float(0.)),
+           ('VBFj2pt',                 'VBFj2pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt),op.c_float(0.)),
+           ('VBFj1j2dEta',             'VBFj1j2dEta',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta),op.c_float(0.)),
+           ('VBFj1j2invM',             'VBFj1j2invM',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.invariant_mass(VBFJetPairs[0][0].p4,  VBFJetPairs[0][1].p4),op.c_float(0.)),
            ('zeppenfeldVar',            'zeppenfeldVar',            (50,0.,5.)):    op.switch(op.rng_len(VBFJetPairs) > 0, op.abs(lep.eta - (VBFJetPairs[0][0].eta + VBFJetPairs[0][1].eta)/2.0)/op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta),op.static_cast("Float_t",op.c_float(0.))),
            ('minJetDR',                 'minJetDR',                 (50,0.,5.)):    op.deltaR(jet1.p4,jet3.p4),
-           ('minLepJetDR',              'minLepJetDR',              (50,0.,5.)):    self.HLL.MinDR_lep2j(lep,jet1,jet3)}
+           ('minLepJetDR',              'minLepJetDR',              (50,0.,5.)):    self.HLL.MinDR_lep2j(lep,jet1,jet3),
+           ('HbbLepDR',                 'HbbLepDR',                 (50,0.,5.)):    op.c_float(0.),
+           ('HbbLepDPhi',               'HbbLepDPhi',               (50,0.,5.)):    op.c_float(0.),
+           ('HbbMetDPhi',               'HbbMetDPhi',               (50,0.,5.)):    op.c_float(0.),
+           ('HWWLepDR',                 'HWWLepDR',                 (50,0.,5.)):    op.c_float(0.),
+           ('HWWLepDPhi',               'HWWLepDPhi',               (50,0.,5.)):    op.c_float(0.),
+           ('HWWMetDPhi',               'HWWMetDPhi',               (50,0.,5.)):    op.c_float(0.)}
+
            #('HT2_lepJetMet',            'HT2_lepJetMet',            (50,0.,500.)):  self.HLL.HT2_1b1Wj(lep,jet1,jet3,self.corrMET)}
 
 def returnLBNInputs_1b1Wj(self,lep,jet1,jet2,jet3,jet4):
@@ -721,9 +775,20 @@ def returnClassicInputs_1b0Wj(self, lep, jet1, jet2, jet3, jet4, VBFJetPairs, L2
            ('bj1wj2DPhi',              'bj1wj2_DPhi',              (50,0.,4.)):    op.c_float(0.),
            ('bj1wj1DR',                'bj1wj1_DR',                (50,0.,5.)):    op.c_float(0.),
            ('bj1wj1DPhi',              'bj1wj1_DPhi',              (50,0.,4.)):    op.c_float(0.),
+           ('VBFj1pt',                 'VBFj1pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][0].pt, VBFJetPairs[0][1].pt),op.c_float(0.)),
+           ('VBFj2pt',                 'VBFj2pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt),op.c_float(0.)),
+           ('VBFj1j2dEta',             'VBFj1j2dEta',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta),op.c_float(0.)),
+           ('VBFj1j2invM',             'VBFj1j2invM',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.invariant_mass(VBFJetPairs[0][0].p4,  VBFJetPairs[0][1].p4),op.c_float(0.)),
            ('zeppenfeldVar',            'zeppenfeldVar',            (50,0.,5.)):    op.switch(op.rng_len(VBFJetPairs) > 0, op.abs(lep.eta - (VBFJetPairs[0][0].eta + VBFJetPairs[0][1].eta)/2.0)/op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta),op.static_cast("Float_t",op.c_float(0.))),
            ('minJetDR',                 'minJetDR',                 (50,0.,5.)):    op.c_float(0.),
-           ('minLepJetDR',              'minLepJetDR',              (50,0.,5.)):    op.deltaR(lep.p4, jet1.p4)}
+           ('minLepJetDR',              'minLepJetDR',              (50,0.,5.)):    op.deltaR(lep.p4, jet1.p4),
+           ('HbbLepDR',                 'HbbLepDR',                 (50,0.,5.)):    op.c_float(0.),
+           ('HbbLepDPhi',               'HbbLepDPhi',               (50,0.,5.)):    op.c_float(0.),
+           ('HbbMetDPhi',               'HbbMetDPhi',               (50,0.,5.)):    op.c_float(0.),
+           ('HWWLepDR',                 'HWWLepDR',                 (50,0.,5.)):    op.c_float(0.),
+           ('HWWLepDPhi',               'HWWLepDPhi',               (50,0.,5.)):    op.c_float(0.),
+           ('HWWMetDPhi',               'HWWMetDPhi',               (50,0.,5.)):    op.c_float(0.)}
+
            #('HT2_lepJetMet',            'HT2_lepJetMet',            (50,0.,500.)):  self.HLL.HT2_1b0Wj(lep,jet1,self.corrMET)}
 
 def returnLBNInputs_1b0Wj(self,lep,jet1,jet2,jet3,jet4):
@@ -843,9 +908,20 @@ def returnClassicInputs_0b(self, lep, jet1, jet2, jet3, jet4, VBFJetPairs, L2Sco
            ('bj1wj2DPhi',              'bj1wj2_DPhi',              (50,0.,4.)):    op.c_float(0.),
            ('bj1wj1DR',                'bj1wj1_DR',                (50,0.,5.)):    op.c_float(0.),
            ('bj1wj1DPhi',              'bj1wj1_DPhi',              (50,0.,4.)):    op.c_float(0.),
+           ('VBFj1pt',                 'VBFj1pt',                  (100,0,200)):    op.c_float(0.),
+           ('VBFj2pt',                 'VBFj2pt',                  (100,0,200)):    op.c_float(0.),
+           ('VBFj1j2dEta',             'VBFj1j2dEta',               (20,0,5)):      op.c_float(0.),
+           ('VBFj1j2invM',             'VBFj1j2invM',               (20,0,5)):      op.c_float(0.),
            ('zeppenfeldVar',            'zeppenfeldVar',            (50,0.,5.)):    op.c_float(0.),
            ('minJetDR',                 'minJetDR',                 (50,0.,5.)):    op.c_float(0.),
-           ('minLepJetDR',              'minLepJetDR',              (50,0.,5.)):    op.c_float(0.)}
+           ('minLepJetDR',              'minLepJetDR',              (50,0.,5.)):    op.c_float(0.),
+           ('HbbLepDR',                 'HbbLepDR',                 (50,0.,5.)):    op.c_float(0.),
+           ('HbbLepDPhi',               'HbbLepDPhi',               (50,0.,5.)):    op.c_float(0.),
+           ('HbbMetDPhi',               'HbbMetDPhi',               (50,0.,5.)):    op.c_float(0.),
+           ('HWWLepDR',                 'HWWLepDR',                 (50,0.,5.)):    op.c_float(0.),
+           ('HWWLepDPhi',               'HWWLepDPhi',               (50,0.,5.)):    op.c_float(0.),
+           ('HWWMetDPhi',               'HWWMetDPhi',               (50,0.,5.)):    op.c_float(0.)}
+
            #('HT2_lepJetMet',            'HT2_lepJetMet',            (50,0.,500.)):  op.c_float(0.)}
 
 def returnLBNInputs_0b(self,lep,jet1,jet2,jet3,jet4):
@@ -892,6 +968,10 @@ def returnClassicInputs_Hbb2Wj(self, lep, fjet, jet3, jet4, VBFJetPairs, L2Score
            ('fatbjPz',                   'fatbjpz',                (50,0.,500.)):  fjet.p4.Pz(),
            ('fatbjE',                   'fatbjE',                (50,0.,500.)):  fjet.p4.E(),
            ('fatbjsoftdropMass',        'fatbjsoftdropMass',       (50,0.,1.)):    fjet.msoftdrop,
+           ('fatbjtau1',               'fatbjtau1',               (20,0.,1.)):    fjet.tau1,
+           ('fatbjtau2',               'fatbjtau2',               (20,0.,1.)):    fjet.tau2,
+           ('fatbjtau3',               'fatbjtau3',               (20,0.,1.)):    fjet.tau3,
+           ('fatbjtau4',               'fatbjtau4',               (20,0.,1.)):    fjet.tau4,
            #('fatbjbtagDeepB',              'fatbjbtagDeepB',       (50,0.,1.)):    fjet.btagDeepB,
            ('wj1Px',                   'wj1px',                    (50,0.,500.)):  jet3.p4.Px(),
            ('wj1Py',                   'wj1py',                    (50,0.,500.)):  jet3.p4.Py(),
@@ -903,36 +983,41 @@ def returnClassicInputs_Hbb2Wj(self, lep, fjet, jet3, jet4, VBFJetPairs, L2Score
            ('wj2Pz',                   'wj2pz',                    (50,0.,500.)):  jet4.p4.Pz(),
            ('wj2E',                   'wj2E',                    (50,0.,500.)):  jet4.p4.E(),
            ('wj2bTagDeepFlavB',        'wj1_bTagDeepFlavB',        (50,0.,1.)):    jet4.btagDeepFlavB,
-           ('nAk8Jets',                'nAk8Jets',                 (6,0.,5.)):     op.rng_len(self.ak8Jets),
-           ('nAk8BJets',                'nAk8BJets',               (6,0.,5.)):     op.rng_len(self.ak8BJets),
-           ('nAk4JetsCleandWithAk8b',   'nAk4JetsCleandWithAk8b',  (10,0.,10.)):   op.rng_len(self.ak4JetsCleanedFromAk8b),
+           #('nAk8Jets',                'nAk8Jets',                 (6,0.,5.)):     op.rng_len(self.ak8Jets),
+           #('nAk8BJets',                'nAk8BJets',               (6,0.,5.)):     op.rng_len(self.ak8BJets),
+           #('nAk4JetsCleandWithAk8b',   'nAk4JetsCleandWithAk8b',  (10,0.,10.)):   op.rng_len(self.ak4JetsCleanedFromAk8b),
            ('VBFtag',                  'VBF_tag',                  (2,0.,2.)):     op.c_float(op.rng_len(VBFJetPairs) > 0),
+           ('VBFj1pt',                 'VBFj1pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][0].pt, VBFJetPairs[0][1].pt),op.c_float(0.)),
+           ('VBFj2pt',                 'VBFj2pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt),op.c_float(0.)),
+           ('VBFj1j2dEta',             'VBFj1j2dEta',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta),op.c_float(0.)),
+           ('VBFj1j2invM',             'VBFj1j2invM',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.invariant_mass(VBFJetPairs[0][0].p4,  VBFJetPairs[0][1].p4),op.c_float(0.)),
            ('hT',                       'hT',                       (50,0.,500.)):  self.HLL.HT_SL(self.ak4Jets),
+           ('lepmetDPhi',               'lepmetDPhi',               (100,0.,5.)):  op.abs(self.HLL.SinglepMet_dPhi(lep,self.corrMET)), ###
            ('lepmetpt',                'lepmet_pt',                (50,0.,500.)):  self.HLL.SinglepMet_Pt(lep,self.corrMET),
            ('lepMT',                   'lep_MT',                   (50,0.,500.)):  self.HLL.MT(lep,self.corrMET),
            ('METLD',                   'MET_LD',                   (50,0.,500.)):  self.HLL.MET_LD_DL(self.corrMET, self.ak4Jets, self.electronsFakeSel, self.muonsFakeSel),
            ('fatbjlepDR',                 'fatbjlepDR',                 (50,0.,5.)):    op.deltaR(fjet.p4, lep.p4),
-           ('fatbjlepDPhi',                 'fatbjlepDPhi',                 (50,0.,5.)):    op.abs(op.deltaPhi(fjet.p4, lep.p4)),
+           #('fatbjlepDPhi',                 'fatbjlepDPhi',                 (50,0.,5.)):    op.abs(op.deltaPhi(fjet.p4, lep.p4)),
            ('fatbjWj1DR',                 'fatbjWj1DR',                 (50,0.,5.)):    op.deltaR(fjet.p4, jet3.p4),
            ('fatbjwj2DR',                 'fatbjwj2DR',                 (50,0.,5.)):    op.deltaR(fjet.p4, jet4.p4),
            ('wj1lepDR',                 'wj1lepDR',                 (50,0.,5.)):    op.deltaR(jet3.p4, lep.p4),
-           ('wj1lepDPhi',               'wj1lepDPhi',               (50,0.,4.)):    op.abs(op.deltaPhi(jet3.p4, lep.p4)),
+           #('wj1lepDPhi',               'wj1lepDPhi',               (50,0.,4.)):    op.abs(op.deltaPhi(jet3.p4, lep.p4)),
            ('wj2lepDR',                 'wj2lepDR',                 (50,0.,5.)):    op.deltaR(jet4.p4, lep.p4),
-           ('wj2lepDPhi',               'wj2lepDPhi',               (50,0.,4.)):    op.abs(op.deltaPhi(jet4.p4, lep.p4)),
+           #('wj2lepDPhi',               'wj2lepDPhi',               (50,0.,4.)):    op.abs(op.deltaPhi(jet4.p4, lep.p4)),
            ('wj1wj2pt',                'wj1wj2_pt',                (50,0.,500.)):  (jet3.p4 + jet4.p4).Pt(),
            ('wj1wj2DR',                'wj1wj2_dr',                (50,0.,500.)):  op.deltaR(jet3.p4, jet4.p4), ##
            ('wj1wj2invM',                 'wj1wj2_M',                 (50,0.,500.)):  op.invariant_mass(jet3.p4, jet4.p4),
            ('mTtop3particle',         'mT_top_3particle',         (50,0.,500.)):  op.min(self.HLL.mT2(fjet.subJet1.p4, lep.p4 ,self.corrMET.p4), 
                                                                                            self.HLL.mT2(fjet.subJet2.p4, lep.p4, self.corrMET.p4)),
+           ('WWplaneAnglewithMET',    'WWplaneAngle_withMET',    (50,0.,3.2)) : self.HLL.angleWWplane(lep.p4, self.corrMET, jet3.p4, jet4.p4),
            ('HWplaneAngle',          'angleBetHWPlane',          (50,0.,5.)):    self.HLL.angleBetPlanes(fjet.subJet1.p4,fjet.subJet2.p4,jet3.p4,jet4.p4),
            ('HWWSimpleMass',          'HWW_Simple_Mass',          (50,0.,500.)):  self.HLL.HWW_met_simple(jet3.p4,jet4.p4,lep.p4,self.corrMET.p4).M(),
+           ('HWWdR',                 'HWW_dR',                   (50,0.,5.0)): self.HLL.dR_Hww(jet3.p4,jet4.p4,lep.p4,self.corrMET),
+           ('cosThetaSHbb',          'cosThetaSHbb',             (20,0.,1.)) : op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(fjet.subJet1.p4,fjet.subJet2.p4),
+           ('cosThetaSWjjsimple',    'cosThetaSWjjsimple',       (20,0.,1.)) : op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(jet3.p4, jet4.p4),
            ('cosThetaSWWsimplemet',  'cosThetaS_WW_simple_met',  (50,0.,1.)):    op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(self.HLL.Wjj_simple(jet3.p4,jet4.p4), self.HLL.Wlep_met_simple(lep.p4, self.corrMET.p4)),
            ('cosThetaSHHsimplemet',  'cosThetaS_HH_simple_met',  (50,0.,1.)):    op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(fjet.subJet1.p4+fjet.subJet2.p4,self.HLL.HWW_met_simple(jet3.p4,jet4.p4,lep.p4, self.corrMET.p4)),
-           #('MTW1W2',                  'w1w2_MT',                  (50,0.,500.)):  self.HLL.MT_W1W2_ljj(lep,jet3,jet4, self.corrMET),
-           ('VBFj1pt',                 'VBFj1pt',                  (50,0.,500.)):  op.switch(op.rng_len(VBFJetPairs) > 0, op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt, VBFJetPairs[0][1].pt),op.c_float(0.)),
-           ('VBFj2pt',                 'VBFj2pt',                  (50,0.,500.)):  op.switch(op.rng_len(VBFJetPairs) > 0, op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt, VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt),op.c_float(0.)),
-           ('VBFj1j2dPhi',              'VBFj1j2dPhi',              (50,0.,500.)): op.switch(op.rng_len(VBFJetPairs) > 0,op.abs(op.deltaPhi(VBFJetPairs[0][0].p4,VBFJetPairs[0][1].p4)),op.c_float(0.)),
-           ('VBFj1j2invM',              'VBFj1j2invM',              (50,0.,500.)): op.switch(op.rng_len(VBFJetPairs) > 0,op.invariant_mass(VBFJetPairs[0][0].p4,  VBFJetPairs[0][1].p4), op.c_float(0.)),
+           ('MTW1W2',                  'w1w2_MT',                  (50,0.,500.)):  self.HLL.MT_W1W2_ljj(lep,jet3,jet4, self.corrMET),
            ('zeppenfeldVar',            'zeppenfeldVar',            (50,0.,5.)):   op.switch(op.rng_len(VBFJetPairs) > 0, op.abs(lep.eta - (VBFJetPairs[0][0].eta + VBFJetPairs[0][1].eta)/2.0)/op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta), op.c_float(0.))}
 
 def returnLBNInputs_Hbb2Wj(self,lep,fjet,jet3,jet4):
@@ -974,6 +1059,10 @@ def returnClassicInputs_Hbb1Wj(self, lep, fjet, jet3, jet4, VBFJetPairs, L2Score
            ('fatbjPz',                   'fatbjpz',                (50,0.,500.)):  fjet.p4.Pz(),
            ('fatbjE',                   'fatbjE',                  (50,0.,500.)):  fjet.p4.E(),
            ('fatbjsoftdropMass',        'fatbjsoftdropMass',       (50,0.,1.)):    fjet.msoftdrop,
+           ('fatbjtau1',               'fatbjtau1',               (20,0.,1.)):    fjet.tau1,
+           ('fatbjtau2',               'fatbjtau2',               (20,0.,1.)):    fjet.tau2,
+           ('fatbjtau3',               'fatbjtau3',               (20,0.,1.)):    fjet.tau3,
+           ('fatbjtau4',               'fatbjtau4',               (20,0.,1.)):    fjet.tau4,
            #('fatbjbtagDeepB',              'fatbjbtagDeepB',       (50,0.,1.)):    fjet.btagDeepB,
            ('wj1Px',                   'wj1px',                    (50,0.,500.)):  jet3.p4.Px(),
            ('wj1Py',                   'wj1py',                    (50,0.,500.)):  jet3.p4.Py(),
@@ -992,39 +1081,41 @@ def returnClassicInputs_Hbb1Wj(self, lep, fjet, jet3, jet4, VBFJetPairs, L2Score
            #('wj1pt',                   'wj1pt',                    (50,0.,500.)):  jet3.pt,
            #('wj1bTagDeepFlavB',        'wj1_bTagDeepFlavB',        (50,0.,1.)):    jet3.btagDeepFlavB,
            #('wj2pt',                   'wj2pt',                    (50,0.,500.)):  op.c_float(0.),
-           ('nAk8Jets',                'nAk8Jets',                 (6,0.,5.)):     op.rng_len(self.ak8Jets),
-           ('nAk8BJets',                'nAk8BJets',               (6,0.,5.)):     op.rng_len(self.ak8BJets),
-           ('nAk4JetsCleandWithAk8b',   'nAk4JetsCleandWithAk8b',  (10,0.,10.)):   op.rng_len(self.ak4JetsCleanedFromAk8b),
+           #('nAk8Jets',                'nAk8Jets',                 (6,0.,5.)):     op.rng_len(self.ak8Jets),
+           #('nAk8BJets',                'nAk8BJets',               (6,0.,5.)):     op.rng_len(self.ak8BJets),
+           #('nAk4JetsCleandWithAk8b',   'nAk4JetsCleandWithAk8b',  (10,0.,10.)):   op.rng_len(self.ak4JetsCleanedFromAk8b),
            ('VBFtag',                  'VBF_tag',                  (2,0.,2.)):     op.c_float(op.rng_len(VBFJetPairs) > 0),
+           ('VBFj1pt',                 'VBFj1pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][0].pt, VBFJetPairs[0][1].pt),op.c_float(0.)),
+           ('VBFj2pt',                 'VBFj2pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt),op.c_float(0.)),
+           ('VBFj1j2dEta',             'VBFj1j2dEta',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta),op.c_float(0.)),
+           ('VBFj1j2invM',             'VBFj1j2invM',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.invariant_mass(VBFJetPairs[0][0].p4,  VBFJetPairs[0][1].p4),op.c_float(0.)),
            ('hT',                       'hT',                       (50,0.,500.)): self.HLL.HT_SL(self.ak4Jets),
            ('lepmetpt',                'lepmet_pt',                (50,0.,500.)):  self.HLL.SinglepMet_Pt(lep,self.corrMET),
+           ('lepmetDPhi',               'lepmetDPhi',               (100,0.,5.)):  op.abs(self.HLL.SinglepMet_dPhi(lep,self.corrMET)), ###  
            ('lepMT',                   'lep_MT',                   (50,0.,500.)):  self.HLL.MT(lep,self.corrMET),
            ('METLD',                   'MET_LD',                   (50,0.,500.)):  self.HLL.MET_LD_DL(self.corrMET, self.ak4Jets, self.electronsFakeSel, self.muonsFakeSel),
            ('fatbjlepDR',                 'fatbjlepDR',            (50,0.,5.)):    op.deltaR(fjet.p4, lep.p4),
-           ('fatbjlepDPhi',                 'fatbjlepDPhi',        (50,0.,5.)):    op.abs(op.deltaPhi(fjet.p4, lep.p4)),
+           #('fatbjlepDPhi',                 'fatbjlepDPhi',        (50,0.,5.)):    op.abs(op.deltaPhi(fjet.p4, lep.p4)),
            ('fatbjWj1DR',                 'fatbjWj1DR',            (50,0.,5.)):    op.deltaR(fjet.p4, jet3.p4),
            ('fatbjwj2DR',                 'fatbjwj2DR',            (50,0.,5.)):    op.c_float(0.),
            ('wj1lepDR',                 'wj1lepDR',                (50,0.,5.)):    op.deltaR(jet3.p4, lep.p4),
-           ('wj1lepDPhi',               'wj1lepDPhi',              (50,0.,4.)):    op.abs(op.deltaPhi(jet3.p4, lep.p4)),
+           #('wj1lepDPhi',               'wj1lepDPhi',              (50,0.,4.)):    op.abs(op.deltaPhi(jet3.p4, lep.p4)),
            ('wj2lepDR',                 'wj2lepDR',                (50,0.,5.)):    op.c_float(0.),
-           ('wj2lepDPhi',               'wj2lepDPhi',              (50,0.,4.)):    op.c_float(0.),
+           #('wj2lepDPhi',               'wj2lepDPhi',              (50,0.,4.)):    op.c_float(0.),
            ('wj1wj2pt',                'wj1wj2_pt',                (50,0.,500.)):  op.c_float(0.),
            ('wj1wj2DR',                'wj1wj2_dr',                (50,0.,500.)):  op.c_float(0.), ##
            ('wj1wj2invM',                 'wj1wj2_M',              (50,0.,500.)):  op.c_float(0.),
            ('mTtop3particle',         'mT_top_3particle',          (50,0.,500.)):  op.min(self.HLL.mT2(fjet.subJet1.p4, lep.p4 ,self.corrMET.p4), 
                                                                                           self.HLL.mT2(fjet.subJet2.p4, lep.p4, self.corrMET.p4)),
-           ('HWplaneAngle',          'angleBetHWPlane',          (50,0.,5.)):     op.c_float(0.),
+           ('WWplaneAnglewithMET',    'WWplaneAngle_withMET',    (50,0.,3.2)) : op.c_float(0.),
+           ('HWplaneAngle',           'angleBetHWPlane',          (50,0.,5.)):     op.c_float(0.),
            ('HWWSimpleMass',          'HWW_Simple_Mass',          (50,0.,500.)):  op.c_float(0.),
+           ('HWWdR',                 'HWW_dR',                   (50,0.,5.0)): op.c_float(0.),
+           ('cosThetaSHbb',          'cosThetaSHbb',             (20,0.,1.)) : op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(fjet.subJet1.p4,fjet.subJet2.p4),
+           ('cosThetaSWjjsimple',    'cosThetaSWjjsimple',       (20,0.,1.)) : op.c_float(0.),
            ('cosThetaSWWsimplemet',  'cosThetaS_WW_simple_met',  (50,0.,1.)):     op.c_float(0.),
            ('cosThetaSHHsimplemet',  'cosThetaS_HH_simple_met',  (50,0.,1.)):     op.c_float(0.),
-           ('VBFj1pt',                 'VBFj1pt',                  (50,0.,500.)): op.switch(op.rng_len(VBFJetPairs) > 0, 
-                                                                                            op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt, VBFJetPairs[0][1].pt),
-                                                                                            op.c_float(0.)),
-           ('VBFj2pt',                 'VBFj2pt',                  (50,0.,500.)):  op.switch(op.rng_len(VBFJetPairs) > 0, 
-                                                                                             op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt, VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt),
-                                                                                             op.c_float(0.)),
-           ('VBFj1j2dPhi',              'VBFj1j2dPhi',              (50,0.,500.)): op.switch(op.rng_len(VBFJetPairs) > 0,op.abs(op.deltaPhi(VBFJetPairs[0][0].p4,VBFJetPairs[0][1].p4)),op.c_float(0.)),
-           ('VBFj1j2invM',              'VBFj1j2invM',              (50,0.,500.)): op.switch(op.rng_len(VBFJetPairs) > 0,op.invariant_mass(VBFJetPairs[0][0].p4,  VBFJetPairs[0][1].p4),op.c_float(0.)),
+           ('MTW1W2',                  'w1w2_MT',                  (50,0.,500.)): op.c_float(0.),
            ('zeppenfeldVar',            'zeppenfeldVar',            (50,0.,5.)):   op.switch(op.rng_len(VBFJetPairs) > 0, op.abs(lep.eta - (VBFJetPairs[0][0].eta + VBFJetPairs[0][1].eta)/2.0)/op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta), op.c_float(0.))}
 
 def returnLBNInputs_Hbb1Wj(self,lep,fjet,jet3,jet4):
@@ -1067,6 +1158,10 @@ def returnClassicInputs_Hbb0Wj(self, lep, fjet, jet3, jet4, VBFJetPairs, L2Score
            ('fatbjE',                   'fatbjE',                (50,0.,500.)):    fjet.p4.E(),
            ('fatbjsoftdropMass',        'fatbjsoftdropMass',       (50,0.,1.)):    fjet.msoftdrop,
            #('fatbjbtagDeepB',              'fatbjbtagDeepB',       (50,0.,1.)):   fjet.btagDeepB,
+           ('fatbjtau1',               'fatbjtau1',               (20,0.,1.)):    fjet.tau1,
+           ('fatbjtau2',               'fatbjtau2',               (20,0.,1.)):    fjet.tau2,
+           ('fatbjtau3',               'fatbjtau3',               (20,0.,1.)):    fjet.tau3,
+           ('fatbjtau4',               'fatbjtau4',               (20,0.,1.)):    fjet.tau4,
            ('wj1Px',                   'wj1px',                    (50,0.,500.)):  op.c_float(0.),
            ('wj1Py',                   'wj1py',                    (50,0.,500.)):  op.c_float(0.),
            ('wj1Pz',                   'wj1pz',                    (50,0.,500.)):  op.c_float(0.),
@@ -1084,36 +1179,41 @@ def returnClassicInputs_Hbb0Wj(self, lep, fjet, jet3, jet4, VBFJetPairs, L2Score
            #('wj1pt',                   'wj1pt',                    (50,0.,500.)):  op.c_float(0.),
            #('wj1bTagDeepFlavB',        'wj1_bTagDeepFlavB',        (50,0.,1.)):    op.c_float(0.),
            #('wj2pt',                   'wj2pt',                    (50,0.,500.)):  op.c_float(0.),
-           ('nAk8Jets',                'nAk8Jets',                 (6,0.,5.)):     op.rng_len(self.ak8Jets),
-           ('nAk8BJets',               'nAk8BJets',                (6,0.,5.)):     op.rng_len(self.ak8BJets),
-           ('nAk4JetsCleandWithAk8b',   'nAk4JetsCleandWithAk8b',  (10,0.,10.)):   op.rng_len(self.ak4JetsCleanedFromAk8b),
+           #('nAk8Jets',                'nAk8Jets',                 (6,0.,5.)):     op.rng_len(self.ak8Jets),
+           #('nAk8BJets',               'nAk8BJets',                (6,0.,5.)):     op.rng_len(self.ak8BJets),
+           #('nAk4JetsCleandWithAk8b',   'nAk4JetsCleandWithAk8b',  (10,0.,10.)):   op.rng_len(self.ak4JetsCleanedFromAk8b),
            ('VBFtag',                  'VBF_tag',                  (2,0.,2.)):     op.c_float(op.rng_len(VBFJetPairs) > 0),
+           ('VBFj1pt',                 'VBFj1pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][0].pt, VBFJetPairs[0][1].pt),op.c_float(0.)),
+           ('VBFj2pt',                 'VBFj2pt',                  (100,0,200)):   op.switch(op.rng_len(VBFJetPairs) > 0,op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt,VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt),op.c_float(0.)),
+           ('VBFj1j2dEta',             'VBFj1j2dEta',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta),op.c_float(0.)),
+           ('VBFj1j2invM',             'VBFj1j2invM',              (20,0,5)):      op.switch(op.rng_len(VBFJetPairs) > 0,op.invariant_mass(VBFJetPairs[0][0].p4,  VBFJetPairs[0][1].p4),op.c_float(0.)),
            ('hT',                      'hT',                       (50,0.,500.)):  self.HLL.HT_SL(self.ak4Jets),
+           ('lepmetDPhi',               'lepmetDPhi',               (100,0.,5.)):  op.abs(self.HLL.SinglepMet_dPhi(lep,self.corrMET)), ### 
            ('lepmetpt',                'lepmet_pt',                (50,0.,500.)):  self.HLL.SinglepMet_Pt(lep,self.corrMET),
            ('lepMT',                   'lep_MT',                   (50,0.,500.)):  self.HLL.MT(lep,self.corrMET),
            ('METLD',                   'MET_LD',                   (50,0.,500.)):  self.HLL.MET_LD_DL(self.corrMET, self.ak4Jets, self.electronsFakeSel, self.muonsFakeSel),
            ('fatbjlepDR',              'fatbjlepDR',               (50,0.,5.)):    op.deltaR(fjet.p4, lep.p4),
-           ('fatbjlepDPhi',                 'fatbjlepDPhi',        (50,0.,5.)):    op.abs(op.deltaPhi(fjet.p4, lep.p4)),
+           #('fatbjlepDPhi',                 'fatbjlepDPhi',        (50,0.,5.)):    op.abs(op.deltaPhi(fjet.p4, lep.p4)),
            ('fatbjWj1DR',              'fatbjWj1DR',               (50,0.,5.)):    op.c_float(0.),
            ('fatbjwj2DR',              'fatbjwj2DR',               (50,0.,5.)):    op.c_float(0.),
            ('wj1lepDR',                'wj1lepDR',                 (50,0.,5.)):    op.c_float(0.),
-           ('wj1lepDPhi',              'wj1lepDPhi',               (50,0.,4.)):    op.c_float(0.),
+           #('wj1lepDPhi',              'wj1lepDPhi',               (50,0.,4.)):    op.c_float(0.),
            ('wj2lepDR',                'wj2lepDR',                 (50,0.,5.)):    op.c_float(0.),
-           ('wj2lepDPhi',              'wj2lepDPhi',               (50,0.,4.)):    op.c_float(0.),
+           #('wj2lepDPhi',              'wj2lepDPhi',               (50,0.,4.)):    op.c_float(0.),
            ('wj1wj2pt',                'wj1wj2_pt',                (50,0.,500.)):  op.c_float(0.),
            ('wj1wj2DR',                'wj1wj2_dr',                (50,0.,500.)):  op.c_float(0.), ##
            ('wj1wj2invM',              'wj1wj2_M',                 (50,0.,500.)):  op.c_float(0.),
            ('mTtop3particle',          'mT_top_3particle',         (50,0.,500.)):  op.min(self.HLL.mT2(fjet.subJet1.p4, lep.p4 ,self.corrMET.p4), 
                                                                                           self.HLL.mT2(fjet.subJet2.p4, lep.p4, self.corrMET.p4)),
+           ('WWplaneAnglewithMET',    'WWplaneAngle_withMET',    (50,0.,3.2)) :    op.c_float(0.),
            ('HWplaneAngle',          'angleBetHWPlane',          (50,0.,5.)):      op.c_float(0.),
            ('HWWSimpleMass',          'HWW_Simple_Mass',          (50,0.,500.)):   op.c_float(0.),
+           ('HWWdR',                 'HWW_dR',                   (50,0.,5.0)):     op.c_float(0.),
+           ('cosThetaSHbb',          'cosThetaSHbb',             (20,0.,1.)) : op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(fjet.subJet1.p4,fjet.subJet2.p4),
+           ('cosThetaSWjjsimple',    'cosThetaSWjjsimple',       (20,0.,1.)) : op.c_float(0.),
            ('cosThetaSWWsimplemet',  'cosThetaS_WW_simple_met',  (50,0.,1.)):      op.c_float(0.),
            ('cosThetaSHHsimplemet',  'cosThetaS_HH_simple_met',  (50,0.,1.)):      op.c_float(0.),
-           #('MTW1W2',                  'w1w2_MT',                  (50,0.,500.)):  op.c_float(0.),
-           ('VBFj1pt',                 'VBFj1pt',                  (50,0.,500.)):  op.switch(op.rng_len(VBFJetPairs) > 0, op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt, VBFJetPairs[0][1].pt),op.c_float(0.)),
-           ('VBFj2pt',                 'VBFj2pt',                  (50,0.,500.)):  op.switch(op.rng_len(VBFJetPairs) > 0, op.switch(VBFJetPairs[0][0].pt > VBFJetPairs[0][1].pt, VBFJetPairs[0][1].pt, VBFJetPairs[0][0].pt),op.c_float(0.)),
-           ('VBFj1j2dPhi',              'VBFj1j2dPhi',              (50,0.,500.)): op.switch(op.rng_len(VBFJetPairs) > 0,op.abs(op.deltaPhi(VBFJetPairs[0][0].p4,VBFJetPairs[0][1].p4)),op.c_float(0.)),
-           ('VBFj1j2invM',              'VBFj1j2invM',              (50,0.,500.)): op.switch(op.rng_len(VBFJetPairs) > 0,op.invariant_mass(VBFJetPairs[0][0].p4,  VBFJetPairs[0][1].p4),op.c_float(0.)),
+           ('MTW1W2',                  'w1w2_MT',                  (50,0.,500.)):  op.c_float(0.),
            ('zeppenfeldVar',            'zeppenfeldVar',            (50,0.,5.)):   op.switch(op.rng_len(VBFJetPairs) > 0, op.abs(lep.eta - (VBFJetPairs[0][0].eta + VBFJetPairs[0][1].eta)/2.0)/op.abs(VBFJetPairs[0][0].eta - VBFJetPairs[0][1].eta), op.c_float(0.))}
 
 def returnLBNInputs_Hbb0Wj(self,lep,fjet,jet3,jet4):

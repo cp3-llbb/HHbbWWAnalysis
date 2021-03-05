@@ -223,3 +223,14 @@ class highlevelLambdas:
     def getCorrBp4(self,j):
         return  op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >", (j.pt*j.bRegCorr, j.eta, j.phi, j.mass*j.bRegCorr)) 
 
+    # check florian's snippet
+    def comp_cosThetaSbetBeamAndHiggs(self,genColl):
+        genh = op.select(genColl,lambda g : op.AND(g.pdgId==25, g.statusFlags & ( 0x1 << 13)))
+        HH_p4 = genh[0].p4 + genh[1].p4
+        cm = HH_p4.BoostToCM()
+        boosted_h1 = op.extMethod("ROOT::Math::VectorUtil::boost", returnType=genh[0].p4._typeName)(genh[0].p4,cm)
+        boosted_h2 = op.extMethod("ROOT::Math::VectorUtil::boost", returnType=genh[1].p4._typeName)(genh[1].p4,cm)
+        mHH = op.switch(op.rng_len(genh)==2, op.invariant_mass(genh[0].p4,genh[1].p4) , op.c_float(-9999))
+        cosTheta1 = op.switch(op.rng_len(genh)==2, op.abs(boosted_h1.Pz()/boosted_h1.P()) , op.c_float(-9999))
+        cosTheta2 = op.switch(op.rng_len(genh)==2, op.abs(boosted_h1.Pz()/boosted_h2.P()) , op.c_float(-9999))
+        return [mHH, cosTheta1, cosTheta2]

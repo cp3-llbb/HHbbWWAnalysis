@@ -471,7 +471,23 @@ def makeSemiBoostedHbbSelection(self,selObject,nNonb,copy_sel=False):
     if copy_sel:
         return selObject
 
+def makeVBFSelection(self,selObject,vbfJetPairs,copy_sel=False):
+    if copy_sel:
+        selObject = copy(selObject)
+    selObject.selName += "HasVBFjets"
+    selObject.yieldTitle += " + VBF Jet Pairs $\geq 1$"
+    selObject.refine(cut=[op.rng_len(vbfJetPairs) >= 1])
+    if copy_sel:
+        return selObject
 
+def makeNoVBFSelection(self,selObject,vbfJetPairs,copy_sel=False):
+    if copy_sel:
+        selObject = copy(selObject)
+    selObject.selName += "HasNoVBFjets"
+    selObject.yieldTitle += " + VBF Jet Pairs = 0"
+    selObject.refine(cut=[op.rng_len(vbfJetPairs) == 0])
+    if copy_sel:
+        return selObject
 
 def makeDoubleLeptonSelection(self,baseSel,use_dd=True,fake_selection=False): 
     """

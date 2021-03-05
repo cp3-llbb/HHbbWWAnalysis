@@ -573,7 +573,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
                                   backend               = be, 
-                                  uName                 = sample)
+                                   uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = "Fall17_17Nov2017_V32_MC",
@@ -787,6 +787,15 @@ One lepton and and one jet argument must be specified in addition to the require
                                            down = op.c_float(1))                                                  # Down = not apply
             # Apply correction to TT #
             noSel = noSel.refine("ttbarWeight",weight=self.ttbar_sys)
+
+        ###########################################################################
+        #                     Limit MC weight for HH                              #
+        ###########################################################################
+        print(sampleCfg)
+        #print(sampleCfg, sampleCfg["type"])
+        if 'type' in sampleCfg.keys() and sampleCfg["type"] == 'signal':
+            noSel = noSel.refine('HHMCWeight',cut=[op.abs(t.genWeight)<2])
+
 
         ###########################################################################
         #                               Stitching                                 #
@@ -1363,13 +1372,15 @@ One lepton and and one jet argument must be specified in addition to the require
             self.VBFJetPairsBoosted  = op.sort(op.combine(self.VBFJetsBoosted,  N=2, pred=self.lambda_VBFPair), lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
 
         if channel == "SL":
-            #def cleanVBFwithJPA_Resolved(self, jpaJets, nJpaJets):
-            #    return lambda j : op.OR(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets)))
-            #def cleanVBFwithJPA_Boosted(self, jpaJets, nJpaJets):
-            #    return lambda j : op.AND(op.rng_len(self.ak8BJets) >= 1, op.OR(op.OR(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets))),
-            #                                                                   op.deltaR(self.ak8Jets[0].p4, j.p4) > 1.2))
             print('VBF <<>> ak4/8-jets  cleaning is in Plotter and Skimmer now!!! Would need to move them here')
-
+            '''
+            def cleanVBFwithJPA_Resolved(self,jpaJets, nJpaJets):
+                return lambda j : op.AND(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets)))
+            def cleanVBFwithJPA_Boosted(self,jpaJets, nJpaJets):
+                return lambda j : op.AND(op.rng_len(self.ak8BJets) >= 1, op.AND(op.AND(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets))), op.deltaR(self.ak8Jets[0].p4, j.p4) > 1.2))
+            def cleanVBFwithJPA_Boosted_rest(self):
+                return lambda j : op.AND(op.rng_len(self.ak8BJets) >= 1, op.deltaR(self.ak8Jets[0].p4, j.p4) > 1.2)
+            '''
         #############################################################################
         #                             Scalefactors                                  #
         #############################################################################

@@ -579,6 +579,11 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
         varsToKeep['METpz']       = MET.p4.Pz()
         varsToKeep['METenergy']   = MET.p4.E()
         
+        genVarsList = self.HLL.comp_cosThetaSbetBeamAndHiggs(t.GenPart)
+        #varsToKeep['mHH_gen'], varsToKeep['consTheta1_gen'], varsToKeep['consTheta2_gen'] = self.HLL.comp_cosThetaSbetBeamAndHiggs(t.GenPart)
+        varsToKeep['mHH_gen']        = genVarsList[0]
+        varsToKeep['consTheta1_gen'] = genVarsList[1]
+        varsToKeep['consTheta2_gen'] = genVarsList[2]
 
         #----- Lepton variables -----#
         if self.args.Channel is None:
@@ -753,6 +758,38 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep['bj1wj1_DPhi'] = op.abs(op.deltaPhi(jet1.p4,jet3.p4))   if hasbj1wj1 else op.static_cast("Float_t",op.c_float(0.))
 
             # L-562, L-635 [VBF]
+            varsToKeep['VBFj1Px']        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.Px() > VBFJetPairsJPA[0][1].p4.Px(),
+                                                               VBFJetPairsJPA[0][0].p4.Px(), VBFJetPairsJPA[0][1].p4.Px()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
+            varsToKeep['VBFj2Px']        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.Px() > VBFJetPairsJPA[0][1].p4.Px(),
+                                                               VBFJetPairsJPA[0][1].p4.Px(), VBFJetPairsJPA[0][0].p4.Px()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
+            varsToKeep['VBFj1Py']        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.Py() > VBFJetPairsJPA[0][1].p4.Py(),
+                                                               VBFJetPairsJPA[0][0].p4.Py(), VBFJetPairsJPA[0][1].p4.Py()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
+            varsToKeep['VBFj2Py']        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.Py() > VBFJetPairsJPA[0][1].p4.Py(),
+                                                               VBFJetPairsJPA[0][1].p4.Py(), VBFJetPairsJPA[0][0].p4.Py()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
+            varsToKeep['VBFj1Pz']        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.Pz() > VBFJetPairsJPA[0][1].p4.Pz(),
+                                                               VBFJetPairsJPA[0][0].p4.Pz(), VBFJetPairsJPA[0][1].p4.Pz()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
+            varsToKeep['VBFj2Pz']        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.Pz() > VBFJetPairsJPA[0][1].p4.Pz(),
+                                                               VBFJetPairsJPA[0][1].p4.Pz(), VBFJetPairsJPA[0][0].p4.Pz()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
+            varsToKeep['VBFj1E']         = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.E() > VBFJetPairsJPA[0][1].p4.E(),
+                                                               VBFJetPairsJPA[0][0].p4.E(), VBFJetPairsJPA[0][1].p4.E()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
+            varsToKeep['VBFj2E']         = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.E() > VBFJetPairsJPA[0][1].p4.E(),
+                                                               VBFJetPairsJPA[0][1].p4.E(), VBFJetPairsJPA[0][0].p4.E()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
             varsToKeep['VBFj1pt']        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
                                                      op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                                                VBFJetPairsJPA[0][0].pt, VBFJetPairsJPA[0][1].pt),
@@ -955,7 +992,39 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep['cosThetaS_WW_simple_met'] = op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(self.HLL.Wjj_simple(jet3.p4,jet4.p4), self.HLL.Wlep_met_simple(lepton.p4, MET.p4)) if self.args.Hbb2Wj else op.static_cast("Float_t",op.c_float(0.))
             varsToKeep['cosThetaS_HH_simple_met'] = op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(jet1.p4 + jet2.p4, self.HLL.HWW_met_simple(jet3.p4,jet4.p4,lepton.p4,MET.p4)) if self.args.Hbb2Wj else op.static_cast("Float_t",op.c_float(0.))
 
-            
+
+            varsToKeep['VBFj1Px']        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.Px() > VBFJetPairsJPA[0][1].p4.Px(),
+                                                               VBFJetPairsJPA[0][0].p4.Px(), VBFJetPairsJPA[0][1].p4.Px()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
+            varsToKeep['VBFj2Px']        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.Px() > VBFJetPairsJPA[0][1].p4.Px(),
+                                                               VBFJetPairsJPA[0][1].p4.Px(), VBFJetPairsJPA[0][0].p4.Px()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
+            varsToKeep['VBFj1Py']        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.Py() > VBFJetPairsJPA[0][1].p4.Py(),
+                                                               VBFJetPairsJPA[0][0].p4.Py(), VBFJetPairsJPA[0][1].p4.Py()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
+            varsToKeep['VBFj2Py']        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.Py() > VBFJetPairsJPA[0][1].p4.Py(),
+                                                               VBFJetPairsJPA[0][1].p4.Py(), VBFJetPairsJPA[0][0].p4.Py()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
+            varsToKeep['VBFj1Pz']        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.Pz() > VBFJetPairsJPA[0][1].p4.Pz(),
+                                                               VBFJetPairsJPA[0][0].p4.Pz(), VBFJetPairsJPA[0][1].p4.Pz()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
+            varsToKeep['VBFj2Pz']        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.Pz() > VBFJetPairsJPA[0][1].p4.Pz(),
+                                                               VBFJetPairsJPA[0][1].p4.Pz(), VBFJetPairsJPA[0][0].p4.Pz()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
+            varsToKeep['VBFj1E']         = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.E() > VBFJetPairsJPA[0][1].p4.E(),
+                                                               VBFJetPairsJPA[0][0].p4.E(), VBFJetPairsJPA[0][1].p4.E()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)
+            varsToKeep['VBFj2E']         = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
+                                                     op.switch(VBFJetPairsJPA[0][0].p4.E() > VBFJetPairsJPA[0][1].p4.E(),
+                                                               VBFJetPairsJPA[0][1].p4.E(), VBFJetPairsJPA[0][0].p4.E()),
+                                                     op.static_cast("Float_t",op.c_float(0.))) if not self.args.Res0b else op.c_float(0.)            
             varsToKeep['VBFj1pt']        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
                                                      op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                                                VBFJetPairsJPA[0][0].pt, VBFJetPairsJPA[0][1].pt),
@@ -964,7 +1033,6 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                                                      op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                                                VBFJetPairsJPA[0][1].pt, VBFJetPairsJPA[0][0].pt),
                                                      op.static_cast("Float_t",op.c_float(0.)))
-
             varsToKeep['VBFj1eta']       = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
                                                      op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                                                VBFJetPairsJPA[0][0].eta, VBFJetPairsJPA[0][1].eta),

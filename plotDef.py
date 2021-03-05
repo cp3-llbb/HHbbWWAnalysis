@@ -2514,6 +2514,8 @@ def makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,nodes,chan
         sel = selObjNodesDict[node].sel
         if node in ["GGF","VBF"]:
             plotots.update({'blinded-range':[0.5,1]})
+            # just to plot the VBF and GGF nodes
+            # slide the below to the left if you want make plots for all nodes
         plots.append(Plot.make1D("%s_%s_DNNOutput_%s"%(channel,suffix,node),
                                  output[i],
                                  sel,
@@ -2521,4 +2523,26 @@ def makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,nodes,chan
                                  #EquidistantBinning(10,0.,1.),
                                  xTitle = 'DNN output %s'%node,
                                  plotopts = plotots))
+    return plots    
+
+def makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict,output,nodes,channel):
+    plots = []
+
+    #channelLabel = DoubleLeptonChannelTitleLabel(channel)
+    channelLabel = SingleLeptonChannelTitleLabel(channel)
+    for i,node in enumerate(nodes):
+        plotots = {**channelLabel}
+        suffix = selObjNodesDict[node].selName
+        sel = selObjNodesDict[node].sel
+        if node in ["GGF","VBF"]:
+            plotots.update({'blinded-range':[0.5,1]})
+            # just to plot the VBF and GGF nodes
+            # slide the below to the left if you want make plots for all nodes
+            plots.append(Plot.make1D("%s_%s_DNNOutput_%s"%(channel,suffix,node),
+                                     output[i],
+                                     sel,
+                                     EquidistantBinning(400,0.,1.),
+                                     #EquidistantBinning(10,0.,1.),
+                                     xTitle = 'DNN output %s'%node,
+                                     plotopts = plotots))
     return plots    

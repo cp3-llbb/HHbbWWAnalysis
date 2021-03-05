@@ -17,21 +17,12 @@ multiclass:
     - output_VBF
     - output_WJets
   list_color:
-<<<<<<< HEAD
-    - "#288a24"
-    - "#06b894"
-    - "#610596"
-    - "#99053d"
-    - "#8f0a1e"
-    - "#d95564"
-=======
     - '#610596'
     - '#288a24'
     - '#06b894'
     - '#cc7a16'
     - '#8f0a1e'
     - '#d95564'
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
   list_legend:
     - node Ewk
     - node GGF

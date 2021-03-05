@@ -162,6 +162,8 @@ def main():
                 continue
             ntuple = os.path.join(basepath,sample)
             tfile = ROOT.TFile.Open(ntuple, "READ")
+            #evTree = tfile.Get("Events")
+            #print(tfile.GetListOfKeys)
             rdf = ROOT.RDataFrame("Events", tfile)
             rdfRuns = ROOT.RDataFrame("Runs", tfile)
             eventWtSum = rdfRuns.Sum("genEventSumw").GetValue()
