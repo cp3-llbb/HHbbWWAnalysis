@@ -1,0 +1,16 @@
+tree: Events
+eras:
+  '2018': 
+    luminosity: 1.
+samples:
+  Sync_GluGluToHHTo2B2VTo2L2Nu_node_SM:
+    files: [/storage/data/cms/store/mc/RunIIAutumn18NanoAODv7/GluGluToHHTo2B2VTo2L2Nu_node_SM_TuneCP5_PSWeights_13TeV-madgraph-pythia8/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/110000/50A82A39-B4DB-794D-A722-20C74AD25416.root]
+    generated-events: 1.
+    cross-section: 1.
+    era: '2018'
+    line-color: "#0f700b"
+    line-type: 1
+    legend: HH (SM) 1 pb
+    order: 1
+    type: signal
+

@@ -6,7 +6,7 @@ from itertools import chain
 from bamboo import treefunctions as op
 from bamboo.analysismodules import NanoAODModule, NanoAODHistoModule, NanoAODSkimmerModule
 from bamboo.analysisutils import makeMultiPrimaryDatasetTriggerSelection
-from bamboo.scalefactors import binningVariables_nano, BtagSF
+from bamboo.scalefactors import binningVariables_nano, BtagSF, get_scalefactor
 from bamboo.plots import SelectionWithDataDriven,CutFlowReport
 
 from METScripts import METFilter, METcorrection
@@ -239,10 +239,6 @@ One lepton and and one jet argument must be specified in addition to the require
                                 action      = "store_true",
                                 default     = False,
                                 help        = "To not apply the stitching weights to DY and WJets samples")
-        parser.add_argument("--DYVariable", 
-                                action      = "store",
-                                default     = False,
-                                help        = "DY data estimation variable")
 
         #----- Skimmer arguments -----#
         parser.add_argument("--Synchronization", 
@@ -302,6 +298,10 @@ One lepton and and one jet argument must be specified in addition to the require
             for e in self.args.Events:
                 print ('... %d'%e)
             noSel = noSel.refine('eventcut',cut = [op.OR(*[tree.event == e for e in self.args.Events])])
+
+        # Safeguards for signals #
+        if "HH" in sample:
+            noSel = noSel.refine('HHMCWeight',cut=[op.abs(tree.genWeight)<10])
 
         # Save some useful stuff in self #
         self.sample = sample
@@ -763,6 +763,69 @@ One lepton and and one jet argument must be specified in addition to the require
                                                    ddSuffix = 'Pseudodata',
                                                    enable   = "PseudoData" in self.datadrivenContributions 
                                     and self.datadrivenContributions["PseudoData"].usesSample(self.sample, self.sampleCfg))
+
+        ###########################################################################
+        #                          Signal Reweighting                             #
+        ###########################################################################
+        if 'type' in sampleCfg.keys() and sampleCfg["type"] == "signal":
+            # Get gen level Higgs #
+            self.genh = op.select(t.GenPart,lambda g : op.AND(g.pdgId==25, g.statusFlags & ( 0x1 << 13)))
+            # Get gen level variables mHH and cos(theta*) #
+            HH_p4 = self.genh[0].p4 + self.genh[1].p4 
+            cm = HH_p4.BoostToCM() 
+            boosted_h = op.extMethod("ROOT::Math::VectorUtil::boost", returnType=self.genh[0].p4._typeName)(self.genh[0].p4,cm)
+            self.mHH = op.invariant_mass(self.genh[0].p4,self.genh[1].p4) 
+            self.cosHH = op.abs(boosted_h.Pz()/boosted_h.P())
+
+            if forSkimmer:
+                # In the case of the skimmer, we cannot use the create from datadriven.
+                # At the same time we do not want the many-to-many procedure for the DNN training
+                # because it would mean repeating events with different weights.
+                # -> We use the one-to-one method 
+                json_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data','ScaleFactors_GGF_LO','{}_{}.json'.format(sample,era))
+                if os.path.exists(json_file):
+                    print("Found file {} -> Will apply for NO->NLO reweighting".format(json_file))
+                    self.reweightLO = get_scalefactor("lepton", json_file, paramDefs={'Eta': lambda x : self.mHH, 'Pt': lambda x : self.cosHH})
+                    noSel = noSel.refine("LoToNLO",weight = self.reweightLO(op.c_float(1.)))
+
+            else:
+                # For the Plotter we want the many-to-many worfklow.
+                # This means create as many files (with the create) 
+                # as there are NLO weight files (+ original LO file)
+                # Hard code the benchmarks (TODO : find smarter) #
+                benchmarks = [
+                    'BenchmarkSM',  
+                    'Benchmark1',  
+                    'Benchmark2',  
+                    'Benchmark3',  
+                    'Benchmark4',  
+                    'Benchmark5',  
+                    'Benchmark6',  
+                    'Benchmark7',  
+                    'Benchmark8',  
+                    'Benchmark9',  
+                    'Benchmark10',  
+                    'Benchmark11',  
+                    'Benchmark12',  
+                    'BenchmarkcHHH0',  
+                    'BenchmarkcHHH1',  
+                    'BenchmarkcHHH2p45',  
+                    'BenchmarkcHHH5',  
+                ]
+
+                for benchmark in benchmarks:
+                    json_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data','ScaleFactors_GGF_LO','{}_to_{}_{}.json'.format(sample,benchmark,era))
+                    if os.path.exists(json_file):
+                        print("Found file {} -> Will apply for NO->NLO reweighting".format(json_file))
+                        reweightLO = get_scalefactor("lepton", json_file, paramDefs={'Eta': lambda x : self.mHH, 'Pt': lambda x : self.cosHH})
+                        noSel = SelectionWithDataDriven.create(parent   = noSel,
+                                                               name     = 'noSel'+benchmark,
+                                                               ddSuffix = benchmark,
+                                                               cut      = op.c_bool(True),
+                                                               ddCut    = op.c_bool(True),
+                                                               weight   = op.c_float(1.),
+                                                               ddWeight = reweightLO(op.c_float(1.)),
+                                                               enable   = True)
 
         ###########################################################################
         #                           TTbar reweighting                             #
@@ -1435,14 +1498,14 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                            op.c_float(1.)),
                                                                  op.c_float(1.))]
 
-#            #### Ak8 btag efficiencies ####
-#            if self.isNanov7:
-#                self.Ak8Eff_bjets = self.SF.get_scalefactor("lepton",('ak8btag_eff_{}'.format(era),'eff_bjets'),combine="weight", systName="ak8btag_eff_bjets", defineOnFirstUse=(not forSkimmer),
-#                                                            additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
-#                self.Ak8Eff_cjets = self.SF.get_scalefactor("lepton",('ak8btag_eff_{}'.format(era),'eff_cjets'),combine="weight", systName="ak8btag_eff_cjets", defineOnFirstUse=(not forSkimmer),
-#                                                            additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
-#                self.Ak8Eff_lightjets = self.SF.get_scalefactor("lepton",('ak8btag_eff_{}'.format(era),'eff_lightjets'),combine="weight", systName="ak8btag_eff_lightjets", defineOnFirstUse=(not forSkimmer),
-#                                                            additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
+            #### Ak8 btag efficiencies ####
+            if self.isNanov7:
+                self.Ak8Eff_bjets = self.SF.get_scalefactor("lepton",('ak8btag_eff','eff_bjets_{}'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer),
+                                                            additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
+                self.Ak8Eff_cjets = self.SF.get_scalefactor("lepton",('ak8btag_eff','eff_cjets_{}'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer),
+                                                            additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
+                self.Ak8Eff_lightjets = self.SF.get_scalefactor("lepton",('ak8btag_eff','eff_lightjets_{}'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer),
+                                                            additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
  
             #----- Triggers -----# 
             #### Single lepton triggers ####
@@ -1537,9 +1600,6 @@ One lepton and and one jet argument must be specified in addition to the require
             self.lambda_FR_el       = lambda el : returnFFSF(el,self.electronFRList,"el_FR")
             self.lambda_FR_mu       = lambda mu : returnFFSF(mu,self.muonFRList,"mu_FR")
 
-            # Correction factor only for DL #
-            self.lambda_FRcorr_el   = lambda el : self.lambda_FR_el(el)*self.electronCorrFR
-            self.lambda_FRcorr_mu   = lambda mu : self.lambda_FR_mu(mu)*self.muonCorrFR
 
             if channel == "SL":
                 self.lambda_FF_el = lambda el : self.lambda_FR_el(el)/(1-self.lambda_FR_el(el))
@@ -1547,6 +1607,10 @@ One lepton and and one jet argument must be specified in addition to the require
                 self.ElFakeFactor = lambda el : self.lambda_FF_el(el)
                 self.MuFakeFactor = lambda mu : self.lambda_FF_mu(mu)
             if channel == "DL":
+                # Correction factor only for DL #
+                self.lambda_FRcorr_el   = lambda el : self.lambda_FR_el(el)*self.electronCorrFR
+                self.lambda_FRcorr_mu   = lambda mu : self.lambda_FR_mu(mu)*self.muonCorrFR
+
                 self.lambda_FF_el   = lambda el : self.lambda_FRcorr_el(el)/(1-self.lambda_FRcorr_el(el))
                 self.lambda_FF_mu   = lambda mu : self.lambda_FRcorr_mu(mu)/(1-self.lambda_FRcorr_mu(mu))
                 self.ElElFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),op.NOT(self.lambda_electronTightSel(dilep[1]))),
@@ -1584,19 +1648,10 @@ One lepton and and one jet argument must be specified in addition to the require
         #                    b-tagging efficiency scale factors                   #
         ###########################################################################
         if self.is_MC:
-            #if self.era == '2016':
-            #    if ('db' in sampleCfg.keys() and 'TuneCP5' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['TuneCP5' in f for f in sampleCfg['files']])):
-            #        csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_2016LegacySF_V1_TuneCP5.csv")
-            #    else: # With CUETP8M1
-            #        csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_2016LegacySF_V1.csv")
-            #if self.era == '2017':
-            #    csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepFlavour_94XSF_V4_B_F.csv")
-            #if self.era == '2018':
-            #    csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "DeepJet_102XSF_V2.csv")
-            csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "deepjet_{}.csv".format(self.era))
-                
-            if not os.path.exists(csvFileNameAk4):
-                raise RuntimeError('Could not find Ak4 csv file %s'%csvFileNameAk4)
+            if self.era == '2016' and (('db' in sampleCfg.keys() and not 'TuneCP5' in sampleCfg['db']) or ('files' in sampleCfg.keys() and not any(['TuneCP5' in f for f in sampleCfg['files']]))):
+                csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "deepjet_2016_oldtune.csv")
+            else:
+                csvFileNameAk4 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "deepjet_{}.csv".format(self.era))
             print ('Btag Ak4 CSV file',csvFileNameAk4)
 
             #----- Ak4 SF -----# 
@@ -1621,31 +1676,31 @@ One lepton and and one jet argument must be specified in addition to the require
                                                  getters          = {'Discri':lambda j : j.btagDeepFlavB},
                                                  uName            = self.sample)
 
-#        if self.isNanov7:
-#            if era == '2016':
-#                csvFileNameAk8= os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_2016LegacySF_V1.csv")
-#            if era == '2017':
-#                csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_94XSF_V4_B_F_v2.csv")
-#            if era == '2018':
-#                csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_102XSF_V1.csv")
-#            
-#            #----- Ak8 SF -----# 
-#            if not os.path.exists(csvFileNameAk8):
-#                raise RuntimeError('Could not find Ak8 csv file %s'%csvFileNameAk8)
-#            print ('Btag Ak8 CSV file',csvFileNameAk8)
-#            self.DeepCsvSubjetMediumSF = BtagSF(taggerName       = "deepcsvSubjet", 
-#                                                csvFileName      = csvFileNameAk8,
-#                                                wp               = "medium",
-#                                                sysType          = "central", 
-#                                                otherSysTypes    = ['up','down'],
-#                                                measurementType  = {"B": "lt", "C": "lt", "UDSG": "incl"},
-#                                                getters          = {'Discri':lambda subjet : subjet.btagDeepB,
-#                                                                    'JetFlavour': lambda subjet : op.static_cast("BTagEntry::JetFlavor",
-#                                                                                                        op.multiSwitch((subjet.nBHadrons>0,op.c_int(0)), # B -> flav = 5 -> BTV = 0
-#                                                                                                                       (subjet.nCHadrons>0,op.c_int(1)), # C -> flav = 4 -> BTV = 1
-#                                                                                                                       op.c_int(2)))},                  # UDSG -> flav = 0 -> BTV = 2
-#                                                sel              = sel, 
-#                                                uName            = self.sample)
+        if self.isNanov7:
+            if era == '2016':
+                csvFileNameAk8= os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_2016LegacySF_V1.csv")
+            if era == '2017':
+                csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_94XSF_V4_B_F_v2.csv")
+            if era == '2018':
+                csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_102XSF_V1.csv")
+            
+            #----- Ak8 SF -----# 
+            if not os.path.exists(csvFileNameAk8):
+                raise RuntimeError('Could not find Ak8 csv file %s'%csvFileNameAk8)
+            print ('Btag Ak8 CSV file',csvFileNameAk8)
+            self.DeepCsvSubjetMediumSF = BtagSF(taggerName       = "deepcsvSubjet", 
+                                                csvFileName      = csvFileNameAk8,
+                                                wp               = "medium",
+                                                sysType          = "central", 
+                                                otherSysTypes    = ['up','down'],
+                                                measurementType  = {"B": "lt", "C": "lt", "UDSG": "incl"},
+                                                getters          = {'Discri':lambda subjet : subjet.btagDeepB,
+                                                                    'JetFlavour': lambda subjet : op.static_cast("BTagEntry::JetFlavor",
+                                                                                                        op.multiSwitch((subjet.nBHadrons>0,op.c_int(0)), # B -> flav = 5 -> BTV = 0
+                                                                                                                       (subjet.nCHadrons>0,op.c_int(1)), # C -> flav = 4 -> BTV = 1
+                                                                                                                       op.c_int(2)))},                  # UDSG -> flav = 0 -> BTV = 2
+                                                sel              = noSel, 
+                                                uName            = self.sample)
 
 
         ###########################################################################
@@ -1672,7 +1727,7 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                           Jet PU ID reweighting                           #
         #############################################################################
-        if self.is_MC:
+        if self.is_MC and not self.args.BtagReweightingOff and not self.args.BtagReweightingOn:
             wFail = op.extMethod("scalefactorWeightForFailingObject", returnType="double")
             lambda_puid_weight = lambda j : op.switch(j.genJet.isValid,
                                                       op.switch(((j.puId >> 2) & 1),
@@ -1729,37 +1784,34 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                 nameHint = "bamboo_nJetsWeight_{}".format(self.sample.replace('-','_')))
                 sel = sel.refine("BtagAk4SF"+name , weight = [self.btagAk4SF,self.BtagRatioWeight])
 
-#            if self.isNanov7:
-#                #----- AK8 jets -> using Method 1.a -----#
-#                # See https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagShapeCalibration
-#
-#
-#                # Reweighting #
-#                wFail = op.extMethod("scalefactorWeightForFailingObject", returnType="double") # 
-#                # double scalefactorWeightForFailingObject(double sf, double eff) {
-#                #  return (1.-sf*eff)/(1.-eff);
-#                #  }
-#
-#                # Method 1.a
-#                # P(MC) = Π_{i tagged} eff_i Π_{j not tagged} (1-eff_j)
-#                # P(data) = Π_{i tagged} SF_i x eff_i Π_{j not tagged} (1-SF_jxeff_j)
-#                # w = P(data) / P(MC) = Π_{i tagged} SF_i Π_{j not tagged} (1-SF_jxeff_j)/(1-eff_j)
-#                # NB : for  SF_i, self.DeepCsvSubjetMediumSF will find the correct SF based on the true flavour
-#                #      however for eff_i, this comes from json SF and differs by flavour -> need multiSwitch
-#                lambda_subjetWeight = lambda subjet : op.multiSwitch((subjet.nBHadrons>0,      # True bjets 
-#                                                                      op.switch(self.lambda_subjetBtag(subjet),                                         # check if tagged
-#                                                                                self.DeepCsvSubjetMediumSF(subjet),                                     # Tag : return SF_i
-#                                                                                wFail(self.DeepCsvSubjetMediumSF(subjet),self.Ak8Eff_bjets(subjet)))),  # Not tagged : return (1-SF_jxeff_j)/(1-eff_j)
-#                                                                     (subjet.nCHadrons>0,      # True cjets 
-#                                                                      op.switch(self.lambda_subjetBtag(subjet),                                         # check if tagged
-#                                                                                self.DeepCsvSubjetMediumSF(subjet),                                     # Tag : return SF_i
-#                                                                                wFail(self.DeepCsvSubjetMediumSF(subjet),self.Ak8Eff_cjets(subjet)))),  # Not tagged : return (1-SF_jxeff_j)/(1-eff_j)
-#                                                                      # Else : true lightjets 
-#                                                                      op.switch(self.lambda_subjetBtag(subjet),                                               # check if tagged
-#                                                                                self.DeepCsvSubjetMediumSF(subjet),                                           # Tag : return SF_i
-#                                                                                wFail(self.DeepCsvSubjetMediumSF(subjet),self.Ak8Eff_lightjets(subjet))))     # Not tagged : return (1-SF_jxeff_j)/(1-eff_j)
-#                self.ak8BtagReweighting = op.rng_product(self.ak8Jets, lambda j : lambda_subjetWeight(j.subJet1)*lambda_subjetWeight(j.subJet2))
-#                sel = sel.refine("BtagAk8SF"+name , weight = [self.ak8BtagReweighting])
+            if self.isNanov7 and not self.args.BtagReweightingOff and not self.args.BtagReweightingOn:
+                #----- AK8 jets -> using Method 1.a -----#
+                # Reweighting #
+                wFail = op.extMethod("scalefactorWeightForFailingObject", returnType="double") # 
+                # double scalefactorWeightForFailingObject(double sf, double eff) {
+                #  return (1.-sf*eff)/(1.-eff);
+                #  }
+
+                # Method 1.a
+                # P(MC) = Π_{i tagged} eff_i Π_{j not tagged} (1-eff_j)
+                # P(data) = Π_{i tagged} SF_i x eff_i Π_{j not tagged} (1-SF_jxeff_j)
+                # w = P(data) / P(MC) = Π_{i tagged} SF_i Π_{j not tagged} (1-SF_jxeff_j)/(1-eff_j)
+                # NB : for  SF_i, self.DeepCsvSubjetMediumSF will find the correct SF based on the true flavour
+                #      however for eff_i, this comes from json SF and differs by flavour -> need multiSwitch
+                lambda_subjetWeight = lambda subjet : op.multiSwitch((subjet.nBHadrons>0,      # True bjets 
+                                                                      op.switch(self.lambda_subjetBtag(subjet),                                         # check if tagged
+                                                                                self.DeepCsvSubjetMediumSF(subjet),                                     # Tag : return SF_i
+                                                                                wFail(self.DeepCsvSubjetMediumSF(subjet),self.Ak8Eff_bjets(subjet)))),  # Not tagged : return (1-SF_jxeff_j)/(1-eff_j)
+                                                                     (subjet.nCHadrons>0,      # True cjets 
+                                                                      op.switch(self.lambda_subjetBtag(subjet),                                         # check if tagged
+                                                                                self.DeepCsvSubjetMediumSF(subjet),                                     # Tag : return SF_i
+                                                                                wFail(self.DeepCsvSubjetMediumSF(subjet),self.Ak8Eff_cjets(subjet)))),  # Not tagged : return (1-SF_jxeff_j)/(1-eff_j)
+                                                                      # Else : true lightjets 
+                                                                      op.switch(self.lambda_subjetBtag(subjet),                                               # check if tagged
+                                                                                self.DeepCsvSubjetMediumSF(subjet),                                           # Tag : return SF_i
+                                                                                wFail(self.DeepCsvSubjetMediumSF(subjet),self.Ak8Eff_lightjets(subjet))))     # Not tagged : return (1-SF_jxeff_j)/(1-eff_j)
+                self.ak8BtagReweighting = op.rng_product(self.ak8Jets, lambda j : lambda_subjetWeight(j.subJet1)*lambda_subjetWeight(j.subJet2))
+                sel = sel.refine("BtagAk8SF"+name , weight = [self.ak8BtagReweighting])
         
         return sel
        

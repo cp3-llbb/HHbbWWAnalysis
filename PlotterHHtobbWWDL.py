@@ -54,7 +54,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         era = sampleCfg['era']
 
         #----- Machine Learning Model -----#                
-        model_num = "10"
+        model_num = "11"
         if not self.args.OnlyYield:
             path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
             print ("DNN model : %s"%path_model)
