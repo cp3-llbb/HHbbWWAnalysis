@@ -13,11 +13,7 @@ import time
 import array
 import numpy as np
 import itertools
-<<<<<<< HEAD
 import plotille # For plots in terminal
-=======
-#import plotille # For plots in terminal
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
 from sklearn.model_selection import train_test_split
 
@@ -86,11 +82,7 @@ class HyperModel:
         # Records #
         if not generator:
             x = data[[param.replace('$','') for param in parameters.inputs]+parameters.LBN_inputs].values
-<<<<<<< HEAD
             y = data[self.list_outputs+['learning_weight']].values
-=======
-            y = data[self.list_outputs+['learning_weights']].values
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
             # Data splitting #
             if model_idx is None:
                 size = parameters.training_ratio/(parameters.training_ratio+parameters.evaluation_ratio)
@@ -322,7 +314,6 @@ class HyperModel:
         # Hist in terminal #
         eval_mean_arr = r.data['eval_mean'].values
         val_loss_arr = r.data['val_loss'].values
-<<<<<<< HEAD
         fig1 = plotille.Figure()
         fig1.width = 150
         fig1.height = 50
@@ -342,27 +333,6 @@ class HyperModel:
         print ('  Val loss  '.center(80,'-'))
         print ('Best model : ',sorted_data.iloc[0][['val_loss']])
         print(fig2.show(legend=True))
-=======
-        #fig1 = plotille.Figure()
-        #fig1.width = 150
-        #fig1.height = 50
-        #fig1.set_x_limits(min_=np.amin(eval_mean_arr),max_=np.amax(eval_mean_arr))
-        #fig1.color_mode = 'byte'
-        #fig1.histogram(eval_mean_arr, bins=200, lc=25)
-        print ('  Evaluation error  '.center(80,'-'))
-        print ('Best model : ',sorted_data.iloc[0][['eval_mean']])
-        #print(fig1.show(legend=True))
-
-        #fig2 = plotille.Figure()
-        #fig2.width = 150
-        #fig2.height = 50
-        #fig2.set_x_limits(min_=np.amin(val_loss_arr),max_=np.amax(val_loss_arr))
-        #fig2.color_mode = 'byte'
-        #fig2.histogram(val_loss_arr, bins=200, lc=100)
-        print ('  Val loss  '.center(80,'-'))
-        print ('Best model : ',sorted_data.iloc[0][['val_loss']])
-        #print(fig2.show(legend=True))
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
         logging.info('='*80)
 

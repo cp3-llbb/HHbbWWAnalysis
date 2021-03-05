@@ -99,7 +99,6 @@ def main():
                 #    def_name = 'MakeROCPlot',
                 #    plot_name = ''),
                 ########### Multivariate ROC ############
-<<<<<<< HEAD
                 ROC(tpl = 'ROCMulti_class_unit_weight.yml.tpl',
                     class_name = 'Plot_Multi_ROC',
                     def_name = 'MakeMultiROCPlot',
@@ -108,12 +107,6 @@ def main():
                     class_name = 'Plot_Multi_ROC',
                     def_name = 'MakeMultiROCPlot',
                     plot_name = 'Multiclass_event'),
-=======
-                ROC(tpl = 'ROCMulti_class.yml.tpl',
-                    class_name = 'Plot_Multi_ROC',
-                    def_name = 'MakeMultiROCPlot',
-                    plot_name = 'Multiclass'),
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
            ]
 
     # Make the output dir #

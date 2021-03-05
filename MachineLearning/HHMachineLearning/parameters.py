@@ -21,11 +21,7 @@ path_out = '/nfs/scratch/fynu/fbury/HHMachineLearning_output/'
 path_model = os.path.join(main_path,'model')
 
 ##############################  Datasets proportion   #################################
-<<<<<<< HEAD
 crossvalidation = False
-=======
-crossvalidation = True
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
 # Classic training #
 # -> For crossvalidation == False
@@ -53,19 +49,13 @@ if N_apply != N_slices/N_models: # Otherwise the same slice can be applied on se
 ############################### Slurm parameters ######################################
 partition = 'gpu'  # Def, cp3, cp3-gpu or gpu
 QOS = 'normal' # cp3, normal, cp3-gpu
-<<<<<<< HEAD
 time = '0-08:00:00' # days-hh:mm:ss
 mem = '80000' # ram in MB
-=======
-time = '0-12:00:00' # days-hh:mm:ss
-mem = '60000' # ram in MB
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 tasks = 1 # Number of threads(as a string) (not parallel training for classic mode)
 cpus = 1
 gpus = 1
 additional_options = ""
 workers = 20
-<<<<<<< HEAD
 split_per_model = True # in case of cross validation, to send one job per model or not
 
 ##################################  Naming ######################################
@@ -74,16 +64,6 @@ config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL_S
 lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
 #eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
 eras = [2018]
-=======
-split_per_model = False # in case of cross validation, to send one job per model or not
-
-##################################  Naming ######################################
-# Physics Config #
-config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL.yml')
-lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
-#eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
-eras = [2017]
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
 categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj','resolved0b']
 #categories = ['boosted2b2Wj','boosted2b1Wj', 'boosted2b0Wj']
@@ -91,7 +71,6 @@ channels = ['El','Mu']
 
 # Better put them in alphabetical order
 nodes = ['Ewk','GGF','H','Top','VBF','WJets']
-<<<<<<< HEAD
 
 weight_groups = [
                   (1.0/10, ('GGF')),
@@ -105,9 +84,6 @@ weight_groups = [
 
 quantile = 0.95 # repeat weights with too high learning weights
 
-=======
-        
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 #    def loss(self): # -> DL
 #        return GroupedXEnt(
 #            group_ids=[
@@ -119,11 +95,7 @@ quantile = 0.95 # repeat weights with too high learning weights
 #                (1.0, [5]),  # ttbar
 #                (1.0, [2, 4, 6, 7, 8]),  # Other
 #            ]
-<<<<<<< HEAD
 #        )#
-=======
-#        )
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
 # Input plots options #
 node_colors = {
@@ -151,23 +123,14 @@ train_cache = os.path.join(path_out,'train_cache_'+suffix+'_'+'_'.join([str(era)
 test_cache = os.path.join(path_out,'test_cache_'+suffix+'_'+'_'.join([str(era) for era in eras])+'.pkl')
 
 # Meta config info #
-<<<<<<< HEAD
 xsec_json = os.path.join(main_path,'xsec_{era}.json')
 event_weight_sum_json = os.path.join(main_path,'event_weight_sum_{era}.json')
-=======
-xsec_json = os.path.join(main_path,'background_{era}_xsec.json')
-event_weight_sum_json = os.path.join(main_path,'background_{era}_event_weight_sum.json')
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
 # Training resume #
 resume_model = ''
 
 # Output #
-<<<<<<< HEAD
 output_batch_size = 100000
-=======
-output_batch_size = 50000
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 split_name = 'tag' # 'sample' or 'tag' : criterion for output file splitting
 
 ##############################  Evaluation criterion   ################################
@@ -177,30 +140,18 @@ eval_criterion = "eval_error" # either val_loss or eval_error or val_acc
 ##############################  Model callbacks ################################
 # Early stopping to stop learning after some criterion 
 early_stopping_params = {'monitor'   : 'val_categorical_accuracy',  # Value to monitor
-<<<<<<< HEAD
                          'min_delta' : 0.0001,          # Minimum delta to declare an improvement
                          'patience'  : 50,          # How much time to wait for an improvement
-=======
-                         'min_delta' : 0.001,          # Minimum delta to declare an improvement
-                         'patience'  : 100,          # How much time to wait for an improvement
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
                          'verbose'   : 1,           # Verbosity level
                          'restore_best_weights': False,
                          'mode'      : 'max'}       # Mode : 'auto', 'min', 'max'
 
 # Reduce LR on plateau : if no improvement for some time, will reduce lr by a certain factor
 reduceLR_params = {'monitor'    : 'val_categorical_accuracy',   # Value to monitor
-<<<<<<< HEAD
                    'factor'     : 0.5,          # Multiplicative factor by which to multiply LR
                    'min_lr'     : 1e-5,         # Minimum value for LR
                    'min_delta'  : 0.001,       # Minimum delta to declare an improvement
                    'patience'   : 20,            # How much time to wait for an improvement
-=======
-                   'factor'     : 0.1,          # Multiplicative factor by which to multiply LR
-                   'min_lr'     : 1e-5,         # Minimum value for LR
-                   'min_delta'  : 0.001,       # Minimum delta to declare an improvement
-                   'patience'   : 30,            # How much time to wait for an improvement
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
                    'cooldown'   : 10,            # How many epochs before starting again to monitor
                    'verbose'    : 1,            # Verbosity level
                    'mode'      : 'max'}         # Mode : 'auto', 'min', 'max'
@@ -225,7 +176,6 @@ reduceLR_params = {'monitor'    : 'val_categorical_accuracy',   # Value to monit
 #    'loss_function' : [grouped_loss] , #  [categorical_crossentropy]
 #}
 p = { 
-<<<<<<< HEAD
     'lr' : [0.01], 
     'first_neuron' : [256],
     'activation' : [relu],
@@ -237,19 +187,6 @@ p = {
     'epochs' : [500],   
     'batch_size' : [50000], 
     'n_particles' : [10],
-=======
-    'lr' : [0.001], 
-    'first_neuron' : [256],
-    'activation' : [relu],
-    'dropout' : [0.01],
-    'hidden_layers' : [4], # does not take into account the first layer
-    'output_activation' : [softmax],
-    'l2' : [1e-3],
-    'optimizer' : [Adam],  
-    'epochs' : [500],   
-    'batch_size' : [50000], 
-    'n_particles' : [16],
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
     'loss_function' : [categorical_crossentropy],
 }
 
@@ -258,11 +195,7 @@ repetition = 1 # How many times each hyperparameter has to be used
 
 ###################################  Variables   ######################################
 
-<<<<<<< HEAD
 cut = 'total_weight > 0 && MC_weight <10000'
-=======
-cut = 'total_weight > 0 && abs(total_weight)<1e5'
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 #cut = 'MC_weight > 0'
 
 weight = 'total_weight'
@@ -288,11 +221,7 @@ inputs = [
             'L2_1b0Wj',
             'L2_0b',
             # LL variables #
-<<<<<<< HEAD
 #            'METpt',               
-=======
-            'METpt',               
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
             'METpx',               # discard               
             'METpy',               # discard
             'METenergy',           # discard
@@ -334,17 +263,12 @@ inputs = [
 #            'nAk8BJets',           # discard
             'VBF_tag',
            # HL variables #
-<<<<<<< HEAD
             'lepmet_DPhi',
-=======
-#            'lepmet_DPhi',
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
             'lepmet_pt',
             'lep_MT',
             'MET_LD',
             'hT',
             'bj1LepDR',
-<<<<<<< HEAD
             'bj2LepDR',
             'bj1MetDPhi',
             'bj2MetDPhi',
@@ -404,61 +328,6 @@ inputs = [
 #            ############################
 #            ####-----  Boosted  ----####
 #            ############################
-=======
-            'bj1LepDPhi',
-#            'bj1MetDPhi',
-            'minDR_lep_allJets',
-            'bj2LepDR',
-            'bj2LepDPhi',
-#            'bj2MetDPhi',
-            'bj1bj2_pt',
-            'bj1bj2_M',
-#            'cosThetaS_Hbb',
-            'mT_top_3particle',
-            'wj1LepDR',
-            'wj1LepDPhi',
-#            'wj1MetDPhi',
-            'wj2LepDR',
-            'wj2LepDPhi',
-#            'wj2MetDPhi',
-            'wj1wj2_pt',
-            'wj1wj2_M',
-            'w1w2_MT',
-            'HWW_Mass',
-            'HWW_Simple_Mass',
-            'HWW_dR',
-#            'cosThetaS_Wjj_simple',
-#            'cosThetaS_WW_simple_met ',
-#            'cosThetaS_HH_simple_met',
-#            'angleBetWWPlane',
-#            'angleBetHWPlane',
-            'bj1bj2_DR',
-            'bj1bj2_DPhi',
-            'bj2wj1_DR',
-            'bj2wj1_DPhi',
-            'wj1wj2_DR',
-            'wj1wj2_DPhi',
-            'bj1wj2_DR',
-            'bj1wj2_DPhi',
-            'bj1wj1_DR',
-            'bj1wj1_DPhi',
-#            'VBFj1pt',
-#            'VBFj2pt',
-#            'VBFj1eta',
-#            'VBFj2eta',
-#            'VBFj1j2dEta',
-#            'VBFj1j2dPhi',
-#            'VBFj1j2invM',
-            'zeppenfeldVar',
-            'minJetDR',
-            'minLepJetDR',
-#            'HT2_lepJetMet',
-#            'HT2R_lepJetMet',
-#
-            ############################
-            ####-----  Boosted  ----####
-            ############################
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 #            # Onehot #
 #            '$era@op_era',
 #            'lep_pdgId@op_pdgid',
@@ -470,7 +339,6 @@ inputs = [
 #            'L2_Hbb0Wj',
 #            # LL variables #
 #            'METpt',               
-<<<<<<< HEAD
 #            'METpx',               # discard               
 #            'METpy',               # discard
 #            'lep_Px',              # discard
@@ -502,19 +370,6 @@ inputs = [
 #            'VBFj2pt',
 #            'VBFj1j2dEta',
 #            'VBFj1j2invM',
-=======
-#            'lep_pt',
-#            'fatbj_pt',
-#            'fatbj_softdropMass',
-#            'fatbj_btagDeepB',
-#            'wj1_pt',
-#            'wj1_bTagDeepFlavB',
-#            'wj2_pt',
-#            'wj2_bTagDeepFlavB ',
-#            'nAk8Jets',
-#            'nAk8BJets',
-#            'VBF_tag',
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 #            # HL variables #
 #            'hT',
 #            'lepmet_DPhi',
@@ -524,7 +379,6 @@ inputs = [
 #            'fatbj_lepDR',
 #            'fatbj_Wj1DR',
 #            'fatbj_wj2DR',
-<<<<<<< HEAD
 #            #'fatbjSub1_lepDR',
 #            #'fatbjSub2_lepDR',
 #            #'fatbjSub1_Wj1DR',
@@ -533,12 +387,6 @@ inputs = [
 #            #'fatbjSub2_Wj2DR',
 #            'wj1_lepDR',
 #            'wj2_lepDR',
-=======
-#            'wj1_lepDR',
-#            'wj1_lepDPhi',
-#            'wj2_lepDR',
-#            'wj2_lepDPhi',
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 #            'wj1wj2_pt',
 #            'wj1wj2DR',
 #            'wj1wj2invM',
@@ -549,7 +397,6 @@ inputs = [
 #            'HWW_dR',
 #            'cosThetaS_Hbb',
 #            'cosThetaS_Wjj_simple',
-<<<<<<< HEAD
 #            'cosThetaS_WW_simple_met',
 #            'cosThetaS_HH_simple_met',
 #            #'minSubJetLepDR',
@@ -557,21 +404,6 @@ inputs = [
 #            'zeppenfeldVar',
 #            #'HT2_lepJetMet',
 #            #'HT2R_lepJetMet',
-=======
-#            'cosThetaS_WW_simple_met ',
-#            'cosThetaS_HH_simple_met',
-#            'MT_W1W2',
-##            'VBFj1pt',
-##            'VBFj2pt',
-##            'VBFj1eta',
-##            'VBFj2eta',
-##            'VBFj1j2dEta',
-##            'VBFj1j2dPhi',
-##            'VBFj1j2invM',
-#            'zeppenfeldVar',
-#            #'HT2_lepJetMet',
-##            'HT2R_lepJetMet',
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
     ]
 
@@ -598,15 +430,11 @@ LBN_inputs = [
 #              'wj1_E','wj1_Px','wj1_Py','wj1_Pz',
 #              'wj2_E','wj2_Px','wj2_Py','wj2_Pz',
 #             ]
-<<<<<<< HEAD
 #
 #
 
 #### /!\ format = [E,Px,Py,Pz] per particle
 
-=======
-## /!\ format = [E,Px,Py,Pz] per particle
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
 assert len(LBN_inputs)%4 == 0
 

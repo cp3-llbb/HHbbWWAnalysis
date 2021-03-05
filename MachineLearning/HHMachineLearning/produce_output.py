@@ -33,10 +33,7 @@ class ProduceOutput:
             if len(self.model) == 1: # classic training
                 instance = HyperModel(self.model[0])
                 output = instance.HyperRestore(inputs,verbose=1)
-<<<<<<< HEAD
                 output_df = pd.DataFrame(output,columns=[('output_%s'%o).replace('$','') for o in parameters.outputs],index=data.index)
-=======
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
             else:   # cross validation
                 output_df = pd.DataFrame(np.zeros((data.shape[0],len(parameters.outputs))),columns=[('output_%s'%o).replace('$','') for o in parameters.outputs],index=data.index)
                 for model_idx,model in enumerate(self.model):

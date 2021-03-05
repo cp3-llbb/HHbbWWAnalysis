@@ -53,32 +53,8 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         era = sampleCfg['era']
 
-<<<<<<< HEAD
         #----- Machine Learning Model -----#                
         model_num = "11"
-=======
-
-        #----- Ratio reweighting variables (before lepton and jet selection) -----#
-        if self.args.BtagReweightingOff or self.args.BtagReweightingOn:
-            noSel = self.beforeJetselection(noSel)
-            plots.append(objectsNumberPlot(channel="NoChannel",suffix='NoSelection',sel=noSel,objCont=self.ak4Jets,objName='Ak4Jets',Nmax=15,xTitle='N(Ak4 jets)'))
-            plots.append(CutFlowReport("BtagReweightingCutFlowReport",noSel,printInLog=True,recursive=True))
-            return plots
-
-        #----- Stitching study -----#
-        if self.args.DYStitchingPlots or self.args.WJetsStitchingPlots:
-            if self.args.DYStitchingPlots and sampleCfg['group'] != 'DY':
-                raise RuntimeError("Stitching is only done on DY MC samples")
-            if self.args.WJetsStitchingPlots and sampleCfg['group'] != 'Wjets':
-                raise RuntimeError("Stitching is only done on WJets MC samples")
-            plots.extend(makeLHEPlots(noSel,t.LHE))
-            plots.append(objectsNumberPlot(channel="NoChannel",suffix='NoSelection',sel=noSel,objCont=self.ak4Jets,objName='Ak4Jets',Nmax=15,xTitle='N(Ak4 jets)'))
-            plots.append(CutFlowReport("DYStitchingCutFlowReport",noSel,printInLog=True,recursive=True))
-            return plots
-
-        #----- Machine Learning Model -----#                
-        model_num = "10"
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
         if not self.args.OnlyYield:
             path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
             print ("DNN model : %s"%path_model)
@@ -139,10 +115,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             self.ResolvedDYReweighting2bElEl = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'ElEl_HT_{}_2b'.format(mode)), combine="weight", 
                                                                    systName="dy_ee_resolved_reweighting_2b", 
                                                                    additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
-<<<<<<< HEAD
 
-=======
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 #            # Correction #
 #            self.ResolvedDYReweighting1bElEl_corr = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'ElEl_MET_{}_1b'.format(mode)), combine="weight", 
 #                                                                            #additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda dilep: op.deltaR(dilep[0].p4,dilep[1].p4)})
@@ -158,10 +131,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             self.ResolvedDYReweighting2bMuMu = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'MuMu_HT_{}_2b'.format(mode)), combine="weight", 
                                                                    systName="dy_mm_resolved_reweighting_1b", 
                                                                    additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
-<<<<<<< HEAD
 
-=======
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 #            # Correction #
 #            self.ResolvedDYReweighting1bMuMu_corr = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'MuMu_MET_{}_1b'.format(mode)), combine="weight", 
 #                                                                            #additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda dilep: op.deltaR(dilep[0].p4,dilep[1].p4)})
@@ -177,7 +147,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             self.BoostedDYReweighting1bMuMu  =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'MuMu_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
                                                                    systName="dy_mm_boosted_reweighting_1b", 
                                                                    additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
-<<<<<<< HEAD
             if mode == 'data':
                 self.ResolvedDYReweighting1bElEl_nonclosure = self.SF.get_scalefactor("lepton", ('DY_non_closure_{}'.format(era),'ee_resolved1b_HT'), combine="weight", 
                                                                        systName="dy_ee_resolved_nonclosure_1b", 
@@ -205,8 +174,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 self.ResolvedDYReweighting2bMuMu_nonclosure = lambda x : op.c_float(1.)
                 self.BoostedDYReweighting1bMuMu_nonclosure  = lambda x : op.c_float(1.)
 
-=======
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
         else:
             self.ResolvedDYReweighting1bElEl = lambda x : op.c_float(1.)
             self.ResolvedDYReweighting2bElEl = lambda x : op.c_float(1.) 
@@ -219,7 +186,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             self.BoostedDYReweighting1bElEl = lambda x : op.c_float(1.)
             self.BoostedDYReweighting1bMuMu = lambda x : op.c_float(1.)
 
-<<<<<<< HEAD
             self.ResolvedDYReweighting1bElEl_nonclosure = lambda x : op.c_float(1.)
             self.ResolvedDYReweighting2bElEl_nonclosure = lambda x : op.c_float(1.)
             self.BoostedDYReweighting1bElEl_nonclosure  = lambda x : op.c_float(1.)
@@ -227,8 +193,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             self.ResolvedDYReweighting2bMuMu_nonclosure = lambda x : op.c_float(1.)
             self.BoostedDYReweighting1bMuMu_nonclosure  = lambda x : op.c_float(1.)
 
-=======
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
 
         #----- Channel and trigger plots -----#

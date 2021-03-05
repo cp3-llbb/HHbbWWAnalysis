@@ -60,15 +60,9 @@ python extractTTHSingleLeptonTriggerScaleFactorsFromRoot.py -s SingleMuon_2018 -
 #python extractTTHFakeRates.py --era 2017 --file ../data/FakeRates/2017/FR_lep_ttH_mva_2017_CERN_2019Jul08.root --wp Tight
 #python extractTTHFakeRates.py --era 2018 --file ../data/FakeRates/2018/FR_lep_ttH_mva_2018_CERN_2019Jul08.root --wp Tight
 
-<<<<<<< HEAD
 python extractTTHFakeRates.py --era 2016 --file ../data/FakeRates/2016/FR_lep_mva_hh_multilepton_wFullSyst_2016_KBFI_2020Dec21_wCERNUncs2_FRErrTheshold_0p01.root --wp Loose --channel DL
 python extractTTHFakeRates.py --era 2017 --file ../data/FakeRates/2017/FR_lep_mva_hh_multilepton_wFullSyst_2017_KBFI_2020Dec21_wCERNUncs2_FRErrTheshold_0p01.root --wp Loose --channel DL
 python extractTTHFakeRates.py --era 2018 --file ../data/FakeRates/2018/FR_lep_mva_hh_multilepton_wFullSyst_2018_KBFI_2020Dec21_wCERNUncs2_FRErrTheshold_0p01.root --wp Loose --channel DL
-=======
-python extractTTHFakeRates.py --era 2016 --file ../data/FakeRates/2016/FR_lep_mva_hh_multilepton_wFullSyst_2016_KBFI_2021Jan18_wCERNUncs2_FRErrTheshold_0p01_wTightChargeCut.root --wp Loose --channel DL
-python extractTTHFakeRates.py --era 2017 --file ../data/FakeRates/2017/FR_lep_mva_hh_multilepton_wFullSyst_2017_KBFI_2021Jan18_wCERNUncs2_FRErrTheshold_0p01_wTightChargeCut.root --wp Loose --channel DL
-python extractTTHFakeRates.py --era 2018 --file ../data/FakeRates/2018/FR_lep_mva_hh_multilepton_wFullSyst_2018_KBFI_2021Jan18_wCERNUncs2_FRErrTheshold_0p01_wTightChargeCut.root --wp Loose --channel DL
->>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
 python extractTTHFakeRates.py --era 2016 --file ../data/FakeRates/2016/FR_lep_mva_hh_bbWW_wFullSyst_2016_KBFI_2021Feb3_wCERNUncs2_FRErrTheshold_0p01.root --wp Loose --channel SL
 python extractTTHFakeRates.py --era 2017 --file ../data/FakeRates/2017/FR_lep_mva_hh_bbWW_wFullSyst_2017_KBFI_2021Feb3_wCERNUncs2_FRErrTheshold_0p01.root --wp Loose --channel SL
