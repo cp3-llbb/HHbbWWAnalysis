@@ -326,7 +326,6 @@ def makeCoarseBoostedSelection(self,selObject,copy_sel=False):
     if copy_sel:
         return selObject
 
-
 def makeExclusiveLooseResolvedJetComboSelection(self,selObject,nbJet,copy_sel=False):
     if copy_sel:
         selObject = copy(selObject)
@@ -357,6 +356,7 @@ def makeExclusiveLooseResolvedJetComboSelection(self,selObject,nbJet,copy_sel=Fa
     
     if copy_sel:
         return selObject
+
 
 def makeExclusiveTightResolvedJetComboSelection(self,selObject,nbJet,copy_sel=False):
     if copy_sel:
@@ -488,6 +488,7 @@ def makeNoVBFSelection(self,selObject,vbfJetPairs,copy_sel=False):
     selObject.refine(cut=[op.rng_len(vbfJetPairs) == 0])
     if copy_sel:
         return selObject
+
 
 def makeDoubleLeptonSelection(self,baseSel,use_dd=True,fake_selection=False): 
     """
