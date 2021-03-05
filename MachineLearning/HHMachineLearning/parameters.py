@@ -17,11 +17,11 @@ from grouped_entropy import GroupedXEnt
 ##################################  Path variables ####################################
 
 main_path = os.path.abspath(os.path.dirname(__file__))
-path_out = '/nfs/scratch/fynu/gsaha/HHMachineLearning_output_boosted/'
+path_out = '/nfs/scratch/fynu/fbury/HHMachineLearning_output/'
 path_model = os.path.join(main_path,'model')
 
 ##############################  Datasets proportion   #################################
-crossvalidation = True
+crossvalidation = False
 
 # Classic training #
 # -> For crossvalidation == False
@@ -50,58 +50,40 @@ if N_apply != N_slices/N_models: # Otherwise the same slice can be applied on se
 partition = 'gpu'  # Def, cp3, cp3-gpu or gpu
 QOS = 'normal' # cp3, normal, cp3-gpu
 time = '0-08:00:00' # days-hh:mm:ss
-mem = '30000' # ram in MB
+mem = '80000' # ram in MB
 tasks = 1 # Number of threads(as a string) (not parallel training for classic mode)
 cpus = 1
 gpus = 1
 additional_options = ""
 workers = 20
-split_per_model = False # in case of cross validation, to send one job per model or not
+split_per_model = True # in case of cross validation, to send one job per model or not
 
 ##################################  Naming ######################################
 # Physics Config #
-config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL.yml')
+config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL_SM.yml')
 lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
 #eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
-eras = [2016,2017,2018]
+eras = [2018]
 
-#categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj','resolved0b']
-categories = ['boosted2b2Wj','boosted2b1Wj', 'boosted2b0Wj']
+categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj','resolved0b']
+#categories = ['boosted2b2Wj','boosted2b1Wj', 'boosted2b0Wj']
 channels = ['El','Mu']
 
 # Better put them in alphabetical order
-#nodes = ['GGF','H','Rare','ST','TT','VBF','WJets']
 nodes = ['Ewk','GGF','H','Top','VBF','WJets']
-group_ids = [
-        (1.0, [0,5]),           # signals
-        (1.0, [1,2,3,4,6]),     # backgrounds
-#        (1.0, [0]),             # GGF
-#        (1.0, [4]),             # TT
-#        (1.0, [5]),             # VBF
-#        (1.0, [6]),             # WJets
-#        (1.0, [1,2,3]),         # rest : H + Rare + ST       
-        (1.0, [0]),             # GGF
-        (1.0, [5]),             # VBF
-        (1.0, [1,2,3,4,6]),             # TT
-            ]
-grouped_loss_0 = categorical_crossentropy
-grouped_loss_1 = GroupedXEnt([(1.0, [0,5]),             # signal
-                              (1.0, [1,2,3,4,6])])      # background
-grouped_loss_2 = GroupedXEnt([(1.0, [0,5]),             # signal
-                              (1.0, [1,2,3,4,6]),       # background
-                              (1.0, [0]),               # GGF
-                              (1.0, [4]),               # TT
-                              (1.0, [5]),               # VBF
-                              (1.0, [6]),               # WJets
-                              (1.0, [1,2,3])])          # rest : H + Rare + ST
-grouped_loss_3 = GroupedXEnt([(1.0, [0,5]),             # signal
-                              (1.0, [1,2,3,4,6]),       # background
-                              (1.0, [0]),               # GGF
-                              (1.0, [5])])              # VBF
-grouped_loss_4 = GroupedXEnt([(1.0, [0]),               # GGF
-                              (1.0, [5]),               # VBF
-                              (1.0, [1,2,3,4,6])])      # background
-        
+
+weight_groups = [
+                  (1.0/10, ('GGF')),
+                  (1.0/10, ('VBF')),
+                  (1.0, ('H')),
+                  (1.0, ('Ewk')),
+                  (1.0, ('Top')),
+                  (1.0, ('WJets')),
+                ]
+
+
+quantile = 0.95 # repeat weights with too high learning weights
+
 #    def loss(self): # -> DL
 #        return GroupedXEnt(
 #            group_ids=[
@@ -113,14 +95,14 @@ grouped_loss_4 = GroupedXEnt([(1.0, [0]),               # GGF
 #                (1.0, [5]),  # ttbar
 #                (1.0, [2, 4, 6, 7, 8]),  # Other
 #            ]
-#        )
+#        )#
 
 # Input plots options #
 node_colors = {
-            'Ewk'   : '#610596',
+            'Ewk'  : '#610596',
             'GGF'   : '#288a24',
             'H'     : '#06b894',
-            'Top'   : '#cc7a16',
+            'Top'    : '#cc7a16',
             'VBF'   : '#8f0a1e',
             'WJets' : '#d95564',
              }
@@ -129,8 +111,8 @@ node_colors = {
 tree_name = 'Events'
 
 # scaler and mask names #
-suffix = 'boosted' 
-#suffix = 'resolved' 
+#suffix = 'boosted' 
+suffix = 'resolved' 
 # scaler_name -> 'scaler_{suffix}.pkl'  If does not exist will be created 
 # mask_name -> 'mask_{suffix}_{sample}.npy'  If does not exist will be created 
 scaler_name = 'scaler_'+suffix+'_'.join([str(era) for era in eras])+'.pkl'
@@ -141,14 +123,14 @@ train_cache = os.path.join(path_out,'train_cache_'+suffix+'_'+'_'.join([str(era)
 test_cache = os.path.join(path_out,'test_cache_'+suffix+'_'+'_'.join([str(era) for era in eras])+'.pkl')
 
 # Meta config info #
-xsec_json = os.path.join(main_path,'background_{era}_xsec.json')
-event_weight_sum_json = os.path.join(main_path,'background_{era}_event_weight_sum.json')
+xsec_json = os.path.join(main_path,'xsec_{era}.json')
+event_weight_sum_json = os.path.join(main_path,'event_weight_sum_{era}.json')
 
 # Training resume #
 resume_model = ''
 
 # Output #
-output_batch_size = 50000
+output_batch_size = 100000
 split_name = 'tag' # 'sample' or 'tag' : criterion for output file splitting
 
 ##############################  Evaluation criterion   ################################
@@ -158,19 +140,18 @@ eval_criterion = "eval_error" # either val_loss or eval_error or val_acc
 ##############################  Model callbacks ################################
 # Early stopping to stop learning after some criterion 
 early_stopping_params = {'monitor'   : 'val_categorical_accuracy',  # Value to monitor
-                         'min_delta' : 0.001,          # Minimum delta to declare an improvement
-                         'patience'  : 100,          # How much time to wait for an improvement
+                         'min_delta' : 0.0001,          # Minimum delta to declare an improvement
+                         'patience'  : 50,          # How much time to wait for an improvement
                          'verbose'   : 1,           # Verbosity level
-                         #'restore_best_weights':True,
-                         'restore_best_weights':False,
+                         'restore_best_weights': False,
                          'mode'      : 'max'}       # Mode : 'auto', 'min', 'max'
 
 # Reduce LR on plateau : if no improvement for some time, will reduce lr by a certain factor
 reduceLR_params = {'monitor'    : 'val_categorical_accuracy',   # Value to monitor
-                   'factor'     : 0.1,          # Multiplicative factor by which to multiply LR
+                   'factor'     : 0.5,          # Multiplicative factor by which to multiply LR
                    'min_lr'     : 1e-5,         # Minimum value for LR
                    'min_delta'  : 0.001,       # Minimum delta to declare an improvement
-                   'patience'   : 30,            # How much time to wait for an improvement
+                   'patience'   : 20,            # How much time to wait for an improvement
                    'cooldown'   : 10,            # How many epochs before starting again to monitor
                    'verbose'    : 1,            # Verbosity level
                    'mode'      : 'max'}         # Mode : 'auto', 'min', 'max'
@@ -194,43 +175,27 @@ reduceLR_params = {'monitor'    : 'val_categorical_accuracy',   # Value to monit
 #    'n_particles' : [16],
 #    'loss_function' : [grouped_loss] , #  [categorical_crossentropy]
 #}
-# Set By Florian
-
-p = { 
-    'lr' : [0.01], 
-    'first_neuron' : [512],
-    'activation' : [relu],
-    'dropout' : [0.3],
-    'hidden_layers' : [6], # does not take into account the first layer
-    'output_activation' : [softmax],
-    'l2' : [1e-4],
-    'optimizer' : [Adam],  
-    'epochs' : [500],   
-    'batch_size' : [40000], 
-    'n_particles' : [10],
-    'loss_function' : [categorical_crossentropy],
-}
-'''
 p = { 
     'lr' : [0.01], 
     'first_neuron' : [256],
     'activation' : [relu],
-    'dropout' : [0.2],
-    'hidden_layers' : [5], # does not take into account the first layer
+    'dropout' : [0.001],
+    'hidden_layers' : [4], # does not take into account the first layer
     'output_activation' : [softmax],
-    'l2' : [1e-5],
+    'l2' : [1e-6],
     'optimizer' : [Adam],  
     'epochs' : [500],   
-    'batch_size' : [30000], 
+    'batch_size' : [50000], 
     'n_particles' : [10],
     'loss_function' : [categorical_crossentropy],
 }
-'''
+
+
 repetition = 1 # How many times each hyperparameter has to be used 
 
 ###################################  Variables   ######################################
 
-cut = 'MC_weight > 0 && abs(total_weight)<1e5 && (total_weight/MC_weight)<100'
+cut = 'total_weight > 0 && MC_weight <10000'
 #cut = 'MC_weight > 0'
 
 weight = 'total_weight'
@@ -239,204 +204,206 @@ weight = 'total_weight'
 # Input branches (combinations possible just as in ROOT #
 #/!\ onehot variables need to be at the beginning of the list (checked later)
 inputs = [
-#            ###########################
-#            ####----- Resolved ----####
-#            ###########################
+            ###########################
+            ####----- Resolved ----####
+            ###########################
+            # Onehot #
+            #'$era@op_era',
+            'lep_pdgId@op_pdgid',
+            'lep_charge@op_charge',
+            'JPAcat@op_resolved_jpacat',
+            # JPA values #
+            'L2_2b2Wj',
+            'L2_2b1Wj',
+            'L2_2b0Wj',
+            'L2_1b2Wj',
+            'L2_1b1Wj',
+            'L2_1b0Wj',
+            'L2_0b',
+            # LL variables #
+#            'METpt',               
+            'METpx',               # discard               
+            'METpy',               # discard
+            'METenergy',           # discard
+            'lep_Px',              # discard
+            'lep_Py',              # discard
+            'lep_Pz',              # discard
+            'lep_E',               # discard     
+#           'lep_pt',
+#           'lep_eta',             # discard
+            'bj1_Px',              # discard
+            'bj1_Py',              # discard
+            'bj1_Pz',              # discard
+            'bj1_E',               # discard
+#           'bj1_pt',
+#            'bj1_eta',             # discard
+           'bj1_bTagDeepFlavB',
+            'bj2_Px',              # discard
+            'bj2_Py',              # discard
+            'bj2_Pz',              # discard
+            'bj2_E',               # discard
+#           'bj2_pt',
+#            'bj2_eta',             # discard
+           'bj2_bTagDeepFlavB',
+            'wj1_Px',              # discard
+            'wj1_Py',              # discard
+            'wj1_Pz',              # discard
+            'wj1_E',               # discard
+#           'wj1_pt',
+#            'wj1_eta',             # discard
+           'wj1_bTagDeepFlavB',
+            'wj2_Px',              # discard
+            'wj2_Py',              # discard
+            'wj2_Pz',              # discard
+            'wj2_E',               # discard
+#            'wj2_pt',
+#            'wj2_eta',             # discard
+           'wj2_bTagDeepFlavB ',
+#            'nAk4BJets',           
+#            'nAk8BJets',           # discard
+            'VBF_tag',
+           # HL variables #
+            'lepmet_DPhi',
+            'lepmet_pt',
+            'lep_MT',
+            'MET_LD',
+            'hT',
+            'bj1LepDR',
+            'bj2LepDR',
+            'bj1MetDPhi',
+            'bj2MetDPhi',
+#            'bj1LepDPhi',
+#            'bj2LepDPhi',
+            'minDR_lep_allJets',
+            'bj1bj2_pt',
+            'wj1wj2_pt',
+#            'bj1bj2_M',
+            'cosThetaS_Hbb',
+            'mT_top_3particle',
+            'wj1LepDR',
+            'wj2LepDR',
+#            'wj1LepDPhi',
+#            'wj2LepDPhi',
+            'wj1MetDPhi',
+            'wj2MetDPhi',
+            'wj1wj2_M',
+#            'w1w2_MT',
+#            'HWW_Mass',
+            'HWW_Simple_Mass',
+            'HWW_dR',
+            'cosThetaS_Wjj_simple',
+            'cosThetaS_WW_simple_met ',
+            'cosThetaS_HH_simple_met',
+            'angleBetWWPlane',
+            'angleBetHWPlane',
+            'bj1bj2_DR',
+            'bj1wj1_DR',
+            'bj1wj2_DR',
+            'bj2wj1_DR',
+            'wj1wj2_DR',
+#            'bj1bj2_DPhi',
+#            'bj2wj1_DPhi',
+#            'wj1wj2_DPhi',
+#            'bj1wj2_DPhi',
+#            'bj1wj1_DPhi',
+            'VBFj1pt',
+            'VBFj2pt',
+#            'VBFj1eta',
+#            'VBFj2eta',
+            'VBFj1j2dEta',
+            'VBFj1j2dPhi',
+            'VBFj1j2invM',
+            'zeppenfeldVar',
+            'minJetDR',
+            'minLepJetDR',
+            'HbbLepDR',
+#            'HbbLepDPhi',
+#            'HbbMetDPhi',
+            'HWWLepDR',
+#            'HWWLepDPhi',
+            'HWWMetDPhi',
+#            'HT2_lepJetMet',
+#            'HT2R_lepJetMet',
+
+#            ############################
+#            ####-----  Boosted  ----####
+#            ############################
 #            # Onehot #
-#            #'$era@op_era',
+#            '$era@op_era',
 #            'lep_pdgId@op_pdgid',
 #            'lep_charge@op_charge',
-#            'JPAcat@op_resolved_jpacat',
+#            'JPAcat@op_boosted_jpacat',
 #            # JPA values #
-#            'L2_2b2Wj',
-#            'L2_2b1Wj',
-#            'L2_2b0Wj',
-#            'L2_1b2Wj',
-#            'L2_1b1Wj',
-#            'L2_1b0Wj',
-#            'L2_0b',
+#            'L2_Hbb2Wj',
+#            'L2_Hbb1Wj',
+#            'L2_Hbb0Wj',
 #            # LL variables #
 #            'METpt',               
-##            'METpx',               # discard               
-##            'METpy',               # discard
-##            'METenergy',           # discard
-##            'lep_Px',              # discard
-##            'lep_Py',              # discard
-##            'lep_Pz',              # discard
-##            'lep_E',               # discard     
-#           'lep_pt',
-##            'lep_eta',             # discard
-##            'bj1_Px',              # discard
-##            'bj1_Py',              # discard
-##            'bj1_Pz',              # discard
-##            'bj1_E',               # discard
-#           'bj1_pt',
-##            'bj1_eta',             # discard
-#           'bj1_bTagDeepFlavB',
-##            'bj2_Px',              # discard
-##            'bj2_Py',              # discard
-##            'bj2_Pz',              # discard
-##            'bj2_E',               # discard
-#           'bj2_pt',
-##            'bj2_eta',             # discard
-#           'bj2_bTagDeepFlavB',
-##            'wj1_Px',              # discard
-##            'wj1_Py',              # discard
-##            'wj1_Pz',              # discard
-##            'wj1_E',               # discard
-#           'wj1_pt',
-##            'wj1_eta',             # discard
-#           'wj1_bTagDeepFlavB',
-##            'wj2_Px',              # discard
-##            'wj2_Py',              # discard
-##            'wj2_Pz',              # discard
-##            'wj2_E',               # discard
-#           'wj2_pt',
-##            'wj2_eta',             # discard
-#           'wj2_bTagDeepFlavB ',
-#            'nAk4BJets',           
-##            'nAk8BJets',           # discard
+#            'METpx',               # discard               
+#            'METpy',               # discard
+#            'lep_Px',              # discard
+#            'lep_Py',              # discard
+#            'lep_Pz',              # discard
+#            'lep_E',               # discard    
+#            'fatbj_Px',
+#            'fatbj_Py',
+#            'fatbj_Pz',
+#            'fatbj_E',
+#            'fatbj_softdropMass',
+#            'fatbj_tau1',
+#            'fatbj_tau2',
+#            'fatbj_tau3',
+#            'fatbj_tau4',
+#            #'fatbj_btagDeepB',
+#            'wj1_Px',
+#            'wj1_Py',
+#            'wj1_Pz',
+#            'wj1_E',
+#            'wj1_bTagDeepFlavB',
+#            'wj2_Px',
+#            'wj2_Py',
+#            'wj2_Pz',
+#            'wj2_E',
+#            'wj2_bTagDeepFlavB',
 #            'VBF_tag',
-#           # HL variables #
+#            'VBFj1pt',
+#            'VBFj2pt',
+#            'VBFj1j2dEta',
+#            'VBFj1j2invM',
+#            # HL variables #
+#            'hT',
 #            'lepmet_DPhi',
 #            'lepmet_pt',
 #            'lep_MT',
 #            'MET_LD',
-#            'hT',
-#            'bj1LepDR',
-#            'bj1LepDPhi',
-#            'bj1MetDPhi',
-#            'minDR_lep_allJets',
-#            'bj2LepDR',
-#            'bj2LepDPhi',
-#            'bj2MetDPhi',
-#            'bj1bj2_pt',
-#            'bj1bj2_M',
-#            'cosThetaS_Hbb',
-#            'mT_top_3particle',
-#            'wj1LepDR',
-#            'wj1LepDPhi',
-#            'wj1MetDPhi',
-#            'wj2LepDR',
-#            'wj2LepDPhi',
-#            'wj2MetDPhi',
+#            'fatbj_lepDR',
+#            'fatbj_Wj1DR',
+#            'fatbj_wj2DR',
+#            #'fatbjSub1_lepDR',
+#            #'fatbjSub2_lepDR',
+#            #'fatbjSub1_Wj1DR',
+#            #'fatbjSub2_Wj1DR',
+#            #'fatbjSub1_Wj2DR',
+#            #'fatbjSub2_Wj2DR',
+#            'wj1_lepDR',
+#            'wj2_lepDR',
 #            'wj1wj2_pt',
-#            'wj1wj2_M',
-#            'w1w2_MT',
-#            'HWW_Mass',
+#            'wj1wj2DR',
+#            'wj1wj2invM',
+#            'mT_top_3particle',
+#            'WWplaneAngle_withMET', 
+#            'HWplaneAngle',
 #            'HWW_Simple_Mass',
 #            'HWW_dR',
+#            'cosThetaS_Hbb',
 #            'cosThetaS_Wjj_simple',
-#            'cosThetaS_WW_simple_met ',
+#            'cosThetaS_WW_simple_met',
 #            'cosThetaS_HH_simple_met',
-#            'angleBetWWPlane',
-#            'angleBetHWPlane',
-#            'bj1bj2_DR',
-#            'bj1bj2_DPhi',
-#            'bj2wj1_DR',
-#            'bj2wj1_DPhi',
-#            'wj1wj2_DR',
-#            'wj1wj2_DPhi',
-#            'bj1wj2_DR',
-#            'bj1wj2_DPhi',
-#            'bj1wj1_DR',
-#            'bj1wj1_DPhi',
-##            'VBFj1pt',
-##            'VBFj2pt',
-##            'VBFj1eta',
-##            'VBFj2eta',
-##            'VBFj1j2dEta',
-##            'VBFj1j2dPhi',
-##            'VBFj1j2invM',
-#            'zeppenfeldVar',
-#            'minJetDR',
-#            'minLepJetDR',
-##            'HT2_lepJetMet',
-##            'HT2R_lepJetMet',
-##
-            ############################
-            ####-----  Boosted  ----####
-            ############################
-            # Onehot #
-            '$era@op_era',
-            'lep_pdgId@op_pdgid',
-            'lep_charge@op_charge',
-#            'JPAcat@op_boosted_jpacat',
-            # JPA values #
-#            'L2_Hbb2Wj',
-#            'L2_Hbb1Wj',
-#            'L2_Hbb0Wj',
-            # LL variables #
-            'METpt',
-            'METpx',
-            'METpy',
-            #'METenergy',
-            #'lep_pt',
-            'lep_Px',
-            'lep_Py',
-            'lep_Pz',
-            'lep_E',
-            'fatbj_Px',
-            'fatbj_Py',
-            'fatbj_Pz',
-            'fatbj_E',
-            'fatbj_softdropMass',
-            #'fatbj_btagDeepB',
-            'wj1_Px',
-            'wj1_Py',
-            'wj1_Pz',
-            'wj1_E', 
-            #'wj1_pt',
-            #'wj1_eta',
-            'wj1_bTagDeepFlavB',
-            'wj2_Px',
-            'wj2_Py',
-            'wj2_Pz',
-            'wj2_E',            
-            #'wj2_pt',
-            #'wj2_eta',
-            'wj2_bTagDeepFlavB ',
-            'nAk8Jets',
-            'nAk8BJets',
-            'nAk4JetsCleandWithAk8b',
-            'VBF_tag',
-            # HL variables #
-            'hT',
-            #'lepmet_DPhi',
-            'lepmet_pt',
-            'lep_MT',
-            'MET_LD',
-            'fatbj_lepDR',
-            'fatbj_lepDPhi',
-            'fatbj_Wj1DR',
-            'fatbj_wj2DR',
-            'wj1_lepDR',
-            'wj1_lepDPhi',
-            'wj2_lepDR',
-            'wj2_lepDPhi',
-            'wj1wj2_pt',
-            'wj1wj2DR',
-            'wj1wj2invM',
-            'mT_top_3particle',
-            #'WWplaneAngle_withMET', 
-            'HWplaneAngle',
-            'HWW_Simple_Mass',
-            #'HWW_dR',
-            #'cosThetaS_Hbb',
-            #'cosThetaS_Wjj_simple',
-            'cosThetaS_WW_simple_met ',
-            'cosThetaS_HH_simple_met',
+#            #'minSubJetLepDR',
 #            'MT_W1W2',
-#            'VBFj1pt',
-#            'VBFj2pt',
-#            'VBFj1eta',
-#            'VBFj2eta',
-#            'VBFj1j2dEta',
-#            'VBFj1j2dPhi',
-#            'VBFj1j2invM',
 #            'zeppenfeldVar',
-            #'HT2_lepJetMet',
-#            'HT2R_lepJetMet',
+#            #'HT2_lepJetMet',
+#            #'HT2R_lepJetMet',
 
     ]
 
@@ -448,22 +415,26 @@ mask_op = [len(inp.split('@'))==2 for inp  in  inputs]
 inputs = [inp.split('@')[0] for inp  in  inputs]
 
 #### Resolved ####
-#LBN_inputs = [
-#              'lep_E','lep_Px','lep_Py','lep_Pz',
-#              'bj1_E','bj1_Px','bj1_Py','bj1_Pz',
-#              'bj2_E','bj2_Px','bj2_Py','bj2_Pz',
-#              'wj1_E','wj1_Px','wj1_Py','wj1_Pz',
-#              'wj2_E','wj2_Px','wj2_Py','wj2_Pz',
-#             ]
-
-#### Boosted ####
 LBN_inputs = [
               'lep_E','lep_Px','lep_Py','lep_Pz',
-              'fatbj_E','fatbj_Px','fatbj_Py','fatbj_Pz',
+              'bj1_E','bj1_Px','bj1_Py','bj1_Pz',
+              'bj2_E','bj2_Px','bj2_Py','bj2_Pz',
               'wj1_E','wj1_Px','wj1_Py','wj1_Pz',
               'wj2_E','wj2_Px','wj2_Py','wj2_Pz',
              ]
-# /!\ format = [E,Px,Py,Pz] per particle
+
+#### Boosted ####
+#LBN_inputs = [
+#              'lep_E','lep_Px','lep_Py','lep_Pz',
+#              'fatbj_E','fatbj_Px','fatbj_Py','fatbj_Pz',
+#              'wj1_E','wj1_Px','wj1_Py','wj1_Pz',
+#              'wj2_E','wj2_Px','wj2_Py','wj2_Pz',
+#             ]
+#
+#
+
+#### /!\ format = [E,Px,Py,Pz] per particle
+
 
 assert len(LBN_inputs)%4 == 0
 

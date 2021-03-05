@@ -45,7 +45,7 @@ class DataCard:
             if self.datacardName is not None:
                 self.datacardName += "_pseudodata"
         self.content = {histName:{g:{} for g in self.groups.keys()} for histName in self.hist_conv.keys()}
-        self.systMissing = {histName:{group:[] for group in self.groups.keys()} for histName in self.hist_conv.keys()}
+        self.systPresent = {histName:{group:[] for group in self.groups.keys()} for histName in self.hist_conv.keys()}
 
         if self.quantiles is not None and self.rebin_factor is not None:
             raise RuntimeError("Cannot apply both quantile and classic rebinning")
@@ -88,11 +88,10 @@ class DataCard:
             if len(groups) == 0:
                 print("[WARNING] Could not find sample %s in group list"%sample)
                 continue
-
             hist_dict = self.getHistograms(f)
             for histName in hist_dict.keys():
                 for group in groups:
-                    self.systMissing[histName][group].append({'systematics': [systname for systname in hist_dict[histName].keys() if systname != 'nominal'],
+                    self.systPresent[histName][group].append({'systematics': [systname for systname in hist_dict[histName].keys() if systname != 'nominal'],
                                                               'nominal': copy.deepcopy(hist_dict[histName]['nominal'])})
 
             for group in groups:
@@ -131,9 +130,9 @@ class DataCard:
                         self.content[histname][group][systName].Add(hist)
 
     def correctMissingSystematics(self):
-        for histName in self.systMissing.keys():
-            for group in self.systMissing[histName].keys():
-                for sampleDict in self.systMissing[histName][group]:
+        for histName in self.systPresent.keys():
+            for group in self.systPresent[histName].keys():
+                for sampleDict in self.systPresent[histName][group]:
                     for systName in self.content[histName][group].keys():
                         if systName == "nominal":
                             continue
@@ -286,7 +285,7 @@ class DataCard:
                         else:
                             raise RuntimeError("Problem with syst {} : cannot find if Up or Down".format(systName))
                         if baseSyst not in self.systConvention.keys():
-                            raise RuntimeError("Could not find {} is systematic dict".format(baseSyst))
+                            raise RuntimeError("Could not find {} in systematic dict".format(baseSyst))
                         CMSName = self.systConvention[baseSyst]
                         systName = systName.replace(baseSyst,CMSName)
                         if '{era}' in systName:

@@ -25,16 +25,26 @@ def submit_on_slurm(name,args,debug=False):
     config.sbatch_qos = parameters.QOS
     config.sbatch_chdir = parameters.main_path
     config.sbatch_time = parameters.time
-    config.sbatch_memPerCPU= parameters.mem
     config.sbatch_additionalOptions = [parameters.additional_options]
-    if parameters.tasks > 1:
-        parameters.additional_options += ["-n {}".format(parameters.tasks)]
-    if parameters.cpus > 1:
-        parameters.additional_options += ["-n {}".format(parameters.cpus)]
+    config.sbatch_memPerCPU = parameters.mem
     if parameters.partition == 'cp3-gpu':
         config.sbatch_additionalOptions += ['--export=NONE']
-    if parameters.partition == 'gpu':
-        config.sbatch_additionalOptions += ['--gres=gpu:TeslaV100:'+str(parameters.gpus),'--export=NONE']
+        #if parameters.cpus > 1:
+        #    config.sbatch_additionalOptions += ["--cpus-per-gpu={}".format(parameters.cpus)]
+        #config.sbatch_additionalOptions += ['--mem-per-gpu={}'.format(parameters.mem)]
+    elif parameters.partition == 'gpu':
+        config.sbatch_additionalOptions += ['--gres=gpu:TeslaV100:{}'.format(parameters.gpus),'--export=NONE']
+        #config.sbatch_additionalOptions += ['--mem-per-gpu={}'.format(parameters.mem)]
+        #if parameters.cpus > 1:
+        #    config.sbatch_additionalOptions += ["--cpus-per-gpu={}".format(parameters.cpus)]
+        if parameters.cpus > 1:
+            #config.sbatch_additionalOptions += ["--cpus-per-gpu={}".format(parameters.cpus)]
+            config.sbatch_additionalOptions += ["--cpus-per-task={}".format(parameters.cpus)]
+    else:
+        if parameters.tasks > 1:
+            config.sbatch_additionalOptions += ["-n={}".format(parameters.tasks)]
+        if parameters.cpus > 1:
+            config.sbatch_additionalOptions += ["--cpus-per-task={}".format(parameters.cpus)]
         
     config.inputSandboxContent = []
     config.useJobArray = True

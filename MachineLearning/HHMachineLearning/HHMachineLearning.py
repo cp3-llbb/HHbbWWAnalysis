@@ -85,6 +85,8 @@ def get_options():
         help='Show DEGUG logging')
     f.add_argument('--nocache', action='store_true', required=False, default=False,
         help='Will not use the cache and will not save it')
+    f.add_argument('--interactive', action='store_true', required=False, default=False,
+        help='Interactive mode to chack the dataframe')
     f.add_argument('--GPU', action='store_true', required=False, default=False,
         help='GPU requires to execute some commandes before')
 
@@ -290,23 +292,26 @@ def main():
                                                       eras                      = era,
                                                       tree_name                 = parameters.tree_name,
                                                       additional_columns        = {'tag':node,'era':era},
-                                                      stop                      = 500000) # TODO : remove 
+                                                      stop                      = 300000) # TODO : remove 
 
                         #if data_node_era.shape[0]>1000000:
                         #    data_node_era = data_node_era.sample(n=1000000,axis=0) # TODO : remove
                         #data_cat_era = data_cat_era.sample(frac=1)[:50000] # TODO : remove 
                         era_str = '{:5s} class - {:15s} category - era {}  : sample size = {:10d}'.format(node,cat,era,data_cat_era.shape[0])
-                        if data_cat_era.shape[0] == 0:
-                            logging.info(era_str)
-                            continue
                         if data_cat is None:
                             data_cat = data_cat_era
                         else:
                             data_cat = pd.concat([data_cat,data_cat_era],axis=0)
+                        if data_cat_era.shape[0] == 0:
+                            logging.info(era_str)
+                            continue
                         if parameters.weight is not None:
                             era_str += ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_cat_era[parameters.weight].sum(),data_cat_era['event_weight'].sum())
                         logging.info(era_str)
                     cat_str = '{:5s} class - {:15s} category : sample size = {:10d}'.format(node,cat,data_cat.shape[0])
+                    if data_cat.shape[0] == 0:
+                        logging.info(cat_str)
+                        continue
                     if parameters.weight is not None:
                         era_str += ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_cat[parameters.weight].sum(),data_cat['event_weight'].sum())
                     if data_node is None:
@@ -318,17 +323,6 @@ def main():
                 if parameters.weight is not None:
                     all_eras_str +=  ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_node[parameters.weight].sum(),data_node['event_weight'].sum())
                 logging.info(all_eras_str)
-
-            # Weight equalization #
-            N = sum([data.shape[0] for data in data_dict.values()])/len(data_dict)
-            for node, data in data_dict.items():
-                if parameters.weight is not None:
-                    sum_weights = data['event_weight'].sum()
-                    logging.info('Sum of weight for %s samples : %.2e'%(node,sum_weights))
-                    data['learning_weights'] = data['event_weight']/sum_weights*N
-                    logging.info('\t -> After equalization : %0.2e (factor %0.2e)'%(data['learning_weights'].sum(),N/sum_weights))
-                else:
-                    data['learning_weights'] = pd.Series([1.]*data.shape[0],index=data.index)
 
             # Data splitting #
             train_dict = {}
@@ -396,10 +390,6 @@ def main():
                 test_all = pd.concat([test_all,test_cat],axis=1)
                 test_all[list_inputs+list_outputs] = test_all[list_inputs+list_outputs].astype('float32')
 
-            # Preprocessing #
-            # The purpose is to create a scaler object and save it
-            # The preprocessing will be implemented in the network with a custom layer
-            MakeScaler(train_all,list_inputs) 
 
           # Caching #
             if not opt.nocache:
@@ -425,6 +415,135 @@ def main():
                     logging.info('     %10s on %10d [%3.2f%%] events'%(slicename,n,n*100/N)+' (With mask indices : ['+','.join([str(s) for s in slices])+'])')
         else:
             logging.info("Sample size for the output  : %d"%test_all.shape[0])
+
+        # Preprocessing #
+        # The purpose is to create a scaler object and save it
+        # The preprocessing will be implemented in the network with a custom layer
+        MakeScaler(train_all,list_inputs) 
+
+        # Weight equalization #
+        N = train_all.shape[0]
+        sumweight_per_group = {}
+        factor_per_node = {}
+        factorsum = sum([factor for factor,_ in parameters.weight_groups])
+        for factor, group in parameters.weight_groups:
+            if not isinstance(group,tuple):
+                group = (group,)
+            if group not in sumweight_per_group.keys():
+                sumweight_per_group[group] = 0
+            for node in group:
+                sumweight_per_group[group] += train_all[train_all['tag']==node]['event_weight'].sum() 
+                if not parameters.crossvalidation:
+                    sumweight_per_group[group] += test_all[test_all['tag']==node]['event_weight'].sum() 
+                factor_per_node[node] = factor
+        sumweight_per_node = {node:sw for group,sw in sumweight_per_group.items() for node in group}
+
+        totweight_per_node = {}
+        train_all['learning_weight'] = pd.Series(np.zeros(train_all.shape[0]),index=train_all.index)
+        if not parameters.crossvalidation:
+            test_all['learning_weight'] = pd.Series(np.zeros(test_all.shape[0]),index=test_all.index)
+        for node in parameters.nodes:
+            sum_event_weight = train_all[train_all['tag']==node]['event_weight'].sum()
+            if not parameters.crossvalidation:
+                sum_event_weight += test_all[test_all['tag']==node]['event_weight'].sum()
+            logging.info('Sum of weight for {:6s} samples : {:.2e}'.format(node,sum_event_weight))
+            train_all.loc[train_all['tag']==node,'learning_weight'] = train_all[train_all['tag']==node]['event_weight'] * (factor_per_node[node]/factorsum) * (N/sumweight_per_node[node])
+            if not parameters.crossvalidation:
+                test_all.loc[test_all['tag']==node,'learning_weight'] = test_all[test_all['tag']==node]['event_weight'] * (factor_per_node[node]/factorsum) * (N/sumweight_per_node[node])
+            sum_learning_weight = train_all[train_all['tag']==node]['learning_weight'].sum()
+            if not parameters.crossvalidation:
+                sum_learning_weight += test_all[test_all['tag']==node]['learning_weight'].sum()
+            logging.info('\t -> After equalization  : {:.2e} (factor {:.2e})'.format(sum_learning_weight,sum_learning_weight/sum_event_weight))
+            totweight_per_node[node] = sum_learning_weight
+        logging.info("Proportions are as follows")
+        for node in totweight_per_node.keys():
+            logging.info("\t Node {:6s} : total weight = {:.2e} [{:3.2f}%]".format(node,totweight_per_node[node],totweight_per_node[node]/sum(totweight_per_node.values())*100))
+
+        # Quantile correction #
+ #       if opt.scan != '':
+        quantile_lim = train_all['learning_weight'].quantile(parameters.quantile)
+        idx_to_repeat = train_all['learning_weight'] >= quantile_lim
+        events_excess = train_all[idx_to_repeat]
+
+        logging.info("{} events have learning weight above the {:0.2f} quantile at {:3f} (compared to mean {:3f})".format(events_excess.shape[0],parameters.quantile,quantile_lim,train_all['learning_weight'].mean()))
+        logging.info("-> These events will be repeated and their learning weights reduced accordingly to avoid unstability :")
+        tags = sorted(pd.unique(train_all['tag']))
+        prop_tag = {tag:(train_all[train_all['tag']==tag].shape[0],train_all[train_all['tag']==tag]['learning_weight'].sum()) for tag in tags}
+        for tag in tags:
+            events_excess_tag = events_excess[events_excess['tag']==tag]['learning_weight']
+            logging.info("\t{:6s} class : {:8d} events in [{:8.2f} : {:8.2f}]".format(tag,events_excess_tag.shape[0],events_excess_tag.min(),events_excess_tag.max()))
+
+        factor = (events_excess['learning_weight']/quantile_lim).values.astype(np.int32)
+        train_all.loc[idx_to_repeat,'learning_weight'] /= factor
+        arr_to_repeat = train_all[idx_to_repeat].values
+        repetition = np.repeat(np.arange(arr_to_repeat.shape[0]), factor-1)
+        df_repeated = pd.DataFrame(np.take(arr_to_repeat,repetition,axis=0),columns=train_all.columns)
+        df_repeated = df_repeated.astype(train_all.dtypes.to_dict()) # otherwise dtypes are object
+        train_all = pd.concat((train_all,df_repeated),axis=0,ignore_index=True).sample(frac=1)
+        logging.info("Effect of the repetitions :")
+        for tag in tags:
+            logging.info("\t{:6s} class : {:8d} events [learning weights = {:12.2f}] -> {:8d} events [learning weights = {:12.2f}]".format(tag,*prop_tag[tag],train_all[train_all['tag']==tag].shape[0],train_all[train_all['tag']==tag]['learning_weight'].sum()))
+            
+        logging.info("")
+
+
+        # Plot learning weights in terminal #
+        import plotille
+        for node in ["all"] + parameters.nodes:
+            logging.info('Class {}'.format(node))
+            height = 10
+            bins = 100
+            if node == 'all':
+                content = train_all['learning_weight']
+            else:
+                content = train_all[train_all[node]==1]['learning_weight']
+            x_max = content.max()
+            y_max = np.histogram(content.array,bins=bins)[0].max()
+            base = len(str(int(y_max)))
+            plot = plotille.histogram(X         = content,
+                                      bins      = bins,
+                                      X_label   = "Learning weight",
+                                      Y_label   = "Events",
+                                      color_mode= 'byte',
+                                      lc        = 25,
+                                      x_min     = 0.,
+                                      x_max     = x_max + (bins - x_max % bins),
+                                      y_min     = 0.,
+                                      y_max     = math.ceil(y_max / 10**(base-2))*10**(base-2),
+                                      height    = height,
+                                      width     = 100)
+
+            for line in plot.split('\n'):
+                logging.info(line)
+            logging.info('')
+
+        # Check of batch content #
+        n_trials = 20
+        for batch_size in parameters.p['batch_size']:
+            logging.info("With a batch size of {} (average of {} trials)".format(batch_size,n_trials))
+            tags = sorted(pd.unique(train_all['tag']))
+            n_per_tag = {tag:[] for tag in tags}
+            w_per_tag = {tag:[] for tag in tags}
+            mw_per_tag = {tag:[] for tag in tags}
+            sw_per_tag = {tag:[] for tag in tags}
+            for _ in range(n_trials):
+                sample = train_all.sample(n=batch_size)
+                for tag in tags:
+                    n_per_tag[tag].append(sample[sample['tag']==tag].shape[0])
+                    w_per_tag[tag].append(sample[sample['tag']==tag]['learning_weight'].sum())
+                    mw_per_tag[tag].append(sample[sample['tag']==tag]['learning_weight'].mean())
+                    sw_per_tag[tag].append(sample[sample['tag']==tag]['learning_weight'].var())
+            for tag in tags:
+                logging.info("\t{:6s} class : N = {:8.0f}, Sum of weights = {:12.5f} [{:3.2f}%], Mean of weights = {:10.5f}, Variance of weights = {:10.5f}".format(tag,
+                        sum(n_per_tag[tag])/n_trials,
+                        sum(w_per_tag[tag])/n_trials,
+                        sum(w_per_tag[tag])/sum([sum(w_per_tag[t]) for t in tags])*100,
+                        sum(mw_per_tag[tag])/n_trials,
+                        sum(sw_per_tag[tag])/n_trials))
+                
+
+
+
     else:
         logging.info("You asked for generator so no data input has been done")
         list_samples = [os.path.join(sampleConfig['sampleDir'],sample) for era in parameters.eras for samples in sampleConfig['sampleDict'][int(era)].values() for sample in samples ]
@@ -443,6 +562,11 @@ def main():
         test_all = None
 
     list_inputs += [inp for inp in parameters.LBN_inputs if inp not in list_inputs]
+
+    if opt.interactive:
+        import IPython
+        IPython.embed()
+
 
     #############################################################################################
     # DNN #

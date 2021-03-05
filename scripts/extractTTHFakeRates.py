@@ -64,8 +64,10 @@ for cat,h_nom,h_ups,h_downs in zip(["Electron","Muon"],[el_nom,mu_nom],[el_hist_
                     xbinning.append(xMin)
                 if xMax not in xbinning:
                     xbinning.append(xMax)
-                err_up = h_up.GetBinContent(x,y)/nom
-                err_down = h_down.GetBinContent(x,y)/nom
+                up = h_up.GetBinContent(x,y)
+                down = h_down.GetBinContent(x,y)
+                err_up = (up-nom)/nom
+                err_down = (nom-down)/nom
                 ydict['values'].append({'bin':[xMin,xMax],
                                         'value':nom,
                                         'error_low':err_down,
