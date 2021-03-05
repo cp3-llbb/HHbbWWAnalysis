@@ -25,6 +25,7 @@ def submit_on_slurm(name,args,debug=False):
     config.sbatch_qos = parameters.QOS
     config.sbatch_chdir = parameters.main_path
     config.sbatch_time = parameters.time
+<<<<<<< HEAD
     config.sbatch_additionalOptions = [parameters.additional_options]
     config.sbatch_memPerCPU = parameters.mem
     if parameters.partition == 'cp3-gpu':
@@ -45,6 +46,18 @@ def submit_on_slurm(name,args,debug=False):
             config.sbatch_additionalOptions += ["-n={}".format(parameters.tasks)]
         if parameters.cpus > 1:
             config.sbatch_additionalOptions += ["--cpus-per-task={}".format(parameters.cpus)]
+=======
+    config.sbatch_memPerCPU= parameters.mem
+    config.sbatch_additionalOptions = [parameters.additional_options]
+    if parameters.tasks > 1:
+        parameters.additional_options += ["-n {}".format(parameters.tasks)]
+    if parameters.cpus > 1:
+        parameters.additional_options += ["-n {}".format(parameters.cpus)]
+    if parameters.partition == 'cp3-gpu':
+        config.sbatch_additionalOptions += ['--export=NONE']
+    if parameters.partition == 'gpu':
+        config.sbatch_additionalOptions += ['--gres=gpu:TeslaV100:'+str(parameters.gpus),'--export=NONE']
+>>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
         
     config.inputSandboxContent = []
     config.useJobArray = True

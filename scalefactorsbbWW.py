@@ -96,11 +96,14 @@ class ScaleFactorsbbWW:
                                                 base_key    = '{channel}_{variable}_{type}_{btag}',
                                                 base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
                                                 format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
+<<<<<<< HEAD
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
                                                 entry_key   = 'DY_non_closure_2016',
                                                 base_key    = '{channel}_{cat}_{var}',
                                                 base_str    = 'HH_cat_{channel}_{cat}_{var}_2016.json',
                                                 format_dict = {'channel':['ee','mm'],('cat','var'):[('boosted1b','B_M'),('resolved1b','HT'),('resolved2b','HT')]})
+=======
+>>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
 
         #  Fake rates #
@@ -128,10 +131,17 @@ class ScaleFactorsbbWW:
 
         # Ak8 efficiency btagging #
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'Btag_SF',
+<<<<<<< HEAD
                                                 entry_key   = 'ak8btag_eff',
                                                 base_key    = 'eff_{flav}_{era}',
                                                 base_str    = 'BtagEff_{flav}_{era}.json',
                                                 format_dict = {'flav':['bjets','cjets','lightjets'],'era':['2016','2017','2018']})
+=======
+                                                entry_key   = 'ak8btag_eff_2016',
+                                                base_key    = 'eff_{flav}',
+                                                base_str    = 'BtagAk8_{flav}_2016.json',
+                                                format_dict = {'flav':['bjets','cjets','lightjets']})
+>>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
         #----- 2017 -----#
         # Check links of 2016 #
@@ -186,11 +196,15 @@ class ScaleFactorsbbWW:
                                                 base_key    = '{channel}_{variable}_{type}_{btag}',
                                                 base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2017.json',
                                                 format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
+<<<<<<< HEAD
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
                                                 entry_key   = 'DY_non_closure_2017',
                                                 base_key    = '{channel}_{cat}_{var}',
                                                 base_str    = 'HH_cat_{channel}_{cat}_{var}_2017.json',
                                                 format_dict = {'channel':['ee','mm'],('cat','var'):[('boosted1b','B_M'),('resolved1b','HT'),('resolved2b','HT')]})
+=======
+
+>>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
         ### POG ID ###
             # https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017
@@ -269,11 +283,14 @@ class ScaleFactorsbbWW:
                                                 base_key    = '{channel}_{variable}_{type}_{btag}',
                                                 base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2018.json',
                                                 format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
+<<<<<<< HEAD
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
                                                 entry_key   = 'DY_non_closure_2018',
                                                 base_key    = '{channel}_{cat}_{var}',
                                                 base_str    = 'HH_cat_{channel}_{cat}_{var}_2018.json',
                                                 format_dict = {'channel':['ee','mm'],('cat','var'):[('boosted1b','B_M'),('resolved1b','HT'),('resolved2b','HT')]})
+=======
+>>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
         ### POG ID ###
             # https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017

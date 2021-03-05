@@ -85,8 +85,11 @@ def get_options():
         help='Show DEGUG logging')
     f.add_argument('--nocache', action='store_true', required=False, default=False,
         help='Will not use the cache and will not save it')
+<<<<<<< HEAD
     f.add_argument('--interactive', action='store_true', required=False, default=False,
         help='Interactive mode to chack the dataframe')
+=======
+>>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
     f.add_argument('--GPU', action='store_true', required=False, default=False,
         help='GPU requires to execute some commandes before')
 
@@ -292,25 +295,41 @@ def main():
                                                       eras                      = era,
                                                       tree_name                 = parameters.tree_name,
                                                       additional_columns        = {'tag':node,'era':era},
+<<<<<<< HEAD
                                                       stop                      = 300000) # TODO : remove 
+=======
+                                                      stop                      = 500000) # TODO : remove 
+>>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
                         #if data_node_era.shape[0]>1000000:
                         #    data_node_era = data_node_era.sample(n=1000000,axis=0) # TODO : remove 
                         era_str = '{:5s} class - {:15s} category - era {}  : sample size = {:10d}'.format(node,cat,era,data_cat_era.shape[0])
+<<<<<<< HEAD
+=======
+                        if data_cat_era.shape[0] == 0:
+                            logging.info(era_str)
+                            continue
+>>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
                         if data_cat is None:
                             data_cat = data_cat_era
                         else:
                             data_cat = pd.concat([data_cat,data_cat_era],axis=0)
+<<<<<<< HEAD
                         if data_cat_era.shape[0] == 0:
                             logging.info(era_str)
                             continue
+=======
+>>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
                         if parameters.weight is not None:
                             era_str += ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_cat_era[parameters.weight].sum(),data_cat_era['event_weight'].sum())
                         logging.info(era_str)
                     cat_str = '{:5s} class - {:15s} category : sample size = {:10d}'.format(node,cat,data_cat.shape[0])
+<<<<<<< HEAD
                     if data_cat.shape[0] == 0:
                         logging.info(cat_str)
                         continue
+=======
+>>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
                     if parameters.weight is not None:
                         era_str += ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_cat[parameters.weight].sum(),data_cat['event_weight'].sum())
                     if data_node is None:
@@ -323,6 +342,20 @@ def main():
                     all_eras_str +=  ', weight sum = {:.3e} (with normalization = {:.3e})'.format(data_node[parameters.weight].sum(),data_node['event_weight'].sum())
                 logging.info(all_eras_str)
 
+<<<<<<< HEAD
+=======
+            # Weight equalization #
+            N = sum([data.shape[0] for data in data_dict.values()])/len(data_dict)
+            for node, data in data_dict.items():
+                if parameters.weight is not None:
+                    sum_weights = data['event_weight'].sum()
+                    logging.info('Sum of weight for %s samples : %.2e'%(node,sum_weights))
+                    data['learning_weights'] = data['event_weight']/sum_weights*N
+                    logging.info('\t -> After equalization : %0.2e (factor %0.2e)'%(data['learning_weights'].sum(),N/sum_weights))
+                else:
+                    data['learning_weights'] = pd.Series([1.]*data.shape[0],index=data.index)
+
+>>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
             # Data splitting #
             train_dict = {}
             test_dict = {}
@@ -389,6 +422,13 @@ def main():
                 test_all = pd.concat([test_all,test_cat],axis=1)
                 test_all[list_inputs+list_outputs] = test_all[list_inputs+list_outputs].astype('float32')
 
+<<<<<<< HEAD
+=======
+            # Preprocessing #
+            # The purpose is to create a scaler object and save it
+            # The preprocessing will be implemented in the network with a custom layer
+            MakeScaler(train_all,list_inputs) 
+>>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
 
           # Caching #
             if not opt.nocache:
@@ -414,6 +454,7 @@ def main():
                     logging.info('     %10s on %10d [%3.2f%%] events'%(slicename,n,n*100/N)+' (With mask indices : ['+','.join([str(s) for s in slices])+'])')
         else:
             logging.info("Sample size for the output  : %d"%test_all.shape[0])
+<<<<<<< HEAD
 
         # Preprocessing #
         # The purpose is to create a scaler object and save it
@@ -543,6 +584,8 @@ def main():
 
 
 
+=======
+>>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
     else:
         logging.info("You asked for generator so no data input has been done")
         list_samples = [os.path.join(sampleConfig['sampleDir'],sample) for era in parameters.eras for samples in sampleConfig['sampleDict'][int(era)].values() for sample in samples ]
@@ -562,11 +605,14 @@ def main():
 
     list_inputs += [inp for inp in parameters.LBN_inputs if inp not in list_inputs]
 
+<<<<<<< HEAD
     if opt.interactive:
         import IPython
         IPython.embed()
 
 
+=======
+>>>>>>> eed57b2aa0f195c36370ef8af9adb2772972dcc4
     #############################################################################################
     # DNN #
     #############################################################################################
