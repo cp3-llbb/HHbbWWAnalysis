@@ -33,7 +33,7 @@ class Analyze:
         self.path_out    = os.path.join(os.path.abspath("."),suffix)
         self.N           = N
         self.suffix      = suffix
-        self.cacheName   = 'cache_df.pkl'
+        self.cacheName   = 'cache_{}_df.pkl'.format(suffix)
 
         self.custom_objects =  {'LBNLayer':LBNLayer} 
         self.custom_objects.update({name:getattr(Operations,name) for name in dir(Operations) if name.startswith('op')})
@@ -53,31 +53,40 @@ class Analyze:
                 raise RuntimeError("You need to specify a number of events")
             # Import arrays #
             data_dict = {}
-            for node in parameters.nodes:
-                logging.info('Starting data importation for class %s'%node)
-                strSelect = [f'{cat}_{channel}_{node}' for channel in parameters.channels for cat in parameters.categories]
-                data_node = None
 
-                for era in parameters.eras:
-                    samples_dict = sampleConfig['sampleDict'][int(era)]
-                    if len(samples_dict.keys())==0:
-                        logging.info('\tSample dict for era {} is empty'.format(era))
-                        continue
-                    list_sample = [sample for key in strSelect for sample in samples_dict[key]]
-                    data_node_era = LoopOverTrees(input_dir                 = sampleConfig['sampleDir'],
-                                                  variables                 = variables,
-                                                  list_sample               = list_sample,
-                                                  cut                       = parameters.cut,
-                                                  eras                      = era,
-                                                  tree_name                 = parameters.tree_name,
-                                                  additional_columns        = {'tag':node,'era':era},
-                                                  stop                      = self.N) 
+            for node in parameters.nodes:
+                logging.info('Starting data importation for class {}'.format(node))
+                data_node = None
+                for cat in parameters.categories:
+                    logging.info('... Starting data importation for jet category {}'.format(cat))
+                    strSelect = [f'{cat}_{channel}_{node}' for channel in parameters.channels]
+                    data_cat = None
+                    for era in parameters.eras:
+                        samples_dict = sampleConfig['sampleDict'][int(era)]
+                        if len(samples_dict.keys())==0:
+                            logging.info('\tSample dict for era {} is empty'.format(era))
+                            continue
+                        list_sample = [sample for key in strSelect for sample in samples_dict[key]]
+                        data_cat_era = LoopOverTrees(input_dir                 = sampleConfig['sampleDir'],
+                                                      variables                 = variables,
+                                                      weight                    = parameters.weight,
+                                                      list_sample               = list_sample,
+                                                      cut                       = parameters.cut,
+                                                      eras                      = era,
+                                                      tree_name                 = parameters.tree_name,
+                                                      additional_columns        = {'tag':node,'era':era},
+                                                      stop                      = self.N) 
+
+                        if data_cat is None:
+                            data_cat = data_cat_era
+                        else:
+                            data_cat = pd.concat([data_cat,data_cat_era],axis=0)
                     if data_node is None:
-                        data_node = data_node_era
+                        data_node = data_cat
                     else:
-                        data_node = pd.concat([data_node,data_node_era],axis=0)
-                    logging.info('{:5s} class in era {}  : sample size = {:10d}'.format(node,era,data_node_era.shape[0]))
+                        data_node = pd.concat([data_node,data_cat],axis=0)
                 data_dict[node] = data_node
+                print('{:5s} class - all categories : sample size = {:10d}'.format(node,data_node.shape[0]))
             self.data = pd.concat(data_dict.values(),copy=True).reset_index(drop=True)
             self.saveDF()
         else:
