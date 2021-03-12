@@ -30,7 +30,9 @@ class highlevelLambdas:
         self.DilepMET_Pt = lambda l1,l2,met : op.sqrt(op.pow(met.pt*op.cos(met.phi)+self.ll_p4(l1,l2).Px(),2)+op.pow(met.pt*op.sin(met.phi)+self.ll_p4(l1,l2).Py(),2))
         # SingleLep-Met variables
         self.SinglepMet_Pt = lambda lep,met : op.sqrt(op.pow(met.pt*op.cos(met.phi)+lep.p4.Px(),2)+op.pow(met.pt*op.sin(met.phi)+lep.p4.Py(),2))
+        #self.SinglepMet_Pt = lambda lep,met : (lep.p4 + met.p4).Pt()
         self.SinglepMet_dPhi = lambda lep, met : lep.p4.Phi()-met.phi
+        #self.SinglepMet_dPhi = lambda lep, met : op.deltaPhi(lep.p4,met.p4)
         
         # Transverse mass #
         self.MT_ll = lambda l1,l2,met : op.sqrt(2*self.ll_p4(l1,l2).Pt()*met.pt*(1-op.cos(self.ll_p4(l1,l2).Phi()-met.phi)))

@@ -81,10 +81,10 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         # ---------- LBN+DNN models ----------- #
         #path_model_resolved = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Resolved','Resolved'+str(era)+'.pb')
         #path_model_boosted  = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Boosted','Boosted_allEras_x512.pb')
-        path_model_resolved_SM  = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Resolved','Resolved'+str(era)+'SM_crossval.pb')
-        path_model_resolved_BSM = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Resolved','Resolved'+str(era)+'BSM_crossval.pb')
-        path_model_boosted_SM   = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Boosted','BoostedSM_crossval.pb')
-        path_model_boosted_BSM  = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Boosted','BoostedBSM_crossval.pb')
+        path_model_resolved_SM  = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Resolved','Resolved'+str(era)+'SMv2.pb')
+        path_model_resolved_BSM = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Resolved','Resolved'+str(era)+'BSMv2.pb')
+        path_model_boosted_SM   = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Boosted','BoostedSMv2.pb')
+        path_model_boosted_BSM  = os.path.join('/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/MachineLearning/ml-models/DNN/Boosted','BoostedBSMv2.pb')
         logger.info('DNN_Model_Resolved {}, {}'.format(path_model_resolved_SM, path_model_resolved_BSM))
         logger.info('DNN_Model_Boosted {}, {}'.format(path_model_boosted_SM, path_model_boosted_BSM))
         plots = []
@@ -542,7 +542,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
                 # DNN objects
                 DNN_1b1Wj_SM  = op.mvaEvaluator(path_model_resolved_SM,mvaType='Tensorflow',otherArgs=(input_names_1b1Wj, output_name))
-                DNN_1b1Wj_BSM = op.mvaEvaluator(path_model_resolved_SM,mvaType='Tensorflow',otherArgs=(input_names_1b1Wj, output_name))
+                DNN_1b1Wj_BSM = op.mvaEvaluator(path_model_resolved_BSM,mvaType='Tensorflow',otherArgs=(input_names_1b1Wj, output_name))
 
                 inputs_array_1b1Wj_El = [op.array("double",val) for val in inputStaticCast(inputsClassic_1b1Wj_El,"float")]
                 inputs_array_1b1Wj_El.append(op.array("double",*inputStaticCast(inputsLBN_1b1Wj_El,"float")))
@@ -634,8 +634,8 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                                             'is_MC':self.is_MC})
 
 
-            #if "Res0b" in jetplot_level or "Resolved" in jetplot_level:
-            if "Res0b" in jetplot_level:
+            if "Res0b" in jetplot_level or "Resolved" in jetplot_level:
+            #if "Res0b" in jetplot_level:
                 logger.info ('...... JPA : 0b Node Selection')
                 ElSelObjResolved0b    = ElResolvedSelObjJetsIdxPerJpaNodeDict.get('0b')[0]
                 MuSelObjResolved0b    = MuResolvedSelObjJetsIdxPerJpaNodeDict.get('0b')[0]
@@ -697,59 +697,59 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 outputBSM = selObjectDNNDict['DNN_Score_BSM']
                 vbfJets   = selObjectDNNDict['VBF_Jets']
                 selObj = selObjectDNNDict['selObject']
-                selObj_0b = makeExclusiveLooseResolvedJetComboSelection(self, selObj, 0, copy_sel=True)
+                #selObj_0b = makeExclusiveLooseResolvedJetComboSelection(self, selObj, 0, copy_sel=True)
                 selObj_1b = makeExclusiveLooseResolvedJetComboSelection(self, selObj, 1, copy_sel=True)
                 selObj_2b = makeExclusiveLooseResolvedJetComboSelection(self, selObj, 2, copy_sel=True)
-                selObj_hasVBF    = makeVBFSelection(self, selObj, vbfJets, copy_sel=True)
-                selObj_0b_hasVBF = makeVBFSelection(self, selObj_0b, vbfJets, copy_sel=True)
-                selObj_1b_hasVBF = makeVBFSelection(self, selObj_1b, vbfJets, copy_sel=True)
-                selObj_2b_hasVBF = makeVBFSelection(self, selObj_2b, vbfJets, copy_sel=True)
-                selObj_hasNoVBF    = makeNoVBFSelection(self, selObj, vbfJets, copy_sel=True)
-                selObj_0b_hasNoVBF = makeNoVBFSelection(self, selObj_0b, vbfJets, copy_sel=True)
-                selObj_1b_hasNoVBF = makeNoVBFSelection(self, selObj_1b, vbfJets, copy_sel=True)
-                selObj_2b_hasNoVBF = makeNoVBFSelection(self, selObj_2b, vbfJets, copy_sel=True)
+                #selObj_hasVBF    = makeVBFSelection(self, selObj, vbfJets, copy_sel=True)
+                #selObj_0b_hasVBF = makeVBFSelection(self, selObj_0b, vbfJets, copy_sel=True)
+                #selObj_1b_hasVBF = makeVBFSelection(self, selObj_1b, vbfJets, copy_sel=True)
+                #selObj_2b_hasVBF = makeVBFSelection(self, selObj_2b, vbfJets, copy_sel=True)
+                #selObj_hasNoVBF    = makeNoVBFSelection(self, selObj, vbfJets, copy_sel=True)
+                #selObj_0b_hasNoVBF = makeNoVBFSelection(self, selObj_0b, vbfJets, copy_sel=True)
+                #selObj_1b_hasNoVBF = makeNoVBFSelection(self, selObj_1b, vbfJets, copy_sel=True)
+                #selObj_2b_hasNoVBF = makeNoVBFSelection(self, selObj_2b, vbfJets, copy_sel=True)
 
                 # SM DNN node selections
-                selObjNodesDict_SM    = makeDNNOutputNodesSelections(self,selObj,outputSM,suffix='_SM_')
-                selObjNodesDict_SM_0b = makeDNNOutputNodesSelections(self,selObj_0b,outputSM,suffix='_SM_')
+                #selObjNodesDict_SM    = makeDNNOutputNodesSelections(self,selObj,outputSM,suffix='_SM_')
+                #selObjNodesDict_SM_0b = makeDNNOutputNodesSelections(self,selObj_0b,outputSM,suffix='_SM_')
                 selObjNodesDict_SM_1b = makeDNNOutputNodesSelections(self,selObj_1b,outputSM,suffix='_SM_')
                 selObjNodesDict_SM_2b = makeDNNOutputNodesSelections(self,selObj_2b,outputSM,suffix='_SM_')
                 # BSM DNN node selections
-                selObjNodesDict_BSM    = makeDNNOutputNodesSelections(self,selObj,outputBSM,suffix='_BSM_')
-                selObjNodesDict_BSM_0b = makeDNNOutputNodesSelections(self,selObj_0b,outputBSM,suffix='_BSM_')
+                #selObjNodesDict_BSM    = makeDNNOutputNodesSelections(self,selObj,outputBSM,suffix='_BSM_')
+                #selObjNodesDict_BSM_0b = makeDNNOutputNodesSelections(self,selObj_0b,outputBSM,suffix='_BSM_')
                 selObjNodesDict_BSM_1b = makeDNNOutputNodesSelections(self,selObj_1b,outputBSM,suffix='_BSM_')
                 selObjNodesDict_BSM_2b = makeDNNOutputNodesSelections(self,selObj_2b,outputBSM,suffix='_BSM_')
                 # has VBF Jet Pairs
-                selObjNodesDict_hasVBF_BSM       = makeDNNOutputNodesSelections(self,selObj_hasVBF,outputBSM,suffix='_BSM_')
-                selObjNodesDict_hasVBF_BSM_0b    = makeDNNOutputNodesSelections(self,selObj_0b_hasVBF,outputBSM,suffix='_BSM_')
-                selObjNodesDict_hasVBF_BSM_1b    = makeDNNOutputNodesSelections(self,selObj_1b_hasVBF,outputBSM,suffix='_BSM_')
-                selObjNodesDict_hasVBF_BSM_2b    = makeDNNOutputNodesSelections(self,selObj_2b_hasVBF,outputBSM,suffix='_BSM_')
+                #selObjNodesDict_hasVBF_BSM       = makeDNNOutputNodesSelections(self,selObj_hasVBF,outputBSM,suffix='_BSM_')
+                #selObjNodesDict_hasVBF_BSM_0b    = makeDNNOutputNodesSelections(self,selObj_0b_hasVBF,outputBSM,suffix='_BSM_')
+                #selObjNodesDict_hasVBF_BSM_1b    = makeDNNOutputNodesSelections(self,selObj_1b_hasVBF,outputBSM,suffix='_BSM_')
+                #selObjNodesDict_hasVBF_BSM_2b    = makeDNNOutputNodesSelections(self,selObj_2b_hasVBF,outputBSM,suffix='_BSM_')
                 # has No VBF Jet Pairs
-                selObjNodesDict_hasNoVBF_BSM       = makeDNNOutputNodesSelections(self,selObj_hasNoVBF,outputBSM,suffix='_BSM_')
-                selObjNodesDict_hasNoVBF_BSM_0b    = makeDNNOutputNodesSelections(self,selObj_0b_hasNoVBF,outputBSM,suffix='_BSM_')
-                selObjNodesDict_hasNoVBF_BSM_1b    = makeDNNOutputNodesSelections(self,selObj_1b_hasNoVBF,outputBSM,suffix='_BSM_')
-                selObjNodesDict_hasNoVBF_BSM_2b    = makeDNNOutputNodesSelections(self,selObj_2b_hasNoVBF,outputBSM,suffix='_BSM_')
+                #selObjNodesDict_hasNoVBF_BSM       = makeDNNOutputNodesSelections(self,selObj_hasNoVBF,outputBSM,suffix='_BSM_')
+                #selObjNodesDict_hasNoVBF_BSM_0b    = makeDNNOutputNodesSelections(self,selObj_0b_hasNoVBF,outputBSM,suffix='_BSM_')
+                #selObjNodesDict_hasNoVBF_BSM_1b    = makeDNNOutputNodesSelections(self,selObj_1b_hasNoVBF,outputBSM,suffix='_BSM_')
+                #selObjNodesDict_hasNoVBF_BSM_2b    = makeDNNOutputNodesSelections(self,selObj_2b_hasNoVBF,outputBSM,suffix='_BSM_')
                 
                 #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDNNDict['selObject'].sel,selObjectDNNDict['selObject'].selName,selObjectDNNDict['channel'],inputs))
                 logger.info('Filling DNN responses')
                 #plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_SM,outputSM,self.nodes,channel=selObjectDNNDict['channel']))
                 #plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_SM_0b,outputSM,self.nodes,channel=selObjectDNNDict['channel']))
-                #plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_SM_1b,outputSM,self.nodes,channel=selObjectDNNDict['channel']))
-                #plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_SM_2b,outputSM,self.nodes,channel=selObjectDNNDict['channel']))
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_BSM,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_BSM_0b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
+                plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_SM_1b,outputSM,self.nodes,channel=selObjectDNNDict['channel']))
+                plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_SM_2b,outputSM,self.nodes,channel=selObjectDNNDict['channel']))
+                #plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_BSM,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
+                #plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_BSM_0b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
                 plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_BSM_1b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
                 plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_BSM_2b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
                 # BSM with VBFs
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasVBF_BSM,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasVBF_BSM_0b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasVBF_BSM_1b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasVBF_BSM_2b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
+                #plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasVBF_BSM,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
+                #plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasVBF_BSM_0b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
+                #plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasVBF_BSM_1b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
+                #plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasVBF_BSM_2b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
                 # BSM with no VBFs
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasNoVBF_BSM,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasNoVBF_BSM_0b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasNoVBF_BSM_1b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasNoVBF_BSM_2b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
+                #plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasNoVBF_BSM,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
+                #plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasNoVBF_BSM_0b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
+                #plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasNoVBF_BSM_1b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
+                #plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasNoVBF_BSM_2b,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
 
         # ========================== JPA Boosted Categories ========================= #
         if any(item in boosted_args for item in jetsel_level):
@@ -941,18 +941,18 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 outputBSM = selObjectDNNDict['DNN_Score_BSM']
                 vbfJets   = selObjectDNNDict['VBF_Jets']
                 selObj = selObjectDNNDict['selObject']
-                selObj_hasVBF  = makeVBFSelection(self, selObj, vbfJets, copy_sel=True)
-                selObj_hasNoVBF  = makeNoVBFSelection(self, selObj, vbfJets, copy_sel=True)
+                #selObj_hasVBF  = makeVBFSelection(self, selObj, vbfJets, copy_sel=True)
+                #selObj_hasNoVBF  = makeNoVBFSelection(self, selObj, vbfJets, copy_sel=True)
                 selObjNodesDict_SM     = makeDNNOutputNodesSelections(self,selObj,outputSM,suffix='_SM_')
                 selObjNodesDict_BSM    = makeDNNOutputNodesSelections(self,selObj,outputBSM,suffix='_BSM_')
-                selObjNodesDict_hasVBF_BSM = makeDNNOutputNodesSelections(self,selObj_hasVBF,outputBSM,suffix='_BSM_')
-                selObjNodesDict_hasNoVBF_BSM = makeDNNOutputNodesSelections(self,selObj_hasNoVBF,outputBSM,suffix='_BSM_')
+                #selObjNodesDict_hasVBF_BSM = makeDNNOutputNodesSelections(self,selObj_hasVBF,outputBSM,suffix='_BSM_')
+                #selObjNodesDict_hasNoVBF_BSM = makeDNNOutputNodesSelections(self,selObj_hasNoVBF,outputBSM,suffix='_BSM_')
                 #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDNNDict['selObject'].sel,selObjectDNNDict['selObject'].selName,selObjectDNNDict['channel'],inputs))
                 logger.info('Filling DNN responses Boosted')
-                #plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_SM,outputSM,self.nodes,channel=selObjectDNNDict['channel']))
+                plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_SM,outputSM,self.nodes,channel=selObjectDNNDict['channel']))
                 plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_BSM,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasVBF_BSM,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasNoVBF_BSM,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
+                #plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasVBF_BSM,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
+                #plots.extend(makeDoubleLeptonMachineLearningOutputPlotsSignalNodesOnly(selObjNodesDict_hasNoVBF_BSM,outputBSM,self.nodes,channel=selObjectDNNDict['channel']))
                       
                 
         #----- Add the Yield plots -----#
