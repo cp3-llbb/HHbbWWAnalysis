@@ -21,6 +21,7 @@ from JPA import *
 from bamboo.root import gbl
 import ROOT
 from DDHelper import DataDrivenFake, DataDrivenDY
+from mvaEvaluatorSL import *
 #from bamboo.root import loadHeader
 #loadHeader("jpa.h")
 
@@ -720,7 +721,7 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep['HWW_dR'] = self.HLL.dR_Hww(jet3.p4,jet4.p4,lepton.p4,MET)           if has2ndWjet else op.static_cast("Float_t",op.c_float(0.))
             varsToKeep['HWWLepDR']   = op.deltaR(jet3.p4+jet4.p4, lepton.p4)                if has2ndWjet else op.static_cast("Float_t",op.c_float(0.)) ###
             varsToKeep['HWWLepDPhi'] = op.abs(op.deltaPhi(jet3.p4+jet4.p4, lepton.p4))      if has2ndWjet else op.static_cast("Float_t",op.c_float(0.)) ###
-            varsToKeep['HWWMetDPhi'] = op.abs(op.deltaPhi(jet4.p4+jet4.p4, MET.p4))         if has2ndWjet else op.static_cast("Float_t",op.c_float(0.)) ###
+            varsToKeep['HWWMetDPhi'] = op.abs(op.deltaPhi(jet3.p4+jet4.p4, MET.p4))         if has2ndWjet else op.static_cast("Float_t",op.c_float(0.)) ###
 
             #varsToKeep['cosThetaS_Wjj_simple']    = op.static_cast("Float_t", self.HLL.comp_cosThetaS(jet3.p4, jet4.p4))  if has2ndWjet else op.static_cast("Float_t",op.c_float(0.))
             #varsToKeep['cosThetaS_WW_simple_met'] = op.static_cast("Float_t", self.HLL.comp_cosThetaS(self.HLL.Wjj_simple(jet3.p4,jet4.p4), self.HLL.Wlep_met_simple(lepton.p4, MET.p4))) \
@@ -826,6 +827,14 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep['HT2_lepJetMet']  = self.HLL.HT2_2b2Wj(lepton,jet1,jet2,jet3,jet4,MET)
                 varsToKeep['HT2R_lepJetMet'] = self.HLL.HT2R_2b2Wj(lepton,jet1,jet2,jet3,jet4,MET)
                 varsToKeep['JPAcat']         = op.c_int(1)
+                dnnInputs = returnClassicInputs_2b2Wj(self = self, 
+                                                      lep = lepton, 
+                                                      jet1 = jet1, jet2 = jet2, jet3 = jet3, jet4 = jet4, 
+                                                      VBFJetPairs = VBFJetPairsJPA, L2Scores = L2out)
+                inputs    = {**dnnInputs}
+                for (varname,_,_),var in inputs.items():
+                    varsToKeep[varname+'_DNN'] = var
+
 
             if self.args.Res2b1Wj : 
                 varsToKeep['minJetDR']       = self.HLL.MinDiJetDRLoose(jet1,jet2,jet3)
@@ -833,13 +842,27 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep['HT2_lepJetMet']  = self.HLL.HT2_2b1Wj(lepton,jet1,jet2,jet3,MET)
                 varsToKeep['HT2R_lepJetMet'] = self.HLL.HT2R_2b1Wj(lepton,jet1,jet2,jet3,MET)
                 varsToKeep['JPAcat']         = op.c_int(2)
-
+                dnnInputs = returnClassicInputs_2b1Wj(self = self, 
+                                                      lep = lepton, 
+                                                      jet1 = jet1, jet2 = jet2, jet3 = jet3, jet4 = None, 
+                                                      VBFJetPairs = VBFJetPairsJPA, L2Scores = L2out)
+                inputs    = {**dnnInputs}
+                for (varname,_,_),var in inputs.items():
+                    varsToKeep[varname+'_DNN'] = var
+                
             if self.args.Res2b0Wj : 
                 varsToKeep['minJetDR']       = op.deltaR(jet1.p4,jet2.p4)
                 varsToKeep['minLepJetDR']    = self.HLL.MinDR_lep2j(lepton,jet1,jet2)
                 varsToKeep['HT2_lepJetMet']  = self.HLL.HT2_2b0Wj(lepton,jet1,jet2,MET)
                 varsToKeep['HT2R_lepJetMet'] = self.HLL.HT2R_2b0Wj(lepton,jet1,jet2,MET)
                 varsToKeep['JPAcat']         = op.c_int(3)
+                dnnInputs = returnClassicInputs_2b0Wj(self = self, 
+                                                      lep = lepton, 
+                                                      jet1 = jet1, jet2 = jet2, jet3 = None, jet4 = None, 
+                                                      VBFJetPairs = VBFJetPairsJPA, L2Scores = L2out)
+                inputs    = {**dnnInputs}
+                for (varname,_,_),var in inputs.items():
+                    varsToKeep[varname+'_DNN'] = var
 
             if self.args.Res1b2Wj : 
                 varsToKeep['minJetDR']       = self.HLL.MinDiJetDRLoose(jet1,jet3,jet4)
@@ -847,6 +870,13 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep['HT2_lepJetMet']  = self.HLL.HT2_1b2Wj(lepton,jet1,jet3,jet4,MET)
                 varsToKeep['HT2R_lepJetMet'] = self.HLL.HT2R_1b2Wj(lepton,jet1,jet3,jet4,MET)
                 varsToKeep['JPAcat']         = op.c_int(4)
+                dnnInputs = returnClassicInputs_1b2Wj(self = self, 
+                                                      lep = lepton, 
+                                                      jet1 = jet1, jet2 = None, jet3 = jet3, jet4 = jet4, 
+                                                      VBFJetPairs = VBFJetPairsJPA, L2Scores = L2out)
+                inputs    = {**dnnInputs}
+                for (varname,_,_),var in inputs.items():
+                    varsToKeep[varname+'_DNN'] = var
 
             if self.args.Res1b1Wj : 
                 varsToKeep['minJetDR']       = op.deltaR(jet1.p4,jet3.p4)
@@ -854,6 +884,13 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep['HT2_lepJetMet']  = self.HLL.HT2_1b1Wj(lepton,jet1,jet3,MET)
                 varsToKeep['HT2R_lepJetMet'] = self.HLL.HT2R_1b1Wj(lepton,jet1,jet3,MET)
                 varsToKeep['JPAcat']         = op.c_int(5)
+                dnnInputs = returnClassicInputs_1b1Wj(self = self, 
+                                                      lep = lepton, 
+                                                      jet1 = jet1, jet2 = None, jet3 = jet3, jet4 =None, 
+                                                      VBFJetPairs = VBFJetPairsJPA, L2Scores = L2out)
+                inputs    = {**dnnInputs}
+                for (varname,_,_),var in inputs.items():
+                    varsToKeep[varname+'_DNN'] = var
 
             if self.args.Res1b0Wj : 
                 varsToKeep['minJetDR']       = op.static_cast("Float_t",op.c_float(0.))
@@ -861,6 +898,13 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep['HT2_lepJetMet']  = self.HLL.HT2_1b0Wj(lepton,jet1,MET)
                 varsToKeep['HT2R_lepJetMet'] = self.HLL.HT2R_1b0Wj(lepton,jet1,MET)
                 varsToKeep['JPAcat']         = op.c_int(6)
+                dnnInputs = returnClassicInputs_1b0Wj(self = self, 
+                                                      lep = lepton, 
+                                                      jet1 = jet1, jet2 = None, jet3 = None, jet4 = None, 
+                                                      VBFJetPairs = VBFJetPairsJPA, L2Scores = L2out)
+                inputs    = {**dnnInputs}
+                for (varname,_,_),var in inputs.items():
+                    varsToKeep[varname+'_DNN'] = var
 
             if self.args.Res0b : 
                 varsToKeep['minJetDR']       = op.static_cast("Float_t",op.c_float(0.))
@@ -1064,6 +1108,14 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep['HT2R']        = self.HLL.HT2R_2b2Wj(lepton, jet1, jet2, jet3, jet4,MET)
                 varsToKeep['MT_W1W2']     = self.HLL.MT_W1W2_ljj(lepton,jet3,jet4,MET)
                 varsToKeep['JPAcat']      = op.c_int(1)                
+                dnnInputs = returnClassicInputs_Hbb2Wj(self = self, 
+                                                       lep = lepton, 
+                                                       fjet = fatjet, jet3 = jet3, jet4 = jet4, 
+                                                       VBFJetPairs = VBFJetPairsJPA, L2Scores = L2out, era = float(era))
+                inputs    = {**dnnInputs}
+                for (varname,_,_),var in inputs.items():
+                    varsToKeep[varname+'_DNN'] = var
+
 
             if self.args.Hbb1Wj:
                 varsToKeep['jetMinDR']    = self.HLL.MinDiJetDRLoose(jet1,jet2,jet3)
@@ -1072,6 +1124,14 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep['HT2R']        = self.HLL.HT2R_2b1Wj(lepton,jet1,jet2,jet3,MET)
                 varsToKeep['MT_W1W2']     = self.HLL.MT_W1W2_lj(lepton,jet3,MET)
                 varsToKeep['JPAcat']      = op.c_int(2)                
+                dnnInputs = returnClassicInputs_Hbb1Wj(self = self, 
+                                                       lep = lepton, 
+                                                       fjet = fatjet, jet3 = jet3, jet4 = None, 
+                                                       VBFJetPairs = VBFJetPairsJPA, L2Scores = L2out, era = float(era))
+                inputs    = {**dnnInputs}
+                for (varname,_,_),var in inputs.items():
+                    varsToKeep[varname+'_DNN'] = var
+
 
             if self.args.Hbb0Wj:
                 varsToKeep['jetMinDR']    = op.static_cast("Float_t",op.c_float(0.))
@@ -1080,6 +1140,13 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep['HT2R']        = self.HLL.HT2R_2b0Wj(lepton,jet1,jet2,MET)
                 varsToKeep['MT_W1W2']     = op.static_cast("Float_t",op.c_float(0.))
                 varsToKeep['JPAcat']      = op.c_int(3)                
+                dnnInputs = returnClassicInputs_Hbb0Wj(self = self, 
+                                                       lep = lepton, 
+                                                       jet1 = jet1, jet2 = jet2, jet3 = None, jet4 = None, 
+                                                       VBFJetPairs = VBFJetPairsJPA, L2Scores = L2out)
+                inputs    = {**dnnInputs}
+                for (varname,_,_),var in inputs.items():
+                    varsToKeep[varname+'_DNN'] = var
 
 
         #----- Additional variables -----#
