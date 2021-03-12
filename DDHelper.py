@@ -75,3 +75,16 @@ class DataDrivenPseudoData(DataDrivenContribution):
                            "stack-index":1,
                            "type":'mc'})
         return modCfg
+
+class DataDrivenLOReweighting(DataDrivenContribution):
+    def __init__(self, name, config, substrs):
+        self.substrs = substrs
+        super(DataDrivenLOReweighting,self).__init__(name,config)
+    def usesSample(self, sampleName, sampleConfig):
+        return any(substr in sampleName for substr in self.substrs)
+    def replacesSample(self, sampleName, sampleConfig):
+        return False
+    def modifiedSampleConfig(self, sampleName, sampleConfig, lumi=None):
+        modCfg = dict(sampleConfig)
+        return modCfg
+    

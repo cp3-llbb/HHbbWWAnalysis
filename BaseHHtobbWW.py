@@ -1884,8 +1884,6 @@ One lepton and and one jet argument must be specified in addition to the require
         ddScenarios = set(self.datadrivenScenarios)
         attrToKeep = ['legend','line-color','line-type','order','type']
         for contribName in self.benchmarks:
-#            print ('---------------------')
-#            print (contribName)
             contrib = self.datadrivenContributions[contribName]
             contribSamples = {sample:sampleCfg for sample,sampleCfg in config['samples'].items() if contrib.usesSample(sample,sampleCfg)}
             LOFiles.extend([sample for sample in contribSamples.keys() if sample not in LOFiles])
@@ -1894,7 +1892,6 @@ One lepton and and one jet argument must be specified in addition to the require
                 eras = list(config["eras"].keys())
             for era in eras:
                 for channel in LOChannels:
-                    #print (channel)
                     contribPerChannel = {sample:sampleCfg for sample,sampleCfg in contribSamples.items() if channel in sample and sampleCfg['era']==era}
                     crossSection = [sampleCfg['cross-section'] for sampleCfg in contribPerChannel.values()]
                     if len(set(crossSection)) != 1:
@@ -1914,10 +1911,6 @@ One lepton and and one jet argument must be specified in addition to the require
                     files = {sample:gbl.TFile.Open(os.path.join(resultsdir,f"{sample}{contribName}.root")) for sample in contribPerChannel.keys()}
                     generatedEvents = {sample:self.readCounters(files[sample])[contribPerChannel[sample]['generated-events']] for sample in contribPerChannel.keys()}
                     generatedEventsSum = sum(list(generatedEvents.values()))
-#                    print ('generatedEvents')
-#                    pprint (generatedEvents)
-#                    print ("sum")
-#                    print (generatedEventsSum,len(generatedEvents))
                     outFile = gbl.TFile.Open(os.path.join(resultsdir,f"{channel}_NLO{contribName}.root"), "RECREATE")
                     hNames = [key.GetName() for key in files[list(files.keys())[0]].GetListOfKeys() if 'TH' in key.GetClassName()]
                     for hName in hNames:
@@ -1929,10 +1922,6 @@ One lepton and and one jet argument must be specified in addition to the require
                                 hist = copy.deepcopy(h)
                             else:
                                 hist.Add(h)
-                            #if hName == "ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag_combined_mHH":
-                            #    print (sample)
-                            #    print ('Integral',hist.Integral())
-                            #    print ('factor',generatedEventsSum/(generatedEvents[sample]*len(generatedEvents)))
                         hist.Write()
                     outFile.Close()
                     
