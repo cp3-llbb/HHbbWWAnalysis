@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import copy
 from itertools import chain
 
 from bamboo import treefunctions as op
@@ -14,7 +15,10 @@ from scalefactorsbbWW import ScaleFactorsbbWW
 from btagHelper import makeBtagRatioReweighting
 from triggers import returnTriggerRanges
 from highlevelLambdas import highlevelLambdas
-from DDHelper import DataDrivenPseudoData
+from DDHelper import DataDrivenPseudoData, DataDrivenLOReweighting
+
+import logging
+logger = logging.getLogger(__name__)
 
 #===============================================================================================#
 #                                  BaseHHtobbWW                                                 #
@@ -32,6 +36,7 @@ class BaseNanoHHtobbWW(NanoAODModule):
                              "ratio-y-axis-range" : [0.8,1.2],
                              "ratio-y-axis" : '#frac{Data}{MC}',
                              "sort-by-yields" : True}
+
 
     #-------------------------------------------------------------------------------------------#
     #                                       addArgs                                             #
@@ -307,14 +312,6 @@ One lepton and and one jet argument must be specified in addition to the require
         self.sample = sample
         self.sampleCfg = sampleCfg
         self.era = era
-
-        # Check if v7#
-        if self.is_MC:
-            self.isNanov7 = ('db' in sampleCfg.keys() and 'NanoAODv7' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['NanoAODv7' in f for f in sampleCfg['files']]))
-        else:
-            self.isNanov7 = ('db' in sampleCfg.keys() and '02Apr2020' in sampleCfg['db']) or ('files' in sampleCfg.keys() and all(['02Apr2020' in f for f in sampleCfg['files']]))
-        if self.isNanov7:
-            print ("Using NanoAODv7")
 
         # Check distributed option #
         isNotWorker = (self.args.distributed != "worker") 
@@ -736,11 +733,61 @@ One lepton and and one jet argument must be specified in addition to the require
         return tree,noSel,be,lumiArgs
 
     def initialize(self,forSkimmer=False):
+        self.LOstr = [
+            'node_SM',
+            'node_1',
+            'node_2',
+            'node_3',
+            'node_4',
+            'node_5',
+            'node_6',
+            'node_7',
+            'node_8',
+            'node_9',
+            'node_10',
+            'node_11',
+            'node_12',
+        ]
+        self.benchmarks = [
+        #    'BenchmarkSM',  
+        #    'Benchmark1',  
+        #    'Benchmark2',  
+        #    'Benchmark3',  
+        #    'Benchmark4',  
+        #    'Benchmark5',  
+        #    'Benchmark6',  
+        #    'Benchmark7',  
+        #    'Benchmark8',  
+        #    'Benchmark9',  
+        #    'Benchmark10',  
+        #    'Benchmark11',  
+        #    'Benchmark12',  
+            'BenchmarkcHHH0',  
+            'BenchmarkcHHH1',  
+            'BenchmarkcHHH2p45',  
+            'BenchmarkcHHH5',  
+        #    'Benchmarkcluster1',
+        #    'Benchmarkcluster2',
+        #    'Benchmarkcluster3',
+        #    'Benchmarkcluster4',
+        #    'Benchmarkcluster5',
+        #    'Benchmarkcluster6',
+        #    'Benchmarkcluster7',
+        ]
+        self.analysisConfig['datadriven'].update({benchmark:{'replaces': 'all', 'uses': 'all'} for benchmark in self.benchmarks})
+
+        if self.args.datadriven is None:
+            self.args.datadriven = self.benchmarks
+        else:
+            self.args.datadriven += self.benchmarks
+
         super(BaseNanoHHtobbWW, self).initialize()
         if not forSkimmer:
             if "PseudoData" in self.datadrivenContributions:
                 contrib = self.datadrivenContributions["PseudoData"]
                 self.datadrivenContributions["PseudoData"] = DataDrivenPseudoData(contrib.name, contrib.config)
+            self.datadrivenContributions.update({benchmark:DataDrivenLOReweighting(benchmark,self.analysisConfig['datadriven'][benchmark],substrs=self.LOstr) for benchmark in self.benchmarks}) 
+
 
     def prepareObjects(self, t, noSel, sample, sampleCfg, channel, forSkimmer=False):
         # Some imports #
@@ -767,7 +814,7 @@ One lepton and and one jet argument must be specified in addition to the require
         ###########################################################################
         #                          Signal Reweighting                             #
         ###########################################################################
-        if 'type' in sampleCfg.keys() and sampleCfg["type"] == "signal":
+        if 'type' in sampleCfg.keys() and sampleCfg["type"] == "signal" and any(LOstr in sample for LOstr in self.LOstr):
             # Get gen level Higgs #
             self.genh = op.select(t.GenPart,lambda g : op.AND(g.pdgId==25, g.statusFlags & ( 0x1 << 13)))
             # Get gen level variables mHH and cos(theta*) #
@@ -782,7 +829,7 @@ One lepton and and one jet argument must be specified in addition to the require
                 # At the same time we do not want the many-to-many procedure for the DNN training
                 # because it would mean repeating events with different weights.
                 # -> We use the one-to-one method 
-                json_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data','ScaleFactors_GGF_LO','{}_{}.json'.format(sample,era))
+                json_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data','ScaleFactors_GGF_LO','{}_to_BenchmarkSM_{}.json'.format(sample,era))
                 if os.path.exists(json_file):
                     print("Found file {} -> Will apply for NO->NLO reweighting".format(json_file))
                     self.reweightLO = get_scalefactor("lepton", json_file, paramDefs={'Eta': lambda x : self.mHH, 'Pt': lambda x : self.cosHH})
@@ -792,31 +839,11 @@ One lepton and and one jet argument must be specified in addition to the require
                 # For the Plotter we want the many-to-many worfklow.
                 # This means create as many files (with the create) 
                 # as there are NLO weight files (+ original LO file)
-                # Hard code the benchmarks (TODO : find smarter) #
-                benchmarks = [
-                    'BenchmarkSM',  
-                    'Benchmark1',  
-                    'Benchmark2',  
-                    'Benchmark3',  
-                    'Benchmark4',  
-                    'Benchmark5',  
-                    'Benchmark6',  
-                    'Benchmark7',  
-                    'Benchmark8',  
-                    'Benchmark9',  
-                    'Benchmark10',  
-                    'Benchmark11',  
-                    'Benchmark12',  
-                    'BenchmarkcHHH0',  
-                    'BenchmarkcHHH1',  
-                    'BenchmarkcHHH2p45',  
-                    'BenchmarkcHHH5',  
-                ]
-
-                for benchmark in benchmarks:
+                for benchmark in self.benchmarks:
                     json_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data','ScaleFactors_GGF_LO','{}_to_{}_{}.json'.format(sample,benchmark,era))
                     if os.path.exists(json_file):
                         print("Found file {} -> Will apply for NO->NLO reweighting".format(json_file))
+                        # Apply reweighting to create #
                         reweightLO = get_scalefactor("lepton", json_file, paramDefs={'Eta': lambda x : self.mHH, 'Pt': lambda x : self.cosHH})
                         noSel = SelectionWithDataDriven.create(parent   = noSel,
                                                                name     = 'noSel'+benchmark,
@@ -1499,14 +1526,13 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                  op.c_float(1.))]
 
             #### Ak8 btag efficiencies ####
-            if self.isNanov7:
-                self.Ak8Eff_bjets = self.SF.get_scalefactor("lepton",('ak8btag_eff','eff_bjets_{}'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer),
-                                                            additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
-                self.Ak8Eff_cjets = self.SF.get_scalefactor("lepton",('ak8btag_eff','eff_cjets_{}'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer),
-                                                            additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
-                self.Ak8Eff_lightjets = self.SF.get_scalefactor("lepton",('ak8btag_eff','eff_lightjets_{}'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer),
-                                                            additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
- 
+            self.Ak8Eff_bjets = self.SF.get_scalefactor("lepton",('ak8btag_eff','eff_bjets_{}'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer),
+                                                        additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
+            self.Ak8Eff_cjets = self.SF.get_scalefactor("lepton",('ak8btag_eff','eff_cjets_{}'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer),
+                                                        additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
+            self.Ak8Eff_lightjets = self.SF.get_scalefactor("lepton",('ak8btag_eff','eff_lightjets_{}'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer),
+                                                        additionalVariables={'Pt':lambda x : x.pt,'Eta':lambda x : x.eta, 'BTagDiscri':lambda x : x.btagDeepB})
+
             #----- Triggers -----# 
             #### Single lepton triggers ####
             self.ttH_singleElectron_trigSF = self.SF.get_scalefactor("lepton", 'singleTrigger_electron_{}'.format(era) , combine="weight", systName="ttH_singleElectron_trigSF", defineOnFirstUse=(not forSkimmer))
@@ -1665,6 +1691,26 @@ One lepton and and one jet argument must be specified in addition to the require
                 
             self.systTypes = ['up_'+s for s in self.systTypes]+['down_'+s for s in self.systTypes]
 
+            def translate_btagSFVarToJECVar_invert(btagVarName, prefix="btagSF_"):
+                if btagVarName.startswith("up_jes") or btagVarName.startswith("down_jes"):
+                    if btagVarName.endswith("_jes"):
+                        return "jesTotal{0}".format(btagVarName.split("_jes")[0])
+                    elif "RelativeBal" in btagVarName or "RelativeSample_2016" in btagVarName:
+                        logger.warning("B-tag SF systematic variation {0} has been inverted".format(btagVarName))
+                        if btagVarName.startswith("up_jes"):
+                            btagVarName = btagVarName.replace("up_jes","down_jes")
+                        elif btagVarName.startswith("down_jes"):
+                            btagVarName = btagVarName.replace("down_jes","up_jes")
+                    return "jes{1}{0}".format(*btagVarName.split("_jes"))
+                elif btagVarName.startswith("up_") or btagVarName.startswith("down_"):
+                    tk = btagVarName.split("_")
+                    return "".join((prefix, "_".join(tk[1:]), tk[0]))
+                elif btagVarName in ("up", "down"):
+                    return "".join((prefix, btagVarName))
+                else:
+                    return btagVarName
+                
+
                 # From https://twiki.cern.ch/twiki/bin/view/CMS/BTagShapeCalibration#Systematic_uncertainties
             self.DeepJetDiscReshapingSF = BtagSF(taggerName       = "deepjet", 
                                                  csvFileName      = csvFileNameAk4,
@@ -1674,33 +1720,33 @@ One lepton and and one jet argument must be specified in addition to the require
                                                  measurementType  = "iterativefit", 
                                                  sel              = noSel, 
                                                  getters          = {'Discri':lambda j : j.btagDeepFlavB},
+                                                 jesTranslate     = translate_btagSFVarToJECVar_invert,
                                                  uName            = self.sample)
 
-        if self.isNanov7:
-            if era == '2016':
-                csvFileNameAk8= os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_2016LegacySF_V1.csv")
-            if era == '2017':
-                csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_94XSF_V4_B_F_v2.csv")
-            if era == '2018':
-                csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_102XSF_V1.csv")
-            
-            #----- Ak8 SF -----# 
-            if not os.path.exists(csvFileNameAk8):
-                raise RuntimeError('Could not find Ak8 csv file %s'%csvFileNameAk8)
-            print ('Btag Ak8 CSV file',csvFileNameAk8)
-            self.DeepCsvSubjetMediumSF = BtagSF(taggerName       = "deepcsvSubjet", 
-                                                csvFileName      = csvFileNameAk8,
-                                                wp               = "medium",
-                                                sysType          = "central", 
-                                                otherSysTypes    = ['up','down'],
-                                                measurementType  = {"B": "lt", "C": "lt", "UDSG": "incl"},
-                                                getters          = {'Discri':lambda subjet : subjet.btagDeepB,
-                                                                    'JetFlavour': lambda subjet : op.static_cast("BTagEntry::JetFlavor",
-                                                                                                        op.multiSwitch((subjet.nBHadrons>0,op.c_int(0)), # B -> flav = 5 -> BTV = 0
-                                                                                                                       (subjet.nCHadrons>0,op.c_int(1)), # C -> flav = 4 -> BTV = 1
-                                                                                                                       op.c_int(2)))},                  # UDSG -> flav = 0 -> BTV = 2
-                                                sel              = noSel, 
-                                                uName            = self.sample)
+        if era == '2016':
+            csvFileNameAk8= os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_2016LegacySF_V1.csv")
+        if era == '2017':
+            csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_94XSF_V4_B_F_v2.csv")
+        if era == '2018':
+            csvFileNameAk8 = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data", "ScaleFactors_POG" , "subjet_DeepCSV_102XSF_V1.csv")
+        
+        #----- Ak8 SF -----# 
+        if not os.path.exists(csvFileNameAk8):
+            raise RuntimeError('Could not find Ak8 csv file %s'%csvFileNameAk8)
+        print ('Btag Ak8 CSV file',csvFileNameAk8)
+        self.DeepCsvSubjetMediumSF = BtagSF(taggerName       = "deepcsvSubjet", 
+                                            csvFileName      = csvFileNameAk8,
+                                            wp               = "medium",
+                                            sysType          = "central", 
+                                            otherSysTypes    = ['up','down'],
+                                            measurementType  = {"B": "lt", "C": "lt", "UDSG": "incl"},
+                                            getters          = {'Discri':lambda subjet : subjet.btagDeepB,
+                                                                'JetFlavour': lambda subjet : op.static_cast("BTagEntry::JetFlavor",
+                                                                                                    op.multiSwitch((subjet.nBHadrons>0,op.c_int(0)), # B -> flav = 5 -> BTV = 0
+                                                                                                                   (subjet.nCHadrons>0,op.c_int(1)), # C -> flav = 4 -> BTV = 1
+                                                                                                                   op.c_int(2)))},                  # UDSG -> flav = 0 -> BTV = 2
+                                            sel              = noSel, 
+                                            uName            = self.sample)
 
 
         ###########################################################################
@@ -1784,7 +1830,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                 nameHint = "bamboo_nJetsWeight_{}".format(self.sample.replace('-','_')))
                 sel = sel.refine("BtagAk4SF"+name , weight = [self.btagAk4SF,self.BtagRatioWeight])
 
-            if self.isNanov7 and not self.args.BtagReweightingOff and not self.args.BtagReweightingOn:
+            if not self.args.BtagReweightingOff and not self.args.BtagReweightingOn:
                 #----- AK8 jets -> using Method 1.a -----#
                 # Reweighting #
                 wFail = op.extMethod("scalefactorWeightForFailingObject", returnType="double") # 
@@ -1823,21 +1869,78 @@ One lepton and and one jet argument must be specified in addition to the require
     ###########################################################################
     def returnTriggers(self,keys):
         triggerRanges = returnTriggerRanges(self.era)
-        # MC : just OR the different paths 
-        if self.is_MC or self.isNanov7:
-            return op.OR(*[trig for k in keys for trig in self.triggersPerPrimaryDataset[k]])
-        else: # Only for NanoV6
-            # Data : due to bug in NanoAOD production, check that the event run number is inside the ranges computed by bricalc
-            conversion = {'SingleElectron':'1e','SingleMuon':'1mu','MuonEG':'1e1mu','DoubleEGamma':'2e','DoubleMuon':'2mu'}
-            list_cond = []
-            for trigKey in keys:
-                rangekey = conversion[trigKey]
-                rangeDict = {triggerRanges[rangekey][i]['name']:triggerRanges[rangekey][i]['runs'] for i in range(len(triggerRanges[rangekey]))}
-                listTrig = self.triggersPerPrimaryDataset[trigKey]
-                trigNames = [trig._parent.name for trig in listTrig]
-                for trig,trigName in zip(listTrig,trigNames):
-                    trigRanges = rangeDict[trigName]
-                    list_cond.append(op.AND(trig,op.OR(*[op.in_range(r[0]-1,self.tree.run,r[1]+1) for r in trigRanges])))
-                        # BEWARE : op.in_range is boundaries excluded !!! (hence extension via -1 and +1)
-            return op.OR(*list_cond)
+        return op.OR(*[trig for k in keys for trig in self.triggersPerPrimaryDataset[k]])
+    
+    ###########################################################################
+    #                             postProcess                                 #
+    ###########################################################################
+    def postProcess(self, taskList, config=None, workdir=None, resultsdir=None):
+        from bamboo.root import gbl
+        from pprint import pprint
+#        if not self.plotList:
+#            self.plotList = self.getPlotList(resultsdir=resultsdir, config=config)
+        LOFiles = []
+        LOChannels = ['GluGluToHHTo2B2VTo2L2Nu','GluGluToHHTo2B2WToLNu2J','GluGluToHHTo2B2Tau']
+        ddScenarios = set(self.datadrivenScenarios)
+        attrToKeep = ['legend','line-color','line-type','order','type']
+        for contribName in self.benchmarks:
+            contrib = self.datadrivenContributions[contribName]
+            contribSamples = {sample:sampleCfg for sample,sampleCfg in config['samples'].items() if contrib.usesSample(sample,sampleCfg)}
+            LOFiles.extend([sample for sample in contribSamples.keys() if sample not in LOFiles])
+            _, eras = self.args.eras
+            if eras is None:
+                eras = list(config["eras"].keys())
+            for era in eras:
+                for channel in LOChannels:
+                    contribPerChannel = {sample:sampleCfg for sample,sampleCfg in contribSamples.items() if channel in sample and sampleCfg['era']==era}
+                    crossSection = [sampleCfg['cross-section'] for sampleCfg in contribPerChannel.values()]
+                    if len(set(crossSection)) != 1:
+                        raise RuntimeError(f"Not all LO samples for channel {channel} have the same cross-section")
+                    else:
+                        crossSection = crossSection[0]
+                    if all(['branching-ratio' in sampleCfg for sampleCfg in contribPerChannel.values()]):
+                        branchingRatio = [sampleCfg['branching-ratio'] for sampleCfg in contribPerChannel.values()]
+                        if len(set(branchingRatio)) != 1:
+                            raise RuntimeError(f"Not all LO samples for channel {channel} have the same branching-ratio")
+                        else:
+                            branchingRatio = branchingRatio[0]
+                    else:
+                        branchingRatio = None 
+                    attrLO = {attr:contribPerChannel[list(contribPerChannel.keys())[0]][attr]  for attr in attrToKeep 
+                                if attr in contribPerChannel[list(contribPerChannel.keys())[0]].keys()}  
+                    files = {sample:gbl.TFile.Open(os.path.join(resultsdir,f"{sample}{contribName}.root")) for sample in contribPerChannel.keys()}
+                    generatedEvents = {sample:self.readCounters(files[sample])[contribPerChannel[sample]['generated-events']] for sample in contribPerChannel.keys()}
+                    generatedEventsSum = sum(list(generatedEvents.values()))
+                    outFile = gbl.TFile.Open(os.path.join(resultsdir,f"{channel}_NLO{contribName}.root"), "RECREATE")
+                    hNames = [key.GetName() for key in files[list(files.keys())[0]].GetListOfKeys() if 'TH' in key.GetClassName()]
+                    for hName in hNames:
+                        hist = None
+                        for sample,f in files.items():
+                            h = f.Get(hName)
+                            h.Scale(generatedEventsSum/(generatedEvents[sample]*len(generatedEvents)))
+                            if hist is None:
+                                hist = copy.deepcopy(h)
+                            else:
+                                hist.Add(h)
+                        hist.Write()
+                    outFile.Close()
+                    
+                    config['samples'][f"{channel}_NLO{contribName}"] = {'cross-section'     : crossSection,
+                                                                        'era'               : era,
+                                                                        'generated-events'  : generatedEventsSum}
+                    config['samples'][f"{channel}_NLO{contribName}"].update(attrLO)
+                    if branchingRatio is not None:
+                        config['samples'][f"{channel}_NLO{contribName}"]['branching-ratio'] = branchingRatio
 
+                for sc in list(ddScenarios):
+                    if contribName in sc:
+                        newSc = tuple(cb for cb in sc if cb != contribName)
+                        ddScenarios.remove(sc)
+                        ddScenarios.add(newSc)
+
+        self.datadrivenScenarios = list(ddScenarios)
+
+#        for LOFile in LOFiles:
+#            del config['samples'][LOFile]
+
+        super(BaseNanoHHtobbWW,self).postProcess(taskList=taskList, config=config, workdir=workdir, resultsdir=resultsdir)
