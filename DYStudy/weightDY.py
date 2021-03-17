@@ -242,7 +242,7 @@ class WeightDY:
                 factor_2b  = d['ZPeak_2b']['MuMu']['S+B'] / d['ZPeak_0b']['MuMu']['S+B']
             else:
                 factor_2b = 0.
-        elif self.channel == "SSDL":
+        elif self.channel == "SF":
             factor_ZVeto = (d['ZVeto_0b']['ElEl']['S+B']+d['ZVeto_0b']['MuMu']['S+B']) / (d['ZVeto_0b']['ElEl']['prefit']+d['ZVeto_0b']['MuMu']['prefit'])
             factor_1b    = (d['ZPeak_1b']['ElEl']['S+B']+d['ZPeak_1b']['MuMu']['S+B']) / (d['ZPeak_0b']['ElEl']['S+B']+d['ZPeak_0b']['MuMu']['S+B'])
             if self.cat == 'resolved':
@@ -1204,36 +1204,36 @@ if __name__ == "__main__":
                             rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
     except Exception as e:
         print ('[ERROR] Failed to produce MuMu weight in data mode :',e)
-#    d["SameSignDLChannel"] = {cat:{'path':d['MuMuChannel'][cat]['path'],
-#                                 'histname':[d['MuMuChannel'][cat]['histname'],d['ElElChannel'][cat]['histname']]}   
-#                                 for cat in d['MuMuChannel'].keys()}
-#    try:
-#        instance = WeightDY(channel     = 'SSDL',
-#                            config      = d['SameSignDLChannel'],
-#                            title       = d['title']+' (#mu^{+}#mu^{-} + e^{+}e^{-} channel)',
-#                            outputname  = d['filename'].format(**{'channel':'SSDL','type':'mc'}),
-#                            mode        = 'mc',
-#                            cat         = d['category'],
-#                            era         = d['era'],
-#                            normalize   = d['normalize'] if 'normalize' in d.keys() else True,
-#                            xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
-#                            yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
-#                            rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
-#                            rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
-#    except Exception as e:
-#        print ('[ERROR] Failed to produce SSDL weight in data mode :',e)
-#    try:
-#        instance = WeightDY(channel     = 'SSDL',
-#                            config      = d['SameSignDLChannel'],
-#                            title       = d['title']+' (#mu^{+}#mu^{-} + e^{+}e^{-} channel)',
-#                            outputname  = d['filename'].format(**{'channel':'SSDL','type':'data'}),
-#                            mode        = 'data',
-#                            cat         = d['category'],
-#                            era         = d['era'],
-#                            normalize   = d['normalize'] if 'normalize' in d.keys() else True,
-#                            xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
-#                            yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
-#                            rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
-#                            rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
-#    except Exception as e:
-#        print ('[ERROR] Failed to produce SSDL weight in mc mode :',e)
+    d["SameFlavourDLChannel"] = {cat:{'path':d['MuMuChannel'][cat]['path'],
+                                 'histname':[d['MuMuChannel'][cat]['histname'],d['ElElChannel'][cat]['histname']]}   
+                                 for cat in d['MuMuChannel'].keys()}
+    try:
+        instance = WeightDY(channel     = 'SF',
+                            config      = d['SameFlavourDLChannel'],
+                            title       = d['title']+' (#mu^{+}#mu^{-} + e^{+}e^{-} channel)',
+                            outputname  = d['filename'].format(**{'channel':'SF','type':'mc'}),
+                            mode        = 'mc',
+                            cat         = d['category'],
+                            era         = d['era'],
+                            normalize   = d['normalize'] if 'normalize' in d.keys() else True,
+                            xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
+                            yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
+                            rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
+                            rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
+    except Exception as e:
+        print ('[ERROR] Failed to produce SF weight in data mode :',e)
+    try:
+        instance = WeightDY(channel     = 'SF',
+                            config      = d['SameFlavourDLChannel'],
+                            title       = d['title']+' (#mu^{+}#mu^{-} + e^{+}e^{-} channel)',
+                            outputname  = d['filename'].format(**{'channel':'SF','type':'data'}),
+                            mode        = 'data',
+                            cat         = d['category'],
+                            era         = d['era'],
+                            normalize   = d['normalize'] if 'normalize' in d.keys() else True,
+                            xaxis       = d['xaxis'] if 'xaxis' in d.keys() else None,
+                            yaxis       = d['yaxis'] if 'yaxis' in d.keys() else None,
+                            rebin_1D    = d['rebin_1D'] if 'rebin_1D' in d.keys() else None,
+                            rebin_2D    = d['rebin_2D'] if 'rebin_2D' in d.keys() else None)
+    except Exception as e:
+        print ('[ERROR] Failed to produce SF weight in mc mode :',e)

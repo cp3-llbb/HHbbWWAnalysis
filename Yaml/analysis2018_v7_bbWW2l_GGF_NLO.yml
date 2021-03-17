@@ -1,0 +1,52 @@
+#################################
+#  Non resonant GGF NLO signals #
+#################################
+##### Double Lepton 
+GluGluToHHTo2B2VTo2L2Nu_node_cHHH0:
+  cross-section: 0.069725
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  generated-events: 'genEventSumw'
+  legend: 'HH#rightarrow bbl#nu l#nu (node cHHH0)' 
+  line-type: 1
+  line-color: "#288a24"
+  order: 10
+  split: 1
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_cHHH1:
+  cross-section: 0.031047
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  legend: 'HH#rightarrow bbl#nu l#nu (node cHHH1)' 
+  generated-events: 'genEventSumw'
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45:
+  cross-section: 0.013124
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  legend: 'HH#rightarrow bbl#nu l#nu (node cHHH2p45)' 
+  generated-events: 'genEventSumw'
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_cHHH5:
+  cross-section: 0.091172
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  legend: 'HH#rightarrow bbl#nu l#nu (node cHHH5)' 
+  generated-events: 'genEventSumw'
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal

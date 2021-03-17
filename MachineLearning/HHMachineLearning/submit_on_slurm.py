@@ -37,9 +37,10 @@ def submit_on_slurm(name,args,debug=False):
         #config.sbatch_additionalOptions += ['--mem-per-gpu={}'.format(parameters.mem)]
         #if parameters.cpus > 1:
         #    config.sbatch_additionalOptions += ["--cpus-per-gpu={}".format(parameters.cpus)]
-        if parameters.cpus > 1:
-            #config.sbatch_additionalOptions += ["--cpus-per-gpu={}".format(parameters.cpus)]
-            config.sbatch_additionalOptions += ["--cpus-per-task={}".format(parameters.cpus)]
+        #if parameters.cpus > 1:
+        #    config.sbatch_additionalOptions += ["--cpus-per-gpu={}".format(parameters.cpus)]
+        #    config.sbatch_additionalOptions += ["--cpus-per-task={}".format(parameters.cpus)]
+            #config.sbatch_additionalOptions += ["-c {}".format(parameters.cpus)]
     else:
         if parameters.tasks > 1:
             config.sbatch_additionalOptions += ["-n={}".format(parameters.tasks)]

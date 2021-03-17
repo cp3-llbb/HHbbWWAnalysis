@@ -816,35 +816,41 @@ def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,use_dd=T
     selObject.yieldTitle += " + Exclusive Resolved (1 bjet)"
     if use_dd:
         enable = "DYEstimation" in self.datadrivenContributions and self.datadrivenContributions["DYEstimation"].usesSample(self.sample, self.sampleCfg) 
-        if "ElEl" in selObject.selName:
-            selObject.create(ddSuffix  = "DYEstimation",
-                             cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0], 
-                             weight    = AppliedSF,
-                             ddCut     = [op.rng_len(self.ak4BJets)==0,
-                                          op.rng_len(self.ak8BJets)==0,
-                                          op.rng_len(self.ak8Jets)==0,
-                                          (self.tree.event//5)%2==0],
-                             #ddWeight  = 2*self.ResolvedDYReweighting1bElEl(self.ak4LightJetsByBtagScore[0]), 
-                             ddWeight  = 2*self.ResolvedDYReweighting1bElEl(self.ak4Jets)*self.ResolvedDYReweighting1bElEl_nonclosure(self.ak4Jets),
-                             #ddWeight  = 2*self.ResolvedDYReweighting1bElEl(self.ak4Jets)*self.ResolvedDYReweighting1bElEl_corr(self.corrMET), 
-                             enable    = enable)
-        elif "MuMu" in selObject.selName:
-            selObject.create(ddSuffix  = "DYEstimation",
-                             cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
-                             weight    = AppliedSF,
-                             ddCut     = [op.rng_len(self.ak4BJets)==0,
-                                          op.rng_len(self.ak8BJets)==0,
-                                          op.rng_len(self.ak8Jets)==0,
-                                          (self.tree.event//5)%2==0],
-                             #ddWeight  = 2*self.ResolvedDYReweighting1bMuMu(self.ak4LightJetsByBtagScore[0]), 
-                             ddWeight  = 2*self.ResolvedDYReweighting1bMuMu(self.ak4Jets)*self.ResolvedDYReweighting1bMuMu_nonclosure(self.ak4Jets),
-                             #ddWeight  = 2*self.ResolvedDYReweighting1bMuMu(self.ak4Jets)*self.ResolvedDYReweighting1bMuMu_corr(self.corrMET), 
-                             enable    = enable)
-        elif "ElMu" in selObject.selName:
-            selObject.refine(cut    = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0], 
-                             weight = AppliedSF)
-        else:
-            raise RuntimeError("Could not find the channel in selection name")
+        selObject.create(ddSuffix  = "DYEstimation",
+                         cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0], 
+                         weight    = AppliedSF,
+                         ddCut     = [op.rng_len(self.ak4BJets)==0,
+                                      op.rng_len(self.ak8BJets)==0,
+                                      op.rng_len(self.ak8Jets)==0,
+                                      (self.tree.event//5)%2==0],
+                         ddWeight  = 2*self.ResolvedDYReweighting1b(self.ak4Jets),
+                         enable    = enable)
+
+#        if "ElEl" in selObject.selName:
+#            selObject.create(ddSuffix  = "DYEstimation",
+#                             cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0], 
+#                             weight    = AppliedSF,
+#                             ddCut     = [op.rng_len(self.ak4BJets)==0,
+#                                          op.rng_len(self.ak8BJets)==0,
+#                                          op.rng_len(self.ak8Jets)==0,
+#                                          (self.tree.event//5)%2==0],
+#                             ddWeight  = 2*self.ResolvedDYReweighting1b(self.ak4Jets),
+#                             enable    = enable)
+#        elif "MuMu" in selObject.selName:
+#            selObject.create(ddSuffix  = "DYEstimation",
+#                             cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0],
+#                             weight    = AppliedSF,
+#                             ddCut     = [op.rng_len(self.ak4BJets)==0,
+#                                          op.rng_len(self.ak8BJets)==0,
+#                                          op.rng_len(self.ak8Jets)==0,
+#                                          (self.tree.event//5)%2==0],
+#                             ddWeight  = 2*self.ResolvedDYReweighting1b(self.ak4Jets),
+#                             enable    = enable)
+#        elif "ElMu" in selObject.selName:
+#            selObject.refine(cut    = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0], 
+#                             weight = AppliedSF)
+#        else:
+#            raise RuntimeError("Could not find the channel in selection name")
     else:
         selObject.refine(cut    = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0], 
                          weight = AppliedSF)
@@ -870,35 +876,45 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,use_dd=
 
     if use_dd:
         enable = "DYEstimation" in self.datadrivenContributions and self.datadrivenContributions["DYEstimation"].usesSample(self.sample, self.sampleCfg) 
-        if "ElEl" in selObject.selName:
-            selObject.create(ddSuffix  = "DYEstimation",
-                             cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
-                             weight    = AppliedSF,
-                             ddCut     = [op.rng_len(self.ak4BJets)==0,
-                                          op.rng_len(self.ak8BJets)==0,
-                                          op.rng_len(self.ak8Jets)==0,
-                                          (self.tree.event//5)%2==1],
-                             #ddWeight  = 2*self.ResolvedDYReweighting2bElEl(self.ak4LightJetsByBtagScore[0]), 
-                             ddWeight  = 2*self.ResolvedDYReweighting2bElEl(self.ak4Jets)*self.ResolvedDYReweighting2bElEl_nonclosure(self.ak4Jets),
-                             #ddWeight  = 2*self.ResolvedDYReweighting2bElEl(self.ak4Jets)*self.ResolvedDYReweighting2bElEl_corr(self.corrMET), 
-                             enable    = enable)
-        elif "MuMu" in selObject.selName:
-            selObject.create(ddSuffix  = "DYEstimation",
-                             cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
-                             weight    = AppliedSF,
-                             ddCut     = [op.rng_len(self.ak4BJets)==0,
-                                          op.rng_len(self.ak8BJets)==0,
-                                          op.rng_len(self.ak8Jets)==0,
-                                          (self.tree.event//5)%2==1],
-                             #ddWeight  = 2*self.ResolvedDYReweighting2bMuMu(self.ak4LightJetsByBtagScore[0]), 
-                             ddWeight  = 2*self.ResolvedDYReweighting2bMuMu(self.ak4Jets)*self.ResolvedDYReweighting2bMuMu_nonclosure(self.ak4Jets),
-                             #ddWeight  = 2*self.ResolvedDYReweighting2bMuMu(self.ak4Jets)*self.ResolvedDYReweighting2bMuMu_corr(self.corrMET), 
-                             enable    = enable)
-        elif "ElMu" in selObject.selName:
-            selObject.refine(cut    = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
-                             weight = AppliedSF)
-        else:
-            raise RuntimeError("Could not find the channel in selection name")
+        selObject.create(ddSuffix  = "DYEstimation",
+                         cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
+                         weight    = AppliedSF,
+                         ddCut     = [op.rng_len(self.ak4BJets)==0,
+                                      op.rng_len(self.ak8BJets)==0,
+                                      op.rng_len(self.ak8Jets)==0,
+                                      (self.tree.event//5)%2==1],
+                         ddWeight  = 2*self.ResolvedDYReweighting2b(self.ak4Jets),
+                         enable    = enable)
+
+#        if "ElEl" in selObject.selName:
+#            selObject.create(ddSuffix  = "DYEstimation",
+#                             cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
+#                             weight    = AppliedSF,
+#                             ddCut     = [op.rng_len(self.ak4BJets)==0,
+#                                          op.rng_len(self.ak8BJets)==0,
+#                                          op.rng_len(self.ak8Jets)==0,
+#                                          (self.tree.event//5)%2==1],
+#                             #ddWeight  = 2*self.ResolvedDYReweighting2bElEl(self.ak4LightJetsByBtagScore[0]), 
+#                             ddWeight  = 2*self.ResolvedDYReweighting2bElEl(self.ak4Jets),
+#                             #ddWeight  = 2*self.ResolvedDYReweighting2bElEl(self.ak4Jets)*self.ResolvedDYReweighting2bElEl_corr(self.corrMET), 
+#                             enable    = enable)
+#        elif "MuMu" in selObject.selName:
+#            selObject.create(ddSuffix  = "DYEstimation",
+#                             cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
+#                             weight    = AppliedSF,
+#                             ddCut     = [op.rng_len(self.ak4BJets)==0,
+#                                          op.rng_len(self.ak8BJets)==0,
+#                                          op.rng_len(self.ak8Jets)==0,
+#                                          (self.tree.event//5)%2==1],
+#                             #ddWeight  = 2*self.ResolvedDYReweighting2bMuMu(self.ak4LightJetsByBtagScore[0]), 
+#                             ddWeight  = 2*self.ResolvedDYReweighting2bMuMu(self.ak4Jets),
+#                             #ddWeight  = 2*self.ResolvedDYReweighting2bMuMu(self.ak4Jets)*self.ResolvedDYReweighting2bMuMu_corr(self.corrMET), 
+#                             enable    = enable)
+#        elif "ElMu" in selObject.selName:
+#            selObject.refine(cut    = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
+#                             weight = AppliedSF)
+#        else:
+#            raise RuntimeError("Could not find the channel in selection name")
     else:
         selObject.refine(cut    = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0], 
                          weight = AppliedSF)
@@ -944,25 +960,32 @@ def makeInclusiveBoostedOneBtagSelection(self,selObject,copy_sel=False,use_dd=Tr
 
     if use_dd:
         enable = "DYEstimation" in self.datadrivenContributions and self.datadrivenContributions["DYEstimation"].usesSample(self.sample, self.sampleCfg) 
-        if "ElEl" in selObject.selName:
-            selObject.create(ddSuffix  = "DYEstimation",
-                             cut       = [op.rng_len(self.ak8BJets) >= 1],
-                             weight    = AppliedSF,
-                             ddCut     = [op.rng_len(self.ak8BJets) == 0,op.rng_len(self.ak4BJets) == 0],
-                             ddWeight  = self.BoostedDYReweighting1bElEl(self.ak8Jets[0])*self.BoostedDYReweighting1bElEl_nonclosure(self.ak8Jets[0]), 
-                             enable    = enable)
-        elif "MuMu" in selObject.selName:
-            selObject.create(ddSuffix  = "DYEstimation",
-                             cut       = [op.rng_len(self.ak8BJets) >= 1],
-                             weight    = AppliedSF,
-                             ddCut     = [op.rng_len(self.ak8BJets) == 0,op.rng_len(self.ak4BJets) == 0],
-                             ddWeight  = self.BoostedDYReweighting1bMuMu(self.ak8Jets[0])*self.BoostedDYReweighting1bMuMu_nonclosure(self.ak8Jets[0]), 
-                             enable    = enable)
-        elif "ElMu" in selObject.selName:
-            selObject.refine(cut    = [op.rng_len(self.ak8BJets)>=1],
-                             weight = AppliedSF)
-        else:
-            raise RuntimeError("Could not find the channel in selection name")
+        selObject.create(ddSuffix  = "DYEstimation",
+                         cut       = [op.rng_len(self.ak8BJets) >= 1],
+                         weight    = AppliedSF,
+                         ddCut     = [op.rng_len(self.ak8BJets) == 0,op.rng_len(self.ak4BJets) == 0],
+                         ddWeight  = self.BoostedDYReweighting1b(self.ak8Jets[0]), 
+                         enable    = enable)
+#            selObject.create(ddSuffix  = "DYEstimation",
+#        if "ElEl" in selObject.selName:
+#            selObject.create(ddSuffix  = "DYEstimation",
+#                             cut       = [op.rng_len(self.ak8BJets) >= 1],
+#                             weight    = AppliedSF,
+#                             ddCut     = [op.rng_len(self.ak8BJets) == 0,op.rng_len(self.ak4BJets) == 0],
+#                             ddWeight  = self.BoostedDYReweighting1bElEl(self.ak8Jets[0]), 
+#                             enable    = enable)
+#        elif "MuMu" in selObject.selName:
+#            selObject.create(ddSuffix  = "DYEstimation",
+#                             cut       = [op.rng_len(self.ak8BJets) >= 1],
+#                             weight    = AppliedSF,
+#                             ddCut     = [op.rng_len(self.ak8BJets) == 0,op.rng_len(self.ak4BJets) == 0],
+#                             ddWeight  = self.BoostedDYReweighting1bMuMu(self.ak8Jets[0]), 
+#                             enable    = enable)
+#        elif "ElMu" in selObject.selName:
+#            selObject.refine(cut    = [op.rng_len(self.ak8BJets)>=1],
+#                             weight = AppliedSF)
+#        else:
+#            raise RuntimeError("Could not find the channel in selection name")
     else:
         selObject.refine(cut    = [op.rng_len(self.ak8BJets)>=1],
                          weight = AppliedSF)

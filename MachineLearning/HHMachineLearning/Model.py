@@ -209,7 +209,7 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
     mean_scale = np.mean(out_preprocess)
     std_scale = np.std(out_preprocess)
     if abs(mean_scale)>0.01 or abs((std_scale-1)/std_scale)>0.1: # Check that scaling is correct to 1%
-        raise RuntimeError("Something is wrong with the preprocessing layer (mean = %0.6f, std = %0.6f), maybe you loaded an incorrect scaler"%(mean_scale,std_scale))
+        logging.warning("Something is wrong with the preprocessing layer (mean = %0.6f, std = %0.6f), maybe you loaded an incorrect scaler"%(mean_scale,std_scale))
 
     # Tensorboard logs #
     #path_board = os.path.join(parameters.main_path,"TensorBoard")
