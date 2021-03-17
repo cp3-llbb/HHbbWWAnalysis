@@ -281,7 +281,7 @@ One lepton and and one jet argument must be specified in addition to the require
             if not isinstance(keys,list):
                 keys = [keys]
             if all([key in reqArgs for key in keys]) or 'all' in reqArgs:
-                with open(item['config']) as handle:
+                with open(os.path.join('Yaml',item['config'])) as handle:
                     samples.update(yaml.load(handle,yaml.SafeLoader))
         self.analysisConfig['samples'] = samples
 

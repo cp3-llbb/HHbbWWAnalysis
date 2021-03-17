@@ -3,7 +3,7 @@ eras:
   '2018':
     luminosity: 59740.565201546
     luminosity-error: 0.025
-dbcache: dascache2018
+dbcache: ../dascache2018
 samples:
   - config: analysis2018_v7_bkg.yml
     keys: mc
