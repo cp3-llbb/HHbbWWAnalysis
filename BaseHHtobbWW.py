@@ -95,6 +95,10 @@ One lepton and and one jet argument must be specified in addition to the require
                             type=str, 
                             default="dataframe", 
                             help="Backend to use, 'dataframe' (default) or 'lazy'")
+        parser.add_argument("--samples", 
+                            type        = str,
+                            required    = True,
+                            help="Samples to be run over, keys defined in the 'samples' entry of the yaml analysis config")
         parser.add_argument("--NoSystematics", 
                             action      = "store_true",
                             default     = False,
@@ -103,6 +107,10 @@ One lepton and and one jet argument must be specified in addition to the require
                             nargs       = '+',
                             type        = int,
                             help="Cut on events (as list)")
+        parser.add_argument("--HHReweighting", 
+                            action      = "store_true",
+                            default     = False,
+                            help="Wether to apply GGF LO->NLO reweighting")
 
 
         #----- Lepton selection arguments -----#
@@ -273,7 +281,28 @@ One lepton and and one jet argument must be specified in addition to the require
                             type        = str,
                             help        = "BDT | simple")
 
+    #-------------------------------------------------------------------------------------------#
+    #                                   customizeAnalysisCfg                                    #
+    #-------------------------------------------------------------------------------------------#
+    def customizeAnalysisCfg(self,analysisCfg):
+        import yaml
+        samples = {} 
+        reqArgs = self.args.samples.split(',')
+        for item in analysisCfg['samples']:
+            keys = item['keys']
+            if not isinstance(keys,list):
+                keys = [keys]
+            if all([key in reqArgs for key in keys]) or 'all' in reqArgs:
+                with open(item['config']) as handle:
+                    samples.update(yaml.load(handle,yaml.SafeLoader))
+        self.analysisConfig['samples'] = samples
+        import IPython
+        IPython.embed()
 
+
+    #-------------------------------------------------------------------------------------------#
+    #                                       prepareTree                                         #
+    #-------------------------------------------------------------------------------------------#
     def prepareTree(self, tree, sample=None, sampleCfg=None):
         from bamboo.treedecorators import NanoAODDescription, nanoRochesterCalc, nanoJetMETCalc, nanoJetMETCalc_METFixEE2017, nanoFatJetCalc
         # JEC's Recommendation for Full RunII: https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC
@@ -733,62 +762,26 @@ One lepton and and one jet argument must be specified in addition to the require
         return tree,noSel,be,lumiArgs
 
     def initialize(self,forSkimmer=False):
-        self.LOstr = [
-            'node_SM',
-            'node_1',
-            'node_2',
-            'node_3',
-            'node_4',
-            'node_5',
-            'node_6',
-            'node_7',
-            'node_8',
-            'node_9',
-            'node_10',
-            'node_11',
-            'node_12',
-        ]
-        self.benchmarks = [
-        #    'BenchmarkSM',  
-        #    'Benchmark1',  
-        #    'Benchmark2',  
-        #    'Benchmark3',  
-        #    'Benchmark4',  
-        #    'Benchmark5',  
-        #    'Benchmark6',  
-        #    'Benchmark7',  
-        #    'Benchmark8',  
-        #    'Benchmark9',  
-        #    'Benchmark10',  
-        #    'Benchmark11',  
-        #    'Benchmark12',  
-            'BenchmarkcHHH0',  
-            'BenchmarkcHHH1',  
-            'BenchmarkcHHH2p45',  
-            'BenchmarkcHHH5',  
-        #    'Benchmarkcluster1',
-        #    'Benchmarkcluster2',
-        #    'Benchmarkcluster3',
-        #    'Benchmarkcluster4',
-        #    'Benchmarkcluster5',
-        #    'Benchmarkcluster6',
-        #    'Benchmarkcluster7',
-        ]
-        self.analysisConfig['datadriven'].update({benchmark:{'replaces': 'all', 'uses': 'all'} for benchmark in self.benchmarks})
 
-        if self.args.datadriven is None:
-            self.args.datadriven = self.benchmarks
-        else:
-            self.args.datadriven += self.benchmarks
+        if not forSkimmer and self.args.HHReweighting:
+            self.analysisConfig['datadriven'].update({benchmark:{'replaces': 'all', 'uses': 'all'} for benchmark in self.analysisConfig['benchmarks']['targets']})
+            if self.args.datadriven is None:
+                self.args.datadriven = self.analysisConfig['benchmarks']['targets']
+            else:
+                self.args.datadriven += self.analysisConfig['benchmarks']['targets']
 
         super(BaseNanoHHtobbWW, self).initialize()
         if not forSkimmer:
             if "PseudoData" in self.datadrivenContributions:
                 contrib = self.datadrivenContributions["PseudoData"]
                 self.datadrivenContributions["PseudoData"] = DataDrivenPseudoData(contrib.name, contrib.config)
-            self.datadrivenContributions.update({benchmark:DataDrivenLOReweighting(benchmark,self.analysisConfig['datadriven'][benchmark],substrs=self.LOstr) for benchmark in self.benchmarks}) 
+        if self.args.HHReweighting:
+            self.datadrivenContributions.update({benchmark:DataDrivenLOReweighting(benchmark,self.analysisConfig['datadriven'][benchmark],substrs=self.analysisConfig['benchmarks']['uses']) for benchmark in self.analysisConfig['benchmarks']['targets']}) 
 
 
+    #-------------------------------------------------------------------------------------------#
+    #                                     prepareObjects                                        #
+    #-------------------------------------------------------------------------------------------#
     def prepareObjects(self, t, noSel, sample, sampleCfg, channel, forSkimmer=False):
         # Some imports #
 
@@ -804,7 +797,7 @@ One lepton and and one jet argument must be specified in addition to the require
         ###########################################################################
         #                              Pseudo-data                                #
         ###########################################################################
-        if not forSkimmer and "PseudoData" in self.datadrivenContributions: # Skimmer does not know about self.datadrivenContributions
+        if not forSkimmer and "PseudoData" in self.datadrivenContributions and self.is_MC: # Skimmer does not know about self.datadrivenContributions
             noSel = SelectionWithDataDriven.create(parent   = noSel,
                                                    name     = 'pseudodata',
                                                    ddSuffix = 'Pseudodata',
@@ -814,7 +807,7 @@ One lepton and and one jet argument must be specified in addition to the require
         ###########################################################################
         #                          Signal Reweighting                             #
         ###########################################################################
-        if 'type' in sampleCfg.keys() and sampleCfg["type"] == "signal" and any(LOstr in sample for LOstr in self.LOstr):
+        if 'type' in sampleCfg.keys() and sampleCfg["type"] == "signal" and any(useFile in sample for useFile in self.analysisConfig['benchmarks']['uses']) and self.args.HHReweighting:
             # Get gen level Higgs #
             self.genh = op.select(t.GenPart,lambda g : op.AND(g.pdgId==25, g.statusFlags & ( 0x1 << 13)))
             # Get gen level variables mHH and cos(theta*) #
@@ -839,7 +832,7 @@ One lepton and and one jet argument must be specified in addition to the require
                 # For the Plotter we want the many-to-many worfklow.
                 # This means create as many files (with the create) 
                 # as there are NLO weight files (+ original LO file)
-                for benchmark in self.benchmarks:
+                for benchmark in self.analysisConfig['benchmarks']['targets']:
                     json_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data','ScaleFactors_GGF_LO','{}_to_{}_{}.json'.format(sample,benchmark,era))
                     if os.path.exists(json_file):
                         print("Found file {} -> Will apply for NO->NLO reweighting".format(json_file))
@@ -1879,66 +1872,79 @@ One lepton and and one jet argument must be specified in addition to the require
         from pprint import pprint
 #        if not self.plotList:
 #            self.plotList = self.getPlotList(resultsdir=resultsdir, config=config)
-        LOFiles = []
-        LOChannels = ['GluGluToHHTo2B2VTo2L2Nu','GluGluToHHTo2B2WToLNu2J','GluGluToHHTo2B2Tau']
-        ddScenarios = set(self.datadrivenScenarios)
-        attrToKeep = ['legend','line-color','line-type','order','type']
-        for contribName in self.benchmarks:
-            contrib = self.datadrivenContributions[contribName]
-            contribSamples = {sample:sampleCfg for sample,sampleCfg in config['samples'].items() if contrib.usesSample(sample,sampleCfg)}
-            LOFiles.extend([sample for sample in contribSamples.keys() if sample not in LOFiles])
-            _, eras = self.args.eras
-            if eras is None:
-                eras = list(config["eras"].keys())
-            for era in eras:
-                for channel in LOChannels:
-                    contribPerChannel = {sample:sampleCfg for sample,sampleCfg in contribSamples.items() if channel in sample and sampleCfg['era']==era}
-                    crossSection = [sampleCfg['cross-section'] for sampleCfg in contribPerChannel.values()]
-                    if len(set(crossSection)) != 1:
-                        raise RuntimeError(f"Not all LO samples for channel {channel} have the same cross-section")
-                    else:
-                        crossSection = crossSection[0]
-                    if all(['branching-ratio' in sampleCfg for sampleCfg in contribPerChannel.values()]):
-                        branchingRatio = [sampleCfg['branching-ratio'] for sampleCfg in contribPerChannel.values()]
-                        if len(set(branchingRatio)) != 1:
-                            raise RuntimeError(f"Not all LO samples for channel {channel} have the same branching-ratio")
+        
+        if self.args.HHReweighting:
+            LOFiles = []
+            LOChannels = ['GluGluToHHTo2B2VTo2L2Nu','GluGluToHHTo2B2WToLNu2J','GluGluToHHTo2B2Tau']
+            ddScenarios = set(self.datadrivenScenarios)
+            attrToKeep = ['legend','line-color','line-type','order','type']
+            for contribName in self.analysisConfig['benchmarks']['targets']:
+#            print ('---------------------')
+#            print (contribName)
+                contrib = self.datadrivenContributions[contribName]
+                contribSamples = {sample:sampleCfg for sample,sampleCfg in config['samples'].items() if contrib.usesSample(sample,sampleCfg)}
+                LOFiles.extend([sample for sample in contribSamples.keys() if sample not in LOFiles])
+                _, eras = self.args.eras
+                if eras is None:
+                    eras = list(config["eras"].keys())
+                for era in eras:
+                    for channel in LOChannels:
+                        #print (channel)
+                        contribPerChannel = {sample:sampleCfg for sample,sampleCfg in contribSamples.items() if channel in sample and sampleCfg['era']==era}
+                        crossSection = [sampleCfg['cross-section'] for sampleCfg in contribPerChannel.values()]
+                        if len(set(crossSection)) != 1:
+                            raise RuntimeError(f"Not all LO samples for channel {channel} have the same cross-section")
                         else:
-                            branchingRatio = branchingRatio[0]
-                    else:
-                        branchingRatio = None 
-                    attrLO = {attr:contribPerChannel[list(contribPerChannel.keys())[0]][attr]  for attr in attrToKeep 
-                                if attr in contribPerChannel[list(contribPerChannel.keys())[0]].keys()}  
-                    files = {sample:gbl.TFile.Open(os.path.join(resultsdir,f"{sample}{contribName}.root")) for sample in contribPerChannel.keys()}
-                    generatedEvents = {sample:self.readCounters(files[sample])[contribPerChannel[sample]['generated-events']] for sample in contribPerChannel.keys()}
-                    generatedEventsSum = sum(list(generatedEvents.values()))
-                    outFile = gbl.TFile.Open(os.path.join(resultsdir,f"{channel}_NLO{contribName}.root"), "RECREATE")
-                    hNames = [key.GetName() for key in files[list(files.keys())[0]].GetListOfKeys() if 'TH' in key.GetClassName()]
-                    for hName in hNames:
-                        hist = None
-                        for sample,f in files.items():
-                            h = f.Get(hName)
-                            h.Scale(generatedEventsSum/(generatedEvents[sample]*len(generatedEvents)))
-                            if hist is None:
-                                hist = copy.deepcopy(h)
+                            crossSection = crossSection[0]
+                        if all(['branching-ratio' in sampleCfg for sampleCfg in contribPerChannel.values()]):
+                            branchingRatio = [sampleCfg['branching-ratio'] for sampleCfg in contribPerChannel.values()]
+                            if len(set(branchingRatio)) != 1:
+                                raise RuntimeError(f"Not all LO samples for channel {channel} have the same branching-ratio")
                             else:
-                                hist.Add(h)
-                        hist.Write()
-                    outFile.Close()
-                    
-                    config['samples'][f"{channel}_NLO{contribName}"] = {'cross-section'     : crossSection,
-                                                                        'era'               : era,
-                                                                        'generated-events'  : generatedEventsSum}
-                    config['samples'][f"{channel}_NLO{contribName}"].update(attrLO)
-                    if branchingRatio is not None:
-                        config['samples'][f"{channel}_NLO{contribName}"]['branching-ratio'] = branchingRatio
+                                branchingRatio = branchingRatio[0]
+                        else:
+                            branchingRatio = None 
+                        attrLO = {attr:contribPerChannel[list(contribPerChannel.keys())[0]][attr]  for attr in attrToKeep 
+                                    if attr in contribPerChannel[list(contribPerChannel.keys())[0]].keys()}  
+                        files = {sample:gbl.TFile.Open(os.path.join(resultsdir,f"{sample}{contribName}.root")) for sample in contribPerChannel.keys()}
+                        generatedEvents = {sample:self.readCounters(files[sample])[contribPerChannel[sample]['generated-events']] for sample in contribPerChannel.keys()}
+                        generatedEventsSum = sum(list(generatedEvents.values()))
+#                    print ('generatedEvents')
+#                    pprint (generatedEvents)
+#                    print ("sum")
+#                    print (generatedEventsSum,len(generatedEvents))
+                        outFile = gbl.TFile.Open(os.path.join(resultsdir,f"{channel}_NLO{contribName}.root"), "RECREATE")
+                        hNames = [key.GetName() for key in files[list(files.keys())[0]].GetListOfKeys() if 'TH' in key.GetClassName()]
+                        for hName in hNames:
+                            hist = None
+                            for sample,f in files.items():
+                                h = f.Get(hName)
+                                h.Scale(generatedEventsSum/(generatedEvents[sample]*len(generatedEvents)))
+                                if hist is None:
+                                    hist = copy.deepcopy(h)
+                                else:
+                                    hist.Add(h)
+                                #if hName == "ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag_combined_mHH":
+                                #    print (sample)
+                                #    print ('Integral',hist.Integral())
+                                #    print ('factor',generatedEventsSum/(generatedEvents[sample]*len(generatedEvents)))
+                            hist.Write()
+                        outFile.Close()
+                        
+                        config['samples'][f"{channel}_NLO{contribName}"] = {'cross-section'     : crossSection,
+                                                                            'era'               : era,
+                                                                            'generated-events'  : generatedEventsSum}
+                        config['samples'][f"{channel}_NLO{contribName}"].update(attrLO)
+                        if branchingRatio is not None:
+                            config['samples'][f"{channel}_NLO{contribName}"]['branching-ratio'] = branchingRatio
 
-                for sc in list(ddScenarios):
-                    if contribName in sc:
-                        newSc = tuple(cb for cb in sc if cb != contribName)
-                        ddScenarios.remove(sc)
-                        ddScenarios.add(newSc)
+                    for sc in list(ddScenarios):
+                        if contribName in sc:
+                            newSc = tuple(cb for cb in sc if cb != contribName)
+                            ddScenarios.remove(sc)
+                            ddScenarios.add(newSc)
 
-        self.datadrivenScenarios = list(ddScenarios)
+            self.datadrivenScenarios = list(ddScenarios)
 
 #        for LOFile in LOFiles:
 #            del config['samples'][LOFile]

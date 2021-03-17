@@ -21,7 +21,7 @@ class ProduceOutput:
         if self.list_inputs is None:
             self.list_inputs = copy.deepcopy(parameters.inputs) 
 
-    def OutputFromTraining(self,data,path_output,output_name=None):
+    def OutputFromTraining(self,data,path_output,output_name=None,crossval_use_training=False):
         """
             Get the output of the model from the test set
             This is data separated from the training
@@ -36,10 +36,20 @@ class ProduceOutput:
                 output_df = pd.DataFrame(output,columns=[('output_%s'%o).replace('$','') for o in parameters.outputs],index=data.index)
             else:   # cross validation
                 output_df = pd.DataFrame(np.zeros((data.shape[0],len(parameters.outputs))),columns=[('output_%s'%o).replace('$','') for o in parameters.outputs],index=data.index)
+                used_train_idx = [] # for train output
                 for model_idx,model in enumerate(self.model):
                     instance = HyperModel(model)
-                    apply_idx, _, _ = GenerateSliceIndices(model_idx)
-                    apply_mask = GenerateSliceMask(apply_idx,data['mask']) 
+                    apply_idx,eval_idx,train_idx = GenerateSliceIndices(model_idx)
+                    if crossval_use_training:
+                        for i in range(model_idx,model_idx+len(train_idx)):
+                            if train_idx[i%len(train_idx)] not in used_train_idx:
+                                train_idx = [train_idx[i%len(train_idx)]]
+                                used_train_idx.extend(train_idx)
+                                break
+                                # logic necessary so that each model is applied once
+                        apply_mask = GenerateSliceMask(train_idx,data['mask']) 
+                    else:
+                        apply_mask = GenerateSliceMask(apply_idx,data['mask']) 
                     model_out = instance.HyperRestore(inputs[apply_mask])
                     output_df[apply_mask] = model_out
             assert not (output_df.max(1)==0).any()

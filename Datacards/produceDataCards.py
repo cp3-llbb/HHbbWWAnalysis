@@ -161,7 +161,7 @@ class DataCard:
         if sample_type == "mc" or sample_type == "signal":
             xsec = self.yaml_dict["samples"][sample]['cross-section']
             sumweight = self.yaml_dict["samples"][sample]['generated-events']
-            br = self.yaml_dict["samples"][sample]["branching-ratio"] if "branching-ratio" in self.yaml_dict["samples"][sample].keys() else 1
+            br = self.yaml_dict["samples"][sample]["branching-ratio"] if "branching-ratio" in self.yaml_dict["samples"][sample].keys() else 1.
         else:
             xsec = None
             sumweight = None

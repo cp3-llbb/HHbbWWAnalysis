@@ -1,0 +1,134 @@
+#################################
+#  Non resonant GGF LO signals  #
+#################################
+##### Tau tau 
+GluGluToHHTo2B2Tau_node_SM:
+  cross-section: 1
+  branching-ratio: 0.073056256
+  era: '2017'
+  db: das:/GluGluToHHTo2B2Tau_node_SM_13TeV-madgraph_correctedcfg/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbbbtautau (node SM)' 
+  line-type: 1
+  split: 100
+  type: signal
+ GluGluToHHTo2B2Tau_node_1:
+   cross-section: 1
+   branching-ratio: 0.073056256
+   era: '2017'
+   db: das:/GluGluToHHTo2B2Tau_node_1_13TeV-madgraph_correctedcfg/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+   generated-events: genEventSumw
+   legend: 'HH#rightarrow bbbbtautau (node 1)' 
+   line-type: 1
+   split: 100
+   type: signal
+GluGluToHHTo2B2Tau_node_2:
+  cross-section: 1
+  branching-ratio: 0.073056256
+  era: '2017'
+  db: das:/GluGluToHHTo2B2Tau_node_2_13TeV-madgraph_correctedcfg/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbbbtautau (node 1)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2Tau_node_3:
+  cross-section: 1
+  branching-ratio: 0.073056256
+  era: '2017'
+  db: das:/GluGluToHHTo2B2Tau_node_3_13TeV-madgraph_correctedcfg/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbbbtautau (node 2)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2Tau_node_4:
+  cross-section: 1
+  branching-ratio: 0.073056256
+  era: '2017'
+  db: das:/GluGluToHHTo2B2Tau_node_4_13TeV-madgraph_correctedcfg/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbbbtautau (node 3)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2Tau_node_5:
+  cross-section: 1
+  branching-ratio: 0.073056256
+  era: '2017'
+  db: das:/GluGluToHHTo2B2Tau_node_5_13TeV-madgraph/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbbbtautau (node 5)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2Tau_node_6:
+  cross-section: 1
+  branching-ratio: 0.073056256
+  era: '2017'
+  db: das:/GluGluToHHTo2B2Tau_node_6_13TeV-madgraph/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbbbtautau (node 6)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2Tau_node_7:
+  cross-section: 1
+  branching-ratio: 0.073056256
+  era: '2017'
+  db: das:/GluGluToHHTo2B2Tau_node_7_13TeV-madgraph_correctedcfg/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbbbtautau (node 7)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2Tau_node_8:
+  cross-section: 1
+  branching-ratio: 0.073056256
+  era: '2017'
+  db: das:/GluGluToHHTo2B2Tau_node_8_13TeV-madgraph/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbbbtautau (node 8)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2Tau_node_9:
+  cross-section: 1
+  branching-ratio: 0.073056256
+  era: '2017'
+  db: das:/GluGluToHHTo2B2Tau_node_9_13TeV-madgraph_correctedcfg/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbbbtautau (node 9)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2Tau_node_10:
+  cross-section: 1
+  branching-ratio: 0.073056256
+  era: '2017'
+  db: das:/GluGluToHHTo2B2Tau_node_10_13TeV-madgraph/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbbbtautau (node 10)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2Tau_node_11:
+  cross-section: 1
+  branching-ratio: 0.073056256
+  era: '2017'
+  db: das:/GluGluToHHTo2B2Tau_node_11_13TeV-madgraph/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbbbtautau (node 11)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2Tau_node_12:
+  cross-section: 1
+  branching-ratio: 0.073056256
+  era: '2017'
+  db: das:/GluGluToHHTo2B2Tau_node_12_13TeV-madgraph_correctedcfg/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbbbtautau (node 12)' 
+  line-type: 1
+  split: 100
+  type: signal

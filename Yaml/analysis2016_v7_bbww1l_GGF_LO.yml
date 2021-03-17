@@ -1,0 +1,134 @@
+#################################
+#  Non resonant GGF LO signals #
+#################################
+##### Single Lepton
+GluGluToHHTo2B2WToLNu2J_node_SM:
+  cross-section: 1
+  branching-ratio: 0.109369082142029
+  era: '2016'
+  db: das:/GluGluToHHTo2B2WToLNu2J_node_SM_TuneCUETP8M1_PSWeights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bblql#nu (node SM)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2WToLNu2J_node_1:
+  cross-section: 1
+  branching-ratio: 0.109369082142029
+  era: '2016'
+  db: das:/GluGluToHHTo2B2WToLNu2J_node_1_TuneCUETP8M1_PSWeights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bblql#nu (node 1)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2WToLNu2J_node_2:
+  cross-section: 1
+  branching-ratio: 0.109369082142029
+  era: '2016'
+  db: das:/GluGluToHHTo2B2WToLNu2J_node_2_TuneCUETP8M1_PSWeights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bblql#nu (node 1)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2WToLNu2J_node_3:
+  cross-section: 1
+  branching-ratio: 0.109369082142029
+  era: '2016'
+  db: das:/GluGluToHHTo2B2WToLNu2J_node_3_TuneCUETP8M1_PSWeights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bblql#nu (node 2)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2WToLNu2J_node_4:
+  cross-section: 1
+  branching-ratio: 0.109369082142029
+  era: '2016'
+  db: das:/GluGluToHHTo2B2WToLNu2J_node_4_TuneCUETP8M1_PSWeights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bblql#nu (node 3)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2WToLNu2J_node_5:
+  cross-section: 1
+  branching-ratio: 0.109369082142029
+  era: '2016'
+  db: das:/GluGluToHHTo2B2WToLNu2J_node_5_TuneCUETP8M1_PSWeights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bblql#nu (node 5)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2WToLNu2J_node_6:
+  cross-section: 1
+  branching-ratio: 0.109369082142029
+  era: '2016'
+  db: das:/GluGluToHHTo2B2WToLNu2J_node_6_TuneCUETP8M1_PSWeights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bblql#nu (node 6)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2WToLNu2J_node_7:
+  cross-section: 1
+  branching-ratio: 0.109369082142029
+  era: '2016'
+  db: das:/GluGluToHHTo2B2WToLNu2J_node_7_TuneCUETP8M1_PSWeights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bblql#nu (node 7)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2WToLNu2J_node_8:
+  cross-section: 1
+  branching-ratio: 0.109369082142029
+  era: '2016'
+  db: das:/GluGluToHHTo2B2WToLNu2J_node_8_TuneCUETP8M1_PSWeights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bblql#nu (node 8)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2WToLNu2J_node_9:
+  cross-section: 1
+  branching-ratio: 0.109369082142029
+  era: '2016'
+  db: das:/GluGluToHHTo2B2WToLNu2J_node_9_TuneCUETP8M1_PSWeights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bblql#nu (node 9)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2WToLNu2J_node_10:
+  cross-section: 1
+  branching-ratio: 0.109369082142029
+  era: '2016'
+  db: das:/GluGluToHHTo2B2WToLNu2J_node_10_TuneCUETP8M1_PSWeights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bblql#nu (node 10)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2WToLNu2J_node_11:
+  cross-section: 1
+  branching-ratio: 0.109369082142029
+  era: '2016'
+  db: das:/GluGluToHHTo2B2WToLNu2J_node_11_TuneCUETP8M1_PSWeights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bblql#nu (node 11)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2WToLNu2J_node_12:
+  cross-section: 1
+  branching-ratio: 0.109369082142029
+  era: '2016'
+  db: das:/GluGluToHHTo2B2WToLNu2J_node_12_TuneCUETP8M1_PSWeights_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bblql#nu (node 12)' 
+  line-type: 1
+  split: 100
+  type: signal

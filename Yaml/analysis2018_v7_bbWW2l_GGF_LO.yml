@@ -1,0 +1,134 @@
+#################################
+#  Non resonant GGF LO signals  #
+#################################
+##### Double lepton
+GluGluToHHTo2B2VTo2L2Nu_node_SM:
+  cross-section: 1
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_SM_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbl#nu l#nu (node SM)' 
+  line-type: 1
+  split: 10
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_1:
+  cross-section: 1
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_1_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbl#nu l#nu (node 1)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_2:
+  cross-section: 1
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_2_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbl#nu l#nu (node 1)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_3:
+  cross-section: 1
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_3_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbl#nu l#nu (node 2)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_4:
+  cross-section: 1
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_4_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbl#nu l#nu (node 3)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_5:
+  cross-section: 1
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_5_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbl#nu l#nu (node 5)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_6:
+  cross-section: 1
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_6_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbl#nu l#nu (node 6)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_7:
+  cross-section: 1
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_7_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbl#nu l#nu (node 7)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_8:
+  cross-section: 1
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_8_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbl#nu l#nu (node 8)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_9:
+  cross-section: 1
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_9_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbl#nu l#nu (node 9)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_10:
+  cross-section: 1
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_10_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbl#nu l#nu (node 10)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_11:
+  cross-section: 1
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_11_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbl#nu l#nu (node 11)' 
+  line-type: 1
+  split: 100
+  type: signal
+GluGluToHHTo2B2VTo2L2Nu_node_12:
+  cross-section: 1
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_12_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+  era: '2018'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bbl#nu l#nu (node 12)' 
+  line-type: 1
+  split: 100
+  type: signal

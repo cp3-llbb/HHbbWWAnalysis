@@ -72,7 +72,8 @@ def main():
     list_plots = [
                     Plots(name = 'test',
                           override_params = {}),
-                                              
+                    Plots(name = 'train',
+                          override_params = {}),
                  ]
 
     templates = [
@@ -107,6 +108,10 @@ def main():
                     class_name = 'Plot_Multi_ROC',
                     def_name = 'MakeMultiROCPlot',
                     plot_name = 'Multiclass_event'),
+                ROC(tpl = 'ROCMulti_class_learning_weight.yml.tpl',
+                    class_name = 'Plot_Multi_ROC',
+                    def_name = 'MakeMultiROCPlot',
+                    plot_name = 'Multiclass_learning'),
            ]
 
     # Make the output dir #

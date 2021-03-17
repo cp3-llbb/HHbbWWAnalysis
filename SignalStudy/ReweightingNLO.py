@@ -105,6 +105,7 @@ class ReweightingNLO:
         self.couplings = self.model.getBenchmark(idx)
 
     def SetCouplings(self,couplings):
+        """ ["kl", "kt", "c2", "cg", "c2g"] """
         if len(couplings) != 5:
             raise RuntimeError("There must be 5 couplings")
         self.couplings = couplings
@@ -125,11 +126,20 @@ converter = {
     'node_11' : 11,
     'node_12' : 12,
 }
-NLO_couplings = {
+additional_couplings = {
+    # NLO samples
     'cHHH0'     : [0.,1.,0.,0.,0.],
     'cHHH1'     : [1.,1.,0.,0.,0.],
     'cHHH2p45'  : [2.45,1.,0.,0.,0.],
     'cHHH5'     : [5.,1.,0.,0.,0.],
+    # https://arxiv.org/pdf/1908.08923.pdf
+    'cluster1' : [3.94,0.94,-1./3,0.5,1./3],
+    'cluster2' : [6.84,0.61,1./3,0.,-1./3],
+    'cluster3' : [2.21,1.05,-1./3,0.5,0.5],
+    'cluster4' : [2.79,0.61,1./3,-0.5,1/6],
+    'cluster5' : [3.95,1.17,-1./3,1./6,-0.5],
+    'cluster6' : [5.68,0.83,1./3,-0.5,1./3],
+    'cluster7' : [-0.10,0.94,1.,1./6,-1./6],
 }
 
 
@@ -165,9 +175,10 @@ if __name__=="__main__":
                 if idxBM == 0:
                     idxBM = 'SM'
                 reweight.SaveToJson("weights/{}_to_Benchmark{}_{}".format(sample.replace('.root',''),idxBM,args.era))
-            for node, couplings in NLO_couplings.items():
+            for node, couplings in additional_couplings.items():
                 reweight.SetCouplings(couplings)
                 reweight.SaveToJson("weights/{}_to_Benchmark{}_{}".format(sample.replace('.root',''),node,args.era))
+
 
 
 

@@ -1,0 +1,88 @@
+#################################
+#  Non resonant VBF LO signals  #
+#################################
+##### Tau tau 
+VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff:
+  cross-section: 0.0108237
+  branching-ratio: 0.073056256
+  db: das:/VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  era: '2017'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bb#tau#tau (CV 0.5 - C2V 1 - C3 1)'
+  line-type: 1
+  line-color: "#8f0a1e"
+  split: 1
+  order: 10
+  type: signal
+VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff:
+  cross-section: 0.0660185
+  branching-ratio: 0.073056256
+  db: das:/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  era: '2017'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bb#tau#tau (CV 1.5 - C2V 1 - C3 1)'
+  line-type: 1
+  line-color: "#8f0a1e"
+  split: 1
+  order: 10
+  type: signal
+VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff:
+  cross-section: 0.02708
+  branching-ratio: 0.073056256
+  db: ["das:/VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM","das:/VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8_ext1-v1/NANOAODSIM"]
+  era: '2017'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bb#tau#tau (CV 1 - C2V 0 - C3 1)'
+  line-type: 1
+  line-color: "#8f0a1e"
+  split: 1
+  order: 10
+  type: signal
+VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff:
+  cross-section: 0.0046089
+  branching-ratio: 0.073056256
+  db: das:/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  era: '2017'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bb#tau#tau (CV 1 - C2V 1 - C3 0)'
+  line-type: 1
+  line-color: "#8f0a1e"
+  split: 1
+  order: 10
+  type: signal
+VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff:
+  cross-section: 0.001726
+  branching-ratio: 0.073056256
+  db: das:/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  era: '2017'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bb#tau#tau (CV 1 - C2V 1 - C3 1)'
+  line-type: 1
+  line-color: "#8f0a1e"
+  split: 1
+  order: 10
+  type: signal
+VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff:
+  cross-section: 0.0014228
+  branching-ratio: 0.073056256
+  db: das:/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  era: '2017'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bb#tau#tau (CV 1 - C2V 1 - C3 2)'
+  line-type: 1
+  line-color: "#8f0a1e"
+  split: 1
+  order: 10
+  type: signal
+VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff:
+  cross-section: 0.0142178
+  branching-ratio: 0.073056256
+  db: das:/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  era: '2017'
+  generated-events: genEventSumw
+  legend: 'HH#rightarrow bb#tau#tau (CV 1 - C2V 2 - C3 1)'
+  line-type: 1
+  line-color: "#8f0a1e"
+  split: 1
+  order: 10
+  type: signal

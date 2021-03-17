@@ -154,7 +154,7 @@ class Analyze:
 #        IPython.embed()
 
     def inputPlots(self):
-        InputPlots(self.data,self.inputs,self.path_out)
+        InputPlots(self.data,self.inputs,self.path_out,force=True)
 
     def loadModel(self,basemodel):
         # Need to find basemodel.json and basemodel.h5 #

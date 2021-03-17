@@ -1,0 +1,34 @@
+tree: Events
+eras:
+  '2018':
+    luminosity: 59740.565201546
+    luminosity-error: 0.025
+dbcache: dascache2018
+samples:
+  - config: analysis2018_v7_bkg.yml
+    keys: mc
+  - config: analysis2018_v7_bbWW2l_GGF_LO.yml
+    keys: [bbWW2l,GGFLO]    
+  - config: analysis2018_v7_bbWW1l_GGF_LO.yml
+    keys: [bbWW1l,GGFLO]    
+  - config: analysis2018_v7_bbtautau_GGF_LO.yml
+    keys: [bbtautau,GGFLO]    
+  - config: analysis2018_v7_bbWW2l_GGF_NLO.yml
+    keys: [bbWW2l,GGFNLO]    
+  - config: analysis2018_v7_bbWW1l_GGF_NLO.yml
+    keys: [bbWW1l,GGFNLO]    
+  - config: analysis2018_v7_bbtautau_GGF_NLO.yml
+    keys: [bbtautau,GGFNLO]    
+  - config: analysis2018_v7_bbWW2l_VBF_LO.yml
+    keys: [bbWW2l,VBFLO]    
+  - config: analysis2018_v7_bbWW1l_VBF_LO.yml
+    keys: [bbWW1l,VBFLO]    
+  - config: analysis2018_v7_bbtautau_VBF_LO.yml
+    keys: [bbtautau,VBFLO]    
+    
+  
+datadriven: !include datadriven.yml
+benchmarks: !include benchmarks.yml
+plotit    : !include plotit.yml
+
+

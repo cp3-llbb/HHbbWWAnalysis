@@ -6,6 +6,7 @@ from root_numpy import hist2array, array2hist
 
 ROOT.gStyle.SetOptStat(0)
 ROOT.gROOT.SetBatch(True)
+ROOT.gErrorIgnoreLevel = 2001
 
 parser = argparse.ArgumentParser(description='Plotter of systematic contributions')
 parser.add_argument('--file', action='store', required=True, type=str, 
@@ -77,21 +78,23 @@ for systName in hups.keys():
 all_leg.SetNColumns(2)
 all_leg.SetFillStyle(0)
 all_leg.Draw()
-c.Print(args.output)
+c.Print(args.output,'Title:All systematics')
 
 # One stat per plot #
 for systName in hups.keys():
     print (systName)
     c.Clear()
-    one_leg = ROOT.TLegend(0.6,0.8,0.98,0.98)
+    one_leg = ROOT.TLegend(0.65,0.7,0.98,0.98)
+    one_leg.SetTextSize(0.033)
     hnom.SetTitle(systName)
     hnom.Draw("hist")
     hups[systName].Draw("hist same")
     hdowns[systName].Draw("hist same")
-    one_leg.AddEntry(hups[systName],"{} - Up".format(systName))
-    one_leg.AddEntry(hdowns[systName],"{} - Down".format(systName))
+    one_leg.AddEntry(hups[systName],"#splitline{{{} - Up}}{{Integral = {:.6f}}}".format(systName,hups[systName].Integral()))
+    one_leg.AddEntry(hnom,"#splitline{{{} - Nominal}}{{Integral = {:.6f}}}".format(systName,hnom.Integral()))
+    one_leg.AddEntry(hdowns[systName],"#splitline{{{} - Down}}{{Integral = {:.6f}}}".format(systName,hdowns[systName].Integral()))
     one_leg.Draw()
-    c.Print(args.output)
+    c.Print(args.output,'Title:'+systName)
 
 c.Print(args.output+']')
 
