@@ -284,8 +284,6 @@ One lepton and and one jet argument must be specified in addition to the require
                 with open(item['config']) as handle:
                     samples.update(yaml.load(handle,yaml.SafeLoader))
         self.analysisConfig['samples'] = samples
-        import IPython
-        IPython.embed()
 
 
     #-------------------------------------------------------------------------------------------#
