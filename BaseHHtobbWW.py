@@ -106,18 +106,6 @@ One lepton and and one jet argument must be specified in addition to the require
 
 
         #----- Lepton selection arguments -----#
-        parser.add_argument("--POGID", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Use the POG id for tight leptons")
-        parser.add_argument("--TTHIDLoose", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Use the Loose mva ttH ID tight leptons")
-        parser.add_argument("--TTHIDTight", 
-                            action      = "store_true",
-                            default     = False,
-                            help        = "Use the Tight mva ttH ID tight leptons")
         parser.add_argument("--NoZVeto", 
                             action      = "store_true",
                             default     = False,
@@ -967,35 +955,17 @@ One lepton and and one jet argument must be specified in addition to the require
                      # If no associated jet, isolated lepton : cool !  
 
         # Cone pt #
-        if self.args.POGID:
-            self.lambda_conept_electron = lambda lep : lep.pt
-            self.lambda_conept_muon = lambda lep : lep.pt
-        if self.args.TTHIDTight:
-            # Def conept : https://github.com/CERN-PH-CMG/cmgtools-lite/blob/f8a34c64a4489d94ff9ac4c0d8b0b06dad46e521/TTHAnalysis/python/tools/conept.py#L74
-            self.lambda_conept_electron = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
-                                                                      # if (abs(lep.pdgId)!=11 and abs(lep.pdgId)!=13): return lep.pt : anything that is not muon or electron
-                                                                      (op.AND(op.abs(lep.pdgId)==11 , lep.mvaTTH > 0.80) , op.static_cast("Float_t",lep.pt)),
-                                                                      # if electron, check above MVA 
-                                                                       op.static_cast("Float_t",0.9*lep.pt*(1.+lep.jetRelIso)))
-                                                                      # else: return 0.90 * lep.pt / jetPtRatio where jetPtRatio = 1./(Electron_jetRelIso + 1.)
-            self.lambda_conept_muon = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
-                                                                   # if (abs(lep.pdgId)!=11 and abs(lep.pdgId)!=13): return lep.pt : anything that is not muon or electron
-                                                                  (op.AND(op.abs(lep.pdgId)==13 , lep.mediumId ,lep.mvaTTH > 0.85) , op.static_cast("Float_t",lep.pt)),
-                                                                   # if muon, check that passes medium and above MVA
+        self.lambda_conept_electron = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
+                                                                  # if (abs(lep.pdgId)!=11 and abs(lep.pdgId)!=13): return lep.pt : anything that is not muon or electron
+                                                                  (op.AND(op.abs(lep.pdgId)==11 , lep.mvaTTH > 0.30) , op.static_cast("Float_t",lep.pt)),
+                                                                  # if electron, check above MVA 
                                                                    op.static_cast("Float_t",0.9*lep.pt*(1.+lep.jetRelIso)))
-                                                               # else: return 0.90 * lep.pt / lep.jetPtRatiov2
-        if self.args.TTHIDLoose:
-            self.lambda_conept_electron = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
-                                                                      # if (abs(lep.pdgId)!=11 and abs(lep.pdgId)!=13): return lep.pt : anything that is not muon or electron
-                                                                      (op.AND(op.abs(lep.pdgId)==11 , lep.mvaTTH > 0.30) , op.static_cast("Float_t",lep.pt)),
-                                                                      # if electron, check above MVA 
-                                                                       op.static_cast("Float_t",0.9*lep.pt*(1.+lep.jetRelIso)))
-                                                                      # else: return 0.90 * lep.pt / jetPtRatio where jetPtRatio = 1./(Electron_jetRelIso + 1.)
-            self.lambda_conept_muon = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
-                                                                   # if (abs(lep.pdgId)!=11 and abs(lep.pdgId)!=13): return lep.pt : anything that is not muon or electron
-                                                                  (op.AND(op.abs(lep.pdgId)==13 , lep.mediumId ,lep.mvaTTH > 0.50) , op.static_cast("Float_t",lep.pt)),
-                                                                   # if muon, check that passes medium and above MVA
-                                                                   op.static_cast("Float_t",0.9*lep.pt*(1.+lep.jetRelIso)))
+                                                                  # else: return 0.90 * lep.pt / jetPtRatio where jetPtRatio = 1./(Electron_jetRelIso + 1.)
+        self.lambda_conept_muon = lambda lep : op.multiSwitch((op.AND(op.abs(lep.pdgId)!=11 , op.abs(lep.pdgId)!=13) , op.static_cast("Float_t",lep.pt)),
+                                                               # if (abs(lep.pdgId)!=11 and abs(lep.pdgId)!=13): return lep.pt : anything that is not muon or electron
+                                                              (op.AND(op.abs(lep.pdgId)==13 , lep.mediumId ,lep.mvaTTH > 0.50) , op.static_cast("Float_t",lep.pt)),
+                                                               # if muon, check that passes medium and above MVA
+                                                               op.static_cast("Float_t",0.9*lep.pt*(1.+lep.jetRelIso)))
                                                                # else: return 0.90 * lep.pt / lep.jetPtRatiov2
 
         self.electron_conept = op.map(t.Electron, self.lambda_conept_electron)
@@ -1053,153 +1023,92 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                                 Muons                                     #
         #############################################################################
-        if self.args.POGID:
-            muonsByPt = op.sort(t.Muon, lambda mu : -mu.pt) # Ordering done by pt
-            self.lambda_muonTightSel = lambda mu : op.AND(mu.tightId,
-                                                          mu.pfRelIso04_all <= 0.15,
-                                                          mu.pt >= 15.,
-                                                          op.abs(mu.eta) <= 2.4)
-            self.muonsTightSel = op.select(muonsByPt, self.lambda_muonTightSel)
-                                                        
-        if self.args.TTHIDLoose or self.args.TTHIDTight:
-            muonsByPt = op.sort(t.Muon, lambda mu : -self.muon_conept[mu.idx]) # Ordering done by conept
-            # Preselection #
-            self.lambda_muonPreSel = lambda mu : op.AND(mu.pt >= 5.,
-                                                        op.abs(mu.eta) <= 2.4,
-                                                        op.abs(mu.dxy) <= 0.05,
-                                                        op.abs(mu.dz) <= 0.1,
-                                                        mu.miniPFRelIso_all <= 0.4, # mini PF relative isolation, total (with scaled rho*EA PU corrections)
-                                                        mu.sip3d <= 8,
-                                                        mu.looseId)
+        muonsByPt = op.sort(t.Muon, lambda mu : -self.muon_conept[mu.idx]) # Ordering done by conept
+        # Preselection #
+        self.lambda_muonPreSel = lambda mu : op.AND(mu.pt >= 5.,
+                                                    op.abs(mu.eta) <= 2.4,
+                                                    op.abs(mu.dxy) <= 0.05,
+                                                    op.abs(mu.dz) <= 0.1,
+                                                    mu.miniPFRelIso_all <= 0.4, # mini PF relative isolation, total (with scaled rho*EA PU corrections)
+                                                    mu.sip3d <= 8,
+                                                    mu.looseId)
 
-            self.muonsPreSel = op.select(muonsByPt, self.lambda_muonPreSel)
-            # Fakeable selection #
-            if self.args.TTHIDTight:
-                self.lambda_muonFakeSel = lambda mu : op.AND(self.muon_conept[mu.idx] >= op.c_float(10.),
-                                                             self.lambda_lepton_associatedJetLessThanMediumBtag(mu),
-                                                             op.OR(mu.mvaTTH >= 0.85, op.AND(mu.jetRelIso<0.5 , self.lambda_muon_deepJetInterpIfMvaFailed(mu))))
-                                                            # If mvaTTH < 0.85 : jetRelIso <0.5 and < deepJet medium with interpolation
-            if self.args.TTHIDLoose:
-                self.lambda_muonFakeSel = lambda mu : op.AND(self.muon_conept[mu.idx] >= op.c_float(10.),
-                                                             self.lambda_lepton_associatedJetLessThanMediumBtag(mu),
-                                                             op.OR(mu.mvaTTH >= 0.50, op.AND(mu.jetRelIso<0.8 , self.lambda_muon_deepJetInterpIfMvaFailed(mu))))
-                                                            # If mvaTTH < 0.50 : jetRelIso <0.8 and < deepJet medium with interpolation
-            self.muonsFakeSel = op.select(self.muonsPreSel, self.lambda_muonFakeSel)
-            # Tight selection #
-            if self.args.TTHIDTight:
-                self.lambda_muonTightSel = lambda mu : op.AND(mu.mvaTTH >= 0.85, # Lepton MVA id from ttH
-                                                              mu.mediumId)
-            if self.args.TTHIDLoose:
-                self.lambda_muonTightSel = lambda mu : op.AND(mu.mvaTTH >= 0.50, # Lepton MVA id from ttH
-                                                              mu.mediumId)
+        self.muonsPreSel = op.select(muonsByPt, self.lambda_muonPreSel)
+        # Fakeable selection #
+        self.lambda_muonFakeSel = lambda mu : op.AND(self.muon_conept[mu.idx] >= op.c_float(10.),
+                                                     self.lambda_lepton_associatedJetLessThanMediumBtag(mu),
+                                                     op.OR(mu.mvaTTH >= 0.50, op.AND(mu.jetRelIso<0.8 , self.lambda_muon_deepJetInterpIfMvaFailed(mu))))
+                                                    # If mvaTTH < 0.50 : jetRelIso <0.8 and < deepJet medium with interpolation
+        self.muonsFakeSel = op.select(self.muonsPreSel, self.lambda_muonFakeSel)
+        # Tight selection #
+        self.lambda_muonTightSel = lambda mu : op.AND(mu.mvaTTH >= 0.50, # Lepton MVA id from ttH
+                                                      mu.mediumId)
 
-            self.muonsTightSel = op.select(self.muonsFakeSel, self.lambda_muonTightSel)
+        self.muonsTightSel = op.select(self.muonsFakeSel, self.lambda_muonTightSel)
 
         #############################################################################
         #                              Electrons                                    #
         #############################################################################
-        # Preselection #
-        if self.args.POGID:
-            electronsByPt = op.sort(t.Electron, lambda ele : -ele.pt) # Ordering done by pt
-            self.lambda_electronTightSel = lambda ele : op.AND(ele.mvaFall17V2Iso_WP90,
-                                                               ele.pt >= 15.,
-                                                               op.abs(ele.eta) <= 2.5)
-            self.lambda_cleanElectron = lambda ele : op.NOT(op.rng_any(self.muonsTightSel, lambda mu : op.deltaR(mu.p4, ele.p4) <= 0.3 ))
-            self.electronsTightSelBeforeCleaning = op.select(electronsByPt, self.lambda_electronTightSel)
-            self.electronsTightSel = op.select(self.electronsTightSelBeforeCleaning, self.lambda_cleanElectron)
+        electronsByPt = op.sort(t.Electron, lambda ele : -self.electron_conept[ele.idx]) # Ordering done by conept
+        self.lambda_electronPreSel = lambda ele : op.AND(ele.pt >= 7.,
+                                                         op.abs(ele.eta) <= 2.5,
+                                                         op.abs(ele.dxy) <= 0.05,
+                                                         op.abs(ele.dz) <= 0.1,
+                                                         ele.miniPFRelIso_all <= 0.4, # mini PF relative isolation, total (with scaled rho*EA PU corrections)
 
-        if self.args.TTHIDLoose or self.args.TTHIDTight:
-            electronsByPt = op.sort(t.Electron, lambda ele : -self.electron_conept[ele.idx]) # Ordering done by conept
-            self.lambda_electronPreSel = lambda ele : op.AND(ele.pt >= 7.,
-                                                             op.abs(ele.eta) <= 2.5,
-                                                             op.abs(ele.dxy) <= 0.05,
-                                                             op.abs(ele.dz) <= 0.1,
-                                                             ele.miniPFRelIso_all <= 0.4, # mini PF relative isolation, total (with scaled rho*EA PU corrections)
+                                                         ele.sip3d <= 8,
+                                                         ele.mvaFall17V2noIso_WPL, 
+                                                         ele.lostHits <=1)    # number of missing inner hits
 
-                                                             ele.sip3d <= 8,
-                                                             ele.mvaFall17V2noIso_WPL, 
-                                                             ele.lostHits <=1)    # number of missing inner hits
+        self.electronsPreSelInclu = op.select(electronsByPt, self.lambda_electronPreSel) # can include a muon in cone
+        self.lambda_cleanElectron = lambda ele : op.NOT(op.rng_any(self.muonsPreSel, lambda mu : op.deltaR(mu.p4, ele.p4) <= 0.3 ))
+            # No overlap between electron and muon in cone of DR<=0.3
+        self.electronsPreSel = op.select(self.electronsPreSelInclu, self.lambda_cleanElectron)
+        # Fakeable selection #
+        self.lambda_electronFakeSel = lambda ele : op.AND(self.electron_conept[ele.idx] >= 10,
+                                                          op.OR(
+                                                                  op.AND(op.abs(ele.eta+ele.deltaEtaSC)<=1.479, ele.sieie<=0.011), 
+                                                                  op.AND(op.abs(ele.eta+ele.deltaEtaSC)>1.479, ele.sieie<=0.030)),
+                                                          ele.hoe <= 0.10,
+                                                          ele.eInvMinusPInv >= -0.04,
+                                                          op.OR(ele.mvaTTH >= 0.30, op.AND(ele.jetRelIso<0.7, ele.mvaFall17V2noIso_WP90)), # Lepton MVA id from ttH
+                                                              # If mvaTTH < 0.30 : jetRelIso <0.7 and Fall17V2noIso_WP90
+                                                          op.switch(ele.mvaTTH < 0.30, 
+                                                                    self.lambda_lepton_associatedJetLessThanTightBtag(ele),
+                                                                    self.lambda_lepton_associatedJetLessThanMediumBtag(ele)),
+                                                          ele.lostHits == 0,    # number of missing inner hits
+                                                          ele.convVeto)        # Passes conversion veto
 
-            self.electronsPreSelInclu = op.select(electronsByPt, self.lambda_electronPreSel) # can include a muon in cone
-            self.lambda_cleanElectron = lambda ele : op.NOT(op.rng_any(self.muonsPreSel, lambda mu : op.deltaR(mu.p4, ele.p4) <= 0.3 ))
-                # No overlap between electron and muon in cone of DR<=0.3
-            self.electronsPreSel = op.select(self.electronsPreSelInclu, self.lambda_cleanElectron)
-            # Fakeable selection #
-            if self.args.TTHIDTight:
-                self.lambda_electronFakeSel = lambda ele : op.AND(self.electron_conept[ele.idx] >= 10,
-                                                                  op.OR(
-                                                                          op.AND(op.abs(ele.eta+ele.deltaEtaSC)<=1.479, ele.sieie<=0.011), 
-                                                                          op.AND(op.abs(ele.eta+ele.deltaEtaSC)>1.479, ele.sieie<=0.030)),
-                                                                  self.lambda_lepton_associatedJetLessThanMediumBtag(ele),
-                                                                  ele.hoe <= 0.10,
-                                                                  ele.eInvMinusPInv >= -0.04,
-                                                                  op.OR(ele.mvaTTH >= 0.80, op.AND(ele.jetRelIso<0.7, ele.mvaFall17V2noIso_WP80)), # Lepton MVA id from ttH
-                                                                      # If mvaTTH < 0.80 : jetRelIso <0.7 and Fall17V2noIso_WP80
-                                                                  ele.lostHits == 0,    # number of missing inner hits
-                                                                  ele.convVeto)        # Passes conversion veto
-            if self.args.TTHIDLoose:
-                self.lambda_electronFakeSel = lambda ele : op.AND(self.electron_conept[ele.idx] >= 10,
-                                                                  op.OR(
-                                                                          op.AND(op.abs(ele.eta+ele.deltaEtaSC)<=1.479, ele.sieie<=0.011), 
-                                                                          op.AND(op.abs(ele.eta+ele.deltaEtaSC)>1.479, ele.sieie<=0.030)),
-                                                                  ele.hoe <= 0.10,
-                                                                  ele.eInvMinusPInv >= -0.04,
-                                                                  op.OR(ele.mvaTTH >= 0.30, op.AND(ele.jetRelIso<0.7, ele.mvaFall17V2noIso_WP90)), # Lepton MVA id from ttH
-                                                                      # If mvaTTH < 0.30 : jetRelIso <0.7 and Fall17V2noIso_WP90
-                                                                  op.switch(ele.mvaTTH < 0.30, 
-                                                                            self.lambda_lepton_associatedJetLessThanTightBtag(ele),
-                                                                            self.lambda_lepton_associatedJetLessThanMediumBtag(ele)),
-                                                                  ele.lostHits == 0,    # number of missing inner hits
-                                                                  ele.convVeto)        # Passes conversion veto
-
-            self.electronsFakeSel = op.select(self.electronsPreSel, self.lambda_electronFakeSel)
-            # Tight selection #
-            if self.args.TTHIDTight:
-                self.lambda_electronTightSel = lambda ele : ele.mvaTTH >= 0.80
-            if self.args.TTHIDLoose:
-                self.lambda_electronTightSel = lambda ele : ele.mvaTTH >= 0.30
-            self.electronsTightSel = op.select(self.electronsFakeSel, self.lambda_electronTightSel)
+        self.electronsFakeSel = op.select(self.electronsPreSel, self.lambda_electronFakeSel)
+        # Tight selection #
+        self.lambda_electronTightSel = lambda ele : ele.mvaTTH >= 0.30
+        self.electronsTightSel = op.select(self.electronsFakeSel, self.lambda_electronTightSel)
 
         #############################################################################
         #                               Dileptons                                   #
         #############################################################################
 
-        if self.args.POGID:
-            # To remove mll>12 resonances #
-            self.ElElTightDileptonPairs = op.combine(self.electronsTightSelBeforeCleaning, N=2)
-            self.MuMuTightDileptonPairs = op.combine(self.muonsTightSel, N=2)
-            self.ElMuTightDileptonPairs = op.combine((self.electronsTightSelBeforeCleaning,self.muonsTightSel))
-            # To remove Z peak resonances #
-            self.ElElTightDileptonOSPairs = op.combine(self.electronsTightSel, N=2, pred=lambda l1,l2: l1.charge != l2.charge)
-            self.MuMuTightDileptonOSPairs = op.combine(self.muonsTightSel, N=2, pred=lambda l1,l2: l1.charge != l2.charge)
+        #----- Needed for both SL and DL -----#
+        # Preselected dilepton -> Mll>12 cut #
+        self.ElElDileptonPreSel = op.combine(self.electronsPreSelInclu, N=2)
+        self.MuMuDileptonPreSel = op.combine(self.muonsPreSel, N=2)
+        self.ElMuDileptonPreSel = op.combine((self.electronsPreSelInclu, self.muonsPreSel))
+            # Need pairs without sign for one of the selection
+            # We use electrons before muon cleaning : electron-muon pair that has low mass are typically close to each other
+        # OS Preselected dilepton -> Z Veto #
+        self.OSElElDileptonPreSel = op.combine(self.electronsPreSel, N=2, pred=self.lambda_leptonOS)
+        self.OSMuMuDileptonPreSel = op.combine(self.muonsPreSel, N=2, pred=self.lambda_leptonOS)
+        self.OSElMuDileptonPreSel = op.combine((self.electronsPreSel, self.muonsPreSel), pred=self.lambda_leptonOS) 
 
-            if channel == "DL":
-                self.ElElTightSel = op.combine(self.electronsTightSel, N=2)
-                self.MuMuTightSel = op.combine(self.muonsTightSel, N=2)
-                self.ElMuTightSel = op.combine((self.electronsTightSel,self.muonsTightSel))
+        # Dilepton for selection #
+        if channel == "DL":
+            self.ElElFakeSel = op.combine(self.electronsFakeSel, N=2)
+            self.MuMuFakeSel = op.combine(self.muonsFakeSel, N=2)
+            self.ElMuFakeSel = op.combine((self.electronsFakeSel,self.muonsFakeSel))
 
-        if self.args.TTHIDLoose or self.args.TTHIDTight:
-            #----- Needed for both SL and DL -----#
-            # Preselected dilepton -> Mll>12 cut #
-            self.ElElDileptonPreSel = op.combine(self.electronsPreSelInclu, N=2)
-            self.MuMuDileptonPreSel = op.combine(self.muonsPreSel, N=2)
-            self.ElMuDileptonPreSel = op.combine((self.electronsPreSelInclu, self.muonsPreSel))
-                # Need pairs without sign for one of the selection
-                # We use electrons before muon cleaning : electron-muon pair that has low mass are typically close to each other
-            # OS Preselected dilepton -> Z Veto #
-            self.OSElElDileptonPreSel = op.combine(self.electronsPreSel, N=2, pred=self.lambda_leptonOS)
-            self.OSMuMuDileptonPreSel = op.combine(self.muonsPreSel, N=2, pred=self.lambda_leptonOS)
-            self.OSElMuDileptonPreSel = op.combine((self.electronsPreSel, self.muonsPreSel), pred=self.lambda_leptonOS) 
-
-            # Dilepton for selection #
-            if channel == "DL":
-                self.ElElFakeSel = op.combine(self.electronsFakeSel, N=2)
-                self.MuMuFakeSel = op.combine(self.muonsFakeSel, N=2)
-                self.ElMuFakeSel = op.combine((self.electronsFakeSel,self.muonsFakeSel))
-
-                self.ElElTightSel = op.combine(self.electronsTightSel, N=2)
-                self.MuMuTightSel = op.combine(self.muonsTightSel, N=2)
-                self.ElMuTightSel = op.combine((self.electronsTightSel,self.muonsTightSel))
+            self.ElElTightSel = op.combine(self.electronsTightSel, N=2)
+            self.MuMuTightSel = op.combine(self.muonsTightSel, N=2)
+            self.ElMuTightSel = op.combine((self.electronsTightSel,self.muonsTightSel))
 
         #############################################################################
         #                               Triggers                                    #
@@ -1238,14 +1147,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                             )
         self.tauSel = op.select (t.Tau, self.lambda_tauSel)
         # Cleaning #
-        if self.args.POGID:
-            self.lambda_tauClean = lambda ta : op.AND(op.NOT(op.rng_any(self.electronsTightSel, lambda el : op.deltaR(ta.p4, el.p4) <= 0.3)), 
-                                                      op.NOT(op.rng_any(self.muonsTightSel, lambda mu : op.deltaR(ta.p4, mu.p4) <= 0.3)))
-        elif self.args.TTHIDLoose or self.args.TTHIDTight:
-            self.lambda_tauClean = lambda ta : op.AND(op.NOT(op.rng_any(self.electronsFakeSel, lambda el : op.deltaR(ta.p4, el.p4) <= 0.3)), 
-                                                      op.NOT(op.rng_any(self.muonsFakeSel, lambda mu : op.deltaR(ta.p4, mu.p4) <= 0.3)))
-        else:
-            self.lambda_tauClean = lambda ta : op.c_float(True)
+        self.lambda_tauClean = lambda ta : op.AND(op.NOT(op.rng_any(self.electronsFakeSel, lambda el : op.deltaR(ta.p4, el.p4) <= 0.3)), 
+                                                  op.NOT(op.rng_any(self.muonsFakeSel, lambda mu : op.deltaR(ta.p4, mu.p4) <= 0.3)))
         self.tauCleanSel = op.select(self.tauSel, self.lambda_tauClean)
 
         #############################################################################
@@ -1262,55 +1165,49 @@ One lepton and and one jet argument must be specified in addition to the require
         self.ak4JetsPreSel        = op.select(self.ak4JetsByPt, lambda j : op.AND(self.lambda_ak4JetsPreSel(j),self.lambda_jetPUID(j)))
 
         # Cleaning #
-        if self.args.POGID:
-            self.lambda_cleanAk4Jets = lambda j : op.AND(op.NOT(op.rng_any(self.electronsTightSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.4 )), 
-                                                         op.NOT(op.rng_any(self.muonsTightSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.4 )))
-        elif self.args.TTHIDLoose or self.args.TTHIDTight:
-            if channel == 'SL':
-                def returnLambdaCleaningWithRespectToLeadingLepton(DR):
-                   return lambda j : op.multiSwitch(
-                            (op.AND(op.rng_len(self.electronsFakeSel) >= 1, op.rng_len(self.muonsFakeSel) == 0), op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR),
-                            (op.AND(op.rng_len(self.electronsFakeSel) == 0, op.rng_len(self.muonsFakeSel) >= 1), op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR),
-                            (op.AND(op.rng_len(self.muonsFakeSel) >= 1, op.rng_len(self.electronsFakeSel) >= 1),
-                                   op.switch(self.electron_conept[self.electronsFakeSel[0].idx] >= self.muon_conept[self.muonsFakeSel[0].idx],
-                                             op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR,
-                                             op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR)),
-                            op.c_bool(True))
-                self.lambda_cleanAk4Jets = returnLambdaCleaningWithRespectToLeadingLepton(0.4)
+        if channel == 'SL':
+            def returnLambdaCleaningWithRespectToLeadingLepton(DR):
+               return lambda j : op.multiSwitch(
+                        (op.AND(op.rng_len(self.electronsFakeSel) >= 1, op.rng_len(self.muonsFakeSel) == 0), op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR),
+                        (op.AND(op.rng_len(self.electronsFakeSel) == 0, op.rng_len(self.muonsFakeSel) >= 1), op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR),
+                        (op.AND(op.rng_len(self.muonsFakeSel) >= 1, op.rng_len(self.electronsFakeSel) >= 1),
+                               op.switch(self.electron_conept[self.electronsFakeSel[0].idx] >= self.muon_conept[self.muonsFakeSel[0].idx],
+                                         op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR,
+                                         op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR)),
+                        op.c_bool(True))
+            self.lambda_cleanAk4Jets = returnLambdaCleaningWithRespectToLeadingLepton(0.4)
 
-            # remove jets within cone of DR<0.4 of leading lept
-            if channel == 'DL':
-                def returnLambdaCleaningWithRespectToLeadingLeptons(DR):
-                    return lambda j : op.multiSwitch(
-                          (op.AND(op.rng_len(self.electronsFakeSel) >= 2,op.rng_len(self.muonsFakeSel) == 0), 
-                              # Only electrons 
-                              op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[1].p4)>=DR)),
-                          (op.AND(op.rng_len(self.electronsFakeSel) == 0,op.rng_len(self.muonsFakeSel) >= 2), 
-                              # Only muons  
-                              op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[1].p4)>=DR)),
-                          (op.AND(op.rng_len(self.electronsFakeSel) == 1,op.rng_len(self.muonsFakeSel) == 1),
-                              # One electron + one muon
-                              op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR)),
-                          (op.AND(op.rng_len(self.electronsFakeSel) >= 1,op.rng_len(self.muonsFakeSel) >= 1),
-                              # At least one electron + at least one muon
-                           op.switch(self.electron_conept[self.electronsFakeSel[0].idx] > self.muon_conept[self.muonsFakeSel[0].idx],
-                                     # Electron is leading #
-                                     op.switch(op.rng_len(self.electronsFakeSel) == 1,
-                                               op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR),
-                                               op.switch(self.electron_conept[self.electronsFakeSel[1].idx] > self.muon_conept[self.muonsFakeSel[0].idx],
-                                                         op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[1].p4)>=DR),
-                                                         op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR))),
-                                     # Muon is leading #
-                                     op.switch(op.rng_len(self.muonsFakeSel) == 1,
-                                               op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR),
-                                               op.switch(self.muon_conept[self.muonsFakeSel[1].idx] > self.electron_conept[self.electronsFakeSel[0].idx],
-                                                         op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[1].p4)>=DR),
-                                                         op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR))))),
-                           op.c_bool(True))
-                self.lambda_cleanAk4Jets = returnLambdaCleaningWithRespectToLeadingLeptons(0.4)
-            
-        else:
-            self.lambda_cleanAk4Jets = lambda j : op.c_float(True)
+        # remove jets within cone of DR<0.4 of leading lept
+        if channel == 'DL':
+            def returnLambdaCleaningWithRespectToLeadingLeptons(DR):
+                return lambda j : op.multiSwitch(
+                      (op.AND(op.rng_len(self.electronsFakeSel) >= 2,op.rng_len(self.muonsFakeSel) == 0), 
+                          # Only electrons 
+                          op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[1].p4)>=DR)),
+                      (op.AND(op.rng_len(self.electronsFakeSel) == 0,op.rng_len(self.muonsFakeSel) >= 2), 
+                          # Only muons  
+                          op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[1].p4)>=DR)),
+                      (op.AND(op.rng_len(self.electronsFakeSel) == 1,op.rng_len(self.muonsFakeSel) == 1),
+                          # One electron + one muon
+                          op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR)),
+                      (op.AND(op.rng_len(self.electronsFakeSel) >= 1,op.rng_len(self.muonsFakeSel) >= 1),
+                          # At least one electron + at least one muon
+                       op.switch(self.electron_conept[self.electronsFakeSel[0].idx] > self.muon_conept[self.muonsFakeSel[0].idx],
+                                 # Electron is leading #
+                                 op.switch(op.rng_len(self.electronsFakeSel) == 1,
+                                           op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR),
+                                           op.switch(self.electron_conept[self.electronsFakeSel[1].idx] > self.muon_conept[self.muonsFakeSel[0].idx],
+                                                     op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[1].p4)>=DR),
+                                                     op.AND(op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR))),
+                                 # Muon is leading #
+                                 op.switch(op.rng_len(self.muonsFakeSel) == 1,
+                                           op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR),
+                                           op.switch(self.muon_conept[self.muonsFakeSel[1].idx] > self.electron_conept[self.electronsFakeSel[0].idx],
+                                                     op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.muonsFakeSel[1].p4)>=DR),
+                                                     op.AND(op.deltaR(j.p4, self.muonsFakeSel[0].p4)>=DR, op.deltaR(j.p4, self.electronsFakeSel[0].p4)>=DR))))),
+                       op.c_bool(True))
+            self.lambda_cleanAk4Jets = returnLambdaCleaningWithRespectToLeadingLeptons(0.4)
+        
 
         self.ak4JetsForPUID     = op.select(self.ak4JetsPreSelForPUID,self.lambda_cleanAk4Jets) # Pt ordered
         self.ak4Jets            = op.select(self.ak4JetsPreSel,self.lambda_cleanAk4Jets) # Pt ordered
@@ -1365,17 +1262,11 @@ One lepton and and one jet argument must be specified in addition to the require
             self.ak8JetsPreSel = op.select(self.ak8JetsByPt, self.lambda_ak8JetsPreSel)
 
         # Cleaning #
-        if self.args.POGID:
-            self.lambda_cleanAk8Jets = lambda j : op.AND(op.NOT(op.rng_any(self.electronsTightSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.8 )), 
-                                                         op.NOT(op.rng_any(self.muonsTightSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.8 )))
-        elif self.args.TTHIDLoose or self.args.TTHIDTight:
-            if channel == 'SL':
-                self.lambda_cleanAk8Jets = returnLambdaCleaningWithRespectToLeadingLepton(0.8)
-            if channel == 'DL':
-                self.lambda_cleanAk8Jets = returnLambdaCleaningWithRespectToLeadingLeptons(0.8)
+        if channel == 'SL':
+            self.lambda_cleanAk8Jets = returnLambdaCleaningWithRespectToLeadingLepton(0.8)
+        if channel == 'DL':
+            self.lambda_cleanAk8Jets = returnLambdaCleaningWithRespectToLeadingLeptons(0.8)
         # remove jets within cone of DR<0.8 of preselected electrons and muons
-        else:
-            self.lambda_cleanAk8Jets = lambda j : op.c_float(True)
         self.ak8Jets = op.select(self.ak8JetsPreSel,self.lambda_cleanAk8Jets)
 
         ############     Btagging     #############
@@ -1418,16 +1309,10 @@ One lepton and and one jet argument must be specified in addition to the require
         self.VBFJetsPreSelForPUID = op.select(self.ak4JetsByPt, lambda j : op.AND(j.pt<=50.,self.lambda_VBFJets(j)))
         self.VBFJetsPreSel        = op.select(self.ak4JetsByPt, lambda j : op.AND(self.lambda_VBFJets(j),self.lambda_jetPUID(j)))
 
-        if self.args.POGID:
-            self.lambda_cleanVBFLeptons = lambda j : op.AND(op.NOT(op.rng_any(self.electronsTightSel, lambda ele : op.deltaR(j.p4, ele.p4) <= 0.4 )), 
-                                                            op.NOT(op.rng_any(self.muonsTightSel, lambda mu : op.deltaR(j.p4, mu.p4) <= 0.4 )))
-        elif self.args.TTHIDLoose or self.args.TTHIDTight:
-            if channel == 'SL':
-                self.lambda_cleanVBFLeptons = returnLambdaCleaningWithRespectToLeadingLepton(0.4)
-            if channel == 'DL':
-                self.lambda_cleanVBFLeptons = returnLambdaCleaningWithRespectToLeadingLeptons(0.4)
-        else:
-            self.lambda_cleanVBFLeptons = lambda j : op.c_bool(True)
+        if channel == 'SL':
+            self.lambda_cleanVBFLeptons = returnLambdaCleaningWithRespectToLeadingLepton(0.4)
+        if channel == 'DL':
+            self.lambda_cleanVBFLeptons = returnLambdaCleaningWithRespectToLeadingLeptons(0.4)
 
         self.VBFJetsForPUID     = op.select(self.VBFJetsPreSelForPUID, self.lambda_cleanVBFLeptons)
         self.VBFJets            = op.select(self.VBFJetsPreSel, self.lambda_cleanVBFLeptons)
@@ -1477,10 +1362,7 @@ One lepton and and one jet argument must be specified in addition to the require
             ####  Muons ####
             self.muLooseId = self.SF.get_scalefactor("lepton", 'muon_loose_{}'.format(era), combine="weight", systName="mu_loose", defineOnFirstUse=(not forSkimmer)) 
             self.lambda_MuonLooseSF = lambda mu : [op.switch(self.lambda_is_matched(mu), self.muLooseId(mu), op.c_float(1.))]
-            if self.args.TTHIDTight:
-                self.muTightMVA = self.SF.get_scalefactor("lepton", 'muon_tightMVA_{}'.format(era), combine="weight", systName="mu_tightmva", defineOnFirstUse=(not forSkimmer))
-            if self.args.TTHIDLoose:
-                self.muTightMVA = self.SF.get_scalefactor("lepton", 'muon_tightMVArelaxed_{}'.format(era), combine="weight", systName="mu_tightmva", defineOnFirstUse=(not forSkimmer))
+            self.muTightMVA = self.SF.get_scalefactor("lepton", 'muon_tightMVArelaxed_{}'.format(era), combine="weight", systName="mu_tightmva", defineOnFirstUse=(not forSkimmer))
 
             self.lambda_MuonTightSF = lambda mu : [op.switch(self.lambda_muonTightSel(mu),      # check if actual tight lepton (needed because in Fake CR one of the dilepton is not)
                                                              op.switch(self.lambda_is_matched(mu), # check if gen matched
@@ -1514,10 +1396,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                                            op.switch(self.lambda_is_matched(el),self.elLooseEff(el),op.c_float(1.)),
                                                            op.switch(self.lambda_is_matched(el),self.elLooseReco(el),op.c_float(1.))]
 
-            if self.args.TTHIDTight:
-                self.elTightMVA = self.SF.get_scalefactor("lepton", 'electron_tightMVA_{}'.format(era) , combine="weight", systName="el_tightmva", defineOnFirstUse=(not forSkimmer))
-            if self.args.TTHIDLoose:
-                self.elTightMVA = self.SF.get_scalefactor("lepton", 'electron_tightMVArelaxed_{}'.format(era) , combine="weight", systName="el_tightmva", defineOnFirstUse=(not forSkimmer))
+            self.elTightMVA = self.SF.get_scalefactor("lepton", 'electron_tightMVArelaxed_{}'.format(era) , combine="weight", systName="el_tightmva", defineOnFirstUse=(not forSkimmer))
 
             self.lambda_ElectronTightSF = lambda el : [op.switch(self.lambda_electronTightSel(el),      # check if actual tight lepton (needed because in Fake CR one of the dilepton is not)
                                                                  op.switch(self.lambda_is_matched(el), # check if gen matched
@@ -1583,11 +1462,7 @@ One lepton and and one jet argument must be specified in addition to the require
                     (op.min(self.electron_conept[dilep[0].idx],self.muon_conept[dilep[1].idx])<25, op.systematic(op.c_float(0.98), name="ttH_electronMuon_trigSF", up=op.c_float(0.98*1.01), down=op.c_float(0.98*0.99))),
                     op.systematic(op.c_float(1.00), name="ttH_electronMuon_trigSF", up=op.c_float(1.01), down=op.c_float(0.99)))
         #----- Fake rates -----#
-        if self.args.TTHIDTight or self.args.TTHIDLoose:
-            if self.args.TTHIDTight:
-                FRSysts = ['Tight_pt_syst','Tight_barrel_syst','Tight_norm_syst']
-            if self.args.TTHIDLoose:
-                FRSysts = [f'Loose_{channel}_pt_syst',f'Loose_{channel}_barrel_syst',f'Loose_{channel}_norm_syst']
+            FRSysts = [f'Loose_{channel}_pt_syst',f'Loose_{channel}_barrel_syst',f'Loose_{channel}_norm_syst']
             self.electronFRList = [self.SF.get_scalefactor("lepton", ('electron_fakerates_'+era, syst), combine="weight", systName="el_FR_"+syst, defineOnFirstUse=(not forSkimmer),
                                                  additionalVariables={'Pt' : lambda obj : self.electron_conept[obj.idx]}) for syst in FRSysts]
             self.muonFRList = [self.SF.get_scalefactor("lepton", ('muon_fakerates_'+era, syst), combine="weight", systName="mu_FR_"+syst, defineOnFirstUse=(not forSkimmer),
@@ -1610,65 +1485,64 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                             Fake Factors                                  #
         #############################################################################
-        if self.args.TTHIDTight or self.args.TTHIDLoose:
-            # Non closure between ttbar and QCD correction #
-            # https://gitlab.cern.ch/cms-hh-bbww/cms-hh-to-bbww/-/blob/master/Legacy/backgroundEstimation.md
-            if era == '2016':
-                self.electronCorrFR = op.systematic(op.c_float(1.376), name="electronCorrFR",up=op.c_float(1.376*1.376),down=op.c_float(1.))
-                self.muonCorrFR     = op.systematic(op.c_float(1.050), name="muonCorrFR",up=op.c_float(1.050*1.050),down=op.c_float(1.))
-            elif era == '2017':
-                self.electronCorrFR = op.systematic(op.c_float(1.252), name="electronCorrFR",up=op.c_float(1.252*1.252),down=op.c_float(1.))
-                self.muonCorrFR     = op.systematic(op.c_float(1.157), name="muonCorrFR",up=op.c_float(1.157*1.157),down=op.c_float(1.))
-            elif era == '2018':
-                self.electronCorrFR = op.systematic(op.c_float(1.325), name="electronCorrFR",up=op.c_float(1.325*1.325),down=op.c_float(1.))
-                self.muonCorrFR     = op.systematic(op.c_float(1.067), name="muonCorrFR",up=op.c_float(1.067*1.067),down=op.c_float(1.))
+        # Non closure between ttbar and QCD correction #
+        # https://gitlab.cern.ch/cms-hh-bbww/cms-hh-to-bbww/-/blob/master/Legacy/backgroundEstimation.md
+        if era == '2016':
+            self.electronCorrFR = op.systematic(op.c_float(1.376), name="electronCorrFR",up=op.c_float(1.376*1.376),down=op.c_float(1.))
+            self.muonCorrFR     = op.systematic(op.c_float(1.050), name="muonCorrFR",up=op.c_float(1.050*1.050),down=op.c_float(1.))
+        elif era == '2017':
+            self.electronCorrFR = op.systematic(op.c_float(1.252), name="electronCorrFR",up=op.c_float(1.252*1.252),down=op.c_float(1.))
+            self.muonCorrFR     = op.systematic(op.c_float(1.157), name="muonCorrFR",up=op.c_float(1.157*1.157),down=op.c_float(1.))
+        elif era == '2018':
+            self.electronCorrFR = op.systematic(op.c_float(1.325), name="electronCorrFR",up=op.c_float(1.325*1.325),down=op.c_float(1.))
+            self.muonCorrFR     = op.systematic(op.c_float(1.067), name="muonCorrFR",up=op.c_float(1.067*1.067),down=op.c_float(1.))
 
-            self.lambda_FR_el       = lambda el : returnFFSF(el,self.electronFRList,"el_FR")
-            self.lambda_FR_mu       = lambda mu : returnFFSF(mu,self.muonFRList,"mu_FR")
+        self.lambda_FR_el       = lambda el : returnFFSF(el,self.electronFRList,"el_FR")
+        self.lambda_FR_mu       = lambda mu : returnFFSF(mu,self.muonFRList,"mu_FR")
 
 
-            if channel == "SL":
-                self.lambda_FF_el = lambda el : self.lambda_FR_el(el)/(1-self.lambda_FR_el(el))
-                self.lambda_FF_mu = lambda mu : self.lambda_FR_mu(mu)/(1-self.lambda_FR_mu(mu))
-                self.ElFakeFactor = lambda el : self.lambda_FF_el(el)
-                self.MuFakeFactor = lambda mu : self.lambda_FF_mu(mu)
-            if channel == "DL":
-                # Correction factor only for DL #
-                self.lambda_FRcorr_el   = lambda el : self.lambda_FR_el(el)*self.electronCorrFR
-                self.lambda_FRcorr_mu   = lambda mu : self.lambda_FR_mu(mu)*self.muonCorrFR
+        if channel == "SL":
+            self.lambda_FF_el = lambda el : self.lambda_FR_el(el)/(1-self.lambda_FR_el(el))
+            self.lambda_FF_mu = lambda mu : self.lambda_FR_mu(mu)/(1-self.lambda_FR_mu(mu))
+            self.ElFakeFactor = lambda el : self.lambda_FF_el(el)
+            self.MuFakeFactor = lambda mu : self.lambda_FF_mu(mu)
+        if channel == "DL":
+            # Correction factor only for DL #
+            self.lambda_FRcorr_el   = lambda el : self.lambda_FR_el(el)*self.electronCorrFR
+            self.lambda_FRcorr_mu   = lambda mu : self.lambda_FR_mu(mu)*self.muonCorrFR
 
-                self.lambda_FF_el   = lambda el : self.lambda_FRcorr_el(el)/(1-self.lambda_FRcorr_el(el))
-                self.lambda_FF_mu   = lambda mu : self.lambda_FRcorr_mu(mu)/(1-self.lambda_FRcorr_mu(mu))
-                self.ElElFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),op.NOT(self.lambda_electronTightSel(dilep[1]))),
-                                                                     # Both electrons fail tight -> -F1*F2
-                                                                     -self.lambda_FF_el(dilep[0])*self.lambda_FF_el(dilep[1])),
-                                                                    (op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),self.lambda_electronTightSel(dilep[1])),
-                                                                     # Only leading electron fails tight -> F1
-                                                                     self.lambda_FF_el(dilep[0])),
-                                                                    (op.AND(self.lambda_electronTightSel(dilep[0]),op.NOT(self.lambda_electronTightSel(dilep[1]))),
-                                                                     # Only subleading electron fails tight -> F2
-                                                                     self.lambda_FF_el(dilep[1])),
-                                                                     op.c_float(1.)) # Should not happen
-                self.MuMuFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_muonTightSel(dilep[0])),op.NOT(self.lambda_muonTightSel(dilep[1]))),
-                                                                     # Both muons fail tight -> -F1*F2
-                                                                     -self.lambda_FF_mu(dilep[0])*self.lambda_FF_mu(dilep[1])),
-                                                                    (op.AND(op.NOT(self.lambda_muonTightSel(dilep[0])),self.lambda_muonTightSel(dilep[1])),
-                                                                     # Only leading muon fails tight -> F1
-                                                                     self.lambda_FF_mu(dilep[0])),
-                                                                    (op.AND(self.lambda_muonTightSel(dilep[0]),op.NOT(self.lambda_muonTightSel(dilep[1]))),
-                                                                     # Only subleading muon fails tight -> F2
-                                                                     self.lambda_FF_mu(dilep[1])),
-                                                                     op.c_float(1.)) # Should not happen
-                self.ElMuFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),op.NOT(self.lambda_muonTightSel(dilep[1]))),
-                                                                     # Both electron and muon fail tight -> -F1*F2
-                                                                     -self.lambda_FF_el(dilep[0])*self.lambda_FF_mu(dilep[1])),
-                                                                    (op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),self.lambda_muonTightSel(dilep[1])),
-                                                                     # Only electron fails tight -> F1
-                                                                     self.lambda_FF_el(dilep[0])),
-                                                                    (op.AND(self.lambda_electronTightSel(dilep[0]),op.NOT(self.lambda_muonTightSel(dilep[1]))),
-                                                                     # Only subleading electron fails tight -> F2
-                                                                     self.lambda_FF_mu(dilep[1])),
-                                                                     op.c_float(1.)) # Should not happen
+            self.lambda_FF_el   = lambda el : self.lambda_FRcorr_el(el)/(1-self.lambda_FRcorr_el(el))
+            self.lambda_FF_mu   = lambda mu : self.lambda_FRcorr_mu(mu)/(1-self.lambda_FRcorr_mu(mu))
+            self.ElElFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),op.NOT(self.lambda_electronTightSel(dilep[1]))),
+                                                                 # Both electrons fail tight -> -F1*F2
+                                                                 -self.lambda_FF_el(dilep[0])*self.lambda_FF_el(dilep[1])),
+                                                                (op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),self.lambda_electronTightSel(dilep[1])),
+                                                                 # Only leading electron fails tight -> F1
+                                                                 self.lambda_FF_el(dilep[0])),
+                                                                (op.AND(self.lambda_electronTightSel(dilep[0]),op.NOT(self.lambda_electronTightSel(dilep[1]))),
+                                                                 # Only subleading electron fails tight -> F2
+                                                                 self.lambda_FF_el(dilep[1])),
+                                                                 op.c_float(1.)) # Should not happen
+            self.MuMuFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_muonTightSel(dilep[0])),op.NOT(self.lambda_muonTightSel(dilep[1]))),
+                                                                 # Both muons fail tight -> -F1*F2
+                                                                 -self.lambda_FF_mu(dilep[0])*self.lambda_FF_mu(dilep[1])),
+                                                                (op.AND(op.NOT(self.lambda_muonTightSel(dilep[0])),self.lambda_muonTightSel(dilep[1])),
+                                                                 # Only leading muon fails tight -> F1
+                                                                 self.lambda_FF_mu(dilep[0])),
+                                                                (op.AND(self.lambda_muonTightSel(dilep[0]),op.NOT(self.lambda_muonTightSel(dilep[1]))),
+                                                                 # Only subleading muon fails tight -> F2
+                                                                 self.lambda_FF_mu(dilep[1])),
+                                                                 op.c_float(1.)) # Should not happen
+            self.ElMuFakeFactor = lambda dilep : op.multiSwitch((op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),op.NOT(self.lambda_muonTightSel(dilep[1]))),
+                                                                 # Both electron and muon fail tight -> -F1*F2
+                                                                 -self.lambda_FF_el(dilep[0])*self.lambda_FF_mu(dilep[1])),
+                                                                (op.AND(op.NOT(self.lambda_electronTightSel(dilep[0])),self.lambda_muonTightSel(dilep[1])),
+                                                                 # Only electron fails tight -> F1
+                                                                 self.lambda_FF_el(dilep[0])),
+                                                                (op.AND(self.lambda_electronTightSel(dilep[0]),op.NOT(self.lambda_muonTightSel(dilep[1]))),
+                                                                 # Only subleading electron fails tight -> F2
+                                                                 self.lambda_FF_mu(dilep[1])),
+                                                                 op.c_float(1.)) # Should not happen
 
         ###########################################################################
         #                    b-tagging efficiency scale factors                   #

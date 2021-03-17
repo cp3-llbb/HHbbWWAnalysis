@@ -82,14 +82,9 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             jetsel_level.append("Ak8") # Boosted needs the Ak8 selection
 
         #----- Select correct dilepton -----#
-        if self.args.POGID:
-            OSElElDilepton = self.ElElTightSel
-            OSMuMuDilepton = self.MuMuTightSel
-            OSElMuDilepton = self.ElMuTightSel
-        if self.args.TTHIDLoose or self.args.TTHIDTight:
-            OSElElDilepton = self.ElElFakeSel
-            OSMuMuDilepton = self.MuMuFakeSel
-            OSElMuDilepton = self.ElMuFakeSel
+        OSElElDilepton = self.ElElFakeSel
+        OSMuMuDilepton = self.MuMuFakeSel
+        OSElMuDilepton = self.ElMuFakeSel
 
         #----- DY reweighting -----#
         if "DYEstimation" in self.datadrivenContributions:
