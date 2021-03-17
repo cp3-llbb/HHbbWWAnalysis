@@ -780,6 +780,8 @@ One lepton and and one jet argument must be specified in addition to the require
 
         self.yields = CutFlowReport("yields",printInLog=self.args.Events is not None,recursive=self.args.Events is not None)
 
+        self.forSkimmer = forSkimmer
+
         ###########################################################################
         #                              Pseudo-data                                #
         ###########################################################################
@@ -1741,84 +1743,72 @@ One lepton and and one jet argument must be specified in addition to the require
     ###########################################################################
     def postProcess(self, taskList, config=None, workdir=None, resultsdir=None):
         from bamboo.root import gbl
-        from pprint import pprint
-#        if not self.plotList:
-#            self.plotList = self.getPlotList(resultsdir=resultsdir, config=config)
         
-        if self.args.HHReweighting:
-            LOFiles = []
-            LOChannels = ['GluGluToHHTo2B2VTo2L2Nu','GluGluToHHTo2B2WToLNu2J','GluGluToHHTo2B2Tau']
-            ddScenarios = set(self.datadrivenScenarios)
-            attrToKeep = ['legend','line-color','line-type','order','type']
-            for contribName in self.analysisConfig['benchmarks']['targets']:
-#            print ('---------------------')
-#            print (contribName)
-                contrib = self.datadrivenContributions[contribName]
-                contribSamples = {sample:sampleCfg for sample,sampleCfg in config['samples'].items() if contrib.usesSample(sample,sampleCfg)}
-                LOFiles.extend([sample for sample in contribSamples.keys() if sample not in LOFiles])
-                _, eras = self.args.eras
-                if eras is None:
-                    eras = list(config["eras"].keys())
-                for era in eras:
-                    for channel in LOChannels:
-                        #print (channel)
-                        contribPerChannel = {sample:sampleCfg for sample,sampleCfg in contribSamples.items() if channel in sample and sampleCfg['era']==era}
-                        crossSection = [sampleCfg['cross-section'] for sampleCfg in contribPerChannel.values()]
-                        if len(set(crossSection)) != 1:
-                            raise RuntimeError(f"Not all LO samples for channel {channel} have the same cross-section")
-                        else:
-                            crossSection = crossSection[0]
-                        if all(['branching-ratio' in sampleCfg for sampleCfg in contribPerChannel.values()]):
-                            branchingRatio = [sampleCfg['branching-ratio'] for sampleCfg in contribPerChannel.values()]
-                            if len(set(branchingRatio)) != 1:
-                                raise RuntimeError(f"Not all LO samples for channel {channel} have the same branching-ratio")
+        if not self.forSkimmer:
+            if self.args.HHReweighting:
+                LOFiles = []
+                LOChannels = ['GluGluToHHTo2B2VTo2L2Nu','GluGluToHHTo2B2WToLNu2J','GluGluToHHTo2B2Tau']
+                ddScenarios = set(self.datadrivenScenarios)
+                attrToKeep = ['legend','line-color','line-type','order','type']
+                for contribName in self.analysisConfig['benchmarks']['targets']:
+                    contrib = self.datadrivenContributions[contribName]
+                    contribSamples = {sample:sampleCfg for sample,sampleCfg in config['samples'].items() if contrib.usesSample(sample,sampleCfg)}
+                    LOFiles.extend([sample for sample in contribSamples.keys() if sample not in LOFiles])
+                    _, eras = self.args.eras
+                    if eras is None:
+                        eras = list(config["eras"].keys())
+                    for era in eras:
+                        for channel in LOChannels:
+                            #print (channel)
+                            contribPerChannel = {sample:sampleCfg for sample,sampleCfg in contribSamples.items() if channel in sample and sampleCfg['era']==era}
+                            crossSection = [sampleCfg['cross-section'] for sampleCfg in contribPerChannel.values()]
+                            if len(set(crossSection)) != 1:
+                                raise RuntimeError(f"Not all LO samples for channel {channel} have the same cross-section")
                             else:
-                                branchingRatio = branchingRatio[0]
-                        else:
-                            branchingRatio = None 
-                        attrLO = {attr:contribPerChannel[list(contribPerChannel.keys())[0]][attr]  for attr in attrToKeep 
-                                    if attr in contribPerChannel[list(contribPerChannel.keys())[0]].keys()}  
-                        files = {sample:gbl.TFile.Open(os.path.join(resultsdir,f"{sample}{contribName}.root")) for sample in contribPerChannel.keys()}
-                        generatedEvents = {sample:self.readCounters(files[sample])[contribPerChannel[sample]['generated-events']] for sample in contribPerChannel.keys()}
-                        generatedEventsSum = sum(list(generatedEvents.values()))
-#                    print ('generatedEvents')
-#                    pprint (generatedEvents)
-#                    print ("sum")
-#                    print (generatedEventsSum,len(generatedEvents))
-                        outFile = gbl.TFile.Open(os.path.join(resultsdir,f"{channel}_NLO{contribName}.root"), "RECREATE")
-                        hNames = [key.GetName() for key in files[list(files.keys())[0]].GetListOfKeys() if 'TH' in key.GetClassName()]
-                        for hName in hNames:
-                            hist = None
-                            for sample,f in files.items():
-                                h = f.Get(hName)
-                                h.Scale(generatedEventsSum/(generatedEvents[sample]*len(generatedEvents)))
-                                if hist is None:
-                                    hist = copy.deepcopy(h)
+                                crossSection = crossSection[0]
+                            if all(['branching-ratio' in sampleCfg for sampleCfg in contribPerChannel.values()]):
+                                branchingRatio = [sampleCfg['branching-ratio'] for sampleCfg in contribPerChannel.values()]
+                                if len(set(branchingRatio)) != 1:
+                                    raise RuntimeError(f"Not all LO samples for channel {channel} have the same branching-ratio")
                                 else:
-                                    hist.Add(h)
-                                #if hName == "ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag_combined_mHH":
-                                #    print (sample)
-                                #    print ('Integral',hist.Integral())
-                                #    print ('factor',generatedEventsSum/(generatedEvents[sample]*len(generatedEvents)))
-                            hist.Write()
-                        outFile.Close()
-                        
-                        config['samples'][f"{channel}_NLO{contribName}"] = {'cross-section'     : crossSection,
-                                                                            'era'               : era,
-                                                                            'generated-events'  : generatedEventsSum}
-                        config['samples'][f"{channel}_NLO{contribName}"].update(attrLO)
-                        if branchingRatio is not None:
-                            config['samples'][f"{channel}_NLO{contribName}"]['branching-ratio'] = branchingRatio
+                                    branchingRatio = branchingRatio[0]
+                            else:
+                                branchingRatio = None 
+                            attrLO = {attr:contribPerChannel[list(contribPerChannel.keys())[0]][attr]  for attr in attrToKeep 
+                                        if attr in contribPerChannel[list(contribPerChannel.keys())[0]].keys()}  
+                            files = {sample:gbl.TFile.Open(os.path.join(resultsdir,f"{sample}{contribName}.root")) for sample in contribPerChannel.keys()}
+                            generatedEvents = {sample:self.readCounters(files[sample])[contribPerChannel[sample]['generated-events']] for sample in contribPerChannel.keys()}
+                            generatedEventsSum = sum(list(generatedEvents.values()))
+                            outFile = gbl.TFile.Open(os.path.join(resultsdir,f"{channel}_NLO{contribName}.root"), "RECREATE")
+                            hNames = [key.GetName() for key in files[list(files.keys())[0]].GetListOfKeys() if 'TH' in key.GetClassName()]
+                            for hName in hNames:
+                                hist = None
+                                for sample,f in files.items():
+                                    h = f.Get(hName)
+                                    h.Scale(generatedEventsSum/(generatedEvents[sample]*len(generatedEvents)))
+                                    if hist is None:
+                                        hist = copy.deepcopy(h)
+                                    else:
+                                        hist.Add(h)
+                                hist.Write()
+                            outFile.Close()
+                            
+                            config['samples'][f"{channel}_NLO{contribName}"] = {'cross-section'     : crossSection,
+                                                                                'era'               : era,
+                                                                                'generated-events'  : generatedEventsSum}
+                            config['samples'][f"{channel}_NLO{contribName}"].update(attrLO)
+                            if branchingRatio is not None:
+                                config['samples'][f"{channel}_NLO{contribName}"]['branching-ratio'] = branchingRatio
 
-                    for sc in list(ddScenarios):
-                        if contribName in sc:
-                            newSc = tuple(cb for cb in sc if cb != contribName)
-                            ddScenarios.remove(sc)
-                            ddScenarios.add(newSc)
+                        for sc in list(ddScenarios):
+                            if contribName in sc:
+                                newSc = tuple(cb for cb in sc if cb != contribName)
+                                ddScenarios.remove(sc)
+                                ddScenarios.add(newSc)
 
-            self.datadrivenScenarios = list(ddScenarios)
+                self.datadrivenScenarios = list(ddScenarios)
 
-#        for LOFile in LOFiles:
-#            del config['samples'][LOFile]
+            for LOFile in LOFiles:
+                del config['samples'][LOFile]
 
         super(BaseNanoHHtobbWW,self).postProcess(taskList=taskList, config=config, workdir=workdir, resultsdir=resultsdir)
