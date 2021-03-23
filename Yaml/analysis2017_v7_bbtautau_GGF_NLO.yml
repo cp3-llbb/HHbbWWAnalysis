@@ -12,9 +12,11 @@ GluGluToHHTo2B2Tau_node_cHHH0:
   line-type: 1
   line-color: "#288a24"
   type: signal
+  hide: True
   split: 1
   order: 10
   type: signal
+  hide: True
 GluGluToHHTo2B2Tau_node_cHHH1:
   cross-section: 0.031047
   branching-ratio: 0.073056256
@@ -27,6 +29,7 @@ GluGluToHHTo2B2Tau_node_cHHH1:
   split: 1
   order: 10
   type: signal
+  hide: True
 GluGluToHHTo2B2Tau_node_cHHH2p45:
   cross-section: 0.013124
   branching-ratio: 0.073056256
@@ -39,6 +42,7 @@ GluGluToHHTo2B2Tau_node_cHHH2p45:
   split: 1
   order: 10
   type: signal
+  hide: True
 GluGluToHHTo2B2Tau_node_cHHH5:
   cross-section: 0.091172
   branching-ratio: 0.073056256
@@ -51,4 +55,5 @@ GluGluToHHTo2B2Tau_node_cHHH5:
   split: 1
   order: 10
   type: signal
+  hide: True
 

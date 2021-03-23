@@ -13,6 +13,7 @@ VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1_dipoleRecoilOff:
   line-color: "#8f0a1e"
   split: 1
   type: signal
+  hide: True
   order: 10
 VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_dipoleRecoilOff:
   cross-section: 0.066334
@@ -26,6 +27,7 @@ VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_dipoleRecoilOff:
   split: 1
   order: 10
   type: signal
+  hide: True
 VBFHHTo2B2VTo2L2Nu_CV_1_C2V_0_C3_1_dipoleRecoilOff:
   cross-section: 0.0272322
   branching-ratio: 0.027669886574221
@@ -38,6 +40,7 @@ VBFHHTo2B2VTo2L2Nu_CV_1_C2V_0_C3_1_dipoleRecoilOff:
   split: 1
   order: 10
   type: signal
+  hide: True
 VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_dipoleRecoilOff:
   cross-section: 0.0045915
   branching-ratio: 0.027669886574221
@@ -50,6 +53,7 @@ VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_dipoleRecoilOff:
   split: 1
   order: 10
   type: signal
+  hide: True
 VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff:
   cross-section: 0.001726
   branching-ratio: 0.027669886574221
@@ -62,6 +66,7 @@ VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff:
   split: 1
   order: 10
   type: signal
+  hide: True
 VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_dipoleRecoilOff:
   cross-section: 0.0014306
   branching-ratio: 0.027669886574221
@@ -74,6 +79,7 @@ VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_dipoleRecoilOff:
   split: 1
   order: 10
   type: signal
+  hide: True
 VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff:
   cross-section: 0.0143923
   branching-ratio: 0.027669886574221
@@ -86,3 +92,4 @@ VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff:
   split: 1
   order: 10
   type: signal
+  hide: True

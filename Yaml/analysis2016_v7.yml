@@ -5,30 +5,51 @@ eras:
     luminosity-error: 0.025     #pb
 dbcache: ../dascache2016
 samples:
+    # BACKGROUNDS #
   - config: analysis2016_v7_bkg.yml
     keys: mc
-  - config: analysis2016_v7_bbWW2l_GGF_LO.yml
-    keys: [bbWW2l,GGFLO]    
-  - config: analysis2016_v7_bbWW1l_GGF_LO.yml
-    keys: [bbWW1l,GGFLO]    
+    # DATA #
+  - config: analysis2016_v7_data.yml
+    keys: data
+    # GGF LO #
+  - config: analysis2016_v7_bbww2l_GGF_LO.yml
+    keys: [bbww2l,GGFLO]    
+  - config: analysis2016_v7_bbww1l_GGF_LO.yml
+    keys: [bbww1l,GGFLO]    
   - config: analysis2016_v7_bbtautau_GGF_LO.yml
     keys: [bbtautau,GGFLO]    
-  - config: analysis2016_v7_bbWW2l_GGF_NLO.yml
-    keys: [bbWW2l,GGFNLO]    
-  - config: analysis2016_v7_bbWW1l_GGF_NLO.yml
-    keys: [bbWW1l,GGFNLO]    
+    # GGF NLO #
+  - config: analysis2016_v7_bbww2l_GGF_NLO.yml
+    keys: [bbww2l,GGFNLO]    
+  - config: analysis2016_v7_bbww1l_GGF_NLO.yml
+    keys: [bbww1l,GGFNLO]    
   - config: analysis2016_v7_bbtautau_GGF_NLO.yml
     keys: [bbtautau,GGFNLO]    
-  - config: analysis2016_v7_bbWW2l_VBF_LO.yml
-    keys: [bbWW2l,VBFLO]    
-  - config: analysis2016_v7_bbWW1l_VBF_LO.yml
-    keys: [bbWW1l,VBFLO]    
+    # VBF LO #
+  - config: analysis2016_v7_bbww2l_VBF_LO.yml
+    keys: [bbww2l,VBFLO]    
+  - config: analysis2016_v7_bbww1l_VBF_LO.yml
+    keys: [bbww1l,VBFLO]    
   - config: analysis2016_v7_bbtautau_VBF_LO.yml
     keys: [bbtautau,VBFLO]    
-    
+    # GRAVITON #
+  - config: analysis2016_v7_bbww2l_graviton.yml
+    keys: [bbww2l,graviton]
+  - config: analysis2016_v7_bbww1l_graviton.yml
+    keys: [bbww1l,graviton]
+  - config: analysis2016_v7_bbtautau_graviton.yml
+    keys: [bbtautau,graviton]
+        # RADION #
+  - config: analysis2016_v7_bbww2l_radion.yml
+    keys: [bbww2l,radion]
+  - config: analysis2016_v7_bbww1l_radion.yml
+    keys: [bbww1l,radion]
+  - config: analysis2016_v7_bbtautau_radion.yml
+    keys: [bbtautau,radion]
+
   
 datadriven: !include datadriven.yml
 benchmarks: !include benchmarks.yml
-plotit    : !include plotit.yml
+plotIt    : !include plotit.yml
 
 

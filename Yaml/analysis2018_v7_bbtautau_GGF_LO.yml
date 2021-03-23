@@ -12,16 +12,18 @@ GluGluToHHTo2B2Tau_node_SM:
   line-type: 1
   split: 100
   type: signal
- GluGluToHHTo2B2Tau_node_1:
-   cross-section: 1
-   branching-ratio: 0.073056256
-   db: das:/GluGluToHHTo2B2Tau_node_1_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
-   era: '2018'
-   generated-events: genEventSumw
-   legend: 'HH#rightarrow bb#tau#tau (node 1)' 
-   line-type: 1
-   split: 100
-   type: signal
+  hide: True
+#GluGluToHHTo2B2Tau_node_1:
+#  cross-section: 1
+#  branching-ratio: 0.073056256
+#  db: das:/GluGluToHHTo2B2Tau_node_1_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
+#  era: '2018'
+#  generated-events: genEventSumw
+#  legend: 'HH#rightarrow bb#tau#tau (node 1)' 
+#  line-type: 1
+#  split: 100
+#  type: signal
+  hide: True
 GluGluToHHTo2B2Tau_node_2:
   cross-section: 1
   branching-ratio: 0.073056256
@@ -32,6 +34,7 @@ GluGluToHHTo2B2Tau_node_2:
   line-type: 1
   split: 100
   type: signal
+  hide: True
 GluGluToHHTo2B2Tau_node_3:
   cross-section: 1
   branching-ratio: 0.073056256
@@ -42,6 +45,7 @@ GluGluToHHTo2B2Tau_node_3:
   line-type: 1
   split: 100
   type: signal
+  hide: True
 GluGluToHHTo2B2Tau_node_4:
   cross-section: 1
   branching-ratio: 0.073056256
@@ -52,6 +56,7 @@ GluGluToHHTo2B2Tau_node_4:
   line-type: 1
   split: 100
   type: signal
+  hide: True
 GluGluToHHTo2B2Tau_node_5:
   cross-section: 1
   branching-ratio: 0.073056256
@@ -62,6 +67,7 @@ GluGluToHHTo2B2Tau_node_5:
   line-type: 1
   split: 100
   type: signal
+  hide: True
 GluGluToHHTo2B2Tau_node_6:
   cross-section: 1
   branching-ratio: 0.073056256
@@ -72,6 +78,7 @@ GluGluToHHTo2B2Tau_node_6:
   line-type: 1
   split: 100
   type: signal
+  hide: True
 GluGluToHHTo2B2Tau_node_7:
   cross-section: 1
   branching-ratio: 0.073056256
@@ -82,6 +89,7 @@ GluGluToHHTo2B2Tau_node_7:
   line-type: 1
   split: 100
   type: signal
+  hide: True
 GluGluToHHTo2B2Tau_node_8:
   cross-section: 1
   branching-ratio: 0.073056256
@@ -92,6 +100,7 @@ GluGluToHHTo2B2Tau_node_8:
   line-type: 1
   split: 100
   type: signal
+  hide: True
 GluGluToHHTo2B2Tau_node_9:
   cross-section: 1
   branching-ratio: 0.073056256
@@ -102,6 +111,7 @@ GluGluToHHTo2B2Tau_node_9:
   line-type: 1
   split: 100
   type: signal
+  hide: True
 GluGluToHHTo2B2Tau_node_10:
   cross-section: 1
   branching-ratio: 0.073056256
@@ -112,6 +122,7 @@ GluGluToHHTo2B2Tau_node_10:
   line-type: 1
   split: 100
   type: signal
+  hide: True
 GluGluToHHTo2B2Tau_node_11:
   cross-section: 1
   branching-ratio: 0.073056256
@@ -122,6 +133,7 @@ GluGluToHHTo2B2Tau_node_11:
   line-type: 1
   split: 100
   type: signal
+  hide: True
 GluGluToHHTo2B2Tau_node_12:
   cross-section: 1
   branching-ratio: 0.073056256
@@ -132,3 +144,4 @@ GluGluToHHTo2B2Tau_node_12:
   line-type: 1
   split: 100
   type: signal
+  hide: True
