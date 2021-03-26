@@ -30,7 +30,7 @@ GluGluToHHTo2B2Tau_node_2:
   era: '2017'
   db: das:/GluGluToHHTo2B2Tau_node_2_13TeV-madgraph_correctedcfg/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
   generated-events: genEventSumw
-  legend: 'HH#rightarrow bbbbtautau (node 1)' 
+  legend: 'HH#rightarrow bbbbtautau (node 2)' 
   line-type: 1
   split: 100
   type: signal
@@ -41,7 +41,7 @@ GluGluToHHTo2B2Tau_node_3:
   era: '2017'
   db: das:/GluGluToHHTo2B2Tau_node_3_13TeV-madgraph_correctedcfg/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
   generated-events: genEventSumw
-  legend: 'HH#rightarrow bbbbtautau (node 2)' 
+  legend: 'HH#rightarrow bbbbtautau (node 3)' 
   line-type: 1
   split: 100
   type: signal
@@ -52,7 +52,7 @@ GluGluToHHTo2B2Tau_node_4:
   era: '2017'
   db: das:/GluGluToHHTo2B2Tau_node_4_13TeV-madgraph_correctedcfg/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
   generated-events: genEventSumw
-  legend: 'HH#rightarrow bbbbtautau (node 3)' 
+  legend: 'HH#rightarrow bbbbtautau (node 4)' 
   line-type: 1
   split: 100
   type: signal

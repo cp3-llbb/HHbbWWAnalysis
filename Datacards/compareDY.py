@@ -2,6 +2,7 @@ import os
 import sys
 import glob
 import json 
+import math
 from array import array
 import ROOT
 
@@ -92,9 +93,27 @@ for era in ['2016','2017','2018']:
         h_datadriven = h_datadriven.Rebin(len(xn)-1,'rebin',array('d',xn))
         h_closure = h_closure.Rebin(len(xn)-1,'rebin',array('d',xn))
 
-        N_MC = h_MC.Integral()
-        N_datadriven = h_datadriven.Integral()
-        N_closure = h_closure.Integral()
+        Nerr_MC = ROOT.Double(0.)
+        Nerr_datadriven = ROOT.Double(0.)
+        Nerr_closure = ROOT.Double(0.)
+        N_MC = h_MC.IntegralAndError(0,h_MC.GetNbinsX()+1,Nerr_MC)
+        N_datadriven = h_datadriven.IntegralAndError(0,h_datadriven.GetNbinsX()+1,Nerr_datadriven)
+        N_closure = h_closure.IntegralAndError(0,h_closure.GetNbinsX()+1,Nerr_closure)
+
+
+        def computeFactor(a,b,sa,sb):
+            """
+                factor = a/b
+                a +/- sa
+                b +/- sb
+                -> sfactor by error propagation
+            """
+            factor = a/b
+            sfactor = math.sqrt((1./b**2)*sa**2 + (a**2/b**4)*sb**2)
+            return factor,sfactor 
+
+        factor_datadriven = computeFactor(N_MC,N_datadriven,Nerr_MC,Nerr_datadriven)
+        factor_closure = computeFactor(N_MC,N_closure,Nerr_MC,Nerr_closure)
 
         #print (h_MC.GetNbinsX(),h_datadriven.GetNbinsX(), h_closure.GetNbinsX())
 
@@ -157,9 +176,9 @@ for era in ['2016','2017','2018']:
         h_closure.Draw("e1p same")
 
         leg_up = ROOT.TLegend(0.6,0.4,0.9,0.9)
-        leg_up.AddEntry(h_MC,"#splitline{{DY (MC)}}{{Integral = {integral:0.3f}}}".format(integral=N_MC))
-        leg_up.AddEntry(h_datadriven,"#splitline{{DY (data)}}{{Integral = {integral:0.3f}}}".format(integral=N_datadriven))
-        leg_up.AddEntry(h_closure,"#splitline{{DY (closure)}}{{Integral = {integral:0.3f}}}".format(integral=N_closure))
+        leg_up.AddEntry(h_MC,"#splitline{{DY (MC)}}{{Integral = {:0.3f} #pm {:0.3f}}}".format(N_MC,Nerr_MC))
+        leg_up.AddEntry(h_datadriven,"#splitline{{DY (data)}}{{Integral = {:0.3f} #pm {:0.3f}}}".format(N_datadriven,Nerr_datadriven))
+        leg_up.AddEntry(h_closure,"#splitline{{DY (closure)}}{{Integral = {:0.3f} #pm {:0.3f}}}".format(N_closure,Nerr_closure))
         leg_up.SetBorderSize(0)
         leg_up.SetFillStyle(0)
         leg_up.Draw()
@@ -173,16 +192,19 @@ for era in ['2016','2017','2018']:
 
         ratio_DY_datadriven.Draw("e1p")
         ratio_DY_closure.Draw("e1p same")
-        ratio_DY_datadriven.GetYaxis().SetRangeUser(-0.5,0.5)
-        leg_down = ROOT.TLegend(0.65,0.65,0.9,1.0)
-        leg_down.AddEntry(ratio_DY_datadriven,"\splitline{{#frac{{DY (MC) - DY (data)}}{{DY (data)}}}}{{Factor = {factor:0.3f}}}".format(factor=N_MC/N_datadriven))
-        leg_down.AddEntry(ratio_DY_closure,"\splitline{{#frac{{DY (MC) - DY (closure)}}{{DY (closure)}}}}{{Factor = {factor:0.3f}}}".format(factor=N_MC/N_closure))
+        ratio_DY_datadriven.GetYaxis().SetRangeUser(-1.0,1.5)
+        leg_down = ROOT.TLegend(0.55,0.65,0.9,1.0)
+        leg_down.AddEntry(ratio_DY_datadriven,"\splitline{{#frac{{DY (MC) - DY (data)}}{{DY (data)}}}}{{Factor = {:0.5f} #pm {:0.5f}}}".format(*factor_datadriven))
+        leg_down.AddEntry(ratio_DY_closure,"\splitline{{#frac{{DY (MC) - DY (closure)}}{{DY (closure)}}}}{{Factor = {:0.5f} #pm {:0.5f}}}".format(*factor_closure))
         leg_down.SetTextSize(0.04)
         leg_down.SetBorderSize(0)
         leg_down.SetFillStyle(0)
         leg_down.Draw()
+        #line = ROOT.TLine(0,(ratio_max+ratio_min)/2,1,(ratio_max+ratio_min)/2)
+        line = ROOT.TLine(0,0.,1,0.)
+        line.Draw()
 
-        factors[plotName.replace('.root','')] = N_MC/N_closure
+        factors[plotName.replace('.root','')] = factor_closure[0]
 
         C.Print(f'CompareDY/ComparisonDY_{era}.pdf','Title:{}'.format(plotName))
 

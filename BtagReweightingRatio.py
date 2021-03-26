@@ -18,7 +18,7 @@ from BaseHHtobbWW import BaseNanoHHtobbWW
 from plotDef import *
 
 #===============================================================================================#
-#                                       PlotterHHtobbWW                                         #
+#                                   BtagReweightingRatioNano                                    #
 #===============================================================================================#
 class BtagReweightingRatioNano(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModule):
     def __init__(self, args):

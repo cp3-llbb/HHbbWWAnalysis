@@ -4,22 +4,27 @@ Courtesy of Brieux François :
 https://github.com/BrieucF/HHTools/blob/MIS_RUNII/histFactory_hh/normAndSmoothTF.py
 """
 
+import os
 import sys
-import ROOT as R
+import ROOT 
 import argparse
 import copy
+import numpy as np
 
-R.gROOT.SetBatch(True)
-R.gErrorIgnoreLevel = 2000
-R.gStyle.SetOptStat("rm")
-R.gStyle.SetOptFit()
+from rebin import rebin2D
+
+ROOT.gROOT.SetBatch(True)
+ROOT.gErrorIgnoreLevel = 2000
+ROOT.gStyle.SetOptStat("rm")
+ROOT.gStyle.SetOptFit()
 
 def parseArguments():
     parser = argparse.ArgumentParser(description='Build transfer functions out of 2D histogram created by plotter.')
     parser.add_argument('-i', '--input', type=str, dest='input', required=True, help='Input file')
     parser.add_argument('-o', '--output', type=str, dest='output', required=True, help='Output file')
-    parser.add_argument('-p', '--plot', action='store_true',dest='plot', required=False, default=False,help='Produce plots')
+    parser.add_argument('-p', '--plot', action='store',dest='plot', required=False, type=str, default=None,help='Plot directory in "pdf/" directory')
     return parser.parse_args()
+
 
 def normalizeDeltaE(hist):
     xAxis = hist.GetXaxis()
@@ -41,7 +46,6 @@ def normalizeDeltaE(hist):
             hist.SetBinContent(i, j, oldContent/widthRatio)
 
     hist.Smooth(1)
-    hist.Smooth(1)
     
     for i in range(1, xAxis.GetNbins()+1):
         
@@ -58,29 +62,20 @@ def normalizeDeltaE(hist):
 def plotSlices(hist2D,title):
     xAxis = hist2D.GetXaxis()
     yAxis = hist2D.GetYaxis()
-    threshold = 0.0001
     list_hist1D = []
 
-    graph_mean = R.TGraph(xAxis.GetNbins())
-    graph_std = R.TGraph(xAxis.GetNbins())
-    graph_res = R.TGraph(xAxis.GetNbins())
+    graph_mean = ROOT.TGraph(xAxis.GetNbins())
+    graph_std = ROOT.TGraph(xAxis.GetNbins())
+    graph_res = ROOT.TGraph(xAxis.GetNbins())
     
     for i in range(1, xAxis.GetNbins()+1):
         # Get plot range #
-        bins_above_threshold = []
-        for j in range(1, yAxis.GetNbins()+1):
-            if hist2D.GetBinContent(i,j) > threshold:
-                bins_above_threshold.append(j)
-
-        # Project on Y axis #
+       # Project on Y axis #
         hist = hist2D.ProjectionY("%d_py"%i,i,i)
         if hist.Integral() <= 0.:
             continue
 
         # plot parameters #
-        origin_bin = hist.FindBin(hist.GetMaximum())
-        max_range = max(origin_bin-min(bins_above_threshold),max(bins_above_threshold)-origin_bin)
-        hist.GetXaxis().SetRange(max(1,origin_bin-max_range),min(hist.GetXaxis().GetNbins(),origin_bin+max_range))
         low_lim = xAxis.GetBinLowEdge(i)
         up_lim = xAxis.GetBinUpEdge(i)
         center = xAxis.GetBinCenter(i)
@@ -100,7 +95,7 @@ def plotSlices(hist2D,title):
     graph_std.SetTitle("#DeltaE standard deviation;E_{gen} [GeV]];Std dev #DeltaE")
     graph_res.SetTitle("Resolution;E_{gen} [GeV]];#frac{#sigma(E)}{E}")
     graph_mean.GetHistogram().GetXaxis().SetRangeUser(0.,up_lim)
-    graph_mean.GetHistogram().GetYaxis().SetRangeUser(0.,hist.GetMean())
+    graph_mean.GetHistogram().SetMinimum(0.)
     graph_std.GetHistogram().GetXaxis().SetRangeUser(0.,up_lim)
     graph_std.GetHistogram().SetMinimum(0.)
     graph_res.GetHistogram().GetXaxis().SetRangeUser(0.,up_lim)
@@ -108,7 +103,7 @@ def plotSlices(hist2D,title):
 
     return list_hist1D, graph_mean, graph_std, graph_res
 
-def findAndCorrectArtifacts(h):
+def findAndCorrectArtifacts(h,threshold=10):
     xAxis = h.GetXaxis()
     yAxis = h.GetYaxis()
     Nx = xAxis.GetNbins()
@@ -129,7 +124,7 @@ def findAndCorrectArtifacts(h):
             if y < Ny:
                 c_yup = h.GetBinContent(x,y+1)
             avg = (c_xlow+c_xup+c_ylow+c_yup)/4
-            if avg>0 and abs(content-avg)/avg > 10:
+            if avg!=0 and abs((content-avg)/avg) > threshold:
                 h.SetBinContent(x,y,avg)
             #    print ()
             #    print (x,y)
@@ -139,80 +134,116 @@ def findAndCorrectArtifacts(h):
             #    print (content/avg)
             #    print ((content-avg)/avg)
 
-def normAndSmooth(TFset, inFile, outFile, plot, rebinX = None, rebinsY = None):
-    inFile = R.TFile.Open(inFile)
-    outFile = R.TFile(outFile, "recreate")
+def normAndSmooth(TFset, inFile, outFile, plot):
+    inFile = ROOT.TFile.Open(inFile)
+    outFile = ROOT.TFile(outFile, "recreate")
    
     for TF in TFset:
         print ("Looking over %s"%(TF['base']))
         inputHists = []
+        keys = [key.GetName() for key in inFile.GetListOfKeys()]
         for hist in TF["histNames"]:
+            if hist not in keys:
+                raise RuntimeError("Histogram {} not available in {}".format(hist,inFile))
             inputHists.append( inFile.Get(hist) )
         
         DeltaEvsE = inputHists[0].Clone( TF["base"] )
         for hist in inputHists[1:]:
             DeltaEvsE.Add(hist)
 
-        findAndCorrectArtifacts(DeltaEvsE)
-
-        if rebinX is not None:
-            DeltaEvsE.RebinX(rebinX)
-        if rebinY is not None:
-            DeltaEvsE.RebinY(rebinY)
 
         DeltaEvsE.SetTitle("Hist 2D from bamboo")
         DeltaEvsE.GetXaxis().SetTitle("E_{gen}")
         DeltaEvsE.GetYaxis().SetTitle("E_{rec} - E_{gen}")
-        
-        DeltaEvsE_Norm = DeltaEvsE.Clone( TF["norm"] )
-        DeltaEvsE_Norm.SetTitle("Transfer function")
-        normalizeDeltaE(DeltaEvsE_Norm)
 
-        if plot:
+        #findAndCorrectArtifacts(DeltaEvsE,10)
+
+        DeltaEvsE_rebin = DeltaEvsE.Clone("rebin")
+        if 'rebinX' in TF.keys() and (isinstance(TF['rebinX'],list) or isinstance(TF['rebinX'],np.ndarray)) and 'rebinY' in TF.keys() and (isinstance(TF['rebinY'],list) or isinstance(TF['rebinY'],np.ndarray)):
+            DeltaEvsE_rebin = rebin2D(DeltaEvsE_rebin,TF['rebinX'],TF['rebinY'],TF["base"]+'_rebin')
+        if 'rebinX' in TF.keys() and isinstance(TF['rebinX'],int):
+            DeltaEvsE.RebinX(TF['rebinX'])
+        if 'rebinY' in TF.keys() and isinstance(TF['rebinX'],int):
+            DeltaEvsE.RebinY(TF['rebinY'])
+        DeltaEvsE_rebin.SetTitle("Hist 2D from bamboo [rebinned]")
+
+        DeltaEvsE_Norm = DeltaEvsE_rebin.Clone( TF["norm"] )
+        DeltaEvsE_Norm.SetTitle("Transfer function")
+
+        normalizeDeltaE(DeltaEvsE_Norm)
+        
+        if plot is not None:
+            path_out = "pdf/{}".format(plot)
+            if not os.path.exists(path_out):
+                os.makedirs(path_out)
+            pdfName = os.path.join(path_out,"{}.pdf".format(TF["norm"]))
             list_hist, g_mean, g_std, g_res = plotSlices(DeltaEvsE_Norm,TF["title"])
-            C = R.TCanvas("C","C",800,600)
-            C.Print(TF["norm"]+".pdf[")
+            C = ROOT.TCanvas("C","C",800,600)
+            C.Print(pdfName+"[")
 
             # Draw TF #
             C.SetLogz(True)
             DeltaEvsE.SetContour(100)
             DeltaEvsE.Draw("colz")
-            C.Print(TF["norm"]+".pdf")
+            C.Print(pdfName)
+            C.Clear()
+            DeltaEvsE_rebin.SetContour(100)
+            DeltaEvsE_rebin.Draw("colz")
+            C.Print(pdfName)
             C.Clear()
             DeltaEvsE_Norm.SetContour(100)
             DeltaEvsE_Norm.Draw("colz")
-            C.Print(TF["norm"]+".pdf")
-#            DeltaEvsE_Norm.GetYaxis().SetRangeUser(-30,30)
-#            C.Clear()
-#            DeltaEvsE_Norm.Draw("colz")
-#            C.Print(TF["norm"]+".pdf")
+            C.Print(pdfName)
+            C.SetLogz(False)
 
             # Draw graphs #
-            C.SetLogz(False)
             C.Clear()
             g_mean.Draw()
-            C.Print(TF["norm"]+".pdf")
+            C.Print(pdfName)
             C.Clear()
             g_std.Draw()
             #g_std.Fit("pol1")
             #f = g_std.GetListOfFunctions().FindObject("pol1")
             ##f.FixParameter(0,0)
             #print (TF["title"]+" Resolution = %0.2f"%(f.GetParameter(1)*100))
-            C.Print(TF["norm"]+".pdf")
+            C.Print(pdfName)
             C.Clear()
+            #C.SetLogy(True)
             g_res.Draw()
-            C.Print(TF["norm"]+".pdf")
+            C.Print(pdfName)
+            #C.SetLogy(False)
 
 
             # Draw profiles #
+            C.Clear()
+            C.SetCanvasSize(2000,900)
+            C.Divide(2,1)
+            pad1 = C.cd(1)
+            pad2 = C.cd(2)
+            pad1.SetLogy(True)
+            threshold = 0.001
             for hist in list_hist:
-                C.Clear()
+                pad1.Clear()
+                pad1.cd()
+                hist_log = hist.Clone("log")
+                hist_log.Draw("hist")
+
+                pad2.Clear()
+                pad2.cd()
+                bins_above_threshold = [i for i in range(1,hist.GetNbinsX()+1) if hist.GetBinContent(i)>threshold]
+                if len(bins_above_threshold) != 0:
+                    origin_bin = hist.FindBin(hist.GetMaximum())
+                    max_range = max(origin_bin-min(bins_above_threshold),max(bins_above_threshold)-origin_bin)
+                    hist.GetXaxis().SetRange(max(1,origin_bin-max_range),min(hist.GetXaxis().GetNbins(),origin_bin+max_range))
+
                 hist.Draw("hist")
-                C.Print(TF["norm"]+".pdf")
-            C.Print(TF["norm"]+".pdf]")
+                C.Print(pdfName)
+            C.Clear()
+            C.Print(pdfName+"]")
 
         
         DeltaEvsE.Write()
+        DeltaEvsE_rebin.Write()
         DeltaEvsE_Norm.Write()
     
     outFile.Close()
@@ -221,52 +252,56 @@ def normAndSmooth(TFset, inFile, outFile, plot, rebinX = None, rebinsY = None):
 if __name__ == "__main__":
     options = parseArguments()
     TFset = [
+#                {
+#                    "histNames": ['ak4b_TF'],
+#                    "base" : "b_TF",
+#                    "norm" : "b_TF_norm",
+#                    "title": "b transfer function",
+#                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
+#                    "rebinY": np.r_[-500:501:5]
+#                },
+#                {
+#                    "histNames": ['ak4b_TF_bregCorr'],
+#                    "base" : "b_TF_bregCorr",
+#                    "norm" : "b_TF_bregCorr_norm",
+#                    "title": "b transfer function (with regression correction)",
+#                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
+#                    "rebinY": np.r_[-500:501:5]
+#                },
+#                {
+#                    "histNames": ['ak4c_TF'],
+#                    "base" : "c_TF",
+#                    "norm" : "c_TF_norm",
+#                    "title": "c transfer function",
+#                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
+#                    "rebinY": np.r_[-500:501:5]
+#                },
+#                {
+#                    "histNames": ['ak4l_TF'],
+#                    "base" : "l_TF",
+#                    "norm" : "l_TF_norm",
+#                    "title": "lightjet transfer function",
+#                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
+#                    "rebinY": np.r_[-500:501:5]
+#                },
+#                {
+#                    "histNames": ['e_TF'],
+#                    "base" : "e_TF",
+#                    "norm" : "e_TF_norm",
+#                    "title": "e^{#pm} transfer function",
+#                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:100, 500:1001:500, 3000 ],
+#                    "rebinY": np.r_[-500:501:1]
+#                },
                 {
-                    "histNames": ['b_TF'],
-                    "base" : "b_TF",
-                    "norm" : "b_TF_norm",
-                    "title": "b transfer function"
-                },
-#                {
-#                    "histNames": ['e_minus_TF'],
-#                    "base" : "e_minus_TF",
-#                    "norm" : "e_minus_TF_norm",
-#                    "title": "e^{-} transfer function"
-#                },
-#                {
-#                    "histNames": ['e_plus_TF'],
-#                    "base" : "e_plus_TF",
-#                    "norm" : "e_plus_TF_norm",
-#                    "title": "e^{+} transfer function"
-#                },
-                {
-                    "histNames": ['e_minus_TF','e_plus_TF'],
-                    "base" : "e_TF",
-                    "norm" : "e_TF_norm",
-                    "title": "e^{#pm} transfer function"
-                },
-#                {
-#                    "histNames": ['mu_minus_TF'],
-#                    "base" : "mu_minus_TF",
-#                    "norm" : "mu_minus_TF_norm",
-#                    "title": "#mu^{-} transfer function"
-#                },
-#                {
-#                    "histNames": ['mu_plus_TF'],
-#                    "base" : "mu_plus_TF",
-#                    "norm" : "mu_plus_TF_norm",
-#                    "title": "#mu^{+} transfer function"
-#                },
-                {
-                    "histNames": ['mu_minus_TF','mu_plus_TF'],
+                    "histNames": ['m_TF'],
                     "base" : "mu_TF",
                     "norm" : "mu_TF_norm",
-                    "title": "#mu^{#pm} transfer function"
+                    "title": "#mu^{#pm} transfer function",
+                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:100, 500:1001:500, 3000 ],
+                    "rebinY": np.r_[-500:-300:50, -300:-200:20, -200:-100:10, -100:-40:2 , -40:40:1 , 40:100:2 , 100:200:10, 200:300:20, 300:500:50],
                 },
             ]
-    rebinX = 10
-    rebinY = 5
 
-    normAndSmooth(TFset, options.input, options.output, options.plot, rebinX, rebinY)
+    normAndSmooth(TFset, options.input, options.output, options.plot)
 
 

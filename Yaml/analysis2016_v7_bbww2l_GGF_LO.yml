@@ -30,7 +30,7 @@ GluGluToHHTo2B2VTo2L2Nu_node_2:
   era: '2016'
   db: das:/GluGluToHHTo2B2VTo2L2Nu_node_2_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: genEventSumw
-  legend: 'HH#rightarrow bbl#nu l#nu (node 1)' 
+  legend: 'HH#rightarrow bbl#nu l#nu (node 2)' 
   line-type: 1
   split: 100
   type: signal
@@ -41,7 +41,7 @@ GluGluToHHTo2B2VTo2L2Nu_node_3:
   era: '2016'
   db: das:/GluGluToHHTo2B2VTo2L2Nu_node_3_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: genEventSumw
-  legend: 'HH#rightarrow bbl#nu l#nu (node 2)' 
+  legend: 'HH#rightarrow bbl#nu l#nu (node 3)' 
   line-type: 1
   split: 100
   type: signal
@@ -52,7 +52,7 @@ GluGluToHHTo2B2VTo2L2Nu_node_4:
   era: '2016'
   db: das:/GluGluToHHTo2B2VTo2L2Nu_node_4_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: genEventSumw
-  legend: 'HH#rightarrow bbl#nu l#nu (node 3)' 
+  legend: 'HH#rightarrow bbl#nu l#nu (node 4)' 
   line-type: 1
   split: 100
   type: signal

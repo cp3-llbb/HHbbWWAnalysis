@@ -37,7 +37,11 @@ if args.down is not None:
     baseCommand += r" --down "+args.down
 dasCommand = r" $(dasgoclient -query 'file dataset=%s' | sed 's=^\(.*\)$=/storage/data/cms\1=g')"
 
-for sample, dico in data['samples'].items():
+if 'samples' in data.keys():
+    samples = data['samples']
+else:
+    samples = data
+for sample, dico in samples.items():
     command  = baseCommand%(sample,args.era)
     if 'group' in dico: # Signal samples do not have group
         if dico['group'] == "data":
