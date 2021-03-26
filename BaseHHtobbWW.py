@@ -95,10 +95,11 @@ One lepton and and one jet argument must be specified in addition to the require
                             type=str, 
                             default="dataframe", 
                             help="Backend to use, 'dataframe' (default) or 'lazy'")
-        parser.add_argument("--samples", 
+        parser.add_argument("-s",
+                            "--subset", 
                             type        = str,
-                            required    = True,
-                            help="Samples to be run over, keys defined in the 'samples' entry of the yaml analysis config")
+                            required    = False,
+                            help="Subset of samples to be run over, keys defined in the 'samples' entry of the yaml analysis config")
         parser.add_argument("--NoSystematics", 
                             action      = "store_true",
                             default     = False,
@@ -269,22 +270,64 @@ One lepton and and one jet argument must be specified in addition to the require
                             type        = str,
                             help        = "BDT | simple")
 
+
     #-------------------------------------------------------------------------------------------#
     #                                   customizeAnalysisCfg                                    #
     #-------------------------------------------------------------------------------------------#
-    def customizeAnalysisCfg(self,analysisCfg):
+    def initialize(self,forSkimmer=False):
+        # Include all the contributions from the subsets in the yaml #
+        self._customizeAnalysisCfg(self.analysisConfig)
+
+        # Add the LO reweighting to the datadriven parts #
+        if not forSkimmer and self.args.HHReweighting:
+            self.analysisConfig['datadriven'].update({benchmark:{'replaces': 'all', 'uses': 'all'} for benchmark in self.analysisConfig['benchmarks']['targets']})
+            if self.args.datadriven is None:
+                self.args.datadriven = self.analysisConfig['benchmarks']['targets']
+            else:
+                self.args.datadriven += self.analysisConfig['benchmarks']['targets']
+
+        super(BaseNanoHHtobbWW, self).initialize()
+
+        # PseudoData #
+        if not forSkimmer:
+            if "PseudoData" in self.datadrivenContributions:
+                contrib = self.datadrivenContributions["PseudoData"]
+                self.datadrivenContributions["PseudoData"] = DataDrivenPseudoData(contrib.name, contrib.config)
+
+        # Include the datadriven reweighting #
+        if self.args.HHReweighting:
+            self.datadrivenContributions.update({benchmark:DataDrivenLOReweighting(benchmark,self.analysisConfig['datadriven'][benchmark],substrs=self.analysisConfig['benchmarks']['uses']) for benchmark in self.analysisConfig['benchmarks']['targets']}) 
+
+    #-------------------------------------------------------------------------------------------#
+    #                                   customizeAnalysisCfg                                    #
+    #-------------------------------------------------------------------------------------------#
+    def _customizeAnalysisCfg(self,analysisCfg):
         import yaml
         samples = {} 
-        reqArgs = self.args.samples.split(',')
+        if self.args.subset is None:
+            return
+        reqArgs = self.args.subset.split(',')
+        foundArgs = set()
+        subsets = []
         for item in analysisCfg['samples']:
+            if not 'keys' in item.keys() or not 'config' in item.keys():
+                continue
             keys = item['keys']
             if not isinstance(keys,list):
                 keys = [keys]
             if all([key in reqArgs for key in keys]) or 'all' in reqArgs:
-                with open(os.path.join('Yaml',item['config'])) as handle:
+                foundArgs.update(keys)
+                subsets.append(item['config'])
+                with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'Yaml',item['config'])) as handle:
                     samples.update(yaml.load(handle,yaml.SafeLoader))
         self.analysisConfig['samples'] = samples
-
+        notFoundArgs = [arg for arg in reqArgs if arg not in foundArgs]
+        if len(notFoundArgs)>0:
+            raise RuntimeError('The following subsets have not been found in the keys of the analysis yaml file : '+', '.join(notFoundArgs))
+        if len(subsets) > 0:
+            print ("Imported following yaml subsets :")
+            for subset in subsets:
+                print ('... {}'.format(subset))
 
     #-------------------------------------------------------------------------------------------#
     #                                       prepareTree                                         #
@@ -311,6 +354,8 @@ One lepton and and one jet argument must be specified in addition to the require
     
         self.triggersPerPrimaryDataset = {}
         from bamboo.analysisutils import configureJets ,configureRochesterCorrection, configureType1MET 
+
+        self.yields = CutFlowReport("yields",printInLog=self.args.Events is not None,recursive=self.args.Events is not None)
 
         # Event cut #
         if self.args.Events:
@@ -375,10 +420,15 @@ One lepton and and one jet argument must be specified in addition to the require
             # len(LHEScaleWeight) different (usually 44 ?!)
             #   -> nominal = up = down = 1.
             if hasattr(tree,"LHEScaleWeight"):
-                self.scaleWeight_Fact = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.systematic(tree.LHEScaleWeight[4],
-                                                                                                            name = "ScaleWeight_Fact",
-                                                                                                            up   = tree.LHEScaleWeight[5],
-                                                                                                            down = tree.LHEScaleWeight[3])),
+                self.scaleWeight_Fact = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.switch(op.abs(tree.LHEScaleWeight[4]) < 1000,
+                                                                                                        op.systematic(tree.LHEScaleWeight[4],
+                                                                                                                      name = "ScaleWeight_Fact",
+                                                                                                                      up   = tree.LHEScaleWeight[5],
+                                                                                                                      down = tree.LHEScaleWeight[3]),
+                                                                                                        op.systematic(op.c_float(1.), 
+                                                                                                                      name = "ScaleWeight_Fact",
+                                                                                                                      up   = op.c_float(1.),
+                                                                                                                      down = op.c_float(1.)))),
                                                        (op.rng_len(tree.LHEScaleWeight) == 8, op.systematic(op.c_float(1.),
                                                                                                             name = "ScaleWeight_Fact",
                                                                                                             up   = tree.LHEScaleWeight[4],
@@ -387,10 +437,15 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                      name = "ScaleWeight_Fact",
                                                                      up   = op.c_float(1.),
                                                                      down = op.c_float(1.)))
-                self.scaleWeight_Renorm = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.systematic(tree.LHEScaleWeight[4],
-                                                                                                              name = "ScaleWeight_Renorm",
-                                                                                                              up   = tree.LHEScaleWeight[7],
-                                                                                                              down = tree.LHEScaleWeight[1])),
+                self.scaleWeight_Renorm = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.switch(op.abs(tree.LHEScaleWeight[4]) < 1000,
+                                                                                                          op.systematic(tree.LHEScaleWeight[4],
+                                                                                                                        name = "ScaleWeight_Renorm",
+                                                                                                                        up   = tree.LHEScaleWeight[7],
+                                                                                                                        down = tree.LHEScaleWeight[1]),
+                                                                                                        op.systematic(op.c_float(1.), 
+                                                                                                                      name = "ScaleWeight_Renorm",
+                                                                                                                      up   = op.c_float(1.),
+                                                                                                                      down = op.c_float(1.)))),
                                                          (op.rng_len(tree.LHEScaleWeight) == 8, op.systematic(op.c_float(1.),
                                                                                                               name = "ScaleWeight_Renorm",
                                                                                                               up   = tree.LHEScaleWeight[6],
@@ -399,10 +454,15 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                        name = "ScaleWeight_Renorm",
                                                                        up   = op.c_float(1.),
                                                                        down = op.c_float(1.)))
-                self.scaleWeight_Mixed = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.systematic(tree.LHEScaleWeight[4],
-                                                                                                             name = "ScaleWeight_Mixed",
-                                                                                                             up   = tree.LHEScaleWeight[8],
-                                                                                                             down = tree.LHEScaleWeight[0])),
+                self.scaleWeight_Mixed = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, op.switch(op.abs(tree.LHEScaleWeight[4]) < 1000,
+                                                                                                         op.systematic(tree.LHEScaleWeight[4],
+                                                                                                                       name = "ScaleWeight_Mixed",
+                                                                                                                       up   = tree.LHEScaleWeight[8],
+                                                                                                                       down = tree.LHEScaleWeight[0]),
+                                                                                                        op.systematic(op.c_float(1.), 
+                                                                                                                      name = "ScaleWeight_Renorm",
+                                                                                                                      up   = op.c_float(1.),
+                                                                                                                      down = op.c_float(1.)))),
                                                         (op.rng_len(tree.LHEScaleWeight) == 8, op.systematic(op.c_float(1.),
                                                                                                              name = "ScaleWeight_Mixed",
                                                                                                              up   = tree.LHEScaleWeight[7],
@@ -411,12 +471,58 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                       name = "ScaleWeight_Mixed",
                                                                       up   = op.c_float(1.),
                                                                       down = op.c_float(1.)))
+
+                self.scaleWeight = op.multiSwitch((op.rng_len(tree.LHEScaleWeight) == 9, 
+                                                                op.switch(op.abs(tree.LHEScaleWeight[4]) < 1000,
+                                                                           op.systematic(tree.LHEScaleWeight[4],
+                                                                                         name       = "ScaleWeight",
+                                                                                         Factup     = tree.LHEScaleWeight[5],
+                                                                                         Factdown   = tree.LHEScaleWeight[3],
+                                                                                         Renormup   = tree.LHEScaleWeight[7],
+                                                                                         Renormdown = tree.LHEScaleWeight[1],
+                                                                                         Mixedup    = tree.LHEScaleWeight[8],
+                                                                                         Mixeddown  = tree.LHEScaleWeight[0]),
+                                                                           op.systematic(op.c_float(1.),
+                                                                                         name       = "ScaleWeight",
+                                                                                         Factup     = op.c_float(1.),
+                                                                                         Factdown   = op.c_float(1.),
+                                                                                         Renormup   = op.c_float(1.),
+                                                                                         Renormdown = op.c_float(1.),
+                                                                                         Mixedup    = op.c_float(1.),
+                                                                                         Mixeddown  = op.c_float(1.)))),
+                                                  (op.rng_len(tree.LHEScaleWeight) == 8, op.systematic(op.c_float(1.),
+                                                                                                       name       = "ScaleWeight",
+                                                                                                       Factup     = tree.LHEScaleWeight[4],
+                                                                                                       Factdown   = tree.LHEScaleWeight[3],
+                                                                                                       Renormup   = tree.LHEScaleWeight[6],
+                                                                                                       Renormdown = tree.LHEScaleWeight[1],
+                                                                                                       Mixedup    = tree.LHEScaleWeight[7],
+                                                                                                       Mixeddown  = tree.LHEScaleWeight[0])),
+                                                  op.systematic(op.c_float(1.),
+                                                                name       = "ScaleWeight",
+                                                                Factup     = op.c_float(1.),
+                                                                Factdown   = op.c_float(1.),
+                                                                Renormup   = op.c_float(1.),
+                                                                Renormdown = op.c_float(1.),
+                                                                Mixedup    = op.c_float(1.),
+                                                                Mixeddown  = op.c_float(1.)))
+
+                                                                                                 
             else:
                 self.scaleWeight_Fact = op.systematic(op.c_float(1.), name = "ScaleWeight_Fact", up = op.c_float(1.), down = op.c_float(1.))
                 self.scaleWeight_Renorm = op.systematic(op.c_float(1.), name = "ScaleWeight_Renorm", up = op.c_float(1.), down = op.c_float(1.))
                 self.scaleWeight_Mixed = op.systematic(op.c_float(1.), name = "ScaleWeight_Mixed", up = op.c_float(1.), down = op.c_float(1.))
+                self.scaleWeight = op.systematic(op.c_float(1.),
+                                                 name       = "ScaleWeight",
+                                                 Factup     = op.c_float(1.),
+                                                 Factdown   = op.c_float(1.),
+                                                 Renormup   = op.c_float(1.),
+                                                 Renormdown = op.c_float(1.),
+                                                 Mixedup    = op.c_float(1.),
+                                                 Mixeddown  = op.c_float(1.))
 
-            noSel = noSel.refine("PDFweights", weight = [self.scaleWeight_Fact,self.scaleWeight_Renorm,self.scaleWeight_Mixed])
+            #noSel = noSel.refine("PDFweights", weight = [self.scaleWeight_Fact,self.scaleWeight_Renorm,self.scaleWeight_Mixed])
+            noSel = noSel.refine("PDFweights", weight = [self.scaleWeight])
 
             # PS weights #
             self.psISRSyst = op.switch(op.rng_len(tree.PSWeight) == 4,
@@ -747,24 +853,6 @@ One lepton and and one jet argument must be specified in addition to the require
 
         return tree,noSel,be,lumiArgs
 
-    def initialize(self,forSkimmer=False):
-
-        if not forSkimmer and self.args.HHReweighting:
-            self.analysisConfig['datadriven'].update({benchmark:{'replaces': 'all', 'uses': 'all'} for benchmark in self.analysisConfig['benchmarks']['targets']})
-            if self.args.datadriven is None:
-                self.args.datadriven = self.analysisConfig['benchmarks']['targets']
-            else:
-                self.args.datadriven += self.analysisConfig['benchmarks']['targets']
-
-        super(BaseNanoHHtobbWW, self).initialize()
-        if not forSkimmer:
-            if "PseudoData" in self.datadrivenContributions:
-                contrib = self.datadrivenContributions["PseudoData"]
-                self.datadrivenContributions["PseudoData"] = DataDrivenPseudoData(contrib.name, contrib.config)
-        if self.args.HHReweighting:
-            self.datadrivenContributions.update({benchmark:DataDrivenLOReweighting(benchmark,self.analysisConfig['datadriven'][benchmark],substrs=self.analysisConfig['benchmarks']['uses']) for benchmark in self.analysisConfig['benchmarks']['targets']}) 
-
-
     #-------------------------------------------------------------------------------------------#
     #                                     prepareObjects                                        #
     #-------------------------------------------------------------------------------------------#
@@ -777,10 +865,6 @@ One lepton and and one jet argument must be specified in addition to the require
         era = sampleCfg['era']
         self.era = era
         self.tree = t
-
-        self.yields = CutFlowReport("yields",printInLog=self.args.Events is not None,recursive=self.args.Events is not None)
-
-        self.forSkimmer = forSkimmer
 
         ###########################################################################
         #                              Pseudo-data                                #
@@ -795,7 +879,7 @@ One lepton and and one jet argument must be specified in addition to the require
         ###########################################################################
         #                          Signal Reweighting                             #
         ###########################################################################
-        if 'type' in sampleCfg.keys() and sampleCfg["type"] == "signal" and any(useFile in sample for useFile in self.analysisConfig['benchmarks']['uses']) and self.args.HHReweighting:
+        if 'type' in sampleCfg.keys() and sampleCfg["type"] == "signal" and 'benchmarks' in self.analysisConfig.keys() and any(useFile in sample for useFile in self.analysisConfig['benchmarks']['uses']) and self.args.HHReweighting:
             # Get gen level Higgs #
             self.genh = op.select(t.GenPart,lambda g : op.AND(g.pdgId==25, g.statusFlags & ( 0x1 << 13)))
             # Get gen level variables mHH and cos(theta*) #
@@ -1682,6 +1766,7 @@ One lepton and and one jet argument must be specified in addition to the require
 
             if self.args.BtagReweightingOn and self.args.BtagReweightingOff: 
                 raise RuntimeError("Reweighting cannot be both on and off") 
+
             if self.args.BtagReweightingOn:
                 sel = sel.refine("BtagSF" , weight = self.btagAk4SF)
             elif self.args.BtagReweightingOff:
@@ -1741,10 +1826,17 @@ One lepton and and one jet argument must be specified in addition to the require
     ###########################################################################
     #                             postProcess                                 #
     ###########################################################################
-    def postProcess(self, taskList, config=None, workdir=None, resultsdir=None):
+    def postProcess(self, taskList, config=None, workdir=None, resultsdir=None, forSkimmer=True):
         from bamboo.root import gbl
-        
-        if not self.forSkimmer:
+
+        if not forSkimmer:
+            ### Disable plotting for some signal samples ###
+            samplesToHide = [sample for sample,sampleCfg in config['samples'].items() if 'hide' in sampleCfg.keys() and sampleCfg['hide']]
+            for sample in samplesToHide:
+                config['samples'][sample]['line-color'] = "#01000000" # transparent 
+                config['samples'][sample]['legend'] = ""
+
+            ### HH reweighting ###
             if self.args.HHReweighting:
                 LOFiles = []
                 LOChannels = ['GluGluToHHTo2B2VTo2L2Nu','GluGluToHHTo2B2WToLNu2J','GluGluToHHTo2B2Tau']
@@ -1759,7 +1851,6 @@ One lepton and and one jet argument must be specified in addition to the require
                         eras = list(config["eras"].keys())
                     for era in eras:
                         for channel in LOChannels:
-                            #print (channel)
                             contribPerChannel = {sample:sampleCfg for sample,sampleCfg in contribSamples.items() if channel in sample and sampleCfg['era']==era}
                             crossSection = [sampleCfg['cross-section'] for sampleCfg in contribPerChannel.values()]
                             if len(set(crossSection)) != 1:
@@ -1808,7 +1899,7 @@ One lepton and and one jet argument must be specified in addition to the require
 
                 self.datadrivenScenarios = list(ddScenarios)
 
-            for LOFile in LOFiles:
-                del config['samples'][LOFile]
+                for LOFile in LOFiles:
+                    del config['samples'][LOFile]
 
         super(BaseNanoHHtobbWW,self).postProcess(taskList=taskList, config=config, workdir=workdir, resultsdir=resultsdir)
