@@ -21,7 +21,7 @@ path_out = '/nfs/scratch/fynu/fbury/HHMachineLearning_output/'
 path_model = os.path.join(main_path,'model')
 
 ##############################  Datasets proportion   #################################
-crossvalidation = False
+crossvalidation = True
 
 # Classic training #
 # -> For crossvalidation == False
@@ -49,10 +49,10 @@ if N_apply != N_slices/N_models: # Otherwise the same slice can be applied on se
 ############################### Slurm parameters ######################################
 partition = 'gpu'  # Def, cp3, cp3-gpu or gpu
 QOS = 'normal' # cp3, normal, cp3-gpu
-time = '0-08:00:00' # days-hh:mm:ss
-mem = '80000' # ram in MB
+time = '0-04:00:00' # days-hh:mm:ss
+mem = '90000' # ram in MB
 tasks = 1 # Number of threads(as a string) (not parallel training for classic mode)
-cpus = 1
+cpus = 8
 gpus = 1
 additional_options = ""
 workers = 20
@@ -60,12 +60,12 @@ split_per_model = True # in case of cross validation, to send one job per model 
 
 ##################################  Naming ######################################
 # Physics Config #
-config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL_SM.yml')
+config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL_BSM.yml')
 lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
 #eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
 eras = [2018]
 
-categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj','resolved0b']
+categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj']
 #categories = ['boosted2b2Wj','boosted2b1Wj', 'boosted2b0Wj']
 channels = ['El','Mu']
 
@@ -73,8 +73,8 @@ channels = ['El','Mu']
 nodes = ['Ewk','GGF','H','Top','VBF','WJets']
 
 weight_groups = [
-                  (1.0/10, ('GGF')),
-                  (1.0/10, ('VBF')),
+                  (1.0, ('GGF')),
+                  (1.0, ('VBF')),
                   (1.0, ('H')),
                   (1.0, ('Ewk')),
                   (1.0, ('Top')),
@@ -139,22 +139,22 @@ eval_criterion = "eval_error" # either val_loss or eval_error or val_acc
 
 ##############################  Model callbacks ################################
 # Early stopping to stop learning after some criterion 
-early_stopping_params = {'monitor'   : 'val_categorical_accuracy',  # Value to monitor
+early_stopping_params = {'monitor'   : 'val_loss',  # Value to monitor
                          'min_delta' : 0.0001,          # Minimum delta to declare an improvement
                          'patience'  : 50,          # How much time to wait for an improvement
                          'verbose'   : 1,           # Verbosity level
                          'restore_best_weights': False,
-                         'mode'      : 'max'}       # Mode : 'auto', 'min', 'max'
+                         'mode'      : 'min'}       # Mode : 'auto', 'min', 'max'
 
 # Reduce LR on plateau : if no improvement for some time, will reduce lr by a certain factor
-reduceLR_params = {'monitor'    : 'val_categorical_accuracy',   # Value to monitor
+reduceLR_params = {'monitor'    : 'val_loss',   # Value to monitor
                    'factor'     : 0.5,          # Multiplicative factor by which to multiply LR
                    'min_lr'     : 1e-5,         # Minimum value for LR
-                   'min_delta'  : 0.001,       # Minimum delta to declare an improvement
+                   'min_delta'  : 0.0001,       # Minimum delta to declare an improvement
                    'patience'   : 20,            # How much time to wait for an improvement
-                   'cooldown'   : 10,            # How many epochs before starting again to monitor
+                   'cooldown'   : 0,            # How many epochs before starting again to monitor
                    'verbose'    : 1,            # Verbosity level
-                   'mode'      : 'max'}         # Mode : 'auto', 'min', 'max'
+                   'mode'      : 'min'}         # Mode : 'auto', 'min', 'max'
 
 
     
@@ -177,12 +177,12 @@ reduceLR_params = {'monitor'    : 'val_categorical_accuracy',   # Value to monit
 #}
 p = { 
     'lr' : [0.01], 
-    'first_neuron' : [256],
+    'first_neuron' : [512],
     'activation' : [relu],
-    'dropout' : [0.001],
+    'dropout' : [0.01],
     'hidden_layers' : [4], # does not take into account the first layer
     'output_activation' : [softmax],
-    'l2' : [1e-6],
+    'l2' : [1e-3],
     'optimizer' : [Adam],  
     'epochs' : [500],   
     'batch_size' : [50000], 
@@ -195,7 +195,7 @@ repetition = 1 # How many times each hyperparameter has to be used
 
 ###################################  Variables   ######################################
 
-cut = 'total_weight > 0 && MC_weight <10000'
+cut = 'total_weight > 0 && MC_weight <10000 && total_weight < 10e10'
 #cut = 'MC_weight > 0'
 
 weight = 'total_weight'
@@ -322,7 +322,7 @@ inputs = [
             'HWWLepDR',
 #            'HWWLepDPhi',
             'HWWMetDPhi',
-#            'HT2_lepJetMet',
+            'HT2_lepJetMet',
 #            'HT2R_lepJetMet',
 
 #            ############################
@@ -339,12 +339,12 @@ inputs = [
 #            'L2_Hbb0Wj',
 #            # LL variables #
 #            'METpt',               
-#            'METpx',               # discard               
-#            'METpy',               # discard
-#            'lep_Px',              # discard
-#            'lep_Py',              # discard
-#            'lep_Pz',              # discard
-#            'lep_E',               # discard    
+#            'METpx',
+#            'METpy',
+#            'lep_Px',
+#            'lep_Py',
+#            'lep_Pz',
+#            'lep_E',
 #            'fatbj_Px',
 #            'fatbj_Py',
 #            'fatbj_Pz',
@@ -431,7 +431,7 @@ LBN_inputs = [
 #              'wj2_E','wj2_Px','wj2_Py','wj2_Pz',
 #             ]
 #
-#
+
 
 #### /!\ format = [E,Px,Py,Pz] per particle
 

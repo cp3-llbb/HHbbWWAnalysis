@@ -13,7 +13,7 @@ from bamboo.analysismodules import HistogramsModule, DataDrivenBackgroundHistogr
 from bamboo import treefunctions as op
 from bamboo.plots import CutFlowReport, Plot, EquidistantBinning, SummedPlot
 
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)))) # Add scripts in this directory
+sys.path.append(os.path.dirname(os.path.abspath(__file__))) # Add scripts in this directory
 from BaseHHtobbWW import BaseNanoHHtobbWW
 from plotDef import *
 from selectionDef import *
@@ -25,8 +25,6 @@ def switch_on_index(indexes, condition, contA, contB):
         raise RuntimeError("The containers do not derive from the same base, this won't work")
     base = contA._base
     return [base[op.switch(condition, contA[index].idx, contB[index].idx)] for index in indexes]       
-
-
 #===============================================================================================#
 #                                       PlotterHHtobbWW                                         #
 #===============================================================================================#
@@ -82,118 +80,57 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             jetsel_level.append("Ak8") # Boosted needs the Ak8 selection
 
         #----- Select correct dilepton -----#
-        if self.args.POGID:
-            OSElElDilepton = self.ElElTightSel
-            OSMuMuDilepton = self.MuMuTightSel
-            OSElMuDilepton = self.ElMuTightSel
-        if self.args.TTHIDLoose or self.args.TTHIDTight:
-            OSElElDilepton = self.ElElFakeSel
-            OSMuMuDilepton = self.MuMuFakeSel
-            OSElMuDilepton = self.ElMuFakeSel
+        OSElElDilepton = self.ElElFakeSel
+        OSMuMuDilepton = self.MuMuFakeSel
+        OSElMuDilepton = self.ElMuFakeSel
 
         #----- DY reweighting -----#
         if "DYEstimation" in self.datadrivenContributions:
             mode = 'mc' if "PseudoData" in self.datadrivenContributions else 'data'
-            # Resolved : ElEl #
-#        self.ResolvedDYReweighting1bElEl = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'ElEl_leadjetPt_{}_1b'.format(mode)), combine="weight", 
-#                                                               systName="dy_ee_resolved_reweighting_1b", 
-#                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: self.HLL.getCorrBp4(x).Pt()})
-#        self.ResolvedDYReweighting2bElEl = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'ElEl_leadjetPt_{}_2b'.format(mode)), combine="weight", 
-#                                                               systName="dy_ee_resolved_reweighting_2b", 
-#                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: self.HLL.getCorrBp4(x).Pt()})
-#        # Resolved : MuMu #
-#        self.ResolvedDYReweighting1bMuMu = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'MuMu_leadjetPt_{}_1b'.format(mode)), combine="weight", 
-#                                                               systName="dy_mm_resolved_reweighting_1b", 
-#                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: self.HLL.getCorrBp4(x).Pt()})
-#        self.ResolvedDYReweighting2bMuMu = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'MuMu_leadjetPt_{}_2b'.format(mode)), combine="weight", 
-#                                                               systName="dy_mm_resolved_reweighting_1b", 
-#                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: self.HLL.getCorrBp4(x).Pt()})
-            # Resolved : ElEl #
-            self.ResolvedDYReweighting1bElEl = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'ElEl_HT_{}_1b'.format(mode)), combine="weight", 
-                                                                   systName="dy_ee_resolved_reweighting_1b", 
-                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
-            self.ResolvedDYReweighting2bElEl = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'ElEl_HT_{}_2b'.format(mode)), combine="weight", 
-                                                                   systName="dy_ee_resolved_reweighting_2b", 
-                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
-
-#            # Correction #
-#            self.ResolvedDYReweighting1bElEl_corr = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'ElEl_MET_{}_1b'.format(mode)), combine="weight", 
-#                                                                            #additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda dilep: op.deltaR(dilep[0].p4,dilep[1].p4)})
-#                                                                            additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda met: met.pt})
-#            self.ResolvedDYReweighting2bElEl_corr = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'ElEl_MET_{}_2b'.format(mode)), combine="weight", 
-#                                                                            #additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda dilep: op.deltaR(dilep[0].p4,dilep[1].p4)})
-#                                                                            additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda met: met.pt})
-
-            # Resolved : MuMu #
-            self.ResolvedDYReweighting1bMuMu = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'MuMu_HT_{}_1b'.format(mode)), combine="weight", 
-                                                                   systName="dy_mm_resolved_reweighting_1b", 
-                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
-            self.ResolvedDYReweighting2bMuMu = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'MuMu_HT_{}_2b'.format(mode)), combine="weight", 
-                                                                   systName="dy_mm_resolved_reweighting_1b", 
-                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
-
-#            # Correction #
-#            self.ResolvedDYReweighting1bMuMu_corr = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'MuMu_MET_{}_1b'.format(mode)), combine="weight", 
-#                                                                            #additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda dilep: op.deltaR(dilep[0].p4,dilep[1].p4)})
-#                                                                            additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda met: met.pt})
-#            self.ResolvedDYReweighting2bMuMu_corr = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'MuMu_MET_{}_2b'.format(mode)), combine="weight", 
-#                                                                            #additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda dilep: op.deltaR(dilep[0].p4,dilep[1].p4)})
-#                                                                            additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda met: met.pt})
-            # Boosted : ElEl #
-            self.BoostedDYReweighting1bElEl  =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'ElEl_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
-                                                                   systName="dy_ee_boosted_reweighting_1b", 
-                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
-            # Boosted : MuMu #
-            self.BoostedDYReweighting1bMuMu  =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'MuMu_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
-                                                                   systName="dy_mm_boosted_reweighting_1b", 
-                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
-            if mode == 'data':
-                self.ResolvedDYReweighting1bElEl_nonclosure = self.SF.get_scalefactor("lepton", ('DY_non_closure_{}'.format(era),'ee_resolved1b_HT'), combine="weight", 
-                                                                       systName="dy_ee_resolved_nonclosure_1b", 
-                                                                       additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
-                self.ResolvedDYReweighting2bElEl_nonclosure = self.SF.get_scalefactor("lepton", ('DY_non_closure_{}'.format(era),'ee_resolved2b_HT'), combine="weight", 
-                                                                       systName="dy_ee_resolved_nonclosure_2b", 
-                                                                       additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
-                self.BoostedDYReweighting1bElEl_nonclosure  =  self.SF.get_scalefactor("lepton", ('DY_non_closure_{}'.format(era),'ee_boosted1b_B_M'), combine="weight", 
-                                                                       systName="dy_ee_boosted_nonclosure_1b", 
-                                                                       additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
-                self.ResolvedDYReweighting1bMuMu_nonclosure = self.SF.get_scalefactor("lepton", ('DY_non_closure_{}'.format(era),'mm_resolved1b_HT'), combine="weight", 
-                                                                       systName="dy_mm_resolved_nonclosure_1b", 
-                                                                       additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
-                self.ResolvedDYReweighting2bMuMu_nonclosure = self.SF.get_scalefactor("lepton", ('DY_non_closure_{}'.format(era),'mm_resolved2b_HT'), combine="weight", 
-                                                                       systName="dy_mm_resolved_nonclosure_2b", 
-                                                                       additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
-                self.BoostedDYReweighting1bMuMu_nonclosure  =  self.SF.get_scalefactor("lepton", ('DY_non_closure_{}'.format(era),'mm_boosted1b_B_M'), combine="weight", 
-                                                                       systName="dy_mm_boosted_nonclosure_1b", 
-                                                                       additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
-            else:
-                self.ResolvedDYReweighting1bElEl_nonclosure = lambda x : op.c_float(1.)
-                self.ResolvedDYReweighting2bElEl_nonclosure = lambda x : op.c_float(1.)
-                self.BoostedDYReweighting1bElEl_nonclosure  = lambda x : op.c_float(1.)
-                self.ResolvedDYReweighting1bMuMu_nonclosure = lambda x : op.c_float(1.)
-                self.ResolvedDYReweighting2bMuMu_nonclosure = lambda x : op.c_float(1.)
-                self.BoostedDYReweighting1bMuMu_nonclosure  = lambda x : op.c_float(1.)
-
+#            # Resolved : ElEl #
+#            self.ResolvedDYReweighting1bElEl = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'ElEl_HT_{}_1b'.format(mode)), combine="weight", 
+#                                                                   systName="dy_ee_resolved_reweighting_1b", 
+#                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
+#            self.ResolvedDYReweighting2bElEl = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'ElEl_HT_{}_2b'.format(mode)), combine="weight", 
+#                                                                   systName="dy_ee_resolved_reweighting_2b", 
+#                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
+#
+#            # Resolved : MuMu #
+#            self.ResolvedDYReweighting1bMuMu = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'MuMu_HT_{}_1b'.format(mode)), combine="weight", 
+#                                                                   systName="dy_mm_resolved_reweighting_1b", 
+#                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
+#            self.ResolvedDYReweighting2bMuMu = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'MuMu_HT_{}_2b'.format(mode)), combine="weight", 
+#                                                                   systName="dy_mm_resolved_reweighting_1b", 
+#                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
+#
+#            # Boosted : ElEl #
+#            self.BoostedDYReweighting1bElEl  =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'ElEl_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
+#                                                                   systName="dy_ee_boosted_reweighting_1b", 
+#                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
+#            # Boosted : MuMu #
+#            self.BoostedDYReweighting1bMuMu  =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'MuMu_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
+#                                                                   systName="dy_mm_boosted_reweighting_1b", 
+#                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
+            # Resolved 
+            self.ResolvedDYReweighting1b = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'SF_HT_{}_1b'.format(mode)), combine="weight", 
+                                                                  systName="dy_resolved_1b", 
+                                                                  additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
+            self.ResolvedDYReweighting2b = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'SF_HT_{}_2b'.format(mode)), combine="weight", 
+                                                                  systName="dy_resolved_2b", 
+                                                                  additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
+            self.BoostedDYReweighting1b =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'SF_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
+                                                                  systName="dy_boosted_1b", 
+                                                                  additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
         else:
-            self.ResolvedDYReweighting1bElEl = lambda x : op.c_float(1.)
-            self.ResolvedDYReweighting2bElEl = lambda x : op.c_float(1.) 
-            #self.ResolvedDYReweighting1bElEl_corr = lambda x : op.c_float(1.)
-            #self.ResolvedDYReweighting2bElEl_corr = lambda x : op.c_float(1.)
-            self.ResolvedDYReweighting1bMuMu = lambda x : op.c_float(1.) 
-            self.ResolvedDYReweighting2bMuMu = lambda x : op.c_float(1.) 
-            #self.ResolvedDYReweighting1bMuMu_corr = lambda x : op.c_float(1.) 
-            #self.ResolvedDYReweighting2bMuMu_corr = lambda x : op.c_float(1.) 
-            self.BoostedDYReweighting1bElEl = lambda x : op.c_float(1.)
-            self.BoostedDYReweighting1bMuMu = lambda x : op.c_float(1.)
-
-            self.ResolvedDYReweighting1bElEl_nonclosure = lambda x : op.c_float(1.)
-            self.ResolvedDYReweighting2bElEl_nonclosure = lambda x : op.c_float(1.)
-            self.BoostedDYReweighting1bElEl_nonclosure  = lambda x : op.c_float(1.)
-            self.ResolvedDYReweighting1bMuMu_nonclosure = lambda x : op.c_float(1.)
-            self.ResolvedDYReweighting2bMuMu_nonclosure = lambda x : op.c_float(1.)
-            self.BoostedDYReweighting1bMuMu_nonclosure  = lambda x : op.c_float(1.)
-
-
+            #self.ResolvedDYReweighting1bElEl = lambda x : op.c_float(1.)
+            #self.ResolvedDYReweighting2bElEl = lambda x : op.c_float(1.) 
+            #self.ResolvedDYReweighting1bMuMu = lambda x : op.c_float(1.) 
+            #self.ResolvedDYReweighting2bMuMu = lambda x : op.c_float(1.) 
+            #self.BoostedDYReweighting1bElEl = lambda x : op.c_float(1.)
+            #self.BoostedDYReweighting1bMuMu = lambda x : op.c_float(1.)
+            self.ResolvedDYReweighting1b = lambda x : op.c_float(1.)
+            self.ResolvedDYReweighting2b = lambda x : op.c_float(1.) 
+            self.BoostedDYReweighting1b  = lambda x : op.c_float(1.)
 
         #----- Channel and trigger plots -----#
 
@@ -579,3 +516,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             
         #----- Return -----#
         return plots
+
+    ### PostProcess ###
+    def postProcess(self, taskList, config=None, workdir=None, resultsdir=None):
+        super(PlotterNanoHHtobbWWDL, self).postProcess(taskList, config, workdir, resultsdir, forSkimmer= False)

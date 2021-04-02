@@ -90,17 +90,12 @@ class ScaleFactorsbbWW:
                                                 entry_key   = 'DY_resolved_2016',
                                                 base_key    = '{channel}_{variable}_{type}_{btag}',
                                                 base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
-                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b'],'variable':['HT']})
+                                                format_dict = {'channel':['ElEl','MuMu','SF'],'type':['data','mc'],'btag':['1b','2b'],'variable':['HT']})
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
                                                 entry_key   = 'DY_boosted_2016',
                                                 base_key    = '{channel}_{variable}_{type}_{btag}',
                                                 base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2016.json',
-                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
-                                                entry_key   = 'DY_non_closure_2016',
-                                                base_key    = '{channel}_{cat}_{var}',
-                                                base_str    = 'HH_cat_{channel}_{cat}_{var}_2016.json',
-                                                format_dict = {'channel':['ee','mm'],('cat','var'):[('boosted1b','B_M'),('resolved1b','HT'),('resolved2b','HT')]})
+                                                format_dict = {'channel':['ElEl','MuMu','SF'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
 
 
         #  Fake rates #
@@ -180,17 +175,12 @@ class ScaleFactorsbbWW:
                                                 entry_key   = 'DY_resolved_2017',
                                                 base_key    = '{channel}_{variable}_{type}_{btag}',
                                                 base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2017.json',
-                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b'],'variable':['HT']})
+                                                format_dict = {'channel':['ElEl','MuMu','SF'],'type':['data','mc'],'btag':['1b','2b'],'variable':['HT']})
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
                                                 entry_key   = 'DY_boosted_2017',
                                                 base_key    = '{channel}_{variable}_{type}_{btag}',
                                                 base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2017.json',
-                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
-                                                entry_key   = 'DY_non_closure_2017',
-                                                base_key    = '{channel}_{cat}_{var}',
-                                                base_str    = 'HH_cat_{channel}_{cat}_{var}_2017.json',
-                                                format_dict = {'channel':['ee','mm'],('cat','var'):[('boosted1b','B_M'),('resolved1b','HT'),('resolved2b','HT')]})
+                                                format_dict = {'channel':['ElEl','MuMu','SF'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
 
         ### POG ID ###
             # https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017
@@ -263,17 +253,12 @@ class ScaleFactorsbbWW:
                                                 entry_key   = 'DY_resolved_2018',
                                                 base_key    = '{channel}_{variable}_{type}_{btag}',
                                                 base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2018.json',
-                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b','2b'],'variable':['HT']})
+                                                format_dict = {'channel':['ElEl','MuMu','SF'],'type':['data','mc'],'btag':['1b','2b'],'variable':['HT']})
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
                                                 entry_key   = 'DY_boosted_2018',
                                                 base_key    = '{channel}_{variable}_{type}_{btag}',
                                                 base_str    = 'weight_{variable}_{channel}_{type}_1D_weight_{btag}_2018.json',
-                                                format_dict = {'channel':['ElEl','MuMu'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
-        instance.AddScaleFactorWithWorkingPoint(path_key    = 'DY_SF',
-                                                entry_key   = 'DY_non_closure_2018',
-                                                base_key    = '{channel}_{cat}_{var}',
-                                                base_str    = 'HH_cat_{channel}_{cat}_{var}_2018.json',
-                                                format_dict = {'channel':['ee','mm'],('cat','var'):[('boosted1b','B_M'),('resolved1b','HT'),('resolved2b','HT')]})
+                                                format_dict = {'channel':['ElEl','MuMu','SF'],'type':['data','mc'],'btag':['1b'],'variable':['fatjetsoftDropmass']})
 
         ### POG ID ###
             # https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017
