@@ -455,10 +455,10 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep['fatbjSub2_wj2DR']   = op.deltaR(jet2.p4, jet4.p4)               if self.args.Hbb2Wj else op.static_cast("Float_t",op.c_float(0.))
             varsToKeep['fatbjSub2_wj2DPhi'] = op.abs(op.deltaPhi(jet2.p4, jet4.p4))     if self.args.Hbb2Wj else op.static_cast("Float_t",op.c_float(0.))
 
-            varsToKeep['wj1wj2_pt']   = (jet3.p4+jet4.p4).Pt()                    if self.args.Hbb2Wj else op.static_cast("Float_t",op.c_float(0.))
-            varsToKeep['wj1wj2DR']    = op.deltaR(jet3.p4, jet4.p4)               if self.args.Hbb2Wj else op.static_cast("Float_t",op.c_float(0.))
-            varsToKeep['wj1wj2DPhi']  = op.abs(op.deltaPhi(jet3.p4, jet4.p4))     if self.args.Hbb2Wj else op.static_cast("Float_t",op.c_float(0.))
-            varsToKeep['wj1wj2invM']  = op.invariant_mass(jet3.p4,jet4.p4)        if self.args.Hbb2Wj else op.static_cast("Float_t",op.c_float(0.))
+            varsToKeep['wj1wj2_pt']    = (jet3.p4+jet4.p4).Pt()                    if self.args.Hbb2Wj else op.static_cast("Float_t",op.c_float(0.))
+            varsToKeep['wj1wj2DR']     = op.deltaR(jet3.p4, jet4.p4)               if self.args.Hbb2Wj else op.static_cast("Float_t",op.c_float(0.))
+            varsToKeep['wj1wj2DPhi']   = op.abs(op.deltaPhi(jet3.p4, jet4.p4))     if self.args.Hbb2Wj else op.static_cast("Float_t",op.c_float(0.))
+            varsToKeep['wj1wj2invM']   = op.invariant_mass(jet3.p4,jet4.p4)        if self.args.Hbb2Wj else op.static_cast("Float_t",op.c_float(0.))
             #varsToKeep["angleBetWWPlane"] = self.HLL.angleWWplane(lepton.p4, MET, jet3.p4, jet4.p4) if self.args.Hbb2Wj else op.static_cast("Float_t",op.c_float(0.))
             varsToKeep["HWplaneAngle"] = self.HLL.angleBetPlanes(jet1.p4,jet2.p4,jet3.p4,jet4.p4) if self.args.Hbb2Wj else op.static_cast("Float_t",op.c_float(0.))
 

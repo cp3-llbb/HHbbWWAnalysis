@@ -776,10 +776,11 @@ One lepton and and one jet argument must be specified in addition to the require
         ]
         self.analysisConfig['datadriven'].update({benchmark:{'replaces': 'all', 'uses': 'all'} for benchmark in self.benchmarks})
 
-        if self.args.datadriven is None:
-            self.args.datadriven = self.benchmarks
-        else:
-            self.args.datadriven += self.benchmarks
+        if not forSkimmer:
+            if self.args.datadriven is None:
+                self.args.datadriven = self.benchmarks
+            else:
+                self.args.datadriven += self.benchmarks
 
         super(BaseNanoHHtobbWW, self).initialize()
         if not forSkimmer:
@@ -1870,7 +1871,7 @@ One lepton and and one jet argument must be specified in addition to the require
     def returnTriggers(self,keys):
         triggerRanges = returnTriggerRanges(self.era)
         return op.OR(*[trig for k in keys for trig in self.triggersPerPrimaryDataset[k]])
-    
+    '''
     ###########################################################################
     #                             postProcess                                 #
     ###########################################################################
@@ -1944,3 +1945,4 @@ One lepton and and one jet argument must be specified in addition to the require
 #            del config['samples'][LOFile]
 
         super(BaseNanoHHtobbWW,self).postProcess(taskList=taskList, config=config, workdir=workdir, resultsdir=resultsdir)
+    '''

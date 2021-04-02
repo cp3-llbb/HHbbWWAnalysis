@@ -219,7 +219,7 @@ def findJPACategoryResolved (self, selObj, lepton, muons, electrons, jets, bJets
         
         if idx == 0:
             best = op.rng_max_element_by(combo4, lambdaFunc)
-            maxScore = op.switch(best.idx != -1, best.idx.op.this.result.second, op.c_float(-1.)) ## hack: index of best is first in a pair, with the maximum value as second
+            maxScore = op.switch(best.idx != -1, best.idx.op.this.result.second, op.c_float(-1.)) 
             #best.idx.op.this.canDefine=False
         elif idx == 1:
             best = op.rng_max_element_by(combo3_2b1Wj, lambdaFunc)            ## hack: index of best is first in a pair, with the maximum value as second
@@ -245,24 +245,20 @@ def findJPACategoryResolved (self, selObj, lepton, muons, electrons, jets, bJets
     
     evtCatOutList = evtCat(*JPAMaxScoreList)
     maxIdx = op.rng_max_element_index(evtCatOutList)
-    #maxIdx = op.rng_max_element_index(evtCat(*JPAMaxScoreList))
-    #maxVal = op.rng_max_element_by(evtCatOutList, lambda z : z)
-    #print('maxVal Type: ', type(maxVal))
 
     newSelObj  = copy(selObj)
     selObjJPAjetsIdxDict = {}
+
     for i, node in enumerate(nodeList):
         outSelObj = copy(newSelObj)
         outSelObj.selName += '%s'%node
         outSelObj.yieldTitle += " in %s node"%node 
         outSelObj.refine(cut = (maxIdx == i)) 
-        #outSelObj.refine(cut = [maxVal == op.c_int(i)]) 
-        #if plot_yield:
-        #    outSelObj.makeYield(self.yieldPlots)
         if i < 6:
             selObjJPAjetsIdxDict[node] = [outSelObj, bestCombo_per_cat[i]]
         else:
-            selObjJPAjetsIdxDict[node] = [outSelObj, bestCombo_per_cat[i-1]] # bestCombo_per_cat[i-1] :: Obsolete. 
+            selObjJPAjetsIdxDict[node] = [outSelObj, None]
+
     return JPAMaxScoreList, evtCatOutList, selObjJPAjetsIdxDict
     
 # ----------------------------------- Boosted -------------------------------------- #
@@ -312,7 +308,7 @@ def findJPACategoryBoosted (self, selObj, lepton, muons, electrons, fatJets, jet
         if i < 2:
             selObjJPAjetsIdxDict[node] = [outSelObj, bestCombo_per_cat[i]]
         else:
-            selObjJPAjetsIdxDict[node] = [outSelObj, bestCombo_per_cat[i-1]] # bestCombo_per_cat[i-1] : Obsolete
+            selObjJPAjetsIdxDict[node] = [outSelObj, None]
 
     return JPAMaxScoreList, JPAL2outList, selObjJPAjetsIdxDict
     
