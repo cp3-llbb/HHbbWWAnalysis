@@ -8,9 +8,10 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 import parameters
 
-def InputPlots(data,list_inputs,path='.'):
+def InputPlots(data,list_inputs,path='.',force=False):
     pdf_path = os.path.join(os.path.abspath(path),'inputs.pdf')
-    if os.path.exists(pdf_path):
+    if os.path.exists(pdf_path) and not force:
+        print ('PDF {} already exists'.format(pdf_path))
         return
     pp = PdfPages(pdf_path)
     for inp in list_inputs:
@@ -38,38 +39,39 @@ def InputPlots(data,list_inputs,path='.'):
                  label      = l)
         axs.set_xlabel(inp,fontsize=18)
         axs.set_ylabel("Events",fontsize=18)
+        axs.set_yscale('log')
         axs.legend(loc="upper right",fontsize=18)
         pp.savefig(fig)
 
 
-        # Stack plot #
-        fig,axs = plt.subplots(1,1,figsize=(7,6))
-        axs.hist(x          = [v for k,v in x.items() if k not in ['VBF','GGF']],
-                 bins       = 50,
-                 range      = (xmin,xmax),
-                 color      = [v for k,v in c.items() if k not in ['VBF','GGF']],
-                 histtype   = 'barstacked',
-                 stacked    = True,
-                 weights    = [v for k,v in w.items() if k not in ['VBF','GGF']],
-                 label      = [v for v in l if v not in ['VBF','GGF']])
-        axs.hist(x          = x['GGF'],
-                 bins       = 50,
-                 range      = (xmin,xmax),
-                 color      = c['GGF'],
-                 histtype   = 'step',
-                 weights    = w['GGF']*(0.5*sum([v for k,v in sw.items() if k not in ['VBF','GGF']])/sw['GGF']),
-                 label      = 'GGF')
-        axs.hist(x          = x['VBF'],
-                 bins       = 50,
-                 range      = (xmin,xmax),
-                 color      = c['VBF'],
-                 histtype   = 'step',
-                 weights    = w['VBF']*(0.5*sum([v for k,v in sw.items() if k not in ['VBF','GGF']])/sw['VBF']),
-                 label      = 'VBF')
-        axs.set_xlabel(inp,fontsize=18)
-        axs.set_ylabel("Events",fontsize=18)
-        axs.legend(loc="upper right",fontsize=18)
-        pp.savefig(fig)
-        plt.close(fig)
+#        # Stack plot #
+#        fig,axs = plt.subplots(1,1,figsize=(7,6))
+#        axs.hist(x          = [v for k,v in x.items() if k not in ['VBF','GGF']],
+#                 bins       = 50,
+#                 range      = (xmin,xmax),
+#                 color      = [v for k,v in c.items() if k not in ['VBF','GGF']],
+#                 histtype   = 'barstacked',
+#                 stacked    = True,
+#                 weights    = [v for k,v in w.items() if k not in ['VBF','GGF']],
+#                 label      = [v for v in l if v not in ['VBF','GGF']])
+#        axs.hist(x          = x['GGF'],
+#                 bins       = 50,
+#                 range      = (xmin,xmax),
+#                 color      = c['GGF'],
+#                 histtype   = 'step',
+#                 weights    = w['GGF']*(0.5*sum([v for k,v in sw.items() if k not in ['VBF','GGF']])/sw['GGF']),
+#                 label      = 'GGF')
+#        axs.hist(x          = x['VBF'],
+#                 bins       = 50,
+#                 range      = (xmin,xmax),
+#                 color      = c['VBF'],
+#                 histtype   = 'step',
+#                 weights    = w['VBF']*(0.5*sum([v for k,v in sw.items() if k not in ['VBF','GGF']])/sw['VBF']),
+#                 label      = 'VBF')
+#        axs.set_xlabel(inp,fontsize=18)
+#        axs.set_ylabel("Events",fontsize=18)
+#        axs.legend(loc="upper right",fontsize=18)
+#        pp.savefig(fig)
+#        plt.close(fig)
     pp.close()
     logging.info('Produced %s'%pdf_path)

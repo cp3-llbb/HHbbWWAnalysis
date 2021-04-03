@@ -9,6 +9,7 @@ import os
 import sys
 import pprint
 import logging
+import plotille
 import copy
 import pickle
 import json
@@ -44,7 +45,7 @@ def get_options():
         help='Name of the scan to be used')
     a.add_argument('--task', action='store', required=False, type=str, default='',
         help='Name of dict to be used for scan (used by function itself when submitting jobs or DEBUG)')
-    a.add_argument('--modelId', action='store', required=False, type=int, default=-1,
+    a.add_argument('--modelId', action='store', nargs='+', required=False, type=int, default=-1,
         help='Model ID or the cross validation (used by function itself when submitting jobs or DEBUG)')
     a.add_argument('--generator', action='store_true', required=False, default=False, 
         help='Whether to use a generator for the neural network')
@@ -169,7 +170,6 @@ def main():
         
         # Arguments to send #
         args = '' 
-        if opt.generator:           args += ' --generator '
         if opt.generator:           args += ' --generator '
         if opt.GPU:                 args += ' --GPU '
         if opt.resume:              args += ' --resume '
@@ -460,87 +460,88 @@ def main():
             logging.info("\t Node {:6s} : total weight = {:.2e} [{:3.2f}%]".format(node,totweight_per_node[node],totweight_per_node[node]/sum(totweight_per_node.values())*100))
 
         # Quantile correction #
- #       if opt.scan != '':
-        quantile_lim = train_all['learning_weight'].quantile(parameters.quantile)
-        idx_to_repeat = train_all['learning_weight'] >= quantile_lim
-        events_excess = train_all[idx_to_repeat]
+        if opt.scan != '':
+            quantile_lim = train_all['learning_weight'].quantile(parameters.quantile)
+            idx_to_repeat = train_all['learning_weight'] >= quantile_lim
+            events_excess = train_all[idx_to_repeat]
 
-        logging.info("{} events have learning weight above the {:0.2f} quantile at {:3f} (compared to mean {:3f})".format(events_excess.shape[0],parameters.quantile,quantile_lim,train_all['learning_weight'].mean()))
-        logging.info("-> These events will be repeated and their learning weights reduced accordingly to avoid unstability :")
-        tags = sorted(pd.unique(train_all['tag']))
-        prop_tag = {tag:(train_all[train_all['tag']==tag].shape[0],train_all[train_all['tag']==tag]['learning_weight'].sum()) for tag in tags}
-        for tag in tags:
-            events_excess_tag = events_excess[events_excess['tag']==tag]['learning_weight']
-            logging.info("\t{:6s} class : {:8d} events in [{:8.2f} : {:8.2f}]".format(tag,events_excess_tag.shape[0],events_excess_tag.min(),events_excess_tag.max()))
+            logging.info("{} events have learning weight above the {:0.2f} quantile at {:3f} (compared to mean {:3f})".format(events_excess.shape[0],parameters.quantile,quantile_lim,train_all['learning_weight'].mean()))
+            logging.info("-> These events will be repeated and their learning weights reduced accordingly to avoid unstability :")
+            tags = sorted(pd.unique(train_all['tag']))
+            prop_tag = {tag:(train_all[train_all['tag']==tag].shape[0],train_all[train_all['tag']==tag]['learning_weight'].sum()) for tag in tags}
+            for tag in tags:
+                events_excess_tag = events_excess[events_excess['tag']==tag]['learning_weight']
+                logging.info("\t{:6s} class : {:8d} events in [{:8.2f} : {:8.2f}]".format(tag,events_excess_tag.shape[0],events_excess_tag.min(),events_excess_tag.max()))
 
-        factor = (events_excess['learning_weight']/quantile_lim).values.astype(np.int32)
-        train_all.loc[idx_to_repeat,'learning_weight'] /= factor
-        arr_to_repeat = train_all[idx_to_repeat].values
-        repetition = np.repeat(np.arange(arr_to_repeat.shape[0]), factor-1)
-        df_repeated = pd.DataFrame(np.take(arr_to_repeat,repetition,axis=0),columns=train_all.columns)
-        df_repeated = df_repeated.astype(train_all.dtypes.to_dict()) # otherwise dtypes are object
-        train_all = pd.concat((train_all,df_repeated),axis=0,ignore_index=True).sample(frac=1)
-        logging.info("Effect of the repetitions :")
-        for tag in tags:
-            logging.info("\t{:6s} class : {:8d} events [learning weights = {:12.2f}] -> {:8d} events [learning weights = {:12.2f}]".format(tag,*prop_tag[tag],train_all[train_all['tag']==tag].shape[0],train_all[train_all['tag']==tag]['learning_weight'].sum()))
-            
-        logging.info("")
+            factor = (events_excess['learning_weight']/quantile_lim).values.astype(np.int32)
+            train_all.loc[idx_to_repeat,'learning_weight'] /= factor
+            arr_to_repeat = train_all[idx_to_repeat].values
+            repetition = np.repeat(np.arange(arr_to_repeat.shape[0]), factor-1)
+            df_repeated = pd.DataFrame(np.take(arr_to_repeat,repetition,axis=0),columns=train_all.columns)
+            df_repeated = df_repeated.astype(train_all.dtypes.to_dict()) # otherwise dtypes are object
+            train_all = pd.concat((train_all,df_repeated),axis=0,ignore_index=True).sample(frac=1)
+            logging.info("Effect of the repetitions :")
+            for tag in tags:
+                logging.info("\t{:6s} class : {:8d} events [learning weights = {:12.2f}] -> {:8d} events [learning weights = {:12.2f}]".format(tag,*prop_tag[tag],train_all[train_all['tag']==tag].shape[0],train_all[train_all['tag']==tag]['learning_weight'].sum()))
+                
+            logging.info("")
 
 
         # Plot learning weights in terminal #
-        import plotille
-        for node in ["all"] + parameters.nodes:
-            logging.info('Class {}'.format(node))
-            height = 10
-            bins = 100
-            if node == 'all':
-                content = train_all['learning_weight']
-            else:
-                content = train_all[train_all[node]==1]['learning_weight']
-            x_max = content.max()
-            y_max = np.histogram(content.array,bins=bins)[0].max()
-            base = len(str(int(y_max)))
-            plot = plotille.histogram(X         = content,
-                                      bins      = bins,
-                                      X_label   = "Learning weight",
-                                      Y_label   = "Events",
-                                      color_mode= 'byte',
-                                      lc        = 25,
-                                      x_min     = 0.,
-                                      x_max     = x_max + (bins - x_max % bins),
-                                      y_min     = 0.,
-                                      y_max     = math.ceil(y_max / 10**(base-2))*10**(base-2),
-                                      height    = height,
-                                      width     = 100)
+        if opt.scan != '':
+            for node in ["all"] + parameters.nodes:
+                logging.info('Class {}'.format(node))
+                height = 10
+                bins = 100
+                if node == 'all':
+                    content = train_all['learning_weight']
+                else:
+                    content = train_all[train_all[node]==1]['learning_weight']
+                x_max = content.max()
+                y_max = np.histogram(content.array,bins=bins)[0].max()
+                base = len(str(int(y_max)))
+                plot = plotille.histogram(X         = content,
+                                          bins      = bins,
+                                          X_label   = "Learning weight",
+                                          Y_label   = "Events",
+                                          color_mode= 'byte',
+                                          lc        = 25,
+                                          x_min     = 0.,
+                                          x_max     = x_max + (bins - x_max % bins),
+                                          y_min     = 0.,
+                                          y_max     = math.ceil(y_max / 10**(base-2))*10**(base-2),
+                                          height    = height,
+                                          width     = 100)
 
-            for line in plot.split('\n'):
-                logging.info(line)
-            logging.info('')
+                for line in plot.split('\n'):
+                    logging.info(line)
+                logging.info('')
 
         # Check of batch content #
-        n_trials = 20
-        for batch_size in parameters.p['batch_size']:
-            logging.info("With a batch size of {} (average of {} trials)".format(batch_size,n_trials))
-            tags = sorted(pd.unique(train_all['tag']))
-            n_per_tag = {tag:[] for tag in tags}
-            w_per_tag = {tag:[] for tag in tags}
-            mw_per_tag = {tag:[] for tag in tags}
-            sw_per_tag = {tag:[] for tag in tags}
-            for _ in range(n_trials):
-                sample = train_all.sample(n=batch_size)
+        if opt.scan != '':
+            n_trials = 20
+            for batch_size in parameters.p['batch_size']:
+                logging.info("With a batch size of {} (average of {} trials)".format(batch_size,n_trials))
+                tags = sorted(pd.unique(train_all['tag']))
+                n_per_tag = {tag:[] for tag in tags}
+                w_per_tag = {tag:[] for tag in tags}
+                mw_per_tag = {tag:[] for tag in tags}
+                sw_per_tag = {tag:[] for tag in tags}
+                for _ in range(n_trials):
+                    sample = train_all.sample(n=batch_size)
+                    for tag in tags:
+                        n_per_tag[tag].append(sample[sample['tag']==tag].shape[0])
+                        w_per_tag[tag].append(sample[sample['tag']==tag]['learning_weight'].sum())
+                        mw_per_tag[tag].append(sample[sample['tag']==tag]['learning_weight'].mean())
+                        sw_per_tag[tag].append(sample[sample['tag']==tag]['learning_weight'].var())
                 for tag in tags:
-                    n_per_tag[tag].append(sample[sample['tag']==tag].shape[0])
-                    w_per_tag[tag].append(sample[sample['tag']==tag]['learning_weight'].sum())
-                    mw_per_tag[tag].append(sample[sample['tag']==tag]['learning_weight'].mean())
-                    sw_per_tag[tag].append(sample[sample['tag']==tag]['learning_weight'].var())
-            for tag in tags:
-                logging.info("\t{:6s} class : N = {:8.0f}, Sum of weights = {:12.5f} [{:3.2f}%], Mean of weights = {:10.5f}, Variance of weights = {:10.5f}".format(tag,
-                        sum(n_per_tag[tag])/n_trials,
-                        sum(w_per_tag[tag])/n_trials,
-                        sum(w_per_tag[tag])/sum([sum(w_per_tag[t]) for t in tags])*100,
-                        sum(mw_per_tag[tag])/n_trials,
-                        sum(sw_per_tag[tag])/n_trials))
-                
+                    logging.info("\t{:6s} class : N = {:8.0f}, Sum of weights = {:12.5f} [{:3.2f}%], Mean of weights = {:10.5f}, Variance of weights = {:10.5f}".format(tag,
+                            sum(n_per_tag[tag])/n_trials,
+                            sum(w_per_tag[tag])/n_trials,
+                            sum(w_per_tag[tag])/sum([sum(w_per_tag[t]) for t in tags])*100,
+                            sum(mw_per_tag[tag])/n_trials,
+                            sum(sw_per_tag[tag])/n_trials))
+                    
 
 
 
@@ -583,9 +584,10 @@ def main():
         if parameters.crossvalidation:
             modelIds = list(range(parameters.N_models))
             if opt.modelId != -1:
-                if opt.modelId not in modelIds:
-                    raise RuntimeError("You asked model id %d but only these ids are available : ["+','.join([str(m) for m in modelIds])+']')
-                modelIds = [opt.modelId]
+                for modelId in opt.modelId:
+                    if modelId not in modelIds:
+                        raise RuntimeError("You asked model id {} but only these ids are available : [".format(modelId)+','.join([str(m) for m in modelIds])+']')
+                modelIds = opt.modelId
             for i in modelIds:
                 logging.info("*"*80)
                 logging.info("Starting training of model %d"%i)
@@ -605,15 +607,17 @@ def main():
         
     if len(opt.model) != 0: 
         # Make path #
-        output_name = "test" 
         model_name = opt.model[0]
         if parameters.crossvalidation:
             if parameters.N_models != len(opt.model):
                 raise RuntimeError('Cross validation requires %d models but you provided %d'%(parameters.N_models,len(opt.model)))
             model_name = model_name[:-1]
-        path_output = os.path.join(parameters.path_out,model_name,output_name)
-        if not os.path.exists(path_output):
-            os.makedirs(path_output)
+        path_output_train = os.path.join(parameters.path_out,model_name,'train')
+        path_output_test = os.path.join(parameters.path_out,model_name,'test')
+        if not os.path.exists(path_output_train):
+            os.makedirs(path_output_train)
+        if not os.path.exists(path_output_test):
+            os.makedirs(path_output_test)
 
         # Instance of output class #
         inst_out = ProduceOutput(model=[os.path.join(parameters.main_path,'model',model) for model in opt.model],
@@ -624,9 +628,11 @@ def main():
         if opt.test:
             logging.info('  Processing test output sample  '.center(80,'*'))
             if parameters.crossvalidation: # in cross validation the testing set in inside the training DF
-                inst_out.OutputFromTraining(data=train_all,path_output=path_output)
+                inst_out.OutputFromTraining(data=train_all,path_output=path_output_test)
+                inst_out.OutputFromTraining(data=train_all,path_output=path_output_train,crossval_use_training=True)
             else:
-                inst_out.OutputFromTraining(data=test_all,path_output=path_output)
+                inst_out.OutputFromTraining(data=test_all,path_output=path_output_test)
+                inst_out.OutputFromTraining(data=train_all,path_output=path_output_train)
             logging.info('')
              
     if opt.GPU:

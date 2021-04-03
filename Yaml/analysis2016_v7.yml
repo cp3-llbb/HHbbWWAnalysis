@@ -1,0 +1,55 @@
+tree: Events
+eras:
+  '2016': 
+    luminosity: 35922 #pb 
+    luminosity-error: 0.025     #pb
+dbcache: ../dascache2016
+samples:
+    # BACKGROUNDS #
+  - config: analysis2016_v7_bkg.yml
+    keys: mc
+    # DATA #
+  - config: analysis2016_v7_data.yml
+    keys: data
+    # GGF LO #
+  - config: analysis2016_v7_bbww2l_GGF_LO.yml
+    keys: [bbww2l,GGFLO]    
+  - config: analysis2016_v7_bbww1l_GGF_LO.yml
+    keys: [bbww1l,GGFLO]    
+  - config: analysis2016_v7_bbtautau_GGF_LO.yml
+    keys: [bbtautau,GGFLO]    
+    # GGF NLO #
+  - config: analysis2016_v7_bbww2l_GGF_NLO.yml
+    keys: [bbww2l,GGFNLO]    
+  - config: analysis2016_v7_bbww1l_GGF_NLO.yml
+    keys: [bbww1l,GGFNLO]    
+  - config: analysis2016_v7_bbtautau_GGF_NLO.yml
+    keys: [bbtautau,GGFNLO]    
+    # VBF LO #
+  - config: analysis2016_v7_bbww2l_VBF_LO.yml
+    keys: [bbww2l,VBFLO]    
+  - config: analysis2016_v7_bbww1l_VBF_LO.yml
+    keys: [bbww1l,VBFLO]    
+  - config: analysis2016_v7_bbtautau_VBF_LO.yml
+    keys: [bbtautau,VBFLO]    
+    # GRAVITON #
+  - config: analysis2016_v7_bbww2l_graviton.yml
+    keys: [bbww2l,graviton]
+  - config: analysis2016_v7_bbww1l_graviton.yml
+    keys: [bbww1l,graviton]
+  - config: analysis2016_v7_bbtautau_graviton.yml
+    keys: [bbtautau,graviton]
+        # RADION #
+  - config: analysis2016_v7_bbww2l_radion.yml
+    keys: [bbww2l,radion]
+  - config: analysis2016_v7_bbww1l_radion.yml
+    keys: [bbww1l,radion]
+  - config: analysis2016_v7_bbtautau_radion.yml
+    keys: [bbtautau,radion]
+
+  
+datadriven: !include datadriven.yml
+benchmarks: !include benchmarks.yml
+plotIt    : !include plotit.yml
+
+

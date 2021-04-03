@@ -25,18 +25,18 @@ args = parser.parse_args()
 
 era = args.era
 
-cmd = [['bambooRun','--TTHIDLoose','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_MC.yml','--Hbb2Wj','--Channel','El','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLBackground_BoostedHbb2Wj_El'],
-       ['bambooRun','--TTHIDLoose','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_MC.yml','--Hbb2Wj','--Channel','Mu','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLBackground_BoostedHbb2Wj_Mu'],
-       ['bambooRun','--TTHIDLoose','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_MC.yml','--Hbb1Wj','--Channel','El','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLBackground_BoostedHbb1Wj_El'],
-       ['bambooRun','--TTHIDLoose','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_MC.yml','--Hbb1Wj','--Channel','Mu','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLBackground_BoostedHbb1Wj_Mu'],
-       ['bambooRun','--TTHIDLoose','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_MC.yml','--Hbb0Wj','--Channel','El','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLBackground_BoostedHbb0Wj_El'],
-       ['bambooRun','--TTHIDLoose','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_MC.yml','--Hbb0Wj','--Channel','Mu','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLBackground_BoostedHbb0Wj_Mu'],
-       ['bambooRun','--TTHIDLoose','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_signal_SL.yml','--Hbb2Wj','--Channel','El','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLSignal_BoostedHbb2Wj_El'],
-       ['bambooRun','--TTHIDLoose','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_signal_SL.yml','--Hbb2Wj','--Channel','Mu','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLSignal_BoostedHbb2Wj_Mu'],
-       ['bambooRun','--TTHIDLoose','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_signal_SL.yml','--Hbb1Wj','--Channel','El','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLSignal_BoostedHbb1Wj_El'],
-       ['bambooRun','--TTHIDLoose','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_signal_SL.yml','--Hbb1Wj','--Channel','Mu','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLSignal_BoostedHbb1Wj_Mu'],
-       ['bambooRun','--TTHIDLoose','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_signal_SL.yml','--Hbb0Wj','--Channel','El','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLSignal_BoostedHbb0Wj_El'],
-       ['bambooRun','--TTHIDLoose','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_signal_SL.yml','--Hbb0Wj','--Channel','Mu','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLSignal_BoostedHbb0Wj_Mu']]
+cmd = [['bambooRun','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_MC.yml','--Hbb2Wj','--Channel','El','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLBackground_BoostedHbb2Wj_El'],
+       ['bambooRun','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_MC.yml','--Hbb2Wj','--Channel','Mu','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLBackground_BoostedHbb2Wj_Mu'],
+       ['bambooRun','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_MC.yml','--Hbb1Wj','--Channel','El','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLBackground_BoostedHbb1Wj_El'],
+       ['bambooRun','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_MC.yml','--Hbb1Wj','--Channel','Mu','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLBackground_BoostedHbb1Wj_Mu'],
+       ['bambooRun','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_MC.yml','--Hbb0Wj','--Channel','El','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLBackground_BoostedHbb0Wj_El'],
+       ['bambooRun','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_MC.yml','--Hbb0Wj','--Channel','Mu','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLBackground_BoostedHbb0Wj_Mu'],
+       ['bambooRun','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_signal_SL.yml','--Hbb2Wj','--Channel','El','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLSignal_BoostedHbb2Wj_El'],
+       ['bambooRun','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_signal_SL.yml','--Hbb2Wj','--Channel','Mu','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLSignal_BoostedHbb2Wj_Mu'],
+       ['bambooRun','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_signal_SL.yml','--Hbb1Wj','--Channel','El','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLSignal_BoostedHbb1Wj_El'],
+       ['bambooRun','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_signal_SL.yml','--Hbb1Wj','--Channel','Mu','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLSignal_BoostedHbb1Wj_Mu'],
+       ['bambooRun','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_signal_SL.yml','--Hbb0Wj','--Channel','El','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLSignal_BoostedHbb0Wj_El'],
+       ['bambooRun','--distributed=driver','-m','SkimmerHHtobbWWSL.py:SkimmerNanoHHtobbWWSL',f'analysis{era}_v7_signal_SL.yml','--Hbb0Wj','--Channel','Mu','-o',f'/nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA/Skim{era}_SLSignal_BoostedHbb0Wj_Mu']]
 
 def remove():
     for c in cmd:

@@ -1,0 +1,186 @@
+################################
+#  Resonant Graviton signals   #
+################################
+##### Single lepton
+GluGluToRadionToHHTo2B2WToLNu2J_M-250:
+  cross-section: 1.
+  branching-ratio: 0.109369082142029
+  db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-250_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 250)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToRadionToHHTo2B2WToLNu2J_M-260:
+  cross-section: 1.
+  branching-ratio: 0.109369082142029
+  db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-260_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 260)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToRadionToHHTo2B2WToLNu2J_M-270:
+  cross-section: 1.
+  branching-ratio: 0.109369082142029
+  db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-270_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 270)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToRadionToHHTo2B2WToLNu2J_M-300:
+  cross-section: 1.
+  branching-ratio: 0.109369082142029
+  db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-300_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 300)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToRadionToHHTo2B2WToLNu2J_M-350:
+  cross-section: 1.
+  branching-ratio: 0.109369082142029
+  db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-350_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 350)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToRadionToHHTo2B2WToLNu2J_M-400:
+  cross-section: 1.
+  branching-ratio: 0.109369082142029
+  db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-400_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 400)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToRadionToHHTo2B2WToLNu2J_M-450:
+  cross-section: 1.
+  branching-ratio: 0.109369082142029
+  db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-450_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 450)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToRadionToHHTo2B2WToLNu2J_M-500:
+  cross-section: 1.
+  branching-ratio: 0.109369082142029
+  db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-500_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 500)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToRadionToHHTo2B2WToLNu2J_M-550:
+  cross-section: 1.
+  branching-ratio: 0.109369082142029
+  db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-550_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 550)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToRadionToHHTo2B2WToLNu2J_M-600:
+  cross-section: 1.
+  branching-ratio: 0.109369082142029
+  db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-600_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 600)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToRadionToHHTo2B2WToLNu2J_M-700:
+  cross-section: 1.
+  branching-ratio: 0.109369082142029
+  db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-700_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 700)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToRadionToHHTo2B2WToLNu2J_M-800:
+  cross-section: 1.
+  branching-ratio: 0.109369082142029
+  db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-800_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 800)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToRadionToHHTo2B2WToLNu2J_M-900:
+  cross-section: 1.
+  branching-ratio: 0.109369082142029
+  db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-900_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 900)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToRadionToHHTo2B2WToLNu2J_M-1000:
+  cross-section: 1.
+  branching-ratio: 0.109369082142029
+  db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-1000_narrow_13TeV-madgraph/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 1000)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True

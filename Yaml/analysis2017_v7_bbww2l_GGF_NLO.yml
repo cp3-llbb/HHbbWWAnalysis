@@ -1,0 +1,56 @@
+#################################
+#  Non resonant GGF NLO signals #
+#################################
+##### Double Lepton 
+GluGluToHHTo2B2VTo2L2Nu_node_cHHH0:
+  cross-section: 0.069725
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  era: '2017'
+  generated-events: 'genEventSumw'
+  legend: 'HH#rightarrow bbl#nu l#nu (node cHHH0)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToHHTo2B2VTo2L2Nu_node_cHHH1:
+  cross-section: 0.031047
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  era: '2017'
+  generated-events: 'genEventSumw'
+  legend: 'HH#rightarrow bbl#nu l#nu (node cHHH1)' 
+  line-color: "#288a24"
+  line-type: 1
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45:
+  cross-section: 0.013124
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  era: '2017'
+  generated-events: 'genEventSumw'
+  legend: 'HH#rightarrow bbl#nu l#nu (node cHHH2p45)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+GluGluToHHTo2B2VTo2L2Nu_node_cHHH5:
+  cross-section: 0.091172
+  branching-ratio: 0.027669886574221
+  db: das:/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  era: '2017'
+  generated-events: 'genEventSumw'
+  legend: 'HH#rightarrow bbl#nu l#nu (node cHHH5)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
