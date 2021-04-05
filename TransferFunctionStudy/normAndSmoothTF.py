@@ -160,7 +160,7 @@ def normAndSmooth(TFset, inFile, outFile, plot):
 
         DeltaEvsE_rebin = DeltaEvsE.Clone("rebin")
         if 'rebinX' in TF.keys() and (isinstance(TF['rebinX'],list) or isinstance(TF['rebinX'],np.ndarray)) and 'rebinY' in TF.keys() and (isinstance(TF['rebinY'],list) or isinstance(TF['rebinY'],np.ndarray)):
-            DeltaEvsE_rebin = rebin2D(DeltaEvsE_rebin,TF['rebinX'],TF['rebinY'],TF["base"]+'_rebin')
+            DeltaEvsE_rebin = rebin2D(DeltaEvsE_rebin,TF['rebinX'],TF['rebinY'],TF["base"]+'_rebin',capMin=0.)
         if 'rebinX' in TF.keys() and isinstance(TF['rebinX'],int):
             DeltaEvsE.RebinX(TF['rebinX'])
         if 'rebinY' in TF.keys() and isinstance(TF['rebinX'],int):
@@ -187,6 +187,7 @@ def normAndSmooth(TFset, inFile, outFile, plot):
             DeltaEvsE.Draw("colz")
             C.Print(pdfName)
             C.Clear()
+            C.SetLogx(True)
             DeltaEvsE_rebin.SetContour(100)
             DeltaEvsE_rebin.Draw("colz")
             C.Print(pdfName)
@@ -195,6 +196,7 @@ def normAndSmooth(TFset, inFile, outFile, plot):
             DeltaEvsE_Norm.Draw("colz")
             C.Print(pdfName)
             C.SetLogz(False)
+            C.SetLogx(False)
 
             # Draw graphs #
             C.Clear()
@@ -221,7 +223,7 @@ def normAndSmooth(TFset, inFile, outFile, plot):
             pad1 = C.cd(1)
             pad2 = C.cd(2)
             pad1.SetLogy(True)
-            threshold = 0.001
+            threshold = 0.0001
             for hist in list_hist:
                 pad1.Clear()
                 pad1.cd()
@@ -252,53 +254,53 @@ def normAndSmooth(TFset, inFile, outFile, plot):
 if __name__ == "__main__":
     options = parseArguments()
     TFset = [
-#                {
-#                    "histNames": ['ak4b_TF'],
-#                    "base" : "b_TF",
-#                    "norm" : "b_TF_norm",
-#                    "title": "b transfer function",
-#                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
-#                    "rebinY": np.r_[-500:501:5]
-#                },
-#                {
-#                    "histNames": ['ak4b_TF_bregCorr'],
-#                    "base" : "b_TF_bregCorr",
-#                    "norm" : "b_TF_bregCorr_norm",
-#                    "title": "b transfer function (with regression correction)",
-#                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
-#                    "rebinY": np.r_[-500:501:5]
-#                },
-#                {
-#                    "histNames": ['ak4c_TF'],
-#                    "base" : "c_TF",
-#                    "norm" : "c_TF_norm",
-#                    "title": "c transfer function",
-#                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
-#                    "rebinY": np.r_[-500:501:5]
-#                },
-#                {
-#                    "histNames": ['ak4l_TF'],
-#                    "base" : "l_TF",
-#                    "norm" : "l_TF_norm",
-#                    "title": "lightjet transfer function",
-#                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
-#                    "rebinY": np.r_[-500:501:5]
-#                },
-#                {
-#                    "histNames": ['e_TF'],
-#                    "base" : "e_TF",
-#                    "norm" : "e_TF_norm",
-#                    "title": "e^{#pm} transfer function",
-#                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:100, 500:1001:500, 3000 ],
-#                    "rebinY": np.r_[-500:501:1]
-#                },
+                {
+                    "histNames": ['ak4b_TF'],
+                    "base" : "b_TF",
+                    "norm" : "b_TF_norm",
+                    "title": "b transfer function",
+                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
+                    "rebinY": np.r_[-1000:-500:50, -500:-300:10, -300:-200:5, -200:-100:2, -100:100:1, 100:200:2, 200:300:5, 300:500:10, 500:1001:50],
+                },
+                {
+                    "histNames": ['ak4b_TF_bregCorr'],
+                    "base" : "b_TF_bregCorr",
+                    "norm" : "b_TF_bregCorr_norm",
+                    "title": "b transfer function (with regression correction)",
+                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
+                    "rebinY": np.r_[-1000:-500:50, -500:-300:10, -300:-200:5, -200:-100:2, -100:100:1, 100:200:2, 200:300:5, 300:500:10, 500:1001:50],
+                },
+                {
+                    "histNames": ['ak4c_TF'],
+                    "base" : "c_TF",
+                    "norm" : "c_TF_norm",
+                    "title": "c transfer function",
+                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
+                    "rebinY": np.r_[-1000:-500:50, -500:-300:10, -300:-200:5, -200:-100:2, -100:100:1, 100:200:2, 200:300:5, 300:500:10, 500:1001:50],
+                },
+                {
+                    "histNames": ['ak4l_TF'],
+                    "base" : "l_TF",
+                    "norm" : "l_TF_norm",
+                    "title": "lightjet transfer function",
+                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
+                    "rebinY": np.r_[-1000:-500:50, -500:-300:10, -300:-200:5, -200:-100:2, -100:100:1, 100:200:2, 200:300:5, 300:500:10, 500:1001:50],
+                },
+                {
+                    "histNames": ['e_TF'],
+                    "base" : "e_TF",
+                    "norm" : "e_TF_norm",
+                    "title": "e^{#pm} transfer function",
+                    "rebinX": np.r_[0:100:5, 100:200:10, 200:400:20, 400:501:50, 1000, 3000 ],
+                    "rebinY": np.r_[-1000, -500:-300:100, -300:-200:50, -200:-100:10, -100:-10:1, -10:10:0.25, 10:100:1, 100:200:10, 200:300:50, 300:500:100, 500,1000],
+                },
                 {
                     "histNames": ['m_TF'],
                     "base" : "mu_TF",
                     "norm" : "mu_TF_norm",
                     "title": "#mu^{#pm} transfer function",
-                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:100, 500:1001:500, 3000 ],
-                    "rebinY": np.r_[-500:-300:50, -300:-200:20, -200:-100:10, -100:-40:2 , -40:40:1 , 40:100:2 , 100:200:10, 200:300:20, 300:500:50],
+                    "rebinX": np.r_[0:100:5, 100:200:10, 200:400:20, 400:501:50, 1000, 3000 ],
+                    "rebinY": np.r_[-1000:-500:250, -500:-300:100, -300:-200:50, -200:-100:10, -100:-10:1, -10:-5:0.5, -5:5:0.25, 5:10:0.5, 10:100:1, 100:200:10, 200:300:50, 300:500:100, 500:1001:250],
                 },
             ]
 
