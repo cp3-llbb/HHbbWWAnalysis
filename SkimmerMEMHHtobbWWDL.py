@@ -135,33 +135,27 @@ class SkimmerMEMNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         #----- Jet variables -----#
         empty_p4 = op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >",([op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.)]))
         if any([self.args.__dict__[item] for item in ["Resolved0Btag","Resolved1Btag","Resolved2Btag"]]):
-            if self.args.Resolved0Btag:
-                j1 = self.ak4LightJetsByBtagScore[0]
-                j2 = self.ak4LightJetsByBtagScore[1]
-            if self.args.Resolved1Btag:
-                j1 = self.ak4BJets[0]
-                j2 = self.ak4LightJetsByBtagScore[0]
-            if self.args.Resolved2Btag:
-                j1 = self.ak4BJets[0]
-                j2 = self.ak4BJets[1]
+#            if self.args.Resolved0Btag:
+#                j1 = self.ak4LightJetsByBtagScore[0]
+#                j2 = self.ak4LightJetsByBtagScore[1]
+#            if self.args.Resolved1Btag:
+#                j1 = self.ak4BJets[0]
+#                j2 = self.ak4LightJetsByBtagScore[0]
+#            if self.args.Resolved2Btag:
+#                j1 = self.ak4BJets[0]
+#                j2 = self.ak4BJets[1]
+            jets = self.ak4JetsByBtagScore
 
-            varsToKeep['j1_Px']  = j1.p4.Px()
-            varsToKeep['j1_Py']  = j1.p4.Py()
-            varsToKeep['j1_Pz']  = j1.p4.Pz()
-            varsToKeep['j1_E']   = j1.p4.E()
-            varsToKeep['j1_pt']  = j1.pt
-            varsToKeep['j1_eta'] = j1.eta
-            varsToKeep['j1_phi'] = j1.phi
-            varsToKeep['j1_btag']= j1.btagDeepFlavB
+            for idx in range(1,5):
+                varsToKeep[f'j{idx}_Px']  = op.switch(op.rng_len(jets)>=idx, jets[idx-1].p4.Px(), op.c_float(-9999))
+                varsToKeep[f'j{idx}_Py']  = op.switch(op.rng_len(jets)>=idx, jets[idx-1].p4.Py(), op.c_float(-9999))
+                varsToKeep[f'j{idx}_Pz']  = op.switch(op.rng_len(jets)>=idx, jets[idx-1].p4.Pz(), op.c_float(-9999))
+                varsToKeep[f'j{idx}_E']   = op.switch(op.rng_len(jets)>=idx, jets[idx-1].p4.E(), op.c_float(-9999))
+                varsToKeep[f'j{idx}_pt']  = op.switch(op.rng_len(jets)>=idx, jets[idx-1].pt, op.c_float(-9999))
+                varsToKeep[f'j{idx}_eta'] = op.switch(op.rng_len(jets)>=idx, jets[idx-1].eta, op.c_float(-9999))
+                varsToKeep[f'j{idx}_phi'] = op.switch(op.rng_len(jets)>=idx, jets[idx-1].phi, op.c_float(-9999))
+                varsToKeep[f'j{idx}_btag']= op.switch(op.rng_len(jets)>=idx, jets[idx-1].btagDeepFlavB, op.c_float(-9999))
 
-            varsToKeep['j2_Px']  = j2.p4.Px()
-            varsToKeep['j2_Py']  = j2.p4.Py()
-            varsToKeep['j2_Pz']  = j2.p4.Pz()
-            varsToKeep['j2_E']   = j2.p4.E()
-            varsToKeep['j2_pt']  = j2.pt
-            varsToKeep['j2_eta'] = j2.eta
-            varsToKeep['j2_phi'] = j2.phi
-            varsToKeep['j2_btag']= j2.btagDeepFlavB
 
             varsToKeep['n_ak4'] = op.static_cast("UInt_t",op.rng_len(self.ak4Jets))
             varsToKeep['n_ak4_btag'] = op.static_cast("UInt_t",op.rng_len(self.ak4BJets))

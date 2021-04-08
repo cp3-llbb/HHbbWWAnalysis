@@ -2503,22 +2503,41 @@ def makeDoubleLeptonMachineLearningInputPlots(sel,suffix,channel,inputs):
                                  plotopts = channelLabel))
     return plots
     
-def makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,nodes,channel):
+def makeDoubleLeptonMachineLearningExclusiveOutputPlots(selObjNodesDict,output,nodes,channel):
     plots = []
 
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
+    plotopts = {**channelLabel}
     for i,node in enumerate(nodes):
-        plotots = {**channelLabel}
         suffix = selObjNodesDict[node].selName
         sel = selObjNodesDict[node].sel
         if node in ["GGF","VBF"]:
-            plotots.update({'blinded-range':[0.5,1]})
+            plotopts.update({'blinded-range':[0.5,1]})
         plots.append(Plot.make1D("%s_%s_DNNOutput_%s"%(channel,suffix,node),
                                  output[i],
                                  sel,
                                  EquidistantBinning(400,0.,1.),
                                  xTitle = 'DNN output %s'%node,
-                                 plotopts = plotots))
-      
+                                 plotopts = plotopts))
+
+    return plots    
+
+def makeDoubleLeptonMachineLearningInclusiveOutputPlots(selObjNodesDict,output,nodes,channel):
+    plots = []
+
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
+    plotopts = {**channelLabel}
+    for selectNode in nodes:
+        suffix = selObjNodesDict[selectNode].selName
+        sel = selObjNodesDict[selectNode].sel
+        for i,plotNode in enumerate(nodes):
+            if selectNode in ["GGF","VBF"]:
+                plotopts.update({'blinded-range':[0.5,1]})
+            plots.append(Plot.make1D("%s_%s_DNNOutput_%s"%(channel,suffix,plotNode),
+                                     output[i],
+                                     sel,
+                                     EquidistantBinning(400,0.,1.),
+                                     xTitle = 'DNN output %s'%plotNode,
+                                     plotopts = plotopts))
 
     return plots    

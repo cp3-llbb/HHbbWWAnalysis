@@ -15,12 +15,8 @@ import ROOT
 from IPython import embed
 ROOT.gROOT.SetBatch(True)
 
-sys.path.append(os.path.abspath('../DYStudy'))
-from CDFShift import CDFShift
-
-
 class DataCard:
-    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,pseudodata=False,quantiles=None,rebin_factor=None,DYEstimation=None,produce_plots=False,**kwargs):
+    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,pseudodata=False,quantiles=None,rebin_factor=None,produce_plots=False,**kwargs):
         self.datacardName   = datacardName
         self.path           = path
         self.groups         = groups
@@ -31,10 +27,9 @@ class DataCard:
         self.pseudodata     = pseudodata
         self.quantiles      = quantiles
         self.rebin_factor   = rebin_factor
-        self.DYEstimation   = DYEstimation
         self.produce_plots  = produce_plots
         
-        self.yaml_dict = self.loadYaml(os.path.join(self.path,yamlName))
+        self.yaml_dict = self.loadYaml(self.path,yamlName)
 
         with open('systematics.yml','r') as handle:
             self.systConvention = yaml.load(handle,Loader=yaml.FullLoader)
@@ -53,8 +48,6 @@ class DataCard:
         self.loopOverFiles()
         if self.pseudodata:
             self.roundFakeData()
-        if self.DYEstimation is not None:
-            self.produceDYShit()
         if self.quantiles is not None:
             self.rebinInQuantile()
         if self.rebin_factor is not None:
@@ -74,9 +67,15 @@ class DataCard:
         return newg
 
     def loopOverFiles(self):
-        files = glob.glob(os.path.join(self.path,'results','*.root'))
+        if isinstance(self.path,list):
+            files = set()
+            for path in self.path:
+                files = files.union(set([f for f in glob.glob(os.path.join(path,'results','*.root'))]))
+            files = list(files)
+        else:
+            files = glob.glob(os.path.join(self.path,'results','*.root'))
         pbar = enlighten.Counter(total=len(files), desc='Progress', unit='files')
-        for f in files:
+        for f in sorted(files):
             pbar.update()
             if '__skeleton__' in f:
                 continue
@@ -90,6 +89,8 @@ class DataCard:
                 continue
             hist_dict = self.getHistograms(f)
             for histName in hist_dict.keys():
+                if len(hist_dict[histName]) == 0:
+                    continue
                 for group in groups:
                     self.systPresent[histName][group].append({'systematics': [systname for systname in hist_dict[histName].keys() if systname != 'nominal'],
                                                               'nominal': copy.deepcopy(hist_dict[histName]['nominal'])})
@@ -112,6 +113,8 @@ class DataCard:
 
     def addSampleToGroup(self,hist_dict,group):
         for histname,hists in hist_dict.items():
+            if len(hists) == 0:
+                continue
             nominal = hists['nominal']
             if not 'nominal' in self.content[histname][group].keys():
                 self.content[histname][group]['nominal'] = copy.deepcopy(nominal)
@@ -178,7 +181,7 @@ class DataCard:
             for histname in histnames:
                 # Check #
                 if not histname in list_histnames:
-                    print ("Could not find hist %s in %s"%(histname,rootfile))
+                    #print ("Could not find hist %s in %s"%(histname,rootfile))
                     continue
                 listsyst = [hn for hn in list_histnames if histname in hn and '__' in hn] if self.use_syst else []
                 # Nominal histogram #
@@ -224,20 +227,41 @@ class DataCard:
         return l
         
 
-    def loadYaml(self,yaml_path):
-        # Parse YAML #
-        with open(yaml_path,"r") as handle:
-            full_dict = yaml.load(handle,Loader=yaml.FullLoader)
-        # Get Lumi per era #  
-        lumi_dict = full_dict["configuration"]["luminosity"]
+    def loadYaml(self,paths,yamlName):
+        if not isinstance(paths,list):
+            paths = [path]
+        yamlDict = {}
+        for path in paths:
+            yamlPath = os.path.join(path,yamlName)
+            if not os.path.exists(yamlPath):
+                print ("{} -> not found, skipped".format(yamlPath))
+                continue
+            # Parse YAML #
+            with open(yamlPath,"r") as handle:
+                full_dict = yaml.load(handle,Loader=yaml.FullLoader)
+            # Get Lumi per era #  
+            lumi_dict = full_dict["configuration"]["luminosity"]
+            if 'luminosity' not in yamlDict.keys():
+                yamlDict['luminosity'] = lumi_dict
+            else:
+                yamlDict['luminosity'].update(lumi_dict)
 
-        # Get data per sample #
-        sample_dict = {}
-        info_to_keep = ['cross-section','generated-events','group','type','era','branching-ratio']
-        for sample,data in full_dict['files'].items():
-            sample_dict[sample] = {k:data[k] for k in data.keys() & info_to_keep}
+            # Get data per sample #
+            if 'samples' not in yamlDict.keys():
+                sample_dict = {}
+                info_to_keep = ['cross-section','generated-events','group','type','era','branching-ratio']
+                for sample,data in full_dict['files'].items():
+                    sample_dict[sample] = {k:data[k] for k in data.keys() & info_to_keep}
 
-        return {'luminosity':lumi_dict,'samples':sample_dict,'plots':full_dict['plots']}
+                yamlDict['samples'] = sample_dict
+
+            # Get plot options #
+            if 'plots' not in yamlDict.keys(): 
+                yamlDict['plots'] = full_dict['plots']
+            else:
+                yamlDict['plots'].update(full_dict['plots'])
+
+        return yamlDict
 
     def roundFakeData(self):
         for hist_dict in self.content.values():
@@ -328,139 +352,6 @@ class DataCard:
                 for systName in self.content[histName][group].keys():
                     self.content[histName][group][systName].Rebin(self.rebin_factor)
 
-    def produceDYShit(self):
-        print ('Producing DY estimation')
-        with open(self.DYEstimation['yaml'],'r') as handle:
-            f = yaml.load(handle,Loader=yaml.FullLoader)
-
-        if not self.pseudodata:
-            with open('DYFits/ZPeak_2016.yml','r') as handle:
-                norm_ZPeak = yaml.load(handle,Loader=yaml.FullLoader)
-            with open('DYFits/ZVeto_2016.yml','r') as handle:
-                norm_ZVeto = yaml.load(handle,Loader=yaml.FullLoader)
-
-        f['quantiles'] = None
-        f['produce_plots'] = False
-        ZPeak_datacard = DataCard(**f,pseudodata=self.pseudodata)
-
-        path_DY = os.path.join(os.path.abspath(os.path.dirname(__file__)),self.datacardName,'DYEstimation')
-        if not os.path.exists(path_DY):
-            os.makedirs(path_DY)
-
-        for histName,gDict in self.content.items():
-            print ("---------------------------")
-            print (histName)
-            if not histName in self.DYEstimation['shift'].keys():
-                continue
-            if histName not in self.DYEstimation['shift'].keys():
-                continue
-            proxyName = self.DYEstimation['shift'][histName]
-            if proxyName not in ZPeak_datacard.content.keys():
-                raise RuntimeError("Could not find histogram %s in Z Peak datacard"%proxyName)
-
-            if not self.pseudodata:
-                proxyPeak_norm = norm_ZPeak[proxyName]
-                proxyVeto_norm = norm_ZVeto[proxyName]
-                histPeak_norm  = norm_ZPeak[histName]
-                #histVeto_norm  = norm_ZVeto[histName]
-
-            histZVeto = None 
-            histZPeak = None 
-            proxyZVeto = None 
-            proxyZPeak = None 
-            if not set(self.DYEstimation['factors'].keys()).issubset(set(self.groups.keys())):
-                raise RuntimeError('Group factors in DYestimation dict {'+','.join([g for g in self.DYEstimation['factors'].keys() if g not in self.groups.keys()])+'} are not in the groups dict')
-
-            for group in gDict.keys():
-                if group not in self.DYEstimation['factors'].keys():
-                    continue
-                factor = self.DYEstimation['factors'][group]
-                hv = copy.deepcopy(self.content[histName][group])
-                hz = copy.deepcopy(ZPeak_datacard.content[histName][group])
-                pv = copy.deepcopy(self.content[proxyName][group])
-                pz = copy.deepcopy(ZPeak_datacard.content[proxyName][group])
-                
-                if not self.pseudodata:
-                    factor_hz = None
-                    factor_pv = None
-                    factor_pz = None
-                    print (group,proxyName,histName)
-                    #if group in histVeto_norm.keys():
-                    #    factor_hv = histVeto_norm[group][1]/histVeto_norm[group][0]
-                    if group in histPeak_norm.keys():
-                        factor_hz = histPeak_norm[group][1]/histPeak_norm[group][0]
-                    else:
-                        factor_hz = 1.
-                    if group in proxyVeto_norm.keys():
-                        factor_pv = proxyVeto_norm[group][1]/proxyVeto_norm[group][0]
-                    else:
-                        factor_pv = 1. 
-                    if group in proxyPeak_norm.keys():
-                        factor_pz = proxyPeak_norm[group][1]/proxyPeak_norm[group][0]
-                    else:
-                        factor_pz = 1.
-                    print (factor_hz,factor_pv,factor_pz)
-                    hz.Scale(factor_hz)
-                    pv.Scale(factor_pv)
-                    pz.Scale(factor_pz)
-
-                hv.Scale(factor)
-                hz.Scale(factor)
-                pv.Scale(factor)
-                pz.Scale(factor)
-
-                if histZVeto is None:
-                    histZVeto = hv
-                    histZPeak = hz
-                    proxyZVeto = pv
-                    proxyZPeak = pz
-                else:
-                    histZVeto.Add(hv)
-                    histZPeak.Add(hz)
-                    proxyZVeto.Add(pv)
-                    proxyZPeak.Add(pz)
-
-            print (histZPeak.Integral(),proxyZVeto.Integral(),proxyZPeak.Integral())
-            if histZPeak.Integral() <= 0. or proxyZVeto.Integral() <= 0. or proxyZPeak.Integral() <= 0.:
-                continue
-
-            if self.pseudodata:
-                norm = histZVeto.Integral() * histZPeak.Integral() / proxyZPeak.Integral()
-            else:
-                norm = proxyZVeto.Integral() * histZPeak.Integral() / proxyZPeak.Integral()
-
-
-            shiftObj = CDFShift(proxyZPeak,histZPeak,proxyZVeto,norm=norm)
-            sHist, sHistUp, sHistDown = shiftObj.returnHistAndSyst()
-
-            shiftObj.rootsave['histZVeto'] = copy.deepcopy(histZVeto)
-            shiftObj.rootsave['histZPeak'] = copy.deepcopy(histZPeak)
-            shiftObj.rootsave['proxyZVeto'] = copy.deepcopy(proxyZVeto)
-            shiftObj.rootsave['proxyZPeak'] = copy.deepcopy(proxyZPeak)
-            shiftObj.saveToRoot(os.path.join(path_DY,histName+'.root'))
-            #shiftObj.saveToPDF(histName+'.pdf')
-            sHist.SetName(self.content[histName][self.DYEstimation['replace']].GetName())
-            sHistUp.SetName(self.content[histName][self.DYEstimation['replace']].GetName()+'__DYsystUp')
-            sHistDown.SetName(self.content[histName][self.DYEstimation['replace']].GetName()+'__DYsystDown')
-            self.content[histName][self.DYEstimation['replace']] = sHist
-            self.content[histName][self.DYEstimation['replace']+'__DYsystUp'] = sHistUp
-            self.content[histName][self.DYEstimation['replace']+'__DYsystDown'] = sHistDown
-
-
-            pdfname = os.path.join(path_DY,histName+'.pdf')
-            C = ROOT.TCanvas("C","C",800,600)
-            #C.Print(pdfname+'[')
-
-            
-            histZVeto.Draw("AP")
-            histZPeak.Draw("same")
-            proxyZVeto.Draw("same")
-            proxyZPeak.Draw("same")
-
-            #C.cd(0)
-            C.Print(pdfname,'Title:Test')
-
- 
     def preparePlotIt(self,suffix=''):
         print ("Preparing plotIt root files")
         # Make new directory with root files for plotIt #
@@ -524,11 +415,6 @@ class DataCard:
                 continue
             if gconfig['type'] != 'signal':
                 config['groups'][group] = {k:v for k,v in gconfig.items() if k not in ['files','type']}
-            if self.DYEstimation is not None and group == self.DYEstimation['replace']:
-                if self.pseudodata:
-                    config['groups'][group]['legend'] += ' (from pseudo-data)'
-                else:
-                    config['groups'][group]['legend'] += ' (from data)'
 
 
         config['plots'] = {}

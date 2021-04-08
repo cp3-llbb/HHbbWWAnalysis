@@ -1,7 +1,7 @@
 # PDF #
-ScaleWeight_Fact:   pdf_fact
-ScaleWeight_Renorm: pdf_renorm
-ScaleWeight_Mixed:  pdf_mixed
+Fact:   pdf_fact
+Renorm: pdf_renorm
+Mixed:  pdf_mixed
 
 # PS #
 psFSR: ps_fsr
@@ -86,12 +86,9 @@ jetpuid_eff:        CMS_PUJET_eff_{era}
 jetpuid_mistag:     CMS_PUJET_mistag_{era}
 
 # DY #
-dy_ee_boosted_reweighting_1b:  CMS_bbwwdl_ee_boosted1b_dy_{era}
-dy_mm_boosted_reweighting_1b:  CMS_bbwwdl_mm_boosted1b_dy_{era}
-dy_ee_resolved_reweighting_1b: CMS_bbwwdl_ee_resolved1b_dy_{era}
-dy_mm_resolved_reweighting_1b: CMS_bbwwdl_mm_resolved1b_dy_{era}
-dy_ee_resolved_reweighting_2b: CMS_bbwwdl_ee_resolved2b_dy_{era}
-dy_mm_resolved_reweighting_2b: CMS_bbwwdl_mm_resolved2b_dy_{era}
+dy_boosted_1b:  CMS_bbwwdl_boosted1b_dy_{era}
+dy_resolved_1b: CMS_bbwwdl_resolved1b_dy_{era}
+dy_resolved_2b: CMS_bbwwdl_resolved2b_dy_{era}
 
 dy_ee_boosted_nonclosure_1b:    CMS_bbwwdl_ee_boosted1b_dy_nonclosure_{era}
 dy_mm_boosted_nonclosure_1b:    CMS_bbwwdl_mm_boosted1b_dy_nonclosure_{era}

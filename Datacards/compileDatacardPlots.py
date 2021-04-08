@@ -20,16 +20,17 @@ class TemplateLatex:
 
         # Ordered dicts so that plots keep that order #
         self.channels = collections.OrderedDict([
-                        ("HH_cat_e_", "$e^{\pm}$"),
-                        ("HH_cat_m_", "$\mu^{\pm}$"),
-                        ("HH_cat_ee_", "$e^+e^-$"),
-                        ("HH_cat_mm_", "$\mu^+\mu^-$"),
-                        ("HH_cat_em_", "$e^{\pm}\mu^{\mp}"),
-                        ("HH_cat_ss_", "$e^+e^- + \mu^+\mu^-$"),
+                        #("HH_cat_e_", "$e^{\pm}$"),
+                        #("HH_cat_m_", "$\mu^{\pm}$"),
+                        #("HH_cat_ee_", "$e^+e^-$"),
+                        #("HH_cat_mm_", "$\mu^+\mu^-$"),
+                        #("HH_cat_em_", "$e^{\pm}\mu^{\mp}"),
+                        #("HH_cat_ss_", "$e^+e^- + \mu^+\mu^-$"),
+                        ("HH_", "$e^+e^- + \mu^+\mu^- + e^{\pm}\mu^{\mp}$"),
                         ])
             
         self.selections = collections.OrderedDict([
-                        ('alljet_' , "Resolved (1 btag + 2 btag) + Boosted (1 btag)"),
+                        ('inclusif_' , "Resolved (1 btag + 2 btag) + Boosted (1 btag)"),
                         ('resolved_' , "Exclusive Resolved Jets (1 btag + 2 btag)"),
                         ('boosted_' , "Inclusive Boosted Jets (1 btag)"),
                         ('resolved0b_' , "Exclusive Resolved Jets (0 btag)"),
@@ -46,16 +47,21 @@ class TemplateLatex:
                         ('resolved0b0_' , "Exclusive Resolved Jets 0b"),
                         ])
         self.variables = collections.OrderedDict([
-                        ("VBFnode", "DNN VBF node"),
-                        ("GGFnode", "DNN GGF node"),
-                        ("TTnode", "DNN TT node"),
-                        ("DYnode", "DNN DY node"),
-                        ("STnode", "DNN ST node"),
-                        ("TTVXnode", "DNN TTVX node"),
-                        ("Hnode", "DNN H node"),
-                        ("VVVnode", "DNN VVV node"),
-                        ("Rarenode", "DNN Rare node"),
-                        ("WJetsnode", "DNN WJets node"),
+                        ("_GGF",    "DNN GGF node"),
+                        ("_VBF",    "DNN VBF node"),
+                        ("_H",      "DNN H node"),
+                        ("_DY_VVV", "DNN DY+VVV nodes"),
+                        ("_other",  "DNN TT+TTVX+ST+Rare nodes"),
+                        #("VBFnode", "DNN VBF node"),
+                        #("GGFnode", "DNN GGF node"),
+                        #("TTnode", "DNN TT node"),
+                        #("DYnode", "DNN DY node"),
+                        #("STnode", "DNN ST node"),
+                        #("TTVXnode", "DNN TTVX node"),
+                        #("Hnode", "DNN H node"),
+                        #("VVVnode", "DNN VVV node"),
+                        #("Rarenode", "DNN Rare node"),
+                        #("WJetsnode", "DNN WJets node"),
                         ])
                 # "_" at beginning is useful to distinguish leading and subleading
                 # "." at end is useful to distinguish "HT2" and "HT2R"
@@ -77,7 +83,6 @@ class TemplateLatex:
                 logging.info("... "+"-"*40)
                 logging.info("... Selection : "+selection)
                 variabledict = {}
-                #if self.logplot:
                 base_pdf = channel+"*"+selection+"*.pdf"
                 if self.logplot:
                     base_pdf = base_pdf.replace('.pdf','_logy.pdf')
@@ -137,7 +142,7 @@ class TemplateLatex:
                 for i,(chan,chan_name) in enumerate(self.channels.items()):
                     frame += "\n\t\t"
                     try:
-                        frame += "\includegraphics[width=0.45\linewidth]{%s}"%(self.channeldict[chan][sel][var])
+                        frame += "\includegraphics[width=0.9\linewidth]{%s}"%(self.channeldict[chan][sel][var])
                         if i == 1:
                             frame += r"\\" # Back to line after two first plots
                         valid_plot = True

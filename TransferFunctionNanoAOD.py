@@ -22,13 +22,13 @@ def plotMatching(contName,cont,sel,partName,bregCorr=False):
     plots.append(Plot.make1D(contName+"_deltaR",
                              op.map(cont,lambda m : op.deltaR(m[0].p4,m[1].p4)), 
                              sel,
-                             EquidistantBinning(100,0.,0.2),
+                             EquidistantBinning(1000,0.,0.2),
                              xTitle="#Delta R(%s_{gen},%s_{reco})"%(partName,partName)))
     plots.append(Plot.make1D(contName+"_deltaPtRel",
-                             op.map(cont,lambda m : (m[1].pt-m[0].pt)/m[1].pt),
+                             op.map(cont,lambda m : (m[1].pt-m[0].pt)/(m[0].pt+m[1].pt)),
                              sel,
-                             EquidistantBinning(100,-2.,2.),
-                             xTitle="P_{T}(%s_{reco})-P_{T}(%s_{gen})/P_{T}(%s_{reco})"%(partName,partName,partName)))
+                             EquidistantBinning(1000,-1.,1.),
+                             xTitle="P_{T}(%s_{reco})-P_{T}(%s_{gen})/P_{T}(%s_{reco})+P_{T}(%s_{gen})"%(partName,partName,partName,partName)))
     plots.append(Plot.make2D(contName+"_Pt2D",
                              [op.map(cont,lambda m : m[0].pt),op.map(cont,lambda m : m[1].pt)],
                              sel,
@@ -38,7 +38,7 @@ def plotMatching(contName,cont,sel,partName,bregCorr=False):
     plots.append(Plot.make2D(contName+"_TF",
                              (op.map(cont,lambda m : m[0].p4.E()),op.map(cont,lambda m : m[1].p4.E()-m[0].p4.E())),
                              sel,
-                             [EquidistantBinning(3000,0.,3000.),EquidistantBinning(5000,-500.,500.)],
+                             [EquidistantBinning(3000,0.,3000.),EquidistantBinning(8000,-1000.,1000.)],
                              xTitle="E^{parton}(e^{-})",
                              yTitle="#Delta E = E^{reco}(%s)-E^{parton}(%s)"%(partName,partName)))
     if bregCorr:
@@ -47,7 +47,7 @@ def plotMatching(contName,cont,sel,partName,bregCorr=False):
         plots.append(Plot.make2D(contName+"_TF_bregCorr",
                                  (op.map(cont,lambda m : m[0].p4.E()),op.map(cont,lambda m : getCorrBp4(m[1]).E()-m[0].p4.E())),
                                  sel,
-                                 [EquidistantBinning(3000,0.,3000.),EquidistantBinning(5000,-500.,500.)],
+                                 [EquidistantBinning(3000,0.,3000.),EquidistantBinning(8000,-1000.,1000.)],
                                  xTitle="E^{parton}(e^{-})",
                                  yTitle="#Delta E = E^{reco}(%s)-E^{parton}(%s)"%(partName,partName)))
 
@@ -140,10 +140,10 @@ class TransferFunction(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModule):
         #                       Leptons                          #
         ##########################################################
         #----- Gen particles -----# 
-        gen_e  = op.select(t.GenPart,lambda g : op.AND(op.abs(g.pdgId) == 11 , 
-                                                       g.statusFlags & ( 0x1 << 13), 
-                                                       g.pt >= 10, 
-                                                       op.abs(g.eta)<2.5 ))
+        gen_e = op.select(t.GenPart,lambda g : op.AND(op.abs(g.pdgId) == 11 , 
+                                                      g.statusFlags & ( 0x1 << 13), 
+                                                      g.pt >= 10, 
+                                                      op.abs(g.eta)<2.5 ))
         gen_m = op.select(t.GenPart,lambda g : op.AND(op.abs(g.pdgId) == 13 , 
                                                       g.statusFlags & ( 0x1 << 13), 
                                                       g.pt >= 10, 
@@ -159,44 +159,26 @@ class TransferFunction(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModule):
                                            op.abs(mu.eta) < 2.4, 
                                            lambda_is_matched(mu))
 
-        reco_e = op.select(t.Electron, lambda_reco_e)
-        reco_m = op.select(t.Muon, lambda_reco_m)
+        reco_e = op.select(self.electronsFakeSel, lambda_reco_e)
+        reco_m = op.select(self.muonsFakeSel, lambda_reco_m)
 
-        fakeable_e = op.select(self.electronsFakeSel, lambda_reco_e)
-        fakeable_m = op.select(self.muonsFakeSel, lambda_reco_m)
-
-        tight_e = op.select(self.electronsTightSel, lambda_reco_e)
-        tight_m = op.select(self.muonsTightSel, lambda_reco_m)
-                                                            
         #---- Matching -----#
-        lambda_lepton_match = lambda gen,reco : op.AND(op.deltaR(gen.p4,reco.p4)<0.1)
+        lambda_lepton_match = lambda gen,reco : op.AND(op.deltaR(gen.p4,reco.p4) < 0.1 , (op.abs(gen.pt-reco.pt)/(gen.pt+reco.pt)) < 0.2 )
 
+#        reco_e_matched = op.select(reco_e, lambda re : op.rng_any(gen_e, lambda ge: lambda_lepton_match(ge,re)))
+#        reco_m_matched = op.select(reco_m, lambda rm : op.rng_any(gen_m, lambda gm: lambda_lepton_match(gm,rm)))
+       
+        #match_e = op.combine((gen_e,reco_e), pred = lambda ge,re : re.idx == op.rng_min_element_by(reco_e_matched,lambda re_matched : op.deltaR(ge.p4,re_matched.p4)).idx)
+        #match_m = op.combine((gen_m,reco_m), pred = lambda gm,rm : rm.idx == op.rng_min_element_by(reco_m_matched,lambda rm_matched : op.deltaR(gm.p4,rm_matched.p4)).idx)
+        
         match_e = op.combine((gen_e,reco_e), pred=lambda_lepton_match)
         match_m = op.combine((gen_m,reco_m), pred=lambda_lepton_match)
 
         plots.extend(plotMatching("e",match_e,noSel,"e^{#pm}"))
         plots.extend(plotMatching("m",match_m,noSel,"#mu^{#pm}"))
 
-        plots.append(plotRecoForGen(noSel,gen_e,reco_e,lambda_lepton_match,"e"))
-        plots.append(plotRecoForGen(noSel,gen_e,reco_m,lambda_lepton_match,"m"))
-
-        match_fakeable_e = op.combine((gen_e,fakeable_e), pred=lambda_lepton_match)
-        match_fakeable_m = op.combine((gen_m,fakeable_m), pred=lambda_lepton_match)
-
-        plots.extend(plotMatching("e_fakeable",match_fakeable_e,noSel,"e^{#pm}"))
-        plots.extend(plotMatching("m_fakeable",match_fakeable_m,noSel,"#mu^{#pm}"))
-
-        plots.append(plotRecoForGen(noSel,gen_e,fakeable_e,lambda_lepton_match,"e_fakeable"))
-        plots.append(plotRecoForGen(noSel,gen_e,fakeable_m,lambda_lepton_match,"m_fakeable"))
-
-        match_tight_e = op.combine((gen_e,tight_e), pred=lambda_lepton_match)
-        match_tight_m = op.combine((gen_m,tight_m), pred=lambda_lepton_match)
-
-        plots.extend(plotMatching("e_tight",match_tight_e,noSel,"e^{#pm}"))
-        plots.extend(plotMatching("m_tight",match_tight_m,noSel,"#mu^{#pm}"))
-
-        plots.append(plotRecoForGen(noSel,gen_e,tight_e,lambda_lepton_match,"e_tight"))
-        plots.append(plotRecoForGen(noSel,gen_e,tight_m,lambda_lepton_match,"m_tight"))
+#        plots.append(plotRecoForGen(noSel,gen_e,tight_e,lambda_lepton_match,"e_tight"))
+#        plots.append(plotRecoForGen(noSel,gen_e,tight_m,lambda_lepton_match,"m_tight"))
 
         ##########################################################
         #                       Ak4 B jets                       #
@@ -213,8 +195,8 @@ class TransferFunction(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModule):
                                                       op.abs(g.eta)<2.4))
         #----- Matching -----#
         lambda_jet_match = lambda gen,reco : op.AND(op.deltaR(gen.p4,reco.p4)<0.2)
-        match_b = op.combine((gen_b, recoJet_b), pred=lambda_jet_match)
-        plots.append(plotRecoForGen(noSel,gen_b,recoJet_b,lambda_jet_match,"ak4b"))
+        reco_b_matched = op.select(recoJet_b, lambda jetb: op.rng_any(gen_b, lambda gb: lambda_jet_match(gb,jetb)))
+        match_b = op.combine((gen_b,recoJet_b), pred = lambda gb,jetb : jetb.idx == op.rng_min_element_by(reco_b_matched,lambda rb_matched : op.deltaR(gb.p4,rb_matched.p4)).idx)
         plots.extend(plotMatching("ak4b",match_b,noSel,"b",bregCorr=True))
 
         ##########################################################
@@ -231,8 +213,8 @@ class TransferFunction(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModule):
                                                       g.pt>=20,
                                                       op.abs(g.eta)<2.4))
         #----- Matching -----#
-        match_c = op.combine((gen_c, recoJet_c), pred=lambda_jet_match)
-        plots.append(plotRecoForGen(noSel,gen_c,recoJet_c,lambda_jet_match,"ak4c"))
+        reco_c_matched = op.select(recoJet_c, lambda jetc: op.rng_any(gen_c, lambda gc: lambda_jet_match(gc,jetc)))
+        match_c = op.combine((gen_c,recoJet_c), pred = lambda gc,jetc : jetc.idx == op.rng_min_element_by(reco_c_matched,lambda rc_matched : op.deltaR(gc.p4,rc_matched.p4)).idx)
         plots.extend(plotMatching("ak4c",match_c,noSel,"c"))
 
         ##########################################################
@@ -253,26 +235,26 @@ class TransferFunction(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModule):
                                                       g.pt>=20,
                                                       op.abs(g.eta)<2.4))
         #----- Matching -----#
-        match_l = op.combine((gen_l, recoJet_l), pred=lambda_jet_match)
-        plots.append(plotRecoForGen(noSel,gen_l,recoJet_l,lambda_jet_match,"ak4l"))
+        reco_l_matched = op.select(recoJet_l, lambda jetl: op.rng_any(gen_l, lambda gl: lambda_jet_match(gl,jetl)))
+        match_l = op.combine((gen_l,recoJet_l), pred = lambda gl,jetl : jetl.idx == op.rng_min_element_by(reco_l_matched,lambda rl_matched : op.deltaR(gl.p4,rl_matched.p4)).idx)
         plots.extend(plotMatching("ak4l",match_l,noSel,"l"))
 
-        ##########################################################
-        #                        Ak8 jets                        #
-        ##########################################################
-        #----- RecoJets -----#
-        recoFatJet = op.select(t.FatJet, lambda j : op.AND(j.pt>=100,
-                                                           op.abs(j.eta)<2.4,
-                                                           op.AND(j.subJet1.isValid, j.subJet1.pt >= 20. , op.abs(j.subJet1.eta)<=2.4,
-                                                                  j.subJet2.isValid, j.subJet2.pt >= 20. , op.abs(j.subJet2.eta)<=2.4),
-                                                           op.AND(j.msoftdrop >= 30, j.msoftdrop <= 210),
-                                                           j.tau2/j.tau1 <= 0.75))
-        #recoFatJet_b = op.select(recoFatJet, lambda j : op.abs(j.partonFlavour) == 5)
-        #recoFatJet_c = op.select(recoFatJet, lambda j : op.abs(j.partonFlavour) == 4)
-        #recoFatJet_l = op.select(recoFatJet, lambda j : op.OR(op.abs(j.partonFlavour) == 1,
-        #                                                   op.abs(j.partonFlavour) == 2, 
-        #                                                   op.abs(j.partonFlavour) == 3))
-
-        plots.extend(fatjetPlots(noSel,recoFatJet,"fatjet"))
+#        ##########################################################
+#        #                        Ak8 jets                        #
+#        ##########################################################
+#        #----- RecoJets -----#
+#        recoFatJet = op.select(t.FatJet, lambda j : op.AND(j.pt>=100,
+#                                                           op.abs(j.eta)<2.4,
+#                                                           op.AND(j.subJet1.isValid, j.subJet1.pt >= 20. , op.abs(j.subJet1.eta)<=2.4,
+#                                                                  j.subJet2.isValid, j.subJet2.pt >= 20. , op.abs(j.subJet2.eta)<=2.4),
+#                                                           op.AND(j.msoftdrop >= 30, j.msoftdrop <= 210),
+#                                                           j.tau2/j.tau1 <= 0.75))
+#        #recoFatJet_b = op.select(recoFatJet, lambda j : op.abs(j.partonFlavour) == 5)
+#        #recoFatJet_c = op.select(recoFatJet, lambda j : op.abs(j.partonFlavour) == 4)
+#        #recoFatJet_l = op.select(recoFatJet, lambda j : op.OR(op.abs(j.partonFlavour) == 1,
+#        #                                                   op.abs(j.partonFlavour) == 2, 
+#        #                                                   op.abs(j.partonFlavour) == 3))
+#
+#        plots.extend(fatjetPlots(noSel,recoFatJet,"fatjet"))
 
         return plots
