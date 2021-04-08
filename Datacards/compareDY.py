@@ -4,6 +4,7 @@ import glob
 import json 
 import math
 from array import array
+import numpy as np
 import ROOT
 
 ROOT.gStyle.SetOptStat(0)
@@ -136,6 +137,12 @@ for era in ['2016','2017','2018']:
         h_datadriven.SetMarkerStyle(8)
         h_closure.SetMarkerStyle(4)
 
+        # compute quantiles for the fit #
+        prob = np.array([0.01,0.99])
+        quantiles = np.array([0.,0.])
+        h_MC.GetQuantiles(2,quantiles,prob)
+
+
         ratio_DY_datadriven = h_MC.Clone("ratio_DY_datadriven")
         ratio_DY_closure = h_MC.Clone("ratio_DY_closure")
 
@@ -144,9 +151,6 @@ for era in ['2016','2017','2018']:
 
         ratio_DY_datadriven.Divide(h_datadriven)
         ratio_DY_closure.Divide(h_closure)
-
-#        ratio_DY_datadriven.Fit("pol1","Q")
-#        ratio_DY_closure.Fit("pol1","Q")
 
         ratio_DY_datadriven.SetLineColor(600)
         ratio_DY_closure.SetLineColor(1)
@@ -190,9 +194,17 @@ for era in ['2016','2017','2018']:
         pad2.SetRightMargin(0.05)
         pad2.Draw()
 
+
         ratio_DY_datadriven.Draw("e1p")
         ratio_DY_closure.Draw("e1p same")
-        ratio_DY_datadriven.GetYaxis().SetRangeUser(-1.0,1.5)
+        ratio_DY_datadriven.GetYaxis().SetRangeUser(-1.5,1.5)
+        ratio_DY_datadriven.Fit("pol1","QR","",quantiles[0],quantiles[1])
+        ratio_DY_closure.Fit("pol1","QR","",quantiles[0],quantiles[1])
+        fit_datadriven = ratio_DY_datadriven.GetFunction('pol1')
+        fit_closure = ratio_DY_closure.GetFunction('pol1')
+        fit_datadriven.SetLineColor(600)
+        fit_closure.SetLineColor(1)
+
         leg_down = ROOT.TLegend(0.55,0.65,0.9,1.0)
         leg_down.AddEntry(ratio_DY_datadriven,"\splitline{{#frac{{DY (MC) - DY (data)}}{{DY (data)}}}}{{Factor = {:0.5f} #pm {:0.5f}}}".format(*factor_datadriven))
         leg_down.AddEntry(ratio_DY_closure,"\splitline{{#frac{{DY (MC) - DY (closure)}}{{DY (closure)}}}}{{Factor = {:0.5f} #pm {:0.5f}}}".format(*factor_closure))

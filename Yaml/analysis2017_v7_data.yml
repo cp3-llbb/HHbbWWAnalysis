@@ -52,7 +52,7 @@
   SingleMuon_2017C0:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/SingleMuon/Run2017C-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/SingleMuon_2017C_0.txt
+    files: ../utils/DataRuns/SingleMuon_2017C_0.txt
     era: '2017'
     group: data
     run_range:
@@ -62,7 +62,7 @@
   SingleMuon_2017C1:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/SingleMuon/Run2017C-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/SingleMuon_2017C_1.txt
+    files: ../utils/DataRuns/SingleMuon_2017C_1.txt
     era: '2017'
     group: data
     run_range:
@@ -72,7 +72,7 @@
   SingleElectron_2017C0:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/SingleElectron/Run2017C-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/SingleElectron_2017C_0.txt
+    files: ../utils/DataRuns/SingleElectron_2017C_0.txt
     era: '2017'
     group: data
     run_range:
@@ -82,7 +82,7 @@
   SingleElectron_2017C1:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/SingleElectron/Run2017C-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/SingleElectron_2017C_1.txt
+    files: ../utils/DataRuns/SingleElectron_2017C_1.txt
     era: '2017'
     group: data
     run_range:
@@ -92,7 +92,7 @@
   DoubleMuon_2017C0:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/DoubleMuon/Run2017C-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/DoubleMuon_2017C_0.txt
+    files: ../utils/DataRuns/DoubleMuon_2017C_0.txt
     era: '2017'
     group: data
     run_range:
@@ -102,7 +102,7 @@
   DoubleMuon_2017C1:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/DoubleMuon/Run2017C-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/DoubleMuon_2017C_1.txt
+    files: ../utils/DataRuns/DoubleMuon_2017C_1.txt
     era: '2017'
     group: data
     run_range:
@@ -112,7 +112,7 @@
   DoubleEGamma_2017C0:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/DoubleEG/Run2017C-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/DoubleEGamma_2017C_0.txt
+    files: ../utils/DataRuns/DoubleEGamma_2017C_0.txt
     era: '2017'
     group: data
     run_range:
@@ -122,7 +122,7 @@
   DoubleEGamma_2017C1:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/DoubleEG/Run2017C-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/DoubleEGamma_2017C_1.txt
+    files: ../utils/DataRuns/DoubleEGamma_2017C_1.txt
     era: '2017'
     group: data
     run_range:
@@ -132,7 +132,7 @@
   MuonEG_2017C0:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/MuonEG/Run2017C-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/MuonEG_2017C_0.txt
+    files: ../utils/DataRuns/MuonEG_2017C_0.txt
     era: '2017'
     group: data
     run_range:
@@ -142,7 +142,7 @@
   MuonEG_2017C1:
     certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/MuonEG/Run2017C-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/MuonEG_2017C_1.txt
+    files: ../utils/DataRuns/MuonEG_2017C_1.txt
     era: '2017'
     group: data
     run_range:

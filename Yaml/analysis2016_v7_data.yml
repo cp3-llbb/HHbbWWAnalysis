@@ -4,7 +4,7 @@
 ####### Run B
   SingleMuon_2016B0:
     #db: ["das:/SingleMuon/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/SingleMuon/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: utils/DataRuns/SingleMuon_2016B_0.txt
+    files: ../utils/DataRuns/SingleMuon_2016B_0.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
@@ -12,7 +12,7 @@
     split: 30
   SingleMuon_2016B1:
     #db: ["das:/SingleMuon/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/SingleMuon/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: utils/DataRuns/SingleMuon_2016B_1.txt
+    files: ../utils/DataRuns/SingleMuon_2016B_1.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
@@ -20,7 +20,7 @@
     split: 10
   SingleElectron_2016B0:
     #db: ["das:/SingleElectron/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/SingleElectron/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: utils/DataRuns/SingleElectron_2016B_0.txt
+    files: ../utils/DataRuns/SingleElectron_2016B_0.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
@@ -28,7 +28,7 @@
     split: 30
   SingleElectron_2016B1:
     #db: ["das:/SingleElectron/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/SingleElectron/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: utils/DataRuns/SingleElectron_2016B_1.txt
+    files: ../utils/DataRuns/SingleElectron_2016B_1.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
@@ -36,7 +36,7 @@
     split: 5
   DoubleMuon_2016B0:
     #db: ["das:/DoubleMuon/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/DoubleMuon/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: utils/DataRuns/DoubleMuon_2016B_0.txt
+    files: ../utils/DataRuns/DoubleMuon_2016B_0.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
@@ -44,7 +44,7 @@
     split: 30
   DoubleMuon_2016B1:
     #db: ["das:/DoubleMuon/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/DoubleMuon/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: utils/DataRuns/DoubleMuon_2016B_1.txt
+    files: ../utils/DataRuns/DoubleMuon_2016B_1.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
@@ -52,7 +52,7 @@
     split: 5
   DoubleEGamma_2016B0:
     #db: ["das:/DoubleEG/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/DoubleEG/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: utils/DataRuns/DoubleEGamma_2016B_0.txt
+    files: ../utils/DataRuns/DoubleEGamma_2016B_0.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
@@ -60,7 +60,7 @@
     split: 15
   DoubleEGamma_2016B1:
     #db: ["das:/DoubleEG/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/DoubleEG/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: utils/DataRuns/DoubleEGamma_2016B_1.txt
+    files: ../utils/DataRuns/DoubleEGamma_2016B_1.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
@@ -68,7 +68,7 @@
     split: 30
   MuonEG_2016B0:
     #db: ["das:/MuonEG/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/MuonEG/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: utils/DataRuns/MuonEG_2016B_0.txt
+    files: ../utils/DataRuns/MuonEG_2016B_0.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
@@ -76,7 +76,7 @@
     split: 30
   MuonEG_2016B1:
     #db: ["das:/MuonEG/Run2016B-02Apr2020_ver1-v1/NANOAOD","das:/MuonEG/Run2016B-02Apr2020_ver2-v1/NANOAOD"]
-    files: utils/DataRuns/MuonEG_2016B_1.txt
+    files: ../utils/DataRuns/MuonEG_2016B_1.txt
     group: data
     era: '2016'
     run_range: [272007, 275376]
@@ -271,7 +271,7 @@
 ####### Run H
   SingleMuon_2016H0:
     #db: das:/SingleMuon/Run2016H-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/SingleMuon_2016H_0.txt
+    files: ../utils/DataRuns/SingleMuon_2016H_0.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]
@@ -279,7 +279,7 @@
     split: 30
   SingleMuon_2016H1:
     #db: das:/SingleMuon/Run2016H-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/SingleMuon_2016H_1.txt
+    files: ../utils/DataRuns/SingleMuon_2016H_1.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]
@@ -287,7 +287,7 @@
     split: 10
   SingleElectron_2016H0:
     #db: das:/SingleElectron/Run2016H-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/SingleElectron_2016H_0.txt
+    files: ../utils/DataRuns/SingleElectron_2016H_0.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]
@@ -295,7 +295,7 @@
     split: 30
   SingleElectron_2016H1:
     #db: das:/SingleElectron/Run2016H-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/SingleElectron_2016H_1.txt
+    files: ../utils/DataRuns/SingleElectron_2016H_1.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]
@@ -303,7 +303,7 @@
     split: 10
   DoubleMuon_2016H0:
     #db: das:/DoubleMuon/Run2016H-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/DoubleMuon_2016H_0.txt
+    files: ../utils/DataRuns/DoubleMuon_2016H_0.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]
@@ -311,7 +311,7 @@
     split: 30
   DoubleMuon_2016H1:
     #db: das:/DoubleMuon/Run2016H-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/DoubleMuon_2016H_1.txt
+    files: ../utils/DataRuns/DoubleMuon_2016H_1.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]
@@ -319,7 +319,7 @@
     split: 10
   DoubleEGamma_2016H0:
     #db: das:/DoubleEG/Run2016H-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/DoubleEGamma_2016H_0.txt
+    files: ../utils/DataRuns/DoubleEGamma_2016H_0.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]
@@ -327,7 +327,7 @@
     split: 30
   DoubleEGamma_2016H1:
     #db: das:/DoubleEG/Run2016H-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/DoubleEGamma_2016H_1.txt
+    files: ../utils/DataRuns/DoubleEGamma_2016H_1.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]
@@ -335,7 +335,7 @@
     split: 5
   MuonEG_2016H0:
     #db: das:/MuonEG/Run2016H-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/MuonEG_2016H_0.txt
+    files: ../utils/DataRuns/MuonEG_2016H_0.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]
@@ -343,7 +343,7 @@
     split: 30
   MuonEG_2016H1:
     #db: das:/MuonEG/Run2016H-02Apr2020-v1/NANOAOD
-    files: utils/DataRuns/MuonEG_2016H_1.txt
+    files: ../utils/DataRuns/MuonEG_2016H_1.txt
     group: data
     era: '2016'
     run_range: [280919, 284044]

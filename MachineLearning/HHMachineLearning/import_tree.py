@@ -77,6 +77,7 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
         df['cross_section'] = np.ones(df.shape[0])
         df['luminosity'] = np.ones(df.shape[0])
         df['event_weight_sum'] = np.ones(df.shape[0])
+        relative_weight /= df.shape[0]
    
     if weight is not None:
         df['event_weight'] = df[weight]*relative_weight

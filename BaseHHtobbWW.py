@@ -450,9 +450,6 @@ One lepton and and one jet argument must be specified in addition to the require
 
                                                                                                  
             else:
-                self.scaleWeight_Fact = op.systematic(op.c_float(1.), name = "ScaleWeight_Fact", up = op.c_float(1.), down = op.c_float(1.))
-                self.scaleWeight_Renorm = op.systematic(op.c_float(1.), name = "ScaleWeight_Renorm", up = op.c_float(1.), down = op.c_float(1.))
-                self.scaleWeight_Mixed = op.systematic(op.c_float(1.), name = "ScaleWeight_Mixed", up = op.c_float(1.), down = op.c_float(1.))
                 self.scaleWeight = op.systematic(op.c_float(1.),
                                                  name       = "ScaleWeight",
                                                  Factup     = op.c_float(1.),

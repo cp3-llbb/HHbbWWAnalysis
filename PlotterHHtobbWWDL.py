@@ -87,30 +87,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         #----- DY reweighting -----#
         if "DYEstimation" in self.datadrivenContributions:
             mode = 'mc' if "PseudoData" in self.datadrivenContributions else 'data'
-#            # Resolved : ElEl #
-#            self.ResolvedDYReweighting1bElEl = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'ElEl_HT_{}_1b'.format(mode)), combine="weight", 
-#                                                                   systName="dy_ee_resolved_reweighting_1b", 
-#                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
-#            self.ResolvedDYReweighting2bElEl = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'ElEl_HT_{}_2b'.format(mode)), combine="weight", 
-#                                                                   systName="dy_ee_resolved_reweighting_2b", 
-#                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
-#
-#            # Resolved : MuMu #
-#            self.ResolvedDYReweighting1bMuMu = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'MuMu_HT_{}_1b'.format(mode)), combine="weight", 
-#                                                                   systName="dy_mm_resolved_reweighting_1b", 
-#                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
-#            self.ResolvedDYReweighting2bMuMu = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'MuMu_HT_{}_2b'.format(mode)), combine="weight", 
-#                                                                   systName="dy_mm_resolved_reweighting_1b", 
-#                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
-#
-#            # Boosted : ElEl #
-#            self.BoostedDYReweighting1bElEl  =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'ElEl_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
-#                                                                   systName="dy_ee_boosted_reweighting_1b", 
-#                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
-#            # Boosted : MuMu #
-#            self.BoostedDYReweighting1bMuMu  =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'MuMu_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
-#                                                                   systName="dy_mm_boosted_reweighting_1b", 
-#                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
             # Resolved 
             self.ResolvedDYReweighting1b = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'SF_HT_{}_1b'.format(mode)), combine="weight", 
                                                                   systName="dy_resolved_1b", 
@@ -118,16 +94,11 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             self.ResolvedDYReweighting2b = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'SF_HT_{}_2b'.format(mode)), combine="weight", 
                                                                   systName="dy_resolved_2b", 
                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
+            # Boosted
             self.BoostedDYReweighting1b =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'SF_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
                                                                   systName="dy_boosted_1b", 
                                                                   additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
         else:
-            #self.ResolvedDYReweighting1bElEl = lambda x : op.c_float(1.)
-            #self.ResolvedDYReweighting2bElEl = lambda x : op.c_float(1.) 
-            #self.ResolvedDYReweighting1bMuMu = lambda x : op.c_float(1.) 
-            #self.ResolvedDYReweighting2bMuMu = lambda x : op.c_float(1.) 
-            #self.BoostedDYReweighting1bElEl = lambda x : op.c_float(1.)
-            #self.BoostedDYReweighting1bMuMu = lambda x : op.c_float(1.)
             self.ResolvedDYReweighting1b = lambda x : op.c_float(1.)
             self.ResolvedDYReweighting2b = lambda x : op.c_float(1.) 
             self.BoostedDYReweighting1b  = lambda x : op.c_float(1.)
@@ -486,7 +457,8 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             output = DNN(*inputs)
             selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,suffix=model_num)
 
-            plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
+            plots.extend(makeDoubleLeptonMachineLearningExclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
+            #plots.extend(makeDoubleLeptonMachineLearningInclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
 
 #            # DY datadriven investigations #
 #            selDY = selObjNodesDict['DY']
