@@ -16,7 +16,7 @@ from IPython import embed
 ROOT.gROOT.SetBatch(True)
 
 class DataCard:
-    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,pseudodata=False,quantiles=None,rebin_factor=None,produce_plots=False,**kwargs):
+    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,pseudodata=False,rebin=None,produce_plots=False,**kwargs):
         self.datacardName   = datacardName
         self.path           = path
         self.groups         = groups
@@ -25,8 +25,7 @@ class DataCard:
         self.use_syst       = use_syst
         self.root_subdir    = root_subdir
         self.pseudodata     = pseudodata
-        self.quantiles      = quantiles
-        self.rebin_factor   = rebin_factor
+        self.rebin          = rebin
         self.produce_plots  = produce_plots
         
         self.yaml_dict = self.loadYaml(self.path,yamlName)
@@ -42,16 +41,11 @@ class DataCard:
         self.content = {histName:{g:{} for g in self.groups.keys()} for histName in self.hist_conv.keys()}
         self.systPresent = {histName:{group:[] for group in self.groups.keys()} for histName in self.hist_conv.keys()}
 
-        if self.quantiles is not None and self.rebin_factor is not None:
-            raise RuntimeError("Cannot apply both quantile and classic rebinning")
-
         self.loopOverFiles()
         if self.pseudodata:
             self.roundFakeData()
-        if self.quantiles is not None:
-            self.rebinInQuantile()
-        if self.rebin_factor is not None:
-            self.rebinClassic()
+        if self.rebin is not None:
+            self.applyRebinning()
         if self.datacardName is not None:
             self.saveDatacard()
         if self.produce_plots:
@@ -141,7 +135,6 @@ class DataCard:
                             continue
                         if systName not in sampleDict['systematics']:
                             self.content[histName][group][systName].Add(sampleDict['nominal'])
-
 
     def findGroup(self,sample):
         group_of_sample = []
@@ -247,13 +240,17 @@ class DataCard:
                 yamlDict['luminosity'].update(lumi_dict)
 
             # Get data per sample #
+            info_to_keep = ['cross-section','generated-events','group','type','era','branching-ratio']
             if 'samples' not in yamlDict.keys():
                 sample_dict = {}
-                info_to_keep = ['cross-section','generated-events','group','type','era','branching-ratio']
                 for sample,data in full_dict['files'].items():
                     sample_dict[sample] = {k:data[k] for k in data.keys() & info_to_keep}
-
                 yamlDict['samples'] = sample_dict
+            else:
+                for sample,data in full_dict['files'].items():
+                    if sample not in yamlDict['samples'].keys():
+                        yamlDict['samples'].update({sample:data})
+                
 
             # Get plot options #
             if 'plots' not in yamlDict.keys(): 
@@ -295,9 +292,9 @@ class DataCard:
                     if hist is None:
                         continue
                     for i in range(1,hist.GetNbinsX()+1):
-                        #hist.SetBinError(i,0.) #TODO : check 
                         if hist.GetBinContent(i) < 0.:
                             hist.SetBinContent(i,0.) 
+                            hist.SetBinError(i,0.) 
                     
                     if systName ==  "nominal":
                         save_name = group
@@ -323,35 +320,84 @@ class DataCard:
             f.Close()
             print ("Saved file %s"%filename)
 
-    def rebinInQuantile(self,qObjects=None):
-        from QuantileBinning import Quantile
-        print ("Producing quantile binning")
-        pbar = enlighten.Counter(total=len(self.content.keys()), desc='Progress', unit='histograms')
-        for histName in self.content.keys():
-            nodes = [node for node in self.quantiles.keys() if node in histName]
-            if len(nodes) != 1:
-                raise RuntimeError("For histogram {} : found matches in quantile dict : "+','.join(nodes))
+    def applyRebinning(self):
+        print ('Applying rebinning')
+        for histName, histContent in self.content.items():
+            if histName in self.rebin.keys():
+                method = self.rebin[histName]['method']
+                params = self.rebin[histName]['params']
+                print ('... {:20s} -> rebinning scheme : {}'.format(histName,self.rebin[histName]['method']))
+                if method == 'classic':
+                    rebinFunc = self.rebinClassic
+                elif method == 'quantile':
+                    rebinFunc = self.rebinInQuantile
+                elif method == 'threshold':
+                    rebinFunc = self.rebinThreshold
+                else:
+                    raise RuntimeError("Could not understand rebinning method {} for histogram {}".format(method,histName))
+                rebinFunc(histName,params)
             else:
-                node = nodes[0]
-            groups_for_binning = self.quantiles[node]['groups']
-            if not set(groups_for_binning).issubset(set(self.groups.keys())):
-                raise RuntimeError('Groups {'+','.join([g for g in groups_for_binning if g not in self.groups.keys()])+'} for quantile are not in group dict')
-            hists_for_binning = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in groups_for_binning if histDict['nominal'] is not None]
-            quantiles = np.array(self.quantiles[node]['quantile'])
-            qObj = Quantile(hists_for_binning,quantiles)
+                print ('... {:20s} -> rebinning scheme not requested'.format(histName))
+        
+    def rebinClassic(self,histName,params):
+        """
+            Using the classic ROOT rebinning
+            histName: name of histogram in keys of self.content
+            params : (int) number of rebinning groups
+        """
+        assert isinstance(params,int)
+        for group,histDict in self.content[histName].items():
+            for systName,hist in histDict.items():
+                self.content[histName][group][systName].Rebin(params)
 
-            for group in self.content[histName].keys():
-                for systName,hist in self.content[histName][group].items():
-                    self.content[histName][group][systName] = qObj(hist) 
+    def rebinInQuantile(self,histName,params):
+        """
+            Using the quantile rebinning
+            histName: name of histogram in keys of self.content
+            params : (list) [quantiles (list), groups (list)]
+        """
+        from Rebinning import Quantile
+        assert isinstance(params,list)
+        assert len(params) == 2
+        assert isinstance(params[0],list)
+        assert isinstance(params[1],list)
+        quantiles = params[0]
+        groups_for_binning = params[1]
+        if not set(groups_for_binning).issubset(set(self.groups.keys())):
+            raise RuntimeError('Groups {'+','.join([g for g in groups_for_binning if g not in self.groups.keys()])+'} for quantile are not in group dict')
 
+        hists_for_binning = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in groups_for_binning if histDict['nominal'] is not None]
+        qObj = Quantile(hists_for_binning,quantiles)
+        for group in self.content[histName].keys():
+            for systName,hist in self.content[histName][group].items():
+                self.content[histName][group][systName] = qObj(hist) 
 
-    def rebinClassic(self):
-        assert isinstance(self.rebin_factor,int)
-        for histName in self.content.keys():
-            for group in self.content[histName].keys():
-                for systName in self.content[histName][group].keys():
-                    self.content[histName][group][systName].Rebin(self.rebin_factor)
-
+    def rebinThreshold(self,histName,params):
+        """
+            Using the threshold rebinning
+            histName: name of histogram in keys of self.content
+            params : (list) [thresholds (list), backgrounds (list), extra contributions (list)]
+        """
+        from Rebinning import Threshold
+        assert isinstance(params,list)
+        assert len(params) == 3
+        assert isinstance(params[0],list)
+        assert isinstance(params[1],list)
+        assert isinstance(params[2],list)
+        thresholds  = params[0]
+        backgrounds = params[1]
+        extra       = params[2]
+        if not set(backgrounds).issubset(set(self.groups.keys())):
+            raise RuntimeError('Groups {'+','.join([g for g in backgrounds if g not in self.groups.keys()])+'} for threshold are not in group dict')
+        if not set(extra).issubset(set(self.groups.keys())):
+            raise RuntimeError('Groups {'+','.join([g for g in extra if g not in self.groups.keys()])+'} for extra contributions are not in group dict')
+        hists_for_binning = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in backgrounds]
+        hists_extra       = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in extra]
+        tObj = Threshold(thresholds,hists_for_binning,True,hists_extra)
+        for group in self.content[histName].keys():
+            for systName,hist in self.content[histName][group].items():
+                self.content[histName][group][systName] = tObj(hist) 
+                
     def preparePlotIt(self,suffix=''):
         print ("Preparing plotIt root files")
         # Make new directory with root files for plotIt #
