@@ -4,6 +4,7 @@ import glob
 import copy
 import yaml
 import argparse
+import subprocess
 import numpy as np
 import math
 from itertools import chain
@@ -494,7 +495,31 @@ class DataCard:
                                                                         'era': self.era,
                                                                         'yaml': path_yaml})
         print (cmd)
-        
+        print ("Calling plotIt")
+        rc = self.run_command(cmd.split(" "),print_output=True)
+        if rc == 0:
+            return ('... success')
+        else:
+            return ('... failure')
+
+    @staticmethod
+    def run_command(command,return_output=False,print_output=False):
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+        outputs = []
+        while True:
+            out = process.stdout.readline()
+            if len(out) == 0 and process.poll() is not None:
+                break
+            if out and print_output:
+                print (out.strip())
+            if return_output:
+                outputs.append(out)
+        rc = process.poll()
+        if return_output:
+            return rc,outputs
+        else:
+            return rc
+ 
 
 
 if __name__=="__main__":
