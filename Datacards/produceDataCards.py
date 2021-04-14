@@ -17,7 +17,7 @@ from IPython import embed
 ROOT.gROOT.SetBatch(True)
 
 class DataCard:
-    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,pseudodata=False,rebin=None,produce_plots=False,**kwargs):
+    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,produce_plots=False,**kwargs):
         self.datacardName   = datacardName
         self.path           = path
         self.groups         = groups
@@ -26,6 +26,7 @@ class DataCard:
         self.use_syst       = use_syst
         self.root_subdir    = root_subdir
         self.pseudodata     = pseudodata
+        self.DYnonclosure   = DYnonclosure
         self.rebin          = rebin
         self.produce_plots  = produce_plots
         
@@ -45,6 +46,8 @@ class DataCard:
         self.loopOverFiles()
         if self.pseudodata:
             self.roundFakeData()
+        if self.DYnonclosure is not None:
+            self.applyDYNonClosure()
         if self.rebin is not None:
             self.applyRebinning()
         if self.datacardName is not None:
@@ -62,6 +65,12 @@ class DataCard:
         return newg
 
     def loopOverFiles(self):
+        self.fileHistList = []
+        for val in self.hist_conv.values():
+            if isinstance(val,list):
+                self.fileHistList.extend(val)
+            else:
+                self.fileHistList.append(val)
         if isinstance(self.path,list):
             files = set()
             for path in self.path:
@@ -120,8 +129,6 @@ class DataCard:
                     if systName == 'nominal':
                         continue
                     hist = hists[systName]
-                    #groupsyst = group + '__' + systName
-                    #if groupsyst not in self.content[histname].keys():
                     if systName not in self.content[histname][group].keys():
                         self.content[histname][group][systName] = copy.deepcopy(hist)
                     else:
@@ -164,7 +171,13 @@ class DataCard:
             sumweight = None
             br = None
         # Get list of hist names #
-        list_histnames = self.getHistList(f)
+        list_histnames = []
+        for key in f.GetListOfKeys():
+            keyName = key.GetName()
+            if not self.use_syst and '__' in keyName:
+                continue
+            if any([histname in keyName for histname in self.fileHistList]):
+                list_histnames.append(keyName)
 
         # Loop through hists #
         hist_dict = {}
@@ -172,21 +185,39 @@ class DataCard:
             hist_dict[datacardname] = {}
             if not isinstance(histnames,list):
                 histnames = [histnames]
+            # Get all defined systematics in the file histogram #
+            systPresentInFile = []
+            if self.use_syst:
+                for histname in list_histnames:
+                    if '__' not in histname:
+                        continue
+                    hName, sName = histname.split('__')
+                    if hName not in histnames:
+                        continue
+                    if sName not in systPresentInFile:
+                        systPresentInFile.append(sName)
+                # this is because if several histograms are to be summed in the conversion
+                # and one has a systematic that the other does not have, one needs to add 
+                # the nominal to fill up this missing systematic
+
             for histname in histnames:
                 # Check #
                 if not histname in list_histnames:
                     #print ("Could not find hist %s in %s"%(histname,rootfile))
                     continue
-                listsyst = [hn for hn in list_histnames if histname in hn and '__' in hn] if self.use_syst else []
                 # Nominal histogram #
-                h = self.getHistogram(f,histname,lumi,br,xsec,sumweight)
+                hnom = self.getHistogram(f,histname,lumi,br,xsec,sumweight)
                 if not 'nominal' in hist_dict[datacardname].keys():
-                    hist_dict[datacardname]['nominal'] = copy.deepcopy(h)
+                    hist_dict[datacardname]['nominal'] = copy.deepcopy(hnom)
                 else:
-                    hist_dict[datacardname]['nominal'].Add(h)
+                    hist_dict[datacardname]['nominal'].Add(hnom)
                 # Systematic histograms #
+                listsyst = [histname + '__' + systName for systName in systPresentInFile]
                 for syst in listsyst:
-                    h = self.getHistogram(f,syst,lumi,br,xsec,sumweight) 
+                    if syst in list_histnames: # systematic is there
+                        h = self.getHistogram(f,syst,lumi,br,xsec,sumweight) 
+                    else: # systematic for histogram is not present, use the nominal
+                        h = copy.deepcopy(hnom) 
                     systName = syst.split('__')[-1]
                     if systName.endswith('up'):
                         systName = systName[:-2]+"Up"
@@ -210,20 +241,9 @@ class DataCard:
             h.Scale(lumi*xsec*br/sumweight)
         return h
              
-    
-    @staticmethod
-    def getHistList(f):
-        l = []
-        for key in f.GetListOfKeys():
-            obj = key.ReadObj()
-            if "TH1" in obj.ClassName():
-                l.append(obj.GetName())
-        return l
-        
-
     def loadYaml(self,paths,yamlName):
         if not isinstance(paths,list):
-            paths = [path]
+            paths = [paths]
         yamlDict = {}
         for path in paths:
             yamlPath = os.path.join(path,yamlName)
@@ -321,6 +341,31 @@ class DataCard:
             f.Close()
             print ("Saved file %s"%filename)
 
+
+    def applyDYNonClosure(self):
+        print ('Applying DY non closure shift')
+        from DYNonClosure import NonClosureSystematic
+        dyObj = NonClosureSystematic.load_from_json(self.DYnonclosure['path'])
+        for histName in self.content.keys():
+            if histName not in self.DYnonclosure['hist']:
+                continue
+            catName = '{}_{}'.format(histName,self.era)
+            dyObj.SetCategory(catName)
+            group = self.DYnonclosure['group']
+
+            # Add non closure systematics #
+            if self.use_syst:
+                h_up, h_down = dyObj.GetNonClosureShape(self.content[histName][group]['nominal'])
+                self.content[histName][group]['dy_nonclosureUp'] = h_up
+                self.content[histName][group]['dy_nonclosureDown'] = h_down
+
+            # Scale all DY histograms based on non closure #
+            for systName in self.content[histName][group].keys():
+                if 'dy_nonclosure' in systName:
+                    continue # avoid applying twice
+                dyObj(self.content[histName][group][systName])
+                
+
     def applyRebinning(self):
         print ('Applying rebinning')
         for histName, histContent in self.content.items():
@@ -346,10 +391,12 @@ class DataCard:
             histName: name of histogram in keys of self.content
             params : (int) number of rebinning groups
         """
-        assert isinstance(params,int)
+        assert isinstance(params,list)
+        assert len(params) == 1
+        assert isinstance(params[0],int)
         for group,histDict in self.content[histName].items():
             for systName,hist in histDict.items():
-                self.content[histName][group][systName].Rebin(params)
+                self.content[histName][group][systName].Rebin(params[0])
 
     def rebinInQuantile(self,histName,params):
         """
