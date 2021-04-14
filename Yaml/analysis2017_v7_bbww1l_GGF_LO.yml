@@ -10,7 +10,7 @@ GluGluToHHTo2B2WToLNu2J_node_SM:
   generated-events: genEventSumw
   legend: 'HH#rightarrow bblql#nu (node SM)' 
   line-type: 1
-  split: 100
+  split: 1
   type: signal
   hide: True
 GluGluToHHTo2B2WToLNu2J_node_1:
@@ -21,7 +21,7 @@ GluGluToHHTo2B2WToLNu2J_node_1:
   generated-events: genEventSumw
   legend: 'HH#rightarrow bblql#nu (node 1)' 
   line-type: 1
-  split: 100
+  split: 1
   type: signal
   hide: True
 GluGluToHHTo2B2WToLNu2J_node_2:
@@ -32,7 +32,7 @@ GluGluToHHTo2B2WToLNu2J_node_2:
   generated-events: genEventSumw
   legend: 'HH#rightarrow bblql#nu (node 2)' 
   line-type: 1
-  split: 100
+  split: 1
   type: signal
   hide: True
 GluGluToHHTo2B2WToLNu2J_node_3:
@@ -43,7 +43,7 @@ GluGluToHHTo2B2WToLNu2J_node_3:
   generated-events: genEventSumw
   legend: 'HH#rightarrow bblql#nu (node 3)' 
   line-type: 1
-  split: 100
+  split: 1
   type: signal
   hide: True
 GluGluToHHTo2B2WToLNu2J_node_4:
@@ -54,7 +54,7 @@ GluGluToHHTo2B2WToLNu2J_node_4:
   generated-events: genEventSumw
   legend: 'HH#rightarrow bblql#nu (node 4)' 
   line-type: 1
-  split: 100
+  split: 1
   type: signal
   hide: True
 GluGluToHHTo2B2WToLNu2J_node_5:
@@ -65,7 +65,7 @@ GluGluToHHTo2B2WToLNu2J_node_5:
   generated-events: genEventSumw
   legend: 'HH#rightarrow bblql#nu (node 5)' 
   line-type: 1
-  split: 100
+  split: 1
   type: signal
   hide: True
 GluGluToHHTo2B2WToLNu2J_node_6:
@@ -76,7 +76,7 @@ GluGluToHHTo2B2WToLNu2J_node_6:
   generated-events: genEventSumw
   legend: 'HH#rightarrow bblql#nu (node 6)' 
   line-type: 1
-  split: 100
+  split: 1
   type: signal
   hide: True
 GluGluToHHTo2B2WToLNu2J_node_7:
@@ -87,7 +87,7 @@ GluGluToHHTo2B2WToLNu2J_node_7:
   generated-events: genEventSumw
   legend: 'HH#rightarrow bblql#nu (node 7)' 
   line-type: 1
-  split: 100
+  split: 1
   type: signal
   hide: True
 GluGluToHHTo2B2WToLNu2J_node_8:
@@ -98,7 +98,7 @@ GluGluToHHTo2B2WToLNu2J_node_8:
   generated-events: genEventSumw
   legend: 'HH#rightarrow bblql#nu (node 8)' 
   line-type: 1
-  split: 100
+  split: 1
   type: signal
   hide: True
 GluGluToHHTo2B2WToLNu2J_node_9:
@@ -109,7 +109,7 @@ GluGluToHHTo2B2WToLNu2J_node_9:
   generated-events: genEventSumw
   legend: 'HH#rightarrow bblql#nu (node 9)' 
   line-type: 1
-  split: 100
+  split: 1
   type: signal
   hide: True
 GluGluToHHTo2B2WToLNu2J_node_10:
@@ -120,7 +120,7 @@ GluGluToHHTo2B2WToLNu2J_node_10:
   generated-events: genEventSumw
   legend: 'HH#rightarrow bblql#nu (node 10)' 
   line-type: 1
-  split: 100
+  split: 1
   type: signal
   hide: True
 GluGluToHHTo2B2WToLNu2J_node_11:
@@ -131,7 +131,7 @@ GluGluToHHTo2B2WToLNu2J_node_11:
   generated-events: genEventSumw
   legend: 'HH#rightarrow bblql#nu (node 11)' 
   line-type: 1
-  split: 100
+  split: 1
   type: signal
   hide: True
 GluGluToHHTo2B2WToLNu2J_node_12:
@@ -142,6 +142,6 @@ GluGluToHHTo2B2WToLNu2J_node_12:
   generated-events: genEventSumw
   legend: 'HH#rightarrow bblql#nu (node 12)' 
   line-type: 1
-  split: 100
+  split: 1
   type: signal
   hide: True

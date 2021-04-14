@@ -30,7 +30,7 @@ targets:
   - Benchmark11
   - Benchmark12
   - BenchmarkcHHH0
-  #- BenchmarkcHHH1'
+  - BenchmarkcHHH1
   - BenchmarkcHHH2p45
   - BenchmarkcHHH5
   - Benchmarkcluster1

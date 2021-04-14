@@ -3,7 +3,7 @@
 #################################
 ##### Run A
 SingleMuon_2018A:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/SingleMuon/Run2018A-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -12,7 +12,7 @@ SingleMuon_2018A:
   - 316995
   split: 50
 DoubleMuon_2018A:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/DoubleMuon/Run2018A-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -21,7 +21,7 @@ DoubleMuon_2018A:
   - 316995
   split: 50
 EGamma_2018A:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/EGamma/Run2018A-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -30,7 +30,7 @@ EGamma_2018A:
   - 316995
   split: 50
 MuonEG_2018A:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/MuonEG/Run2018A-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -41,7 +41,7 @@ MuonEG_2018A:
 
 ##### Run B
 SingleMuon_2018B:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/SingleMuon/Run2018B-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -50,7 +50,7 @@ SingleMuon_2018B:
   - 319310
   split: 50
 DoubleMuon_2018B:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/DoubleMuon/Run2018B-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -59,7 +59,7 @@ DoubleMuon_2018B:
   - 319310
   split: 50
 EGamma_2018B:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/EGamma/Run2018B-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -68,7 +68,7 @@ EGamma_2018B:
   - 319310
   split: 50
 MuonEG_2018B:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/MuonEG/Run2018B-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -79,7 +79,7 @@ MuonEG_2018B:
 
 ##### Run C
 SingleMuon_2018C:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/SingleMuon/Run2018C-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -88,7 +88,7 @@ SingleMuon_2018C:
   - 320065
   split: 50
 DoubleMuon_2018C:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/DoubleMuon/Run2018C-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -97,7 +97,7 @@ DoubleMuon_2018C:
   - 320065
   split: 50
 EGamma_2018C:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/EGamma/Run2018C-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -106,7 +106,7 @@ EGamma_2018C:
   - 320065
   split: 50
 MuonEG_2018C:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/MuonEG/Run2018C-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -117,7 +117,7 @@ MuonEG_2018C:
 
 ##### Run D
 SingleMuon_2018D:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/SingleMuon/Run2018D-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -126,7 +126,7 @@ SingleMuon_2018D:
   - 325175
   split: 50
 DoubleMuon_2018D:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/DoubleMuon/Run2018D-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -135,7 +135,7 @@ DoubleMuon_2018D:
   - 325175
   split: 50
 EGamma_2018D:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/EGamma/Run2018D-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
@@ -144,7 +144,7 @@ EGamma_2018D:
   - 325175
   split: 50
 MuonEG_2018D:
-  certified_lumi_file: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+  certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/MuonEG/Run2018D-02Apr2020-v1/NANOAOD
   era: '2018'
   group: data
