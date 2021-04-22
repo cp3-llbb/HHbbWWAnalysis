@@ -3,7 +3,7 @@
 #################################
 ####### Run B
   SingleMuon_2017B:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/SingleElectron/Run2017B-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -12,7 +12,7 @@
     - 299329
     split: 50
   SingleElectron_2017B:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/SingleMuon/Run2017B-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -21,7 +21,7 @@
     - 299329
     split: 50
   DoubleMuon_2017B:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleMuon/Run2017B-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -30,7 +30,7 @@
     - 299329
     split: 50
   DoubleEGamma_2017B:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleEG/Run2017B-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -39,7 +39,7 @@
     - 299329
     split: 50
   MuonEG_2017B:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/MuonEG/Run2017B-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -50,7 +50,7 @@
 
 ####### Run C
   SingleMuon_2017C0:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/SingleMuon/Run2017C-02Apr2020-v1/NANOAOD
     files: ../utils/DataRuns/SingleMuon_2017C_0.txt
     era: '2017'
@@ -60,7 +60,7 @@
     - 302029
     split: 50
   SingleMuon_2017C1:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/SingleMuon/Run2017C-02Apr2020-v1/NANOAOD
     files: ../utils/DataRuns/SingleMuon_2017C_1.txt
     era: '2017'
@@ -70,7 +70,7 @@
     - 302029
     split: 5
   SingleElectron_2017C0:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/SingleElectron/Run2017C-02Apr2020-v1/NANOAOD
     files: ../utils/DataRuns/SingleElectron_2017C_0.txt
     era: '2017'
@@ -80,7 +80,7 @@
     - 302029
     split: 50
   SingleElectron_2017C1:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/SingleElectron/Run2017C-02Apr2020-v1/NANOAOD
     files: ../utils/DataRuns/SingleElectron_2017C_1.txt
     era: '2017'
@@ -90,7 +90,7 @@
     - 302029
     split: 10
   DoubleMuon_2017C0:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/DoubleMuon/Run2017C-02Apr2020-v1/NANOAOD
     files: ../utils/DataRuns/DoubleMuon_2017C_0.txt
     era: '2017'
@@ -100,7 +100,7 @@
     - 302029
     split: 50
   DoubleMuon_2017C1:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/DoubleMuon/Run2017C-02Apr2020-v1/NANOAOD
     files: ../utils/DataRuns/DoubleMuon_2017C_1.txt
     era: '2017'
@@ -110,7 +110,7 @@
     - 302029
     split: 5
   DoubleEGamma_2017C0:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/DoubleEG/Run2017C-02Apr2020-v1/NANOAOD
     files: ../utils/DataRuns/DoubleEGamma_2017C_0.txt
     era: '2017'
@@ -120,7 +120,7 @@
     - 302029
     split: 50
   DoubleEGamma_2017C1:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/DoubleEG/Run2017C-02Apr2020-v1/NANOAOD
     files: ../utils/DataRuns/DoubleEGamma_2017C_1.txt
     era: '2017'
@@ -130,7 +130,7 @@
     - 302029
     split: 10
   MuonEG_2017C0:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/MuonEG/Run2017C-02Apr2020-v1/NANOAOD
     files: ../utils/DataRuns/MuonEG_2017C_0.txt
     era: '2017'
@@ -140,7 +140,7 @@
     - 302029
     split: 50
   MuonEG_2017C1:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/MuonEG/Run2017C-02Apr2020-v1/NANOAOD
     files: ../utils/DataRuns/MuonEG_2017C_1.txt
     era: '2017'
@@ -152,7 +152,7 @@
 
 ####### Run D
   SingleMuon_2017D:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/SingleMuon/Run2017D-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -161,7 +161,7 @@
     - 303434
     split: 50
   SingleElectron_2017D:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/SingleElectron/Run2017D-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -170,7 +170,7 @@
     - 303434
     split: 50
   DoubleMuon_2017D:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleMuon/Run2017D-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -179,7 +179,7 @@
     - 303434
     split: 50
   DoubleEGamma_2017D:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleEG/Run2017D-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -188,7 +188,7 @@
     - 303434
     split: 50
   MuonEG_2017D:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/MuonEG/Run2017D-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -199,7 +199,7 @@
 
 ####### Run E
   SingleMuon_2017E:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/SingleMuon/Run2017E-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -208,7 +208,7 @@
     - 304826
     split: 50
   SingleElectron_2017E:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/SingleElectron/Run2017E-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -217,7 +217,7 @@
     - 304826
     split: 50
   DoubleMuon_2017E:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleMuon/Run2017E-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -226,7 +226,7 @@
     - 304826
     split: 50
   DoubleEGamma_2017E:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleEG/Run2017E-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -235,7 +235,7 @@
     - 304826
     split: 50
   MuonEG_2017E:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/MuonEG/Run2017E-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -246,7 +246,7 @@
 
 ####### Run F
   SingleMuon_2017F:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/SingleMuon/Run2017F-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -255,7 +255,7 @@
     - 306462
     split: 50
   SingleElectron_2017F:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/SingleElectron/Run2017F-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -264,7 +264,7 @@
     - 306462
     split: 50
   DoubleMuon_2017F:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleMuon/Run2017F-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -273,7 +273,7 @@
     - 306462
     split: 50
   DoubleEGamma_2017F:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleEG/Run2017F-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
@@ -282,7 +282,7 @@
     - 306462
     split: 50
   MuonEG_2017F:
-    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/MuonEG/Run2017F-02Apr2020-v1/NANOAOD
     era: '2017'
     group: data
