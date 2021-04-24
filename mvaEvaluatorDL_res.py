@@ -151,7 +151,7 @@ def returnHighLevelMVAInputs(self,l1,l2,met,jets,bjets,electrons,muons,channel):
                                                                                                                      (op.rng_len(bjets) == 1, op.deltaR((l1.p4+l2.p4),bjets[0].p4)),
                                                                                                                      op.deltaR((l1.p4+l2.p4),(bjets[0].p4+bjets[1].p4))),
             ('m_T',                     'Transverse mass',                        (100,0.,1000.))   : op.switch(op.rng_len(bjets) > 2,
-                                                                                                                op.sqrt(2*(l1.p4+l2.p4).pt*met.p4.E()*(1-op.cos((l1.p4+l2.p4).phi-met.phi))),
+                                                                                                                op.sqrt(2*(l1.p4+l2.p4).Pt()*met.p4.E()*(1-op.cos((l1.p4+l2.p4).Phi()-met.p4.Phi()))),
                                                                                                                 op.c_float(0.)),
             }
 
