@@ -10,8 +10,6 @@ from bamboo.analysisutils import makePileupWeight
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)))) # Add scripts in this directory
 from BaseHHtobbWW import BaseNanoHHtobbWW
 from selectionDef import *
-from highlevelLambdas import *
-from mvaEvaluatorDL import *
 
 #===============================================================================================#
 #                                 SkimmerHHtobbWW                                               #
@@ -551,15 +549,11 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         #                                    Selection tree                                     #
         #---------------------------------------------------------------------------------------#
 
-        #----- MET variables -----#
-        MET = self.corrMET
+        from mvaEvaluatorDL_res import returnMETMVAInputs,returnLeptonsMVAInputs,returnJetsMVAInputs,returnFatjetMVAInputs,returnHighLevelMVAInputs
 
-        varsToKeep['MET_pt']  = MET.pt
-        varsToKeep['MET_phi']  = MET.phi
-        varsToKeep['met_E'] = MET.p4.E()
-        varsToKeep['met_Px'] = MET.p4.Px()
-        varsToKeep['met_Py'] = MET.p4.Py()
-        varsToKeep['met_Pz'] = MET.p4.Pz()
+        #----- MET variables -----#
+        for (varName,_,_), var in returnMETMVAInputs(self,self.corrMET).items():
+            varsToKeep[varName] = var
 
         #----- Lepton variables -----#
         if self.args.Channel is None:
@@ -580,216 +574,37 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         l1 = dilepton[0]
         l2 = dilepton[1]
 
-        varsToKeep['l1_Px']     = l1.p4.Px()
-        varsToKeep['l1_Py']     = l1.p4.Py()
-        varsToKeep['l1_Pz']     = l1.p4.Pz()
-        varsToKeep['l1_E']      = l1.p4.E()
-        varsToKeep['l1_pt']     = l1.pt
-        varsToKeep['l1_eta']    = l1.eta
-        varsToKeep['l1_phi']    = l1.phi
-        varsToKeep['l1_pdgId']  = l1.pdgId
-        varsToKeep['l1_charge'] = l1.charge
-
-        varsToKeep['l2_Px']     = l2.p4.Px()
-        varsToKeep['l2_Py']     = l2.p4.Py()
-        varsToKeep['l2_Pz']     = l2.p4.Pz()
-        varsToKeep['l2_E']      = l2.p4.E()
-        varsToKeep['l2_pt']     = l2.pt
-        varsToKeep['l2_eta']    = l2.eta
-        varsToKeep['l2_phi']    = l2.phi
-        varsToKeep['l2_pdgId']  = l2.pdgId
-        varsToKeep['l2_charge'] = l2.charge
-
-#        if self.args.Channel == "ElEl":
-#            varsToKeep['l1_conept'] = self.electron_conept[l1.idx]
-#            varsToKeep['l2_conept'] = self.electron_conept[l2.idx]
-#        if self.args.Channel == "MuMu":
-#            varsToKeep['l1_conept'] = self.muon_conept[l1.idx]
-#            varsToKeep['l2_conept'] = self.muon_conept[l2.idx]
-#        if self.args.Channel == "ElMu":
-#            varsToKeep['l1_conept'] = self.electron_conept[l1.idx]
-#            varsToKeep['l2_conept'] = self.muon_conept[l2.idx]
-#
-#        varsToKeep['ll_pt'] = (l1.p4+l2.p4).Pt()
-#        varsToKeep['ll_DR'] = op.deltaR(l1.p4,l2.p4)
-#        varsToKeep['ll_DPhi'] = op.deltaPhi(l1.p4,l2.p4) # Might need abs
-#
-#        varsToKeep['llmet_DPhi'] = self.HLL.DilepMET_deltaPhi(l1,l2,MET)
-#        varsToKeep['llmet_pt'] = self.HLL.DilepMET_Pt(l1,l2,MET)
-#
-#        varsToKeep['ll_M'] = op.invariant_mass(l1.p4,l2.p4) 
-#        varsToKeep['ll_MT'] = self.HLL.MT_ll(l1,l2,MET)
+        for (varName,_,_), var in returnLeptonsMVAInputs(self,l1,l2,self.args.Channel).items():
+            varsToKeep[varName] = var
 
         #----- Jet variables -----#
-        empty_p4 = op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >",([op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.)]))
-        if any([self.args.__dict__[item] for item in ["Resolved0Btag","Resolved1Btag","Resolved2Btag"]]):
-            if self.args.Resolved0Btag:
-                j1 = self.ak4LightJetsByBtagScore[0]
-                j2 = self.ak4LightJetsByBtagScore[1]
-            if self.args.Resolved1Btag:
-                j1 = self.ak4BJets[0]
-                j2 = self.ak4LightJetsByBtagScore[0]
-            if self.args.Resolved2Btag:
-                j1 = self.ak4BJets[0]
-                j2 = self.ak4BJets[1]
-
-#            varsToKeep['j1_Px']  = j1.p4.Px()
-#            varsToKeep['j1_Py']  = j1.p4.Py()
-#            varsToKeep['j1_Pz']  = j1.p4.Pz()
-#            varsToKeep['j1_E']   = j1.p4.E()
-#            varsToKeep['j1_pt']  = j1.pt
-#            varsToKeep['j1_eta'] = j1.eta
-#            varsToKeep['j1_phi'] = j1.phi
-#            varsToKeep['j1_btag']= j1.btagDeepFlavB
-#
-#            varsToKeep['j2_Px']  = j2.p4.Px()
-#            varsToKeep['j2_Py']  = j2.p4.Py()
-#            varsToKeep['j2_Pz']  = j2.p4.Pz()
-#            varsToKeep['j2_E']   = j2.p4.E()
-#            varsToKeep['j2_pt']  = j2.pt
-#            varsToKeep['j2_eta'] = j2.eta
-#            varsToKeep['j2_phi'] = j2.phi
-#            varsToKeep['j2_btag']= j2.btagDeepFlavB
-#
-#            varsToKeep['jj_pt'] = (j1.p4+j2.p4).Pt()
-#            varsToKeep['jj_DR'] = op.deltaR(j1.p4,j2.p4)
-#            varsToKeep['jj_DPhi'] = op.deltaPhi(j1.p4,j2.p4) # Might need abs
-#            varsToKeep['jj_M'] = op.invariant_mass(j1.p4,j2.p4) 
-#
-#            varsToKeep['lljj_M'] = self.HLL.M_lljj(l1,l2,j1,j2)
-#            varsToKeep['lljj_MT'] = self.HLL.MT_lljj(l1,l2,j1,j2,MET)
-#            varsToKeep['lj_MinDR'] = self.HLL.MinDR_lj(l1,l2,j1,j2)
-#            varsToKeep['l1_jetsMinDR'] = self.HLL.JetsMinDR(l1,j1,j2)
-#            varsToKeep['l2_jetsMinDR'] = self.HLL.JetsMinDR(l2,j1,j2)
-#            varsToKeep['j1_lepsMinDR'] = self.HLL.LepsMinDR(j1,l1,l2)
-#            varsToKeep['j2_lepsMinDR'] = self.HLL.LepsMinDR(j2,l1,l2)
-#            varsToKeep['HT2'] = self.HLL.HT2(l1,l2,j1,j2,MET)
-#            varsToKeep['HT2R'] = self.HLL.HT2R(l1,l2,j1,j2,MET)
-#            #varsToKeep['jj_mRegCorr'] = op.invariant_mass(self.HLL.bJetCorrP4(j1), self.HLL.bJetCorrP4(j2)),
-#
-#            varsToKeep['MET_LD'] = self.HLL.MET_LD_DL(MET,self.ak4Jets,self.electronsFakeSel,self.muonsFakeSel)
-#
-#            varsToKeep['n_ak4'] = op.static_cast("UInt_t",op.rng_len(self.ak4Jets))
-#            varsToKeep['n_ak4_btag'] = op.static_cast("UInt_t",op.rng_len(self.ak4BJets))
-
+        for (varName,_,_), var in returnJetsMVAInputs(self,self.ak4Jets).items():
+            varsToKeep[varName] = var
 
         #----- Fatjet variables -----#
-        if any([self.args.__dict__[item] for item in ["Ak8","Boosted0Btag","Boosted1Btag"]]):
-            if self.args.Ak8:
-                fatjet = self.ak8Jets[0]
-            if self.args.Boosted0Btag:
-                fatjet = self.ak8Jets[0]
-            if self.args.Boosted1Btag:
-                fatjet = self.ak8BJets[0]
+        for (varName,_,_), var in returnFatjetMVAInputs(self,self.ak8Jets).items():
+            varsToKeep[varName] = var
 
-            j1 = fatjet.subJet1
-            j2 = fatjet.subJet2
+        #----- High level variables -----#
+        for (varName,_,_), var in returnHighLevelMVAInputs(self, \
+                                                           l1        = l1, \
+                                                           l2        = l2, \
+                                                           met       = self.corrMET, \
+                                                           jets      = self.ak4Jets, \
+                                                           bjets     = self.ak4JetsByBtagScore[:op.min(op.rng_len(self.ak4JetsByBtagScore),op.static_cast("std::size_t",op.c_int(2)))], \
+                                                           electrons = self.electronsTightSel, \
+                                                           muons     = self.muonsTightSel,     \
+                                                           channel   = self.args.Channel).items():
+            varsToKeep[varName] = var
 
-#            varsToKeep['j1_Px']  = j1.p4.Px()
-#            varsToKeep['j1_Py']  = j1.p4.Py()
-#            varsToKeep['j1_Pz']  = j1.p4.Pz()
-#            varsToKeep['j1_E']   = j1.p4.E()
-#            varsToKeep['j1_pt']  = j1.pt
-#            varsToKeep['j1_eta'] = j1.eta
-#            varsToKeep['j1_phi'] = j1.phi
-#            varsToKeep['j1_btag']= j1.btagDeepB
-#
-#            varsToKeep['j2_Px']  = j2.p4.Px()
-#            varsToKeep['j2_Py']  = j2.p4.Py()
-#            varsToKeep['j2_Pz']  = j2.p4.Pz()
-#            varsToKeep['j2_E']   = j2.p4.E()
-#            varsToKeep['j2_pt']  = j2.pt
-#            varsToKeep['j2_eta'] = j2.eta
-#            varsToKeep['j2_phi'] = j2.phi
-#            varsToKeep['j2_btag']= j2.btagDeepB
-#
-#            varsToKeep['fatjet_Px']  = fatjet.p4.Px()
-#            varsToKeep['fatjet_Py']  = fatjet.p4.Py()
-#            varsToKeep['fatjet_Pz']  = fatjet.p4.Pz()
-#            varsToKeep['fatjet_E']   = fatjet.p4.E()
-#            varsToKeep['fatjet_pt']  = fatjet.pt
-#            varsToKeep['fatjet_eta'] = fatjet.eta
-#            varsToKeep['fatjet_phi'] = fatjet.phi
-#            varsToKeep['fatjet_softdropMass'] = fatjet.msoftdrop
-#            varsToKeep['fatjet_btagDeepB'] = fatjet.btagDeepB
-#            varsToKeep['fatjet_btagHbb'] = fatjet.btagHbb
-#
-#            varsToKeep['jj_pt'] = (j1.p4+j2.p4).Pt()
-#            varsToKeep['jj_DR'] = op.deltaR(j1.p4,j2.p4)
-#            varsToKeep['jj_DPhi'] = op.deltaPhi(j1.p4,j2.p4) # Might need abs
-#            varsToKeep['jj_M'] = op.invariant_mass(j1.p4,j2.p4) 
-#
-#            varsToKeep['lljj_M'] = self.HLL.M_lljj(l1,l2,j1,j2)
-#            varsToKeep['lljj_MT'] = self.HLL.MT_lljj(l1,l2,j1,j2,MET)
-#            varsToKeep['lj_MinDR'] = self.HLL.MinDR_lj(l1,l2,j1,j2)
-#            varsToKeep['l1_jetsMinDR'] = self.HLL.JetsMinDR(l1,j1,j2)
-#            varsToKeep['l2_jetsMinDR'] = self.HLL.JetsMinDR(l2,j1,j2)
-#            varsToKeep['j1_lepsMinDR'] = self.HLL.LepsMinDR(j1,l1,l2)
-#            varsToKeep['j2_lepsMinDR'] = self.HLL.LepsMinDR(j2,l1,l2)
-#            varsToKeep['HT2'] = self.HLL.HT2(l1,l2,j1,j2,MET)
-#            varsToKeep['HT2R'] = self.HLL.HT2R(l1,l2,j1,j2,MET)
-#
-#            varsToKeep['MET_LD'] = self.HLL.MET_LD_DL(MET,self.ak4Jets,self.electronsFakeSel,self.muonsFakeSel)
-#
-#            varsToKeep['n_ak8'] = op.static_cast("UInt_t",op.rng_len(self.ak8Jets))
-#            varsToKeep['n_ak8_btag'] = op.static_cast("UInt_t",op.rng_len(self.ak8BJets))
-
-        if any([self.args.__dict__[item] for item in ["Boosted0Btag","Boosted1Btag","Resolved0Btag","Resolved1Btag","Resolved2Btag"]]):
-
-            varsToKeep['n_ak4'] = op.static_cast("UInt_t",op.rng_len(self.ak4Jets))
-            varsToKeep['n_ak4_btag'] = op.static_cast("UInt_t",op.rng_len(self.ak4BJets))
-            varsToKeep['n_ak8'] = op.static_cast("UInt_t",op.rng_len(self.ak8Jets))
-            varsToKeep['n_ak8_btag'] = op.static_cast("UInt_t",op.rng_len(self.ak8BJets))
-
-            # DNN #
-            inputsLeps = returnLeptonsMVAInputs(self     = self,
-                                                l1       = l1,
-                                                l2       = l2,
-                                                channel  = self.args.Channel)
-            inputsJets =    returnJetsMVAInputs(self = self,
-                                                jets = self.ak4Jets)
-            inputsMET =      returnMETMVAInputs(self = self,
-                                                met  = self.corrMET)     
-            inputsFatjet =  returnFatjetMVAInputs(self      = self,
-                                                  fatjets   = self.ak8Jets)
-            inputsHL = returnHighLevelMVAInputs(self      = self,
-                                                l1        = l1,
-                                                l2        = l2,
-                                                met       = self.corrMET,
-                                                jets      = self.ak4Jets,
-                                                bjets     = self.ak4JetsByBtagScore[:op.min(op.rng_len(self.ak4JetsByBtagScore),op.static_cast("std::size_t",op.c_int(2)))],
-                                                electrons = self.electronsTightSel,
-                                                muons     = self.muonsTightSel,
-                                                channel   = self.args.Channel)
-            inputsParam = returnParamMVAInputs(self)
-            inputsEventNr = returnEventNrMVAInputs(self,t)
-
-            inputs = {**inputsLeps,**inputsJets,**inputsFatjet,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
-            for (varname,_,_),var in inputs.items():
-                varsToKeep[varname] = var
-
-#            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','10','model','model.pb')
-#            nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
-#            print ("DNN model : %s"%path_model)
-#            if not os.path.exists(path_model):
-#                raise RuntimeError('Could not find model file %s'%path_model)
-#            try:
-#                #input_names = ["input_1","input_2","input_3","input_4","input_5","input_6"]
-#                input_names = ["lep","jet","fat","met","hl","param","eventnr"]
-#                output_name = "Identity"
-#                DNN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
-#            except:
-#                raise RuntimeError('Could not load model %s'%path_model)
-#            outputs = DNN(*inputs.values())
-#            for node, output in zip(nodes,outputs): 
-#                varsToKeep[node] = output
 
         #----- Additional variables -----#
         if self.is_MC:
-            varsToKeep["MC_weight"]         = t.genWeight
-        varsToKeep['total_weight']      = selObj.sel.weight
-#        varsToKeep["event"]             = None # Already in tree
-#        varsToKeep["run"]               = None # Already in tree 
-#        varsToKeep["ls"]                = t.luminosityBlock
+            varsToKeep["MC_weight"] = t.genWeight
+        varsToKeep['total_weight']  = selObj.sel.weight
+        varsToKeep['era']           = op.c_int(int(self.era))
+        varsToKeep["event"]         = None # Already in tree
+        varsToKeep["run"]           = None # Already in tree 
+        varsToKeep["ls"]            = t.luminosityBlock
 
         return selObj.sel, varsToKeep

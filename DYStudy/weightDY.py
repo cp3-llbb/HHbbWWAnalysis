@@ -84,7 +84,7 @@ class WeightDY:
             histograms = [histograms]
 
         # Get YAML info #
-        yaml_dict = self.loadYaml(os.path.join(directory,'plots_FakeExtrapolation.yml'),histograms)
+        yaml_dict = self.loadYaml(os.path.join(directory,'plots.yml'),histograms)
 
         # Loop over file to recover histograms #
         hist_dict = {}
@@ -663,8 +663,6 @@ class WeightDY:
         for name in ['ZVeto_0b','ZVeto_1b','ZVeto_2b','ZPeak_0b','ZPeak_1b','ZPeak_2b']:
             histograms[name].Scale(1./ histograms[name].Integral()) 
 
-        amax = max([histograms[k].GetMaximum() for k in ['ZVeto_0b','ZPeak_0b','ZPeak_1b','ZPeak_2b']])
-
         C = ROOT.TCanvas("c1", "c1", 600, 700)
 
         pad1 = ROOT.TPad("pad1", "pad1", 0., 0., 1., 1.0)
@@ -673,7 +671,7 @@ class WeightDY:
         pad1.SetLeftMargin(0.12)
         pad1.SetRightMargin(0.1)
         pad1.SetGridx()
-        pad1.SetGridy()
+        #pad1.SetGridy()
         
         pad2 = ROOT.TPad("pad2", "pad2", 0, 0.0, 1., 0.5)
         pad2.SetTopMargin(0.)
@@ -696,30 +694,31 @@ class WeightDY:
         #pad3.Draw()
 
         ##########  PAD 1 ##########
-        amax = max([histograms[k].GetMaximum() for k in ['ZVeto_0b','ZPeak_0b','ZPeak_2b','ZPeak_1b','ZPeak_1b']])
+
+        pad1.SetLogy(True)
+
+        histograms['ZVeto_0b'].Rebin(20)
+        histograms['ZVeto_1b'].Rebin(20)
+        histograms['ZVeto_2b'].Rebin(20)
+        histograms['ZPeak_0b'].Rebin(20)
+        histograms['ZPeak_1b'].Rebin(20)
+        histograms['ZPeak_2b'].Rebin(20)
+
+        amax = 2 * max([histograms[k].GetMaximum() for k in ['ZVeto_0b','ZPeak_0b','ZPeak_2b','ZPeak_1b','ZPeak_1b']])
 
         pad1.cd()
 
-        histograms['ZVeto_0b'].SetMaximum(amax*1.2)
-        histograms['ZVeto_0b'].SetMinimum(0)
-        histograms['ZVeto_0b'].GetYaxis().SetTitle("Normalized events")
-        histograms['ZVeto_0b'].GetYaxis().SetTitleSize(0.035)
-        histograms['ZVeto_0b'].GetYaxis().SetTitleOffset(1.30)
-        histograms['ZVeto_0b'].GetYaxis().SetLabelSize(0.02)
-        histograms['ZVeto_0b'].GetXaxis().SetTitleSize(0.)
-        histograms['ZVeto_0b'].GetXaxis().SetLabelSize(0.)
-        histograms['ZVeto_0b'].SetTitle(self.title)
 
-        histograms['ZVeto_0b'].SetLineWidth(2) 
-        histograms['ZVeto_0b'].SetLineStyle(2) 
-        histograms['ZVeto_0b'].SetLineColor(418) 
-        histograms['ZVeto_1b'].SetLineWidth(2) 
-        histograms['ZVeto_1b'].SetLineColor(602) 
-        histograms['ZVeto_1b'].SetLineStyle(2) 
-        if self.cat == 'resolved':
-            histograms['ZVeto_2b'].SetLineWidth(2) 
-            histograms['ZVeto_2b'].SetLineColor(634) 
-            histograms['ZVeto_2b'].SetLineStyle(2) 
+        histograms['ZPeak_0b'].SetMaximum(amax)
+        #histograms['ZPeak_0b'].SetMinimum(0)
+        histograms['ZPeak_0b'].GetYaxis().SetTitle("Normalized yield")
+        histograms['ZPeak_0b'].GetYaxis().SetTitleSize(0.035)
+        histograms['ZPeak_0b'].GetYaxis().SetTitleOffset(1.30)
+        histograms['ZPeak_0b'].GetYaxis().SetLabelSize(0.02)
+        histograms['ZPeak_0b'].GetXaxis().SetTitleSize(0.)
+        histograms['ZPeak_0b'].GetXaxis().SetLabelSize(0.)
+        histograms['ZPeak_0b'].SetTitle(self.title)
+
         histograms['ZPeak_0b'].SetLineWidth(2) 
         histograms['ZPeak_0b'].SetLineColor(418) 
         histograms['ZPeak_1b'].SetLineWidth(2) 
@@ -728,27 +727,43 @@ class WeightDY:
             histograms['ZPeak_2b'].SetLineWidth(2) 
             histograms['ZPeak_2b'].SetLineColor(634) 
 
-
-        histograms['ZVeto_0b'].Draw("hist")
-        histograms['ZVeto_1b'].Draw("same hist")
+        histograms['ZVeto_0b'].SetLineWidth(1) 
+        histograms['ZVeto_0b'].SetLineColor(418) 
+        histograms['ZVeto_0b'].SetMarkerColor(418) 
+        histograms['ZVeto_0b'].SetMarkerStyle(23) 
+        histograms['ZVeto_0b'].SetMarkerSize(0.8) 
+        histograms['ZVeto_1b'].SetLineWidth(1) 
+        histograms['ZVeto_1b'].SetLineColor(602) 
+        histograms['ZVeto_1b'].SetMarkerColor(602) 
+        histograms['ZVeto_1b'].SetMarkerStyle(23) 
+        histograms['ZVeto_1b'].SetMarkerSize(0.8) 
         if self.cat == 'resolved':
-            histograms['ZVeto_2b'].Draw("hist same")
-        histograms['ZPeak_0b'].Draw("same hist")
-        histograms['ZPeak_1b'].Draw("same hist")
+            histograms['ZVeto_2b'].SetLineWidth(1) 
+            histograms['ZVeto_2b'].SetLineColor(634) 
+            histograms['ZVeto_2b'].SetMarkerColor(634) 
+            histograms['ZVeto_2b'].SetMarkerStyle(23) 
+            histograms['ZVeto_2b'].SetMarkerSize(0.8) 
+
+        histograms['ZPeak_0b'].Draw("hist")
+        histograms['ZPeak_1b'].Draw("hist same")
         if self.cat == 'resolved':
             histograms['ZPeak_2b'].Draw("hist same")
+        histograms['ZVeto_0b'].Draw("e1p same")
+        histograms['ZVeto_1b'].Draw("e1p same")
+        if self.cat == 'resolved':
+            histograms['ZVeto_2b'].Draw("e1p same")
 
         leg1 = ROOT.TLegend(0.65,0.70,0.95,0.95)
         leg1.SetTextSize(0.015)
         mode = "DY data estimation" if self.mode == "data" else "DY MC"
-        leg1.AddEntry(histograms['ZVeto_0b'],"#splitline{Z Veto 0 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZVeto0b))
-        leg1.AddEntry(histograms['ZVeto_1b'],"#splitline{Z Veto 1 btag (DY MC)}{Integral = %0.2f}"%(self.N_ZVeto1b))
-        if self.cat == 'resolved':
-            leg1.AddEntry(histograms['ZVeto_2b'],"#splitline{Z Veto 2 btag (DY MC)}{Integral = %0.2f}"%(self.N_ZVeto2b))
         leg1.AddEntry(histograms['ZPeak_0b'],"#splitline{Z Peak 0 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak0b))
         leg1.AddEntry(histograms['ZPeak_1b'],"#splitline{Z Peak 1 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak1b))
         if self.cat == 'resolved':
             leg1.AddEntry(histograms['ZPeak_2b'],"#splitline{Z Peak 2 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZPeak2b))
+        leg1.AddEntry(histograms['ZVeto_0b'],"#splitline{Z Veto 0 btag (%s)}{Integral = %0.2f}"%(mode,self.N_ZVeto0b))
+        leg1.AddEntry(histograms['ZVeto_1b'],"#splitline{Z Veto 1 btag (DY MC)}{Integral = %0.2f}"%(self.N_ZVeto1b))
+        if self.cat == 'resolved':
+            leg1.AddEntry(histograms['ZVeto_2b'],"#splitline{Z Veto 2 btag (DY MC)}{Integral = %0.2f}"%(self.N_ZVeto2b))
         leg1.Draw()
 
         if self.normalize:
@@ -759,7 +774,7 @@ class WeightDY:
                 text.AddText("N_{Z peak}^{2b}/N_{Z peak}^{0b} = %0.5f"%self.factor_2b)
             #text.AddText("N_{Z veto}^{0b} = %0.5f"%self.factor_ZVeto)
             text.SetBorderSize(0)
-            text.Draw()
+            #text.Draw()
 
 
         ##########  PAD 2 ##########
@@ -772,7 +787,7 @@ class WeightDY:
 
         #content_w1b = np.ravel(hist2array(self.weight_1b))
         #self.weight_1b.SetMaximum(np.percentile(content_w1b,99))
-        self.weight_1b.SetMinimum(0.)
+        #self.weight_1b.SetMinimum(0.)
         self.weight_1b.SetLineWidth(2)
         self.weight_1b.SetLineColor(602)
         #self.weight.SetLineWidth(2)

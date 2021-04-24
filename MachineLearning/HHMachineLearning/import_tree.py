@@ -20,7 +20,7 @@ from ROOT import TChain, TFile, TTree
 # Tree2Pandas#
 ###############################################################################
 
-def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_weight_sum=None, luminosity=None, tree_name='tree',start=None,stop=None,additional_columns={}):
+def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_weight_sum=None, luminosity=None, paramFun=None, tree_name='tree',start=None,stop=None,additional_columns={}):
     """
     Convert a ROOT TTree to a pandas DF
     """
@@ -84,6 +84,13 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
     else:
         df['event_weight'] = np.ones(df.shape[0])
 
+    if paramFun is not None:
+        assert callable(paramFun)
+        param = paramFun(os.path.basename(input_file))
+        if param is None:
+            param = 0
+        df['param'] = np.ones(df.shape[0]) * param
+
     # Register additional columns #
     if len(additional_columns.keys()) != 0:
         for key,val in additional_columns.items():
@@ -102,7 +109,7 @@ def Tree2Pandas(input_file, variables, weight=None, cut=None, xsec=None, event_w
 # LoopOverTrees #
 ###############################################################################
 
-def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=None, xsec_dict=None, event_weight_sum_dict=None, lumi_dict=None, eras=None, tree_name='tree', list_sample=None, start=None, stop=None):
+def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=None, xsec_dict=None, event_weight_sum_dict=None, lumi_dict=None, eras=None, paramFun=None, tree_name='tree', list_sample=None, start=None, stop=None):
     """
     Loop over ROOT trees inside input_dir and process them using Tree2Pandas.
     """
@@ -192,6 +199,7 @@ def LoopOverTrees(input_dir, variables, weight=None, additional_columns={}, cut=
                          event_weight_sum           = event_weight_sum,
                          luminosity                 = luminosity,
                          tree_name                  = tree_name,
+                         paramFun                   = paramFun,
                          start                      = ni,
                          stop                       = nf)
         if df is None:

@@ -1,0 +1,172 @@
+tree: Events
+eras:
+  '2017': 
+    luminosity: 1000
+    luminosity-error: 0.025   
+
+samples:
+  GluGluToBulkGravitonToHHTo2B2Tau_M-2500: # fails ak4b
+    cross-section: 1.
+    branching-ratio: 0.073056256
+    db: das:/GluGluToBulkGravitonToHHTo2B2Tau_M-2500_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+    era: '2017'
+    generated-events: genEventSumw
+    legend: 'G#rightarrowHH#rightarrowbb#tau#tau (M = 2500)' 
+    line-type: 1
+    line-color: "#288a24"
+    split: 1
+    order: 10
+    type: signal
+    hide: True
+  GluGluToRadionToHHTo2B2WToLNu2J_M-2500:  # fails ak4l
+    cross-section: 1.
+    branching-ratio: 0.109369082142029
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-2500_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8    /RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+    era: '2017'
+    generated-events: genEventSumw
+    legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 2500)'
+    line-type: 1
+    line-color: "#288a24"
+    split: 1
+    order: 10
+    type: signal
+    hide: True
+ 
+  GluGluToRadionToHHTo2B2WToLNu2J_M-3000: # fails ak4l
+    cross-section: 1.
+    branching-ratio: 0.109369082142029
+    db: das:/GluGluToRadionToHHTo2B2WToLNu2J_M-3000_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8    /RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM
+    era: '2017'
+    generated-events: genEventSumw
+    legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 3000)'
+    line-type: 1
+    line-color: "#288a24"
+    split: 1
+    order: 10
+    type: signal
+    hide: True
+
+
+
+
+### Datadriven 
+datadriven:
+  DYEstimation:
+    replaces: DY
+    uses: all
+  FakeExtrapolation:
+    replaces: all
+    uses: all
+  PseudoData:
+    replaces: all
+    uses: all
+
+
+
+#### plotIt
+plotIt:
+  configuration:
+    width: 800
+    height: 599
+    luminosity-label: '%1$.2f fb^{-1} (13 TeV)'  #TODO
+    experiment: CMS
+    extra-label: 2016 Data -- Work in progress
+    show-overflow: true
+    margin-left: 0.15
+    margin-right: 0.03
+    margin-top: 0.05 
+    margin-bottom: 0.13
+  legend:
+    position: [0.7, 0.6, 0.91, 0.91]
+  groups:
+    data:
+      legend: data
+    ttbar:
+      fill-color: "#cc7a16"
+      legend: tt
+      order: 1
+    ST:
+      fill-color: "#99053d"
+      legend: Single Top
+      order: 2
+    DY:
+      fill-color: "#1a83a1"
+      legend: Drell-Yan
+      order: 3
+    Wjets:
+      fill-color: "#d95564"
+      legend: W+jets
+      order: 4
+    VVV: 
+      fill-color: "#ccbf45"
+      legend: VV(V)
+      order: 5
+    ttVV:
+      fill-color: "#174704"
+      legend: tt+V(V)
+      order: 6
+    SM:
+      fill-color: "#06b894"
+      legend: SM Higgs (ggH, qqH, ttH, ZH)
+      order: 7
+    Rares:
+      fill-color: "#610596"
+      legend: Rares
+      order: 8
+    DYEstimation:
+      fill-color: "#1a83a1"
+      legend: Drell-Yan (from data)
+      order: 9
+    Fake:
+      fill-color: "#6e3303"
+      legend: Fake
+      order: 10
+  systematics:
+      # on the jets
+    - jer
+    - jesTotal
+      # on the lepton id
+    - mu_loose
+    - mu_tightmva
+    - el_looserecoptlt20
+    - el_looserecoptgt20
+    - el_looseid
+    - el_looseeff
+    - el_tightmva
+     # on the lepton trigger 
+    - ttH_singleElectron_trigSF
+    - ttH_singleMuon_trigSF
+    - ttH_doubleElectron_trigSF 
+    - ttH_doubleMuon_trigSF
+    - ttH_electronMuon_trigSF
+     # on the pileup
+    - pileup
+      # on the jet btagging
+    - deepjet
+    #- deepcsv
+    # Btag SF #
+    - btagSF_lf
+    - btagSF_hf
+    - btagSF_hfstats1
+    - btagSF_hfstats2
+    - btagSF_lfstats1
+    - btagSF_lfstats2
+    - btagSF_cferr1
+    - btagSF_cferr2
+    # Top pt reweighting #
+    - topPtReweighting
+    # Btag reweighting
+    - btag_ratio
+    # DY weight #
+    - dy_reweighting_elel
+    - dy_reweighting_mumu
+    # Fake factor
+    - el_FR_pt_syst
+    - el_FR_barrel_syst
+    - el_FR_norm_syst
+    - electronCorrFR
+    - mu_FR_pt_syst
+    - mu_FR_barrel_syst
+    - mu_FR_norm_syst
+    - muonCorrFR
+

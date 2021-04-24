@@ -11,6 +11,7 @@ uses:
   - node_6
   - node_7
   - node_8
+  - node_8
   - node_9
   - node_10
   - node_11
@@ -25,12 +26,13 @@ targets:
   - Benchmark6
   - Benchmark7
   - Benchmark8
+  - Benchmark8a
   - Benchmark9
   - Benchmark10
   - Benchmark11
   - Benchmark12
   - BenchmarkcHHH0
-  #- BenchmarkcHHH1'
+  - BenchmarkcHHH1
   - BenchmarkcHHH2p45
   - BenchmarkcHHH5
   - Benchmarkcluster1
