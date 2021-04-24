@@ -18,7 +18,7 @@ from BaseHHtobbWW import BaseNanoHHtobbWW
 from plotDef import *
 from selectionDef import *
 from DDHelper import DataDrivenFake, DataDrivenDY
-from mvaEvaluatorDL import *
+from mvaEvaluatorDL_nonres import *
 
 def switch_on_index(indexes, condition, contA, contB):
     if contA._base != contB._base:
@@ -355,6 +355,8 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 ChannelDictList.append({'channel': 'ElMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'b1':container2b0j[0],'b2':container2b0j[1],'sel':ElMuSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':ElMuSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
 
         for channelDict in ChannelDictList:
+            # Branch out the LO -> NLO reweighting #
+            channelDict["sel"] = self.addSignalReweighting(channelDict["sel"])
             plots.extend(makeDoubleLeptonSelectedResolvedVariables(**channelDict,HLL=self.HLL))
 
         #----- Selected variables : Boosted -----#
@@ -457,24 +459,12 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             output = DNN(*inputs)
             selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,suffix=model_num)
 
+            # Branch out the LO -> NLO reweighting #
+            for node in selObjNodesDict.values():
+                node.sel = self.addSignalReweighting(node.sel)
+
             plots.extend(makeDoubleLeptonMachineLearningExclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
             #plots.extend(makeDoubleLeptonMachineLearningInclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
-
-#            # DY datadriven investigations #
-#            selDY = selObjNodesDict['DY']
-#            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selDY.sel,selDY.selName,selObjectDict['channel'],inputsLeps))
-#            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selDY.sel,selDY.selName,selObjectDict['channel'],inputsJets))
-#            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selDY.sel,selDY.selName,selObjectDict['channel'],inputsFatjet))
-#            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selDY.sel,selDY.selName,selObjectDict['channel'],inputsMET))
-#            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selDY.sel,selDY.selName,selObjectDict['channel'],inputsHL))
-#
-#            selDY.selName += "CutDYNode0p4"
-#            selDY.refine(cut=[output[3]>=0.4])
-#            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selDY.sel,selDY.selName,selObjectDict['channel'],inputsLeps))
-#            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selDY.sel,selDY.selName,selObjectDict['channel'],inputsJets))
-#            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selDY.sel,selDY.selName,selObjectDict['channel'],inputsFatjet))
-#            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selDY.sel,selDY.selName,selObjectDict['channel'],inputsMET))
-#            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selDY.sel,selDY.selName,selObjectDict['channel'],inputsHL))
 
 
 

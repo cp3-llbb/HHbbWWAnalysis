@@ -60,21 +60,22 @@ split_per_model = True # in case of cross validation, to send one job per model 
 
 ##################################  Naming ######################################
 # Physics Config #
-config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL_BSM.yml')
+config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL_res.yml')
 lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
 #eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
 eras = [2018]
 
-categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj']
+#categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj']
+categories = ['resolved2b2Wj']
 #categories = ['boosted2b2Wj','boosted2b1Wj', 'boosted2b0Wj']
-channels = ['El','Mu']
+#channels = ['El','Mu']
+channels = ['El']
 
 # Better put them in alphabetical order
-nodes = ['Ewk','GGF','H','Top','VBF','WJets']
+nodes = ['Ewk','GGF','H','Top','WJets']
 
 weight_groups = [
                   (1.0, ('GGF')),
-                  (1.0, ('VBF')),
                   (1.0, ('H')),
                   (1.0, ('Ewk')),
                   (1.0, ('Top')),
@@ -103,7 +104,6 @@ node_colors = {
             'GGF'   : '#288a24',
             'H'     : '#06b894',
             'Top'    : '#cc7a16',
-            'VBF'   : '#8f0a1e',
             'WJets' : '#d95564',
              }
 
@@ -209,17 +209,17 @@ inputs = [
             ###########################
             # Onehot #
             #'$era@op_era',
-            'lep_pdgId@op_pdgid',
-            'lep_charge@op_charge',
-            'JPAcat@op_resolved_jpacat',
+            'leppdgId@op_pdgid',
+            'lepcharge@op_charge',
+            #'JPAcat@op_resolved_jpacat',
             # JPA values #
-            'L2_2b2Wj',
-            'L2_2b1Wj',
-            'L2_2b0Wj',
-            'L2_1b2Wj',
-            'L2_1b1Wj',
-            'L2_1b0Wj',
-            'L2_0b',
+#            'L2_2b2Wj',
+#            'L2_2b1Wj',
+#            'L2_2b0Wj',
+#            'L2_1b2Wj',
+#            'L2_1b1Wj',
+#            'L2_1b0Wj',
+#            'L2_0b',
             # LL variables #
 #            'METpt',               
             'METpx',               # discard               
@@ -446,7 +446,6 @@ outputs = [
             '$GGF',
             '$H',
             '$Top',
-            '$VBF',
             '$WJets',
           ] 
 

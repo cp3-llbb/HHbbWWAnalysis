@@ -381,6 +381,8 @@ class DataCard:
             print (f"Saved file {shapes[histName]}")
 
         # Save txt file #
+        if self.textfiles is None:
+            self.textfiles = '{}.txt'
         if '{}' not in self.textfiles:
             print ('Will create a single datacard txt file for all the categories')
             writer = Writer([f'{histName}_{self.era}' for histName in self.content.keys()])
