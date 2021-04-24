@@ -238,3 +238,15 @@ class Threshold(Rebin):
                 tidx -= 1
         return idx[1 + tidx :]     
 
+class Boundary(Rebin):
+    """
+        Applied boundary binning 
+        Rebin with the given boundaries for the bin edges
+    """
+    def __init__(self, boundaries):
+        """
+            boundaries : list of bin edges
+        """
+        self.ne = np.array(boundaries)
+
+

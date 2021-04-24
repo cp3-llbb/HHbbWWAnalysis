@@ -17,23 +17,30 @@ from IPython import embed
 ROOT.gROOT.SetBatch(True)
 
 class DataCard:
-    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,produce_plots=False,**kwargs):
+    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,produce_plots=False,**kwargs):
         self.datacardName   = datacardName
         self.path           = path
-        self.groups         = groups
         self.hist_conv      = hist_conv
         self.era            = str(era)
         self.use_syst       = use_syst
+        self.shapeSyst      = shapeSyst
+        self.normSyst       = normSyst
         self.root_subdir    = root_subdir
         self.pseudodata     = pseudodata
         self.DYnonclosure   = DYnonclosure
         self.rebin          = rebin
+        self.textfiles      = textfiles
         self.produce_plots  = produce_plots
+
+        if isinstance(groups,dict):
+            self.groups = groups
+        elif isinstance(groups,list) or isinstance(groups,tuple):
+            assert all([isinstance(subgroups,dict) for subgroups in groups])
+            self.groups = {key:val for subgroups in groups for key,val in subgroups.items()}
+        else: 
+            raise RuntimeError("Group format not understood")
         
         self.yaml_dict = self.loadYaml(self.path,yamlName)
-
-        with open('systematics.yml','r') as handle:
-            self.systConvention = yaml.load(handle,Loader=yaml.FullLoader)
 
         if self.pseudodata:
             print ('Will use pseudodata')
@@ -241,43 +248,46 @@ class DataCard:
             h.Scale(lumi*xsec*br/sumweight)
         return h
              
-    def loadYaml(self,paths,yamlName):
+    def loadYaml(self,paths,yamlNames):
         if not isinstance(paths,list):
             paths = [paths]
+        if not isinstance(yamlNames,list):
+            yamlNames = [yamlNames]
         yamlDict = {}
         for path in paths:
-            yamlPath = os.path.join(path,yamlName)
-            if not os.path.exists(yamlPath):
-                print ("{} -> not found, skipped".format(yamlPath))
-                continue
-            # Parse YAML #
-            with open(yamlPath,"r") as handle:
-                full_dict = yaml.load(handle,Loader=yaml.FullLoader)
-            # Get Lumi per era #  
-            lumi_dict = full_dict["configuration"]["luminosity"]
-            if 'luminosity' not in yamlDict.keys():
-                yamlDict['luminosity'] = lumi_dict
-            else:
-                yamlDict['luminosity'].update(lumi_dict)
+            for yamlName in yamlNames:
+                yamlPath = os.path.join(path,yamlName)
+                if not os.path.exists(yamlPath):
+                    print ("{} -> not found, skipped".format(yamlPath))
+                    continue
+                # Parse YAML #
+                with open(yamlPath,"r") as handle:
+                    full_dict = yaml.load(handle,Loader=yaml.FullLoader)
+                # Get Lumi per era #  
+                lumi_dict = full_dict["configuration"]["luminosity"]
+                if 'luminosity' not in yamlDict.keys():
+                    yamlDict['luminosity'] = lumi_dict
+                else:
+                    yamlDict['luminosity'].update(lumi_dict)
 
-            # Get data per sample #
-            info_to_keep = ['cross-section','generated-events','group','type','era','branching-ratio']
-            if 'samples' not in yamlDict.keys():
-                sample_dict = {}
-                for sample,data in full_dict['files'].items():
-                    sample_dict[sample] = {k:data[k] for k in data.keys() & info_to_keep}
-                yamlDict['samples'] = sample_dict
-            else:
-                for sample,data in full_dict['files'].items():
-                    if sample not in yamlDict['samples'].keys():
-                        yamlDict['samples'].update({sample:data})
-                
+                # Get data per sample #
+                info_to_keep = ['cross-section','generated-events','group','type','era','branching-ratio']
+                if 'samples' not in yamlDict.keys():
+                    sample_dict = {}
+                    for sample,data in full_dict['files'].items():
+                        sample_dict[sample] = {k:data[k] for k in data.keys() & info_to_keep}
+                    yamlDict['samples'] = sample_dict
+                else:
+                    for sample,data in full_dict['files'].items():
+                        if sample not in yamlDict['samples'].keys():
+                            yamlDict['samples'].update({sample:data})
+                    
 
-            # Get plot options #
-            if 'plots' not in yamlDict.keys(): 
-                yamlDict['plots'] = full_dict['plots']
-            else:
-                yamlDict['plots'].update(full_dict['plots'])
+                # Get plot options #
+                if 'plots' not in yamlDict.keys(): 
+                    yamlDict['plots'] = full_dict['plots']
+                else:
+                    yamlDict['plots'].update(full_dict['plots'])
 
         return yamlDict
 
@@ -294,52 +304,194 @@ class DataCard:
                             hist.SetBinError(i,0)
 
     def saveDatacard(self):
+        from txtwriter import Writer
         if self.datacardName is None:
             raise RuntimeError("Datacard name is not set")
-        path_datacard = os.path.join(os.path.abspath(os.path.dirname(__file__)),self.datacardName)
+        path_datacard = os.path.join(os.path.abspath(os.path.dirname(__file__)),'datacards',self.datacardName)
 
+        shapes = {histName:os.path.join(path_datacard,f"{histName}_{self.era}.root") for histName in self.content.keys()}
+
+        # Save root file #
         if not os.path.exists(path_datacard):
             os.makedirs(path_datacard)
         for histName in self.content.keys():
-            filename = os.path.join(path_datacard,histName+'_'+self.era+'.root')
-            f = ROOT.TFile(filename,'recreate')
+            f = ROOT.TFile(shapes[histName],'recreate')
             if self.root_subdir is not None:
                 d = f.mkdir(self.root_subdir,self.root_subdir)
                 d.cd()
             for group in self.content[histName].keys():
-                for systName,hist in self.content[histName][group].items():
-                    if self.pseudodata and group == 'data_real':
+                # Loop over systematics first to fix and save #
+                for systName in self.content[histName][group].keys():
+                    if self.pseudodata and group == 'data_real': # avoid writing data when using pseudodata
                         continue
-                    if hist is None:
+                    if systName ==  "nominal": # will do afterwards
                         continue
-                    for i in range(1,hist.GetNbinsX()+1):
-                        if hist.GetBinContent(i) < 0.:
-                            hist.SetBinContent(i,0.) 
-                            hist.SetBinError(i,0.) 
-                    
-                    if systName ==  "nominal":
-                        save_name = group
+                    if systName.endswith('Down'): # wait for the Up and do both at the same time
+                        continue
+
+                    if systName.endswith('Up'): 
+                        # Get correct name #
+                        systName = systName[:-2]
+                        if systName not in self.shapeSyst.keys():
+                            raise RuntimeError("Could not find {} in systematic dict".format(systName))
+                        CMSName = self.shapeSyst[systName]
+                        if '{era}' in CMSName:
+                            CMSName = CMSName.format(era=self.era)
+        
+                        systNameUp   = systName + "Up"
+                        systNameDown = systName + "Down"
+                         
+                        if systNameUp not in self.content[histName][group].keys():
+                            raise RuntimeError(f"Could not find syst named {systNameUp} in group {group} for histogram {histName}")
+                        if systNameDown not in self.content[histName][group].keys():
+                            raise RuntimeError(f"Could not find syst named {systNameDown} in group {group} for histogram {histName}")
+
+                        # Fix shape in case needed #
+                        self.fixSystematics(hnom  = self.content[histName][group]['nominal'],
+                                            hup   = self.content[histName][group][systNameUp],
+                                            hdown = self.content[histName][group][systNameDown])
+
+                        # Write to file #
+                        CMSNameUp   = f"{group}_{CMSName}Up"
+                        CMSNameDown = f"{group}_{CMSName}Down"
+
+                        self.content[histName][group][systNameUp].SetTitle(CMSNameUp)
+                        self.content[histName][group][systNameUp].SetName(CMSNameUp)
+                        self.content[histName][group][systNameDown].SetTitle(CMSNameDown)
+                        self.content[histName][group][systNameDown].SetName(CMSNameDown)
+        
+                        self.content[histName][group][systNameUp].Write(CMSNameUp) 
+                        self.content[histName][group][systNameDown].Write(CMSNameDown) 
                     else:
-                        if systName.endswith('Up'):
-                            baseSyst = systName[:-2]
-                        elif systName.endswith('Down'):
-                            baseSyst = systName[:-4]
-                        else:
-                            raise RuntimeError("Problem with syst {} : cannot find if Up or Down".format(systName))
-                        if baseSyst not in self.systConvention.keys():
-                            raise RuntimeError("Could not find {} in systematic dict".format(baseSyst))
-                        CMSName = self.systConvention[baseSyst]
-                        systName = systName.replace(baseSyst,CMSName)
-                        if '{era}' in systName:
-                            systName = systName.format(era=self.era)
-                        save_name = '{}_{}'.format(group,systName)
+                        raise RuntimeError(f"Something wrong happened with {systName} in group {group} for histogram {histName}")
+
+                # Save nominal (done after because can be correct when fixing systematics #
+                if 'nominal' not in self.content[histName][group].keys():
+                    raise RuntimeError(f"Group {group} nominal histogram {histName} was not found")
+                for i in range(1,self.content[histName][group]['nominal'].GetNbinsX()+1): # Still check for zero bins in case not ran over systematics
+                    if self.content[histName][group]['nominal'].GetBinContent(i) < 0.:
+                        self.content[histName][group]['nominal'].SetBinContent(i,0.)
+                        self.content[histName][group]['nominal'].SetBinError(i,0.)
+                self.content[histName][group]['nominal'].SetTitle(group)
+                self.content[histName][group]['nominal'].SetName(group)
+                self.content[histName][group]['nominal'].Write(group)
                         
-                    hist.SetTitle(save_name)
-                    hist.SetName(save_name)
-                    hist.Write(save_name)
             f.Write()
             f.Close()
-            print ("Saved file %s"%filename)
+            print (f"Saved file {shapes[histName]}")
+
+        # Save txt file #
+        if '{}' not in self.textfiles:
+            print ('Will create a single datacard txt file for all the categories')
+            writer = Writer([f'{histName}_{self.era}' for histName in self.content.keys()])
+        else:
+            print ('Will create one datacard txt file per categories')
+        for histName in self.content.keys():
+            binName = f'{histName}_{self.era}'
+            if '{}' in self.textfiles:
+                writer = Writer(binName)
+            # Add processes #
+            for group in self.content[histName]:
+                writer.addProcess(binName       = binName,
+                                  processName   = group,
+                                  rate          = self.content[histName][group]['nominal'].Integral(),
+                                  processType   = self.groups[group]['type'])
+                # Add shape systematics #
+                if self.use_syst:
+                    for systName in self.content[histName][group]:
+                        if systName == 'nominal':
+                            continue
+                        if systName.endswith('Up'):
+                            systName = systName[:-2]
+                            # Check integral of systematics
+                            normUp = self.content[histName][group][f'{systName}Up'].Integral()
+                            normDown = self.content[histName][group][f'{systName}Down'].Integral()
+                            if normUp <= 0. or normDown <=0.:
+                                continue
+
+                            # Get convention naming #
+                            if systName not in self.shapeSyst.keys():
+                                raise RuntimeError("Could not find {} in systematic dict".format(baseSyst))
+                            CMSName = self.shapeSyst[systName]
+                            if '{era}' in CMSName:
+                                CMSName = CMSName.format(era=self.era)
+                            # Record #
+                            writer.addShapeSystematic(binName,group,CMSName)
+                # Add norm systematics #
+                if self.use_syst:
+                    for systName,systList in self.normSyst.items():
+                        if not isinstance(systList,list):
+                            systList = [systList]
+                        for systContent in systList:
+                            if systContent is None:
+                                raise RuntimeError(f"Problem with lnL systematic {systName}")
+                            processes = list(self.groups.keys())
+                            if 'era' in systContent.keys():
+                                if str(systContent['era']) != str(self.era):
+                                    continue
+                            if 'proc' in systContent.keys():
+                                if not isinstance(systContent['proc'],list):
+                                    selectProcess = [systContent['proc']]
+                                else:
+                                    selectProcess = systContent['proc']
+                                if all([proc.startswith("\\") for proc in selectProcess]):
+                                    for proc in selectProcess:
+                                        proc = proc.replace('\\','')
+                                        if proc in processes:
+                                            processes.remove(proc)
+                                else:
+                                    processes = selectProcess
+                            if 'hist' in systContent.keys():
+                                if histName != systContent['hist']:
+                                    continue
+                            for process in processes:
+                                writer.addLnNSystematic(binName,process,systName,systContent['val'])
+
+                
+            if '{}' in self.textfiles:
+                textPath = os.path.join(path_datacard,self.textfiles.format(f"{histName}_{self.era}"))
+                writer.dump(textPath,os.path.basename(shapes[histName]))
+                print (f"Saved file {textPath}")
+        if '{}' not in self.textfiles:
+            textPath = os.path.join(path_datacard,self.textfiles)
+            writer.dump(textPath,[os.path.basename(shape) for shape in shapes.values()])
+            print (f"Saved file {textPath}")
+
+    @staticmethod
+    def fixSystematics(hnom,hdown,hup):
+        # Loop over bins #
+        for i in range(1,hnom.GetNbinsX()+1):
+            # First clip to 0 all negative bin content #
+            if hnom.GetBinContent(i) < 0.:
+                hnom.SetBinContent(i,0.)
+                hnom.SetBinError(i,0.) 
+            if hup.GetBinContent(i) < 0.:
+                hup.SetBinContent(i,0.)
+                hup.SetBinError(i,0.)
+            if hdown.GetBinContent(i) < 0.:
+                hdown.SetBinContent(i,0.)
+                hdown.SetBinError(i,0.)
+
+            # Second, check the up and down compared to nominal #
+            if hnom.GetBinContent(i) > 0:
+                # Nominal bin not zero #
+                # Check if zero bin -> apply nominal**2 / up or down
+                if hdown.GetBinContent(i) == 0. and abs(hup.GetBinContent(i)) > 0:
+                    hdown.SetBinContent(i, hnom.GetBinContent(i)**2 / hup.GetBinContent(i)) 
+                if hup.GetBinContent(i) == 0. and abs(hdown.GetBinContent(i)) > 0:
+                    hup.SetBinContent(i, hnom.GetBinContent(i)**2 / hdown.GetBinContent(i))
+                # Check if too big, deflate in case #
+                if hdown.GetBinContent(i)/hnom.GetBinContent(i) > 100:
+                    hdown.SetBinContent(i, 100 * hnom.GetBinContent(i))
+                if hup.GetBinContent(i)/hnom.GetBinContent(i) > 100:
+                    hup.SetBinContent(i, 100 * hnom.GetBinContent(i))
+            else:
+                # Nominal is == 0 #
+                if abs(hup.GetBinContent(i)) > 0 or abs(hdown.GetBinContent(i)) > 0:
+                    # zero nominal but non zero systematics -> set all at 0.00001 #
+                    hnom.SetBinContent(i,0.00001)
+                    hup.SetBinContent(i,0.00001)
+                    hdown.SetBinContent(i,0.00001)
 
 
     def applyDYNonClosure(self):
@@ -347,21 +499,31 @@ class DataCard:
         from DYNonClosure import NonClosureSystematic
         dyObj = NonClosureSystematic.load_from_json(self.DYnonclosure['path'])
         for histName in self.content.keys():
-            if histName not in self.DYnonclosure['hist']:
+            if histName not in self.DYnonclosure['hist'].keys():
                 continue
-            catName = '{}_{}'.format(histName,self.era)
+            catName = self.DYnonclosure['hist'][histName]['entry']
+            closureSystName = self.DYnonclosure['hist'][histName]['name']
             dyObj.SetCategory(catName)
+            print ("... Histogram {:20s} -> applying non closure with key {:20s}".format(histName,catName))
+            #dyObj.PlotFitToPdf('shapes_'+catName)
             group = self.DYnonclosure['group']
 
             # Add non closure systematics #
             if self.use_syst:
-                h_up, h_down = dyObj.GetNonClosureShape(self.content[histName][group]['nominal'])
-                self.content[histName][group]['dy_nonclosureUp'] = h_up
-                self.content[histName][group]['dy_nonclosureDown'] = h_down
+                ((h_shape1_up,h_shape1_down),(h_shape2_up,h_shape2_down)) = dyObj.GetNonClosureShape(self.content[histName][group]['nominal'])
+                h_shape1_up.SetName(self.content[histName][group]['nominal'].GetName()+f'_{closureSystName}_shape1Up')
+                h_shape1_down.SetName(self.content[histName][group]['nominal'].GetName()+f'_{closureSystName}_shape1Down')
+                h_shape2_up.SetName(self.content[histName][group]['nominal'].GetName()+f'_{closureSystName}_shape2Up')
+                h_shape2_down.SetName(self.content[histName][group]['nominal'].GetName()+f'_{closureSystName}_shape2Down')
+
+                self.content[histName][group][f'{closureSystName}_shape1Up']   = h_shape1_up
+                self.content[histName][group][f'{closureSystName}_shape1Down'] = h_shape1_down
+                self.content[histName][group][f'{closureSystName}_shape2Up']   = h_shape2_up
+                self.content[histName][group][f'{closureSystName}_shape2Down'] = h_shape2_down
 
             # Scale all DY histograms based on non closure #
             for systName in self.content[histName][group].keys():
-                if 'dy_nonclosure' in systName:
+                if closureSystName in systName:
                     continue # avoid applying twice
                 dyObj(self.content[histName][group][systName])
                 
@@ -375,6 +537,8 @@ class DataCard:
                 print ('... {:20s} -> rebinning scheme : {}'.format(histName,self.rebin[histName]['method']))
                 if method == 'classic':
                     rebinFunc = self.rebinClassic
+                if method == 'boundary':
+                    rebinFunc = self.rebinBoundary
                 elif method == 'quantile':
                     rebinFunc = self.rebinInQuantile
                 elif method == 'threshold':
@@ -389,7 +553,7 @@ class DataCard:
         """
             Using the classic ROOT rebinning
             histName: name of histogram in keys of self.content
-            params : (int) number of rebinning groups
+            params : (list) [groups(int)]
         """
         assert isinstance(params,list)
         assert len(params) == 1
@@ -397,6 +561,21 @@ class DataCard:
         for group,histDict in self.content[histName].items():
             for systName,hist in histDict.items():
                 self.content[histName][group][systName].Rebin(params[0])
+
+    def rebinBoundary(self,histName,params):
+        """
+            Using the given hardcoded boundaries
+            histName: name of histogram in keys of self.content
+            params : (list) [boundaries(list)]
+        """
+        from Rebinning import Boundary
+        assert isinstance(params,list)
+        assert len(params) == 1
+        assert isinstance(params[0],list)
+        boundObj = Boundary(params[0])
+        for group in self.content[histName].keys():
+            for systName,hist in self.content[histName][group].items():
+                self.content[histName][group][systName] = boundObj(hist) 
 
     def rebinInQuantile(self,histName,params):
         """
@@ -449,7 +628,7 @@ class DataCard:
     def preparePlotIt(self,suffix=''):
         print ("Preparing plotIt root files")
         # Make new directory with root files for plotIt #
-        path_plotIt = os.path.join(os.path.abspath(os.path.dirname(__file__)),self.datacardName,'plotit')
+        path_plotIt = os.path.join(os.path.abspath(os.path.dirname(__file__)),'datacards',self.datacardName,'plotit')
         path_rootfiles = os.path.join(path_plotIt,'root')
         systematics = []
         if not os.path.exists(path_rootfiles):
@@ -495,12 +674,15 @@ class DataCard:
         for group,gconfig in self.groups.items():
             if self.pseudodata and group == 'data_real':
                 continue
+            if 'hide' in gconfig.keys() and gconfig['hide']:
+                continue
             config['files'][group+'.root'] = {'cross-section'   : 1./lumi,
                                               'era'             : str(self.era),
                                               'generated-events': 1.,
                                               'type'            : gconfig['type']}
             if gconfig['type'] != 'signal':
-                config['files'][group+'.root'].update({'group':group})
+                plotGroup = group if 'group' not in gconfig.keys() else gconfig['group']
+                config['files'][group+'.root'].update({'group':plotGroup})
             else:
                 config['files'][group+'.root'].update({k:v for k,v in gconfig.items() if k not in ['files','type']})
         config['groups'] = {}
@@ -508,7 +690,9 @@ class DataCard:
             if self.pseudodata and group == 'data_real':
                 continue
             if gconfig['type'] != 'signal':
-                config['groups'][group] = {k:v for k,v in gconfig.items() if k not in ['files','type']}
+                plotGroup = group if 'group' not in gconfig.keys() else gconfig['group']
+                if plotGroup not in config['groups'].keys():
+                    config['groups'][plotGroup] = {k:v for k,v in gconfig.items() if k not in ['files','type']}
 
 
         config['plots'] = {}
@@ -517,11 +701,13 @@ class DataCard:
                 config['plots'][h1] = self.yaml_dict['plots'][h2[0]]
             else:
                 config['plots'][h1] = self.yaml_dict['plots'][h2]
-            config['plots'][h1]['legend-columns'] = 2
+            #config['plots'][h1]['legend-columns'] = 2
             if 'VBF' in h1 or 'GGF' in h1:
                 config['plots'][h1]['blinded-range'] = [0.5,1.]
             else:
                 config['plots'][h1].pop('blinded-range',None)
+            config['plots'][h1]['ratio-y-axis-range'] = [0.5,1.5]
+            config['plots'][h1]['sort-by-yields'] = False
 
         if len(systematics) > 0:
             config['systematics'] = systematics
@@ -542,12 +728,13 @@ class DataCard:
                                                                         'era': self.era,
                                                                         'yaml': path_yaml})
         print (cmd)
-        print ("Calling plotIt")
-        rc = self.run_command(cmd.split(" "),print_output=True)
-        if rc == 0:
-            return ('... success')
-        else:
-            return ('... failure')
+        if self.which('plotIt') is not None:
+            print ("Calling plotIt")
+            rc = self.run_command(cmd.split(" "),print_output=True)
+            if rc == 0:
+                return ('... success')
+            else:
+                return ('... failure')
 
     @staticmethod
     def run_command(command,return_output=False,print_output=False):
@@ -566,7 +753,42 @@ class DataCard:
             return rc,outputs
         else:
             return rc
+
+    @staticmethod
+    def which(program):
+        import os
+        def is_exe(fpath):
+            return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+    
+        fpath, fname = os.path.split(program)
+        if fpath:
+            if is_exe(program):
+                return program
+        else:
+            for path in os.environ["PATH"].split(os.pathsep):
+                exe_file = os.path.join(path, program)
+                if is_exe(exe_file):
+                    return exe_file
+    
+        return None
+
+
+
  
+
+class YMLIncludeLoader(yaml.SafeLoader): 
+    """Custom yaml loading to support including config files. Use `!include (file)` to insert content of `file` at that position."""
+    
+    def __init__(self, stream):
+        super(YMLIncludeLoader, self).__init__(stream)
+        self._root = os.path.split(stream.name)[0]
+
+    def include(self, node):
+        filename = os.path.join(self._root, self.construct_scalar(node))
+        with open(filename, 'r') as f:
+            return yaml.load(f, YMLIncludeLoader)
+
+YMLIncludeLoader.add_constructor('!include', YMLIncludeLoader.include)
 
 
 if __name__=="__main__":
@@ -580,5 +802,7 @@ if __name__=="__main__":
     if args.yaml is None:
         raise RuntimeError("Must provide the YAML file")
     with open(args.yaml,'r') as handle:
-        f = yaml.load(handle,Loader=yaml.FullLoader)
-    instance = DataCard(datacardName=args.yaml.replace('.yml',''),pseudodata=args.pseudodata,**f)
+        f = yaml.load(handle,Loader=YMLIncludeLoader)
+    instance = DataCard(datacardName    = os.path.basename(args.yaml).replace('.yml',''),
+                        pseudodata      = args.pseudodata,
+                        **f)
