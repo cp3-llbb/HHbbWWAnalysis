@@ -51,6 +51,8 @@ def get_options():
         help='Whether to use a generator for the neural network')
     a.add_argument('--resume', action='store_true', required=False, default=False,
         help='Whether to resume the training of a given model (path in parameters.py)')
+    a.add_argument('--param', action='store_true', required=False, default=False,
+        help='Use parametric learning')
 
     # Splitting and submitting jobs arguments #
     b = parser.add_argument_group('Splitting and submitting jobs arguments')
@@ -242,6 +244,15 @@ def main():
     list_inputs  = [var.replace('$','') for var in parameters.inputs]
     list_outputs = [var.replace('$','') for var in parameters.outputs]
 
+    if opt.param:
+        def findMassInSignal(sampleName):
+            if "HH" not in sampleName:
+                return None
+            return float(re.findall('M-\d+',sampleName)[0].replace('M-',''))
+    else:
+        findMassInSignal = None
+        
+
     # Load samples #
     with open (parameters.config,'r') as f:
         sampleConfig = yaml.load(f)
@@ -290,6 +301,7 @@ def main():
                                                       event_weight_sum_dict     = event_weight_sum_dict,
                                                       lumi_dict                 = parameters.lumidict,
                                                       eras                      = era,
+                                                      paramFun                  = findMassInSignal,
                                                       tree_name                 = parameters.tree_name,
                                                       additional_columns        = {'tag':node,'era':era})
                                                       #stop                      = 300000) # TODO : remove 

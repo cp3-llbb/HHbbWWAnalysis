@@ -4,3 +4,6 @@
 [submodule "MachineLearning/ml-models"]
 	path = MachineLearning/ml-models
 	url = https://gitlab.cern.ch/cms-hh-bbww/ml-models.git
+[submodule "Datacards/HiggsAnalysis/CombinedLimit"]
+	path = Datacards/HiggsAnalysis/CombinedLimit
+	url = https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git

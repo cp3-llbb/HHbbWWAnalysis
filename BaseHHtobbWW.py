@@ -3,6 +3,7 @@ import sys
 import json
 import copy
 from itertools import chain
+from functools import partial
 
 from bamboo import treefunctions as op
 from bamboo.analysismodules import NanoAODModule, NanoAODHistoModule, NanoAODSkimmerModule
@@ -109,9 +110,10 @@ One lepton and and one jet argument must be specified in addition to the require
                             type        = int,
                             help="Cut on events (as list)")
         parser.add_argument("--HHReweighting", 
-                            action      = "store_true",
-                            default     = False,
-                            help="Wether to apply GGF LO->NLO reweighting")
+                            action      = 'append',
+                            type        = str,
+                            default     = None,
+                            help="GGF LO->NLO reweighting benchmarks to use (can be several)")
 
 
         #----- Lepton selection arguments -----#
@@ -279,12 +281,17 @@ One lepton and and one jet argument must be specified in addition to the require
         self._customizeAnalysisCfg(self.analysisConfig)
 
         # Add the LO reweighting to the datadriven parts #
-        if not forSkimmer and self.args.HHReweighting:
-            self.analysisConfig['datadriven'].update({benchmark:{'replaces': 'all', 'uses': 'all'} for benchmark in self.analysisConfig['benchmarks']['targets']})
+        if self.args.HHReweighting is not None and 'all' in self.args.HHReweighting:
+            self.args.HHReweighting = self.analysisConfig['benchmarks']['targets']
+        if not forSkimmer and self.args.HHReweighting is not None:
+            self.analysisConfig['datadriven'].update({benchmark:{'replaces': 'all', 'uses': 'all'} 
+                                                        for benchmark in self.analysisConfig['benchmarks']['targets'] 
+                                                            if benchmark in self.args.HHReweighting})
+            newContrib = [benchmark for benchmark in self.analysisConfig['benchmarks']['targets'] if benchmark in self.args.HHReweighting]
             if self.args.datadriven is None:
-                self.args.datadriven = self.analysisConfig['benchmarks']['targets']
+                self.args.datadriven = newContrib
             else:
-                self.args.datadriven += self.analysisConfig['benchmarks']['targets']
+                self.args.datadriven += newContrib
 
         super(BaseNanoHHtobbWW, self).initialize()
 
@@ -295,8 +302,10 @@ One lepton and and one jet argument must be specified in addition to the require
                 self.datadrivenContributions["PseudoData"] = DataDrivenPseudoData(contrib.name, contrib.config)
 
         # Include the datadriven reweighting #
-        if self.args.HHReweighting:
-            self.datadrivenContributions.update({benchmark:DataDrivenLOReweighting(benchmark,self.analysisConfig['datadriven'][benchmark],substrs=self.analysisConfig['benchmarks']['uses']) for benchmark in self.analysisConfig['benchmarks']['targets']}) 
+        if self.args.HHReweighting is not None:
+            self.datadrivenContributions.update({benchmark:DataDrivenLOReweighting(benchmark,self.analysisConfig['datadriven'][benchmark],substrs=self.analysisConfig['benchmarks']['uses']) 
+                                                        for benchmark in self.analysisConfig['benchmarks']['targets'] 
+                                                            if benchmark in self.args.HHReweighting}) 
 
     #-------------------------------------------------------------------------------------------#
     #                                   customizeAnalysisCfg                                    #
@@ -405,7 +414,7 @@ One lepton and and one jet argument must be specified in addition to the require
 
         #----- Theory uncertainties -----#
         if self.is_MC:
-            # PDF #
+            # PDF scale weights #
             # Twiki: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopSystematics#Factorization_and_renormalizatio 
             # len(LHEScaleWeight) == 9
             #   -> nominal = LHEScaleWeight[4]
@@ -459,7 +468,17 @@ One lepton and and one jet argument must be specified in addition to the require
                                                  Mixedup    = op.c_float(1.),
                                                  Mixeddown  = op.c_float(1.))
 
-            noSel = noSel.refine("PDFweights", weight = [self.scaleWeight])
+            noSel = noSel.refine("PDFScaleWeights", weight = [self.scaleWeight])
+
+            # PDF #
+            #noSel = noSel.refine("PDFWeights", weight = [tree.LHEPdfWeight])
+            # TODO : add that next time 
+            # https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc102X_doca.html#LHEPdfWeight
+            # https://lhapdf.hepforge.org/pdfsets.html
+            # -> range of ID
+            # Branch LHEPdfWeight -> docstring -> get the id -> check the list above
+            # we want "NNPDF31_nnlo_hessian_pdfas" (ID : 306000) -> if not use 1.
+            
 
             # PS weights #
             self.psISRSyst = op.switch(op.rng_len(tree.PSWeight) == 4,
@@ -806,7 +825,8 @@ One lepton and and one jet argument must be specified in addition to the require
         ###########################################################################
         #                              Pseudo-data                                #
         ###########################################################################
-        if not forSkimmer and "PseudoData" in self.datadrivenContributions and self.is_MC: # Skimmer does not know about self.datadrivenContributions
+        if not forSkimmer and "PseudoData" in self.datadrivenContributions and self.is_MC: 
+            # Skimmer does not know about self.datadrivenContributions
             noSel = SelectionWithDataDriven.create(parent   = noSel,
                                                    name     = 'pseudodata',
                                                    ddSuffix = 'Pseudodata',
@@ -816,7 +836,13 @@ One lepton and and one jet argument must be specified in addition to the require
         ###########################################################################
         #                          Signal Reweighting                             #
         ###########################################################################
-        if 'type' in sampleCfg.keys() and sampleCfg["type"] == "signal" and 'benchmarks' in self.analysisConfig.keys() and any(useFile in sample for useFile in self.analysisConfig['benchmarks']['uses']) and self.args.HHReweighting:
+        self.signalReweightBenchmarks = {}
+        if 'type' in sampleCfg.keys() and sampleCfg["type"] == "signal" \
+                                      and not forSkimmer \
+                                      and 'benchmarks' in self.analysisConfig.keys() \
+                                      and any(useFile in sample for useFile in self.analysisConfig['benchmarks']['uses']) \
+                                      and self.args.HHReweighting is not None:
+            from bamboo.analysisutils import forceDefine
             # Get gen level Higgs #
             self.genh = op.select(t.GenPart,lambda g : op.AND(g.pdgId==25, g.statusFlags & ( 0x1 << 13)))
             # Get gen level variables mHH and cos(theta*) #
@@ -826,6 +852,15 @@ One lepton and and one jet argument must be specified in addition to the require
             self.mHH = op.invariant_mass(self.genh[0].p4,self.genh[1].p4) 
             self.cosHH = op.abs(boosted_h.Pz()/boosted_h.P())
 
+            for v in (self.mHH, self.cosHH):
+                forceDefine(v, noSel)
+            def funConst(x, v=None):
+                return v
+            signalReweightParams = {
+                    'Eta': partial(funConst, v=self.mHH),
+                    'Pt' : partial(funConst, v=self.cosHH)
+            }
+
             if forSkimmer:
                 # In the case of the skimmer, we cannot use the create from datadriven.
                 # At the same time we do not want the many-to-many procedure for the DNN training
@@ -833,28 +868,23 @@ One lepton and and one jet argument must be specified in addition to the require
                 # -> We use the one-to-one method 
                 json_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data','ScaleFactors_GGF_LO','{}_to_BenchmarkSM_{}.json'.format(sample,era))
                 if os.path.exists(json_file):
-                    print("Found file {} -> Will apply for NO->NLO reweighting".format(json_file))
-                    self.reweightLO = get_scalefactor("lepton", json_file, paramDefs={'Eta': lambda x : self.mHH, 'Pt': lambda x : self.cosHH})
-                    noSel = noSel.refine("LoToNLO",weight = self.reweightLO(op.c_float(1.)))
+                    print("Found file {} -> Will apply for LO->NLO reweighting".format(json_file))
+                    reweightLO = get_scalefactor("lepton", json_file, paramDefs=signalReweightParams)(None)
+                    noSel = noSel.refine("LoToNLO",weight = self.reweightLO)
 
             else:
                 # For the Plotter we want the many-to-many worfklow.
                 # This means create as many files (with the create) 
                 # as there are NLO weight files (+ original LO file)
                 for benchmark in self.analysisConfig['benchmarks']['targets']:
-                    json_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data','ScaleFactors_GGF_LO','{}_to_{}_{}.json'.format(sample,benchmark,era))
-                    if os.path.exists(json_file):
-                        print("Found file {} -> Will apply for NO->NLO reweighting".format(json_file))
-                        # Apply reweighting to create #
-                        reweightLO = get_scalefactor("lepton", json_file, paramDefs={'Eta': lambda x : self.mHH, 'Pt': lambda x : self.cosHH})
-                        noSel = SelectionWithDataDriven.create(parent   = noSel,
-                                                               name     = 'noSel'+benchmark,
-                                                               ddSuffix = benchmark,
-                                                               cut      = op.c_bool(True),
-                                                               ddCut    = op.c_bool(True),
-                                                               weight   = op.c_float(1.),
-                                                               ddWeight = reweightLO(op.c_float(1.)),
-                                                               enable   = True)
+                    if benchmark in self.args.HHReweighting:
+                        json_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data','ScaleFactors_GGF_LO','{}_to_{}_{}.json'.format(sample,benchmark,era))
+                        if os.path.exists(json_file):
+                            print("Found file {} -> Will apply for LO->NLO reweighting".format(json_file))
+                            # Apply reweighting to create #
+                            reweightLO = get_scalefactor("lepton", json_file, paramDefs=signalReweightParams)(None)
+                            self.signalReweightBenchmarks[benchmark] = reweightLO
+                            forceDefine(reweightLO, noSel)
 
         ###########################################################################
         #                           TTbar reweighting                             #
@@ -1756,12 +1786,36 @@ One lepton and and one jet argument must be specified in addition to the require
     def returnTriggers(self,keys):
         triggerRanges = returnTriggerRanges(self.era)
         return op.OR(*[trig for k in keys for trig in self.triggersPerPrimaryDataset[k]])
-    
+
+    ###########################################################################
+    #                          Add Signal Reweighting                         #
+    ###########################################################################
+    def addSignalReweighting(self, selection):
+        """
+        Signal reweighting
+
+        For the Plotter we want the many-to-many worfklow.
+        This means create as many files (with the create) 
+        as there are NLO weight files (+ original LO file)
+        """
+        baseName = selection.name
+        for benchmark, reweightLO in self.signalReweightBenchmarks.items():
+            selection = SelectionWithDataDriven.create(
+                    parent = selection,
+                    name = f"{baseName}{benchmark}",
+                    ddSuffix = benchmark,
+                    ddWeight = reweightLO,
+                    enable = True
+                    )
+        return selection
+
     ###########################################################################
     #                             postProcess                                 #
     ###########################################################################
     def postProcess(self, taskList, config=None, workdir=None, resultsdir=None, forSkimmer=True):
         from bamboo.root import gbl
+        if not self.plotList:
+            self.plotList = self.getPlotList(resultsdir=resultsdir, config=config)
 
         if not forSkimmer:
             ### Disable plotting for some signal samples ###
@@ -1771,12 +1825,14 @@ One lepton and and one jet argument must be specified in addition to the require
                 config['samples'][sample]['legend'] = ""
 
             ### HH reweighting ###
-            if self.args.HHReweighting:
+            if self.args.HHReweighting is not None:
                 LOFiles = []
                 LOChannels = ['GluGluToHHTo2B2VTo2L2Nu','GluGluToHHTo2B2WToLNu2J','GluGluToHHTo2B2Tau']
                 ddScenarios = set(self.datadrivenScenarios)
                 attrToKeep = ['legend','line-color','line-type','order','type']
                 for contribName in self.analysisConfig['benchmarks']['targets']:
+                    if contribName not in self.args.HHReweighting:
+                        continue
                     contrib = self.datadrivenContributions[contribName]
                     contribSamples = {sample:sampleCfg for sample,sampleCfg in config['samples'].items() if contrib.usesSample(sample,sampleCfg)}
                     LOFiles.extend([sample for sample in contribSamples.keys() if sample not in LOFiles])
@@ -1786,6 +1842,8 @@ One lepton and and one jet argument must be specified in addition to the require
                     for era in eras:
                         for channel in LOChannels:
                             contribPerChannel = {sample:sampleCfg for sample,sampleCfg in contribSamples.items() if channel in sample and sampleCfg['era']==era}
+                            if len(contribPerChannel) == 0:
+                                continue
                             crossSection = [sampleCfg['cross-section'] for sampleCfg in contribPerChannel.values()]
                             if len(set(crossSection)) != 1:
                                 raise RuntimeError(f"Not all LO samples for channel {channel} have the same cross-section")
@@ -1803,24 +1861,32 @@ One lepton and and one jet argument must be specified in addition to the require
                                         if attr in contribPerChannel[list(contribPerChannel.keys())[0]].keys()}  
                             files = {sample:gbl.TFile.Open(os.path.join(resultsdir,f"{sample}{contribName}.root")) for sample in contribPerChannel.keys()}
                             generatedEvents = {sample:self.readCounters(files[sample])[contribPerChannel[sample]['generated-events']] for sample in contribPerChannel.keys()}
-                            generatedEventsSum = sum(list(generatedEvents.values()))
-                            outFile = gbl.TFile.Open(os.path.join(resultsdir,f"{channel}_NLO{contribName}.root"), "RECREATE")
-                            hNames = [key.GetName() for key in files[list(files.keys())[0]].GetListOfKeys() if 'TH' in key.GetClassName()]
-                            for hName in hNames:
-                                hist = None
-                                for sample,f in files.items():
-                                    h = f.Get(hName)
-                                    h.Scale(generatedEventsSum/(generatedEvents[sample]*len(generatedEvents)))
-                                    if hist is None:
-                                        hist = copy.deepcopy(h)
-                                    else:
-                                        hist.Add(h)
-                                hist.Write()
-                            outFile.Close()
+                            outPath = os.path.join(resultsdir,f"{channel}_NLO{contribName}.root")
+                            if os.path.exists(outPath):
+                                print (f'NLO file {outPath} already exists, will not recompute')
+                            else:
+                                outFile = gbl.TFile.Open(outPath, "RECREATE")
+                                hNames = [key.GetName() for key in files[list(files.keys())[0]].GetListOfKeys() if 'TH' in key.GetClassName()]
+                                for hName in hNames:
+                                    hist = None
+                                    for sample,f in files.items():
+                                        h = f.Get(hName)
+                                        #h.Scale(generatedEventsSum/(generatedEvents[sample]*len(generatedEvents)))
+                                        h.Scale(1./(generatedEvents[sample]))
+                                        if hist is None:
+                                            hist = copy.deepcopy(h)
+                                        else:
+                                            hist.Add(h)
+                                    hist.Write()
+                                outFile.Close()
+                                print (f'NLO file {outPath} produced')
+                                for f in files.values():
+                                    f.Close()
                             
                             config['samples'][f"{channel}_NLO{contribName}"] = {'cross-section'     : crossSection,
                                                                                 'era'               : era,
-                                                                                'generated-events'  : generatedEventsSum}
+                                                                                'generated-events'  : len(generatedEvents)}
+                                                                                #'generated-events'  : generatedEventsSum}
                             config['samples'][f"{channel}_NLO{contribName}"].update(attrLO)
                             if branchingRatio is not None:
                                 config['samples'][f"{channel}_NLO{contribName}"]['branching-ratio'] = branchingRatio
