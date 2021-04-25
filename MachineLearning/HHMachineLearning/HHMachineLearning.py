@@ -291,12 +291,12 @@ def main():
                                                       lumi_dict                 = parameters.lumidict,
                                                       eras                      = era,
                                                       tree_name                 = parameters.tree_name,
-                                                      additional_columns        = {'tag':node,'era':era},
-                                                      stop                      = 300000) # TODO : remove 
+                                                      additional_columns        = {'tag':node,'era':era})
+                                                      #stop                      = 300000) # TODO : remove 
 
                         #if data_node_era.shape[0]>1000000:
                         #    data_node_era = data_node_era.sample(n=1000000,axis=0) # TODO : remove
-                        #data_cat_era = data_cat_era.sample(frac=1)[:50000] # TODO : remove 
+                        data_cat_era = data_cat_era.sample(frac=1)[:350000] # TODO : remove 
                         era_str = '{:5s} class - {:15s} category - era {}  : sample size = {:10d}'.format(node,cat,era,data_cat_era.shape[0])
                         if data_cat is None:
                             data_cat = data_cat_era
@@ -358,7 +358,7 @@ def main():
             #logging.info('Current memory usage : %0.3f GB'%(pid.memory_info().rss/(1024**3)))
 
             # Plots #
-            if opt.task == '':
+            if opt.task == 'plotFeatures':
                 InputPlots(train_all,list_inputs)
 
             # Randomize order, we don't want only one type per batch #

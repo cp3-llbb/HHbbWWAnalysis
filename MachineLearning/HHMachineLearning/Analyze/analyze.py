@@ -148,7 +148,7 @@ class Analyze:
         g.set_xticklabels(g.get_xmajorticklabels(), size = int(50/math.sqrt(corr.shape[0])))
 
         name = os.path.join(self.path_out,'correlation_matrix.png')
-        plt.savefig(name)
+        plt.savefig(name, dpi=600)
         logging.info("... saved as %s"%name)
 #        import IPython
 #        IPython.embed()

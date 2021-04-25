@@ -1250,10 +1250,7 @@ One lepton and and one jet argument must be specified in addition to the require
 
         # Doesn't contain the leading bTag scored Light Jet
         self.remainingJets = op.select(self.ak4LightJetsByPt, lambda jet : jet.idx != self.ak4LightJetsByBtagScore[0].idx)
-        self.remainingJetPairs = lambda jets : op.combine(jets, N=2)
-        #self.remainingJets = op.select(self.ak4Jets, lambda jet : op.NOT(op.OR(jet.idx == self.ak4JetsByBtagScore[0].idx,
-        #                                                                       jet.idx == self.ak4JetsByBtagScore[1].idx)))
-        #self.remainingJetPairs = lambda jets : op.combine(jets, N=2)
+        self.makeJetPairs  = lambda jets : op.combine(jets, N=2, pred=lambda j1, j2 : j1.pt > j2.pt, samePred=lambda j1,j2 : j1.idx != j2.idx)
 
         #############################################################################
         #                                AK8 Jets                                   #

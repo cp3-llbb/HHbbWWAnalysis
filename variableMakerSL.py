@@ -59,7 +59,7 @@ def returnCommonInputs_Resolved(self):
            ('METenergy',               'METenergy',               (50, 0, 300)):    self.corrMET.p4.E(),
            ('METpt',                   'METpt',                   (50, 0, 300)):    self.corrMET.pt,
            ('METphi',                  'METphi',                  (50, 0, 300)):    self.corrMET.phi,
-           ('MET_LD',                  'MET_LD',                  (40,0,200)):      self.HLL.MET_LD_DL(self.corrMET, self.ak4Jets, self.electronsFakeSel, self.muonsFakeSel),
+           ('METLD',                   'MET_LD',                  (40,0,200)):      self.HLL.MET_LD_DL(self.corrMET, self.ak4Jets, self.electronsFakeSel, self.muonsFakeSel),
            ('nfakeableMuons',          'nfakeableMuons',          (5,0,5)):         op.static_cast("UInt_t",op.rng_len(self.muonsFakeSel)),
            ('nfakeableElectrons',      'nfakeableElectrons',      (5,0,5)):         op.static_cast("UInt_t",op.rng_len(self.electronsFakeSel)),
            ('hT',                      'hT',                      (50,0,300)):      op.static_cast("Float_t", self.HLL.HT_SL(self.ak4Jets)),
@@ -151,11 +151,29 @@ def returnClassicInputs_Resolved(self, lepton, jpaSelectedJets, L1out, L2out, jp
     has1bj = any([Res1b2Wj, Res1b1Wj, Res1b0Wj])
     has2wj = any([Res2b2Wj, Res1b2Wj])
     has1wj = any([Res2b1Wj, Res1b1Wj])
+
+    lep_Px = lepton.p4.Px();
+    lep_Py = lepton.p4.Py();
+    lep_Pz = lepton.p4.Pz();
+    lep_E  = lepton.p4.E();
+    bj1_Px = self.HLL.bJetCorrP4(jet1).Px() if not Res0b else op.c_float(0.)
+    bj1_Py = self.HLL.bJetCorrP4(jet1).Py() if not Res0b else op.c_float(0.)
+    bj1_Pz = self.HLL.bJetCorrP4(jet1).Pz() if not Res0b else op.c_float(0.)
+    bj1_E  = self.HLL.bJetCorrP4(jet1).E()  if not Res0b else op.c_float(0.)
+    bj2_Px = self.HLL.bJetCorrP4(jet2).Px() if has2bj else op.c_float(0.)
+    bj2_Py = self.HLL.bJetCorrP4(jet2).Py() if has2bj else op.c_float(0.)
+    bj2_Pz = self.HLL.bJetCorrP4(jet2).Pz() if has2bj else op.c_float(0.)
+    bj2_E  = self.HLL.bJetCorrP4(jet2).E()  if has2bj else op.c_float(0.)
+    wj1_Px = jet3.p4.Px() if has1wj or has2wj else op.c_float(0.)
+    wj1_Py = jet3.p4.Py() if has1wj or has2wj else op.c_float(0.)
+    wj1_Pz = jet3.p4.Pz() if has1wj or has2wj else op.c_float(0.)
+    wj1_E  = jet3.p4.E()  if has1wj or has2wj else op.c_float(0.)
+    wj2_Px = jet4.p4.Px() if has2wj else op.c_float(0.)
+    wj2_Py = jet4.p4.Py() if has2wj else op.c_float(0.)
+    wj2_Pz = jet4.p4.Pz() if has2wj else op.c_float(0.)
+    wj2_E  = jet4.p4.E()  if has2wj else op.c_float(0.)
+    
     # Jet-1 variables :: Available for each category
-    bj1_Px             = self.HLL.bJetCorrP4(jet1).Px()                       if not Res0b else op.c_float(0.)
-    bj1_Py             = self.HLL.bJetCorrP4(jet1).Py()                       if not Res0b else op.c_float(0.)
-    bj1_Pz             = self.HLL.bJetCorrP4(jet1).Pz()                       if not Res0b else op.c_float(0.)
-    bj1_E              = self.HLL.bJetCorrP4(jet1).E()                        if not Res0b else op.c_float(0.)
     bj1_M              = self.HLL.bJetCorrP4(jet1).M()                        if not Res0b else op.c_float(0.)
     bj1_pt             = self.HLL.bJetCorrP4(jet1).Pt()                       if not Res0b else op.c_float(0.)
     bj1_eta            = self.HLL.bJetCorrP4(jet1).Eta()                      if not Res0b else op.c_float(0.)
@@ -167,10 +185,6 @@ def returnClassicInputs_Resolved(self, lepton, jpaSelectedJets, L1out, L2out, jp
     bj1MetDPhi         = op.abs(self.HLL.SinglepMet_dPhi(jet1, self.corrMET)) if not Res0b else op.c_float(0.)
 
     # Jet-2 variables :: Available for 2b2Wj, 2b1Wj. 2b0Wj
-    bj2_Px            = self.HLL.bJetCorrP4(jet2).Px()                        if has2bj else op.c_float(0.)
-    bj2_Py            = self.HLL.bJetCorrP4(jet2).Py()                        if has2bj else op.c_float(0.)
-    bj2_Pz            = self.HLL.bJetCorrP4(jet2).Pz()                        if has2bj else op.c_float(0.)
-    bj2_E             = self.HLL.bJetCorrP4(jet2).E()                         if has2bj else op.c_float(0.)
     bj2_M             = self.HLL.bJetCorrP4(jet2).M()                         if has2bj else op.c_float(0.)
     bj2_pt            = self.HLL.bJetCorrP4(jet2).Pt()                        if has2bj else op.c_float(0.)
     bj2_eta           = self.HLL.bJetCorrP4(jet2).Eta()                       if has2bj else op.c_float(0.)
@@ -189,10 +203,6 @@ def returnClassicInputs_Resolved(self, lepton, jpaSelectedJets, L1out, L2out, jp
     cosThetaS_Hbb     = op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(jet1.p4, jet2.p4)   if has2bj else op.c_float(0.)
 
     # Jet-3 variables :: Available for 2b2Wj, 2b1Wj, 1b2Wj, 1b1Wj
-    wj1_Px            = jet3.p4.Px()                                  if has1wj or has2wj else op.c_float(0.)
-    wj1_Py            = jet3.p4.Py()                                  if has1wj or has2wj else op.c_float(0.)
-    wj1_Pz            = jet3.p4.Pz()                                  if has1wj or has2wj else op.c_float(0.)
-    wj1_E             = jet3.p4.E()                                   if has1wj or has2wj else op.c_float(0.)
     wj1_M             = jet3.mass                                     if has1wj or has2wj else op.c_float(0.)
     wj1_pt            = jet3.pt                                       if has1wj or has2wj else op.c_float(0.)
     wj1_eta           = jet3.eta                                      if has1wj or has2wj else op.c_float(0.)
@@ -204,10 +214,6 @@ def returnClassicInputs_Resolved(self, lepton, jpaSelectedJets, L1out, L2out, jp
     wj1MetDPhi        = op.abs(self.HLL.SinglepMet_dPhi(jet3, self.corrMET))   if has1wj or has2wj else op.c_float(0.)
     
     # Jet-4 variables :: Available for 2b2Wj, 1b2Wj
-    wj2_Px            = jet4.p4.Px()                                  if has2wj else op.c_float(0.)
-    wj2_Py            = jet4.p4.Py()                                  if has2wj else op.c_float(0.)
-    wj2_Pz            = jet4.p4.Pz()                                  if has2wj else op.c_float(0.)
-    wj2_E             = jet4.p4.E()                                   if has2wj else op.c_float(0.)
     wj2_M             = jet4.mass                                     if has2wj else op.c_float(0.)
     wj2_pt            = jet4.pt                                       if has2wj else op.c_float(0.)
     wj2_eta           = jet4.eta                                      if has2wj else op.c_float(0.)
@@ -274,35 +280,35 @@ def returnClassicInputs_Resolved(self, lepton, jpaSelectedJets, L1out, L2out, jp
     
     # VBF variables
     VBFj1Px        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                               op.switch(VBFJetPairsJPA[0][0].p4.Px() > VBFJetPairsJPA[0][1].p4.Px(),
+                               op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                          VBFJetPairsJPA[0][0].p4.Px(), VBFJetPairsJPA[0][1].p4.Px()),
                                op.c_float(0.)) if not Res0b else op.c_float(0.)
     VBFj2Px        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                               op.switch(VBFJetPairsJPA[0][0].p4.Px() > VBFJetPairsJPA[0][1].p4.Px(),
+                               op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                          VBFJetPairsJPA[0][1].p4.Px(), VBFJetPairsJPA[0][0].p4.Px()),
                                op.c_float(0.)) if not Res0b else op.c_float(0.)
     VBFj1Py        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                               op.switch(VBFJetPairsJPA[0][0].p4.Py() > VBFJetPairsJPA[0][1].p4.Py(),
+                               op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                          VBFJetPairsJPA[0][0].p4.Py(), VBFJetPairsJPA[0][1].p4.Py()),
                                op.c_float(0.)) if not Res0b else op.c_float(0.)
     VBFj2Py        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                               op.switch(VBFJetPairsJPA[0][0].p4.Py() > VBFJetPairsJPA[0][1].p4.Py(),
+                               op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                          VBFJetPairsJPA[0][1].p4.Py(), VBFJetPairsJPA[0][0].p4.Py()),
                                op.c_float(0.)) if not Res0b else op.c_float(0.)
     VBFj1Pz        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                               op.switch(VBFJetPairsJPA[0][0].p4.Pz() > VBFJetPairsJPA[0][1].p4.Pz(),
+                               op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                          VBFJetPairsJPA[0][0].p4.Pz(), VBFJetPairsJPA[0][1].p4.Pz()),
                                op.c_float(0.)) if not Res0b else op.c_float(0.)
     VBFj2Pz        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                               op.switch(VBFJetPairsJPA[0][0].p4.Pz() > VBFJetPairsJPA[0][1].p4.Pz(),
+                               op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                          VBFJetPairsJPA[0][1].p4.Pz(), VBFJetPairsJPA[0][0].p4.Pz()),
                                op.c_float(0.)) if not Res0b else op.c_float(0.)
     VBFj1E         = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                               op.switch(VBFJetPairsJPA[0][0].p4.E() > VBFJetPairsJPA[0][1].p4.E(),
+                               op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                          VBFJetPairsJPA[0][0].p4.E(), VBFJetPairsJPA[0][1].p4.E()),
                                op.c_float(0.)) if not Res0b else op.c_float(0.)
     VBFj2E         = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                               op.switch(VBFJetPairsJPA[0][0].p4.E() > VBFJetPairsJPA[0][1].p4.E(),
+                               op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                          VBFJetPairsJPA[0][1].p4.E(), VBFJetPairsJPA[0][0].p4.E()),
                                op.c_float(0.)) if not Res0b else op.c_float(0.)
     VBFj1pt        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
@@ -435,8 +441,8 @@ def returnClassicInputs_Resolved(self, lepton, jpaSelectedJets, L1out, L2out, jp
         minJetDPhi     = op.abs(op.deltaPhi(jet1.p4,jet2.p4))
         minJetDEta     = op.abs(jet1.eta - jet2.eta)
         maxJetDR       = op.deltaR(jet1.p4,jet2.p4)
-        maxJetDPhi       = op.abs(op.deltaPhi(jet1.p4,jet2.p4))
-        maxJetDEta       = op.abs(jet1.eta-jet2.eta)
+        maxJetDPhi     = op.abs(op.deltaPhi(jet1.p4,jet2.p4))
+        maxJetDEta     = op.abs(jet1.eta-jet2.eta)
         minLepJetDR    = self.HLL.MinDR_lep2j(lepton,jet1,jet2)
         minLepJetDPhi  = self.HLL.MinDPhi_lep2j(lepton,jet1,jet2)
         minLepJetDEta  = self.HLL.MinDEta_lep2j(lepton,jet1,jet2)
@@ -534,32 +540,47 @@ def returnClassicInputs_Resolved(self, lepton, jpaSelectedJets, L1out, L2out, jp
         w1w2_MT        = op.c_float(0.)
         JPAcat         = op.c_int(7)
         
-    return{('L1_2b2Wj',                'L1_2b2Wj',                (25,0,1)):        L1out[0],
-           ('L1_2b1Wj',                'L1_2b1Wj',                (25,0,1)):        L1out[1],
-           ('L1_1b2Wj',                'L1_1b2Wj',                (25,0,1)):        L1out[2],
-           ('L1_2b0Wj',                'L1_2b0Wj',                (25,0,1)):        L1out[3],
-           ('L1_1b1Wj',                'L1_1b1Wj',                (25,0,1)):        L1out[4],
-           ('L1_1b0Wj',                'L1_1b0Wj',                (25,0,1)):        L1out[5],
-           ('L2_2b2Wj',                'L2_2b2Wj',                (25,0,1)):        L2out[0],
-           ('L2_2b1Wj',                'L2_2b1Wj',                (25,0,1)):        L2out[1],
-           ('L2_1b2Wj',                'L2_1b2Wj',                (25,0,1)):        L2out[2],
-           ('L2_2b0Wj',                'L2_2b0Wj',                (25,0,1)):        L2out[3],
-           ('L2_1b1Wj',                'L2_1b1Wj',                (25,0,1)):        L2out[4],
-           ('L2_1b0Wj',                'L2_1b0Wj',                (25,0,1)):        L2out[5],
-           ('L2_0b',                   'L2_0b',                   (25,0,1)):        L2out[6],
+    return{('L12b2Wj',                 'L1_2b2Wj',                (25,0,1)):        L1out[0],
+           ('L12b1Wj',                 'L1_2b1Wj',                (25,0,1)):        L1out[1],
+           ('L11b2Wj',                 'L1_1b2Wj',                (25,0,1)):        L1out[2],
+           ('L12b0Wj',                 'L1_2b0Wj',                (25,0,1)):        L1out[3],
+           ('L11b1Wj',                 'L1_1b1Wj',                (25,0,1)):        L1out[4],
+           ('L11b0Wj',                 'L1_1b0Wj',                (25,0,1)):        L1out[5],
+           ('L22b2Wj',                 'L2_2b2Wj',                (25,0,1)):        L2out[0],
+           ('L22b1Wj',                 'L2_2b1Wj',                (25,0,1)):        L2out[1],
+           ('L21b2Wj',                 'L2_1b2Wj',                (25,0,1)):        L2out[2],
+           ('L22b0Wj',                 'L2_2b0Wj',                (25,0,1)):        L2out[3],
+           ('L21b1Wj',                 'L2_1b1Wj',                (25,0,1)):        L2out[4],
+           ('L21b0Wj',                 'L2_1b0Wj',                (25,0,1)):        L2out[5],
+           ('L20b',                    'L2_0b',                   (25,0,1)):        L2out[6],
            ('leppdgId',                'leppdgId',                (45,-22.,22.)):   lepton.pdgId,
            ('lepcharge',               'lepcharge',               (3,-1,1.)):       lepton.charge,
-           ('lepmet_DPhi',             'lepmet_DPhi',             (20,0,3.2)):      op.abs(self.HLL.SinglepMet_dPhi(lepton, self.corrMET)),
-           ('lepmet_pt',               'lepmet_pt',               (50,0,300)):      self.HLL.SinglepMet_Pt(lepton, self.corrMET),
-           ('lep_MT',                  'lep_MT',                  (40,0,200)):      self.HLL.MT(lepton, self.corrMET),
-           ('lep_conept',              'lep_conept',              (40,0,200)):      self.HLL.lambdaConePt(lepton),
-           ('minDR_lep_allJets',       'minDR_lep_allJets',       (5,0,5)):         self.HLL.MinDR_part1_partCont(lepton, self.ak4Jets),
-           ('minDEta_lep_allJets',     'minDEta_lep_allJets',     (5,0,5)):         self.HLL.MinDEta_part1_partCont(lepton, self.ak4Jets),
-           #('minDPhi_lep_allJets',     'minDPhi_lep_allJets',     (5,0,5)):         self.HLL.MinDPhi_part1_partCont(lepton, self.ak4Jets),
-           ('bj1Px',                   'bj1_Px',                  (50,-250.,250.)): bj1_Px,
-           ('bj1Py',                   'bj1_Py',                  (50,-250.,250.)): bj1_Py,
-           ('bj1Pz',                   'bj1_Pz',                  (50,-250.,250.)): bj1_Pz,
-           ('bj1E',                    'bj1_E',                   (50,0.,500.)):    bj1_E,
+           ('lepE',                    'lepE',                    (50,0.,500.)):    lep_E,
+           ('lepPx',                   'lepPx',                   (50,-250.,250.)): lep_Px,
+           ('lepPy',                   'lepPy',                   (50,-250.,250.)): lep_Py,
+           ('lepPz',                   'lepPz',                   (50,-250.,250.)): lep_Pz,
+           ('bj1E',                    'bj1E',                    (50,0.,500.)):    bj1_E,
+           ('bj1Px',                   'bj1Px',                   (50,-250.,250.)): bj1_Px,
+           ('bj1Py',                   'bj1Py',                   (50,-250.,250.)): bj1_Py,
+           ('bj1Pz',                   'bj1Pz',                   (50,-250.,250.)): bj1_Pz,
+           ('bj2E',                    'bj2E',                    (50,0.,500.)):    bj2_E,
+           ('bj2Px',                   'bj2Px',                   (50,-250.,250.)): bj2_Px,
+           ('bj2Py',                   'bj2Py',                   (50,-250.,250.)): bj2_Py,
+           ('bj2Pz',                   'bj2Pz',                   (50,-250.,250.)): bj2_Pz,
+           ('wj1E',                    'wj1E',                    (50,0.,500.)):    wj1_E,
+           ('wj1Px',                   'wj1Px',                   (50,-250.,250.)): wj1_Px,
+           ('wj1Py',                   'wj1Py',                   (50,-250.,250.)): wj1_Py,
+           ('wj1Pz',                   'wj1Pz',                   (50,-250.,250.)): wj1_Pz,
+           ('wj2E',                    'wj2E',                    (50,0.,500.)):    wj2_E,
+           ('wj2Px',                   'wj2Px',                   (50,-250.,250.)): wj2_Px,
+           ('wj2Py',                   'wj2Py',                   (50,-250.,250.)): wj2_Py,
+           ('wj2Pz',                   'wj2Pz',                   (50,-250.,250.)): wj2_Pz,
+           ('lepmetDPhi',              'lepmet_DPhi',             (20,0,3.2)):      op.abs(self.HLL.SinglepMet_dPhi(lepton, self.corrMET)),
+           ('lepmetPt',                'lepmet_pt',               (50,0,300)):      self.HLL.SinglepMet_Pt(lepton, self.corrMET),
+           ('lepMT',                   'lep_MT',                  (40,0,200)):      self.HLL.MT(lepton, self.corrMET),
+           ('lepConept',               'lep_conept',              (40,0,200)):      self.HLL.lambdaConePt(lepton),
+           ('minDRLepAllJets',         'minDR_lep_allJets',       (5,0,5)):         self.HLL.MinDR_part1_partCont(lepton, self.ak4Jets),
+           ('minDEtaLepAllJets',       'minDEta_lep_allJets',     (5,0,5)):         self.HLL.MinDEta_part1_partCont(lepton, self.ak4Jets),
            ('bj1M',                    'bj1_M',                   (50,0.,500.)):    bj1_M,
            ('bj1Pt',                   'bj1_Pt',                  (50,-250.,250.)): bj1_pt,
            ('bj1Eta',                  'bj1_Eta',                 (50,0.,5.)):      bj1_eta,
@@ -569,10 +590,6 @@ def returnClassicInputs_Resolved(self, lepton, jpaSelectedJets, L1out, L2out, jp
            ('bj1LepDEta',              'bj1LepDEta',              (50,0.,5.)):      bj1LepDEta,
            ('bj1LepDPhi',              'bj1LepDPhi',              (50,0.,5.)):      bj1LepDPhi,
            ('bj1MetDPhi',              'bj1MetDPhi',              (50,0.,5.)):      bj1MetDPhi,
-           ('bj2Px',                   'bj2_Px',                  (50,-250.,250.)): bj2_Px,
-           ('bj2Py',                   'bj2_Py',                  (50,-250.,250.)): bj2_Py,
-           ('bj2Pz',                   'bj2_Pz',                  (50,-250.,250.)): bj2_Pz,
-           ('bj2E',                    'bj2_E',                   (50,0.,500.)):    bj2_E,
            ('bj2M',                    'bj2_M',                   (50,0.,500.)):    bj2_M,
            ('bj2Pt',                   'bj2_Pt',                  (50,-250.,250.)): bj2_pt,
            ('bj2Eta',                  'bj2_Eta',                 (50,0.,5.)):      bj2_eta,
@@ -586,11 +603,7 @@ def returnClassicInputs_Resolved(self, lepton, jpaSelectedJets, L1out, L2out, jp
            ('HbbLepDEta',              'HbbLepDEta',              (50,0.,5.)):      HbbLepDEta,
            ('HbbLepDPhi',              'HbbLepDPhi',              (50,0.,5.)):      HbbLepDPhi,
            ('HbbMetDPhi',              'HbbMetDPhi',              (50,0.,5.)):      HbbMetDPhi,
-           ('cosThetaS_Hbb',           'cosThetaS_Hbb',           (50,0.,1.)):      cosThetaS_Hbb,
-           ('wj1Px',                   'wj1_Px',                  (50,-250.,250.)): wj1_Px,
-           ('wj1Py',                   'wj1_Py',                  (50,-250.,250.)): wj1_Py,
-           ('wj1Pz',                   'wj1_Pz',                  (50,-250.,250.)): wj1_Pz,
-           ('wj1E',                    'wj1_E',                   (50,0.,500.)):    wj1_E,
+           ('cosThetaSHbb',            'cosThetaS_Hbb',           (50,0.,1.)):      cosThetaS_Hbb,
            ('wj1M',                    'wj1_M',                   (50,0.,500.)):    wj1_M,
            ('wj1Pt',                   'wj1_Pt',                  (50,-250.,250.)): wj1_pt,
            ('wj1Eta',                  'wj1_Eta',                 (50,0.,5.)):      wj1_eta,
@@ -600,10 +613,6 @@ def returnClassicInputs_Resolved(self, lepton, jpaSelectedJets, L1out, L2out, jp
            ('wj1LepDEta',              'wj1LepDEta',              (50,0.,5.)):      wj1LepDEta,
            ('wj1LepDPhi',              'wj1LepDPhi',              (50,0.,5.)):      wj1LepDPhi,
            ('wj1MetDPhi',              'wj1MetDPhi',              (50,0.,5.)):      wj1MetDPhi,
-           ('wj2Px',                   'wj2_Px',                  (50,-250.,250.)): wj2_Px,
-           ('wj2Py',                   'wj2_Py',                  (50,-250.,250.)): wj2_Py,
-           ('wj2Pz',                   'wj2_Pz',                  (50,-250.,250.)): wj2_Pz,
-           ('wj2E',                    'wj2_E',                   (50,0.,500.)):    wj2_E,
            ('wj2M',                    'wj2_M',                   (50,0.,500.)):    wj2_M,
            ('wj2Pt',                   'wj2_Pt',                  (50,-250.,250.)): wj2_pt,
            ('wj2Eta',                  'wj2_Eta',                 (50,0.,5.)):      wj2_eta,
@@ -617,15 +626,15 @@ def returnClassicInputs_Resolved(self, lepton, jpaSelectedJets, L1out, L2out, jp
            ('WjjLepDEta',              'wLepDEta',                (50,0.,5.)):      WjjLepDEta,
            ('WjjLepDPhi',              'wLepDPhi',                (50,0.,5.)):      WjjLepDPhi,
            ('WjjMetDPhi',              'wMetDPhi',                (50,0.,5.)):      WjjMetDPhi,
-           ('HWW_Mass',                'HWW_Mass',                (50,0.,300.)):    HWW_Mass,
-           ('HWW_Simple_Mass',         'HWW_Simple_Mass',         (50,0.,300.)):    HWW_Simple_Mass,
-           ('HWW_dR',                  'HWW_dR',                  (50,0.,5.)):      HWW_dR,
-           ('HWW_dPhi',                'HWW_dPhi',                (50,0.,5.)):      HWW_dPhi,
-           ('HWW_dEta',                'HWW_dEta',                (50,0.,5.)):      HWW_dEta,
+           ('HWWMass',                 'HWW_Mass',                (50,0.,300.)):    HWW_Mass,
+           ('HWWSimpleMass',           'HWW_Simple_Mass',         (50,0.,300.)):    HWW_Simple_Mass,
+           ('HWWdR',                   'HWW_dR',                  (50,0.,5.)):      HWW_dR,
+           ('HWWdPhi',                 'HWW_dPhi',                (50,0.,5.)):      HWW_dPhi,
+           ('HWWdEta',                 'HWW_dEta',                (50,0.,5.)):      HWW_dEta,
            ('angleBetWWPlane',         'angleBetWWPlane',         (50,0.,5.)):      angleBetWWPlane,           
-           ('cosThetaS_Wjj_simple',    'cosThetaS_Wjj_simple',    (20,0.,1.)):      cosThetaS_Wjj_simple,
-           ('cosThetaS_WW_simple_met', 'cosThetaS_WW_simple_met', (20,0.,1.)):      cosThetaS_WW_simple_met,
-           ('cosThetaS_HH_simple_met', 'cosThetaS_HH_simple_met', (20,0.,1.)):      cosThetaS_HH_simple_met,
+           ('cosThetaSWjjSimple',      'cosThetaS_Wjj_simple',    (20,0.,1.)):      cosThetaS_Wjj_simple,
+           ('cosThetaSWWSimpleMet',    'cosThetaS_WW_simple_met', (20,0.,1.)):      cosThetaS_WW_simple_met,
+           ('cosThetaSHHSimpleMet',    'cosThetaS_HH_simple_met', (20,0.,1.)):      cosThetaS_HH_simple_met,
            ('mHH',                     'mHH',                     (50,0.,300.)):    mHH,
            ('angleBetHWPlane',         'angleBetHWPlane',         (50,0.,5.)):      angleBetHWPlane,
            ('neuPx',                   'neuPx',                   (50,-100.,100.)): neuPx,
@@ -633,24 +642,24 @@ def returnClassicInputs_Resolved(self, lepton, jpaSelectedJets, L1out, L2out, jp
            ('neuPz',                   'neuPz',                   (50,-100.,100.)): neuPz,
            ('neuPt',                   'neuPt',                   (50,-100.,100.)): neuPt,
            ('neuE',                    'neuE',                    (50,-100.,100.)): neuE,
-           ('bj1bj2_DR',               'bj1bj2_DR',               (50,0.,5)):       bj1bj2_DR,
-           ('bj1bj2_DPhi',             'bj1bj2_DPhi',             (50,0.,5)):       bj1bj2_DPhi,
-           ('bj1bj2_DEta',             'bj1bj2_DEta',             (50,0.,5)):       bj1bj2_DEta,
-           ('bj1wj1_DR',               'bj1wj1_DR',               (50,0.,5)):       bj1wj1_DR,
-           ('bj1wj1_DPhi',             'bj1wj1_DPhi',             (50,0.,5)):       bj1wj1_DPhi,
-           ('bj1wj1_DEta',             'bj1wj1_DEta',             (50,0.,5)):       bj1wj1_DEta,
-           ('bj1wj2_DR',               'bj1wj2_DR',               (50,0.,5)):       bj1wj2_DR,
-           ('bj1wj2_DPhi',             'bj1wj2_DPhi',             (50,0.,5)):       bj1wj2_DPhi,
-           ('bj1wj2_DEta',             'bj1wj2_DEta',             (50,0.,5)):       bj1wj2_DEta,
-           ('bj2wj1_DR',               'bj2wj1_DR',               (50,0.,5)):       bj2wj1_DR,
-           ('bj2wj1_DPhi',             'bj2wj1_DPhi',             (50,0.,5)):       bj2wj1_DPhi,
-           ('bj2wj1_DEta',             'bj2wj1_DEta',             (50,0.,5)):       bj2wj1_DEta,
-           ('bj2wj2_DR',               'bj2wj2_DR',               (50,0.,5)):       bj2wj2_DR,
-           ('bj2wj2_DPhi',             'bj2wj2_DPhi',             (50,0.,5)):       bj2wj2_DPhi,
-           ('bj2wj2_DEta',             'bj2wj2_DEta',             (50,0.,5)):       bj2wj2_DEta,
-           ('wj1wj2_DR',               'wj1wj2_DR',               (50,0.,5)):       wj1wj2_DR,
-           ('wj1wj2_DPhi',             'wj1wj2_DPhi',             (50,0.,5)):       wj1wj2_DPhi,
-           ('wj1wj2_DEta',             'wj1wj2_DEta',             (50,0.,5)):       wj1wj2_DEta,
+           ('bj1bj2DR',                'bj1bj2_DR',               (50,0.,5)):       bj1bj2_DR,
+           ('bj1bj2DPhi',              'bj1bj2_DPhi',             (50,0.,5)):       bj1bj2_DPhi,
+           ('bj1bj2DEta',              'bj1bj2_DEta',             (50,0.,5)):       bj1bj2_DEta,
+           ('bj1wj1DR',                'bj1wj1_DR',               (50,0.,5)):       bj1wj1_DR,
+           ('bj1wj1DPhi',              'bj1wj1_DPhi',             (50,0.,5)):       bj1wj1_DPhi,
+           ('bj1wj1DEta',              'bj1wj1_DEta',             (50,0.,5)):       bj1wj1_DEta,
+           ('bj1wj2DR',                'bj1wj2_DR',               (50,0.,5)):       bj1wj2_DR,
+           ('bj1wj2DPhi',              'bj1wj2_DPhi',             (50,0.,5)):       bj1wj2_DPhi,
+           ('bj1wj2DEta',              'bj1wj2_DEta',             (50,0.,5)):       bj1wj2_DEta,
+           ('bj2wj1DR',                'bj2wj1_DR',               (50,0.,5)):       bj2wj1_DR,
+           ('bj2wj1DPhi',              'bj2wj1_DPhi',             (50,0.,5)):       bj2wj1_DPhi,
+           ('bj2wj1DEta',              'bj2wj1_DEta',             (50,0.,5)):       bj2wj1_DEta,
+           ('bj2wj2DR',                'bj2wj2_DR',               (50,0.,5)):       bj2wj2_DR,
+           ('bj2wj2DPhi',              'bj2wj2_DPhi',             (50,0.,5)):       bj2wj2_DPhi,
+           ('bj2wj2DEta',              'bj2wj2_DEta',             (50,0.,5)):       bj2wj2_DEta,
+           ('wj1wj2DR',                'wj1wj2_DR',               (50,0.,5)):       wj1wj2_DR,
+           ('wj1wj2DPhi',              'wj1wj2_DPhi',             (50,0.,5)):       wj1wj2_DPhi,
+           ('wj1wj2DEta',              'wj1wj2_DEta',             (50,0.,5)):       wj1wj2_DEta,
            ('VBFj1Px',                 'VBFj1Px',                 (50,0.,200)):     VBFj1Px,           
            ('VBFj1Py',                 'VBFj1Py',                 (50,0.,200)):     VBFj1Py,           
            ('VBFj1Pz',                 'VBFj1Pz',                 (50,0.,200)):     VBFj1Pz,           
@@ -666,13 +675,13 @@ def returnClassicInputs_Resolved(self, lepton, jpaSelectedJets, L1out, L2out, jp
            ('VBFj1j2dEta',             'VBFj1j2dEta',             (50,0.,200)):     VBFj1j2dEta,
            ('VBFj1j2dPhi',             'VBFj1j2dPhi',             (50,0.,200)):     VBFj1j2dPhi,
            ('VBFj1j2invM',             'VBFj1j2invM',             (50,0.,200)):     VBFj1j2invM,           
-           ('VBF_tag',                 'VBF_tag',                 (2, 0, 2)):       VBF_tag,
+           ('VBFtag',                  'VBF_tag',                 (2, 0, 2)):       VBF_tag,
            ('zeppenfeldVar',           'zeppenfeldVar',           (50,0.,200)):     zeppenfeldVar,           
-           ('pt_taggedJetsAvg',        'pt_taggedJetsAvg',        (50,0.,200)):     pt_taggedJetsAvg,
-           ('mass_taggedJetsAvg',      'mass_taggedJetsAvg',      (50,0.,200)):     mass_taggedJetsAvg,
-           ('bj1bj2_pt',               'bj1bj2_pt',               (50,0.,200)):     bj1bj2_pt,
-           ('bj1bj2_M',                'bj1bj2_M',                (50,0.,200)):     bj1bj2_M,
-           ('mT_top_3particle',        'mT_top_3particle',        (50,0.,200)):     mT_top_3particle,
+           ('ptTaggedJetsAvg',         'pt_taggedJetsAvg',        (50,0.,200)):     pt_taggedJetsAvg,
+           ('massTaggedJetsAvg',       'mass_taggedJetsAvg',      (50,0.,200)):     mass_taggedJetsAvg,
+           ('bj1bj2Pt',                'bj1bj2_pt',               (50,0.,200)):     bj1bj2_pt,
+           ('bj1bj2M',                 'bj1bj2_M',                (50,0.,200)):     bj1bj2_M,
+           ('mTtop3particle',          'mT_top_3particle',        (50,0.,200)):     mT_top_3particle,
            ('avgJetDR',                'avgJetDR',                (50,0.,200)):     avgJetDR,
            ('minJetDR',                'minJetDR',                (50,0.,200)):     minJetDR,
            ('maxJetDR',                'maxJetDR',                (50,0.,200)):     maxJetDR,
@@ -688,56 +697,121 @@ def returnClassicInputs_Resolved(self, lepton, jpaSelectedJets, L1out, L2out, jp
            ('maxJetDPhi',              'maxJetDPhi',              (50,0.,200)):     maxJetDPhi,
            ('minLepJetDPhi',           'minLepJetDPhi',           (50,0.,200)):     minLepJetDPhi,
            ('maxLepJetDPhi',           'maxLepJetDPhi',           (50,0.,200)):     maxLepJetDPhi,
-           ('HT2_lepJetMet',           'HT2_lepJetMet',           (50,0.,200)):     HT2_lepJetMet,
-           ('HT2R_lepJetMet',          'HT2R_lepJetMet',          (50,0.,200)):     HT2R_lepJetMet,
-           ('wj1wj2_pt',               'wj1wj2_pt',               (50,0.,200)):     wj1wj2_pt,
-           ('wj1wj2_M',                'wj1wj2_M',                (50,0.,200)):     wj1wj2_M,
-           ('w1w2_MT',                 'w1w2_MT',                 (50,0.,200)):     w1w2_MT,
+           ('HT2LepJetMet',            'HT2_lepJetMet',           (50,0.,200)):     HT2_lepJetMet,
+           ('HT2RLepJetMet',           'HT2R_lepJetMet',          (50,0.,200)):     HT2R_lepJetMet,
+           ('wj1wj2Pt',                'wj1wj2_pt',               (50,0.,200)):     wj1wj2_pt,
+           ('wj1wj2M',                 'wj1wj2_M',                (50,0.,200)):     wj1wj2_M,
+           ('w1w2MT',                  'w1w2_MT',                 (50,0.,200)):     w1w2_MT,
            ('JPAcat',                  'JPAcat',                  (8,0.,8)):        JPAcat 
     }
 
 
-def returnLBNInputs_Resolved(self,lepton,jet1=None,jet2=None,jet3=None,jet4=None) :
+def returnLBNInputs_Resolved(self,lepton,jpaSelectedJets,jpaArg) :
+    Res2b2Wj = False
+    Res2b1Wj = False
+    Res1b2Wj = False
+    Res2b0Wj = False
+    Res1b1Wj = False
+    Res1b0Wj = False
+    Res0b    = False
+    if jpaArg == 'Res2b2Wj':
+        Res2b2Wj = True
+        jet1 = jpaSelectedJets[0]
+        jet2 = jpaSelectedJets[1]
+        jet3 = jpaSelectedJets[2]
+        jet4 = jpaSelectedJets[3]
+
+    elif jpaArg == 'Res2b1Wj':
+        Res2b1Wj = True
+        jet1 = jpaSelectedJets[0]
+        jet2 = jpaSelectedJets[1]
+        jet3 = jpaSelectedJets[2]
+        jet4 = None
+
+    elif jpaArg == 'Res1b2Wj':
+        Res1b2Wj = True
+        jet1 = jpaSelectedJets[0]
+        jet2 = None
+        jet3 = jpaSelectedJets[1]
+        jet4 = jpaSelectedJets[2]
+
+    elif jpaArg == 'Res2b0Wj':
+        Res2b0Wj = True
+        jet1 = jpaSelectedJets[0]
+        jet2 = jpaSelectedJets[1]
+        jet3 = None
+        jet4 = None
+
+    elif jpaArg == 'Res1b1Wj':
+        Res1b1Wj = True
+        jet1 = jpaSelectedJets[0]
+        jet2 = None
+        jet3 = jpaSelectedJets[1]
+        jet4 = None
+
+    elif jpaArg == 'Res1b0Wj':
+        Res1b0Wj = True
+        jet1 = jpaSelectedJets[0]
+        jet2 = None
+        jet3 = None
+        jet4 = None
+
+    elif jpaArg == 'Res0b':
+        Res0b = True
+        jet1 = None
+        jet2 = None
+        jet3 = None
+        jet4 = None        
+
+    else:
+        raise RuntimeError('Resolved JPA category is not mentioned!')
+
+    # 4 bools to make this easy
+    has2bj = any([Res2b2Wj, Res2b1Wj, Res2b0Wj])
+    has1bj = any([Res1b2Wj, Res1b1Wj, Res1b0Wj])
+    has2wj = any([Res2b2Wj, Res1b2Wj])
+    has1wj = any([Res2b1Wj, Res1b1Wj])
+
     lep_Px = lepton.p4.Px();
     lep_Py = lepton.p4.Py();
     lep_Pz = lepton.p4.Pz();
     lep_E  = lepton.p4.E();
-    bj1_Px = op.c_float(0.) if jet1 == None else jet1.p4.Px()
-    bj1_Py = op.c_float(0.) if jet1 == None else jet1.p4.Py()
-    bj1_Pz = op.c_float(0.) if jet1 == None else jet1.p4.Pz()
-    bj1_E  = op.c_float(0.) if jet1 == None else jet1.p4.E()
-    bj2_Px = op.c_float(0.) if jet2 == None else jet2.p4.Px()
-    bj2_Py = op.c_float(0.) if jet2 == None else jet2.p4.Py()
-    bj2_Pz = op.c_float(0.) if jet2 == None else jet2.p4.Pz()
-    bj2_E  = op.c_float(0.) if jet2 == None else jet2.p4.E()
-    wj1_Px = op.c_float(0.) if jet3 == None else jet3.p4.Px()
-    wj1_Py = op.c_float(0.) if jet3 == None else jet3.p4.Py()
-    wj1_Pz = op.c_float(0.) if jet3 == None else jet3.p4.Pz()
-    wj1_E  = op.c_float(0.) if jet3 == None else jet3.p4.E()
-    wj2_Px = op.c_float(0.) if jet4 == None else jet4.p4.Px()
-    wj2_Py = op.c_float(0.) if jet4 == None else jet4.p4.Py()
-    wj2_Pz = op.c_float(0.) if jet4 == None else jet4.p4.Pz()
-    wj2_E  = op.c_float(0.) if jet4 == None else jet4.p4.E()
-    return {('lep_E',   'lep_E',   (50,0.,500.)):    lep_E,
-            ('lep_Px',  'lep_Px',  (50,-250.,250.)): lep_Px,
-            ('lep_Py',  'lep_Py',  (50,-250.,250.)): lep_Py,
-            ('lep_Pz',  'lep_Pz',  (50,-250.,250.)): lep_Pz,
-            ('bj1_E',   'bj1_E',   (50,0.,500.)):    bj1_E,
-            ('bj1_Px',  'bj1_Px',  (50,-250.,250.)): bj1_Px,
-            ('bj1_Py',  'bj1_Py',  (50,-250.,250.)): bj1_Py,
-            ('bj1_Pz',  'bj1_Pz',  (50,-250.,250.)): bj1_Pz,
-            ('bj2_E',   'bj2_E',   (50,0.,500.)):    bj2_E,
-            ('bj2_Px',  'bj2_Px',  (50,-250.,250.)): bj2_Px,
-            ('bj2_Py',  'bj2_Py',  (50,-250.,250.)): bj2_Py,
-            ('bj2_Pz',  'bj2_Pz',  (50,-250.,250.)): bj2_Pz,
-            ('wj1_E',   'wj1_E',   (50,0.,500.)):    wj1_E,
-            ('wj1_Px',  'wj1_Px',  (50,-250.,250.)): wj1_Px,
-            ('wj1_Py',  'wj1_Py',  (50,-250.,250.)): wj1_Py,
-            ('wj1_Pz',  'wj1_Pz',  (50,-250.,250.)): wj1_Pz,
-            ('wj2_E',   'wj2_E',   (50,0.,500.)):    wj2_E,
-            ('wj2_Px',  'wj2_Px',  (50,-250.,250.)): wj2_Px,
-            ('wj2_Py',  'wj2_Py',  (50,-250.,250.)): wj2_Py,
-            ('wj2_Pz',  'wj2_Pz',  (50,-250.,250.)): wj2_Pz
+    bj1_Px = self.HLL.bJetCorrP4(jet1).Px() if not Res0b else op.c_float(0.)
+    bj1_Py = self.HLL.bJetCorrP4(jet1).Py() if not Res0b else op.c_float(0.)
+    bj1_Pz = self.HLL.bJetCorrP4(jet1).Pz() if not Res0b else op.c_float(0.)
+    bj1_E  = self.HLL.bJetCorrP4(jet1).E()  if not Res0b else op.c_float(0.)
+    bj2_Px = self.HLL.bJetCorrP4(jet2).Px() if has2bj else op.c_float(0.)
+    bj2_Py = self.HLL.bJetCorrP4(jet2).Py() if has2bj else op.c_float(0.)
+    bj2_Pz = self.HLL.bJetCorrP4(jet2).Pz() if has2bj else op.c_float(0.)
+    bj2_E  = self.HLL.bJetCorrP4(jet2).E()  if has2bj else op.c_float(0.)
+    wj1_Px = jet3.p4.Px() if has1wj or has2wj else op.c_float(0.)
+    wj1_Py = jet3.p4.Py() if has1wj or has2wj else op.c_float(0.)
+    wj1_Pz = jet3.p4.Pz() if has1wj or has2wj else op.c_float(0.)
+    wj1_E  = jet3.p4.E()  if has1wj or has2wj else op.c_float(0.)
+    wj2_Px = jet4.p4.Px() if has2wj else op.c_float(0.)
+    wj2_Py = jet4.p4.Py() if has2wj else op.c_float(0.)
+    wj2_Pz = jet4.p4.Pz() if has2wj else op.c_float(0.)
+    wj2_E  = jet4.p4.E()  if has2wj else op.c_float(0.)
+    return {('lepE',   'lepE',   (50,0.,500.)):    lep_E,
+            ('lepPx',  'lepPx',  (50,-250.,250.)): lep_Px,
+            ('lepPy',  'lepPy',  (50,-250.,250.)): lep_Py,
+            ('lepPz',  'lepPz',  (50,-250.,250.)): lep_Pz,
+            ('bj1E',   'bj1E',   (50,0.,500.)):    bj1_E,
+            ('bj1Px',  'bj1Px',  (50,-250.,250.)): bj1_Px,
+            ('bj1Py',  'bj1Py',  (50,-250.,250.)): bj1_Py,
+            ('bj1Pz',  'bj1Pz',  (50,-250.,250.)): bj1_Pz,
+            ('bj2E',   'bj2E',   (50,0.,500.)):    bj2_E,
+            ('bj2Px',  'bj2Px',  (50,-250.,250.)): bj2_Px,
+            ('bj2Py',  'bj2Py',  (50,-250.,250.)): bj2_Py,
+            ('bj2Pz',  'bj2Pz',  (50,-250.,250.)): bj2_Pz,
+            ('wj1E',   'wj1E',   (50,0.,500.)):    wj1_E,
+            ('wj1Px',  'wj1Px',  (50,-250.,250.)): wj1_Px,
+            ('wj1Py',  'wj1Py',  (50,-250.,250.)): wj1_Py,
+            ('wj1Pz',  'wj1Pz',  (50,-250.,250.)): wj1_Pz,
+            ('wj2E',   'wj2E',   (50,0.,500.)):    wj2_E,
+            ('wj2Px',  'wj2Px',  (50,-250.,250.)): wj2_Px,
+            ('wj2Py',  'wj2Py',  (50,-250.,250.)): wj2_Py,
+            ('wj2Pz',  'wj2Pz',  (50,-250.,250.)): wj2_Pz
     }
     
 
@@ -751,12 +825,12 @@ def returnCommonInputs_Boosted(self):
            ('METenergy',               'METenergy',               (50, 0, 300)):    self.corrMET.p4.E(),
            ('METpt',                   'METpt',                   (50, 0, 300)):    self.corrMET.pt,
            ('METphi',                  'METphi',                  (50, 0, 300)):    self.corrMET.phi,
-           ('MET_LD',                  'MET_LD',                  (40,0,200)):      self.HLL.MET_LD_DL(self.corrMET, self.ak4Jets, self.electronsFakeSel, self.muonsFakeSel),
+           ('METLD',                   'MET_LD',                  (40,0,200)):      self.HLL.MET_LD_DL(self.corrMET, self.ak4Jets, self.electronsFakeSel, self.muonsFakeSel),
            ('nfakeableMuons',          'nfakeableMuons',          (5,0,5)):         op.static_cast("UInt_t",op.rng_len(self.muonsFakeSel)),
            ('nfakeableElectrons',      'nfakeableElectrons',      (5,0,5)):         op.static_cast("UInt_t",op.rng_len(self.electronsFakeSel)),
            ('hT',                      'hT',                      (50,0,300)):      op.static_cast("Float_t", self.HLL.HT_SL(self.ak4Jets)),
-           ('hT_withCleanAk4',         'hT_withCleanAk4',         (50,0,300)):      op.static_cast("Float_t", self.HLL.HT_SL(self.ak4JetsCleanedFromAk8b)),
-           ('hT_withAk8',              'hT_withAk8',              (50,0,300)):      op.static_cast("Float_t", (self.ak8BJets[0].pt+self.HLL.HT_SL(self.ak4JetsCleanedFromAk8b))),
+           ('hTwithCleanAk4',          'hT_withCleanAk4',         (50,0,300)):      op.static_cast("Float_t", self.HLL.HT_SL(self.ak4JetsCleanedFromAk8b)),
+           ('hTwithAk8',               'hT_withAk8',              (50,0,300)):      op.static_cast("Float_t", (self.ak8BJets[0].pt+self.HLL.HT_SL(self.ak4JetsCleanedFromAk8b))),
            ('nAk4Jets',                'nAk4Jets',                (10,0,10)):       op.static_cast("UInt_t",op.rng_len(self.ak4Jets)),
            ('nAk4BJets',               'nAk4BJets',               (10,0,10)):       op.static_cast("UInt_t",op.rng_len(self.ak4BJets)),
            ('nAk4BJetsLoose',          'nAk4BJetsLoose',          (10,0,10)):       op.static_cast("UInt_t",op.rng_len(self.ak4BJetsLoose)),
@@ -799,11 +873,16 @@ def returnClassicInputs_Boosted(self, lepton, jpaSelectedJets, L1out, L2out, jpa
     else:
         raise RuntimeError('Boosted JPA category is not mentioned!')
 
+    wj1_Px = jet3.p4.Px() if not Hbb0Wj else op.c_float(0.)
+    wj1_Py = jet3.p4.Py() if not Hbb0Wj else op.c_float(0.)
+    wj1_Pz = jet3.p4.Pz() if not Hbb0Wj else op.c_float(0.)
+    wj1_E  = jet3.p4.E()  if not Hbb0Wj else op.c_float(0.)
+    wj2_Px = jet4.p4.Px() if Hbb2Wj else op.c_float(0.)
+    wj2_Py = jet4.p4.Py() if Hbb2Wj else op.c_float(0.)
+    wj2_Pz = jet4.p4.Pz() if Hbb2Wj else op.c_float(0.)
+    wj2_E  = jet4.p4.E()  if Hbb2Wj else op.c_float(0.)
+    
     # FatJet Variables
-    fatbj_Px             = fjet.p4.Px()
-    fatbj_Py             = fjet.p4.Py()
-    fatbj_Pz             = fjet.p4.Pz()
-    fatbj_E              = fjet.p4.E()
     fatbj_pt             = fjet.pt
     fatbj_eta            = fjet.eta
     fatbj_phi            = fjet.phi
@@ -837,28 +916,27 @@ def returnClassicInputs_Boosted(self, lepton, jpaSelectedJets, L1out, L2out, jpa
     fatbjSub1_lepDPhi = op.switch(fjet.subJet1.pt > fjet.subJet2.pt, op.abs(op.deltaPhi(fjet.subJet1.p4, lepton.p4)), op.abs(op.deltaPhi(fjet.subJet2.p4, lepton.p4)))
     fatbjSub2_lepDPhi = op.switch(fjet.subJet1.pt > fjet.subJet2.pt, op.abs(op.deltaPhi(fjet.subJet2.p4, lepton.p4)), op.abs(op.deltaPhi(fjet.subJet1.p4, lepton.p4)))
     minSubJetLepDR    = op.min(op.deltaR(fjet.subJet1.p4, lepton.p4), op.deltaR(fjet.subJet2.p4, lepton.p4))
-    
+    fatbj_lepDEta     = op.abs(fjet.eta - lepton.eta)
+    fatbj_metDPhi     = op.abs(op.deltaPhi(fjet.p4, self.corrMET.p4))    
+
     # Wj1 variables
-    wj1_Px            = jet3.p4.Px()                 if not Hbb0Wj else op.c_float(0.)
-    wj1_Py            = jet3.p4.Py()                 if not Hbb0Wj else op.c_float(0.)
-    wj1_Pz            = jet3.p4.Pz()                 if not Hbb0Wj else op.c_float(0.)
-    wj1_E             = jet3.p4.E()                  if not Hbb0Wj else op.c_float(0.)
+    wj1_M             = jet3.p4.M()                  if not Hbb0Wj else op.c_float(0.)
     wj1_pt            = jet3.pt                      if not Hbb0Wj else op.c_float(0.)
     wj1_eta           = jet3.eta                     if not Hbb0Wj else op.c_float(0.)
+    wj1_phi           = jet3.phi                     if not Hbb0Wj else op.c_float(0.)
     wj1_bTagDeepFlavB = jet3.btagDeepFlavB           if not Hbb0Wj else op.c_float(0.)
 
     # Wj2 variables
-    wj2_Px            = jet4.p4.Px()                 if Hbb2Wj else op.c_float(0.)
-    wj2_Py            = jet4.p4.Py()                 if Hbb2Wj else op.c_float(0.)
-    wj2_Pz            = jet4.p4.Pz()                 if Hbb2Wj else op.c_float(0.)
-    wj2_E             = jet4.p4.E()                  if Hbb2Wj else op.c_float(0.)
+    wj2_M             = jet4.p4.M()                  if Hbb2Wj else op.c_float(0.)
     wj2_pt            = jet4.pt                      if Hbb2Wj else op.c_float(0.)
     wj2_eta           = jet4.eta                     if Hbb2Wj else op.c_float(0.)
+    wj2_phi           = jet4.phi                     if Hbb2Wj else op.c_float(0.)
     wj2_bTagDeepFlavB = jet4.btagDeepFlavB           if Hbb2Wj else op.c_float(0.)
     
     # fatjet-Wj1
     fatbj_Wj1DR       = op.deltaR(fjet.p4, jet3.p4)                                if not Hbb0Wj else op.c_float(0.)
     fatbj_Wj1DPhi     = op.abs(op.deltaPhi(fjet.p4, jet3.p4))                      if not Hbb0Wj else op.c_float(0.)
+    fatbj_Wj1DEta     = op.abs(fjet.eta - jet3.eta)                                if not Hbb0Wj else op.c_float(0.)
     fatbjSub1_Wj1DR   = op.switch(fjet.subJet1.pt > fjet.subJet2.pt, 
                                   op.deltaR(fjet.subJet1.p4, jet3.p4), 
                                   op.deltaR(fjet.subJet2.p4, jet3.p4))             if not Hbb0Wj else op.c_float(0.)
@@ -873,12 +951,19 @@ def returnClassicInputs_Boosted(self, lepton, jpaSelectedJets, L1out, L2out, jpa
                                   op.abs(op.deltaPhi(fjet.subJet1.p4, jet3.p4)))   if not Hbb0Wj else op.c_float(0.)
     # Wjs-lepton
     wj1_lepDR         = op.deltaR(jet3.p4, lepton.p4)                     if not Hbb0Wj else op.c_float(0.)
+    wj1_lepDEta       = op.abs(jet3.eta - lepton.eta)                     if not Hbb0Wj else op.c_float(0.)
     wj1_lepDPhi       = op.abs(op.deltaPhi(jet3.p4, lepton.p4))           if not Hbb0Wj else op.c_float(0.)
+    wj1_metDPhi       = op.abs(op.deltaPhi(jet3.p4, self.corrMET.p4))     if not Hbb0Wj else op.c_float(0.)
+
     wj2_lepDR         = op.deltaR(jet4.p4, lepton.p4)                     if Hbb2Wj else op.c_float(0.)
+    wj2_lepDEta       = op.abs(jet4.eta - lepton.eta)                     if Hbb2Wj else op.c_float(0.)
     wj2_lepDPhi       = op.abs(op.deltaPhi(jet4.p4, lepton.p4))           if Hbb2Wj else op.c_float(0.)
+    wj2_metDPhi       = op.abs(op.deltaPhi(jet4.p4, self.corrMET.p4))     if Hbb2Wj else op.c_float(0.)
+    
     # fatjet-Wj2
     fatbj_wj2DR       = op.deltaR(fjet.p4, jet4.p4)                       if Hbb2Wj else op.c_float(0.) 
     fatbj_wj2DPhi     = op.abs(op.deltaPhi(fjet.p4, jet4.p4))             if Hbb2Wj else op.c_float(0.)
+    fatbj_wj2DEta     = op.abs(fjet.eta - jet4.eta)                       if Hbb2Wj else op.c_float(0.)
     fatbjSub1_wj2DR   = op.deltaR(fjet.subJet1.p4, jet4.p4)               if Hbb2Wj else op.c_float(0.)
     fatbjSub1_wj2DPhi = op.abs(op.deltaPhi(fjet.subJet1.p4, jet4.p4))     if Hbb2Wj else op.c_float(0.)
     fatbjSub2_wj2DR   = op.deltaR(fjet.subJet2.p4, jet4.p4)               if Hbb2Wj else op.c_float(0.)
@@ -886,6 +971,7 @@ def returnClassicInputs_Boosted(self, lepton, jpaSelectedJets, L1out, L2out, jpa
     # Wj1-Wj2
     wj1wj2DR             = op.deltaR(jet3.p4, jet4.p4)                                                                                               if Hbb2Wj else op.c_float(0.)
     wj1wj2DPhi           = op.abs(op.deltaPhi(jet3.p4, jet4.p4))                                                                                     if Hbb2Wj else op.c_float(0.)
+    wj1wj2DEta           = op.abs(jet3.eta - jet4.eta)                                                                                               if Hbb2Wj else op.c_float(0.)
     WWplaneAngle         = self.HLL.angleBetPlanes(lepton.p4,self.HLL.neuP4(jet3.p4+jet4.p4+lepton.p4, self.corrMET),jet3.p4, jet4.p4)               if Hbb2Wj else op.c_float(0.) 
     WWplaneAngle_withMET = self.HLL.angleWWplane(lepton.p4, self.corrMET, jet3.p4, jet4.p4)                                                          if Hbb2Wj else op.c_float(0.)
     HWplaneAngle         = self.HLL.angleBetPlanes(fjet.subJet1.p4,fjet.subJet2.p4,jet3.p4,jet4.p4)                                                  if Hbb2Wj else op.c_float(0.)
@@ -893,6 +979,14 @@ def returnClassicInputs_Boosted(self, lepton, jpaSelectedJets, L1out, L2out, jpa
     HWW_Mass          = op.extMethod("HHbbWWJPA::HWW_SimpleMassWithRecoNeutrino", returnType="float")(jet3.p4, jet4.p4, lepton.p4, self.corrMET.p4)  if Hbb2Wj else op.c_float(0.)
     HWW_Simple_Mass   = self.HLL.HWW_met_simple(jet3.p4,jet4.p4,lepton.p4,self.corrMET.p4).M()                                                       if Hbb2Wj else op.c_float(0.)
     HWW_dR            = self.HLL.dR_Hww(jet3.p4,jet4.p4,lepton.p4,self.corrMET)                                                                      if Hbb2Wj else op.c_float(0.)
+    HWW_dEta          = self.HLL.dEta_Hww(jet3.p4,jet4.p4,lepton.p4,self.corrMET)                                                                    if Hbb2Wj else op.c_float(0.)
+    HWW_dPhi          = self.HLL.dPhi_Hww(jet3.p4,jet4.p4,lepton.p4,self.corrMET)                                                                    if Hbb2Wj else op.c_float(0.)
+
+    WjjLepDR          = op.deltaR((jet3.p4 + jet4.p4), lepton.p4)                  if Hbb2Wj else op.c_float(0.)
+    WjjLepDEta        = op.abs((jet3.p4 + jet4.p4).Eta() - lepton.eta)             if Hbb2Wj else op.c_float(0.)
+    WjjLepDPhi        = op.abs(op.deltaPhi((jet3.p4 + jet4.p4), lepton.p4))        if Hbb2Wj else op.c_float(0.)
+    WjjMetDPhi        = op.abs(op.deltaPhi((jet3.p4 + jet4.p4), self.corrMET.p4))  if Hbb2Wj else op.c_float(0.)
+
     cosThetaS_Wjj_simple    = op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(jet3.p4, jet4.p4)                                             if Hbb2Wj else op.c_float(0.)
     cosThetaS_WW_simple_met = op.extMethod("HHbbWWJPA::cosThetaS", returnType="float")(self.HLL.Wjj_simple(jet3.p4,jet4.p4), self.HLL.Wlep_met_simple(lepton.p4, self.corrMET.p4)) \
                               if Hbb2Wj else op.c_float(0.)
@@ -901,28 +995,28 @@ def returnClassicInputs_Boosted(self, lepton, jpaSelectedJets, L1out, L2out, jpa
     
     
     VBFj1Px        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                                 op.switch(VBFJetPairsJPA[0][0].p4.Px() > VBFJetPairsJPA[0][1].p4.Px(),
+                                 op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                            VBFJetPairsJPA[0][0].p4.Px(), VBFJetPairsJPA[0][1].p4.Px()), op.c_float(0.)) 
     VBFj2Px        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                                 op.switch(VBFJetPairsJPA[0][0].p4.Px() > VBFJetPairsJPA[0][1].p4.Px(),
+                                 op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                            VBFJetPairsJPA[0][1].p4.Px(), VBFJetPairsJPA[0][0].p4.Px()), op.c_float(0.)) 
     VBFj1Py        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                                 op.switch(VBFJetPairsJPA[0][0].p4.Py() > VBFJetPairsJPA[0][1].p4.Py(),
+                                 op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                            VBFJetPairsJPA[0][0].p4.Py(), VBFJetPairsJPA[0][1].p4.Py()), op.c_float(0.)) 
     VBFj2Py        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                                 op.switch(VBFJetPairsJPA[0][0].p4.Py() > VBFJetPairsJPA[0][1].p4.Py(),
+                                 op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                            VBFJetPairsJPA[0][1].p4.Py(), VBFJetPairsJPA[0][0].p4.Py()), op.c_float(0.)) 
     VBFj1Pz        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                                 op.switch(VBFJetPairsJPA[0][0].p4.Pz() > VBFJetPairsJPA[0][1].p4.Pz(),
+                                 op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                            VBFJetPairsJPA[0][0].p4.Pz(), VBFJetPairsJPA[0][1].p4.Pz()), op.c_float(0.)) 
     VBFj2Pz        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                                 op.switch(VBFJetPairsJPA[0][0].p4.Pz() > VBFJetPairsJPA[0][1].p4.Pz(),
+                                 op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                            VBFJetPairsJPA[0][1].p4.Pz(), VBFJetPairsJPA[0][0].p4.Pz()), op.c_float(0.)) 
     VBFj1E         = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                                 op.switch(VBFJetPairsJPA[0][0].p4.E() > VBFJetPairsJPA[0][1].p4.E(),
+                                 op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
                                            VBFJetPairsJPA[0][0].p4.E(), VBFJetPairsJPA[0][1].p4.E()), op.c_float(0.))   
     VBFj2E         = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
-                                 op.switch(VBFJetPairsJPA[0][0].p4.E() > VBFJetPairsJPA[0][1].p4.E(), 
+                                 op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt, 
                                            VBFJetPairsJPA[0][1].p4.E(), VBFJetPairsJPA[0][0].p4.E()), op.c_float(0.))   
     VBFj1pt        = op.switch(op.rng_len(VBFJetPairsJPA) > 0, 
                                  op.switch(VBFJetPairsJPA[0][0].pt > VBFJetPairsJPA[0][1].pt,
@@ -992,95 +1086,118 @@ def returnClassicInputs_Boosted(self, lepton, jpaSelectedJets, L1out, L2out, jpa
         JPAcat      = op.c_int(3)                
         
 
-    return{('L1_Hbb2Wj',               'L1_Hbb2Wj',               (25,0,1)):        L1out[0],
-           ('L1_Hbb1Wj',               'L1_Hbb1Wj',               (25,0,1)):        L1out[1],
-           ('L2_Hbb2Wj',               'L2_Hbb2Wj',               (25,0,1)):        L2out[0],
-           ('L2_Hbb1Wj',               'L2_Hbb1Wj',               (25,0,1)):        L2out[1],
-           ('L2_Hbb0Wj',               'L2_Hbb0Wj',               (25,0,1)):        L2out[2],
+    return{('L1Hbb2Wj',                'L1_Hbb2Wj',               (25,0,1)):        L1out[0],
+           ('L1Hbb1Wj',                'L1_Hbb1Wj',               (25,0,1)):        L1out[1],
+           ('L2Hbb2Wj',                'L2_Hbb2Wj',               (25,0,1)):        L2out[0],
+           ('L2Hbb1Wj',                'L2_Hbb1Wj',               (25,0,1)):        L2out[1],
+           ('L2Hbb0Wj',                'L2_Hbb0Wj',               (25,0,1)):        L2out[2],
            ('leppdgId',                'leppdgId',                (45,-22.,22.)):   lepton.pdgId,
            ('lepcharge',               'lepcharge',               (3,-1,1.)):       lepton.charge,
-           ('lepmet_DPhi',             'lepmet_DPhi',             (20,0,3.2)):      op.abs(self.HLL.SinglepMet_dPhi(lepton, self.corrMET)),
-           ('lepmet_pt',               'lepmet_pt',               (50,0,300)):      self.HLL.SinglepMet_Pt(lepton, self.corrMET),
-           ('lep_MT',                  'lep_MT',                  (40,0,200)):      self.HLL.MT(lepton, self.corrMET),
-           ('lep_conept',              'lep_conept',              (40,0,200)):      self.HLL.lambdaConePt(lepton),
-           ('minDR_lep_allJets',       'minDR_lep_allJets',       (5,0,5)):         self.HLL.MinDR_part1_partCont(lepton, self.ak4Jets),
-           ('fatbj_Px',                'fatbj_Px',                (50,-250.,250.)): fatbj_Px,
-           ('fatbj_Py',                'fatbj_Py',                (50,-250.,250.)): fatbj_Py,
-           ('fatbj_Pz',                'fatbj_Py',                (50,-250.,250.)): fatbj_Pz,
-           ('fatbj_E',                 'fatbj_E',                 (50,0.,500.)):    fatbj_E,
-           ('fatbj_pt',                'fatbj_pt',                (50,0.,500.)):    fatbj_pt,
-           ('fatbj_eta',               'fatbj_eta',               (50,0.,500.)):    fatbj_eta,
-           ('fatbj_phi',               'fatbj_phi',               (50,0.,500.)):    fatbj_phi,
-           ('fatbj_sub1pt',            'fatbj_sub1pt',            (50,0.,500.)):    fatbj_sub1pt,
-           ('fatbj_sub1eta',           'fatbj_sub1eta',           (50,0.,500.)):    fatbj_sub1eta,
-           ('fatbj_sub2pt',            'fatbj_sub2pt',            (50,0.,500.)):    fatbj_sub2pt,
-           ('fatbj_sub2eta',           'fatbj_sub2eta',           (50,0.,500.)):    fatbj_sub2eta,
-           ('fatbj_softdropMass',      'fatbj_softdropMass',      (50,0.,500.)):    fatbj_softdropMass,
-           ('fatbj_tau1',              'fatbj_tau1',              (50,0.,500.)):    fatbj_tau1,
-           ('fatbj_tau2',              'fatbj_tau2',              (50,0.,500.)):    fatbj_tau2,
-           ('fatbj_tau3',              'fatbj_tau3',              (50,0.,500.)):    fatbj_tau3,
-           ('fatbj_tau4',              'fatbj_tau4',              (50,0.,500.)):    fatbj_tau4,
-           ('fatbj_tau43',             'fatbj_tau43',             (50,0.,500.)):    fatbj_tau43,
-           ('fatbj_tau32',             'fatbj_tau32',             (50,0.,500.)):    fatbj_tau32,
-           ('fatbj_tau21',             'fatbj_tau21',             (50,0.,500.)):    fatbj_tau21,
-           ('fatbj_btagDDBvL',         'fatbj_btagDDBvL',         (50,0.,500.)):    fatbj_btagDDBvL,
-           ('fatbj_btagDDBvL_noMD',    'fatbj_btagDDBvL_noMD',    (50,0.,500.)):    fatbj_btagDDBvL_noMD,
-           ('fatbj_btagDDCvB',         'fatbj_btagDDCvB',         (50,0.,500.)):    fatbj_btagDDCvB,
-           ('fatbj_btagDDCvB_noMD',    'fatbj_btagDDCvB_noMD',    (50,0.,500.)):    fatbj_btagDDCvB_noMD,
-           ('fatbj_btagDDCvL',         'fatbj_btagDDCvL',         (50,0.,500.)):    fatbj_btagDDCvL,
-           ('fatbj_btagDDCvL_noMD',    'fatbj_btagDDCvL_noMD',    (50,0.,500.)):    fatbj_btagDDCvL_noMD,
-           ('fatbj_btagDeepB',         'fatbj_btagDeepB',         (50,0.,500.)):    fatbj_btagDeepB,
-           ('cosThetaS_Hbb',           'cosThetaS_Hbb',           (50,0.,500.)):    cosThetaS_Hbb,
-           ('mT_top_3particle',        'mT_top_3particle',        (50,0.,500.)):    mT_top_3particle,
-           ('wj1_Px',                  'wj1_Px',                  (50,0.,500.)):    wj1_Px,           
-           ('wj1_Py',                  'wj1_Py',                  (50,0.,500.)):    wj1_Py,           
-           ('wj1_Pz',                  'wj1_Pz',                  (50,0.,500.)):    wj1_Pz,           
-           ('wj1_E',                   'wj1_E',                   (50,0.,500.)):    wj1_E,           
-           ('wj1_pt',                  'wj1_pt',                  (50,0.,500.)):    wj1_pt,           
-           ('wj1_eta',                 'wj1_eta',                 (50,0.,500.)):    wj1_eta,           
-           ('wj1_bTagDeepFlavB',       'wj1_bTagDeepFlavB',       (50,0.,500.)):    wj1_bTagDeepFlavB,
-           ('wj2_Px',                  'wj2_Px',                  (50,0.,500.)):    wj2_Px,           
-           ('wj2_Py',                  'wj2_Py',                  (50,0.,500.)):    wj2_Py,           
-           ('wj2_Pz',                  'wj2_Pz',                  (50,0.,500.)):    wj2_Pz,           
-           ('wj2_E',                   'wj2_E',                   (50,0.,500.)):    wj2_E,           
-           ('wj2_pt',                  'wj2_pt',                  (50,0.,500.)):    wj2_pt,           
-           ('wj2_eta',                 'wj2_eta',                 (50,0.,500.)):    wj2_eta,           
-           ('wj2_bTagDeepFlavB',       'wj2_bTagDeepFlavB',       (50,0.,500.)):    wj2_bTagDeepFlavB,
-           ('fatbj_lepDR',             'fatbj_lepDR',             (50,0.,500.)):    fatbj_lepDR,                     
-           ('fatbjSub1_lepDR',         'fatbjSub1_lepDR',         (50,0.,500.)):    fatbjSub1_lepDR,                     
-           ('fatbjSub2_lepDR',         'fatbjSub2_lepDR',         (50,0.,500.)):    fatbjSub2_lepDR,                     
-           ('fatbj_lepDPhi',           'fatbj_lepDPhi',           (50,0.,500.)):    fatbj_lepDPhi,
-           ('fatbjSub1_lepDPhi',       'fatbjSub1_lepDPhi',       (50,0.,500.)):    fatbjSub1_lepDPhi,
+           ('lepE',                    'lep_E',                   (50,0.,500.)):    lepton.p4.E(),
+           ('lepPx',                   'lep_Px',                  (50,-250.,250.)): lepton.p4.Px(),
+           ('lepPy',                   'lep_Py',                  (50,-250.,250.)): lepton.p4.Py(),
+           ('lepPz',                   'lep_Pz',                  (50,-250.,250.)): lepton.p4.Pz(),
+           ('fatbjE',                  'fatbj_E',                 (50,0.,500.)):    fjet.p4.E(),
+           ('fatbjPx',                 'bj1_Px',                  (50,-250.,250.)): fjet.p4.Px(),
+           ('fatbjPy',                 'bj1_Py',                  (50,-250.,250.)): fjet.p4.Py(),
+           ('fatbjPz',                 'bj1_Pz',                  (50,-250.,250.)): fjet.p4.Pz(),
+           ('wj1E',                    'wj1_E',                   (50,0.,500.)):    wj1_E,
+           ('wj1Px',                   'wj1_Px',                  (50,-250.,250.)): wj1_Px,
+           ('wj1Py',                   'wj1_Py',                  (50,-250.,250.)): wj1_Py,
+           ('wj1Pz',                   'wj1_Pz',                  (50,-250.,250.)): wj1_Pz,
+           ('wj2E',                    'wj2_E',                   (50,0.,500.)):    wj2_E,
+           ('wj2Px',                   'wj2_Px',                  (50,-250.,250.)): wj2_Px,
+           ('wj2Py',                   'wj2_Py',                  (50,-250.,250.)): wj2_Py,
+           ('wj2Pz',                   'wj2_Pz',                  (50,-250.,250.)): wj2_Pz,
+           ('lepmetDPhi',              'lepmet_DPhi',             (20,0,3.2)):      op.abs(self.HLL.SinglepMet_dPhi(lepton, self.corrMET)),
+           ('lepmetPt',                'lepmet_pt',               (50,0,300)):      self.HLL.SinglepMet_Pt(lepton, self.corrMET),
+           ('lepMT',                   'lep_MT',                  (40,0,200)):      self.HLL.MT(lepton, self.corrMET),
+           ('lepConept',               'lep_conept',              (40,0,200)):      self.HLL.lambdaConePt(lepton),
+           ('minDRLepAllJets',         'minDR_lep_allJets',       (5,0,5)):         self.HLL.MinDR_part1_partCont(lepton, self.ak4JetsCleanedFromAk8b),
+           ('minDEtaLepAllJets',       'minDEta_lep_allJets',     (5,0,5)):         self.HLL.MinDEta_part1_partCont(lepton, self.ak4JetsCleanedFromAk8b),
+           ('fatbjPt',                 'fatbj_pt',                (50,0.,500.)):    fatbj_pt,
+           ('fatbjEta',                'fatbj_eta',               (50,0.,500.)):    fatbj_eta,
+           ('fatbjPhi',                'fatbj_phi',               (50,0.,500.)):    fatbj_phi,
+           ('fatbjSub1pt',             'fatbj_sub1pt',            (50,0.,500.)):    fatbj_sub1pt,
+           ('fatbjSub1eta',            'fatbj_sub1eta',           (50,0.,500.)):    fatbj_sub1eta,
+           ('fatbjSub2pt',             'fatbj_sub2pt',            (50,0.,500.)):    fatbj_sub2pt,
+           ('fatbjSub2eta',            'fatbj_sub2eta',           (50,0.,500.)):    fatbj_sub2eta,
+           ('fatbjSoftdropMass',       'fatbj_softdropMass',      (50,0.,500.)):    fatbj_softdropMass,
+           ('fatbjTau1',               'fatbj_tau1',              (50,0.,500.)):    fatbj_tau1,
+           ('fatbjTau2',               'fatbj_tau2',              (50,0.,500.)):    fatbj_tau2,
+           ('fatbjTau3',               'fatbj_tau3',              (50,0.,500.)):    fatbj_tau3,
+           ('fatbjTau4',               'fatbj_tau4',              (50,0.,500.)):    fatbj_tau4,
+           ('fatbjTau43',              'fatbj_tau43',             (50,0.,500.)):    fatbj_tau43,
+           ('fatbjTau32',              'fatbj_tau32',             (50,0.,500.)):    fatbj_tau32,
+           ('fatbjTau21',              'fatbj_tau21',             (50,0.,500.)):    fatbj_tau21,
+           ('fatbjBtagDDBvL',          'fatbj_btagDDBvL',         (50,0.,500.)):    fatbj_btagDDBvL,
+           ('fatbjBtagDDBvL_noMD',     'fatbj_btagDDBvL_noMD',    (50,0.,500.)):    fatbj_btagDDBvL_noMD,
+           ('fatbjBtagDDCvB',          'fatbj_btagDDCvB',         (50,0.,500.)):    fatbj_btagDDCvB,
+           ('fatbjBtagDDCvB_noMD',     'fatbj_btagDDCvB_noMD',    (50,0.,500.)):    fatbj_btagDDCvB_noMD,
+           ('fatbjBtagDDCvL',          'fatbj_btagDDCvL',         (50,0.,500.)):    fatbj_btagDDCvL,
+           ('fatbjBtagDDCvL_noMD',     'fatbj_btagDDCvL_noMD',    (50,0.,500.)):    fatbj_btagDDCvL_noMD,
+           ('fatbjBtagDeepB',          'fatbj_btagDeepB',         (50,0.,500.)):    fatbj_btagDeepB,
+           ('fatbjLepDR',              'fatbj_lepDR',             (50,0.,500.)):    fatbj_lepDR,                     
+           ('fatbjSub1LepDR',          'fatbjSub1_lepDR',         (50,0.,500.)):    fatbjSub1_lepDR,                     
+           ('fatbjSub2LepDR',          'fatbjSub2_lepDR',         (50,0.,500.)):    fatbjSub2_lepDR,                     
+           ('fatbjLepDPhi',            'fatbj_lepDPhi',           (50,0.,500.)):    fatbj_lepDPhi,
+           ('fatbjLepDEta',            'fatbj_lepDEta',           (50,0.,500.)):    fatbj_lepDEta,
+           ('fatbjMetDPhi',            'fatbj_metDPhi',           (50,0.,500.)):    fatbj_metDPhi,
            ('minSubJetLepDR',          'minSubJetLepDR',          (50,0.,500.)):    minSubJetLepDR,
-           ('fatbj_Wj1DR',             'fatbj_Wj1DR',             (50,0.,500.)):    fatbj_Wj1DR,
-           ('fatbj_Wj1DPhi',           'fatbj_Wj1DPhi',           (50,0.,500.)):    fatbj_Wj1DPhi,
-           ('fatbjSub1_Wj1DR',         'fatbjSub1_Wj1DR',         (50,0.,500.)):    fatbjSub1_Wj1DR,
-           ('fatbjSub1_Wj1DPhi',       'fatbjSub1_Wj1DPhi',       (50,0.,500.)):    fatbjSub1_Wj1DPhi,           
-           ('fatbjSub2_Wj1DR',         'fatbjSub2_Wj1DR',         (50,0.,500.)):    fatbjSub2_Wj1DR,
-           ('fatbjSub2_Wj1DPhi',       'fatbjSub2_Wj1DPhi',       (50,0.,500.)):    fatbjSub2_Wj1DPhi,
-           ('wj1_lepDR',               'wj1_lepDR',               (50,0.,500.)):    wj1_lepDR,
-           ('wj1_lepDPhi',             'wj1_lepDPhi',             (50,0.,500.)):    wj1_lepDPhi,
-           ('wj2_lepDR',               'wj2_lepDR',               (50,0.,500.)):    wj2_lepDR,
-           ('wj2_lepDPhi',             'wj2_lepDPhi',             (50,0.,500.)):    wj2_lepDPhi,
-           ('fatbj_wj2DR',             'fatbj_wj2DR',             (50,0.,500.)):    fatbj_wj2DR,
-           ('fatbj_wj2DPhi',           'fatbj_wj2DPhi',           (50,0.,500.)):    fatbj_wj2DPhi,
-           ('fatbjSub1_wj2DR',         'fatbjSub1_wj2DR',         (50,0.,500.)):    fatbjSub1_wj2DR,
-           ('fatbjSub1_wj2DPhi',       'fatbjSub1_wj2DPhi',       (50,0.,500.)):    fatbjSub1_wj2DPhi,
-           ('fatbjSub2_wj2DR',         'fatbjSub2_wj2DR',         (50,0.,500.)):    fatbjSub2_wj2DR,
-           ('fatbjSub2_wj2DPhi',       'fatbjSub2_wj2DPhi',       (50,0.,500.)):    fatbjSub2_wj2DPhi,
-           ('wj1wj2_pt',               'wj1wj2_pt',               (50,0.,500.)):    wj1wj2_pt,
+           ('cosThetaSHbb',            'cosThetaS_Hbb',           (50,0.,500.)):    cosThetaS_Hbb,
+           ('mTtop3particle',          'mT_top_3particle',        (50,0.,500.)):    mT_top_3particle,
+           ('wj1M',                    'wj1M',                    (50,0.,500.)):    wj1_M,
+           ('wj1Pt',                   'wj1_pt',                  (50,0.,500.)):    wj1_pt,           
+           ('wj1Eta',                  'wj1_eta',                 (50,0.,500.)):    wj1_eta,           
+           ('wj1Phi',                  'wj1_phi',                 (50,0.,500.)):    wj1_phi,
+           ('wj1BTagDeepFlavB',        'wj1_bTagDeepFlavB',       (50,0.,500.)):    wj1_bTagDeepFlavB,
+           ('wj1LepDR',                'wj1_lepDR',               (50,0.,500.)):    wj1_lepDR,
+           ('wj1LepDEta',              'wj1_lepDEta',             (50,0.,500.)):    wj1_lepDEta,
+           ('wj1LepDPhi',              'wj1_lepDPhi',             (50,0.,500.)):    wj1_lepDPhi,
+           ('wj1MetDPhi',              'wj1_MetDPhi',             (50,0.,500.)):    wj1_metDPhi,
+           ('wj2M',                    'wj2M',                    (50,0.,500.)):    wj2_M,
+           ('wj2Pt',                   'wj2_pt',                  (50,0.,500.)):    wj2_pt,           
+           ('wj2Eta',                  'wj2_eta',                 (50,0.,500.)):    wj2_eta,           
+           ('wj2Phi',                  'wj2_phi',                 (50,0.,500.)):    wj2_phi,
+           ('wj2bTagDeepFlavB',        'wj2_bTagDeepFlavB',       (50,0.,500.)):    wj2_bTagDeepFlavB,
+           ('wj2LepDR',                'wj2_lepDR',               (50,0.,500.)):    wj2_lepDR,
+           ('wj2LepDEta',              'wj2_lepDEta',             (50,0.,500.)):    wj2_lepDEta,
+           ('wj2LepDPhi',              'wj2_lepDPhi',             (50,0.,500.)):    wj2_lepDPhi,
+           ('wj2MetDPhi',              'wj2_MetDPhi',             (50,0.,500.)):    wj2_metDPhi,
+           ('fatbjWj1DR',              'fatbj_Wj1DR',             (50,0.,500.)):    fatbj_Wj1DR,
+           ('fatbjWj1DPhi',            'fatbj_Wj1DPhi',           (50,0.,500.)):    fatbj_Wj1DPhi,
+           ('fatbjWj1DEta',            'fatbj_Wj1DEta',           (50,0.,500.)):    fatbj_Wj1DEta,
+           ('fatbjSub1Wj1DR',          'fatbjSub1_Wj1DR',         (50,0.,500.)):    fatbjSub1_Wj1DR,
+           ('fatbjSub1Wj1DPhi',        'fatbjSub1_Wj1DPhi',       (50,0.,500.)):    fatbjSub1_Wj1DPhi,           
+           ('fatbjSub2Wj1DR',          'fatbjSub2_Wj1DR',         (50,0.,500.)):    fatbjSub2_Wj1DR,
+           ('fatbjSub2Wj1DPhi',        'fatbjSub2_Wj1DPhi',       (50,0.,500.)):    fatbjSub2_Wj1DPhi,
+           ('fatbjWj2DR',              'fatbj_wj2DR',             (50,0.,500.)):    fatbj_wj2DR,
+           ('fatbjWj2DPhi',            'fatbj_wj2DPhi',           (50,0.,500.)):    fatbj_wj2DPhi,
+           ('fatbjWj2DEta',            'fatbj_wj2DEta',           (50,0.,500.)):    fatbj_wj2DEta,
+           ('fatbjSub1Wj2DR',          'fatbjSub1_wj2DR',         (50,0.,500.)):    fatbjSub1_wj2DR,
+           ('fatbjSub1Wj2DPhi',        'fatbjSub1_wj2DPhi',       (50,0.,500.)):    fatbjSub1_wj2DPhi,
+           ('fatbjSub2Wj2DR',          'fatbjSub2_wj2DR',         (50,0.,500.)):    fatbjSub2_wj2DR,
+           ('fatbjSub2Wj2DPhi',        'fatbjSub2_wj2DPhi',       (50,0.,500.)):    fatbjSub2_wj2DPhi,
+           ('wj1wj2Pt',                'wj1wj2_pt',               (50,0.,500.)):    wj1wj2_pt,
            ('wj1wj2DR',                'wj1wj2DR',                (50,0.,500.)):    wj1wj2DR,
            ('wj1wj2DPhi',              'wj1wj2DPhi',              (50,0.,500.)):    wj1wj2DPhi,
+           ('wj1wj2DEta',              'wj1wj2DEta',              (50,0.,500.)):    wj1wj2DEta,
            ('wj1wj2invM',              'wj1wj2invM',              (50,0.,500.)):    wj1wj2invM,
            ('WWplaneAngle',            'WWplaneAngle',            (50,0.,500.)):    WWplaneAngle,
-           ('WWplaneAngle_withMET',    'WWplaneAngle_withMET',    (50,0.,500.)):    WWplaneAngle_withMET,
+           ('WWplaneAngleWithMET',     'WWplaneAngle_withMET',    (50,0.,500.)):    WWplaneAngle_withMET,
            ('HWplaneAngle',            'HWplaneAngle',            (50,0.,500.)):    HWplaneAngle,
-           ('HWW_Mass',                'HWW_Mass',                (50,0.,500.)):    HWW_Mass,
-           ('HWW_Simple_Mass',         'HWW_Simple_Mass',         (50,0.,500.)):    HWW_Simple_Mass,
-           ('HWW_dR',                  'HWW_dR',                  (50,0.,500.)):    HWW_dR,
-           ('cosThetaS_Wjj_simple',    'cosThetaS_Wjj_simple',    (50,0.,1.)):      cosThetaS_Wjj_simple,
-           ('cosThetaS_WW_simple_met', 'cosThetaS_WW_simple_met', (50,0.,1.)):      cosThetaS_WW_simple_met,
-           ('cosThetaS_HH_simple_met', 'cosThetaS_HH_simple_met', (50,0.,1.)):      cosThetaS_HH_simple_met,
+           ('HWWMass',                 'HWW_Mass',                (50,0.,500.)):    HWW_Mass,
+           ('HWWSimpleMass',           'HWW_Simple_Mass',         (50,0.,500.)):    HWW_Simple_Mass,
+           ('HWWdR',                   'HWW_dR',                  (50,0.,500.)):    HWW_dR,
+           ('HWWdPhi',                 'HWW_dPhi',                (50,0.,500.)):    HWW_dPhi,
+           ('HWWdEta',                 'HWW_dEta',                (50,0.,500.)):    HWW_dEta,
+           ('WjjLepDR',                'WjjLepDR',                (50,0,5)):        WjjLepDR,
+           ('WjjLepDEta',              'WjjLepDEta',              (50,0,5)):        WjjLepDEta,
+           ('WjjLepDPhi',              'WjjLepDPhi',              (50,0,5)):        WjjLepDPhi,
+           ('WjjMetDPhi',              'WjjMetDPhi',              (50,0,5)):        WjjMetDPhi,
+           ('cosThetaSWjjSimple',      'cosThetaS_Wjj_simple',    (50,0.,1.)):      cosThetaS_Wjj_simple,
+           ('cosThetaSWWSimpleMet',    'cosThetaS_WW_simple_met', (50,0.,1.)):      cosThetaS_WW_simple_met,
+           ('cosThetaSHHSimpleMet',    'cosThetaS_HH_simple_met', (50,0.,1.)):      cosThetaS_HH_simple_met,
            ('VBFj1Px',                 'VBFj1Px',                 (50,0.,200)):     VBFj1Px,           
            ('VBFj1Py',                 'VBFj1Py',                 (50,0.,200)):     VBFj1Py,           
            ('VBFj1Pz',                 'VBFj1Pz',                 (50,0.,200)):     VBFj1Pz,           
@@ -1096,7 +1213,7 @@ def returnClassicInputs_Boosted(self, lepton, jpaSelectedJets, L1out, L2out, jpa
            ('VBFj1j2dEta',             'VBFj1j2dEta',             (50,0.,200)):     VBFj1j2dEta,
            ('VBFj1j2dPhi',             'VBFj1j2dPhi',             (50,0.,200)):     VBFj1j2dPhi,
            ('VBFj1j2invM',             'VBFj1j2invM',             (50,0.,200)):     VBFj1j2invM,           
-           ('VBF_tag',                 'VBF_tag',                 (2, 0, 2)):       VBF_tag,
+           ('VBFtag',                  'VBF_tag',                 (2, 0, 2)):       VBF_tag,
            ('zeppenfeldVar',           'zeppenfeldVar',           (50,0.,200)):     zeppenfeldVar,           
            ('jetMinDR',                'jetMinDR',                (50,0.,5)):       jetMinDR,           
            ('jetMaxDR',                'jetMaxDR',                (50,0.,5)):       jetMaxDR,           
@@ -1104,39 +1221,63 @@ def returnClassicInputs_Boosted(self, lepton, jpaSelectedJets, L1out, L2out, jpa
            ('jetLepMaxDR',             'jetLepMaxDR',             (50,0.,5)):       jetLepMaxDR,           
            ('HT2',                     'HT2',                     (50,0.,300)):     HT2,           
            ('HT2R',                    'HT2R',                    (50,0.,300)):     HT2R,
-           ('MT_W1W2',                 'MT_W1W2',                 (50,0.,300)):     MT_W1W2,
-           ('HT_taggedJets',           'HT_taggedJets',           (50,0.,300)):     HT_taggedJets,
-           ('M_taggedJetsAvg',         'M_taggedJetsAvg',         (50,0.,300)):     M_taggedJetsAvg,
-           ('E_taggedJetsAvg',         'E_taggedJetsAvg',         (50,0.,300)):     E_taggedJetsAvg,
+           ('MTW1W2',                  'MT_W1W2',                 (50,0.,300)):     MT_W1W2,
+           ('HTtaggedJets',            'HT_taggedJets',           (50,0.,300)):     HT_taggedJets,
+           ('MtaggedJetsAvg',          'M_taggedJetsAvg',         (50,0.,300)):     M_taggedJetsAvg,
+           ('EtaggedJetsAvg',          'E_taggedJetsAvg',         (50,0.,300)):     E_taggedJetsAvg,
            ('JPAcat',                  'JPAcat',                  (3,0.,3)):        JPAcat           
     }
 
 
-def returnLBNInputs_Boosted(self,lep,jet1=None,jet2=None,jet3=None,jet4=None):
-    wj1_Px = op.c_float(0.) if jet3 == None else jet3.p4.Px()
-    wj1_Py = op.c_float(0.) if jet3 == None else jet3.p4.Py()
-    wj1_Pz = op.c_float(0.) if jet3 == None else jet3.p4.Pz()
-    wj1_E  = op.c_float(0.) if jet3 == None else jet3.p4.E()
-    wj2_Px = op.c_float(0.) if jet4 == None else jet4.p4.Px()
-    wj2_Py = op.c_float(0.) if jet4 == None else jet4.p4.Py()
-    wj2_Pz = op.c_float(0.) if jet4 == None else jet4.p4.Pz()
-    wj2_E  = op.c_float(0.) if jet4 == None else jet4.p4.E()
-    return{('lep_E',   'lep_E',   (50,0.,500.)):    lep.p4.E(),
-           ('lep_Px',  'lep_Px',  (50,-250.,250.)): lep.p4.Px(),
-           ('lep_Py',  'lep_Py',  (50,-250.,250.)): lep.p4.Py(),
-           ('lep_Pz',  'lep_Pz',  (50,-250.,250.)): lep.p4.Pz(),
-           ('fatbj_E', 'fatbj_E', (50,0.,500.)):    jet1.p4.E(),
-           ('fatbj_Px','bj1_Px',  (50,-250.,250.)): jet1.p4.Px(),
-           ('fatbj_Py','bj1_Py',  (50,-250.,250.)): jet1.p4.Py(),
-           ('fatbj_Pz','bj1_Pz',  (50,-250.,250.)): jet1.p4.Pz(),
-           ('wj1_E',   'wj1_E',   (50,0.,500.)):    wj1_E,
-           ('wj1_Px',  'wj1_Px',  (50,-250.,250.)): wj1_Px,
-           ('wj1_Py',  'wj1_Py',  (50,-250.,250.)): wj1_Py,
-           ('wj1_Pz',  'wj1_Pz',  (50,-250.,250.)): wj1_Pz,
-           ('wj2_E',   'wj2_E',   (50,0.,500.)):    wj2_E,
-           ('wj2_Px',  'wj2_Px',  (50,-250.,250.)): wj2_Px,
-           ('wj2_Py',  'wj2_Py',  (50,-250.,250.)): wj2_Py,
-           ('wj2_Pz',  'wj2_Pz',  (50,-250.,250.)): wj2_Pz
+def returnLBNInputs_Boosted(self,lepton,jpaSelectedJets,jpaArg):
+    Hbb2Wj = False
+    Hbb1Wj = False
+    Hbb0Wj = False
+
+    fjet = self.ak8BJets[0]
+
+    if jpaArg == 'Hbb2Wj':
+        Hbb2Wj = True
+        jet3 = jpaSelectedJets[0]
+        jet4 = jpaSelectedJets[1]
+
+    elif jpaArg == 'Hbb1Wj':
+        Hbb1Wj = True
+        jet3 = jpaSelectedJets[0]
+        jet4 = None
+
+    elif jpaArg == 'Hbb0Wj':
+        Hbb0Wj = True
+        jet3 = None
+        jet4 = None
+
+    else:
+        raise RuntimeError('Boosted JPA category is not mentioned!')
+
+    wj1_Px = jet3.p4.Px() if not Hbb0Wj else op.c_float(0.)
+    wj1_Py = jet3.p4.Py() if not Hbb0Wj else op.c_float(0.)
+    wj1_Pz = jet3.p4.Pz() if not Hbb0Wj else op.c_float(0.)
+    wj1_E  = jet3.p4.E()  if not Hbb0Wj else op.c_float(0.)
+    wj2_Px = jet4.p4.Px() if Hbb2Wj else op.c_float(0.)
+    wj2_Py = jet4.p4.Py() if Hbb2Wj else op.c_float(0.)
+    wj2_Pz = jet4.p4.Pz() if Hbb2Wj else op.c_float(0.)
+    wj2_E  = jet4.p4.E()  if Hbb2Wj else op.c_float(0.)
+    return{('lepE',   'lep_E',   (50,0.,500.)):    lepton.p4.E(),
+           ('lepPx',  'lep_Px',  (50,-250.,250.)): lepton.p4.Px(),
+           ('lepPy',  'lep_Py',  (50,-250.,250.)): lepton.p4.Py(),
+           ('lepPz',  'lep_Pz',  (50,-250.,250.)): lepton.p4.Pz(),
+           ('fatbjE', 'fatbj_E', (50,0.,500.)):    fjet.p4.E(),
+           ('fatbjPx','bj1_Px',  (50,-250.,250.)): fjet.p4.Px(),
+           ('fatbjPy','bj1_Py',  (50,-250.,250.)): fjet.p4.Py(),
+           ('fatbjPz','bj1_Pz',  (50,-250.,250.)): fjet.p4.Pz(),
+           ('wj1E',   'wj1_E',   (50,0.,500.)):    wj1_E,
+           ('wj1Px',  'wj1_Px',  (50,-250.,250.)): wj1_Px,
+           ('wj1Py',  'wj1_Py',  (50,-250.,250.)): wj1_Py,
+           ('wj1Pz',  'wj1_Pz',  (50,-250.,250.)): wj1_Pz,
+           ('wj2E',   'wj2_E',   (50,0.,500.)):    wj2_E,
+           ('wj2Px',  'wj2_Px',  (50,-250.,250.)): wj2_Px,
+           ('wj2Py',  'wj2_Py',  (50,-250.,250.)): wj2_Py,
+           ('wj2Pz',  'wj2_Pz',  (50,-250.,250.)): wj2_Pz
     }
 
 ### --------------------------------------------------------------------------------------------------- ###

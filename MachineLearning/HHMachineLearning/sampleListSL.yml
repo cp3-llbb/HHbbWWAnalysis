@@ -1,4 +1,4 @@
-sampleDir: /nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA_Corr/
+sampleDir: /nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA_LastTry/
 sampleDict:
   #####################
   #       2016        # 
@@ -4736,18 +4736,57 @@ sampleDict:
       - Skim2018_Resolved2b2Wj_El/results/ZZZ.root
       - Skim2018_Resolved2b2Wj_El/results/tZq_ll.root
     resolved2b2Wj_El_GGF:
-      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH1.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH1.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_10.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_11.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_12.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_2.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_3.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_4.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_5.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_6.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_7.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_8.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_9.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_SM.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_10.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_11.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_12.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_1.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_2.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_3.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_4.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_5.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_6.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_7.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_8.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_9.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_SM.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_10.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_11.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_12.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_2.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_3.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_4.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_5.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_7.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_8.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_9.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_SM.root
+#      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
     resolved2b2Wj_El_H:
       - Skim2018_Resolved2b2Wj_El/results/GluGluHToBB.root
       - Skim2018_Resolved2b2Wj_El/results/GluGluHToGG.root
@@ -4794,27 +4833,33 @@ sampleDict:
       - Skim2018_Resolved2b2Wj_El/results/TTZToLLNuNu_M-10.root
       - Skim2018_Resolved2b2Wj_El/results/TTZToQQ.root
     resolved2b2Wj_El_VBF:
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
     resolved2b2Wj_El_WJets:
       - Skim2018_Resolved2b2Wj_El/results/W1JetsToLNu.root
       - Skim2018_Resolved2b2Wj_El/results/W2JetsToLNu.root
@@ -4853,18 +4898,57 @@ sampleDict:
       - Skim2018_Resolved2b2Wj_Mu/results/ZZZ.root
       - Skim2018_Resolved2b2Wj_Mu/results/tZq_ll.root
     resolved2b2Wj_Mu_GGF:
-      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH1.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH1.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_10.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_11.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_12.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_2.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_3.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_4.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_5.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_6.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_7.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_8.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_9.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_SM.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_10.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_11.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_12.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_1.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_2.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_3.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_4.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_5.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_6.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_7.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_8.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_9.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_SM.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2WToLNu2J_node_10.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2WToLNu2J_node_11.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2WToLNu2J_node_12.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2WToLNu2J_node_2.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2WToLNu2J_node_3.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2WToLNu2J_node_4.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2WToLNu2J_node_5.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2WToLNu2J_node_7.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2WToLNu2J_node_8.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2WToLNu2J_node_9.root
+      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2WToLNu2J_node_SM.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
     resolved2b2Wj_Mu_H:
       - Skim2018_Resolved2b2Wj_Mu/results/GluGluHToBB.root
       - Skim2018_Resolved2b2Wj_Mu/results/GluGluHToGG.root
@@ -4911,27 +4995,33 @@ sampleDict:
       - Skim2018_Resolved2b2Wj_Mu/results/TTZToLLNuNu_M-10.root
       - Skim2018_Resolved2b2Wj_Mu/results/TTZToQQ.root
     resolved2b2Wj_Mu_VBF:
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b2Wj_Mu/results/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
     resolved2b2Wj_Mu_WJets:
       - Skim2018_Resolved2b2Wj_Mu/results/W1JetsToLNu.root
       - Skim2018_Resolved2b2Wj_Mu/results/W2JetsToLNu.root
@@ -4970,18 +5060,57 @@ sampleDict:
       - Skim2018_Resolved2b1Wj_El/results/ZZZ.root
       - Skim2018_Resolved2b1Wj_El/results/tZq_ll.root
     resolved2b1Wj_El_GGF:
-      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH1.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH1.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_10.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_11.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_12.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_2.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_3.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_4.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_5.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_6.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_7.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_8.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_9.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_SM.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_10.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_11.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_12.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_1.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_2.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_3.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_4.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_5.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_6.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_7.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_8.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_9.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_SM.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_10.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_11.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_12.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_2.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_3.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_4.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_5.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_7.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_8.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_9.root
+      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2WToLNu2J_node_SM.root
+#      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
     resolved2b1Wj_El_H:
       - Skim2018_Resolved2b1Wj_El/results/GluGluHToBB.root
       - Skim2018_Resolved2b1Wj_El/results/GluGluHToGG.root
@@ -5028,27 +5157,33 @@ sampleDict:
       - Skim2018_Resolved2b1Wj_El/results/TTZToLLNuNu_M-10.root
       - Skim2018_Resolved2b1Wj_El/results/TTZToQQ.root
     resolved2b1Wj_El_VBF:
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
-      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff.root
+      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+#      - Skim2018_Resolved2b1Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
     resolved2b1Wj_El_WJets:
       - Skim2018_Resolved2b1Wj_El/results/W1JetsToLNu.root
       - Skim2018_Resolved2b1Wj_El/results/W2JetsToLNu.root
@@ -5087,18 +5222,19 @@ sampleDict:
       - Skim2018_Resolved2b1Wj_Mu/results/ZZZ.root
       - Skim2018_Resolved2b1Wj_Mu/results/tZq_ll.root
     resolved2b1Wj_Mu_GGF:
-      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
-      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+
+#      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+#      - Skim2018_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2Tau_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
     resolved2b1Wj_Mu_H:
       - Skim2018_Resolved2b1Wj_Mu/results/GluGluHToBB.root
       - Skim2018_Resolved2b1Wj_Mu/results/GluGluHToGG.root
