@@ -709,7 +709,9 @@ class DataCard:
             else:
                 config['plots'][h1].pop('blinded-range',None)
             config['plots'][h1]['ratio-y-axis-range'] = [0.5,1.5]
-            config['plots'][h1]['sort-by-yields'] = False
+            config['plots'][h1]['sort-by-yields'] = True
+            if 'labels' in config['plots'][h1].keys():
+                del config['plots'][h1]['labels']
 
         if len(systematics) > 0:
             config['systematics'] = systematics

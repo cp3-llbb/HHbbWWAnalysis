@@ -440,31 +440,31 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             #print ("Param variables  : %d"%len(inputsParam))
             #print ("Event variables  : %d"%len(inputsEventNr))
 
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLeps))
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets))
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsMET))
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL))
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam))
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsEventNr))
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLeps))
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets))
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsMET))
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL))
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam))
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsEventNr))
             
-            inputs = [op.array("double",*inputStaticCast(inputsLeps,"float")),
-                      op.array("double",*inputStaticCast(inputsJets,"float")),
-                      op.array("double",*inputStaticCast(inputsFatjet,"float")),
-                      op.array("double",*inputStaticCast(inputsMET,"float")),
-                      op.array("double",*inputStaticCast(inputsHL,"float")),
-                      op.array("double",*inputStaticCast(inputsParam,"float")),
-                      op.array("long",*inputStaticCast(inputsEventNr,"long"))]
-
-            output = DNN(*inputs)
-            selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,suffix=model_num)
-
-            # Branch out the LO -> NLO reweighting #
-            for node in selObjNodesDict.values():
-                node.sel = self.addSignalReweighting(node.sel)
-
-            plots.extend(makeDoubleLeptonMachineLearningExclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
-            #plots.extend(makeDoubleLeptonMachineLearningInclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
+#            inputs = [op.array("double",*inputStaticCast(inputsLeps,"float")),
+#                      op.array("double",*inputStaticCast(inputsJets,"float")),
+#                      op.array("double",*inputStaticCast(inputsFatjet,"float")),
+#                      op.array("double",*inputStaticCast(inputsMET,"float")),
+#                      op.array("double",*inputStaticCast(inputsHL,"float")),
+#                      op.array("double",*inputStaticCast(inputsParam,"float")),
+#                      op.array("long",*inputStaticCast(inputsEventNr,"long"))]
+#
+#            output = DNN(*inputs)
+#            selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,suffix=model_num)
+#
+#            # Branch out the LO -> NLO reweighting #
+#            for node in selObjNodesDict.values():
+#                node.sel = self.addSignalReweighting(node.sel)
+#
+#            plots.extend(makeDoubleLeptonMachineLearningExclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
+#            #plots.extend(makeDoubleLeptonMachineLearningInclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
 
 
 
