@@ -30,7 +30,10 @@ def GetEntries(f,cut='',treeName="tree"):
             return [player.GetEntries(cut),tree.GetEntries()]
     else:
         print ("Could not open tree %s in file %s"%(treeName,f))
-        return 0
+        if cut=='':
+            return 0
+        else:
+            return [0,0]
 
 ##################################################################################################
 ##########################                 ListEntries                  ##########################

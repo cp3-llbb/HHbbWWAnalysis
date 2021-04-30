@@ -51,8 +51,6 @@ def get_options():
         help='Whether to use a generator for the neural network')
     a.add_argument('--resume', action='store_true', required=False, default=False,
         help='Whether to resume the training of a given model (path in parameters.py)')
-    a.add_argument('--param', action='store_true', required=False, default=False,
-        help='Use parametric learning')
 
     # Splitting and submitting jobs arguments #
     b = parser.add_argument_group('Splitting and submitting jobs arguments')
@@ -141,7 +139,6 @@ def main():
     from split_training import DictSplit
     from concatenate_csv import ConcatenateCSV
     from threadGPU import utilizationGPU
-    from input_plots import InputPlots
     import parameters
 
     # Needed because PyROOT messes with argparse
@@ -244,7 +241,9 @@ def main():
     list_inputs  = [var.replace('$','') for var in parameters.inputs]
     list_outputs = [var.replace('$','') for var in parameters.outputs]
 
-    if opt.param:
+    parametric = 'param' in list_inputs
+
+    if parametric:
         def findMassInSignal(sampleName):
             if "HH" not in sampleName:
                 return None
@@ -303,11 +302,8 @@ def main():
                                                       eras                      = era,
                                                       paramFun                  = findMassInSignal,
                                                       tree_name                 = parameters.tree_name,
-                                                      additional_columns        = {'tag':node,'era':era},
-                                                      stop                      = 300000) # TODO : remove 
-
-                        #if data_node_era.shape[0]>1000000:
-                        #    data_node_era = data_node_era.sample(n=1000000,axis=0) # TODO : remove 
+                                                      additional_columns        = {'tag':node,'era':era})
+                                                      #stop                      = 300000) # TODO : remove 
                         era_str = '{:5s} class - {:15s} category - era {}  : sample size = {:10d}'.format(node,cat,era,data_cat_era.shape[0])
                         if data_cat is None:
                             data_cat = data_cat_era
@@ -336,8 +332,6 @@ def main():
                 logging.info(all_eras_str)
 
             # Data splitting #
-            train_dict = {}
-            test_dict = {}
             for node,data in data_dict.items():
                 if parameters.crossvalidation: # Cross-validation
                     if parameters.splitbranch not in data.columns:
@@ -349,6 +343,8 @@ def main():
                         logging.critical("Problem with the masking")
                         raise ValueError
                 else: # Classic separation
+                    train_dict = {}
+                    test_dict = {}
                     mask = GenerateMask(data.shape[0],parameters.suffix+'_'+node)
                     try:
                         train_dict[node] = data[mask==True]
@@ -366,11 +362,32 @@ def main():
             del data_dict 
             if not parameters.crossvalidation:
                 del train_dict, test_dict
-            #logging.info('Current memory usage : %0.3f GB'%(pid.memory_info().rss/(1024**3)))
 
-            # Plots #
-            if opt.task == '':
-                InputPlots(train_all,list_inputs)
+            if parametric:
+                # Assign random parameters to background in same proportions as signal #
+                param_idx = train_all['param']>0
+                countPerParam = pd.value_counts(train_all[param_idx]['param']) # Number of occurences of each parameter
+                freq = countPerParam / countPerParam.sum() # frequency of all parameters in the training data
+                prop = (freq*(~param_idx).sum()).round().astype(np.int32) # proportions to be applied in the non-param samples
+                if prop.sum() != (~param_idx).sum(): # resolved truncation errors
+                    diff = (~param_idx).sum() - prop.sum()
+                    prop.iloc[-1] += diff
+                rep = pd.DataFrame(prop.index.repeat(prop.values),columns=['param']) # All repetitions in correct proportions
+                rep = rep.sample(frac=1) # shuffle to uniformly distribute for each background
+                rep.index = train_all.loc[~param_idx,'param'].index # Needs to have same index (otherwise nan)
+                train_all.loc[~param_idx,'param'] = rep # Assign the prepared params to the non-param events
+                if not parameters.crossvalidation: # do the same for testing data. TODO: make cleaner
+                    param_idx = test_all['param']>0
+                    prop = (freq*(~param_idx).sum()).round().astype(np.int32)
+                    if prop.sum() != (~param_idx).sum(): 
+                        diff = (~param_idx).sum() - prop.sum()
+                        prop.iloc[-1] += diff
+                    rep = pd.DataFrame(prop.index.repeat(prop.values),columns=['param']) 
+                    rep = rep.sample(frac=1)
+                    rep.index = test_all.loc[~param_idx,'param'].index
+                    test_all.loc[~param_idx,'param'] = rep 
+    
+            #logging.info('Current memory usage : %0.3f GB'%(pid.memory_info().rss/(1024**3)))
 
             # Randomize order, we don't want only one type per batch #
             random_train = np.arange(0,train_all.shape[0]) # needed to randomize x,y and w in same fashion
@@ -469,6 +486,18 @@ def main():
         logging.info("Proportions are as follows")
         for node in totweight_per_node.keys():
             logging.info("\t Node {:6s} : total weight = {:.2e} [{:3.2f}%]".format(node,totweight_per_node[node],totweight_per_node[node]/sum(totweight_per_node.values())*100))
+
+        # Parameterized learning reweighting #
+        if parametric:
+            params = pd.unique(train_all['param'])
+            sum_weight_params = {param:train_all[train_all['param']==param]['learning_weight'].sum() for param in params}
+            total_weight = train_all['learning_weight'].sum()
+            logging.info("Parameterized learning reweighting")
+            for param in sorted(params):
+                sum_weight_param = train_all[train_all['param']==param]['learning_weight'].sum()
+                train_all.loc[train_all['param']==param,'learning_weight'] *= total_weight/sum_weight_param 
+                logging.info('\t Param {:8s} : {:8d} events - total weight = {:.2e} -> {:.2e} [factor = {:3.3f}]'.format(str(param),train_all.loc[train_all['param']==param,'learning_weight'].shape[0],sum_weight_param,train_all[train_all['param']==param]['learning_weight'].sum(),total_weight/sum_weight_param))
+            train_all['learning_weight'] *= N/train_all['learning_weight'].sum() # Rescale to N events
 
         # Quantile correction #
         if opt.scan != '':
