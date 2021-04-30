@@ -60,59 +60,44 @@ split_per_model = True # in case of cross validation, to send one job per model 
 
 ##################################  Naming ######################################
 # Physics Config #
-config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListSL_res.yml')
+config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListDL_res.yml')
 lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
-#eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
-eras = [2018]
+eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
 
-#categories = ['resolved2b2Wj','resolved2b1Wj','resolved2b0Wj','resolved1b2Wj','resolved1b1Wj','resolved1b0Wj']
-categories = ['resolved2b2Wj']
-#categories = ['boosted2b2Wj','boosted2b1Wj', 'boosted2b0Wj']
-#channels = ['El','Mu']
-channels = ['El']
+categories = ["Resolved1Btag","Resolved2Btag","Boosted1Btag"]
+channels = ['ElEl','MuMu','ElMu']
 
 # Better put them in alphabetical order
-nodes = ['Ewk','GGF','H','Top','WJets']
+nodes = ['DY','GGF','H','Rare','ST','TT','TTVX','VVV']
 
 weight_groups = [
+                  (1.0, ('DY')),
                   (1.0, ('GGF')),
                   (1.0, ('H')),
-                  (1.0, ('Ewk')),
-                  (1.0, ('Top')),
-                  (1.0, ('WJets')),
+                  (1.0, ('Rare')),
+                  (1.0, ('ST')),
+                  (1.0, ('TT')),
+                  (1.0, ('TTVX')),
+                  (1.0, ('VVV')),
                 ]
 
 
 quantile = 0.95 # repeat weights with too high learning weights
 
-#    def loss(self): # -> DL
-#        return GroupedXEnt(
-#            group_ids=[
-#                (1.0, [0, 1]),  # Signal
-#                (1.0, [2, 3, 4, 5, 6, 7, 8]),  # Bkg
-#                (1.0, [0]),  # GGF
-#                (1.0, [1]),  # VBF
-#                (1.0, [3]),  # DY
-#                (1.0, [5]),  # ttbar
-#                (1.0, [2, 4, 6, 7, 8]),  # Other
-#            ]
-#        )#
-
 # Input plots options #
-node_colors = {
-            'Ewk'  : '#610596',
-            'GGF'   : '#288a24',
-            'H'     : '#06b894',
-            'Top'    : '#cc7a16',
-            'WJets' : '#d95564',
-             }
+#node_colors = {
+#            'Ewk'  : '#610596',
+#            'GGF'   : '#288a24',
+#            'H'     : '#06b894',
+#            'Top'    : '#cc7a16',
+#            'WJets' : '#d95564',
+#             }
 
 # Tree name #
 tree_name = 'Events'
 
 # scaler and mask names #
-#suffix = 'boosted' 
-suffix = 'resolved' 
+suffix = 'resonant' 
 # scaler_name -> 'scaler_{suffix}.pkl'  If does not exist will be created 
 # mask_name -> 'mask_{suffix}_{sample}.npy'  If does not exist will be created 
 scaler_name = 'scaler_'+suffix+'_'.join([str(era) for era in eras])+'.pkl'
@@ -208,203 +193,79 @@ inputs = [
             ####----- Resolved ----####
             ###########################
             # Onehot #
-            #'$era@op_era',
-            'leppdgId@op_pdgid',
-            'lepcharge@op_charge',
-            #'JPAcat@op_resolved_jpacat',
-            # JPA values #
-#            'L2_2b2Wj',
-#            'L2_2b1Wj',
-#            'L2_2b0Wj',
-#            'L2_1b2Wj',
-#            'L2_1b1Wj',
-#            'L2_1b0Wj',
-#            'L2_0b',
+            '$era@op_era',
+            'l1_charge@op_charge',
+            'l2_charge@op_charge',
+            'l1_pdgId@op_pdgid',
+            'l2_pdgId@op_pdgid',
+            # Parameter #
+            '$param',
             # LL variables #
-#            'METpt',               
-            'METpx',               # discard               
-            'METpy',               # discard
-            'METenergy',           # discard
-            'lep_Px',              # discard
-            'lep_Py',              # discard
-            'lep_Pz',              # discard
-            'lep_E',               # discard     
-#           'lep_pt',
-#           'lep_eta',             # discard
-            'bj1_Px',              # discard
-            'bj1_Py',              # discard
-            'bj1_Pz',              # discard
-            'bj1_E',               # discard
-#           'bj1_pt',
-#            'bj1_eta',             # discard
-           'bj1_bTagDeepFlavB',
-            'bj2_Px',              # discard
-            'bj2_Py',              # discard
-            'bj2_Pz',              # discard
-            'bj2_E',               # discard
-#           'bj2_pt',
-#            'bj2_eta',             # discard
-           'bj2_bTagDeepFlavB',
-            'wj1_Px',              # discard
-            'wj1_Py',              # discard
-            'wj1_Pz',              # discard
-            'wj1_E',               # discard
-#           'wj1_pt',
-#            'wj1_eta',             # discard
-           'wj1_bTagDeepFlavB',
-            'wj2_Px',              # discard
-            'wj2_Py',              # discard
-            'wj2_Pz',              # discard
-            'wj2_E',               # discard
-#            'wj2_pt',
-#            'wj2_eta',             # discard
-           'wj2_bTagDeepFlavB ',
-#            'nAk4BJets',           
-#            'nAk8BJets',           # discard
-            'VBF_tag',
-           # HL variables #
-            'lepmet_DPhi',
-            'lepmet_pt',
-            'lep_MT',
-            'MET_LD',
-            'hT',
-            'bj1LepDR',
-            'bj2LepDR',
-            'bj1MetDPhi',
-            'bj2MetDPhi',
-#            'bj1LepDPhi',
-#            'bj2LepDPhi',
-            'minDR_lep_allJets',
-            'bj1bj2_pt',
-            'wj1wj2_pt',
-#            'bj1bj2_M',
-            'cosThetaS_Hbb',
-            'mT_top_3particle',
-            'wj1LepDR',
-            'wj2LepDR',
-#            'wj1LepDPhi',
-#            'wj2LepDPhi',
-            'wj1MetDPhi',
-            'wj2MetDPhi',
-            'wj1wj2_M',
-#            'w1w2_MT',
-#            'HWW_Mass',
-            'HWW_Simple_Mass',
-            'HWW_dR',
-            'cosThetaS_Wjj_simple',
-            'cosThetaS_WW_simple_met ',
-            'cosThetaS_HH_simple_met',
-            'angleBetWWPlane',
-            'angleBetHWPlane',
-            'bj1bj2_DR',
-            'bj1wj1_DR',
-            'bj1wj2_DR',
-            'bj2wj1_DR',
-            'wj1wj2_DR',
-#            'bj1bj2_DPhi',
-#            'bj2wj1_DPhi',
-#            'wj1wj2_DPhi',
-#            'bj1wj2_DPhi',
-#            'bj1wj1_DPhi',
-            'VBFj1pt',
-            'VBFj2pt',
-#            'VBFj1eta',
-#            'VBFj2eta',
-            'VBFj1j2dEta',
-            'VBFj1j2dPhi',
-            'VBFj1j2invM',
-            'zeppenfeldVar',
-            'minJetDR',
-            'minLepJetDR',
-            'HbbLepDR',
-#            'HbbLepDPhi',
-#            'HbbMetDPhi',
-            'HWWLepDR',
-#            'HWWLepDPhi',
-            'HWWMetDPhi',
-            'HT2_lepJetMet',
-#            'HT2R_lepJetMet',
-
-#            ############################
-#            ####-----  Boosted  ----####
-#            ############################
-#            # Onehot #
-#            '$era@op_era',
-#            'lep_pdgId@op_pdgid',
-#            'lep_charge@op_charge',
-#            'JPAcat@op_boosted_jpacat',
-#            # JPA values #
-#            'L2_Hbb2Wj',
-#            'L2_Hbb1Wj',
-#            'L2_Hbb0Wj',
-#            # LL variables #
-#            'METpt',               
-#            'METpx',
-#            'METpy',
-#            'lep_Px',
-#            'lep_Py',
-#            'lep_Pz',
-#            'lep_E',
-#            'fatbj_Px',
-#            'fatbj_Py',
-#            'fatbj_Pz',
-#            'fatbj_E',
-#            'fatbj_softdropMass',
-#            'fatbj_tau1',
-#            'fatbj_tau2',
-#            'fatbj_tau3',
-#            'fatbj_tau4',
-#            #'fatbj_btagDeepB',
-#            'wj1_Px',
-#            'wj1_Py',
-#            'wj1_Pz',
-#            'wj1_E',
-#            'wj1_bTagDeepFlavB',
-#            'wj2_Px',
-#            'wj2_Py',
-#            'wj2_Pz',
-#            'wj2_E',
-#            'wj2_bTagDeepFlavB',
-#            'VBF_tag',
-#            'VBFj1pt',
-#            'VBFj2pt',
-#            'VBFj1j2dEta',
-#            'VBFj1j2invM',
-#            # HL variables #
-#            'hT',
-#            'lepmet_DPhi',
-#            'lepmet_pt',
-#            'lep_MT',
-#            'MET_LD',
-#            'fatbj_lepDR',
-#            'fatbj_Wj1DR',
-#            'fatbj_wj2DR',
-#            #'fatbjSub1_lepDR',
-#            #'fatbjSub2_lepDR',
-#            #'fatbjSub1_Wj1DR',
-#            #'fatbjSub2_Wj1DR',
-#            #'fatbjSub1_Wj2DR',
-#            #'fatbjSub2_Wj2DR',
-#            'wj1_lepDR',
-#            'wj2_lepDR',
-#            'wj1wj2_pt',
-#            'wj1wj2DR',
-#            'wj1wj2invM',
-#            'mT_top_3particle',
-#            'WWplaneAngle_withMET', 
-#            'HWplaneAngle',
-#            'HWW_Simple_Mass',
-#            'HWW_dR',
-#            'cosThetaS_Hbb',
-#            'cosThetaS_Wjj_simple',
-#            'cosThetaS_WW_simple_met',
-#            'cosThetaS_HH_simple_met',
-#            #'minSubJetLepDR',
-#            'MT_W1W2',
-#            'zeppenfeldVar',
-#            #'HT2_lepJetMet',
-#            #'HT2R_lepJetMet',
-
+            'l1_E',          
+            'l1_Px',    
+            'l1_Py',    
+            'l1_Pz',    
+            'l2_E',     
+            'l2_Px',    
+            'l2_Py',    
+            'l2_Pz',    
+            'j1_E',
+            'j1_Px',
+            'j1_Py', 
+            'j1_Pz', 
+            #'j1_btag',
+            'j2_E',   
+            'j2_Px',  
+            'j2_Py',  
+            'j2_Pz',  
+            #'j2_btag',
+            'j3_E',   
+            'j3_Px',  
+            'j3_Py',  
+            'j3_Pz',  
+            #'j3_btag',
+            'j4_E',   
+            'j4_Px',  
+            'j4_Py',  
+            'j4_Pz',  
+            #'j4_btag',
+            'fatjet_E',       
+            'fatjet_Px',      
+            'fatjet_Py',      
+            'fatjet_Pz',      
+            'fatjet_tau1',    
+            'fatjet_tau2',    
+            'fatjet_tau3',    
+            'fatjet_tau4',    
+            'fatjet_softdrop',
+            'met_E', 
+            'met_Px',
+            'met_Py',
+            'met_Pz',
+            # HL variables #
+            'm_bb_bregcorr',
+            'ht', 
+            'min_dr_jets_lep1',       
+            'min_dr_jets_lep2',       
+            'm_ll',                   
+            'dr_ll',                  
+            'min_dr_jet',             
+            'min_dphi_jet',           
+            'm_hh_simplemet_bregcorr',
+            'met_ld',                 
+            'dr_bb',                  
+            'min_dr_leps_b1',         
+            'min_dr_leps_b2',         
+            'lep1_conept',            
+            'lep2_conept',            
+            'mww_simplemet',          
+            'vbf_tag',                
+            'boosted_tag',            
+            'dphi_met_dilep',         
+            'dphi_met_dibjet',        
+            'dr_dilep_dijet',         
+            'dr_dilep_dibjet',        
+            'm_T',                    
     ]
 
 operations = [inp.split('@')[1] if '@' in inp else None  for inp  in  inputs]
@@ -416,11 +277,11 @@ inputs = [inp.split('@')[0] for inp  in  inputs]
 
 #### Resolved ####
 LBN_inputs = [
-              'lep_E','lep_Px','lep_Py','lep_Pz',
-              'bj1_E','bj1_Px','bj1_Py','bj1_Pz',
-              'bj2_E','bj2_Px','bj2_Py','bj2_Pz',
-              'wj1_E','wj1_Px','wj1_Py','wj1_Pz',
-              'wj2_E','wj2_Px','wj2_Py','wj2_Pz',
+              'l1_E','l1_Px','l1_Py','l1_Pz',
+              'l2_E','l2_Px','l2_Py','l2_Pz',
+              'j1_E','j1_Px','j1_Py','j1_Pz',
+              'j2_E','j2_Px','j2_Py','j2_Pz',
+              'fatjet_E','fatjet_Px','fatjet_Py','fatjet_Pz',
              ]
 
 #### Boosted ####
@@ -442,11 +303,14 @@ assert len(LBN_inputs)%4 == 0
 # Output branches #
 
 outputs = [
-            '$Ewk',
+            '$DY',
             '$GGF',
             '$H',
-            '$Top',
-            '$WJets',
+            '$Rare',
+            '$ST',
+            '$TT',
+            '$TTVX',
+            '$VVV',
           ] 
 
 # Other variables you might want to save in the tree #
