@@ -10,6 +10,8 @@ from bamboo.analysismodules import NanoAODModule, NanoAODHistoModule, NanoAODSki
 from bamboo.analysisutils import makeMultiPrimaryDatasetTriggerSelection
 from bamboo.scalefactors import binningVariables_nano, BtagSF, get_scalefactor
 from bamboo.plots import SelectionWithDataDriven,CutFlowReport
+from bamboo.analysisutils import forceDefine
+from bamboo.root import loadLibrary, loadHeader
 
 from METScripts import METFilter, METcorrection
 from scalefactorsbbWW import ScaleFactorsbbWW
@@ -105,6 +107,10 @@ One lepton and and one jet argument must be specified in addition to the require
                             action      = "store_true",
                             default     = False,
                             help="Disable all systematic variations (default=False)")
+        parser.add_argument("--analysis", 
+                            type        = str,
+                            default     = 'res',
+                            help="Analysis type : res (default) | nonres ")
         parser.add_argument("--Events", 
                             nargs       = '+',
                             type        = int,
@@ -114,6 +120,13 @@ One lepton and and one jet argument must be specified in addition to the require
                             type        = str,
                             default     = None,
                             help="GGF LO->NLO reweighting benchmarks to use (can be several)")
+        parser.add_argument("--mass", 
+                            nargs       = '+',
+                            action      = 'extend',
+                            type        = float,
+                            default     = None,
+                            help="Mass to use for the parametric DNN (can be several)")
+
 
 
         #----- Lepton selection arguments -----#
@@ -307,6 +320,11 @@ One lepton and and one jet argument must be specified in addition to the require
                                                         for benchmark in self.analysisConfig['benchmarks']['targets'] 
                                                             if benchmark in self.args.HHReweighting}) 
 
+        # Check analysis type #
+        if self.args.analysis not in ['res','nonres']:
+            raise RuntimeError("Analysis type '{}' not understood".format(self.args.analysis))
+
+
     #-------------------------------------------------------------------------------------------#
     #                                   customizeAnalysisCfg                                    #
     #-------------------------------------------------------------------------------------------#
@@ -350,17 +368,26 @@ One lepton and and one jet argument must be specified in addition to the require
         era = sampleCfg['era']
         self.is_MC = self.isMC(sample) # no confusion between boolean is_MC and method isMC()
         metName = "METFixEE2017" if era == "2017" else "MET"
-        tree,noSel,be,lumiArgs = super(BaseNanoHHtobbWW,self).prepareTree(tree          = tree, 
-                                                                          sample        = sample, 
-                                                                          sampleCfg     = sampleCfg, 
-                                                                          description   = NanoAODDescription.get(
-                                                                                            tag             = "v7", 
-                                                                                            year            = (era if era else "2016"),
-                                                                                            isMC            = self.is_MC,
-                                                                                            systVariations  = [ (nanoJetMETCalc_METFixEE2017 if era == "2017" else nanoJetMETCalc), nanoFatJetCalc]),
-                                                                                            # will do Jet and MET variations, and not the Rochester correction
-                                                                          lazyBackend   = (self.args.backend == "lazy" or self.args.onlypost))
+        tree,noSel,backend,lumiArgs = super(BaseNanoHHtobbWW,self).prepareTree(tree          = tree, 
+                                                                               sample        = sample, 
+                                                                               sampleCfg     = sampleCfg, 
+                                                                               description   = NanoAODDescription.get(
+                                                                                                 tag             = "v7", 
+                                                                                                 year            = (era if era else "2016"),
+                                                                                                 isMC            = self.is_MC,
+                                                                                                 systVariations  = [ (nanoJetMETCalc_METFixEE2017 if era == "2017" else nanoJetMETCalc), nanoFatJetCalc]),
+                                                                                                 # will do Jet and MET variations, and not the Rochester correction
+                                                                               lazyBackend   = (self.args.backend == "lazy" or self.args.onlypost))
     
+
+        #----- Helper classes declaration ----#
+        loadLibrary(os.path.join(os.path.dirname(os.path.abspath(__file__)),'HMEStudy','build','libBambooHMEEvaluator'))
+        loadHeader(os.path.join(os.path.dirname(os.path.abspath(__file__)),'HMEStudy','include','HME.h'))
+        self.hmeEval = op.define("hme::HMEEvaluator", "hme::HMEEvaluator <<name>>{{}}; // for {sample}".format(sample=sample.replace('-','')), nameHint="bamboo_hmeEval{sample}".format(sample=sample.replace('-','')))
+        #hmeCalcName = backend.symbol(f"hme::HMEEvaluator <<name>>{{}}; // for {sample}", nameHint=f"bamboo_hmeEval{sample}")
+        #self.hmeEval = op.extVar("hme::HMEEvaluator", hmeCalcName)  # then you can use self.hmeEval.runHME in your code
+
+        #----- Triggers and yields -----#
         self.triggersPerPrimaryDataset = {}
         from bamboo.analysisutils import configureJets ,configureRochesterCorrection, configureType1MET 
 
@@ -507,7 +534,7 @@ One lepton and and one jet argument must be specified in addition to the require
 #            configureRochesterCorrection(variProxy  = tree._Muon,
 #                                         paramsFile = os.path.join(os.path.dirname(__file__), "data", "RoccoR2016.txt"),
 #                                         isMC       = self.is_MC,
-#                                         backend    = be, 
+#                                         backend    = backend, 
 #                                         uName      = sample)
  
             # SingleMuon #
@@ -549,7 +576,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   enableSystematics     = lambda v : not "jesTotal" in v,
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
-                                  backend               = be, 
+                                  backend               = backend, 
                                   uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
@@ -561,7 +588,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   enableSystematics     = lambda v : not "jesTotal" in v,
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
-                                  backend               = be, 
+                                  backend               = backend, 
                                   uName                 = sample)
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Summer16_07Aug2017_V11_MC",
@@ -572,7 +599,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                       enableSystematics     = lambda v : not "jesTotal" in v,
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
-                                      backend               = be,
+                                      backend               = backend,
                                       uName                 = sample)
 
                 else:                   # If data -> extract info from config 
@@ -590,7 +617,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jec                   = jecTag,
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
-                                  backend               = be, 
+                                  backend               = backend, 
                                   uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
@@ -598,13 +625,13 @@ One lepton and and one jet argument must be specified in addition to the require
                                   regroupTag            = "V2",
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
-                                  backend               = be, 
+                                  backend               = backend, 
                                   uName                 = sample)
                     configureType1MET(variProxy         = getattr(tree, f"_{metName}"),
                                       jec               = jecTag,
                                       mayWriteCache     = isNotWorker,
                                       isMC              = self.is_MC,
-                                      backend           = be, 
+                                      backend           = backend, 
                                       uName             = sample)
 
         ############################################################################################
@@ -614,7 +641,7 @@ One lepton and and one jet argument must be specified in addition to the require
             #configureRochesterCorrection(variProxy  = tree._Muon,
             #                             paramsFile = os.path.join(os.path.dirname(__file__), "data", "RoccoR2017.txt"),
             #                             isMC       = self.is_MC,
-            #                             backend    = be, 
+            #                             backend    = backend, 
             #                             uName      = sample)
 
             # SingleMuon #
@@ -646,7 +673,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   enableSystematics     = lambda v : not "jesTotal" in v,
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
-                                  backend               = be, 
+                                  backend               = backend, 
                                   uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
@@ -659,7 +686,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
-                                  backend               = be, 
+                                  backend               = backend, 
                                   uName                 = sample)
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Fall17_17Nov2017_V32_MC",
@@ -670,7 +697,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                       enableSystematics     = lambda v : not "jesTotal" in v,
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
-                                      backend               = be,
+                                      backend               = backend,
                                       uName                 = sample)
 
                 else:                   # If data -> extract info from config 
@@ -690,7 +717,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jec                   = jecTag,
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
-                                  backend               = be, 
+                                  backend               = backend, 
                                   uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
@@ -698,13 +725,13 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
-                                  backend               = be, 
+                                  backend               = backend, 
                                   uName                 = sample)
                     configureType1MET(variProxy         = getattr(tree, f"_{metName}"),
                                       jec               = jecTag,
                                       mayWriteCache     = isNotWorker,
                                       isMC              = self.is_MC,
-                                      backend           = be, 
+                                      backend           = backend, 
                                       uName             = sample)
 
         ############################################################################################
@@ -714,7 +741,7 @@ One lepton and and one jet argument must be specified in addition to the require
             #configureRochesterCorrection(variProxy  = tree._Muon,
             #                             paramsFile = os.path.join(os.path.dirname(__file__), "data", "RoccoR2018.txt"),
             #                             isMC       = self.is_MC,
-            #                             backend    = be, 
+            #                             backend    = backend, 
             #                             uName      = sample)
 
             # SingleMuon #
@@ -744,7 +771,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   addHEM2018Issue       = True,
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
-                                  backend               = be, 
+                                  backend               = backend, 
                                   uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
@@ -758,7 +785,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
-                                  backend               = be, 
+                                  backend               = backend, 
                                   uName                 = sample)
                     configureType1MET(variProxy             = getattr(tree, f"_{metName}"),
                                       jec                   = "Autumn18_V19_MC",
@@ -770,7 +797,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                       addHEM2018Issue       = True,
                                       mayWriteCache         = isNotWorker,
                                       isMC                  = self.is_MC,
-                                      backend               = be,
+                                      backend               = backend,
                                       uName                 = sample)
 
                 else:                   # If data -> extract info from config 
@@ -790,7 +817,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   jec                   = jecTag,
                                   mayWriteCache         = isNotWorker,
                                   isMC                  = self.is_MC,
-                                  backend               = be, 
+                                  backend               = backend, 
                                   uName                 = sample)
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
@@ -798,16 +825,16 @@ One lepton and and one jet argument must be specified in addition to the require
                                   mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
-                                  backend               = be, 
+                                  backend               = backend, 
                                   uName                 = sample)
                     configureType1MET(variProxy         = getattr(tree, f"_{metName}"),
                                       jec               = jecTag,
                                       mayWriteCache     = isNotWorker,
                                       isMC              = self.is_MC,
-                                      backend           = be, 
+                                      backend           = backend, 
                                       uName             = sample)
 
-        return tree,noSel,be,lumiArgs
+        return tree,noSel,backend,lumiArgs
 
     #-------------------------------------------------------------------------------------------#
     #                                     prepareObjects                                        #
@@ -842,7 +869,6 @@ One lepton and and one jet argument must be specified in addition to the require
                                       and 'benchmarks' in self.analysisConfig.keys() \
                                       and any(useFile in sample for useFile in self.analysisConfig['benchmarks']['uses']) \
                                       and self.args.HHReweighting is not None:
-            from bamboo.analysisutils import forceDefine
             # Get gen level Higgs #
             self.genh = op.select(t.GenPart,lambda g : op.AND(g.pdgId==25, g.statusFlags & ( 0x1 << 13)))
             # Get gen level variables mHH and cos(theta*) #
@@ -933,12 +959,12 @@ One lepton and and one jet argument must be specified in addition to the require
         ###########################################################################
         #                               tH samples                                #
         ###########################################################################
-        if sample.startswith('TH'):
-            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/SingleTopHiggsGeneration13TeV
-            # https://twiki.cern.ch/twiki/pub/CMS/SingleTopHiggsGeneration13TeV/reweight_encondig.txt
-            # 
-            print ('Applied tH LHE weights')
-            noSel = noSel.refine("tHWeight",weight=t.LHEReweightingWeight[11])
+        #if sample.startswith('TH'):
+        #    # https://twiki.cern.ch/twiki/bin/viewauth/CMS/SingleTopHiggsGeneration13TeV
+        #    # https://twiki.cern.ch/twiki/pub/CMS/SingleTopHiggsGeneration13TeV/reweight_encondig.txt
+        #    # 
+        #    print ('Applied tH LHE weights')
+        #    noSel = noSel.refine("tHWeight",weight=t.LHEReweightingWeight[11])
 
         #############################################################################
         #                            Pre-firing rates                               #
@@ -1272,8 +1298,8 @@ One lepton and and one jet argument must be specified in addition to the require
             self.lambda_ak4Btag =   lambda jet    : jet.btagDeepFlavB > 0.2770
             self.lambda_ak4NoBtag = lambda jet    : jet.btagDeepFlavB <= 0.2770
 
-        self.ak4BJets     = op.select(self.ak4Jets, self.lambda_ak4Btag)
-        self.ak4BJetsLoose     = op.select(self.ak4Jets, self.lambda_ak4BtagLoose)
+        self.ak4BJets = op.select(self.ak4Jets, self.lambda_ak4Btag)
+        self.ak4BJetsLoose = op.select(self.ak4Jets, self.lambda_ak4BtagLoose)
         self.ak4LightJetsByPt = op.select(self.ak4Jets, self.lambda_ak4NoBtag)
         self.ak4LightJetsByBtagScore = op.sort(self.ak4LightJetsByPt, lambda jet : -jet.btagDeepFlavB)
         # Sorted by btag score because for 0 and 1 btag categories, 
@@ -1817,10 +1843,10 @@ One lepton and and one jet argument must be specified in addition to the require
     ###########################################################################
     def postProcess(self, taskList, config=None, workdir=None, resultsdir=None, forSkimmer=True):
         from bamboo.root import gbl
-        if not self.plotList:
-            self.plotList = self.getPlotList(resultsdir=resultsdir, config=config)
 
         if not forSkimmer:
+            if not self.plotList:
+                self.plotList = self.getPlotList(resultsdir=resultsdir, config=config)
             ### Disable plotting for some signal samples ###
             samplesToHide = [sample for sample,sampleCfg in config['samples'].items() if 'hide' in sampleCfg.keys() and sampleCfg['hide']]
             for sample in samplesToHide:
@@ -1906,3 +1932,25 @@ One lepton and and one jet argument must be specified in addition to the require
                     del config['samples'][LOFile]
 
         super(BaseNanoHHtobbWW,self).postProcess(taskList=taskList, config=config, workdir=workdir, resultsdir=resultsdir)
+
+    ###########################################################################
+    #                                  HME                                    #
+    ###########################################################################
+    def computeHMEAfterLeptonSelections(self, sel, l1, l2, bjets, met):
+        if self.args.analysis != 'res':
+            raise RuntimeError('HME was only implemented for resonant analysis')
+
+        hme_pair = self.hmeEval.runHME(l1.p4, l2.p4, bjets[0].p4, bjets[1].p4, met.p4, self.tree.event)
+        hme_pair = op.switch(op.rng_len(bjets) >= 2, hme_pair, op.construct(op.typeOf(hme_pair), [op.c_float(0.), op.c_float(0.)]))
+        hme_pair = op.forSystematicVariation(hme_pair, "jet", "nominal").result   # no variations, always nominal
+        forceDefine(hme_pair, sel)
+        hme = hme_pair.first
+        eff = hme_pair.second
+        forceDefine(hme, sel)
+
+        return hme,eff
+
+
+
+        
+

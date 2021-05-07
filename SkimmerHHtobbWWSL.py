@@ -133,6 +133,10 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
             if self.args.Channel == "Mu":
                 selObj = MuSelObj
                 lep = self.muonsTightSel[0]
+
+            #----- Apply jet corrections -----#
+            ElSelObject.sel = self.beforeJetselection(ElSelObj.sel,'El')
+            MuSelObject.sel = self.beforeJetselection(MuSelObj.sel,'Mu')
             
             #----- Jet selection -----#
             # Since the selections in one line, we can use the non copy option of the selection to modify the selection object internally
