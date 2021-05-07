@@ -17,7 +17,7 @@ from grouped_entropy import GroupedXEnt
 ##################################  Path variables ####################################
 
 main_path = os.path.abspath(os.path.dirname(__file__))
-path_out = '/nfs/scratch/fynu/fbury/HHMachineLearning_output/'
+path_out = '/nfs/scratch/fynu/gsaha/HHMachineLearning_output_res/'
 path_model = os.path.join(main_path,'model')
 
 ##############################  Datasets proportion   #################################
@@ -247,10 +247,14 @@ inputs = [
             'ht', 
             'min_dr_jets_lep1',       
             'min_dr_jets_lep2',       
+            'min_deta_jets_lep1',       
+            'min_deta_jets_lep2',       
             'm_ll',                   
             'dr_ll',                  
+            'deta_ll',                  
             'min_dr_jet',             
             'min_dphi_jet',           
+            'min_deta_jet',
             'm_hh_simplemet_bregcorr',
             'met_ld',                 
             'dr_bb',                  
@@ -259,13 +263,16 @@ inputs = [
             'lep1_conept',            
             'lep2_conept',            
             'mww_simplemet',          
-            'vbf_tag',                
+            #'vbf_tag',                
             'boosted_tag',            
             'dphi_met_dilep',         
             'dphi_met_dibjet',        
             'dr_dilep_dijet',         
             'dr_dilep_dibjet',        
-            'm_T',                    
+            'm_T',
+            'dr_lep1_dibjet',
+            'dr_lep2_dibjet',
+            'cosThetaS_Hbb',
     ]
 
 operations = [inp.split('@')[1] if '@' in inp else None  for inp  in  inputs]
