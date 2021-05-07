@@ -1,4 +1,7 @@
+import os
 from bamboo import treefunctions as op
+from bamboo.root import loadHeader 
+loadHeader(os.path.join(os.path.dirname(os.path.abspath(__file__)),"jpa.h"))
 
 class highlevelLambdas:
     def __init__(self,HHself):
@@ -29,8 +32,10 @@ class highlevelLambdas:
         self.DilepMET_deltaPhi = lambda l1,l2,met : self.ll_p4(l1,l2).Phi()-met.phi
         self.DilepMET_Pt = lambda l1,l2,met : op.sqrt(op.pow(met.pt*op.cos(met.phi)+self.ll_p4(l1,l2).Px(),2)+op.pow(met.pt*op.sin(met.phi)+self.ll_p4(l1,l2).Py(),2))
         # SingleLep-Met variables
-        self.SinglepMet_Pt = lambda lep,met : op.sqrt(op.pow(met.pt*op.cos(met.phi)+lep.p4.Px(),2)+op.pow(met.pt*op.sin(met.phi)+lep.p4.Py(),2))
-        self.SinglepMet_dPhi = lambda lep, met : lep.p4.Phi()-met.phi
+        #self.SinglepMet_Pt = lambda lep,met : op.sqrt(op.pow(met.pt*op.cos(met.phi)+lep.p4.Px(),2)+op.pow(met.pt*op.sin(met.phi)+lep.p4.Py(),2))
+        self.SinglepMet_Pt = lambda lep,met : (lep.p4 + met.p4).Pt()
+        #self.SinglepMet_dPhi = lambda lep, met : lep.p4.Phi()-met.phi
+        self.SinglepMet_dPhi = lambda lep, met : op.deltaPhi(lep.p4,met.p4)
         
         # Transverse mass #
         self.MT_ll = lambda l1,l2,met : op.sqrt(2*self.ll_p4(l1,l2).Pt()*met.pt*(1-op.cos(self.ll_p4(l1,l2).Phi()-met.phi)))
@@ -45,7 +50,10 @@ class highlevelLambdas:
         self.M_HH = lambda l1,l2,j1,j2,met : op.invariant_mass(l1.p4,l2.p4,j1.p4,j2.p4,met.p4)
         self.MinDR_lj = lambda l1,l2,j1,j2 : op.min(op.min(op.deltaR(l1.p4,j1.p4),op.deltaR(l1.p4,j2.p4)),
                                                op.min(op.deltaR(l2.p4,j1.p4),op.deltaR(l2.p4,j2.p4)))
-        self.MinDR_part1_partCont = lambda part1,partCont : op.rng_min(partCont, lambda part2 : op.deltaR(part1.p4, part2.p4))
+        self.MinDR_part1_partCont   = lambda part1,partCont : op.rng_min(partCont, lambda part2 : op.deltaR(part1.p4, part2.p4))
+        self.MinDEta_part1_partCont = lambda part1,partCont : op.rng_min(partCont, lambda part2 : op.abs(part1.eta - part2.eta))
+        self.MinDPhi_part1_partCont = lambda part1,partCont : op.rng_min(partCont, lambda part2 : op.abs(op.deltaPhi(part1.p4, part2.p4)))
+
         self.MinDR_part1_dipart = lambda part1,dipart: op.min(*(op.deltaR(part1.p4, dipart[i2].p4) for i2 in range(2)))
 
         self.JetsMinDR = lambda l,j1,j2 : op.min(op.deltaR(l.p4,j1.p4),op.deltaR(l.p4,j2.p4))
@@ -60,6 +68,23 @@ class highlevelLambdas:
         self.MinDR_lep2j = lambda lep,j1,j2 : op.min(op.deltaR(lep.p4,j1.p4),op.deltaR(lep.p4,j2.p4))
         self.MinDR_lep3j = lambda lep,j1,j2,j3 : op.min(op.min(op.deltaR(lep.p4,j1.p4),op.deltaR(lep.p4,j2.p4)),op.deltaR(lep.p4,j3.p4))
         self.MinDR_lep4j = lambda lep,j1,j2,j3,j4 : op.min(op.min(op.min(op.deltaR(lep.p4,j1.p4),op.deltaR(lep.p4,j2.p4)),op.deltaR(lep.p4,j3.p4)),op.deltaR(lep.p4,j4.p4))
+        self.MinDPhi_lep2j = lambda lep,j1,j2 : op.min(op.abs(op.deltaPhi(lep.p4,j1.p4)), op.abs(op.deltaPhi(lep.p4,j2.p4)))
+        self.MinDPhi_lep3j = lambda lep,j1,j2,j3 : op.min(op.min(op.abs(op.deltaPhi(lep.p4,j1.p4)), op.abs(op.deltaPhi(lep.p4,j2.p4))), op.abs(op.deltaPhi(lep.p4,j3.p4)))
+        self.MinDPhi_lep4j = lambda lep,j1,j2,j3,j4 : op.min(op.min(op.min(op.abs(op.deltaPhi(lep.p4,j1.p4)), op.abs(op.deltaPhi(lep.p4,j2.p4))), op.abs(op.deltaPhi(lep.p4,j3.p4))), op.abs(op.deltaPhi(lep.p4,j4.p4)))
+        self.MinDEta_lep2j = lambda lep,j1,j2 : op.min(op.abs(lep.eta-j1.eta),op.abs(lep.eta-j2.eta))
+        self.MinDEta_lep3j = lambda lep,j1,j2,j3 : op.min(op.min(op.abs(lep.eta-j1.eta),op.abs(lep.eta-j2.eta)),op.abs(lep.eta-j3.eta))
+        self.MinDEta_lep4j = lambda lep,j1,j2,j3,j4 : op.min(op.min(op.min(op.abs(lep.eta-j1.eta),op.abs(lep.eta-j2.eta)),op.abs(lep.eta-j3.eta)),op.abs(lep.eta-j4.eta))
+        
+        
+        self.MaxDR_lep2j = lambda lep,j1,j2 : op.max(op.deltaR(lep.p4,j1.p4),op.deltaR(lep.p4,j2.p4))
+        self.MaxDR_lep3j = lambda lep,j1,j2,j3 : op.max(op.max(op.deltaR(lep.p4,j1.p4),op.deltaR(lep.p4,j2.p4)),op.deltaR(lep.p4,j3.p4))
+        self.MaxDR_lep4j = lambda lep,j1,j2,j3,j4 : op.max(op.max(op.max(op.deltaR(lep.p4,j1.p4),op.deltaR(lep.p4,j2.p4)),op.deltaR(lep.p4,j3.p4)),op.deltaR(lep.p4,j4.p4))
+        self.MaxDPhi_lep2j = lambda lep,j1,j2 : op.max(op.abs(op.deltaPhi(lep.p4,j1.p4)), op.abs(op.deltaPhi(lep.p4,j2.p4)))
+        self.MaxDPhi_lep3j = lambda lep,j1,j2,j3 : op.max(op.max(op.abs(op.deltaPhi(lep.p4,j1.p4)), op.abs(op.deltaPhi(lep.p4,j2.p4))), op.abs(op.deltaPhi(lep.p4,j3.p4)))
+        self.MaxDPhi_lep4j = lambda lep,j1,j2,j3,j4 : op.max(op.max(op.max(op.abs(op.deltaPhi(lep.p4,j1.p4)), op.abs(op.deltaPhi(lep.p4,j2.p4))), op.abs(op.deltaPhi(lep.p4,j3.p4))), op.abs(op.deltaPhi(lep.p4,j4.p4)))
+        self.MaxDEta_lep2j = lambda lep,j1,j2 : op.max(op.abs(lep.eta-j1.eta),op.abs(lep.eta-j2.eta))
+        self.MaxDEta_lep3j = lambda lep,j1,j2,j3 : op.max(op.max(op.abs(lep.eta-j1.eta),op.abs(lep.eta-j2.eta)),op.abs(lep.eta-j3.eta))
+        self.MaxDEta_lep4j = lambda lep,j1,j2,j3,j4 : op.max(op.max(op.max(op.abs(lep.eta-j1.eta),op.abs(lep.eta-j2.eta)),op.abs(lep.eta-j3.eta)),op.abs(lep.eta-j4.eta))
 
         # Higgs related variables #
         #self.HT2 = lambda l1,l2,j1,j2,met : op.sqrt(op.pow(met.pt*op.cos(met.phi)+l1.p4.Px()+l2.p4.Px(),2)+op.pow(met.pt*op.sin(met.phi)+l1.p4.Py()+l2.p4.Py(),2)) + op.abs((j1.p4+j2.p4).Pt())
@@ -101,8 +126,19 @@ class highlevelLambdas:
         self.HT2R_2b2Wj = lambda l,j1,j2,j3,j4,met : self.HT2_2b2Wj(l,j1,j2,j3,j4,met)/(met.pt+l.pt+j1.pt+j2.pt+j3.pt+j4.pt)
         
         #min j1j2DR
-        self.MinDiJetDRLoose = lambda j1,j2,j3: op.min(op.min(op.deltaR(j1.p4,j2.p4), op.deltaR(j2.p4,j3.p4)), op.deltaR(j1.p4,j3.p4))
-        self.MinDiJetDRTight = lambda j1,j2,j3,j4: op.min(op.min(op.min(self.MinDiJetDRLoose(j1,j2,j3), op.deltaR(j1.p4,j4.p4)), op.deltaR(j2.p4,j4.p4)),op.deltaR(j3.p4,j4.p4))
+        self.MinDiJetDRLoose   = lambda j1,j2,j3: op.min(op.min(op.deltaR(j1.p4,j2.p4), op.deltaR(j2.p4,j3.p4)), op.deltaR(j1.p4,j3.p4))
+        self.MinDiJetDRTight   = lambda j1,j2,j3,j4: op.min(op.min(op.min(self.MinDiJetDRLoose(j1,j2,j3), op.deltaR(j1.p4,j4.p4)), op.deltaR(j2.p4,j4.p4)),op.deltaR(j3.p4,j4.p4))
+        self.MinDiJetDEtaLoose = lambda j1,j2,j3: op.min(op.min(op.abs(j1.eta-j2.eta), op.abs(j2.eta-j3.eta)), op.abs(j1.eta-j3.eta))
+        self.MinDiJetDEtaTight = lambda j1,j2,j3,j4: op.min(op.min(op.min(self.MinDiJetDEtaLoose(j1,j2,j3), op.abs(j1.eta-j4.eta)), op.abs(j2.eta-j4.eta)),op.abs(j3.eta-j4.eta))
+        self.MinDiJetDPhiLoose = lambda j1,j2,j3: op.min(op.min(op.abs(op.deltaPhi(j1.p4,j2.p4)), op.abs(op.deltaPhi(j2.p4,j3.p4))), op.abs(op.deltaPhi(j1.p4,j3.p4)))
+        self.MinDiJetDPhiTight = lambda j1,j2,j3,j4: op.min(op.min(op.min(self.MinDiJetDPhiLoose(j1,j2,j3), op.abs(op.deltaPhi(j1.p4,j4.p4))), op.abs(op.deltaPhi(j2.p4,j4.p4))), op.abs(op.deltaPhi(j3.p4,j4.p4)))
+
+        self.MaxDiJetDRLoose   = lambda j1,j2,j3: op.max(op.max(op.deltaR(j1.p4,j2.p4), op.deltaR(j2.p4,j3.p4)), op.deltaR(j1.p4,j3.p4))
+        self.MaxDiJetDRTight   = lambda j1,j2,j3,j4: op.max(op.max(op.max(self.MaxDiJetDRLoose(j1,j2,j3), op.deltaR(j1.p4,j4.p4)), op.deltaR(j2.p4,j4.p4)),op.deltaR(j3.p4,j4.p4))
+        self.MaxDiJetDEtaLoose = lambda j1,j2,j3: op.max(op.max(op.abs(j1.eta-j2.eta), op.abs(j2.eta-j3.eta)), op.abs(j1.eta-j3.eta))
+        self.MaxDiJetDEtaTight = lambda j1,j2,j3,j4: op.max(op.max(op.max(self.MaxDiJetDEtaLoose(j1,j2,j3), op.abs(j1.eta-j4.eta)), op.abs(j2.eta-j4.eta)),op.abs(j3.eta-j4.eta))
+        self.MaxDiJetDPhiLoose = lambda j1,j2,j3: op.max(op.max(op.abs(op.deltaPhi(j1.p4,j2.p4)), op.abs(op.deltaPhi(j2.p4,j3.p4))), op.abs(op.deltaPhi(j1.p4,j3.p4)))
+        self.MaxDiJetDPhiTight = lambda j1,j2,j3,j4: op.max(op.max(op.max(self.MaxDiJetDPhiLoose(j1,j2,j3), op.abs(op.deltaPhi(j1.p4,j4.p4))), op.abs(op.deltaPhi(j2.p4,j4.p4))), op.abs(op.deltaPhi(j3.p4,j4.p4)))
 
         
         # ------------------------------------ lambdas for BDT variables ------------------------------------ #
@@ -149,6 +185,8 @@ class highlevelLambdas:
         self.HWW_simple  = lambda wj1P4,wj2P4,lepP4,met : self.Wjj_simple(wj1P4,wj2P4) + self.Wlep_simple(wj1P4,wj2P4,lepP4,met)
         # dR_HWW
         self.dR_Hww   = lambda j1P4,j2P4,lepP4,met : op.deltaR(self.Wjj_simple(j1P4,j2P4), self.Wlep_simple(j1P4,j2P4,lepP4,met))
+        self.dEta_Hww = lambda j1P4,j2P4,lepP4,met : op.abs(self.Wjj_simple(j1P4,j2P4).Eta() - self.Wlep_simple(j1P4,j2P4,lepP4,met).Eta())
+        self.dPhi_Hww = lambda j1P4,j2P4,lepP4,met : op.abs(op.deltaPhi(self.Wjj_simple(j1P4,j2P4), self.Wlep_simple(j1P4,j2P4,lepP4,met)))
         # P4 of lep + met
         self.Wlep_met_simple = lambda lepP4, metP4 : lepP4 + metP4
         # SimpleP4 of HWW (W1 + W2)
@@ -223,3 +261,14 @@ class highlevelLambdas:
     def getCorrBp4(self,j):
         return  op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >", (j.pt*j.bRegCorr, j.eta, j.phi, j.mass*j.bRegCorr)) 
 
+    # check florian's snippet
+    def comp_cosThetaSbetBeamAndHiggs(self,genColl):
+        genh = op.select(genColl,lambda g : op.AND(g.pdgId==25, g.statusFlags & ( 0x1 << 13)))
+        HH_p4 = genh[0].p4 + genh[1].p4
+        cm = HH_p4.BoostToCM()
+        boosted_h1 = op.extMethod("ROOT::Math::VectorUtil::boost", returnType=genh[0].p4._typeName)(genh[0].p4,cm)
+        boosted_h2 = op.extMethod("ROOT::Math::VectorUtil::boost", returnType=genh[1].p4._typeName)(genh[1].p4,cm)
+        mHH = op.switch(op.rng_len(genh)==2, op.invariant_mass(genh[0].p4,genh[1].p4) , op.c_float(-9999))
+        cosTheta1 = op.switch(op.rng_len(genh)==2, op.abs(boosted_h1.Pz()/boosted_h1.P()) , op.c_float(-9999))
+        cosTheta2 = op.switch(op.rng_len(genh)==2, op.abs(boosted_h1.Pz()/boosted_h2.P()) , op.c_float(-9999))
+        return [mHH, cosTheta1, cosTheta2]

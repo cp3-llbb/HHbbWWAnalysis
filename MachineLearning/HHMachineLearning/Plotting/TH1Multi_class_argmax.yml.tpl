@@ -10,33 +10,41 @@ multiclass:
   xlabel: DNN output
   ylabel: events
   list_variable:
-    - output_Ewk
+    - output_DY
     - output_GGF
     - output_H
-    - output_Top
-    - output_VBF
-    - output_WJets
+    - output_Rare
+    - output_ST
+    - output_TT
+    - output_TTVX
+    - output_VVV
   list_color:
-    - '#610596'
-    - '#288a24'
+    - '#1a83a1'
+    - '#228B22'
     - '#06b894'
+    - '#610596'
+    - '#99053d'
     - '#cc7a16'
-    - '#8f0a1e'
-    - '#d95564'
+    - '#174704'
+    - '#ccbf45'
   list_legend:
-    - node Ewk
+    - node DY
     - node GGF
     - node H
-    - node Top
-    - node VBF
-    - node WJets
+    - node Rare
+    - node ST
+    - node TT
+    - node TTVX
+    - node VVV
   list_cut : 
-    - output_Ewk > output_GGF && output_Ewk > output_H && output_Ewk > output_Top && output_Ewk > output_VBF && output_Ewk > output_WJets
-    - output_GGF > output_Ewk && output_GGF > output_H && output_GGF > output_Top && output_GGF > output_VBF && output_GGF > output_WJets
-    - output_H > output_GGF && output_H > output_Ewk && output_H > output_Top && output_H > output_VBF && output_H > output_WJets
-    - output_Top > output_GGF && output_Top > output_H && output_Top > output_Top && output_Ewk > output_VBF && output_Top > output_WJets
-    - output_VBF > output_GGF && output_VBF > output_H && output_VBF > output_Top && output_VBF > output_VBF && output_Ewk> output_WJets
-    - output_WJets > output_GGF && output_WJets > output_H && output_WJets > output_Top && output_WJets > output_VBF && output_WJets > output_Ewk
+    - output_DY > output_GGF && output_DY > output_H && output_DY > output_Rare && output_DY > output_ST && output_DY > output_TT && output_DY > output_TTVX && output_DY > output_VVV 
+    - output_GGF > output_DY && output_GGF > output_H && output_GGF > output_Rare && output_GGF > output_ST && output_GGF > output_TT && output_GGF > output_TTVX && output_GGF > output_VVV 
+    - output_H > output_DY && output_H > output_GGF && output_H > output_Rare && output_H > output_ST && output_H > output_TT && output_H > output_TTVX && output_H > output_VVV 
+    - output_Rare > output_DY && output_Rare > output_GGF && output_Rare > output_H && output_Rare > output_ST && output_Rare > output_TT && output_Rare > output_TTVX && output_Rare > output_VVV 
+    - output_ST > output_DY && output_ST > output_GGF && output_ST > output_H && output_ST > output_Rare && output_ST > output_TT && output_ST > output_TTVX && output_ST > output_VVV 
+    - output_TT > output_DY && output_TT > output_GGF && output_TT > output_H && output_TT > output_Rare && output_TT > output_ST && output_TT > output_TTVX && output_TT > output_VVV 
+    - output_TTVX > output_DY && output_TTVX > output_GGF && output_TTVX > output_H && output_TTVX > output_Rare && output_TTVX > output_ST && output_TTVX > output_TT && output_TTVX > output_VVV 
+    - output_VVV > output_DY && output_VVV > output_GGF && output_VVV > output_H && output_VVV > output_Rare && output_VVV > output_ST && output_VVV > output_TT && output_VVV > output_TTVX
   legend_pos:
     - 0.4
     - 0.60

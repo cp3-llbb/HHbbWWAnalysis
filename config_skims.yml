@@ -1,0 +1,22 @@
+module: SkimmerHHtobbWWDL.py:SkimmerNanoHHtobbWWDL
+config: 
+  era:
+    - 2016: Yaml/analysis2016_v7.yml
+    - 2017: Yaml/analysis2017_v7.yml
+    - 2018: Yaml/analysis2018_v7.yml
+
+args:
+  - type:
+    - background: --subset=mc
+    - signal:     --subset=bbww2l,bbtautau,graviton,radion
+  - cat:
+    - Resolved1B: --Resolved1Btag
+    - Resolved2B: --Resolved2Btag
+    - Boosted1B:  --Boosted1Btag
+  - channel:
+    - ElEl: --Channel=ElEl
+    - MuMu: --Channel=MuMu
+    - ElMu: --Channel=ElMu
+  - --NoSystematics
+
+output: /home/ucl/cp3/fbury/scratch/SkimsHHbbWWResonant/Skim{era}_{type}_{cat}_{channel}

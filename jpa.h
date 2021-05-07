@@ -2,6 +2,9 @@
 #include "Math/PtEtaPhiM4D.h"
 #include "Math/PxPyPzE4D.h"
 
+#ifndef HHbbWW_JPA_H
+#define HHbbWW_JPA_H
+
 namespace HHbbWWJPA {
   // Wjj_simple: sum of p4
   // dR_HadW_bjet = lambda bP4,j1P4,j2P4 : op.deltaR(self.Wjj_simple(j1P4,j2P4), bP4)
@@ -75,3 +78,5 @@ namespace HHbbWWJPA {
     return HWWP4.M();
   }
 };
+
+#endif 
