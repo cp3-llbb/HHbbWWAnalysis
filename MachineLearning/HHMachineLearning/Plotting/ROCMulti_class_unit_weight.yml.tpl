@@ -1,40 +1,50 @@
 ROC_multi:
   tree: tree
   classes:
-    - Ewk
+    - DY
     - GGF
     - H
-    - Top
-    - VBF
-    - WJets
+    - Rare
+    - ST
+    - TT
+    - TTVX
+    - VVV
   prob_branches:
-    - output_Ewk
+    - output_DY
     - output_GGF
     - output_H
-    - output_Top
-    - output_VBF
-    - output_WJets
+    - output_Rare
+    - output_ST
+    - output_TT
+    - output_TTVX
+    - output_VVV
   labels:
-    - P(Ewk)
+    - P(DY)
     - P(GGF)
     - P(H)
-    - P(Top)
-    - P(VBF)
-    - P(WJets)
+    - P(Rare)
+    - P(ST)
+    - P(TT)
+    - P(TTVX)
+    - P(VVV)
   colors:
-    - '#610596'
-    - '#288a24'
+    - '#1a83a1'
+    - '#228B22'
     - '#06b894'
+    - '#610596'
+    - '#99053d'
     - '#cc7a16'
-    - '#8f0a1e'
-    - '#d95564'
+    - '#174704'
+    - '#ccbf45'
   weight : '1'
-  title : Multiclass_unit
+  title : Multiclass_event
   cut : ''
   selector :
-    'Ewk'   : 'Ewk'
-    'GGF'   : 'GGF'
-    'H'     : 'H'
-    'Top'   : 'Top'
-    'VBF'   : 'VBF'
-    'WJets' : 'WJets'
+    'DY'   : 'DY'
+    'GGF'  : 'GGF'
+    'H'    : 'H'
+    'Rare' : 'Rare'
+    'ST'   : 'ST'
+    'TT'   : 'TT'
+    'TTVX' : 'TTVX'
+    'VVV'  : 'VVV '

@@ -2490,6 +2490,20 @@ def makeDoubleLeptonSelectedBoostedVariables(sel,l1,l2,B,jets,met,suffix,channel
 
     return plots
 
+def makeDoubleLeptonHMEPlots(sel,suffix,channel,HME):
+    plots = []
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
+    plots.append(Plot.make1D("%s_%s_HME"%(channel,suffix),
+                             HME,
+                             sel,
+                             EquidistantBinning(200,0.,2000.),
+                             xTitle = "HME [GeV]",
+                             plotopts = channelLabel))
+
+    return plots
+
+
+
 
 def makeDoubleLeptonMachineLearningInputPlots(sel,suffix,channel,inputs):
     plots = []
@@ -2521,6 +2535,25 @@ def makeDoubleLeptonMachineLearningExclusiveOutputPlots(selObjNodesDict,output,n
                                  plotopts = plotopts))
 
     return plots    
+
+def makeDoubleLeptonMachineLearningExclusiveOutputPlotsWithHME(selObjNodesDict,output,nodes,channel,HME):
+    plots = []
+
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
+    plotopts = {**channelLabel}
+    for i,node in enumerate(nodes):
+        suffix = selObjNodesDict[node].selName
+        sel = selObjNodesDict[node].sel
+        plots.append(Plot.make2D("%s_%s_DNNOutputvsHME_%s"%(channel,suffix,node),
+                                 (output[i],HME),
+                                 sel,
+                                 (EquidistantBinning(400,0.,1.),EquidistantBinning(400,0,2000)),
+                                 xTitle = 'DNN output %s'%node,
+                                 yTitle = 'HME',
+                                 plotopts = plotopts))
+
+    return plots    
+
 
 def makeDoubleLeptonMachineLearningInclusiveOutputPlots(selObjNodesDict,output,nodes,channel):
     plots = []

@@ -134,7 +134,7 @@ class BambooLauncher:
                     failures  = sum([ec != 0 for ec in exitcodes if ec is not None])))
 
 
-            time.sleep(3)
+            time.sleep(10)
 
 
         if self.mode == 'driver':
@@ -226,8 +226,10 @@ class BambooLauncher:
                 output_path = self.output.format(**output_format)
                 if self.mode == 'driver' and os.path.exists(output_path):
                     print ('Driver mode and path {} already exists, will pass command'.format(output_path))
+                    continue
                 if self.mode == 'finalize' and not os.path.exists(output_path):
                     print ('Finalize mode and path {} does not exist, will pass command'.format(output_path))
+                    continue
 
                 # Line command #
                 cmd = baseCmd.format(mode       = mode,

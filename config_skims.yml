@@ -18,6 +18,5 @@ args:
     - MuMu: --Channel=MuMu
     - ElMu: --Channel=ElMu
   - --NoSystematics
-  - --maxFiles=1
 
 output: /home/ucl/cp3/fbury/scratch/SkimsHHbbWWResonant/Skim{era}_{type}_{cat}_{channel}

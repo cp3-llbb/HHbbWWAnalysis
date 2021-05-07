@@ -10,26 +10,32 @@ multiclass:
   xlabel: DNN output
   ylabel: events
   list_variable:
-    - output_Ewk
+    - output_DY
     - output_GGF
     - output_H
-    - output_Top
-    - output_VBF
-    - output_WJets
+    - output_Rare
+    - output_ST
+    - output_TT
+    - output_TTVX
+    - output_VVV
   list_color:
-    - '#610596'
-    - '#288a24'
+    - '#1a83a1'
+    - '#228B22'
     - '#06b894'
+    - '#610596'
+    - '#99053d'
     - '#cc7a16'
-    - '#8f0a1e'
-    - '#d95564'
+    - '#174704'
+    - '#ccbf45'
   list_legend:
-    - node Ewk
+    - node DY
     - node GGF
     - node H
-    - node Top
-    - node VBF
-    - node WJets
+    - node Rare
+    - node ST
+    - node TT
+    - node TTVX
+    - node VVV
   list_cut : '1'
   legend_pos:
     - 0.4
