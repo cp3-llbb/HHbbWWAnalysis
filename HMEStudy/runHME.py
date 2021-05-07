@@ -11,7 +11,14 @@ LV = getattr(gbl, "ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float>>")
 
 # Load extensions and HME #
 loadBambooExtensions()
-loadHeader("HME.h")
+
+here = os.path.dirname(os.path.abspath(__file__)) 
+lib = os.path.join(here,'build','libBambooHMEEvaluator.so')
+header = os.path.join(here,'include','HME.h')
+gbl.gSystem.Load(lib)
+gbl.gROOT.ProcessLine('#include "{}"'.format(header))
+
+evaluator = gbl.hme.HMEEvaluator()
 
 
 def runHME(path,suffix,N=None):
@@ -47,7 +54,7 @@ def runHME(path,suffix,N=None):
 
         start = time.time()
 
-        hme,eff = gbl.runHME(l1,l2,b1,b2,met,event.event)
+        hme,eff = evaluator.runHME(l1,l2,b1,b2,met,event.event)
 
         times.append(time.time()-start)
         hmes.append(hme)
