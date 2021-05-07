@@ -101,6 +101,10 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         #----- Singleleptons -----#
         ElSelObj,MuSelObj = makeSingleLeptonSelection(self,noSel,plot_yield=True)
 
+        #----- Apply jet corrections -----#
+        ElSelObject.sel = self.beforeJetselection(ElSelObj.sel,'El')
+        MuSelObject.sel = self.beforeJetselection(MuSelObj.sel,'Mu')
+
         # selObjectDict : keys -> level (str)
         #                 values -> [El,Mu] x Selection object
         # Select the jets selections that will be done depending on user input #

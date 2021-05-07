@@ -1,4 +1,7 @@
+import os
 from bamboo import treefunctions as op
+from bamboo.root import loadHeader 
+loadHeader(os.path.join(os.path.dirname(os.path.abspath(__file__)),"jpa.h"))
 
 class highlevelLambdas:
     def __init__(self,HHself):

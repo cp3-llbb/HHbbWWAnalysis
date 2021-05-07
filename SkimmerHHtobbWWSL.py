@@ -78,6 +78,10 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
             if self.args.Channel == "Mu":
                 selObj = MuSelObj
                 lep = self.muonsTightSel[0]
+
+            #----- Apply jet corrections -----#
+            ElSelObject.sel = self.beforeJetselection(ElSelObj.sel,'El')
+            MuSelObject.sel = self.beforeJetselection(MuSelObj.sel,'Mu')
             
             #----- Jet selection -----#
             if any([self.args.__dict__[item] for item in ["Ak4","Res2b2Wj","Res2b1Wj","Res2b0Wj","Res1b2Wj","Res1b1Wj","Res1b0Wj","Res0b"]]):

@@ -64,7 +64,7 @@ config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListDL_r
 lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
 eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
 
-categories = ["Resolved1Btag","Resolved2Btag","Boosted1Btag"]
+categories = ["Resolved1B","Resolved2B","Boosted1B"]
 channels = ['ElEl','MuMu','ElMu']
 
 # Better put them in alphabetical order
@@ -263,16 +263,24 @@ inputs = [
             'lep1_conept',            
             'lep2_conept',            
             'mww_simplemet',          
+<<<<<<< HEAD
             #'vbf_tag',                
+=======
+>>>>>>> eaa183177b2a516bab079cf6944b33c310d95b7a
             'boosted_tag',            
             'dphi_met_dilep',         
             'dphi_met_dibjet',        
             'dr_dilep_dijet',         
             'dr_dilep_dibjet',        
+<<<<<<< HEAD
             'm_T',
             'dr_lep1_dibjet',
             'dr_lep2_dibjet',
             'cosThetaS_Hbb',
+=======
+            'm_T',                    
+            'cosThetaS_Hbb',                    
+>>>>>>> eaa183177b2a516bab079cf6944b33c310d95b7a
     ]
 
 operations = [inp.split('@')[1] if '@' in inp else None  for inp  in  inputs]
@@ -288,6 +296,8 @@ LBN_inputs = [
               'l2_E','l2_Px','l2_Py','l2_Pz',
               'j1_E','j1_Px','j1_Py','j1_Pz',
               'j2_E','j2_Px','j2_Py','j2_Pz',
+              'j3_E','j3_Px','j3_Py','j3_Pz',
+              'j4_E','j4_Px','j4_Py','j4_Pz',
               'fatjet_E','fatjet_Px','fatjet_Py','fatjet_Pz',
              ]
 

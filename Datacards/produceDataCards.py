@@ -14,10 +14,10 @@ import enlighten
 import ROOT
 
 from IPython import embed
-ROOT.gROOT.SetBatch(True)
+#ROOT.gROOT.SetBatch(True) # TODO: enable
 
 class DataCard:
-    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,produce_plots=False,**kwargs):
+    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,produce_plots=False,legend=None,**kwargs):
         self.datacardName   = datacardName
         self.path           = path
         self.hist_conv      = hist_conv
@@ -31,6 +31,7 @@ class DataCard:
         self.rebin          = rebin
         self.textfiles      = textfiles
         self.produce_plots  = produce_plots
+        self.legend         = legend
 
         if isinstance(groups,dict):
             self.groups = groups
@@ -347,7 +348,7 @@ class DataCard:
                             raise RuntimeError(f"Could not find syst named {systNameDown} in group {group} for histogram {histName}")
 
                         # Fix shape in case needed #
-                        self.fixSystematics(hnom  = self.content[histName][group]['nominal'],
+                        self.fixHistograms(hnom  = self.content[histName][group]['nominal'],
                                             hup   = self.content[histName][group][systNameUp],
                                             hdown = self.content[histName][group][systNameDown])
 
@@ -365,13 +366,11 @@ class DataCard:
                     else:
                         raise RuntimeError(f"Something wrong happened with {systName} in group {group} for histogram {histName}")
 
-                # Save nominal (done after because can be correct when fixing systematics #
+                # Save nominal (done after because can be correct when fixing systematics) #
                 if 'nominal' not in self.content[histName][group].keys():
                     raise RuntimeError(f"Group {group} nominal histogram {histName} was not found")
-                for i in range(1,self.content[histName][group]['nominal'].GetNbinsX()+1): # Still check for zero bins in case not ran over systematics
-                    if self.content[histName][group]['nominal'].GetBinContent(i) < 0.:
-                        self.content[histName][group]['nominal'].SetBinContent(i,0.)
-                        self.content[histName][group]['nominal'].SetBinError(i,0.)
+                self.fixHistograms(hnom=self.content[histName][group]['nominal'])
+
                 self.content[histName][group]['nominal'].SetTitle(group)
                 self.content[histName][group]['nominal'].SetName(group)
                 self.content[histName][group]['nominal'].Write(group)
@@ -460,22 +459,25 @@ class DataCard:
             print (f"Saved file {textPath}")
 
     @staticmethod
-    def fixSystematics(hnom,hdown,hup):
+    def fixHistograms(hnom,hdown=None,hup=None):
+        val     = 1e-5 * min(1.,hnom.Integral()) 
+        valup   = 1e-5 * min(1.,hup.Integral()) if hdown is not None else None
+        valdown = 1e-5 * min(1.,hdown.Integral()) if hdown is not None else None
         # Loop over bins #
         for i in range(1,hnom.GetNbinsX()+1):
             # First clip to 0 all negative bin content #
-            if hnom.GetBinContent(i) < 0.:
-                hnom.SetBinContent(i,0.)
-                hnom.SetBinError(i,0.) 
-            if hup.GetBinContent(i) < 0.:
-                hup.SetBinContent(i,0.)
-                hup.SetBinError(i,0.)
-            if hdown.GetBinContent(i) < 0.:
-                hdown.SetBinContent(i,0.)
-                hdown.SetBinError(i,0.)
+            if hnom.GetBinContent(i) <= 0.:
+                hnom.SetBinContent(i,val)
+                hnom.SetBinError(i,val) 
+            if hup is not None and hup.GetBinContent(i) <= 0.:
+                hup.SetBinContent(i,valup)
+                hup.SetBinError(i,valup)
+            if hdown is not None and hdown.GetBinContent(i) <= 0.:
+                hdown.SetBinContent(i,valdown)
+                hdown.SetBinError(i,valdown)
 
             # Second, check the up and down compared to nominal #
-            if hnom.GetBinContent(i) > 0:
+            if hnom.GetBinContent(i) > 0 and hdown is not None and hup is not None:
                 # Nominal bin not zero #
                 # Check if zero bin -> apply nominal**2 / up or down
                 if hdown.GetBinContent(i) == 0. and abs(hup.GetBinContent(i)) > 0:
@@ -487,13 +489,19 @@ class DataCard:
                     hdown.SetBinContent(i, 100 * hnom.GetBinContent(i))
                 if hup.GetBinContent(i)/hnom.GetBinContent(i) > 100:
                     hup.SetBinContent(i, 100 * hnom.GetBinContent(i))
+                # Check if too small, inlate in case #
+                if hdown.GetBinContent(i)/hnom.GetBinContent(i) < 1./100:
+                    hdown.SetBinContent(i, 1./100 * hnom.GetBinContent(i))
+                if hup.GetBinContent(i)/hnom.GetBinContent(i) < 1./100:
+                    hup.SetBinContent(i, 1./100 * hnom.GetBinContent(i))
             else:
                 # Nominal is == 0 #
-                if abs(hup.GetBinContent(i)) > 0 or abs(hdown.GetBinContent(i)) > 0:
-                    # zero nominal but non zero systematics -> set all at 0.00001 #
-                    hnom.SetBinContent(i,0.00001)
-                    hup.SetBinContent(i,0.00001)
-                    hdown.SetBinContent(i,0.00001)
+                if hup is not None and hdown is not None:
+                    if abs(hup.GetBinContent(i)) > 0 or abs(hdown.GetBinContent(i)) > 0:
+                        # zero nominal but non zero systematics -> set all at 0.00001 #
+                        hnom.SetBinContent(i,0.00001)
+                        hup.SetBinContent(i,0.00001)
+                        hdown.SetBinContent(i,0.00001)
 
 
     def applyDYNonClosure(self):
@@ -532,28 +540,46 @@ class DataCard:
 
     def applyRebinning(self):
         print ('Applying rebinning')
-        for histName, histContent in self.content.items():
+        for histName in self.content.keys():
             if histName in self.rebin.keys():
-                method = self.rebin[histName]['method']
-                params = self.rebin[histName]['params']
-                print ('... {:20s} -> rebinning scheme : {}'.format(histName,self.rebin[histName]['method']))
-                if method == 'classic':
-                    rebinFunc = self.rebinClassic
-                if method == 'boundary':
-                    rebinFunc = self.rebinBoundary
-                elif method == 'quantile':
-                    rebinFunc = self.rebinInQuantile
-                elif method == 'threshold':
-                    rebinFunc = self.rebinThreshold
-                else:
-                    raise RuntimeError("Could not understand rebinning method {} for histogram {}".format(method,histName))
-                rebinFunc(histName,params)
+                rebinSchemes = self.rebin[histName]
+                if not isinstance(rebinSchemes,list):
+                    rebinSchemes = [rebinSchemes]
+                for rebinScheme in rebinSchemes:
+                    method = rebinScheme['method']
+                    params = rebinScheme['params']
+                    print (f'... {histName:20s} -> rebinning scheme : {method}')
+                    # 1D rebinnings #
+                    if method == 'classic':
+                        rebinFunc = self.rebinClassic
+                    elif method == 'boundary':
+                        rebinFunc = self.rebinBoundary
+                    elif method == 'quantile':
+                        rebinFunc = self.rebinInQuantile
+                    elif method == 'threshold':
+                        rebinFunc = self.rebinThreshold
+                    # 2D rebinnings #
+                    elif method == 'classic2d':
+                        rebinFunc = self.rebinClassic2D
+                    elif method == 'boundary2d':
+                        rebinFunc = self.rebinBoundary2D
+                    elif method == 'quantile2d':
+                        rebinFunc = self.rebinInQuantile2D
+                    elif method == 'threshold2d':
+                        rebinFunc = self.rebinThreshold2D
+                    # 2D Linearized #
+                    elif method == 'linearize2d':
+                        rebinFunc = self.rebinLinearize2D
+                    # Error #
+                    else:
+                        raise RuntimeError("Could not understand rebinning method {} for histogram {}".format(method,histName))
+                    rebinFunc(histName,params)
             else:
                 print ('... {:20s} -> rebinning scheme not requested'.format(histName))
         
     def rebinClassic(self,histName,params):
         """
-            Using the classic ROOT rebinning
+            Using the classic ROOT rebinning (1D)
             histName: name of histogram in keys of self.content
             params : (list) [groups(int)]
         """
@@ -564,9 +590,24 @@ class DataCard:
             for systName,hist in histDict.items():
                 self.content[histName][group][systName].Rebin(params[0])
 
+    def rebinClassic2D(self,histName,params):
+        """
+            Using the classic ROOT rebinning (2D)
+            histName: name of histogram in keys of self.content
+            params : (list) [groups(int),grousp(int)]
+        """
+        assert isinstance(params,list)
+        assert len(params) == 2
+        assert isinstance(params[0],int)
+        assert isinstance(params[1],int)
+        for group,histDict in self.content[histName].items():
+            for systName,hist in histDict.items():
+                self.content[histName][group][systName].Rebin(params[0],params[1])
+
+
     def rebinBoundary(self,histName,params):
         """
-            Using the given hardcoded boundaries
+            Using the given hardcoded boundaries (1D)
             histName: name of histogram in keys of self.content
             params : (list) [boundaries(list)]
         """
@@ -579,9 +620,26 @@ class DataCard:
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = boundObj(hist) 
 
+    def rebinBoundary2D(self,histName,params):
+        """
+            Using the given hardcoded boundaries (2D)
+            histName: name of histogram in keys of self.content
+            params : (list) [boundaries(list),boundaries(list)]
+        """
+        from Rebinning import Boundary2D
+        assert isinstance(params,list)
+        assert len(params) == 2
+        assert isinstance(params[0],list)
+        assert isinstance(params[1],list)
+        boundObj = Boundary2D(params[0],params[1])
+        for group in self.content[histName].keys():
+            for systName,hist in self.content[histName][group].items():
+                self.content[histName][group][systName] = boundObj(hist) 
+
+
     def rebinInQuantile(self,histName,params):
         """
-            Using the quantile rebinning
+            Using the quantile rebinning (1D)
             histName: name of histogram in keys of self.content
             params : (list) [quantiles (list), groups (list)]
         """
@@ -601,11 +659,36 @@ class DataCard:
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = qObj(hist) 
 
+    def rebinInQuantile2D(self,histName,params):
+        """
+            Using the quantile rebinning (2D)
+            histName: name of histogram in keys of self.content
+            params : (list) [quantiles (list), quantiles (list), groups (list)]
+        """
+        from Rebinning import Quantile2D
+        assert isinstance(params,list)
+        assert len(params) == 3
+        assert isinstance(params[0],list)
+        assert isinstance(params[1],list)
+        assert isinstance(params[2],list)
+        qx = params[0]
+        qy = params[1]
+        groups_for_binning = params[2]
+        if not set(groups_for_binning).issubset(set(self.groups.keys())):
+            raise RuntimeError('Groups {'+','.join([g for g in groups_for_binning if g not in self.groups.keys()])+'} for quantile are not in group dict')
+
+        hists_for_binning = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in groups_for_binning if histDict['nominal'] is not None]
+        qObj = Quantile2D(hists_for_binning,qx,qy)
+        for group in self.content[histName].keys():
+            for systName,hist in self.content[histName][group].items():
+                self.content[histName][group][systName] = qObj(hist) 
+
+
     def rebinThreshold(self,histName,params):
         """
-            Using the threshold rebinning
+            Using the threshold rebinning (1D)
             histName: name of histogram in keys of self.content
-            params : (list) [thresholds (list), backgrounds (list), extra contributions (list)]
+            params : (list) [thresholds (list), backgrounds (list), extra contributions (list), rsut (float)]
         """
         from Rebinning import Threshold
         assert isinstance(params,list)
@@ -613,20 +696,72 @@ class DataCard:
         assert isinstance(params[0],list)
         assert isinstance(params[1],list)
         assert isinstance(params[2],list)
+        assert isinstance(params[3],float)
         thresholds  = params[0]
         backgrounds = params[1]
         extra       = params[2]
+        rsut        = params[3] # relative stat. unc. threshold
         if not set(backgrounds).issubset(set(self.groups.keys())):
             raise RuntimeError('Groups {'+','.join([g for g in backgrounds if g not in self.groups.keys()])+'} for threshold are not in group dict')
         if not set(extra).issubset(set(self.groups.keys())):
             raise RuntimeError('Groups {'+','.join([g for g in extra if g not in self.groups.keys()])+'} for extra contributions are not in group dict')
         hists_for_binning = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in backgrounds]
         hists_extra       = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in extra]
-        tObj = Threshold(thresholds,hists_for_binning,True,hists_extra)
+        tObj = Threshold(hists_for_binning,thresholds,True,hists_extra,rsut)
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = tObj(hist) 
                 
+    def rebinThreshold2D(self,histName,params):
+        """
+            Using the threshold rebinning (2D)
+            histName: name of histogram in keys of self.content
+            params : (list) [thresholds (list), thresholds (list), backgrounds (list), extra contributions (list), rsut (float)]
+        """
+        from Rebinning import Threshold2D
+        assert isinstance(params,list)
+        assert len(params) == 4
+        assert isinstance(params[0],list)
+        assert isinstance(params[1],list)
+        assert isinstance(params[2],list)
+        assert isinstance(params[3],list)
+        assert isinstance(params[4],float)
+        threshx     = params[0]
+        threshy     = params[1]
+        backgrounds = params[2]
+        extra       = params[3]
+        rsut        = params[4] # relative stat. unc. threshold
+        if not set(backgrounds).issubset(set(self.groups.keys())):
+            raise RuntimeError('Groups {'+','.join([g for g in backgrounds if g not in self.groups.keys()])+'} for threshold are not in group dict')
+        if not set(extra).issubset(set(self.groups.keys())):
+            raise RuntimeError('Groups {'+','.join([g for g in extra if g not in self.groups.keys()])+'} for extra contributions are not in group dict')
+        hists_for_binning = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in backgrounds]
+        hists_extra       = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in extra]
+        tObj = Threshold(hists_for_binning,threshx,threshy,True,hists_extra,rsut)
+        for group in self.content[histName].keys():
+            for systName,hist in self.content[histName][group].items():
+                self.content[histName][group][systName] = tObj(hist) 
+
+    def rebinLinearize2D(self,histName,params):
+        """
+            Using the linearization of 2D hostogram
+            histName: name of histogram in keys of self.content
+            params : Major axis ('x' or 'y')
+        """
+        from Rebinning import Linearize2D
+        assert isinstance(params,list)
+        assert len(params) == 1
+        assert params[0] in ['x','y']
+        lObj = Linearize2D(major=params[0])
+        for group in self.content[histName].keys():
+            for systName,hist in self.content[histName][group].items():
+                self.content[histName][group][systName] = lObj(hist)
+        if not hasattr(self,'plotLinearizeData'):
+            self.plotLinearizeData = {histName:lObj.getPlotData()}
+        else:
+            self.plotLinearizeData[histName] = lObj.getPlotData()
+         
+
     def preparePlotIt(self,suffix=''):
         print ("Preparing plotIt root files")
         # Make new directory with root files for plotIt #
@@ -699,19 +834,56 @@ class DataCard:
 
         config['plots'] = {}
         for h1,h2 in self.hist_conv.items():
+            # Check histogram dimension #
+            hist = self.content[h1][list(self.groups.keys())[0]]['nominal']
+            if isinstance(hist,ROOT.TH2F) or isinstance(hist,ROOT.TH2D):
+                print(f'Histogram {h1} is a TH2 and can therefore not be used in plotIt')
+                continue
+            print (hist.GetXaxis().GetNdivisions())
+            # Get basic config in case not found in plots.yml
+            baseCfg = {'log-y'              : 'both',
+                       'x-axis'             : hist.GetXaxis().GetTitle(),
+                       'x-axis-range'       : [hist.GetXaxis().GetBinLowEdge(1),hist.GetXaxis().GetBinUpEdge(hist.GetNbinsX())],
+                       'y-axis'             : 'Events',
+                       'y-axis-show-zero'   : True,
+                       'ratio-y-axis'       : '#frac{Data}{MC}',
+                       'show-ratio'         : True}
+                       
+            # Check if plots already in yaml #
             if isinstance(h2,list):
-                config['plots'][h1] = self.yaml_dict['plots'][h2[0]]
+                if h2[0] in self.yaml_dict['plots'].keys():
+                    config['plots'][h1] = self.yaml_dict['plots'][h2[0]]
+                else:
+                    config['plots'][h1] = baseCfg
             else:
-                config['plots'][h1] = self.yaml_dict['plots'][h2]
-            #config['plots'][h1]['legend-columns'] = 2
+                if h2 in self.yaml_dict['plots'].keys():
+                    config['plots'][h1] = self.yaml_dict['plots'][h2]
+                else:
+                    config['plots'][h1] = baseCfg
             if 'VBF' in h1 or 'GGF' in h1:
-                config['plots'][h1]['blinded-range'] = [0.5,1.]
+                xmin, xmax = config['plots'][h1]['x-axis-range']
+                config['plots'][h1]['blinded-range'] = [(xmax-xmin)/2,xmax]
             else:
                 config['plots'][h1].pop('blinded-range',None)
             config['plots'][h1]['ratio-y-axis-range'] = [0.5,1.5]
             config['plots'][h1]['sort-by-yields'] = True
+            config['plots'][h1]['show-overflow'] = True
             if 'labels' in config['plots'][h1].keys():
                 del config['plots'][h1]['labels']
+
+            if self.legend is not None and 'position' in self.legend.keys():
+                assert len(self.legend['position']) == 4
+                config['plots'][h1]['legend-position'] = self.legend['position']
+
+            if hasattr(self,'plotLinearizeData'):
+                if h1 in self.plotLinearizeData.keys():
+                    margin_left = config['configuration']['margin-left']
+                    margin_right = 1-config['configuration']['margin-right']
+                    extraItems = self.plotLinearizeData[h1]
+                    for idx in range(len(extraItems['labels'])):
+                        extraItems['labels'][idx]['position'][0] = margin_left + extraItems['labels'][idx]['position'][0] * (margin_right-margin_left)
+                    config['plots'][h1].update(extraItems)
+                    config['plots'][h1]['x-axis-hide-ticks'] = True
 
         if len(systematics) > 0:
             config['systematics'] = systematics
@@ -736,20 +908,22 @@ class DataCard:
             print ("Calling plotIt")
             rc = self.run_command(cmd.split(" "),print_output=True)
             if rc == 0:
-                return ('... success')
+                print ('... success')
             else:
-                return ('... failure')
+                print ('... failure')
+        else:
+            print ("plotIt not found")
 
     @staticmethod
     def run_command(command,return_output=False,print_output=False):
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
         outputs = []
         while True:
-            out = process.stdout.readline()
+            out = process.stdout.readline().strip().decode()
             if len(out) == 0 and process.poll() is not None:
                 break
             if out and print_output:
-                print (out.strip())
+                print (out)
             if return_output:
                 outputs.append(out)
         rc = process.poll()

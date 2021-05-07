@@ -4,9 +4,6 @@ from copy import copy, deepcopy
 from bamboo import treefunctions as op
 from itertools import chain
 import random
-from bamboo.root import loadHeader
-loadHeader("/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/jpa.h")
-#loadHeader("jpa.h")
 
 ###################################################################################################################
 # ModelPathDict is from Plotter. Keep the order same for function List in Stage-2

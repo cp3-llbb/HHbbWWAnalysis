@@ -57,6 +57,20 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                 selObj = ElMuSelObj
                 dilepton = self.ElMuFakeSel[0]
 
+            #----- HME -----#
+            if self.args.analysis == 'res':
+                HME,HME_eff = self.computeHMEAfterLeptonSelections(
+                                        sel   = selObj.sel,
+                                        l1    = dilepton[0],
+                                        l2    = dilepton[1],
+                                        bjets = self.ak4JetsByBtagScore,
+                                        met   = self.corrMET)
+
+            #----- Apply jet corrections -----#
+            ElElSelObj.sel = self.beforeJetselection(ElElSelObj.sel,'ElEl')
+            MuMuSelObj.sel = self.beforeJetselection(MuMuSelObj.sel,'MuMu')
+            ElMuSelObj.sel = self.beforeJetselection(ElMuSelObj.sel,'ElMu')
+
             #----- Jet selection -----#
             # Since the selections in one line, we can use the non copy option of the selection to modify the selection object internally
             if any([self.args.__dict__[item] for item in ["Ak4","Resolved0Btag","Resolved1Btag","Resolved2Btag"]]):
@@ -548,14 +562,10 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         #---------------------------------------------------------------------------------------# 
         #                                    Selection tree                                     #
         #---------------------------------------------------------------------------------------#
+        if not self.args.analysis == 'res':
+            raise RuntimeError("This part of the Skimmer is only for resonant")
+        import mvaEvaluatorDL_res_save
 
-        from mvaEvaluatorDL_res import returnMETMVAInputs,returnLeptonsMVAInputs,returnJetsMVAInputs,returnFatjetMVAInputs,returnHighLevelMVAInputs
-
-        #----- MET variables -----#
-        for (varName,_,_), var in returnMETMVAInputs(self,self.corrMET).items():
-            varsToKeep[varName] = var
-
-        #----- Lepton variables -----#
         if self.args.Channel is None:
             raise RuntimeError("You need to specify --Channel")
         if self.args.Channel == "ElEl": dilepton = self.ElElTightSel[0]
@@ -568,35 +578,33 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         varsToKeep['is_ee'] = op.static_cast("UInt_t",op.rng_len(self.ElElTightSel)>0)
         varsToKeep['is_mm'] = op.static_cast("UInt_t",op.rng_len(self.MuMuTightSel)>0)
         varsToKeep['is_em'] = op.static_cast("UInt_t",op.rng_len(self.ElMuTightSel)>0)
-        varsToKeep['resolved_tag'] = op.static_cast("UInt_t",op.AND(op.rng_len(self.ak4BJets)>=1,op.rng_len(self.ak8BJets)==0))
-        varsToKeep['boosted_tag'] = op.static_cast("UInt_t",op.AND(op.rng_len(self.ak8BJets)>0))
 
         l1 = dilepton[0]
         l2 = dilepton[1]
 
-        for (varName,_,_), var in returnLeptonsMVAInputs(self,l1,l2,self.args.Channel).items():
-            varsToKeep[varName] = var
+        inputsAll = mvaEvaluatorDL_res_save.returnResonantMVAInputs(
+                                self      = self,
+                                l1        = dilepton[0],
+                                l2        = dilepton[1],
+                                channel   = self.args.Channel,
+                                jets      = self.ak4Jets,
+                                fatjets   = self.ak8Jets,                                                                                                                                   
+                                bjets     = self.ak4JetsByBtagScore[:op.min(op.rng_len(self.ak4JetsByBtagScore),op.static_cast("std::size_t",op.c_int(2)))],
+                                met       = self.corrMET,
+                                electrons = self.electronsTightSel,
+                                muons     = self.muonsTightSel)
 
-        #----- Jet variables -----#
-        for (varName,_,_), var in returnJetsMVAInputs(self,self.ak4Jets).items():
-            varsToKeep[varName] = var
 
-        #----- Fatjet variables -----#
-        for (varName,_,_), var in returnFatjetMVAInputs(self,self.ak8Jets).items():
-            varsToKeep[varName] = var
 
-        #----- High level variables -----#
-        for (varName,_,_), var in returnHighLevelMVAInputs(self, \
-                                                           l1        = l1, \
-                                                           l2        = l2, \
-                                                           met       = self.corrMET, \
-                                                           jets      = self.ak4Jets, \
-                                                           bjets     = self.ak4JetsByBtagScore[:op.min(op.rng_len(self.ak4JetsByBtagScore),op.static_cast("std::size_t",op.c_int(2)))], \
-                                                           electrons = self.electronsTightSel, \
-                                                           muons     = self.muonsTightSel,     \
-                                                           channel   = self.args.Channel).items():
-            varsToKeep[varName] = var
+        for (varName,_,_), var in inputsAll.items():
+            if not isinstance(var,list):
+                varsToKeep[varName] = var
 
+        
+        #----- HME ----#
+        if self.args.Resolved1Btag or self.args.Resolved2Btag:
+            varsToKeep["HME"] = HME
+            varsToKeep["HME_eff"] = HME_eff
 
         #----- Additional variables -----#
         if self.is_MC:
@@ -608,3 +616,8 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         varsToKeep["ls"]            = t.luminosityBlock
 
         return selObj.sel, varsToKeep
+
+    ### PostProcess ###
+    def postProcess(self, taskList, config=None, workdir=None, resultsdir=None):
+        super(SkimmerNanoHHtobbWWDL, self).postProcess(taskList, config, workdir, resultsdir, forSkimmer=True)
+
