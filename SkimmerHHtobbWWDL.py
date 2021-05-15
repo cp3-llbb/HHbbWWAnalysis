@@ -564,7 +564,7 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         #---------------------------------------------------------------------------------------#
         if not self.args.analysis == 'res':
             raise RuntimeError("This part of the Skimmer is only for resonant")
-        import mvaEvaluatorDL_res_save
+        import mvaEvaluatorDL_res
 
         if self.args.Channel is None:
             raise RuntimeError("You need to specify --Channel")
@@ -582,7 +582,7 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         l1 = dilepton[0]
         l2 = dilepton[1]
 
-        inputsAll = mvaEvaluatorDL_res_save.returnResonantMVAInputs(
+        inputsAll = mvaEvaluatorDL_res.returnResonantMVAInputs(
                                 self      = self,
                                 l1        = dilepton[0],
                                 l2        = dilepton[1],
@@ -595,11 +595,33 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                                 muons     = self.muonsTightSel)
 
 
-
         for (varName,_,_), var in inputsAll.items():
             if not isinstance(var,list):
                 varsToKeep[varName] = var
 
+        #----- Additional -----#
+        if self.args.Resolved1Btag or self.args.Resolved2Btag:
+            varsToKeep["b1_E"]  = self.ak4JetsByBtagScore[0].p4.E()
+            varsToKeep["b1_Px"] = self.ak4JetsByBtagScore[0].p4.Px()
+            varsToKeep["b1_Py"] = self.ak4JetsByBtagScore[0].p4.Py()
+            varsToKeep["b1_Pz"] = self.ak4JetsByBtagScore[0].p4.Pz()
+            varsToKeep["b2_E"]  = self.ak4JetsByBtagScore[1].p4.E()
+            varsToKeep["b2_Px"] = self.ak4JetsByBtagScore[1].p4.Px()
+            varsToKeep["b2_Py"] = self.ak4JetsByBtagScore[1].p4.Py()
+            varsToKeep["b2_Pz"] = self.ak4JetsByBtagScore[1].p4.Pz()
+        if self.args.Boosted1Btag:
+            varsToKeep["fatbjet_E"]  = self.ak8BJets[0].p4.E()
+            varsToKeep["fatbjet_Px"] = self.ak8BJets[0].p4.Px()
+            varsToKeep["fatbjet_Py"] = self.ak8BJets[0].p4.Py()
+            varsToKeep["fatbjet_Pz"] = self.ak8BJets[0].p4.Pz()
+            varsToKeep["fatbjet_subjet1_E"]  = self.ak8BJets[0].subJet1.p4.E()
+            varsToKeep["fatbjet_subjet1_Px"] = self.ak8BJets[0].subJet1.p4.Px()
+            varsToKeep["fatbjet_subjet1_Py"] = self.ak8BJets[0].subJet1.p4.Py()
+            varsToKeep["fatbjet_subjet1_Pz"] = self.ak8BJets[0].subJet1.p4.Pz()
+            varsToKeep["fatbjet_subjet2_E"]  = self.ak8BJets[0].subJet2.p4.E()
+            varsToKeep["fatbjet_subjet2_Px"] = self.ak8BJets[0].subJet2.p4.Px()
+            varsToKeep["fatbjet_subjet2_Py"] = self.ak8BJets[0].subJet2.p4.Py()
+            varsToKeep["fatbjet_subjet2_Pz"] = self.ak8BJets[0].subJet2.p4.Pz()
         
         #----- HME ----#
         if self.args.Resolved1Btag or self.args.Resolved2Btag:

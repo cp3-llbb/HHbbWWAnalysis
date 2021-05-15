@@ -60,10 +60,10 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             input_names = ["lep","jet","fat","met","hl","param","eventnr"]
             output_name = "Identity"
         if self.args.analysis == 'res':
-            dnn_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','HHMachineLearning','TFModels')
-            path_model = os.path.join(dnn_dir,'HH_DLRes_v1.pb')
+            dnn_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ResonantModels')
+            path_model = os.path.join(dnn_dir,'Resonant_HighMass_512x4_w1.pb')
             input_names = []
-            with open(os.path.join(dnn_dir,'HH_DLRes_v1_inputs.txt'),'r') as handle:
+            with open(os.path.join(dnn_dir,'Resonant_HighMass_512x4_w1_inputs.txt'),'r') as handle:
                 for line in handle:
                     input_names.append(line.split()[0])
             output_name = "Identity"
@@ -518,7 +518,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
                 HME = HME_per_channel[channel]
 
-                plots.extend(makeDoubleLeptonHMEPlots(selObjectDict['sel'],selObjectDict['suffix'],selObjectDict['channel'],HME))
+                plots.extend(makeDoubleLeptonHMEPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],HME))
 
                 inputsAll = mvaEvaluatorDL_res.returnResonantMVAInputs(
                                                 self      = self,
@@ -566,9 +566,8 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
                     output = DNN(*inputsArr)
                     selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,suffix="M{}".format(int(mass)))
-                    selObjNodesDict_sig = {'GGF':selObjNodesDict['GGF']}
                     plots.extend(makeDoubleLeptonMachineLearningExclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
-                    plots.extend(makeDoubleLeptonMachineLearningExclusiveOutputPlotsWithHME(selObjNodesDict_sig,output,['GGF'],channel=selObjectDict['channel'],HME=HME))
+                    plots.extend(makeDoubleLeptonMachineLearningExclusiveOutputPlotsWithHME(selObjNodesDict,output,['GGF'],channel=selObjectDict['channel'],HME=HME))
 
                             
     
