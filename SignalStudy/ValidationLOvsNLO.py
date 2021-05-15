@@ -11,18 +11,10 @@ from IPython import embed
 baseDir = '/nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/'
 era = '2016'
 paths_LO = [
-    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_Boosted1B_GGFLO_BenchmarkcHHH0',
-    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_Boosted1B_GGFLO_BenchmarkcHHH1',
-    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_Boosted1B_GGFLO_BenchmarkcHHH2p45',
-    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_Boosted1B_GGFLO_BenchmarkcHHH5',
-    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_Resolved1B_GGFLO_BenchmarkcHHH0',
-    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_Resolved1B_GGFLO_BenchmarkcHHH1',
-    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_Resolved1B_GGFLO_BenchmarkcHHH2p45',
-    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_Resolved1B_GGFLO_BenchmarkcHHH5',
-    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_Resolved2B_GGFLO_BenchmarkcHHH0',
-    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_Resolved2B_GGFLO_BenchmarkcHHH1',
-    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_Resolved2B_GGFLO_BenchmarkcHHH2p45',
-    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_Resolved2B_GGFLO_BenchmarkcHHH5',
+    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_GGFLO_BenchmarkcHHH0',
+    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_GGFLO_BenchmarkcHHH1',
+    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_GGFLO_BenchmarkcHHH2p45',
+    f'full{era}NanoV7_TTHIDLoose_Fake_DNN11_GGFLO_BenchmarkcHHH5',
 ]
 
 paths_NLO = [

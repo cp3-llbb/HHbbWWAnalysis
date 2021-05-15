@@ -10,7 +10,7 @@ GluGluToHHTo2B2VTo2L2Nu_node_SM:
   generated-events: genEventSumw
   legend: 'HH#rightarrow bbl#nu l#nu (node SM)' 
   line-type: 1
-  split: 10
+  split: 1
   type: signal
   hide: True
 GluGluToHHTo2B2VTo2L2Nu_node_1:

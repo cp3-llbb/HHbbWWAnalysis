@@ -2540,8 +2540,9 @@ def makeDoubleLeptonMachineLearningExclusiveOutputPlots(selObjNodesDict,output,n
 
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
     plotopts = {**channelLabel}
-
-    for i,node in enumerate(nodes):
+    for i,node in enumerate(selObjNodesDict.keys()):
+        if node not in nodes:
+            continue
         suffix = selObjNodesDict[node].selName
         sel = selObjNodesDict[node].sel
         if node in ["GGF","VBF"]:
@@ -2561,13 +2562,15 @@ def makeDoubleLeptonMachineLearningExclusiveOutputPlotsWithHME(selObjNodesDict,o
 
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
     plotopts = {**channelLabel}
-    for i,node in enumerate(nodes):
+    for i,node in enumerate(selObjNodesDict.keys()):
+        if node not in nodes:
+            continue
         suffix = selObjNodesDict[node].selName
         sel = selObjNodesDict[node].sel
         plots.append(Plot.make2D("%s_%s_DNNOutputvsHME_%s"%(channel,suffix,node),
-                                 (output[i],HME),
+                                 [output[i],HME],
                                  sel,
-                                 (EquidistantBinning(400,0.,1.),EquidistantBinning(400,0,2000)),
+                                 [EquidistantBinning(400,0.,1.),EquidistantBinning(400,0,2000.)],
                                  xTitle = 'DNN output %s'%node,
                                  yTitle = 'HME',
                                  plotopts = plotopts))
@@ -2580,9 +2583,11 @@ def makeDoubleLeptonMachineLearningInclusiveOutputPlots(selObjNodesDict,output,n
 
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
     plotopts = {**channelLabel}
-    for selectNode in nodes:
-        suffix = selObjNodesDict[selectNode].selName
-        sel = selObjNodesDict[selectNode].sel
+    for i,node in enumerate(selObjNodesDict.keys()):
+        if node not in nodes:
+            continue
+        suffix = selObjNodesDict[node].selName
+        sel = selObjNodesDict[node].sel
         for i,plotNode in enumerate(nodes):
             if selectNode in ["GGF","VBF"]:
                 plotopts.update({'blinded-range':[0.5,1]})

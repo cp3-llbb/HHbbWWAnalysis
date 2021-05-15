@@ -49,7 +49,7 @@ TTTo2L2Nu:
   era: '2017'
   generated-events: 'genEventSumw'
   group: ttbar
-  split: 100
+  split: 300
 TTToSemiLeptonic:
   cross-section: 365.52
   db: das:/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_new_pmx_102X_mc2017_realistic_v8-v1/NANOAODSIM

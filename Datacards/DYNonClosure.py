@@ -23,7 +23,7 @@ class NonClosureSystematic:
 
         cov = np.array(self.covariance)
         assert cov.shape == (2,2)
-        eigenValues , eigenVectors = np.linalg.eig(cov)
+        eigenValues , eigenVectors = np.linalg.eigh(cov)
 
         self.shape1_up   = lambda x : (self.coefficients[0] + np.sqrt(eigenValues[0]) * eigenVectors[0][0]) \
                                     + (self.coefficients[1] + np.sqrt(eigenValues[0]) * eigenVectors[0][1]) * x

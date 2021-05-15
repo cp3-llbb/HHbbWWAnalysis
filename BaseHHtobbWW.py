@@ -1939,7 +1939,7 @@ One lepton and and one jet argument must be specified in addition to the require
 
         hme_pair = self.hmeEval.runHME(l1.p4, l2.p4, bjets[0].p4, bjets[1].p4, met.p4, self.tree.event)
         hme_pair = op.switch(op.rng_len(bjets) >= 2, hme_pair, op.construct(op.typeOf(hme_pair), [op.c_float(0.), op.c_float(0.)]))
-        hme_pair = op.forSystematicVariation(hme_pair, "jet", "nominal").result   # no variations, always nominal
+        hme_pair = op.forSystematicVariation(hme_pair, "jet", "nominal")   # no variations, always nominal
         forceDefine(hme_pair, sel)
         hme = hme_pair.first
         eff = hme_pair.second
