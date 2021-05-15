@@ -37,7 +37,7 @@ ROC_multi:
     - '#174704'
     - '#ccbf45'
   weight : 'learning_weight'
-  title : Multiclass_event
+  title : Multiclass_learning
   cut : ''
   selector :
     'DY'   : 'DY'
@@ -47,4 +47,4 @@ ROC_multi:
     'ST'   : 'ST'
     'TT'   : 'TT'
     'TTVX' : 'TTVX'
-    'VVV'  : 'VVV '
+    'VVV'  : 'VVV'

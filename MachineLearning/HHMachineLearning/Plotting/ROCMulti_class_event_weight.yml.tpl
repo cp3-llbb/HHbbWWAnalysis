@@ -47,4 +47,4 @@ ROC_multi:
     'ST'   : 'ST'
     'TT'   : 'TT'
     'TTVX' : 'TTVX'
-    'VVV'  : 'VVV '
+    'VVV'  : 'VVV'

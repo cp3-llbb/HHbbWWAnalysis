@@ -17,7 +17,7 @@ from grouped_entropy import GroupedXEnt
 ##################################  Path variables ####################################
 
 main_path = os.path.abspath(os.path.dirname(__file__))
-path_out = '/nfs/scratch/fynu/gsaha/HHMachineLearning_output_res/'
+path_out = '/nfs/scratch/fynu/gsaha/HHMachineLearning_output_resDL/'
 path_model = os.path.join(main_path,'model')
 
 ##############################  Datasets proportion   #################################
@@ -60,7 +60,7 @@ split_per_model = True # in case of cross validation, to send one job per model 
 
 ##################################  Naming ######################################
 # Physics Config #
-config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListDL_res.yml')
+config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListDL_res_LowMass.yml')
 lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
 eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
 
@@ -72,7 +72,7 @@ nodes = ['DY','GGF','H','Rare','ST','TT','TTVX','VVV']
 
 weight_groups = [
                   (1.0, ('DY')),
-                  (1.0, ('GGF')),
+                  (0.1, ('GGF')),
                   (1.0, ('H')),
                   (1.0, ('Rare')),
                   (1.0, ('ST')),
@@ -97,7 +97,7 @@ quantile = 0.95 # repeat weights with too high learning weights
 tree_name = 'Events'
 
 # scaler and mask names #
-suffix = 'resonant' 
+suffix = 'resonant_LowMass' 
 # scaler_name -> 'scaler_{suffix}.pkl'  If does not exist will be created 
 # mask_name -> 'mask_{suffix}_{sample}.npy'  If does not exist will be created 
 scaler_name = 'scaler_'+suffix+'_'.join([str(era) for era in eras])+'.pkl'
@@ -247,14 +247,10 @@ inputs = [
             'ht', 
             'min_dr_jets_lep1',       
             'min_dr_jets_lep2',       
-            'min_deta_jets_lep1',       
-            'min_deta_jets_lep2',       
             'm_ll',                   
             'dr_ll',                  
-            'deta_ll',                  
             'min_dr_jet',             
             'min_dphi_jet',           
-            'min_deta_jet',
             'm_hh_simplemet_bregcorr',
             'met_ld',                 
             'dr_bb',                  
@@ -263,24 +259,13 @@ inputs = [
             'lep1_conept',            
             'lep2_conept',            
             'mww_simplemet',          
-<<<<<<< HEAD
-            #'vbf_tag',                
-=======
->>>>>>> eaa183177b2a516bab079cf6944b33c310d95b7a
             'boosted_tag',            
             'dphi_met_dilep',         
             'dphi_met_dibjet',        
             'dr_dilep_dijet',         
             'dr_dilep_dibjet',        
-<<<<<<< HEAD
-            'm_T',
-            'dr_lep1_dibjet',
-            'dr_lep2_dibjet',
-            'cosThetaS_Hbb',
-=======
             'm_T',                    
             'cosThetaS_Hbb',                    
->>>>>>> eaa183177b2a516bab079cf6944b33c310d95b7a
     ]
 
 operations = [inp.split('@')[1] if '@' in inp else None  for inp  in  inputs]
