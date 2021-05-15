@@ -921,8 +921,8 @@ def makeDNNOutputNodesSelections(self,selObject,output,suffix=""):
     maxIdx = op.rng_max_element_index(output)
     for i,node in enumerate(self.nodes):
         newSelObj = copy(selBaseObject)
-        newSelObj.selName += suffix+'%snode'%node
-        newSelObj.yieldTitle += " "+suffix+" in %s node"%node 
+        newSelObj.selName += f"{suffix}{node}"
+        newSelObj.yieldTitle += f"{suffix} in {node}"
         newSelObj.refine(cut = [maxIdx == op.c_int(i)]) 
         selObjDict[node] = newSelObj
     return selObjDict

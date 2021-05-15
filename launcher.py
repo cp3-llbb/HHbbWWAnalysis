@@ -7,6 +7,7 @@ import argparse
 import itertools
 import time
 import subprocess
+import shutil
 import multiprocessing as mp
 
 
@@ -76,10 +77,29 @@ class BambooLauncher:
             if cores > mp.cpu_count():
                 print ("You asked for {} processes but the machine has only {} cpus, will reduce to latter".format(cores,mp.cpu_count()))
                 cores = mp.cpu_count()
-
             self.runningLoop(cmds,cores)
+        elif self.mode == 'remove':
+            self.removeOutputs(cmds)
         else:
             raise RuntimeError(f'Mode {self.mode} not understood')
+
+    def removeOutputs(self,cmds):
+        outputs = []
+        for cmd in cmds:
+            cmd = cmd.split()
+            outputs.append(cmd[cmd.index("-o")+1])
+        
+        print ("Will remove the following dirs :")
+        for output in outputs:
+            print ('  ',output)
+        confirmation = input("Are you sure to remove ? (y/[n]) ")
+        if confirmation == "y":
+            for output in outputs:
+                if os.path.exists(output):
+                    shutil.rmtree(output)
+                    print ('Removed dir :',output)
+                else:
+                    print ('Wrong path  :',output)
 
     def runningLoop(self,cmds,cores):
         queue = mp.Queue()
@@ -141,7 +161,7 @@ class BambooLauncher:
             if any([slurm_id is None for slurm_id in slurm_ids]):
                 print ('Some processes did not return a jobid')
             if any([slurm_id is not None for slurm_id in slurm_ids]):
-                print ('Submitted job ID : ',sorted(slurm_ids))
+                print ('Submitted job ID : '+' '.join([str(sid) for sid in sorted(slurm_ids)]))
         if self.mode == 'finalize' and len(sbatch_cmds)>0:
             print ('Not all jobs have succeeded, see below for list of commands to resubmit')
             for sbatch_cmd in sbatch_cmds:
@@ -252,7 +272,7 @@ if __name__=="__main__":
     parser.add_argument('--yaml', action='store', required=True, type=str,
                         help='Yaml containing parameters')
     parser.add_argument('--mode', action='store', required=True, type=str,
-                        help='Mode for launcher : driver | finalize | debug')
+                        help='Mode for launcher : driver | finalize | debug | remove')
     parser.add_argument('-j', action='store', required=False, type=int, default=1,
                         help='Number of commands to run in parallel (default = 1), using -1 will spawn all the commands')
     args = parser.parse_args()

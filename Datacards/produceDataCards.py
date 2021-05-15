@@ -1,7 +1,10 @@
 import os
 import sys
+import re
+import json
 import glob
 import copy
+import shlex
 import yaml
 import argparse
 import subprocess
@@ -13,11 +16,14 @@ import numpy as np
 import enlighten
 import ROOT
 
+from yamlLoader import YMLIncludeLoader
+
 from IPython import embed
 #ROOT.gROOT.SetBatch(True) # TODO: enable
+combine_env = os.path.join(os.path.dirname(os.path.abspath(__file__)),'HiggsAnalysis','CombinedLimit','env_standalone.sh')
 
 class DataCard:
-    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,produce_plots=False,legend=None,**kwargs):
+    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,produce_plots=False,legend=None,combineCmd=None,**kwargs):
         self.datacardName   = datacardName
         self.path           = path
         self.hist_conv      = hist_conv
@@ -32,6 +38,7 @@ class DataCard:
         self.textfiles      = textfiles
         self.produce_plots  = produce_plots
         self.legend         = legend
+        self.combineCmd     = combineCmd
 
         if isinstance(groups,dict):
             self.groups = groups
@@ -51,6 +58,10 @@ class DataCard:
         self.content = {histName:{g:{} for g in self.groups.keys()} for histName in self.hist_conv.keys()}
         self.systPresent = {histName:{group:[] for group in self.groups.keys()} for histName in self.hist_conv.keys()}
 
+        self.datacardPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),'datacards',self.datacardName)
+
+
+    def run_production(self):
         self.loopOverFiles()
         if self.pseudodata:
             self.roundFakeData()
@@ -106,7 +117,6 @@ class DataCard:
                 for group in groups:
                     self.systPresent[histName][group].append({'systematics': [systname for systname in hist_dict[histName].keys() if systname != 'nominal'],
                                                               'nominal': copy.deepcopy(hist_dict[histName]['nominal'])})
-
             for group in groups:
                 self.addSampleToGroup(copy.deepcopy(hist_dict),group)
                 # deepcopy is needed so that if the histogram is in two groups
@@ -308,13 +318,12 @@ class DataCard:
         from txtwriter import Writer
         if self.datacardName is None:
             raise RuntimeError("Datacard name is not set")
-        path_datacard = os.path.join(os.path.abspath(os.path.dirname(__file__)),'datacards',self.datacardName)
 
-        shapes = {histName:os.path.join(path_datacard,f"{histName}_{self.era}.root") for histName in self.content.keys()}
+        shapes = {histName:os.path.join(self.datacardPath,f"{histName}_{self.era}.root") for histName in self.content.keys()}
 
         # Save root file #
-        if not os.path.exists(path_datacard):
-            os.makedirs(path_datacard)
+        if not os.path.exists(self.datacardPath):
+            os.makedirs(self.datacardPath)
         for histName in self.content.keys():
             f = ROOT.TFile(shapes[histName],'recreate')
             if self.root_subdir is not None:
@@ -450,11 +459,11 @@ class DataCard:
 
                 
             if '{}' in self.textfiles:
-                textPath = os.path.join(path_datacard,self.textfiles.format(f"{histName}_{self.era}"))
+                textPath = os.path.join(self.datacardPath,self.textfiles.format(f"{histName}_{self.era}"))
                 writer.dump(textPath,os.path.basename(shapes[histName]))
                 print (f"Saved file {textPath}")
         if '{}' not in self.textfiles:
-            textPath = os.path.join(path_datacard,self.textfiles)
+            textPath = os.path.join(self.datacardPath,self.textfiles)
             writer.dump(textPath,[os.path.basename(shape) for shape in shapes.values()])
             print (f"Saved file {textPath}")
 
@@ -463,6 +472,9 @@ class DataCard:
         val     = 1e-5 * min(1.,hnom.Integral()) 
         valup   = 1e-5 * min(1.,hup.Integral()) if hdown is not None else None
         valdown = 1e-5 * min(1.,hdown.Integral()) if hdown is not None else None
+        #val     = 0.
+        #valup   = 0.
+        #valdown = 0.
         # Loop over bins #
         for i in range(1,hnom.GetNbinsX()+1):
             # First clip to 0 all negative bin content #
@@ -540,7 +552,24 @@ class DataCard:
 
     def applyRebinning(self):
         print ('Applying rebinning')
+        # Check at least one nominal per group #
+        missings = []
         for histName in self.content.keys():
+            for group in self.content[histName]:
+                if 'nominal' not in self.content[histName][group].keys():
+                    missings.append([histName,group])
+        if len(missings) != 0 :
+            print ('Following histograms are missing :')
+            for histName,group in missings:
+                print (f'... {group:20s} -> {histName}')
+            raise RuntimeError('Some nominal files are missing')
+
+                    
+
+        # Apply rebinning schemes #
+        for histName in self.content.keys():
+            histType = self.content[histName][list(self.groups.keys())[0]]['nominal'].__class__.__name__ 
+            print (f'... {histName:20s} ({histType})')
             if histName in self.rebin.keys():
                 rebinSchemes = self.rebin[histName]
                 if not isinstance(rebinSchemes,list):
@@ -548,7 +577,6 @@ class DataCard:
                 for rebinScheme in rebinSchemes:
                     method = rebinScheme['method']
                     params = rebinScheme['params']
-                    print (f'... {histName:20s} -> rebinning scheme : {method}')
                     # 1D rebinnings #
                     if method == 'classic':
                         rebinFunc = self.rebinClassic
@@ -570,12 +598,22 @@ class DataCard:
                     # 2D Linearized #
                     elif method == 'linearize2d':
                         rebinFunc = self.rebinLinearize2D
+                    elif method == 'rebinlinearize2d':
+                        rebinFunc = self.rebinLinearizeSplit2D
                     # Error #
                     else:
                         raise RuntimeError("Could not understand rebinning method {} for histogram {}".format(method,histName))
+                    print (f'\t-> rebinning scheme : {method}')
                     rebinFunc(histName,params)
             else:
-                print ('... {:20s} -> rebinning scheme not requested'.format(histName))
+                print ('\t-> rebinning scheme not requested')
+
+    def rebinGetHists(self,histName,groups_for_binning):
+        if not set(groups_for_binning).issubset(set(self.groups.keys())):
+            raise RuntimeError('Groups {'+','.join([g for g in groups_for_binning if g not in self.groups.keys()])+'} are not in group dict')
+        hists_for_binning = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in groups_for_binning if histDict['nominal'] is not None]
+        return hists_for_binning
+
         
     def rebinClassic(self,histName,params):
         """
@@ -615,7 +653,7 @@ class DataCard:
         assert isinstance(params,list)
         assert len(params) == 1
         assert isinstance(params[0],list)
-        boundObj = Boundary(params[0])
+        boundObj = Boundary(boundaries=params[0])
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = boundObj(hist) 
@@ -650,10 +688,7 @@ class DataCard:
         assert isinstance(params[1],list)
         quantiles = params[0]
         groups_for_binning = params[1]
-        if not set(groups_for_binning).issubset(set(self.groups.keys())):
-            raise RuntimeError('Groups {'+','.join([g for g in groups_for_binning if g not in self.groups.keys()])+'} for quantile are not in group dict')
-
-        hists_for_binning = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in groups_for_binning if histDict['nominal'] is not None]
+        hists_for_binning = self.rebinGetHists(histName,groups_for_binning)
         qObj = Quantile(hists_for_binning,quantiles)
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
@@ -674,10 +709,7 @@ class DataCard:
         qx = params[0]
         qy = params[1]
         groups_for_binning = params[2]
-        if not set(groups_for_binning).issubset(set(self.groups.keys())):
-            raise RuntimeError('Groups {'+','.join([g for g in groups_for_binning if g not in self.groups.keys()])+'} for quantile are not in group dict')
-
-        hists_for_binning = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in groups_for_binning if histDict['nominal'] is not None]
+        hists_for_binning = self.rebinGetHists(histName,groups_for_binning)
         qObj = Quantile2D(hists_for_binning,qx,qy)
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
@@ -692,22 +724,20 @@ class DataCard:
         """
         from Rebinning import Threshold
         assert isinstance(params,list)
-        assert len(params) == 3
+        assert len(params) == 5
         assert isinstance(params[0],list)
-        assert isinstance(params[1],list)
-        assert isinstance(params[2],list)
+        assert isinstance(params[1],list) or isinstance(params[1],str)
+        assert isinstance(params[2],list) or isinstance(params[2],str)
         assert isinstance(params[3],float)
-        thresholds  = params[0]
-        backgrounds = params[1]
-        extra       = params[2]
-        rsut        = params[3] # relative stat. unc. threshold
-        if not set(backgrounds).issubset(set(self.groups.keys())):
-            raise RuntimeError('Groups {'+','.join([g for g in backgrounds if g not in self.groups.keys()])+'} for threshold are not in group dict')
-        if not set(extra).issubset(set(self.groups.keys())):
-            raise RuntimeError('Groups {'+','.join([g for g in extra if g not in self.groups.keys()])+'} for extra contributions are not in group dict')
-        hists_for_binning = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in backgrounds]
-        hists_extra       = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in extra]
-        tObj = Threshold(hists_for_binning,thresholds,True,hists_extra,rsut)
+        assert isinstance(params[4],float)
+        thresholds          = params[0]
+        groups_for_binning  = params[1]
+        extra               = params[2] # main processes to be kept above threshold
+        factor              = params[3] # multiplicative factor
+        rsut                = params[4] # relative stat. unc. threshold
+        hists_for_binning   = self.rebinGetHists(histName,groups_for_binning)
+        hists_extra         = self.rebinGetHists(histName,extra)
+        tObj = Threshold(hists_for_binning,thresholds,hists_extra,factor,rsut)
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = tObj(hist) 
@@ -726,18 +756,16 @@ class DataCard:
         assert isinstance(params[2],list)
         assert isinstance(params[3],list)
         assert isinstance(params[4],float)
-        threshx     = params[0]
-        threshy     = params[1]
-        backgrounds = params[2]
-        extra       = params[3]
-        rsut        = params[4] # relative stat. unc. threshold
-        if not set(backgrounds).issubset(set(self.groups.keys())):
-            raise RuntimeError('Groups {'+','.join([g for g in backgrounds if g not in self.groups.keys()])+'} for threshold are not in group dict')
-        if not set(extra).issubset(set(self.groups.keys())):
-            raise RuntimeError('Groups {'+','.join([g for g in extra if g not in self.groups.keys()])+'} for extra contributions are not in group dict')
-        hists_for_binning = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in backgrounds]
-        hists_extra       = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in extra]
-        tObj = Threshold(hists_for_binning,threshx,threshy,True,hists_extra,rsut)
+        assert isinstance(params[5],float)
+        threshx             = params[0]
+        threshy             = params[1]
+        groups_for_binning  = params[2]
+        extra               = params[3] # main processes to be kept above threshold
+        factor              = params[4] # multiplicative factor
+        rsut                = params[5] # relative stat. unc. threshold
+        hists_for_binning   = self.rebinGetHists(histName,groups_for_binning)
+        hists_extra         = self.rebinGetHists(histName,extra)
+        tObj = Threshold(hists_for_binning,threshx,threshy,hists_extra,factor,rsut)
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = tObj(hist) 
@@ -761,11 +789,70 @@ class DataCard:
         else:
             self.plotLinearizeData[histName] = lObj.getPlotData()
          
+    def rebinLinearizeSplit2D(self,histName,params):
+        """
+            Using the linearization of 2D hostogram
+            histName: name of histogram in keys of self.content
+            params : Major axis ('x' or 'y')
+        """
+        from Rebinning import LinearizeSplitRebin2D
+        assert isinstance(params,list)
+        assert len(params) == 6
+        assert params[0] in ['x','y']       # Major binning
+        assert isinstance(params[1],str)    # Name of class for major ax rebinning
+        assert isinstance(params[2],list)   # Params of the major ax rebinning
+        assert isinstance(params[3],str)    # Name of class for minor ax rebinning
+        assert isinstance(params[4],list)   # Params of the minor ax rebinning
+        assert isinstance(params[5],list)   # Groups to be used in the rebinning definition
+        groups_for_binning = params[5]
+        hists_for_binning  = self.rebinGetHists(histName,groups_for_binning)
+        # Major #
+        major_class = params[1]
+        if major_class == "Boundary":
+            major_params = params[2]
+        elif major_class == "Quantile":
+            major_params = params[2]
+        elif major_class == "Threshold":
+            major_params = params[2]
+            major_params[2][1] = self.rebinGetHists(histName,params[2][1])
+        else:
+            major_class = None
+            major_params = None
+        # Minor #
+        minor_class = params[3]
+        if minor_class == "Boundary":
+            minor_params = params[4]
+        elif minor_class == "Quantile":
+            minor_params = params[4]
+        elif minor_class == "Threshold":
+            minor_params = params[4]
+            minor_params[1] = self.rebinGetHists(histName,params[4][1])
+        else:
+            minor_class = None
+            minor_params = None
+            
+        lObj = LinearizeSplitRebin2D(major        = params[0],
+                                     major_class  = major_class,
+                                     major_params = major_params,
+                                     minor_class  = minor_class,
+                                     minor_params = minor_params,
+                                     h            = hists_for_binning)
+        for group in self.content[histName].keys():
+            for systName,hist in self.content[histName][group].items():
+                self.content[histName][group][systName] = lObj(hist)
+
+        # Save linearized info for plotIt #
+        if not hasattr(self,'plotLinearizeData'):
+            self.plotLinearizeData = {histName:lObj.getPlotData()}
+        else:
+            self.plotLinearizeData[histName] = lObj.getPlotData()
+         
+
 
     def preparePlotIt(self,suffix=''):
         print ("Preparing plotIt root files")
         # Make new directory with root files for plotIt #
-        path_plotIt = os.path.join(os.path.abspath(os.path.dirname(__file__)),'datacards',self.datacardName,'plotit')
+        path_plotIt = os.path.join(self.datacardPath,'plotit')
         path_rootfiles = os.path.join(path_plotIt,'root')
         systematics = []
         if not os.path.exists(path_rootfiles):
@@ -839,7 +926,6 @@ class DataCard:
             if isinstance(hist,ROOT.TH2F) or isinstance(hist,ROOT.TH2D):
                 print(f'Histogram {h1} is a TH2 and can therefore not be used in plotIt')
                 continue
-            print (hist.GetXaxis().GetNdivisions())
             # Get basic config in case not found in plots.yml
             baseCfg = {'log-y'              : 'both',
                        'x-axis'             : hist.GetXaxis().GetTitle(),
@@ -862,10 +948,10 @@ class DataCard:
                     config['plots'][h1] = baseCfg
             if 'VBF' in h1 or 'GGF' in h1:
                 xmin, xmax = config['plots'][h1]['x-axis-range']
-                config['plots'][h1]['blinded-range'] = [(xmax-xmin)/2,xmax]
+                config['plots'][h1]['blinded-range'] = [xmin,xmax] #[(xmax-xmin)/2,xmax]
             else:
                 config['plots'][h1].pop('blinded-range',None)
-            config['plots'][h1]['ratio-y-axis-range'] = [0.5,1.5]
+            config['plots'][h1]['ratio-y-axis-range'] = [0.8,1.2]
             config['plots'][h1]['sort-by-yields'] = True
             config['plots'][h1]['show-overflow'] = True
             if 'labels' in config['plots'][h1].keys():
@@ -884,6 +970,7 @@ class DataCard:
                         extraItems['labels'][idx]['position'][0] = margin_left + extraItems['labels'][idx]['position'][0] * (margin_right-margin_left)
                     config['plots'][h1].update(extraItems)
                     config['plots'][h1]['x-axis-hide-ticks'] = True
+                    #config['plots'][h1]['blinded-range'] = [[0.5,1.],[1.5,2.]]
 
         if len(systematics) > 0:
             config['systematics'] = systematics
@@ -906,7 +993,7 @@ class DataCard:
         print (cmd)
         if self.which('plotIt') is not None:
             print ("Calling plotIt")
-            rc = self.run_command(cmd.split(" "),print_output=True)
+            rc = self.run_command(shlex.split(cmd),print_output=True)
             if rc == 0:
                 print ('... success')
             else:
@@ -914,23 +1001,73 @@ class DataCard:
         else:
             print ("plotIt not found")
 
+    def run_combine(self):
+        print ('Running combine')
+        if self.combineCmd is None:
+            print ("No combine command in the yaml config file")
+            return
+        if '{}' in self.textfiles:
+            raise RuntimeError('Combining several txt files is not yet supported')
+        txtPath = os.path.join(self.datacardPath,self.textfiles)
+        if not os.path.exists(txtPath):
+            print ('Datacard not found, will produce it')
+            self.run_production()
+
+        combineCmd = self.combineCmd.format(txtPath)
+        combine_dir, env_script = os.path.split(combine_env)
+
+        fullCombineCmd  = f"cd {combine_dir}; "
+        fullCombineCmd += f"env -i bash -c 'source {env_script} && {combineCmd}'"
+
+        exitCode,output = self.run_command(fullCombineCmd,return_output=True,print_output=False,shell=True)
+        if exitCode != 0:
+            print ('\n'.join(output))
+            raise RuntimeError('Something went wrong in combine, see log above')    
+        limits = {}
+        for line in output:
+            l_str = None
+            r_str = None
+            if line.startswith('Observed'):
+                print ("\t"+line.strip())
+                r_str = line.split(':')[1]
+            elif line.startswith('Expected'):
+                print ("\t"+line.strip())
+                l_str,r_str = line.split(':')
+            else:
+                continue
+            if l_str is None: 
+                level = -1.
+            else:   
+                level = float(re.findall("\d+.\d+",l_str)[0])
+            limits[level] = float(re.findall("\d+.\d+",r_str)[0])
+            
+        path_out = os.path.join(self.datacardPath,'limits.json')
+        with open(path_out,'w') as handle:
+            json.dump(limits,handle)
+        print (f'Saved limits as {path_out}') 
+
+ 
     @staticmethod
-    def run_command(command,return_output=False,print_output=False):
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-        outputs = []
+    def run_command(command,return_output=False,print_output=False,**kwargs):
+        process = subprocess.Popen(command,universal_newlines=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,**kwargs)
+        # Poll process for new output until finished #
+        output = []
         while True:
-            out = process.stdout.readline().strip().decode()
-            if len(out) == 0 and process.poll() is not None:
+            nextline = process.stdout.readline()
+            if nextline == '' and process.poll() is not None:
                 break
-            if out and print_output:
-                print (out)
+            if print_output:
+                sys.stdout.write(nextline)
+                sys.stdout.flush()
             if return_output:
-                outputs.append(out)
-        rc = process.poll()
+                output.append(nextline)
+        process.communicate()
+        exitCode = process.returncode
         if return_output:
-            return rc,outputs
+            return exitCode,output
         else:
-            return rc
+            return exitCode
+
 
     @staticmethod
     def which(program):
@@ -954,33 +1091,27 @@ class DataCard:
 
  
 
-class YMLIncludeLoader(yaml.SafeLoader): 
-    """Custom yaml loading to support including config files. Use `!include (file)` to insert content of `file` at that position."""
-    
-    def __init__(self, stream):
-        super(YMLIncludeLoader, self).__init__(stream)
-        self._root = os.path.split(stream.name)[0]
-
-    def include(self, node):
-        filename = os.path.join(self._root, self.construct_scalar(node))
-        with open(filename, 'r') as f:
-            return yaml.load(f, YMLIncludeLoader)
-
-YMLIncludeLoader.add_constructor('!include', YMLIncludeLoader.include)
-
-
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Produce datacards')
     parser.add_argument('--yaml', action='store', required=True, type=str,
                         help='Yaml containing parameters')
     parser.add_argument('--pseudodata', action='store_true', required=False, default=False,
                         help='Whether to use pseudo data (data = sum of MC)')
+    parser.add_argument('--combine', action='store_true', required=False, default=False,
+                        help='Run combine on the txt datacard only')
     args = parser.parse_args()
 
     if args.yaml is None:
         raise RuntimeError("Must provide the YAML file")
     with open(args.yaml,'r') as handle:
         f = yaml.load(handle,Loader=YMLIncludeLoader)
+    if not os.path.isfile(args.yaml):
+        raise RuntimeError("YAML file {} is not a valid file".format(args.yaml))
     instance = DataCard(datacardName    = os.path.basename(args.yaml).replace('.yml',''),
                         pseudodata      = args.pseudodata,
                         **f)
+    if args.combine: 
+        instance.run_combine()
+    else:
+        instance.run_production()
+        instance.run_combine()

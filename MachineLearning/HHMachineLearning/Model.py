@@ -156,7 +156,7 @@ def NeuralNetModel(x_train,y_train,x_val,y_val,params):
     inputs_all = []
     encoded_all = []
     for idx in range(x_train.shape[1]):
-        inpName = parameters.inputs[idx].replace('$','').replace(' ','').replace('_','')
+        inpName = parameters.inputs[idx].replace('$','')
         input_layer = tf.keras.Input(shape=(1,), name=inpName)
         # Categorical inputs #
         if parameters.mask_op[idx]:

@@ -1,8 +1,62 @@
+import sys
 import numpy as np
 import scipy
 import scipy.interpolate
 from array import array
 import ROOT
+
+def compareTwoAxes(x1,x2):
+    if x1[0] != x2[0]:
+        raise RuntimeError("Axis first edge not matching : {} != {}".format(x1[0],x2[0]))
+    if x1[-1] != x2[-1]:
+        raise RuntimeError("Axis last edge not matching : {} != {}".format(x1[-1],x2[-1]))
+    if np.any(x1[:-1] > x1[1:]):
+        raise RuntimeError("Axis old edges not increasing : ["+",".join([str(x1[i]) for i in range(x1.shape[0])])+"]")
+    if np.any(x2[:-1] > x2[1:]):
+        raise RuntimeError("Axis new edges not increasing : ["+",".join([str(x2[i]) for i in range(x2.shape[0])])+"]")
+    if not np.isin(x2,x1).all():
+        wrong_edges = x2[~np.isin(x2,x1)]
+        raise RuntimeError("New X axis edges not contained in initial ones : ["+",".join([str(wrong_edges[i]) for i in range(wrong_edges.shape[0])])+"]")
+
+def processHistogramToROOT(h,htype):
+    if isinstance(h,htype):
+        hist = h 
+    elif isinstance(h,list):
+        hist = None
+        for hi in h:
+            if not isinstance(hi,htype):
+                raise RuntimeError('Not a ROOT histogram')
+            if hist is None:
+                hist = hi
+            else:
+                hist.Add(hi)
+    else:
+        raise RuntimeError('Not a ROOT histogram nor a list of ROOT histograms : '+str(type(h)))
+    return hist
+
+def processHistogramToNumpy(h,htype,getter):
+        if isinstance(h,htype):
+            e,w,s = getter(h) 
+        elif isinstance(h,list):
+            e = None
+            w = None
+            s = None
+            for hi in h:
+                if not isinstance(hi,htype):
+                    raise RuntimeError('Not a ROOT histogram')
+                ei,wi,si = getter(hi)
+                if e is None and w is None:
+                    w = wi
+                    e = ei
+                    s = si**2
+                else:
+                    assert np.array_equal(e,ei)
+                    w += wi
+                    s += si**2
+            s = np.sqrt(s)
+        else:
+            raise RuntimeError('Not a ROOT histogram nor a list of ROOT histograms : '+str(type(h)))
+        return e,w,s
 
 
 
@@ -12,7 +66,7 @@ class Rebin:
         includes common methods to rebin, extract and fill histograms
     """
     @staticmethod
-    def getContent(h):
+    def getContent1D(h):
         """
             From TH1 extract : 
                 e : edges including lower and upper 
@@ -20,6 +74,7 @@ class Rebin:
                 s : errors  (GetBinError)
             return [e,w,s]
         """
+        assert isinstance(h,ROOT.TH1)
         e = [h.GetXaxis().GetBinUpEdge(0)]
         w = []
         s = []
@@ -30,7 +85,7 @@ class Rebin:
         return np.array(e).round(9),np.array(w),np.array(s)
 
     @staticmethod
-    def rebin(e,w,s,ne):
+    def rebin1D(e,w,s,ne):
         """
             Given content of histogram 
                 e  : edges of initial histogram
@@ -41,15 +96,7 @@ class Rebin:
                 nw : new bin content
                 ns : new bin errors
         """
-        if e[0] != ne[0]:
-            raise RuntimeError("X axis first edge not matching : {} != {}".format(e[0],ne[0]))
-        if e[-1] != ne[-1]:
-            raise RuntimeError("X axis last edge not matching : {} != {}".format(e[-1],ne[-1]))
-        if np.any(ne[:-1] > ne[1:]):
-            raise RuntimeError("X axis new edges not increasing : ["+",".join([str(ne[i]) for i in range(ne[0].shape[0])])+"]")
-        if not np.isin(ne,e).all():
-            wrong_edges = ne[~np.isin(ne,e)]
-            raise RuntimeError("New X axis edges not contained in initial ones : ["+",".join([str(wrong_edges[i]) for i in range(wrong_edges.shape[0])])+"]")
+        compareTwoAxes(e,ne)
 
         x = (e[1:]+e[:-1])/2
         idx = np.digitize(x,ne) - 1
@@ -64,7 +111,7 @@ class Rebin:
         return nw,ns
 
     @staticmethod
-    def fillHistogram(e,w,s,name=""):
+    def fillHistogram1D(e,w,s,name=""):
         """
             Inputs : 
             e : bin edges
@@ -84,14 +131,14 @@ class Rebin:
             input : initial histogram TH1
             return : rebinned TH1
         """
-        e,w,s = self.getContent(h) 
+        e,w,s = self.getContent1D(h) 
         if np.isnan(w).any():
             print ('Warning : nan found in hist %s'%h.GetName())
             return None
         if not hasattr(self,'ne'):
             raise RuntimeError('New bin edges have not been computed, is the rebin_method() not implemented')
-        nw,ns = self.rebin(e,w,s,self.ne)
-        return self.fillHistogram(self.ne,nw,ns,h.GetName()+'q')
+        nw,ns = self.rebin1D(e,w,s,self.ne)
+        return self.fillHistogram1D(self.ne,nw,ns,h.GetName()+'rebin')
         
 
 
@@ -113,27 +160,7 @@ class Quantile(Rebin):
             raise RuntimeError("Invalid quantiles boundaries ["+",".join([str(q[i]) for i in range(q.shape[0])])+"]")
         if np.any(q[:-1] > q[1:]):
             raise RuntimeError("Quantile edges not increasing ["+",".join([str(q[i]) for i in range(q.shape[0])])+"]")
-        if isinstance(h,ROOT.TH1F) or isinstance(h,ROOT.TH1D):
-            e,w,s = self.getContent(h) 
-        elif isinstance(h,list):
-            e = None
-            w = None
-            s = None
-            for hi in h:
-                if not isinstance(hi,ROOT.TH1F) and not isinstance(hi,ROOT.TH1D):
-                    raise RuntimeError('Not a ROOT histogram')
-                ei,wi,si = self.getContent(hi)
-                if e is None and w is None:
-                    w = wi
-                    e = ei
-                    s = si**2
-                else:
-                    assert np.array_equal(e,ei)
-                    w += wi
-                    s += si**2
-            s = np.sqrt(s)
-        else:
-            raise RuntimeError('Not a ROOT histogram')
+        e,w,s = processHistogramToNumpy(h,ROOT.TH1,self.getContent1D)
         x = (e[:-1]+e[1:])/2
         if w[w>0].shape[0] >= q.shape[0]:
             nx = self.rebin_method(x[w>0],w[w>0],q)
@@ -146,6 +173,7 @@ class Quantile(Rebin):
             idx = np.digitize(x[w>0], e) - 1
             self.ne = np.r_[e[0], e[idx], e[-1]]
             self.ne = np.unique(self.ne)
+
 
     @staticmethod
     def rebin_method(x, w, q):
@@ -175,39 +203,19 @@ class Threshold(Rebin):
            then move to next threshold
         list of threshold values need to be optimized
     """
-    def __init__(self, h, thresh, use_var=False, extra=None, rsut=None):
+    def __init__(self, h, thresh, extra=None, factor=None, rsut=None):
         """
             thresh : thresholds to remain above
             h : either TH1 or list of TH1
-            use_var : if True will take the variance from the bin errors, else zeroes 
             extra : list of hists to remain above 0
         """
-        if isinstance(h,ROOT.TH1F) or isinstance(h,ROOT.TH1D):
-            e,w,s = self.getContent(h) 
-        elif isinstance(h,list):
-            e = None
-            w = None
-            s = None
-            for hi in h:
-                if not isinstance(hi,ROOT.TH1F) and not isinstance(hi,ROOT.TH1D):
-                    raise RuntimeError('Not a ROOT histogram')
-                ei,wi,si = self.getContent(hi)
-                if e is None and w is None:
-                    w = wi
-                    e = ei
-                    s = si**2
-                else:
-                    assert np.array_equal(e,ei)
-                    w += wi
-                    s += si**2
-            s = np.sqrt(s)
-        else:
-            raise RuntimeError('Not a ROOT histogram')
+        use_var = True 
+        e,w,s = processHistogramToNumpy(h,ROOT.TH1,self.getContent1D)
         if extra is not None:
-            extra = [self.getContent(extra_i)[1] for extra_i in extra]
-            for idx in range(len(extra)):
-                if extra[idx].shape[0] != w.shape[0]:
-                    raise RuntimeError("Extra contribution index {} does not have the same number of bins".format(idx))
+            extra = [processHistogramToNumpy(extra_i,ROOT.TH1,self.getContent1D)[1] for extra_i in extra]
+            for i in range(len(extra)):
+                if extra[i].shape[0] != w.shape[0]:
+                    raise RuntimeError("Extra contribution index {} does not have the same number of bins".format(i))
             extra = np.c_[tuple(extra)]
         if not isinstance(thresh,np.ndarray):
             thresh = np.array(thresh)
@@ -215,12 +223,13 @@ class Threshold(Rebin):
             raise RuntimeError("Fewer bins than thresholds")
         if not use_var:
             s = np.zeros_like(w)
+        if factor is not None:
+            thresh *= factor * w.sum() / thresh.max() 
         idx = self.rebin_method(thresh=thresh,val=w,var=np.power(s,2),extra=extra,rsut=rsut)
-
         # fuse left-most two bins if they are rising in content
         if len(idx) > 0 and w[0 : idx[0]].sum() < w[idx[0] : (idx[1] if len(idx) > 1 else None)].sum():
             idx = idx[1:]     
-        self.ne = np.r_[e[0], e[idx] , e[-1]]
+        self.ne = self.ne = np.unique(np.r_[e[0], e[idx] , e[-1]])
 
     @staticmethod
     def rebin_method(thresh,val,var,extra,rsut=np.inf):
@@ -261,22 +270,26 @@ class Threshold(Rebin):
                 sum_var = 0.0
                 sum_extra[:] = 0.0
                 tidx -= 1
+
         return idx[1 + tidx :]     
 
 class Boundary(Rebin):
     """
         Applied boundary binning 
         Rebin with the given boundaries for the bin edges
+        h not used (kept for compatibility)
     """
-    def __init__(self, boundaries):
+    def __init__(self, h=None, boundaries=None):
         """
             boundaries : list of bin edges
         """
+        if boundaries is None:
+            raise RuntimeError("Boundary method requires to set the boundaries")
         self.ne = np.array(boundaries)
 
 class Rebin2D(Rebin):
     @staticmethod
-    def getContent(h):
+    def getContent2D(h):
         """
             From TH2 extract : 
                 e : edges including lower and upper 
@@ -284,6 +297,7 @@ class Rebin2D(Rebin):
                 s : errors  (GetBinError)
             return [e,w,s]
         """
+        assert isinstance(h,ROOT.TH2)
         xAxis = h.GetXaxis()
         yAxis = h.GetYaxis()
         Nx = xAxis.GetNbins() 
@@ -298,8 +312,24 @@ class Rebin2D(Rebin):
              np.array([yAxis.GetBinLowEdge(i) for i in range(1,Ny+2)]).round(9)]
         return e,w,s
 
+    def __call__(self,h):
+        """
+            input : initial histogram TH2
+            return : rebinned TH2
+        """
+        e,w,s = self.getContent2D(h) 
+        if np.isnan(w).any():
+            print ('Warning : nan found in hist %s'%h.GetName())
+            return None
+        if not hasattr(self,'ne'):
+            raise RuntimeError('New bin edges have not been computed, is the rebin_method() not implemented')
+        nw,ns = self.rebin2D(e,w,s,self.ne)
+        return self.fillHistogram2D(self.ne,nw,ns,h.GetName()+'rebin')
+        
+
+
     @staticmethod
-    def rebin(e,w,s,ne):
+    def rebin2D(e,w,s,ne):
         """
             Given content of histogram 
                 e  : edges of initial histogram
@@ -310,24 +340,8 @@ class Rebin2D(Rebin):
                 nw : new bin content
                 ns : new bin errors
         """
-        if e[0][0] != ne[0][0]:
-            raise RuntimeError("X axis first edge not matching : {} != {}".format(e[0][0],ne[0][0]))
-        if e[1][0] != ne[1][0]:
-            raise RuntimeError("Y axis first edge not matching : {} != {}".format(e[1][0],ne[1][0]))
-        if e[0][-1] != ne[0][-1]:
-            raise RuntimeError("X axis last edge not matching : {} != {}".format(e[0][-1],ne[0][-1]))
-        if e[1][-1] != ne[1][-1]:
-            raise RuntimeError("Y axis last edge not matching : {} != {}".format(e[1][-1],ne[1][-1]))
-        if np.any(ne[0][:-1] > ne[0][1:]):
-            raise RuntimeError("X axis new edges not increasing : ["+",".join([str(ne[0][i]) for i in range(ne[0].shape[0])])+"]")
-        if np.any(ne[1][:-1] > ne[1][1:]):
-            raise RuntimeError("Y axis new edges not increasing : ["+",".join([str(ne[1][i]) for i in range(ne[1].shape[0])])+"]")
-        if not np.isin(ne[0],e[0]).all():
-            wrong_edges = ne[0][~np.isin(ne[0],e[0])]
-            raise RuntimeError("New X axis edges not contained in initial ones : ["+",".join([str(wrong_edges[i]) for i in range(wrong_edges.shape[0])])+"]")
-        if not np.isin(ne[1],e[1]).all():
-            wrong_edges = ne[1][~np.isin(ne[1],e[1])]
-            raise RuntimeError("New Y axis edges not contained in initial ones : ["+",".join([str(wrong_edges[i]) for i in range(wrong_edges.shape[0])])+"]")
+        compareTwoAxes(e[0],ne[0])
+        compareTwoAxes(e[1],ne[1])
 
         x = (e[0][1:]+e[0][:-1])/2
         y = (e[1][1:]+e[1][:-1])/2
@@ -345,7 +359,7 @@ class Rebin2D(Rebin):
         return nw,ns
 
     @staticmethod
-    def fillHistogram(e,w,s,name=""):
+    def fillHistogram2D(e,w,s,name=""):
         """
             Inputs : 
             e : bin edges
@@ -388,20 +402,7 @@ class Quantile2D(Rebin2D):
             qx : quantiles list [0 , ... 1]
             qy : quantiles list [0 , ... 1]
         """
-        if isinstance(h,ROOT.TH2F) or isinstance(h,ROOT.TH2D):
-            h2D = h 
-        elif isinstance(h,list):
-            h2D = None
-            for hi in h:
-                if not isinstance(hi,ROOT.TH2F) and not isinstance(hi,ROOT.TH2D):
-                    raise RuntimeError('Not a ROOT histogram')
-                if h2D is None:
-                    h2D = hi
-                else:
-                    h2D.Add(hi)
-        else:
-            raise RuntimeError('Not a ROOT histogram')
-
+        h2D = processHistogramToROOT(h,ROOT.TH2)
         hx = h2D.ProjectionX()
         hy = h2D.ProjectionY()
 
@@ -421,32 +422,14 @@ class Threshold2D(Rebin2D):
            then move to next threshold
         list of threshold values need to be optimized
     """
-    def __init__(self, h, threshx, threshy, use_var=False, extra=None, rsut=None):
+    def __init__(self, h, threshx, threshy, extra=None, rsut=None):
         """
             thresh : thresholds to remain above
             h : either TH1 or list of TH1
             use_var : if True will take the variance from the bin errors, else zeroes 
             extra : list of hists to remain above 0
         """
-        if isinstance(h,ROOT.TH2F) or isinstance(h,ROOT.TH2D):
-            h2D = h 
-        elif isinstance(h,list):
-            h2D = None
-            for hi in h:
-                if not isinstance(hi,ROOT.TH2F) and not isinstance(hi,ROOT.TH2D):
-                    raise RuntimeError('Not a ROOT histogram')
-                if h2D is None:
-                    h2D = hi
-                else:
-                    h2D.Add(hi)
-        else:
-            raise RuntimeError('Not a ROOT histogram')
-
-        if not isinstance(threshx,np.ndarray):
-            threshx = np.array(threshx)
-        if not isinstance(threshy,np.ndarray):
-            threshy = np.array(threshy)
-
+        h2D = processHistogramToROOT(h,ROOT.TH2)
         hx = h2D.ProjectionX()
         hy = h2D.ProjectionY()
 
@@ -462,43 +445,108 @@ class Linearize2D(Rebin2D):
             raise RuntimeError(f'Major {major} not understood')
         self.major = major
 
+        self.nemajor = None
+        self.neminor = None
+
     def __call__(self,h):
         """
             input : initial histogram TH2
             return : linearized TH1
         """
-        e,w,s = self.getContent(h) 
-        if self.major == 'x':
-            flatten_arg = "C"
-            self.eminor = e[1]
-            self.emajor = e[0]
+        e,w,s = self.getContent2D(h) 
+        if np.isnan(w).any():
+            print ('Warning : nan found in hist %s'%h.GetName())
+            return None
+        nw,ns,eminor,emajor = self.split(e,w,s)
+        if self.neminor is not None:
+            if len(nw) != len(self.neminor):
+                raise RuntimeError(f'Number of major bins content {len(nw)} != major bins rebinning {len(self.neminor)}')
+            for i in range(len(nw)):
+                nw[i],ns[i] = self.rebin1D(eminor,nw[i],ns[i],self.neminor[i])
+            eminor = self.neminor
         else:
-            flatten_arg = "F"
-            self.eminor = e[0]
-            self.emajor = e[1]
-        flatten_arg = "C" if self.major == 'x' else "F"
-        nw = w.flatten(flatten_arg)
-        ns = s.flatten(flatten_arg)
-        ne = np.unique(np.array([self.eminor + i * self.eminor[-1] for i in range(len(self.emajor)-1)]).flatten('C'))
-        self.majorsep = [i*self.eminor[-1] for i in range(1,len(self.emajor))]
-        nh = ROOT.TH1F("","",ne.shape[0]-1,array('d',ne))
-        for i in range(nw.shape[0]):
-            nh.SetBinContent(i+1,nw[i])
-            nh.SetBinError(i+1,ns[i])
-            nh.GetXaxis().SetBinLabel(i+1,'#{}'.format(i%(self.eminor.shape[0]-1)+1))
-        nh.GetXaxis().SetNdivisions(self.emajor.shape[0]+self.eminor.shape[0]*100)
+            eminor = [eminor for _ in range(len(nw))] 
+
+        ne,nw,ns = self.linearize(nw,ns,eminor,emajor)
+        nh = self.fillHistogram1D(ne,nw,ns,h.GetName()+"lin")
+        self.savePlotData(eminor,emajor)
         return nh
 
-    def getPlotData(self):
+    def linearize(self,w,s,eminor,emajor):
+        nw = np.concatenate(w)
+        ns = np.concatenate(s)
+        ne = np.unique(np.concatenate([eminor[i]+i*eminor[i-1][-1] for i in range(len(eminor))]))
+        return ne,nw,ns
+
+    def split(self,e,w,s):
+        if self.major == 'x':
+            emajor = e[0]
+            eminor = e[1]
+        else:
+            emajor = e[1]
+            eminor = e[0]
+            w = w.T            
+            s = s.T            
+
+        if self.nemajor is not None:
+            compareTwoAxes(emajor,self.nemajor)
+            xmajor = (emajor[1:]+emajor[:-1])/2
+            idx = np.digitize(xmajor,self.nemajor) - 1
+            emajor = self.nemajor
+            nw = [np.sum(w[np.where(idx==i)],axis=0) for i in np.unique(idx)] 
+            ns = [np.sum(s[np.where(idx==i)],axis=0) for i in np.unique(idx)] 
+        else:
+            nw = [arr.ravel() for arr in np.vsplit(w,w.shape[0])]
+            ns = [arr.ravel() for arr in np.vsplit(s,s.shape[0])]
+
+        return nw,ns,eminor,emajor
+
+    def savePlotData(self,eminor,emajor):
         labels = []
-        lines  = []
         ylabel = 'y'
-        for i in range(len(self.majorsep)):
-            label = f"{self.emajor[i]} < {ylabel} < {self.emajor[i+1]}"
-            poslabel = [float(i+0.2)/len(self.majorsep),0.02]
-            labels.append({'text':label,'position':poslabel})
-            lines.append(float(self.majorsep[i]))
+        xpos = [0.] + [float(eminor[i][-1] + i * eminor[i-1][-1]) for i in range(len(eminor))]
+        lines = xpos[1:-1]
+        for i in range(len(xpos)-1):
+            label = f"{emajor[i]} < {ylabel} < {emajor[i+1]}"
+            poslabel = [(xpos[i] + 0.2 * (xpos[i+1]-xpos[i]))/xpos[-1],0.02]
+            labels.append({'text':label,'position':poslabel,'size':28-2*len(eminor)})
+        self.plotData = {'labels':labels,'vertical-lines':lines}
 
-        return {'labels':labels,'vertical-lines':lines}
+    def getPlotData(self):
+        return self.plotData
 
+class LinearizeSplitRebin2D(Linearize2D):
+    def __init__(self,h,major='y',major_class=None,major_params=None,minor_class=None,minor_params=None):
+        h2D = processHistogramToROOT(h,ROOT.TH2)
+        super(LinearizeSplitRebin2D,self).__init__(major)
+        if major == 'y':
+            hmajor = h2D.ProjectionY()
+            if major_class == 'Threshold':
+                major_params[1] = [h.ProjectionY() for h in major_params[1]]
+        if major == 'x':
+            hmajor = h2D.ProjectionX()
+            if major_class == 'Threshold':
+                major_params[1] = [h.ProjectionX() for h in major_params[1]]
+        
+        majorObj = getattr(sys.modules[__name__], major_class)(hmajor,*major_params)
+
+        self.nemajor = majorObj.ne
+        
+        nw,ns,eminor,emajor = self.split(*self.getContent2D(h2D))
+        if minor_class == 'Threshold':
+            extra_content = [self.split(*self.getContent2D(h)) for h in minor_params[1]]
+            extra_content_nw = [extra[0] for extra in extra_content]
+            extra_content_ns = [extra[1] for extra in extra_content]
+            extra_content_eminor = [extra[2] for extra in extra_content]
+                # Component per extra contribution
+
+        self.neminor = []
+        for i,(w_tmp,s_tmp) in enumerate(zip(nw,ns)):
+            h_tmp = self.fillHistogram1D(eminor,w_tmp,s_tmp,'tmp{}'.format(i))
+            if minor_class == 'Threshold':
+                minor_params[1] = [self.fillHistogram1D(extra_content_eminor[j],extra_content_nw[j][0],extra_content_ns[j][0]) for j in range(len(extra_content))]
+            minorObj = getattr(sys.modules[__name__], minor_class)(h_tmp,*minor_params)
+            self.neminor.append(minorObj.ne)
+
+    
 

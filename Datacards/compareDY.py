@@ -264,14 +264,16 @@ def plotCategory(C,h_MC,h_DD,h_CL,title='',method=''):
         return None
 
 
-print ("\n\n\n")
 C = ROOT.TCanvas("C","C",700,800)
 C.Print(f"CompareDY/ComparisonDY.pdf[")
 numerics = {}
 factors = {}
 fit_results = {}
 for cat in sorted(categories):
-    method = 'fit' if 'DY' in cat or 'other' in cat else 'factor'
+    if '_GGF' in cat or '_VBF' in cat or '_H' in cat:
+        method = 'factor' 
+    else:
+        method= 'fit'
     title = ''
     if 'resolved' in cat or 'inclusive' in cat:
         for era in eras:
