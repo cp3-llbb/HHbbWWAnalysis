@@ -145,6 +145,12 @@ namespace {
     return std::make_pair(c, c);
   }
 
+  float fatjetCorrections(const hme::LorentzVectorF fatb, float mh) {
+    return mh / fatb.M();
+  }
+
+
+
   std::pair<float, float> bjetCorrectionsSliding(const hme::LorentzVectorF b1,
                                                  const hme::LorentzVectorF b2,
                                                  hme::HMEEvaluator::Sampler gen,
@@ -205,10 +211,10 @@ std::pair<float, float> hme::HMEEvaluator::runHME(const hme::LorentzVectorF l1,
                                                   const hme::LorentzVectorF l2,
                                                   const hme::LorentzVectorF b1,
                                                   const hme::LorentzVectorF b2,
+                                                  const hme::LorentzVectorF fatb,
                                                   const hme::LorentzVectorF met,
                                                   const std::uint32_t eventnr,
-                                                  bool verbose) const {
-  //LogDebug<<"Running HME"<<std::endl;
+                                                  bool boosted_tag) const {
   /* Initialize */
   TRandom3& rg = rdfhelpers::getTRandom3(eventnr);
   double met_sigma = 25.2;
@@ -236,28 +242,46 @@ std::pair<float, float> hme::HMEEvaluator::runHME(const hme::LorentzVectorF l1,
     LogDebug << "Iteration " << it << " - eta = " << eta_gen << " - phi = " << phi_gen << std::endl;
 
     /* bjets corrections */
-
-    LogDebug << "  Before corrections" << std::endl;
-    LogDebug << "    MET : " << met << std::endl;
-    LogDebug << "    b1  : " << b1 << std::endl;
-    LogDebug << "    b2  : " << b2 << std::endl;
-
-    std::pair<float, float> c = bjetCorrectionsSliding(b1, b2, m_brescale_gen, rg, mh);
     LorentzVectorF tmp_b1;
     LorentzVectorF tmp_b2;
-    tmp_b1 = b1 * c.first;
-    tmp_b2 = b2 * c.second;
+    LorentzVectorF tmp_fatb;
+    float met_Px_corr;
+    float met_Py_corr;
+
+    LogDebug << "  Before corrections" << std::endl;
+    LogDebug << "    MET  : " << met << std::endl;
+    if (boosted_tag){
+        LogDebug << "    fatb : " << fatb << std::endl;
+        float c = fatjetCorrections(fatb, mh);
+        tmp_fatb = fatb * c;
+        met_Px_corr = -(c - 1) * fatb.Px();
+        met_Py_corr = -(c - 1) * fatb.Py();
+        LogDebug << "  Correction : c = " << c << std::endl;
+    }
+    else{
+        LogDebug << "    b1   : " << b1 << std::endl;
+        LogDebug << "    b2   : " << b2 << std::endl;
+        std::pair<float, float> c = bjetCorrectionsSliding(b1, b2, m_brescale_gen, rg, mh);
+        tmp_b1 = b1 * c.first;
+        tmp_b2 = b2 * c.second;
+        met_Px_corr = -(c.first - 1) * b1.Px() - (c.second - 1) * b2.Px();
+        met_Py_corr = -(c.first - 1) * b1.Py() - (c.second - 1) * b2.Py();
+        LogDebug << "  Corrections : c1 = " << c.first << " - c2 = " << c.second << std::endl;
+    }
 
     /* MET corrections */
-    float met_Px_corr = -(c.first - 1) * b1.Px() - (c.second - 1) * b2.Px();
-    float met_Py_corr = -(c.first - 1) * b1.Py() - (c.second - 1) * b2.Py();
     LorentzVectorF tmp_met;
     tmp_met.SetPxPyPzE(met.Px() + met_dpx + met_Px_corr, met.Px() + met_dpx + met_Px_corr, met.Pz(), met.E());
-    LogDebug << "  Corrections : c1 = " << c.first << " - c2 = " << c.second << std::endl;
+
     LogDebug << "  After corrections" << std::endl;
-    LogDebug << "    MET : " << tmp_met << std::endl;
-    LogDebug << "    b1  : " << tmp_b1 << std::endl;
-    LogDebug << "    b2  : " << tmp_b2 << std::endl;
+    LogDebug << "    MET  : " << tmp_met << std::endl;
+    if (boosted_tag)
+        LogDebug << "    fatb : " << tmp_fatb << std::endl;
+    else{
+        LogDebug << "    b1   : " << tmp_b1 << std::endl;
+        LogDebug << "    b2   : " << tmp_b2 << std::endl;
+    }
+
 
     /* H->WW */
     float hme = 0.;
@@ -311,9 +335,13 @@ std::pair<float, float> hme::HMEEvaluator::runHME(const hme::LorentzVectorF l1,
       LogDebug << "\tOff-shell W : " << w_offshell << std::endl;
 
       /* Produce Higgs p4 */
-      auto hToww = w_onshell + w_offshell;
-      auto hTobb = tmp_b1 + tmp_b2;
-      auto h2Tohh = hTobb + hToww;
+      LorentzVectorF hToww = w_onshell + w_offshell;
+      LorentzVectorF hTobb;
+      if (boosted_tag)
+          hTobb = tmp_fatb;
+      else
+          hTobb = tmp_b1 + tmp_b2;
+      LorentzVectorF h2Tohh = hTobb + hToww;
 
       LogDebug << "\th->bb : " << hTobb << std::endl;
       LogDebug << "\th->WW : " << hToww << std::endl;
@@ -328,13 +356,11 @@ std::pair<float, float> hme::HMEEvaluator::runHME(const hme::LorentzVectorF l1,
         LogDebug << "W off-shell mass " << w_offshell.M() << " > mHH/2" << std::endl;
         continue;  // W offshell should not be larger than mH/2
       }
-      if (verbose) {
         LogDebug << "\tmW (on-shell)  = " << w_onshell.M() << std::endl;
         LogDebug << "\tmW (off-shell) = " << w_offshell.M() << std::endl;
         LogDebug << "\tmH (h->WW)     = " << hToww.M() << std::endl;
         LogDebug << "\tmH (h->bb)     = " << hTobb.M() << std::endl;
         LogDebug << "\tmH (H->hh)     = " << h2Tohh.M() << std::endl;
-      }
 
       /* If valid solution, record value */
       hme += h2Tohh.M();

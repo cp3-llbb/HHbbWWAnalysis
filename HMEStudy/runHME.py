@@ -43,18 +43,23 @@ def runHME(path,suffix,N=None):
     pbar = enlighten.Counter(total=N, desc='Progress', unit='events')
     for i,event in enumerate(chain):
         pbar.update()
-        if event.boosted_tag == 1:
-            # Needs more inputs for boosted
-            continue
+
         l1 = LV(event.l1_Px,event.l1_Py,event.l1_Pz,event.l1_E)
         l2 = LV(event.l2_Px,event.l2_Py,event.l2_Pz,event.l2_E)
-        b1 = LV(event.j1_Px,event.j1_Py,event.j1_Pz,event.j1_E)
-        b2 = LV(event.j2_Px,event.j2_Py,event.j2_Pz,event.j2_E)
         met = LV(event.met_Px,event.met_Py,event.met_Pz,event.met_E)
+
+        if event.boosted_tag == 1:
+            b1 = LV(0.,0.,0.,0.)
+            b2 = LV(0.,0.,0.,0.)
+            fatb = LV(event.fatjet_Px,event.fatjet_Py,event.fatjet_Pz,event.fatjet_E)
+        else:
+            b1 = LV(event.j1_Px,event.j1_Py,event.j1_Pz,event.j1_E)
+            b2 = LV(event.j2_Px,event.j2_Py,event.j2_Pz,event.j2_E)
+            fatb = LV(0.,0.,0.,0.)
 
         start = time.time()
 
-        hme,eff = evaluator.runHME(l1,l2,b1,b2,met,event.event)
+        hme,eff = evaluator.runHME(l1,l2,b1,b2,fatb,met,event.event,event.boosted_tag)
 
         times.append(time.time()-start)
         hmes.append(hme)
@@ -112,7 +117,7 @@ def runHME(path,suffix,N=None):
 
 
 runHME(path     = sys.argv[1],
-       N        = 50000,
-       suffix   = sys.argv[2])
+       suffix   = sys.argv[2],
+       N        = int(sys.argv[3]))
 
     

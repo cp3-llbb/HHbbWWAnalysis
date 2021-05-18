@@ -19,9 +19,10 @@ namespace hme {
                                    const LorentzVectorF l2,
                                    const LorentzVectorF b1,
                                    const LorentzVectorF b2,
+                                   const hme::LorentzVectorF fatb,
                                    const LorentzVectorF met,
                                    const std::uint32_t eventnr,
-                                   bool verbose = false) const;
+                                   bool boosted_tag) const;
 
     struct Sampler {
       std::vector<float> xval;
