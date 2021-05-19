@@ -1936,12 +1936,36 @@ One lepton and and one jet argument must be specified in addition to the require
     ###########################################################################
     #                                  HME                                    #
     ###########################################################################
-    def computeHMEAfterLeptonSelections(self, sel, l1, l2, bjets, met):
+    def computeResolvedHMEAfterLeptonSelections(self, sel, l1, l2, bjets, met):
         if self.args.analysis != 'res':
             raise RuntimeError('HME was only implemented for resonant analysis')
 
-        hme_pair = self.hmeEval.runHME(l1.p4, l2.p4, bjets[0].p4, bjets[1].p4, met.p4, self.tree.event)
-        hme_pair = op.switch(op.rng_len(bjets) >= 2, hme_pair, op.construct(op.typeOf(hme_pair), [op.c_float(0.), op.c_float(0.)]))
+        empty_p4 = op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >",([op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.)]))
+
+        hme_pair = self.hmeEval.runHME(l1.p4, l2.p4, bjets[0].p4, bjets[1].p4, empty_p4, met.p4, self.tree.event, op.c_bool(False))
+        hme_pair = op.switch(op.rng_len(bjets) >= 2, 
+                             hme_pair, 
+                             op.construct(op.typeOf(hme_pair), [op.c_float(0.), op.c_float(0.)]))
+
+        hme_pair = op.forSystematicVariation(hme_pair, "jet", "nominal")   # no variations, always nominal
+        forceDefine(hme_pair, sel)
+        hme = hme_pair.first
+        eff = hme_pair.second
+        forceDefine(hme, sel)
+
+        return hme,eff
+
+    def computeBoostedHMEAfterLeptonSelections(self, sel, l1, l2, fatjets, met):
+        if self.args.analysis != 'res':
+            raise RuntimeError('HME was only implemented for resonant analysis')
+
+        empty_p4 = op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >",([op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.)]))
+
+        hme_pair = self.hmeEval.runHME(l1.p4, l2.p4, empty_p4, empty_p4, fatjets[0].p4, met.p4, self.tree.event, op.c_bool(True))
+        hme_pair = op.switch(op.rng_len(fatjets) >= 1, 
+                             hme_pair, 
+                             op.construct(op.typeOf(hme_pair), [op.c_float(0.), op.c_float(0.)]))
+
         hme_pair = op.forSystematicVariation(hme_pair, "jet", "nominal")   # no variations, always nominal
         forceDefine(hme_pair, sel)
         hme = hme_pair.first

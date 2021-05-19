@@ -60,7 +60,7 @@ split_per_model = True # in case of cross validation, to send one job per model 
 
 ##################################  Naming ######################################
 # Physics Config #
-config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListDL_res_LowMass.yml')
+config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListDL_res_HighMass.yml')
 lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
 eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
 
@@ -97,7 +97,7 @@ quantile = 0.95 # repeat weights with too high learning weights
 tree_name = 'Events'
 
 # scaler and mask names #
-suffix = 'resonant_LowMass' 
+suffix = 'resonant_HighMass' 
 # scaler_name -> 'scaler_{suffix}.pkl'  If does not exist will be created 
 # mask_name -> 'mask_{suffix}_{sample}.npy'  If does not exist will be created 
 scaler_name = 'scaler_'+suffix+'_'.join([str(era) for era in eras])+'.pkl'

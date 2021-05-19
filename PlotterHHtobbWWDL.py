@@ -61,9 +61,9 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             output_name = "Identity"
         if self.args.analysis == 'res':
             dnn_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ResonantModels')
-            path_model = os.path.join(dnn_dir,'Resonant_HighMass_512x4_w1.pb')
+            path_model = os.path.join(dnn_dir,'Resonant_FullRange_512x4_w0p1.pb')
             input_names = []
-            with open(os.path.join(dnn_dir,'Resonant_HighMass_512x4_w1_inputs.txt'),'r') as handle:
+            with open(os.path.join(dnn_dir,'Resonant_FullRange_512x4_w0p1_inputs.txt'),'r') as handle:
                 for line in handle:
                     input_names.append(line.split()[0])
             output_name = "Identity"
@@ -99,21 +99,37 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         #----- HME -----#
         if self.args.analysis == 'res':
-            HME_per_channel = {'ElEl': self.computeHMEAfterLeptonSelections(sel     = ElElSelObj.sel,
-                                                                            l1      = OSElElDilepton[0][0],
-                                                                            l2      = OSElElDilepton[0][1],
-                                                                            bjets   = self.ak4JetsByBtagScore,
-                                                                            met     = self.corrMET)[0],
-                               'MuMu': self.computeHMEAfterLeptonSelections(sel     = MuMuSelObj.sel,
-                                                                            l1      = OSMuMuDilepton[0][0],
-                                                                            l2      = OSMuMuDilepton[0][1],
-                                                                            bjets   = self.ak4JetsByBtagScore,
-                                                                            met     = self.corrMET)[0],
-                               'ElMu': self.computeHMEAfterLeptonSelections(sel     = ElMuSelObj.sel,
-                                                                            l1      = OSElMuDilepton[0][0],
-                                                                            l2      = OSElMuDilepton[0][1],
-                                                                            bjets   = self.ak4JetsByBtagScore,
-                                                                            met     = self.corrMET)[0]}
+            HME_resolved_per_channel = {'ElEl': self.computeResolvedHMEAfterLeptonSelections(sel     = ElElSelObj.sel,
+                                                                                             l1      = OSElElDilepton[0][0],
+                                                                                             l2      = OSElElDilepton[0][1],
+                                                                                             bjets   = self.ak4JetsByBtagScore,
+                                                                                             met     = self.corrMET)[0],
+                                        'MuMu': self.computeResolvedHMEAfterLeptonSelections(sel     = MuMuSelObj.sel,
+                                                                                             l1      = OSMuMuDilepton[0][0],
+                                                                                             l2      = OSMuMuDilepton[0][1],
+                                                                                             bjets   = self.ak4JetsByBtagScore,
+                                                                                             met     = self.corrMET)[0],
+                                        'ElMu': self.computeResolvedHMEAfterLeptonSelections(sel     = ElMuSelObj.sel,
+                                                                                             l1      = OSElMuDilepton[0][0],
+                                                                                             l2      = OSElMuDilepton[0][1],
+                                                                                             bjets   = self.ak4JetsByBtagScore,
+                                                                                             met     = self.corrMET)[0]}
+            HME_boosted_per_channel = {'ElEl': self.computeBoostedHMEAfterLeptonSelections(sel     = ElElSelObj.sel,
+                                                                                           l1      = OSElElDilepton[0][0],
+                                                                                           l2      = OSElElDilepton[0][1],
+                                                                                           fatjets = self.ak8BJets,
+                                                                                           met     = self.corrMET)[0],
+                                       'MuMu': self.computeBoostedHMEAfterLeptonSelections(sel     = MuMuSelObj.sel,
+                                                                                           l1      = OSMuMuDilepton[0][0],
+                                                                                           l2      = OSMuMuDilepton[0][1],
+                                                                                           fatjets = self.ak8BJets,
+                                                                                           met     = self.corrMET)[0],
+                                       'ElMu': self.computeBoostedHMEAfterLeptonSelections(sel     = ElMuSelObj.sel,
+                                                                                           l1      = OSElMuDilepton[0][0],
+                                                                                           l2      = OSElMuDilepton[0][1],
+                                                                                           fatjets = self.ak8BJets,
+                                                                                           met     = self.corrMET)[0]}
+
 
         #----- Apply jet corrections -----#
         ElElSelObj.sel = self.beforeJetselection(ElElSelObj.sel,'ElEl')
@@ -390,10 +406,10 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 ChannelDictList.append({'channel': 'MuMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'b1':container2b0j[0],'b2':container2b0j[1],'sel':MuMuSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':MuMuSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
                 ChannelDictList.append({'channel': 'ElMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'b1':container2b0j[0],'b2':container2b0j[1],'sel':ElMuSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':ElMuSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
 
-        for channelDict in ChannelDictList:
-            # Branch out the LO -> NLO reweighting #
-            channelDict["sel"] = self.addSignalReweighting(channelDict["sel"])
-            plots.extend(makeDoubleLeptonSelectedResolvedVariables(**channelDict,HLL=self.HLL))
+#        for channelDict in ChannelDictList:
+#            # Branch out the LO -> NLO reweighting #
+#            channelDict["sel"] = self.addSignalReweighting(channelDict["sel"])
+#            plots.extend(makeDoubleLeptonSelectedResolvedVariables(**channelDict,HLL=self.HLL))
 
         #----- Selected variables : Boosted -----#
         ChannelDictList = []
@@ -409,9 +425,9 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 ChannelDictList.append({'channel': 'MuMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'B':container1fatb[0],'sel':MuMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':MuMuSelObjAk8JetsInclusiveBoostedOneBtag.selName})
                 ChannelDictList.append({'channel': 'ElMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'B':container1fatb[0],'sel':ElMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':ElMuSelObjAk8JetsInclusiveBoostedOneBtag.selName})
 
-        for channelDict in ChannelDictList:
-            channelDict["sel"] = self.addSignalReweighting(channelDict["sel"])
-            plots.extend(makeDoubleLeptonSelectedBoostedVariables(**channelDict,HLL=self.HLL))
+#        for channelDict in ChannelDictList:
+#            channelDict["sel"] = self.addSignalReweighting(channelDict["sel"])
+#            plots.extend(makeDoubleLeptonSelectedBoostedVariables(**channelDict,HLL=self.HLL))
 
         #----- Machine Learning plots -----#
         selObjectDictList = []
@@ -516,7 +532,12 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     raise RuntimeError('You need to provide the mass of the resonance')
                 self.nodes = ['DY','GGF','H','Rare','ST','TT','TTVX','VVV']
 
-                HME = HME_per_channel[channel]
+                if 'Resolved' in selObjectDict['selObject'].selName:
+                    HME = HME_resolved_per_channel[channel]
+                elif 'Boosted' in selObjectDict['selObject'].selName:
+                    HME = HME_boosted_per_channel[channel]
+                else:
+                    raise RuntimeError("Not understood category")
 
                 plots.extend(makeDoubleLeptonHMEPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],HME))
 

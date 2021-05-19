@@ -851,6 +851,7 @@ class DataCard:
 
     def preparePlotIt(self,suffix=''):
         print ("Preparing plotIt root files")
+
         # Make new directory with root files for plotIt #
         path_plotIt = os.path.join(self.datacardPath,'plotit')
         path_rootfiles = os.path.join(path_plotIt,'root')
@@ -893,7 +894,27 @@ class DataCard:
                                    'width'                    : 800,
                                    'root'                     : 'root',
                                    'show-overflow'            : 'true'}
-        
+
+        # Compute stack values #
+        inMean = {'backgrounds':[]}
+        histMax = {}
+        for histName in self.content.keys():
+            hstack = ROOT.THStack(histName+"stack",histName+"stack")
+            for group in self.content[histName].keys():
+                if self.groups[group]['type'] == 'mc':
+                    hstack.Add(self.content[histName][group]['nominal'])
+                elif self.groups[group]['type'] == 'signal':
+                    if group not in inMean.keys():
+                        inMean[group] = [self.content[histName][group]['nominal'].Integral()]
+                    else:
+                        inMean[group].append(self.content[histName][group]['nominal'].Integral())
+            inMean['backgrounds'].append(hstack.GetStack().Last().Integral())
+            histMax[histName] = hstack.GetMaximum()
+        inMean = {k:sum(values)/len(values) for k,values in inMean.items()} 
+
+
+
+        # Files informations #
         config['files'] = {}
         for group,gconfig in self.groups.items():
             if self.pseudodata and group == 'data_real':
@@ -909,6 +930,9 @@ class DataCard:
                 config['files'][group+'.root'].update({'group':plotGroup})
             else:
                 config['files'][group+'.root'].update({k:v for k,v in gconfig.items() if k not in ['files','type']})
+                config['files'][group+'.root'].update({'scale':0.01*inMean['backgrounds']/inMean[group]})
+
+        # Groups informations #
         config['groups'] = {}
         for group,gconfig in self.groups.items():
             if self.pseudodata and group == 'data_real':
@@ -919,6 +943,7 @@ class DataCard:
                     config['groups'][plotGroup] = {k:v for k,v in gconfig.items() if k not in ['files','type']}
 
 
+        # Plots informations #
         config['plots'] = {}
         for h1,h2 in self.hist_conv.items():
             # Check histogram dimension #
@@ -951,15 +976,20 @@ class DataCard:
                 config['plots'][h1]['blinded-range'] = [xmin,xmax] #[(xmax-xmin)/2,xmax]
             else:
                 config['plots'][h1].pop('blinded-range',None)
+            config['plots'][h1]['y-axis-range'] = [0.,histMax[h1]*1.5]
+            config['plots'][h1]['log-y-axis-range'] = [1.e-1,histMax[h1]*100]
             config['plots'][h1]['ratio-y-axis-range'] = [0.8,1.2]
             config['plots'][h1]['sort-by-yields'] = True
             config['plots'][h1]['show-overflow'] = True
             if 'labels' in config['plots'][h1].keys():
                 del config['plots'][h1]['labels']
 
-            if self.legend is not None and 'position' in self.legend.keys():
-                assert len(self.legend['position']) == 4
-                config['plots'][h1]['legend-position'] = self.legend['position']
+            if self.legend is not None:
+                if 'position' in self.legend.keys():
+                    assert len(self.legend['position']) == 4
+                    config['plots'][h1]['legend-position'] = self.legend['position']
+                if 'columns' in self.legend.keys():
+                    config['plots'][h1]['legend-columns'] = self.legend['columns']
 
             if hasattr(self,'plotLinearizeData'):
                 if h1 in self.plotLinearizeData.keys():
@@ -968,8 +998,10 @@ class DataCard:
                     extraItems = self.plotLinearizeData[h1]
                     for idx in range(len(extraItems['labels'])):
                         extraItems['labels'][idx]['position'][0] = margin_left + extraItems['labels'][idx]['position'][0] * (margin_right-margin_left)
+                    for idx in range(len(extraItems['lines'])):
+                        extraItems['lines'][idx] = [[extraItems['lines'][idx],0.],[extraItems['lines'][idx],histMax[h1]*1.1]]
                     config['plots'][h1].update(extraItems)
-                    config['plots'][h1]['x-axis-hide-ticks'] = True
+                    #config['plots'][h1]['x-axis-hide-ticks'] = True
                     #config['plots'][h1]['blinded-range'] = [[0.5,1.],[1.5,2.]]
 
         if len(systematics) > 0:

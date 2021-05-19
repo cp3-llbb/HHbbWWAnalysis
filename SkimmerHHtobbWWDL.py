@@ -59,12 +59,22 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
 
             #----- HME -----#
             if self.args.analysis == 'res':
-                HME,HME_eff = self.computeHMEAfterLeptonSelections(
+                if self.args.Resolved1Btag or self.args.Resolved2Btag:
+                    HME,HME_eff = self.computeResolvedHMEAfterLeptonSelections(
                                         sel   = selObj.sel,
                                         l1    = dilepton[0],
                                         l2    = dilepton[1],
                                         bjets = self.ak4JetsByBtagScore,
                                         met   = self.corrMET)
+                elif self.args.Boosted1Btag:
+                    HME,HME_eff = self.computeBoostedHMEAfterLeptonSelections(
+                                        sel     = selObj.sel,
+                                        l1      = dilepton[0],
+                                        l2      = dilepton[1],
+                                        fatjets = self.ak8Jets,
+                                        met     = self.corrMET)
+                else:
+                    raise RuntimeError("Wrong category for resonant HME computations")
 
             #----- Apply jet corrections -----#
             ElElSelObj.sel = self.beforeJetselection(ElElSelObj.sel,'ElEl')
@@ -106,6 +116,8 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         #                                 Synchronization tree                                  #
         #---------------------------------------------------------------------------------------#
         if self.args.Synchronization:
+            if self.args.analysis == 'res':
+                raise RuntimeError("This part of the Skimmer is not planned for resonant")
             # Event variables #
             varsToKeep["event"]             = None # Already in tree
             varsToKeep["run"]               = None # Already in tree 
@@ -131,17 +143,18 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                                                                             op.rng_len(self.MuMuTightSel)>=1,
                                                                             op.rng_len(self.ElMuTightSel)>=1))
             if self.args.Channel == 'ElEl':
-                varsToKeep["is_ee"] = op.c_float(True)
-                varsToKeep["is_mm"] = op.c_float(False)
-                varsToKeep["is_em"] = op.c_float(False)
+                varsToKeep["is_ee"] = op.c_bool(True)
+                varsToKeep["is_mm"] = op.c_bool(False)
+                varsToKeep["is_em"] = op.c_bool(False)
             if self.args.Channel == 'MuMu':
-                varsToKeep["is_ee"] = op.c_float(False)
-                varsToKeep["is_mm"] = op.c_float(True)
-                varsToKeep["is_em"] = op.c_float(False)
+                varsToKeep["is_ee"] = op.c_bool(False)
+                varsToKeep["is_mm"] = op.c_bool(True)
+                varsToKeep["is_em"] = op.c_bool(False)
             if self.args.Channel == 'ElMu':
-                varsToKeep["is_ee"] = op.c_float(False)
-                varsToKeep["is_mm"] = op.c_float(False)
-                varsToKeep["is_em"] = op.c_float(True)
+                varsToKeep["is_ee"] = op.c_bool(False)
+                varsToKeep["is_mm"] = op.c_bool(False)
+                varsToKeep["is_em"] = op.c_bool(True)
+
             varsToKeep["is_resolved"]       = op.switch(op.AND(op.rng_len(self.ak4Jets)>=2,op.rng_len(self.ak4BJets)>=1,op.rng_len(self.ak8BJets)==0), op.c_bool(True), op.c_bool(False))
             varsToKeep["is_boosted"]        = op.switch(op.rng_len(self.ak8BJets)>=1, op.c_bool(True), op.c_bool(False))
 
@@ -482,9 +495,6 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             # PDF weights #
             if self.is_MC:
                 varsToKeep["weight_scaleWeight"] = self.scaleWeight
-                varsToKeep["weight_scaleWeight_Fact"] = self.scaleWeight_Fact
-                varsToKeep["weight_scaleWeight_Renorm"] = self.scaleWeight_Renorm
-                varsToKeep["weight_scaleWeight_Mixed"] = self.scaleWeight_Mixed
                 varsToKeep["weight_LHEScaleWeight_len"] = op.static_cast("UInt_t",op.rng_len(t.LHEScaleWeight))
                 for i in range(0,10):
                     varsToKeep["weight_LHEScaleWeight_{}".format(i)] = op.switch(op.rng_len(t.LHEScaleWeight)>i, t.LHEScaleWeight[i], op.c_float(-9999))
@@ -510,46 +520,62 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep["eventWeight"] = noSel.weight if self.inclusive_sel else selObj.sel.weight
 
             if not self.inclusive_sel:
-                # DNN #
-                inputsLeps = returnLeptonsMVAInputs(self     = self,
-                                                    l1       = dilepton[0],
-                                                    l2       = dilepton[1],
-                                                    channel  = self.args.Channel)
-                inputsJets =    returnJetsMVAInputs(self = self,
-                                                    jets = self.ak4Jets)
-                inputsMET =      returnMETMVAInputs(self = self,
-                                                    met  = self.corrMET)     
-                inputsFatjet =  returnFatjetMVAInputs(self      = self,
-                                                      fatjets   = self.ak8Jets)
-                inputsHL = returnHighLevelMVAInputs(self      = self,
-                                                    l1        = dilepton[0],
-                                                    l2        = dilepton[1],
-                                                    met       = self.corrMET,
-                                                    jets      = self.ak4Jets,
-                                                    bjets     = self.ak4JetsByBtagScore[:op.min(op.rng_len(self.ak4JetsByBtagScore),op.static_cast("std::size_t",op.c_int(2)))],
-                                                    electrons = self.electronsTightSel,
-                                                    muons     = self.muonsTightSel,
-                                                    channel   = self.args.Channel)
-                inputsParam = returnParamMVAInputs(self)
-                inputsEventNr = returnEventNrMVAInputs(self,t)
+                import mvaEvaluatorDL_nonres
+                inputsLeps = mvaEvaluatorDL_nonres.returnLeptonsMVAInputs(
+                                                self      = self,
+                                                l1        = dilepton[0],
+                                                l2        = dilepton[1],
+                                                channel   = self.args.Channel)
+                inputsJets = mvaEvaluatorDL_nonres.returnJetsMVAInputs(
+                                                self      = self,
+                                                jets      = self.ak4Jets)
+                inputsMET = mvaEvaluatorDL_nonres.returnMETMVAInputs(
+                                                self      = self,
+                                                met       = self.corrMET)     
+                inputsFatjet = mvaEvaluatorDL_nonres.returnFatjetMVAInputs(
+                                                self      = self,
+                                                fatjets   = self.ak8Jets)
+                inputsHL = mvaEvaluatorDL_nonres.returnHighLevelMVAInputs(
+                                                self      = self,
+                                                l1        = dilepton[0],
+                                                l2        = dilepton[1],
+                                                met       = self.corrMET,
+                                                jets      = self.ak4Jets,
+                                                bjets     = self.ak4JetsByBtagScore[:op.min(op.rng_len(self.ak4JetsByBtagScore),op.static_cast("std::size_t",op.c_int(2)))],
+                                                electrons = self.electronsTightSel,
+                                                muons     = self.muonsTightSel,
+                                                channel  = self.args.Channel)
 
-                inputs = {**inputsLeps,**inputsJets,**inputsFatjet,**inputsMET,**inputsHL,**inputsParam,**inputsEventNr}
-                for (varname,_,_),var in inputs.items():
+                inputsParam = mvaEvaluatorDL_nonres.returnParamMVAInputs(self)
+                inputsEventNr = mvaEvaluatorDL_nonres.returnEventNrMVAInputs(self,t)
+
+                inputsDict = {**inputsLeps,**inputsJets,**inputsMET,**inputsFatjet,**inputsHL,**inputsParam,**inputsEventNr}
+
+                for (varname,_,_),var in inputsDict.items():
                     varsToKeep[varname] = var
            
-#            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','08','model','model.pb')
-#            nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
-#            if not os.path.exists(path_model):
-#                raise RuntimeError('Could not find model file %s'%path_model)
-#            try:
-#                input_names = ["lep","jet","fat","met","hl","param","eventnr"]
-#                output_name = "Identity"
-#                DNN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
-#            except:
-#                raise RuntimeError('Could not load model %s'%path_model)
-#            outputs = DNN(*inputs.values())
-#            for node, output in zip(nodes,outputs): 
-#           varsToKeep[node] = output
+                path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','11','model','model.pb')
+                nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
+                input_names = ["lep","jet","fat","met","hl","param","eventnr"]
+                output_name = "Identity"
+                if not os.path.exists(path_model):
+                    raise RuntimeError('Could not find model file %s'%path_model)
+                try:
+                    DNN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
+                except:
+                    raise RuntimeError('Could not load model %s'%path_model)
+
+                inputs = [op.array("double",*mvaEvaluatorDL_nonres.inputStaticCast(inputsLeps,"float")),
+                          op.array("double",*mvaEvaluatorDL_nonres.inputStaticCast(inputsJets,"float")),
+                          op.array("double",*mvaEvaluatorDL_nonres.inputStaticCast(inputsFatjet,"float")),
+                          op.array("double",*mvaEvaluatorDL_nonres.inputStaticCast(inputsMET,"float")),
+                          op.array("double",*mvaEvaluatorDL_nonres.inputStaticCast(inputsHL,"float")),
+                          op.array("double",*mvaEvaluatorDL_nonres.inputStaticCast(inputsParam,"float")),
+                          op.array("long",*mvaEvaluatorDL_nonres.inputStaticCast(inputsEventNr,"long"))]
+
+                outputs = DNN(*inputs)
+                for node, output in zip(nodes,outputs): 
+                   varsToKeep[node] = output
 
             # Return #
            
@@ -624,9 +650,8 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep["fatbjet_subjet2_Pz"] = self.ak8BJets[0].subJet2.p4.Pz()
         
         #----- HME ----#
-        if self.args.Resolved1Btag or self.args.Resolved2Btag:
-            varsToKeep["HME"] = HME
-            varsToKeep["HME_eff"] = HME_eff
+        varsToKeep["HME"] = HME
+        varsToKeep["HME_eff"] = HME_eff
 
         #----- Additional variables -----#
         if self.is_MC:

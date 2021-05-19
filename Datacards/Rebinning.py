@@ -223,13 +223,21 @@ class Threshold(Rebin):
             raise RuntimeError("Fewer bins than thresholds")
         if not use_var:
             s = np.zeros_like(w)
-        if factor is not None:
-            thresh *= factor * w.sum() / thresh.max() 
-        idx = self.rebin_method(thresh=thresh,val=w,var=np.power(s,2),extra=extra,rsut=rsut)
-        # fuse left-most two bins if they are rising in content
-        if len(idx) > 0 and w[0 : idx[0]].sum() < w[idx[0] : (idx[1] if len(idx) > 1 else None)].sum():
-            idx = idx[1:]     
-        self.ne = self.ne = np.unique(np.r_[e[0], e[idx] , e[-1]])
+#        if factor is not None:
+#            thresh *= factor * w.sum() / thresh.max() 
+#        idx = self.rebin_method(thresh=thresh,val=w,var=np.power(s,2),extra=extra,rsut=rsut)
+#        # fuse left-most two bins if they are rising in content
+#        if len(idx) > 0 and w[0 : idx[0]].sum() < w[idx[0] : (idx[1] if len(idx) > 1 else None)].sum():
+#            idx = idx[1:]     
+#        self.ne = np.unique(np.r_[e[0], e[idx] , e[-1]])
+        for factor in list(np.linspace(1,0,101).round(4)):
+            thresh_test = thresh * factor * w.sum() / thresh.max() 
+            idx = self.rebin_method(thresh=thresh_test,val=w,var=np.power(s,2),extra=extra,rsut=rsut)
+            if len(idx) > 0 and w[0 : idx[0]].sum() < w[idx[0] : (idx[1] if len(idx) > 1 else None)].sum():
+                idx = idx[1:]     
+            self.ne = np.unique(np.r_[e[0], e[idx] , e[-1]])
+            if self.ne.shape[0] >= 6:
+                break
 
     @staticmethod
     def rebin_method(thresh,val,var,extra,rsut=np.inf):
@@ -503,14 +511,14 @@ class Linearize2D(Rebin2D):
 
     def savePlotData(self,eminor,emajor):
         labels = []
-        ylabel = 'y'
+        ylabel = 'HME'
         xpos = [0.] + [float(eminor[i][-1] + i * eminor[i-1][-1]) for i in range(len(eminor))]
         lines = xpos[1:-1]
         for i in range(len(xpos)-1):
             label = f"{emajor[i]} < {ylabel} < {emajor[i+1]}"
-            poslabel = [(xpos[i] + 0.2 * (xpos[i+1]-xpos[i]))/xpos[-1],0.02]
-            labels.append({'text':label,'position':poslabel,'size':28-2*len(eminor)})
-        self.plotData = {'labels':labels,'vertical-lines':lines}
+            poslabel = [(xpos[i] + 0.1 * (xpos[i+1]-xpos[i]))/xpos[-1],0.75]
+            labels.append({'text':label,'position':poslabel,'size':26-2*len(eminor)})
+        self.plotData = {'labels':labels,'lines':lines}
 
     def getPlotData(self):
         return self.plotData
