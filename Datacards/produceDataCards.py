@@ -27,14 +27,14 @@ ROOT.gROOT.SetBatch(True)
 combine_env = os.path.join(os.path.dirname(os.path.abspath(__file__)),'HiggsAnalysis','CombinedLimit','env_standalone.sh')
 
 class DataCard:
-    def __init__(self,datacardName=None,path=None,yamlName=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,produce_plots=False,legend=None,combineCmds=None,**kwargs):
+    def __init__(self,datacardName=None,configPath=None,path=None,yamlName=None,worker=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,produce_plots=False,legend=None,combineConfigs=None,**kwargs):
         self.datacardName   = datacardName
+        self.configPath     = configPath
         self.path           = path
+        self.worker         = worker
         self.hist_conv      = hist_conv
         self.era            = str(era)
         self.use_syst       = use_syst
-        self.shapeSyst      = shapeSyst
-        self.normSyst       = normSyst
         self.root_subdir    = root_subdir
         self.pseudodata     = pseudodata
         self.DYnonclosure   = DYnonclosure
@@ -42,16 +42,12 @@ class DataCard:
         self.textfiles      = textfiles
         self.produce_plots  = produce_plots
         self.legend         = legend
-        self.combineCmds     = combineCmds
+        self.combineConfigs    = combineConfigs
 
-        if isinstance(groups,dict):
-            self.groups = groups
-        elif isinstance(groups,list) or isinstance(groups,tuple):
-            assert all([isinstance(subgroups,dict) for subgroups in groups])
-            self.groups = {key:val for subgroups in groups for key,val in subgroups.items()}
-        else: 
-            raise RuntimeError("Group format not understood")
-        
+        self.groups = self.includeEntry(groups,'Groups')
+        self.normSyst = self.includeEntry(normSyst,'Norm syst')
+        self.shapeSyst = self.includeEntry(shapeSyst,'Shape syst')
+               
         self.yaml_dict = self.loadYaml(self.path,yamlName)
 
         if self.pseudodata:
@@ -77,6 +73,20 @@ class DataCard:
             self.saveDatacard()
         if self.produce_plots:
             self.preparePlotIt()
+
+    @staticmethod
+    def includeEntry(entries,name):
+        if isinstance(entries,dict):
+            return entries
+        elif isinstance(entries,list) or isinstance(entries,tuple):
+            combined = {}
+            for ientries,subentries in enumerate(entries):
+                if not isinstance(subentries,dict):
+                    raise RuntimeError(f'Subentry index {ientries} from {name} is not a dict')
+                combined.update(subentries)
+            return combined
+        else: 
+            raise RuntimeError(f"{name} format not understood")
 
     def generatePseudoData(self,groups):
         back_samples = [sample for sample,sampleCfg in self.yaml_dict['samples'].items() if sampleCfg['type']=='mc']
@@ -346,7 +356,8 @@ class DataCard:
                         # Get correct name #
                         systName = systName[:-2]
                         if systName not in self.shapeSyst.keys():
-                            raise RuntimeError("Could not find {} in systematic dict".format(systName))
+                            logging.warning("Could not find {} in systematic dict".format(systName))
+                            continue
                         CMSName = self.shapeSyst[systName]
                         if '{era}' in CMSName:
                             CMSName = CMSName.format(era=self.era)
@@ -398,7 +409,7 @@ class DataCard:
             logging.info('Will create a single datacard txt file for all the categories')
             writer = Writer([f'{histName}_{self.era}' for histName in self.content.keys()])
         else:
-            logging.info('Will create one datacard txt file per categories')
+            logging.info('Will create one datacard txt file per category')
         for histName in self.content.keys():
             binName = f'{histName}_{self.era}'
             if '{}' in self.textfiles:
@@ -435,6 +446,10 @@ class DataCard:
                     for systName,systList in self.normSyst.items():
                         if not isinstance(systList,list):
                             systList = [systList]
+                        if systName == 'footer':
+                            for line in systList:
+                                writer.addFooter(line)
+                            continue
                         for systContent in systList:
                             if systContent is None:
                                 raise RuntimeError(f"Problem with lnL systematic {systName}")
@@ -566,8 +581,6 @@ class DataCard:
             for histName,group in missings:
                 logging.error(f'... {group:20s} -> {histName}')
             raise RuntimeError('Some nominal files are missing')
-
-                    
 
         # Apply rebinning schemes #
         for histName in self.content.keys():
@@ -723,21 +736,21 @@ class DataCard:
         """
             Using the threshold rebinning (1D)
             histName: name of histogram in keys of self.content
-            params : (list) [thresholds (list), backgrounds (list), extra contributions (list), rsut (float)]
+            params : (list) [thresholds (list), extra contributions (list | str), number of bins (int), rsut (float), groups (list | str)]
         """
         from Rebinning import Threshold
         assert isinstance(params,list)
         assert len(params) == 5
         assert isinstance(params[0],list)
         assert isinstance(params[1],list) or isinstance(params[1],str)
-        assert isinstance(params[2],list) or isinstance(params[2],str)
-        assert isinstance(params[3],int)
-        assert isinstance(params[4],float)
+        assert isinstance(params[2],int)
+        assert isinstance(params[3],float)
+        assert isinstance(params[4],list) or isinstance(params[1],str)
         thresholds          = params[0]
-        groups_for_binning  = params[1]
-        extra               = params[2] # main processes to be kept above threshold
-        nbins               = params[3] 
-        rsut                = params[4] # relative stat. unc. threshold
+        extra               = params[1] # main processes to be kept above threshold
+        nbins               = params[2] 
+        rsut                = params[3] # relative stat. unc. threshold
+        groups_for_binning  = params[4]
         hists_for_binning   = self.rebinGetHists(histName,groups_for_binning)
         hists_extra         = self.rebinGetHists(histName,extra)
         tObj = Threshold(hists_for_binning,thresholds,hists_extra,nbins,rsut)
@@ -749,23 +762,24 @@ class DataCard:
         """
             Using the threshold rebinning (2D)
             histName: name of histogram in keys of self.content
-            params : (list) [thresholds (list), thresholds (list), backgrounds (list), extra contributions (list), rsut (float)]
+            params : (list) [thresholds (list), extra contributions (list), number of bins (int), rsut (float), groups (list | str)]
+            params : (list) [thresholds x (list), thresholds y (list),extra contributions (list), number of bins (int) rsut (float), groups (list)]
         """
         from Rebinning import Threshold2D
         assert isinstance(params,list)
         assert len(params) == 4
         assert isinstance(params[0],list)
         assert isinstance(params[1],list)
-        assert isinstance(params[2],list)
-        assert isinstance(params[3],list)
+        assert isinstance(params[2],list) or isinstance(params[2],str)
+        assert isinstance(params[3],int) 
         assert isinstance(params[4],float)
-        assert isinstance(params[5],float)
+        assert isinstance(params[5],list) or isinstance(params[5],str)
         threshx             = params[0]
         threshy             = params[1]
-        groups_for_binning  = params[2]
-        extra               = params[3] # main processes to be kept above threshold
-        nbins               = params[4] 
-        rsut                = params[5] # relative stat. unc. threshold
+        extra               = params[2] # main processes to be kept above threshold
+        nbins               = params[3] 
+        rsut                = params[4] # relative stat. unc. threshold
+        groups_for_binning  = params[5]
         hists_for_binning   = self.rebinGetHists(histName,groups_for_binning)
         hists_extra         = self.rebinGetHists(histName,extra)
         tObj = Threshold(hists_for_binning,threshx,threshy,hists_extra,nbins,rsut)
@@ -1042,9 +1056,9 @@ class DataCard:
         else:
             logging.warning("plotIt not found")
 
-    def run_combine(self):
+    def run_combine(self,entries):
         logging.info(f'Running combine on {self.datacardName}')
-        if self.combineCmds is None:
+        if self.combineConfigs is None:
             logging.warning("No combine command in the yaml config file")
             return
         txtPaths = self.getTxtFilesPath()
@@ -1052,52 +1066,94 @@ class DataCard:
         for txtPath in txtPaths.values():
             if not os.path.exists(txtPath):
                 missingTxts.append(txtPath)
-        if len(missingTxts):
+        if len(missingTxts) > 0:
             logging.debug('Missing following datacards :')
             for missingTxt in missingTxts:
                 logging.debug(f'... {missingTxt}')
             logging.info('Datacard not found, will produce it')
             self.run_production()
-                
-        combineModes = ['limits','fitdiag']
-        for combineMode,combineCmdCfg in self.combineCmds.items():
+        
+        if entries is None or (isinstance(entries,list) and len(entries)==0):
+            entries = self.combineConfigs.keys()
+
+        combine_dir, env_script = os.path.split(combine_env)
+        combineModes = ['limits','prefit','postfit_b','postfit_s']
+        for entry in entries:
+            if entry not in self.combineConfigs.keys():
+                raise RuntimeError(f'Combine entry {entry} not in combine config in the yaml file')
+            combineCfg = self.combineConfigs[entry]
+            combineMode = combineCfg['mode']
+
             # Make subdirectory #
             logging.info(f'Running mode {combineMode}')
             if combineMode not in combineModes:
                 raise RuntimeError(f'Combine mode {combineMode} not understood')
-            subdir = os.path.join(self.datacardPath,combineMode)
+            subdir = os.path.join(self.datacardPath,entry)
             if os.path.exists(subdir) and len(os.listdir(subdir)) != 0:
-                logging.warning(f'Subdirectory {subdir} is not empty, will not recompute mode {combineMode} (remove it and run again if needed)')
-                continue
+                logging.warning(f'Subdirectory {subdir} is not empty')
             if not os.path.exists(subdir):
                 os.makedirs(subdir)
 
-            # Produce txt file to be used in command #
-            if 'command' not in combineCmdCfg.keys():
-                logging.critical('No "command" entry for combine mode "{combineMode}"')
-                continue
 
-            if 'bins' in combineCmdCfg.keys():
-                if list(txtPaths.keys()) == ['all']:
-                    raise RuntimeError(f'You asked for a single datacard text file, but filter on bins for the command mode {combineMode}')
-                txtPathsForCombination = []
-                for combBin in combineCmdCfg['bins']:
-                    if combBin not in txtPaths.keys():
-                        raise RuntimeError(f'{combBin} not in hist content')
-                    txtPathsForCombination.append(txtPaths[combBin])
-            else:
-                txtPathsForCombination = list(txtPaths.values())
 
-            logging.debug('Will combine the following datacard')
-            for txtPathComb in txtPathsForCombination:
-                logging.debug(f'... {txtPathComb}')
+            # Check if root output is already in subdir #
             combinedTxtPath = os.path.join(subdir,'datacard.txt')
-            logging.debug(f'-> {combinedTxtPath}')
-            if os.path.exists(combinedTxtPath):
-                os.remove(combinedTxtPath)
-            self.combineCards(txtPathsForCombination,combinedTxtPath)
+            workspacePath = os.path.join(subdir,'workspace.root')
+            rootFiles = glob.glob(os.path.join(subdir,'*.root'))
+            if len(rootFiles) == 0 or rootFiles == [workspacePath]:
+                logging.info(f'No root file found in {subdir}, will run the command for mode {combineMode}')
 
-            combineCmd = combineCmdCfg['command'].format(combinedTxtPath)
+                if 'command' not in combineCfg.keys():
+                    logging.warning('No "command" entry for combine mode "{combineMode}"')
+
+                # Select txt files #
+                if 'bins' in combineCfg.keys():
+                    if list(txtPaths.keys()) == ['all']:
+                        raise RuntimeError(f'You asked for a single datacard text file, but filter on bins for the command mode {combineMode}')
+                    txtPathsForCombination = []
+                    for combBin in combineCfg['bins']:
+                        if combBin not in txtPaths.keys():
+                            raise RuntimeError(f'{combBin} not in hist content')
+                        txtPathsForCombination.append(txtPaths[combBin])
+                else:
+                    txtPathsForCombination = list(txtPaths.values())
+
+                # Submit mode #
+                if 'submit' in combineCfg.keys() and not self.worker:
+                    params = combineCfg['submit']
+                    args = {'combine':entry}
+                    subScript = self.writeSbatchCommand(subdir,params,args)
+                    logging.info(f'Generated {subScript}')
+                    rc,output = self.run_command(f'sbatch {subScript}',return_output=True,shell=True)
+                    for line in output:
+                        logging.info(line)
+                    continue
+
+                # Combine txt files into one #
+                if not os.path.exists(combinedTxtPath):
+                    logging.info('Producing combine datacard')
+                    for txtPathComb in txtPathsForCombination:
+                        logging.debug(f'... {txtPathComb}')
+                    logging.debug(f'-> {combinedTxtPath}')
+                    if os.path.exists(combinedTxtPath):
+                        os.remove(combinedTxtPath)
+                    self.combineCards(txtPathsForCombination,combinedTxtPath)
+                    logging.info('... done')
+
+                # Create workspace #
+                if not os.path.exists(workspacePath):
+                    logging.info('Producing workspace')
+                    workspaceCmd = f"cd {combine_dir}; "
+                    workspaceCmd += f"env -i bash -c 'source {env_script} && cd {subdir} && text2workspace.py {combinedTxtPath} -o {workspacePath}'"
+                    exitCode,output = self.run_command(workspaceCmd,return_output=True,shell=True)
+                    if exitCode != 0:
+                        for line in output:
+                            logging.info(line)
+                        raise RuntimeError('Could not produce the workspace, see log above')
+                    logging.info('... done')
+                
+                # Produce command #
+                combineCmd = combineCfg['command'].format(workspacePath)
 #            if combineMode == 'fitdiag':
 #                # Add specific string to output file to avoid overwriting
 #                testName = 'Test'
@@ -1125,47 +1181,93 @@ class DataCard:
 #                combineCmd += f' --keyword-value WORD={random_str}' 
 #                outputFile = f'higgsCombine{testName}.FitDiagnostics.mH{mass}.WORD{random_str}.{seed}.root'
 
-            combine_dir, env_script = os.path.split(combine_env)
+                fullCombineCmd  = f"cd {combine_dir}; "
+                fullCombineCmd += f"env -i bash -c 'source {env_script} && cd {subdir} && {combineCmd}'"
 
-            fullCombineCmd  = f"cd {combine_dir}; "
-            fullCombineCmd += f"env -i bash -c 'source {env_script} && cd {subdir} && {combineCmd}'"
+                logging.debug('Extensive command is below')
+                logging.debug(fullCombineCmd)
 
-            logging.debug('Extensive command is below')
-            logging.debug(fullCombineCmd)
+                # Run command #
+                exitCode,output = self.run_command(fullCombineCmd,return_output=True,shell=True)
+                path_log = os.path.join(subdir,'log_combine.out')
+                with open(path_log,'w') as handle:
+                    for line in output:
+                        handle.write(line)
 
-            exitCode,output = self.run_command(fullCombineCmd,return_output=True,shell=True)
-            path_log = os.path.join(subdir,'log.out')
-            with open(path_log,'w') as handle:
-                for line in output:
-                    handle.write(line)
+                if exitCode != 0:
+                    logging.critical(f'Something went wrong in combine, see log in {path_log}') 
+                    continue
+                else:
+                    logging.info('... done')
+            else:
+                logging.warning(f"Already a root file in subdirectory {subdir}, will not run the combine command again (remove and run again if needed)")
 
-            if exitCode != 0:
-                logging.critical(f'Something went wrong in combine, see log in {path_log}') 
-                continue
-
+            # Saving limit values in json #
             if combineMode == 'limits':
                 limits = {}
-                for line in output:
-                    l_str = None
-                    r_str = None
-                    if line.startswith('Observed'):
-                        logging.info("\t"+line.strip())
-                        r_str = line.split(':')[1]
-                    elif line.startswith('Expected'):
-                        logging.info("\t"+line.strip())
-                        l_str,r_str = line.split(':')
-                    else:
-                        continue
-                    if l_str is None: 
-                        level = -1.
-                    else:   
-                        level = float(re.findall("\d+.\d+",l_str)[0])
-                    limits[level] = float(re.findall("\d+.\d+",r_str)[0])
-                    
+                with open(os.path.join(subdir,'log_combine.out'),'r') as output:
+                    for line in output:
+                        l_str = None
+                        r_str = None
+                        if line.startswith('Observed'):
+                            logging.info("\t"+line.strip())
+                            r_str = line.split(':')[1]
+                        elif line.startswith('Expected'):
+                            logging.info("\t"+line.strip())
+                            l_str,r_str = line.split(':')
+                        else:
+                            continue
+                        if l_str is None: 
+                            level = -1.
+                        else:   
+                            level = float(re.findall("\d+.\d+",l_str)[0])
+                        limits[level] = float(re.findall("\d+.\d+",r_str)[0])
+                        
                 path_limits = os.path.join(self.datacardPath,subdir,'limits.json')
                 with open(path_limits,'w') as handle:
                     json.dump(limits,handle)
                 logging.info(f'Saved limits as {path_limits}') 
+
+            # Producing prefit and postfit plots #
+            if 'prefit' in combineMode or 'postfit' in combineMode:
+                config = combineCfg['plotting']
+                fitdiagFile = glob.glob(os.path.join(subdir,'fitDiagnostic*root'))
+                if len(fitdiagFile) == 0:
+                    raise RuntimeError("Could not find any fitdiag file in subdir")
+                fitdiagFile = fitdiagFile[0]
+                # Generate dat config file #
+                config['main'].update({'fitdiagnosis':fitdiagFile})
+                path_dict = os.path.join(subdir,'dict.dat')
+                self.makeDictForPostFit(path_dict,config)
+                # Run plotting #
+                from fitdiag_plots import create_postfit_plots
+                from collections import OrderedDict
+                info_bin = eval(open(path_dict, "r").read())
+                folder = None
+                if combineMode == 'prefit':
+                    folder = 'shapes_prefit'
+                elif combineMode == 'postfit_b':
+                    folder = 'shapes_fit_b'
+                elif combineMode == 'postfit_s':
+                    folder = 'shapes_fit_s'
+                else:
+                    raise RuntimeError(f'fit mode {combineMode} not understood')
+
+                for key, binCfg in info_bin.items():
+                    unblind = False
+                    for plotCfg in config['plots']:
+                        if plotCfg['name'] in key and 'unblind' in plotCfg.keys() and plotCfg['unblind']:
+                            unblind = True
+                    create_postfit_plots(path                    = subdir,
+                                         fit_diagnostics_path    = fitdiagFile,
+                                         normalize_X_original    = False,
+                                         doPostFit               = 'postfit' in combineMode,
+                                         divideByBinWidth        = False,
+                                         folder                  = folder,
+                                         bin                     = binCfg,
+                                         binToRead               = key,
+                                         unblind                 = unblind)
+                                    
 
     def getTxtFilesPath(self):
         if self.textfiles is None:
@@ -1192,9 +1294,10 @@ class DataCard:
         # combine the datacards #
         combineCmd = "combineCards.py "
         for initTextPath in initTextPaths:
+            if 'auto' in initTextPath:
+                initTextPath = initTextPath.replace('/auto','')
             binName = os.path.basename(initTextPath).replace('.txt','')
             combineCmd += f" {binName}={initTextPath} "
-
         combine_dir, env_script = os.path.split(combine_env)
         fullCombineCmd  = f"cd {combine_dir}; "
         fullCombineCmd += f"env -i bash -c 'source {env_script} && {combineCmd}'"
@@ -1204,6 +1307,87 @@ class DataCard:
         with open(outputTextPath,'w') as handle:
             for line in output:
                 handle.write(line)
+
+    def makeDictForPostFit(self,filePath,config):
+        def colorTrad(s):
+            if isinstance(s,int):
+                return s
+            if isinstance(s,str):
+                return ROOT.TColor.GetColor(s)
+            
+        with open(filePath,'w') as handle:
+            handle.write("{\n")
+            for plotCfg in config['plots']:
+                handle.write(f"\t'{plotCfg['name']}_{self.era}' : "+"{\n")
+                for key,val in config['main'].items():
+                    if isinstance(val,str):
+                        handle.write(f"\t\t'{key}': '{val}',\n")
+                    else:
+                        handle.write(f"\t\t'{key}': {val},\n")
+                handle.write(f"\t\t'header_legend' : '{plotCfg['header']}',\n")
+                handle.write(f"\t\t'era' : {self.era},\n")
+                handle.write("\t\t'align_cats': [")
+                for b in plotCfg['bins']:
+                    if b not in self.hist_conv.keys():
+                        raise RuntimeError(f'Bin {b} not in defined histograms')
+                    handle.write(f"'{b}_{self.era}',")
+                handle.write("],\n")
+                handle.write("\t\t'align_cats_labels'  :[ "+','.join([f"['{l}']" for l in plotCfg['labels']])+"],\n")
+                handle.write("\t\t'align_cats_labelsX' :[ "+','.join([f"{l}" for l in plotCfg['labelpos']])+"],\n")
+                handle.write("\t\t'procs_plot_options_bkg' : OrderedDict(\n\t\t\t[\n")
+                for group,groupCfg in self.groups.items():
+                    if groupCfg['type'] == 'mc':
+                        handle.write(f"\t\t\t('{group}', "+"{")
+                        color = colorTrad(groupCfg['fill-color'])
+                        handle.write(f"'color' : {color}, ")
+                        if 'fill-type' in groupCfg.keys():
+                            handle.write(f"'fillStype' : {groupCfg['fill-type']}, ")
+                        else:
+                            handle.write("'fillStype' : 1001, ")
+                        handle.write(f"'label': '{groupCfg['legend']}', ")
+                        handle.write("'make border' : True}),\n")
+                handle.write("\t\t\t]\n\t\t),\n")
+                handle.write("\t\t'procs_plot_options_sig' : OrderedDict(\n\t\t\t[\n")
+                for group,groupCfg in self.groups.items():
+                    if groupCfg['type'] == 'signal':
+                        if 'hide' in groupCfg.keys() and groupCfg['hide']:
+                            continue
+                        handle.write(f"\t\t\t('{group}', "+"{")
+                        color = colorTrad(groupCfg['line-color'])
+                        handle.write(f"'color' : {color}, ")
+                        if 'fill-type' in groupCfg.keys():
+                            handle.write(f"'fillStype' : {groupCfg['fill-type']}, ")
+                        else:
+                            handle.write("'fillStype' : 3351, ")
+                        handle.write(f"'label': '{groupCfg['legend']}', ")
+                        if 'scale' in groupCfg.keys():
+                            handle.write(f"'scaleBy': {groupCfg['scale']}, ")
+                        handle.write("'scaleBy' : 1.,")
+                        handle.write("'make border' : True}),\n")
+                handle.write("\t\t\t]\n\t\t),\n")
+                handle.write("\t},")
+            handle.write("}")
+
+    def writeSbatchCommand(self,subdir,params={},args={}):
+        # Generate file path #
+        random_str = ''.join(random.choice(string.ascii_lowercase) for i in range(6))
+        filepath = os.path.join(subdir,f'sbatch_{random_str}.sh')
+        with open(filepath,'w') as handle:
+            # Write header #
+            handle.write('#!/bin/bash\n\n')
+            handle.write('#SBATCH --job-name=datacard_prod\n')
+            handle.write(f'#SBATCH --output={os.path.join(subdir,"log_"+random_str+"-%j.out")}\n')
+            handle.write(f'#SBATCH --error={os.path.join(subdir,"log_"+random_str+"-%j.err")}\n')
+            for key,val in params.items():
+                handle.write(f'#SBATCH --{key}={val}\n\n')
+            # Write command #
+            handle.write(f'python3 produceDataCards.py --yaml {self.configPath} --worker ')
+            for key,val in args.items():
+                handle.write(f'--{key} {val} ')
+            handle.write("\n")
+
+        return filepath
+
  
     @staticmethod
     def run_command(command,return_output=False,**kwargs):
@@ -1258,10 +1442,12 @@ if __name__=="__main__":
                         help='Yaml containing parameters')
     parser.add_argument('--pseudodata', action='store_true', required=False, default=False,
                         help='Whether to use pseudo data (data = sum of MC)')
-    parser.add_argument('--combine', action='store_true', required=False, default=False,
+    parser.add_argument('--combine', action='store', required=False, default=None, nargs='*',
                         help='Run combine on the txt datacard only')
     parser.add_argument('-v','--verbose', action='store_true', required=False, default=False,
                         help='Verbose mode')
+    parser.add_argument('--worker', action='store_true', required=False, default=False,
+                        help='Force working locally without submitting jobs')
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(levelname)s - %(message)s',datefmt='%m/%d/%Y %H:%M:%S')
@@ -1275,10 +1461,12 @@ if __name__=="__main__":
     if not os.path.isfile(args.yaml):
         raise RuntimeError("YAML file {} is not a valid file".format(args.yaml))
     instance = DataCard(datacardName    = os.path.basename(args.yaml).replace('.yml',''),
+                        configPath      = os.path.abspath(args.yaml),
+                        worker          = args.worker,
                         pseudodata      = args.pseudodata,
                         **f)
-    if args.combine: 
-        instance.run_combine()
+    if args.combine is not None: 
+        instance.run_combine(args.combine)
     else:
         instance.run_production()
-        instance.run_combine()
+        #instance.run_combine(args.combine)
