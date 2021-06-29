@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 import scipy
+import logging
 import scipy.interpolate
 from array import array
 import ROOT
@@ -133,7 +134,7 @@ class Rebin:
         """
         e,w,s = self.getContent1D(h) 
         if np.isnan(w).any():
-            print ('Warning : nan found in hist %s'%h.GetName())
+            logging.warning('Warning : nan found in hist %s'%h.GetName())
             return None
         if not hasattr(self,'ne'):
             raise RuntimeError('New bin edges have not been computed, is the rebin_method() not implemented')
@@ -203,7 +204,7 @@ class Threshold(Rebin):
            then move to next threshold
         list of threshold values need to be optimized
     """
-    def __init__(self, h, thresh, extra=None, factor=None, rsut=None):
+    def __init__(self, h, thresh, extra=None, nbins=None, rsut=None):
         """
             thresh : thresholds to remain above
             h : either TH1 or list of TH1
@@ -230,13 +231,23 @@ class Threshold(Rebin):
 #        if len(idx) > 0 and w[0 : idx[0]].sum() < w[idx[0] : (idx[1] if len(idx) > 1 else None)].sum():
 #            idx = idx[1:]     
 #        self.ne = np.unique(np.r_[e[0], e[idx] , e[-1]])
-        for factor in list(np.linspace(1,0,101).round(4)):
+        if nbins is None:
+            factors = [1.]
+        else:
+            nbins = min(nbins,thresh.shape[0])
+            factors = list(np.linspace(1,0,101).round(4))
+        for factor in factors:
             thresh_test = thresh * factor * w.sum() / thresh.max() 
             idx = self.rebin_method(thresh=thresh_test,val=w,var=np.power(s,2),extra=extra,rsut=rsut)
-            if len(idx) > 0 and w[0 : idx[0]].sum() < w[idx[0] : (idx[1] if len(idx) > 1 else None)].sum():
+            if len(idx) > 0 and w[0 : idx[0]].sum() < w[idx[0] : (idx[1] if len(idx) > 1 else None)].sum(): # merge two first bins in case rising in content
                 idx = idx[1:]     
             self.ne = np.unique(np.r_[e[0], e[idx] , e[-1]])
-            if self.ne.shape[0] >= 6:
+#            nw,ns = self.rebin1D(e,w,s,self.ne)
+#            import IPython
+#            IPython.embed()
+#            inc_bins = ((nw[1:] > nw[:-1])*1).sum()
+#            print (self.ne.shape[0],inc_bins,0.9*self.ne.shape[0],inc_bins > 0.9*self.ne.shape[0])
+            if nbins is not None and self.ne.shape[0] > nbins :#and inc_bins > 0.9*self.ne.shape[0]:
                 break
 
     @staticmethod
@@ -272,6 +283,7 @@ class Threshold(Rebin):
             sum_extra += extra[i]
             unc = np.sqrt(sum_var)
 
+            #if (sum_val - unc) >= thresh[tidx] and np.all(sum_extra>3.) and np.abs((unc / sum_val)) <= rsut:
             if (sum_val - unc) >= thresh[tidx] and np.all(sum_extra) and np.abs((unc / sum_val)) <= rsut:
                 idx[tidx] = la - 1 - i
                 sum_val = 0.0
@@ -327,7 +339,7 @@ class Rebin2D(Rebin):
         """
         e,w,s = self.getContent2D(h) 
         if np.isnan(w).any():
-            print ('Warning : nan found in hist %s'%h.GetName())
+            logging.warning('Warning : nan found in hist %s'%h.GetName())
             return None
         if not hasattr(self,'ne'):
             raise RuntimeError('New bin edges have not been computed, is the rebin_method() not implemented')
@@ -463,7 +475,7 @@ class Linearize2D(Rebin2D):
         """
         e,w,s = self.getContent2D(h) 
         if np.isnan(w).any():
-            print ('Warning : nan found in hist %s'%h.GetName())
+            logging.warning('Warning : nan found in hist %s'%h.GetName())
             return None
         nw,ns,eminor,emajor = self.split(e,w,s)
         if self.neminor is not None:

@@ -1,8 +1,13 @@
 import os
+import sys
 import json
 import yaml
 
-with open("CompareDY/factors.json","r") as handle:
+assert len(sys.argv) == 3
+input_json = sys.argv[1]
+output_yaml = sys.argv[2]
+
+with open(input_json,"r") as handle:
     factors = json.load(handle)
 d = {}
 for cat,val in factors.items():
@@ -18,8 +23,8 @@ for cat,val in factors.items():
     if era is not None:
         entry['era'] = era
         entry['hist'] = entry['hist'].replace('_'+era,'')
-    d[cat.replace('HH_','dy_nonclosure_')] = [entry]
-with open("config/lnNDY.yml",'w') as handle:
+    d[cat.replace('HH_','CMS_bbwwdl_DYEstimation_nonclosure_')] = entry
+with open(output_yaml,'w') as handle:
     yaml.dump(d,handle)
 
 from pprint import pprint
