@@ -23,8 +23,19 @@ import ROOT
 from yamlLoader import YMLIncludeLoader
 
 from IPython import embed
+
 ROOT.gROOT.SetBatch(True) 
-combine_env = os.path.join(os.path.dirname(os.path.abspath(__file__)),'HiggsAnalysis','CombinedLimit','env_standalone.sh')
+
+INFERENCE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             'inference')
+SETUP_PATH = os.path.join(INFERENCE_PATH,'setup.sh')
+
+COMBINE_ENV = os.path.join(INFERENCE_PATH,
+                          'data',
+                          'software',
+                          'HiggsAnalysis',
+                          'CombinedLimit',
+                          'env_standalone.sh')
 
 class DataCard:
     def __init__(self,datacardName=None,configPath=None,path=None,yamlName=None,worker=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,produce_plots=False,legend=None,combineConfigs=None,**kwargs):
@@ -44,22 +55,34 @@ class DataCard:
         self.legend         = legend
         self.combineConfigs    = combineConfigs
 
+        # Get entries that can either be dicts or list of dicts (eg with !include in yaml) #
         self.groups = self.includeEntry(groups,'Groups')
         self.normSyst = self.includeEntry(normSyst,'Norm syst')
         self.shapeSyst = self.includeEntry(shapeSyst,'Shape syst')
                
+        # Load Yaml configs from bamboo #
         self.yaml_dict = self.loadYaml(self.path,yamlName)
 
+        # Create output directory #
+        self.datacardPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),'datacards',self.datacardName)
+        if not os.path.exists(self.datacardPath):
+            os.makedirs(self.datacardPath)
+
+        # Add logging output to log file #
+        handler = logging.FileHandler(os.path.join(self.datacardPath,'log.out'),mode='w')
+        logger = logging.getLogger()
+        logger.addHandler(handler)
+
+        # Apply pseudo-data #
         if self.pseudodata:
             logging.info('Will use pseudodata')
             self.groups = self.generatePseudoData(self.groups)
             if self.datacardName is not None:
                 self.datacardName += "_pseudodata"
+
+        # Initialise containers #
         self.content = {histName:{g:{} for g in self.groups.keys()} for histName in self.hist_conv.keys()}
         self.systPresent = {histName:{group:[] for group in self.groups.keys()} for histName in self.hist_conv.keys()}
-
-        self.datacardPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),'datacards',self.datacardName)
-
 
     def run_production(self):
         self.loopOverFiles()
@@ -85,8 +108,10 @@ class DataCard:
                     raise RuntimeError(f'Subentry index {ientries} from {name} is not a dict')
                 combined.update(subentries)
             return combined
+        elif entries is None:
+            return None
         else: 
-            raise RuntimeError(f"{name} format not understood")
+            raise RuntimeError(f"{name} format {type(entries)} not understood")
 
     def generatePseudoData(self,groups):
         back_samples = [sample for sample,sampleCfg in self.yaml_dict['samples'].items() if sampleCfg['type']=='mc']
@@ -335,8 +360,6 @@ class DataCard:
         shapes = {histName:os.path.join(self.datacardPath,f"{histName}_{self.era}.root") for histName in self.content.keys()}
 
         # Save root file #
-        if not os.path.exists(self.datacardPath):
-            os.makedirs(self.datacardPath)
         for histName in self.content.keys():
             f = ROOT.TFile(shapes[histName],'recreate')
             if self.root_subdir is not None:
@@ -1056,7 +1079,7 @@ class DataCard:
         else:
             logging.warning("plotIt not found")
 
-    def run_combine(self,entries):
+    def run_combine(self,entries,additional_args={}):
         logging.info(f'Running combine on {self.datacardName}')
         if self.combineConfigs is None:
             logging.warning("No combine command in the yaml config file")
@@ -1076,16 +1099,24 @@ class DataCard:
         if entries is None or (isinstance(entries,list) and len(entries)==0):
             entries = self.combineConfigs.keys()
 
-        combine_dir, env_script = os.path.split(combine_env)
-        combineModes = ['limits','prefit','postfit_b','postfit_s']
+        # Inference setup #
+        setup_dir, setup_script = os.path.split(SETUP_PATH)
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Combine setup #
+        combine_dir, env_script = os.path.split(COMBINE_ENV)
+        combineModes = ['limits','gof','pulls_impact','prefit','postfit_b','postfit_s']
+        slurmIdPerEntry = {}
+        # Loop over all the entries inside the combine configuration #
         for entry in entries:
             if entry not in self.combineConfigs.keys():
                 raise RuntimeError(f'Combine entry {entry} not in combine config in the yaml file')
             combineCfg = self.combineConfigs[entry]
             combineMode = combineCfg['mode']
+            slurmIdPerEntry[entry] = []
 
             # Make subdirectory #
-            logging.info(f'Running mode {combineMode}')
+            logging.info(f'Running entry {entry} with mode {combineMode}')
             if combineMode not in combineModes:
                 raise RuntimeError(f'Combine mode {combineMode} not understood')
             subdir = os.path.join(self.datacardPath,entry)
@@ -1094,66 +1125,522 @@ class DataCard:
             if not os.path.exists(subdir):
                 os.makedirs(subdir)
 
+            if 'command' not in combineCfg.keys():
+                logging.warning('No "command" entry for combine mode "{combineMode}"')
 
+            # Select txt files #
+            if not 'bins' in combineCfg.keys() \
+                    and (('combine_bins' in combineCfg.keys() and combineCfg['combine_bins']) \
+                    or   ('split_bins' in combineCfg.keys() and combineCfg['split_bins'])):
+                raise RuntimeError(f'You did not specify the bins in the config entry {entry} but used `combine_ins` or `split_bins`')
+            if 'bins' in combineCfg.keys() and list(txtPaths.keys()) == ['all']:
+                raise RuntimeError(f'You asked for a single datacard text file, but filter on bins for the command mode {combineMode}')
 
-            # Check if root output is already in subdir #
-            combinedTxtPath = os.path.join(subdir,'datacard.txt')
-            workspacePath = os.path.join(subdir,'workspace.root')
-            rootFiles = glob.glob(os.path.join(subdir,'*.root'))
-            if len(rootFiles) == 0 or rootFiles == [workspacePath]:
-                logging.info(f'No root file found in {subdir}, will run the command for mode {combineMode}')
+            binsToUse = []
+            if 'bins' in combineCfg.keys():
+                if not ('combine_bins' in combineCfg.keys() and not combineCfg['combine_bins']): 
+                    # Unless combine_bins == False : use all bins 
+                    binsToUse.append(combineCfg['bins'])
+                if ('split_bins' in combineCfg.keys() and combineCfg['split_bins']):
+                    # If split_bins == True : do once per bin
+                    for b in combineCfg['bins']:
+                        binsToUse.append([b])
+            else:
+                binsToUse.append('all')
 
-                if 'command' not in combineCfg.keys():
-                    logging.warning('No "command" entry for combine mode "{combineMode}"')
-
-                # Select txt files #
-                if 'bins' in combineCfg.keys():
-                    if list(txtPaths.keys()) == ['all']:
-                        raise RuntimeError(f'You asked for a single datacard text file, but filter on bins for the command mode {combineMode}')
-                    txtPathsForCombination = []
-                    for combBin in combineCfg['bins']:
-                        if combBin not in txtPaths.keys():
-                            raise RuntimeError(f'{combBin} not in hist content')
-                        txtPathsForCombination.append(txtPaths[combBin])
+            # Loop over all the bin combinations (can be all of the one and/or one by one) #
+            subdirBinPaths = []
+            for binNames in binsToUse:
+                # Make bin subdir #
+                if len(binsToUse) == 1:
+                    subdirBin = subdir
+                    binSuffix = ''
                 else:
-                    txtPathsForCombination = list(txtPaths.values())
+                    if len(binNames) == 1:
+                        binSuffix = binNames[0]
+                    else:
+                        binSuffix = 'combination'
+                    subdirBin = os.path.join(subdir,binSuffix)
+                    if not os.path.exists(subdirBin):
+                        os.makedirs(subdirBin)
+                    subdirBinPaths.append(subdirBin)
+                
+                # Check with argument (either debug or worker mode) #
+                if len(binsToUse) > 1 and 'bin' in additional_args.keys():
+                    if additional_args['bin'] != binSuffix:
+                        continue
 
-                # Submit mode #
-                if 'submit' in combineCfg.keys() and not self.worker:
-                    params = combineCfg['submit']
-                    args = {'combine':entry}
-                    subScript = self.writeSbatchCommand(subdir,params,args)
-                    logging.info(f'Generated {subScript}')
-                    rc,output = self.run_command(f'sbatch {subScript}',return_output=True,shell=True)
-                    for line in output:
-                        logging.info(line)
+                # Check if root output is already in subdir #
+                combinedTxtPath = os.path.join(subdirBin,'datacard.txt')
+                workspacePath = os.path.join(subdirBin,'workspace.root')
+                rootFiles = glob.glob(os.path.join(subdirBin,'*.root'))
+                if len(rootFiles) == 0 or rootFiles == [workspacePath]:
+                    logging.info(f'No root file found in {subdirBin}, will run the command for mode {combineMode}')
+
+                    txtPathsForCombination = []
+                    if binNames == 'all':
+                        txtPathsForCombination = list(txtPaths.values())
+                    else:
+                        for binName in binNames:
+                            if binName not in txtPaths.keys():
+                                raise RuntimeError(f'{binName} not in hist content')
+                            txtPathsForCombination.append(txtPaths[binName])
+                    logging.info('Running on txt files :')
+                    for txtPathComb in txtPathsForCombination:
+                        logging.info(f'\t- {txtPathComb}')
+
+
+                    # Combine txt files into one #
+                    if not os.path.exists(combinedTxtPath):
+                        logging.info('Producing combine datacard')
+                        for txtPathComb in txtPathsForCombination:
+                            logging.debug(f'... {txtPathComb}')
+                        logging.debug(f'-> {combinedTxtPath}')
+                        if os.path.exists(combinedTxtPath):
+                            os.remove(combinedTxtPath)
+                        self.combineCards(txtPathsForCombination,combinedTxtPath)
+                        logging.info('... done')
+                        
+                    # Create workspace #
+                    if not os.path.exists(workspacePath):
+                        logging.info('Producing workspace')
+                        workspaceCmd = f"cd {combine_dir}; "
+                        workspaceCmd += f"env -i bash -c 'source {env_script} && cd {subdirBin} && text2workspace.py {combinedTxtPath} -o {workspacePath}'"
+                        exitCode,output = self.run_command(workspaceCmd,return_output=True,shell=True)
+                        if exitCode != 0:
+                            if logging.root.level > 10:
+                                for line in output:
+                                    logging.info(line.strip())
+                            raise RuntimeError('Could not produce the workspace, see log above')
+                        logging.info('... done')
+
+                    # List systematics for the pulls and impacts #
+                    if combineMode == 'pulls_impact':
+                        workspaceJson = workspacePath.replace('.root','.json')
+                        if not os.path.exists(workspaceJson):
+                            worspace_cmd = f"cd {setup_dir}; "
+                            worspace_cmd += f"env -i bash -c 'source {setup_script} && cd {script_dir} && python helperWorkspace.py {workspacePath} {workspaceJson}'"
+                            rc,output = self.run_command(worspace_cmd,shell=True,return_output=True)
+                            if rc != 0: 
+                                if logging.root.level > 10:
+                                    for line in output:
+                                        logging.info(line.strip())
+                                raise RuntimeError(f'Could not convert {workspacePath} into {workspaceJson}, see log above')
+                            else:
+                                logging.info(f'Produced {workspaceJson}')
+                        else:
+                            logging.info(f'Loaded {workspaceJson}')
+
+                        with open(workspaceJson,'r') as handle:
+                            workspaceParams = json.load(handle)
+
+                        # Get systematic names for the jobs #
+                        if 'mc_stats' in combineCfg.keys() and combineCfg['mc_stats']:
+                            systNames = [key for key in workspaceParams.keys() if key != 'r']
+                            # Move mc stats to end of list #
+                            systNames.sort(key=lambda x: 'prop_bin' in x) 
+                        else:
+                            systNames = [key for key in workspaceParams.keys() if key != 'r' and 'prop_bin' in key]
+
+                    # Submit mode #
+                    if 'submit' in combineCfg.keys() and not self.worker:
+                        params = combineCfg['submit']
+                        args = {'combine':entry}
+                        array = None
+                        # Create slurm directories
+                        slurmDir  = os.path.join(subdirBin,'batch')
+                        logDir    = os.path.join(slurmDir,'logs')
+                        outputDir = os.path.join(slurmDir,'output')
+                        for directory in [slurmDir,logDir,outputDir]:
+                            if not os.path.exists(directory):
+                                os.makedirs(directory)
+
+                        if combineMode == 'gof':
+                            toys = combineCfg['toys-per-job']
+                            n_jobs = math.ceil(combineCfg['toys']/toys) + 1 # 1 : data, >1: toys (to match array ids)
+                            def fileChecker(f,idx):
+                                F = ROOT.TFile(f)
+                                valid = True
+                                if 'limit' not in [key.GetName() for key in F.GetListOfKeys()]:
+                                    valid = False
+                                    logging.debug(f'Tree limit not found in {f}')
+                                else:
+                                    tree = F.Get('limit')
+                                    if idx == 1 and tree.GetEntries() != 1:
+                                        logging.debug(f'Tree limit in {f} has {tree.GetEntries()} entries instead of 1')
+                                        valid = False
+                                    if idx > 1 and tree.GetEntries() != toys:
+                                        logging.debug(f'Tree limit in {f} has {tree.GetEntries()} entries instead of {toys}')
+                                        valid = False
+                                F.Close()
+                                return valid
+                        if combineMode == 'pulls_impact':
+                            n_jobs = len(systNames) + 1 # 1 = initial fit, >1: all the systematics
+                            def fileChecker(f,idx):
+                                F = ROOT.TFile(f)
+                                valid = True
+                                if 'limit' not in [key.GetName() for key in F.GetListOfKeys()]:
+                                    valid = False
+                                    logging.debug(f'Tree limit not found in {f}')
+                                else:
+                                    tree = F.Get('limit')
+                                    if tree.GetEntries() != 3:
+                                        logging.debug(f'Tree limit in {f} has {tree.GetEntries()} entries instead of 3')
+                                        valid = False
+                                F.Close()
+                                return valid
+
+                        idxs = [_ for _ in range(1,n_jobs+1)]
+
+                        subScript = os.path.join(slurmDir,'slurmSubmission.sh')
+
+                        if not os.path.exists(subScript):
+                            logging.info(f'{entry} : submitting {n_jobs} jobs')
+                            jobArrayArgs = []
+                            for idx in idxs:
+                                subsubdir = os.path.join(outputDir,str(idx))
+                                if not os.path.exists(subsubdir):
+                                    os.makedirs(subsubdir)
+                                jobArgs = {**args,'combine_args':f'idx={idx}'} 
+                                if binSuffix != '':
+                                    jobArgs['combine_args'] += f' bin={binSuffix}'
+                                jobArrayArgs.append(jobArgs)
+                            subScript = self.writeSbatchCommand(slurmDir,params,jobArrayArgs)
+                        else:
+                            array = []
+                            logging.info(f'{entry}: found batch script, will look for unfinished jobs')
+                            for idx in idxs:
+                                subsubdir = os.path.join(outputDir,str(idx))
+                                rootfile = glob.glob(os.path.join(subsubdir,'*.root')) 
+                                if len(rootfile) == 0:
+                                    logging.debug(f'Root output not found in {subsubdir}')
+                                    array.append(str(idx))
+                                else:
+                                    if not fileChecker(rootfile[0],idx):
+                                        array.append(str(idx))
+                        if array is None:
+                            slurmCmd = f'sbatch {subScript}'
+                        else:
+                            if len(array) > 0:
+                                logging.info('... will resubmit the following array ids : '+','.join(array))
+                                slurmCmd = f"sbatch --array={','.join(array)} {subScript}"
+                            else:
+                                logging.info('... all jobs have succeeded')
+                                slurmCmd = ''
+                        if slurmCmd != '':
+                            logging.debug(f'Submitting {subScript}')
+                            rc,output = self.run_command(slurmCmd,return_output=True,shell=True)
+                            slurm_id = None
+                            for line in output:
+                                if logging.root.level > 10:
+                                    logging.info(line.strip())
+                                numbers = re.findall(r'\d+',line.strip())
+                                if len(numbers) == 1:
+                                    slurm_id = numbers[0]
+                                    if len(slurm_id) != 8:
+                                        slurm_id = None
+                            if slurm_id is None:
+                                logging.error('Slurm job id could not be found')
+                            else:
+                                slurmIdPerEntry[entry].append(slurm_id)
+
+
+                    # Produce command #
+                    combineCmd = combineCfg['command'].format(workspacePath)
+
+                    if len(additional_args) == 0 or ('submit' in combineCfg.keys() and not self.worker): # pass to finalize part
+                        combineCmd = ''
+                    else:
+                        if 'idx' in additional_args.keys():
+                            subdirBin = os.path.join(subdirBin,'batch','output',additional_args['idx'])
+                            combineCmd += f" --seed {additional_args['idx']}"
+                            if combineMode == 'gof':
+                                if int(additional_args['idx']) > 1: # Toys case
+                                    combineCmd += f" --toys {combineCfg['toys-per-job']}"
+                            if combineMode == 'pulls_impact':
+                                if int(additional_args['idx']) == 1: # initial fit 
+                                    combineCmd += " --algo singles"
+                                else: # One job per systematic
+                                    systName = systNames[int(additional_args['idx'])-2] # Offset 0->1 (for array id) + #1 is for initial fit
+                                    combineCmd += f" --algo impact -P {systName}"
+                                if 'unblind' in combineCfg.keys() and combineCfg['unblind']:
+                                    if '--toys' in combineCmd or '-t' in combineCmd:
+                                        raise RuntimeError(f'You want to unblind entry {entry} but used `--toys` in the combine command, these are exclusive')
+                                else:
+                                    if not '--toys' in combineCmd and not '-t' in combineCmd:
+                                        combineCmd += " --toys -1"
+
+                    if combineCmd != '':
+                        fullCombineCmd  = f"cd {combine_dir}; "
+                        fullCombineCmd += f"env -i bash -c 'source {env_script} && cd {subdirBin} && {combineCmd}'"
+
+                        logging.info('Extensive command is below')
+                        logging.info(fullCombineCmd)
+
+                        # Run command #
+                        exitCode,output = self.run_command(fullCombineCmd,return_output=True,shell=True)
+                        path_log = os.path.join(subdirBin,'log_combine.out')
+                        with open(path_log,'w') as handle:
+                            for line in output:
+                                handle.write(line)
+
+                        if exitCode != 0:
+                            raise RuntimeError(f'Something went wrong in combine, see log in {path_log}') 
+                        else:
+                            logging.info('... done')
+                else:
+                    logging.warning(f"Already a root file in subdirectory {subdirBin}, will not run the combine command again (remove and run again if needed)")
+
+                if self.worker:
                     continue
 
-                # Combine txt files into one #
-                if not os.path.exists(combinedTxtPath):
-                    logging.info('Producing combine datacard')
-                    for txtPathComb in txtPathsForCombination:
-                        logging.debug(f'... {txtPathComb}')
-                    logging.debug(f'-> {combinedTxtPath}')
-                    if os.path.exists(combinedTxtPath):
-                        os.remove(combinedTxtPath)
-                    self.combineCards(txtPathsForCombination,combinedTxtPath)
-                    logging.info('... done')
-
-                # Create workspace #
-                if not os.path.exists(workspacePath):
-                    logging.info('Producing workspace')
-                    workspaceCmd = f"cd {combine_dir}; "
-                    workspaceCmd += f"env -i bash -c 'source {env_script} && cd {subdir} && text2workspace.py {combinedTxtPath} -o {workspacePath}'"
-                    exitCode,output = self.run_command(workspaceCmd,return_output=True,shell=True)
-                    if exitCode != 0:
+                # Per bin mode finalize #
+                # Saving limit values in json #
+                if combineMode == 'limits':
+                    limits = {}
+                    with open(os.path.join(subdirBin,'log_combine.out'),'r') as output:
                         for line in output:
-                            logging.info(line)
-                        raise RuntimeError('Could not produce the workspace, see log above')
-                    logging.info('... done')
-                
-                # Produce command #
-                combineCmd = combineCfg['command'].format(workspacePath)
+                            l_str = None
+                            r_str = None
+                            if line.startswith('Observed'):
+                                logging.info("\t"+line.strip())
+                                r_str = line.split(':')[1]
+                            elif line.startswith('Expected'):
+                                logging.info("\t"+line.strip())
+                                l_str,r_str = line.split(':')
+                            else:
+                                continue
+                            if l_str is None: 
+                                level = -1.
+                            else:   
+                                level = float(re.findall("\d+.\d+",l_str)[0])
+                            limits[level] = float(re.findall("\d+.\d+",r_str)[0])
+                            
+                    path_limits = os.path.join(self.datacardPath,subdirBin,'limits.json')
+                    with open(path_limits,'w') as handle:
+                        json.dump(limits,handle)
+                    logging.info(f'Saved limits as {path_limits}') 
+
+                # Producing GoF #
+                if combineMode == 'gof':
+                    if len(additional_args) > 0:
+                        continue
+                    # Hadding in case the file is not there
+                    toys_file = os.path.join(subdirBin,'higgsCombine.GoodnessOfFit.toys.root')
+                    data_file = os.path.join(subdirBin,'higgsCombine.GoodnessOfFit.data.root')
+                    if not os.path.exists(toys_file):
+                        hadd_cmd = ['hadd',toys_file]
+                        for rootfile in glob.glob(os.path.join(subdirBin,'batch','output','*','higgs*root')):
+                            if os.path.join(subdirBin,'batch','output','1','higgs') not in rootfile: # avoid taking data measurement in toys
+                                hadd_cmd.append(rootfile)
+                        rc = self.run_command(hadd_cmd)
+                        if rc != 0:
+                            raise RuntimeError("Hadd command `{' '.join(hadd_cmd)}` failed")
+                        logging.debug(f'Created {toys_file}')
+                    if not os.path.exists(data_file):
+                        rootfile = glob.glob(os.path.join(subdirBin,'batch','output','1','*root'))
+                        if len(rootfile) != 1:
+                            raise RuntimeError(f'Cannot find file {rootfile.__repr__}()')
+                        shutil.copy(rootfile[0],data_file)
+                        logging.debug(f'Created {data_file}')
+
+                    # Inspect root files to get data and toys test statistics #
+                    def getLimitValues(f):
+                        F = ROOT.TFile(f)
+                        t = F.Get('limit')
+                        limits = [event.limit for event in t]
+                        F.Close()
+                        return limits
+
+                    limit_toys = getLimitValues(toys_file)
+                    limit_data = getLimitValues(data_file)
+
+                    # Find algorithm #
+                    algorithm = None
+                    for i,arg in enumerate(combineCmd.split()):
+                        if arg == '--algo': # Used --algo ...
+                            algorithm = combineCmd.split()[i+1]
+                        if '--algo' in arg and arg != '--algo': # Used --algo=...
+                            algorithm = arg.replace('--algo','').replace('=','')
+                    if algorithm is None:
+                        raise RuntimeError('Could not understand algorithm in combine command, did you use `--algo=...` or `--algo ...` ?')
+
+                    # Produce plots #
+                    path_pdf = os.path.join(subdirBin,'gof.pdf')
+                    content = {'paths'      : path_pdf,
+                               'data'       : limit_data[0],
+                               'toys'       : limit_toys,
+                               'algorithm'  : algorithm,
+                               'campaign'   : self.era}
+                    if 'plotting' in combineCfg.keys():
+                        content.update(combineCfg['plotting'])
+                    path_json = os.path.join(subdirBin,'gof.json')
+                    logging.info(f'Saved {os.path.basename(subdirBin)} data in {path_json}')
+                    with open(path_json,'w') as handle:
+                        json.dump(content,handle)
+
+                    gof_cmd = f"cd {setup_dir}; "
+                    gof_cmd += f"env -i bash -c 'source {setup_script} && cd {script_dir} && python helperInference.py dhi.plots.gof.plot_gof_distribution {path_json}'"
+                    rc,output = self.run_command(gof_cmd,shell=True, return_output=True)
+                    if rc != 0: 
+                        if logging.root.level > 10:
+                            for line in output:
+                                logging.info(line.strip())
+                        logging.error('Failed to produce gof plot, see log above')
+                    else:
+                        logging.info(f'Produced {path_pdf}')
+
+                # Pulls and impacts #
+                if combineMode == 'pulls_impact':
+                    data = {"params": []}
+                    # Inspect root files to get poi values #
+                    for idx in range(1,len(systNames)+2):
+                        rootfiles = glob.glob(os.path.join(subdirBin,'batch','output',str(idx),'higgs*root'))
+                        values = {'r':[-1,-1,-1]}
+                        if idx != 1:
+                            systName = systNames[idx-2]
+                            values[systName] = [-1,-1,-1]
+                        if len(rootfiles) != 0:
+                            F = ROOT.TFile(rootfiles[0])
+                            if 'limit' in [key.GetName() for key in F.GetListOfKeys()]:
+                                tree = F.Get('limit')
+                                values['r'] = [event.r for event in tree]
+                                if idx != 1:
+                                    values[systName] = [getattr(event,systName) for event in tree]
+                                if len(values['r']) != 3:
+                                    continue # TODO : plot failed 
+                            F.Close()
+                        if idx == 1:
+                            data['POIs'] = [{"name": 'r', "fit": [values['r'][1],values['r'][0],values['r'][2]]}]
+                        else:
+                            d = {}
+                            params = workspaceParams[systName]
+                            d['name']     = systName
+                            d["type"]     = params['type']
+                            d["groups"]   = params['groups']
+                            d["prefit"]   = params['prefit']
+                            d["fit"]      = [values[systName][1],values[systName][0],values[systName][2]]
+                            d["r"]        = [values['r'][1],values['r'][0],values['r'][2]]
+                            d["impacts"]  = {
+                                'r' : [
+                                        d['r'][1] - d['r'][0],
+                                        d['r'][2] - d['r'][1],
+                                ]
+                            }
+                            d["impact_r"] = max(map(abs, d["impacts"]['r']))
+
+                            data['params'].append(d)
+
+                    path_pdf = os.path.join(subdirBin,'pulls_impact.pdf')
+                    content = {
+                        'paths'     : [path_pdf],
+                        'data'      : data,
+                        'poi'       : 'r',
+                    }
+                    if 'plotting' in combineCfg.keys():
+                        content.update(combineCfg['plotting'])
+                    path_json = os.path.join(subdirBin,'pulls_impact.json')
+                    with open(path_json,'w') as handle:
+                        json.dump(content,handle)
+
+                    pull_cmd = f"cd {setup_dir}; "
+                    pull_cmd += f"env -i bash -c 'source {setup_script} && cd {script_dir} && python helperInference.py dhi.plots.pulls_impacts.plot_pulls_impacts {path_json}'"
+                    rc,output = self.run_command(pull_cmd,shell=True, return_output=True)
+                    if rc != 0: 
+                        if logging.root.level > 10:
+                            for line in output:
+                                logging.info(line.strip())
+                        logging.error('Failed to produce pulls and impact plot, see log above')
+                    else:
+                        logging.info(f'Produced {path_pdf}')
+
+                # Producing prefit and postfit plots #
+                if 'prefit' in combineMode or 'postfit' in combineMode:
+                    config = combineCfg['plotting']
+                    fitdiagFile = glob.glob(os.path.join(subdirBin,'fitDiagnostic*root'))
+                    if len(fitdiagFile) == 0:
+                        raise RuntimeError("Could not find any fitdiag file in subdir")
+                    fitdiagFile = fitdiagFile[0]
+                    # Generate dat config file #
+                    config['main'].update({'fitdiagnosis':fitdiagFile})
+                    path_dict = os.path.join(subdirBin,'dict.dat')
+                    self.makeDictForPostFit(path_dict,config)
+                    # Run plotting #
+                    from fitdiag_plots import create_postfit_plots
+                    from collections import OrderedDict
+                    info_bin = eval(open(path_dict, "r").read())
+                    folder = None
+                    if combineMode == 'prefit':
+                        folder = 'shapes_prefit'
+                    elif combineMode == 'postfit_b':
+                        folder = 'shapes_fit_b'
+                    elif combineMode == 'postfit_s':
+                        folder = 'shapes_fit_s'
+                    else:
+                        raise RuntimeError(f'fit mode {combineMode} not understood')
+
+                    for key, binCfg in info_bin.items():
+                        unblind = False
+                        for plotCfg in config['plots']:
+                            if plotCfg['name'] in key and 'unblind' in plotCfg.keys() and plotCfg['unblind']:
+                                unblind = True
+                        create_postfit_plots(path                    = subdirBin,
+                                             fit_diagnostics_path    = fitdiagFile,
+                                             normalize_X_original    = False,
+                                             doPostFit               = 'postfit' in combineMode,
+                                             divideByBinWidth        = False,
+                                             folder                  = folder,
+                                             bin                     = binCfg,
+                                             binToRead               = key,
+                                             unblind                 = unblind)
+                                        
+            # Combined finalize mode for all bins (in case there was) #
+            if len(subdirBinPaths) > 1 and not self.worker:
+                # Goodness of fit : combine into one plot
+                if combineMode == 'gof':
+                    logging.info('GoF combination :')
+                    path_pdf = os.path.join(subdir,'gof.pdf')
+                    content = {'paths'      : path_pdf,
+                               'n_bins'     : 32,
+                               'data'       : [],
+                               'algorithm'  : 'saturated',
+                               'campaign'   : self.era}
+                    for subdirBinPath in subdirBinPaths:
+                        path_json = os.path.join(subdirBinPath,'gof.json')
+                        if not os.path.exists(path_json):
+                            logging.warning(f'Could not load {path_json}, will continue')
+                            continue
+                        logging.info(f'Loading {path_json}')
+                        with open(path_json,'r') as handle:
+                            subCont = json.load(handle)
+                            content['data'].append({'data' : subCont['data'],
+                                                    'toys' : subCont['toys'], 
+                                                    'name' : os.path.basename(subdirBinPath)})
+                    
+                    path_json = os.path.join(subdir,'gof.json')
+                    logging.info(f'Saved combination data in {path_json}')
+                    with open(path_json,'w') as handle:
+                        subCont = json.dump(content,handle)
+
+                    if len(content['data']) > 0:
+                        gof_cmd = f"cd {setup_dir}; "
+                        gof_cmd += f"env -i bash -c 'source {setup_script} && cd {script_dir} && python helperInference.py dhi.plots.gof.plot_gofs {path_json}'"
+                        rc,output = self.run_command(gof_cmd,shell=True, return_output=True)
+                        if rc != 0: 
+                            if logging.root.level > 10:
+                                for line in output:
+                                    logging.info(line.strip())
+                            logging.error('Failed to produce gof plot, see log above')
+                        else:
+                            logging.info(f'Produced {path_pdf}')
+
+        # Slurm ID printout #
+        if len([v for key,val in slurmIdPerEntry.items() for v in val]) > 0: # If any slurm Id has been registered
+            logging.info('Following slurm job ids were submitted')
+            for entry,slurm_ids in slurmIdPerEntry.items():
+                logging.info(f'... Entry {entry} : '+' '.join(slurm_ids))
+
+                        
 #            if combineMode == 'fitdiag':
 #                # Add specific string to output file to avoid overwriting
 #                testName = 'Test'
@@ -1181,93 +1668,7 @@ class DataCard:
 #                combineCmd += f' --keyword-value WORD={random_str}' 
 #                outputFile = f'higgsCombine{testName}.FitDiagnostics.mH{mass}.WORD{random_str}.{seed}.root'
 
-                fullCombineCmd  = f"cd {combine_dir}; "
-                fullCombineCmd += f"env -i bash -c 'source {env_script} && cd {subdir} && {combineCmd}'"
 
-                logging.debug('Extensive command is below')
-                logging.debug(fullCombineCmd)
-
-                # Run command #
-                exitCode,output = self.run_command(fullCombineCmd,return_output=True,shell=True)
-                path_log = os.path.join(subdir,'log_combine.out')
-                with open(path_log,'w') as handle:
-                    for line in output:
-                        handle.write(line)
-
-                if exitCode != 0:
-                    logging.critical(f'Something went wrong in combine, see log in {path_log}') 
-                    continue
-                else:
-                    logging.info('... done')
-            else:
-                logging.warning(f"Already a root file in subdirectory {subdir}, will not run the combine command again (remove and run again if needed)")
-
-            # Saving limit values in json #
-            if combineMode == 'limits':
-                limits = {}
-                with open(os.path.join(subdir,'log_combine.out'),'r') as output:
-                    for line in output:
-                        l_str = None
-                        r_str = None
-                        if line.startswith('Observed'):
-                            logging.info("\t"+line.strip())
-                            r_str = line.split(':')[1]
-                        elif line.startswith('Expected'):
-                            logging.info("\t"+line.strip())
-                            l_str,r_str = line.split(':')
-                        else:
-                            continue
-                        if l_str is None: 
-                            level = -1.
-                        else:   
-                            level = float(re.findall("\d+.\d+",l_str)[0])
-                        limits[level] = float(re.findall("\d+.\d+",r_str)[0])
-                        
-                path_limits = os.path.join(self.datacardPath,subdir,'limits.json')
-                with open(path_limits,'w') as handle:
-                    json.dump(limits,handle)
-                logging.info(f'Saved limits as {path_limits}') 
-
-            # Producing prefit and postfit plots #
-            if 'prefit' in combineMode or 'postfit' in combineMode:
-                config = combineCfg['plotting']
-                fitdiagFile = glob.glob(os.path.join(subdir,'fitDiagnostic*root'))
-                if len(fitdiagFile) == 0:
-                    raise RuntimeError("Could not find any fitdiag file in subdir")
-                fitdiagFile = fitdiagFile[0]
-                # Generate dat config file #
-                config['main'].update({'fitdiagnosis':fitdiagFile})
-                path_dict = os.path.join(subdir,'dict.dat')
-                self.makeDictForPostFit(path_dict,config)
-                # Run plotting #
-                from fitdiag_plots import create_postfit_plots
-                from collections import OrderedDict
-                info_bin = eval(open(path_dict, "r").read())
-                folder = None
-                if combineMode == 'prefit':
-                    folder = 'shapes_prefit'
-                elif combineMode == 'postfit_b':
-                    folder = 'shapes_fit_b'
-                elif combineMode == 'postfit_s':
-                    folder = 'shapes_fit_s'
-                else:
-                    raise RuntimeError(f'fit mode {combineMode} not understood')
-
-                for key, binCfg in info_bin.items():
-                    unblind = False
-                    for plotCfg in config['plots']:
-                        if plotCfg['name'] in key and 'unblind' in plotCfg.keys() and plotCfg['unblind']:
-                            unblind = True
-                    create_postfit_plots(path                    = subdir,
-                                         fit_diagnostics_path    = fitdiagFile,
-                                         normalize_X_original    = False,
-                                         doPostFit               = 'postfit' in combineMode,
-                                         divideByBinWidth        = False,
-                                         folder                  = folder,
-                                         bin                     = binCfg,
-                                         binToRead               = key,
-                                         unblind                 = unblind)
-                                    
 
     def getTxtFilesPath(self):
         if self.textfiles is None:
@@ -1298,7 +1699,7 @@ class DataCard:
                 initTextPath = initTextPath.replace('/auto','')
             binName = os.path.basename(initTextPath).replace('.txt','')
             combineCmd += f" {binName}={initTextPath} "
-        combine_dir, env_script = os.path.split(combine_env)
+        combine_dir, env_script = os.path.split(COMBINE_ENV)
         fullCombineCmd  = f"cd {combine_dir}; "
         fullCombineCmd += f"env -i bash -c 'source {env_script} && {combineCmd}'"
         rc, output = self.run_command(fullCombineCmd,return_output=True,shell=True)
@@ -1370,22 +1771,56 @@ class DataCard:
 
     def writeSbatchCommand(self,subdir,params={},args={}):
         # Generate file path #
-        random_str = ''.join(random.choice(string.ascii_lowercase) for i in range(6))
-        filepath = os.path.join(subdir,f'sbatch_{random_str}.sh')
+        filepath = os.path.join(subdir,f'slurmSubmission.sh')
+        scriptName = os.path.abspath(__file__)
+        log_dir = os.path.join(subdir,'logs')
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+
+        # Check job type (array or not) #
+        if isinstance(args,list): # Array submission
+            for arg in args:
+                if not isinstance(arg,dict):
+                    raise RuntimeError('Argument needs to be a dict : '+arg.__repr__())
+            N_arrays = len(args)
+        elif isinstance(args,dict): # single job submission
+            N_arrays = 0
+        else:
+            raise RuntimeError('Either a dict or a list needs to be used for args')
+
+
         with open(filepath,'w') as handle:
             # Write header #
             handle.write('#!/bin/bash\n\n')
-            handle.write('#SBATCH --job-name=datacard_prod\n')
-            handle.write(f'#SBATCH --output={os.path.join(subdir,"log_"+random_str+"-%j.out")}\n')
-            handle.write(f'#SBATCH --error={os.path.join(subdir,"log_"+random_str+"-%j.err")}\n')
+            if N_arrays > 0:
+                handle.write('#SBATCH --job-name=datacard_%a\n')
+                handle.write(f'#SBATCH --output={os.path.join(log_dir,"log-%A_%a.out")}\n')
+                handle.write(f'#SBATCH --array=1-{N_arrays}\n')
+            else:
+                handle.write('#SBATCH --job-name=datacard\n')
+                handle.write(f'#SBATCH --output={os.path.join(log_dir,"log-%j.out")}\n')
             for key,val in params.items():
-                handle.write(f'#SBATCH --{key}={val}\n\n')
-            # Write command #
-            handle.write(f'python3 produceDataCards.py --yaml {self.configPath} --worker ')
-            for key,val in args.items():
-                handle.write(f'--{key} {val} ')
-            handle.write("\n")
+                handle.write(f'#SBATCH --{key}={val}\n')
+            handle.write('\n')
+            handle.write('\n')
+                
+            # command #
+            if N_arrays > 0:
+                handle.write('cmds=(\n')
+                for arg in args:
+                    handle.write(f'"python3 {scriptName} --yaml {self.configPath} --worker ')
+                    for key,val in arg.items():
+                        handle.write(f'--{key} {val} ')
+                    handle.write('"\n')
+                handle.write(')\n')
+                handle.write('${cmds[$SLURM_ARRAY_TASK_ID-1]}\n')
+            else:
+                handle.write(f'python3 {scriptName} --yaml {self.configPath} --worker ')
+                for key,val in args.items():
+                    handle.write(f'--{key} {val} ')
+                handle.write("\n")
 
+        logging.debug(f'Generated submission script {filepath}')
         return filepath
 
  
@@ -1444,13 +1879,17 @@ if __name__=="__main__":
                         help='Whether to use pseudo data (data = sum of MC)')
     parser.add_argument('--combine', action='store', required=False, default=None, nargs='*',
                         help='Run combine on the txt datacard only')
+    parser.add_argument('--combine_args', action='store', required=False, default=[], nargs='*',
+                        help='Additional args for the combine commands (used in jobs, keep for debug)')
     parser.add_argument('-v','--verbose', action='store_true', required=False, default=False,
                         help='Verbose mode')
     parser.add_argument('--worker', action='store_true', required=False, default=False,
                         help='Force working locally without submitting jobs')
     args = parser.parse_args()
 
-    logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(levelname)s - %(message)s',datefmt='%m/%d/%Y %H:%M:%S')
+    logging.basicConfig(level   = logging.DEBUG,
+                        format  = '%(asctime)s - %(levelname)s - %(message)s',
+                        datefmt = '%m/%d/%Y %H:%M:%S')
     if not args.verbose:
         logging.getLogger().setLevel(logging.INFO)
 
@@ -1466,7 +1905,12 @@ if __name__=="__main__":
                         pseudodata      = args.pseudodata,
                         **f)
     if args.combine is not None: 
-        instance.run_combine(args.combine)
+        combine_args = {}
+        for arg in args.combine_args:
+            if '=' in arg:
+                combine_args[arg.split('=')[0]] = arg.split('=')[1]
+            else:
+                logging.warning(f'`--combine_args {arg}` will be ignored because no `=`')
+        instance.run_combine(args.combine,combine_args)
     else:
         instance.run_production()
-        #instance.run_combine(args.combine)
