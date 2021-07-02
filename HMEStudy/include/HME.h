@@ -19,7 +19,6 @@ namespace hme {
                                    const LorentzVectorF l2,
                                    const LorentzVectorF b1,
                                    const LorentzVectorF b2,
-                                   const hme::LorentzVectorF fatb,
                                    const LorentzVectorF met,
                                    const std::uint32_t eventnr,
                                    bool boosted_tag) const;

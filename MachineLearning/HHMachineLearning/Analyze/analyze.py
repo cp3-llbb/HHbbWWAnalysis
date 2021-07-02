@@ -217,7 +217,7 @@ class Analyze:
                     outputs_perm = self.model.predict(inputs_perm,batch_size=10000,verbose=0)
                 perm_f1_scores.append(f1_score(targets.argmax(1),outputs_perm.argmax(1),average='macro'))
             perm_f1_scores = np.array(perm_f1_scores)
-            f1_scores[idxPerm] = abs(perm_f1_scores.mean()-true_F1_score)
+            f1_scores[idxPerm] = abs(perm_f1_scores.mean()-true_F1_score)/true_F1_score
             f1_scores_err[idxPerm] = perm_f1_scores.std()
         
         idxSort = np.flip(np.argsort(f1_scores))

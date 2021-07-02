@@ -23,7 +23,7 @@ def runSingleLimit(config):
                               'limits.json')
     if not os.path.exists(limit_path):
         print (f'Limits for config {config} not found -> will compute them')
-        process = subprocess.Popen(['python','-u','produceDataCards.py','--combine','limits','--yaml',config],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,universal_newlines=True)
+        process = subprocess.Popen(['python','-u','produceDataCards.py','--worker','--combine','limits','--yaml',config],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,universal_newlines=True)
         while True:
             nextline = process.stdout.readline()
             if nextline == '' and process.poll() is not None:

@@ -49,17 +49,15 @@ def runHME(path,suffix,N=None):
         met = LV(event.met_Px,event.met_Py,event.met_Pz,event.met_E)
 
         if event.boosted_tag == 1:
-            b1 = LV(0.,0.,0.,0.)
-            b2 = LV(0.,0.,0.,0.)
-            fatb = LV(event.fatjet_Px,event.fatjet_Py,event.fatjet_Pz,event.fatjet_E)
+            b1 = LV(event.fatbjet_subjet1_Px,event.fatbjet_subjet1_Py,event.fatbjet_subjet1_Pz,event.fatbjet_subjet1_E)
+            b2 = LV(event.fatbjet_subjet2_Px,event.fatbjet_subjet2_Py,event.fatbjet_subjet2_Pz,event.fatbjet_subjet2_E)
         else:
             b1 = LV(event.j1_Px,event.j1_Py,event.j1_Pz,event.j1_E)
             b2 = LV(event.j2_Px,event.j2_Py,event.j2_Pz,event.j2_E)
-            fatb = LV(0.,0.,0.,0.)
 
         start = time.time()
 
-        hme,eff = evaluator.runHME(l1,l2,b1,b2,fatb,met,event.event,event.boosted_tag)
+        hme,eff = evaluator.runHME(l1,l2,b1,b2,met,event.event,event.boosted_tag)
 
         times.append(time.time()-start)
         hmes.append(hme)

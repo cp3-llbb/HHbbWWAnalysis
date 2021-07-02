@@ -16,6 +16,10 @@ uses:
   - node_10
   - node_11
   - node_12
+  - node_cHHH0
+  - node_cHHH1
+  - node_cHHH2p45
+  - node_cHHH5
 targets:
   - BenchmarkSM
   - Benchmark1

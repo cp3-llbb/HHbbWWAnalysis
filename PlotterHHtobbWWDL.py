@@ -50,6 +50,8 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         plots = []
 
+        if hasattr(self,'base_plots'):
+            plots.extend(self.base_plots)
 
         era = sampleCfg['era']
 
@@ -61,9 +63,11 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             output_name = "Identity"
         if self.args.analysis == 'res':
             dnn_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ResonantModels')
-            path_model = os.path.join(dnn_dir,'Resonant_FullRange_512x4_w0p1.pb')
+            path_model = os.path.join(dnn_dir,'Resonant_HighMass_Final_512x4_w0p1.pb')
+            #path_model = os.path.join(dnn_dir,'Resonant_LowMass_Final_512x4_w1.pb')
             input_names = []
-            with open(os.path.join(dnn_dir,'Resonant_FullRange_512x4_w0p1_inputs.txt'),'r') as handle:
+            with open(os.path.join(dnn_dir,'Resonant_HighMass_Final_512x4_w0p1_inputs.txt'),'r') as handle:
+            #with open(os.path.join(dnn_dir,'Resonant_LowMass_Final_512x4_w1_inputs.txt'),'r') as handle:
                 for line in handle:
                     input_names.append(line.split()[0])
             output_name = "Identity"
@@ -97,7 +101,13 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         OSMuMuDilepton = self.MuMuFakeSel
         OSElMuDilepton = self.ElMuFakeSel
 
+        ElElSelObj.sel = self.beforeJetselection(ElElSelObj.sel,'ElEl')
+        MuMuSelObj.sel = self.beforeJetselection(MuMuSelObj.sel,'MuMu')
+        ElMuSelObj.sel = self.beforeJetselection(ElMuSelObj.sel,'ElMu')
+
         #----- HME -----#
+        # Must be done to branching of the RDF for jets (weight or cut) to avoid systematics being recomputed in the HME
+        # But after the forceDefine on jet+met (in self.beforeJetselection)
         if self.args.analysis == 'res':
             HME_resolved_per_channel = {'ElEl': self.computeResolvedHMEAfterLeptonSelections(sel     = ElElSelObj.sel,
                                                                                              l1      = OSElElDilepton[0][0],
@@ -129,12 +139,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                                                                                            l2      = OSElMuDilepton[0][1],
                                                                                            fatjets = self.ak8BJets,
                                                                                            met     = self.corrMET)[0]}
-
-
-        #----- Apply jet corrections -----#
-        ElElSelObj.sel = self.beforeJetselection(ElElSelObj.sel,'ElEl')
-        MuMuSelObj.sel = self.beforeJetselection(MuMuSelObj.sel,'MuMu')
-        ElMuSelObj.sel = self.beforeJetselection(ElMuSelObj.sel,'ElMu')
 
         #----- DY reweighting -----#
         if "DYEstimation" in self.datadrivenContributions:

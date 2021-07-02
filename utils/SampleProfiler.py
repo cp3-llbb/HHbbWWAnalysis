@@ -6,10 +6,11 @@ import subprocess
 from prettytable import PrettyTable
 
 if len(sys.argv) != 2:
-    print ('You need to provide the path to a bamboo output dir as argument')
-    sys.exit(1)
+    raise RuntimeError('You need to provide the path to a bamboo output directory as argument')
 
 main_path = os.path.abspath(sys.argv[1])
+if not os.path.exists(main_path):
+    raise RuntimeError('The path your provided does not exist')
 
 class InfoJob:
     def __init__(self,slurmid,arrayid,state,time):
@@ -80,9 +81,9 @@ def inspectLogs(path):
                     exitcode = int(re.findall('\d+',line)[0])
                     
         if sample is None:
-            raise RuntimeError(f'Could not figure out sample from log {logbase}')
+            print(f'[WARNING] Could not figure out sample from log {logbase}')
         if exitcode is None:
-            raise RuntimeError(f'Exit code not found from log {logbase}')
+            print(f'[WARNING] Exit code not found from log {logbase}')
         infoLogs.append(InfoLog(sample,exitcode,slurm_id.split('_')[0],slurm_id.split('_')[1],def_time,def_mem,fill_time,fill_mem))
 
     return infoLogs
@@ -156,7 +157,7 @@ for job in getSacctInfo(slurmIds):
     
     
 samples = sorted(list(sampleFiles.keys()))
-table = PrettyTable(["Sample","Files","Jobs","Run time [hh:mm:ss]","Define time [hh:mm:ss]","Fill time [hh:mm:ss]","Define mem [MB]","Fill mem [MB]"])
+table = PrettyTable(["Sample","Files","Jobs","Run time [hh:mm:ss]","Define time [hh:mm:ss]","Fill time [hh:mm:ss]","Define memory [MB]","Fill memory [MB]"])
 table.add_row(["","","fin / tot","Min < Mean < Max","Min < Mean < Max","Min < Mean < Max","Min < Mean < Max","Min < Mean < Max",])
 invalid_arrayids = []
 for sample in samples:

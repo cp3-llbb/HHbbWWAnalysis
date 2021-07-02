@@ -495,9 +495,9 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             # PDF weights #
             if self.is_MC:
                 varsToKeep["weight_scaleWeight"] = self.scaleWeight
-                varsToKeep["weight_LHEScaleWeight_len"] = op.static_cast("UInt_t",op.rng_len(t.LHEScaleWeight))
+                varsToKeep["weight_LHEScaleWeight_len"] = op.static_cast("UInt_t",op.rng_len(t.LHEScaleWeight)) if hasattr(t,'LHEScaleWeight') else op.c_float(-9999)
                 for i in range(0,10):
-                    varsToKeep["weight_LHEScaleWeight_{}".format(i)] = op.switch(op.rng_len(t.LHEScaleWeight)>i, t.LHEScaleWeight[i], op.c_float(-9999))
+                    varsToKeep["weight_LHEScaleWeight_{}".format(i)] = op.switch(op.rng_len(t.LHEScaleWeight)>i, t.LHEScaleWeight[i], op.c_float(-9999)) if hasattr(t,'LHEScaleWeight') else op.c_float(-9999)
 
 
             # ttbar PT reweighting #
@@ -648,7 +648,30 @@ class SkimmerNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep["fatbjet_subjet2_Px"] = self.ak8BJets[0].subJet2.p4.Px()
             varsToKeep["fatbjet_subjet2_Py"] = self.ak8BJets[0].subJet2.p4.Py()
             varsToKeep["fatbjet_subjet2_Pz"] = self.ak8BJets[0].subJet2.p4.Pz()
-        
+
+            gen = op.select(t.GenPart,lambda g : op.AND(op.OR(op.abs(g.pdgId) == 1,
+                                                              op.abs(g.pdgId) == 2,
+                                                              op.abs(g.pdgId) == 3,
+                                                              op.abs(g.pdgId) == 4,
+                                                              op.abs(g.pdgId) == 5),
+                                                        g.statusFlags & ( 0x1 << 13),
+                                                        g.pt>=20,
+                                                        op.abs(g.eta)<2.4))
+            
+            ak8_sub1 = self.ak8BJets[0].subJet1
+            ak8_sub2 = self.ak8BJets[0].subJet2
+            gen_sub1 = op.sort(gen, lambda g : -op.deltaR(g.p4,ak8_sub1.p4))[0]
+            gen_sub2 = op.sort(gen, lambda g : -op.deltaR(g.p4,ak8_sub2.p4))[0]
+                
+            varsToKeep["fatbjet_subjet1_Pt"]  = self.ak8BJets[0].subJet1.pt
+            varsToKeep["fatbjet_subjet2_Pt"]  = self.ak8BJets[0].subJet2.pt
+            varsToKeep["gen_subjet1_Pt"]  = gen_sub1.pt
+            varsToKeep["gen_subjet2_Pt"]  = gen_sub2.pt
+            varsToKeep["gen_subjet1_pdgId"]  = gen_sub1.pdgId
+            varsToKeep["gen_subjet2_pdgId"]  = gen_sub2.pdgId
+
+
+
         #----- HME ----#
         varsToKeep["HME"] = HME
         varsToKeep["HME_eff"] = HME_eff

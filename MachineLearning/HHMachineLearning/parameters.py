@@ -60,7 +60,7 @@ split_per_model = True # in case of cross validation, to send one job per model 
 
 ##################################  Naming ######################################
 # Physics Config #
-config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListDL_res_HighMass.yml')
+config = os.path.join(os.path.abspath(os.path.dirname(__file__)),'sampleListDL_res_LowMass.yml')
 lumidict = {2016:35922,2017:41529.152060112,2018:59740.565201546}
 eras = [2016,2017,2018] # To enable or disable eras, add or remove from this list
 
@@ -85,19 +85,22 @@ weight_groups = [
 quantile = 0.95 # repeat weights with too high learning weights
 
 # Input plots options #
-#node_colors = {
-#            'Ewk'  : '#610596',
-#            'GGF'   : '#288a24',
-#            'H'     : '#06b894',
-#            'Top'    : '#cc7a16',
-#            'WJets' : '#d95564',
-#             }
+node_colors = {
+               'DY'     : '#1a83a1',
+               'GGF'    : '#42c71a',
+               'H'      : '#06b894',
+               'Rare'   : '#610596',
+               'ST'     : '#99053d',
+               'TT'     : '#cc7a16',
+               'TTVX'   : '#174704',
+               'VVV'    : '#ccbf45',
+             }
 
 # Tree name #
 tree_name = 'Events'
 
 # scaler and mask names #
-suffix = 'resonant_HighMass' 
+suffix = 'resonant_LowMass' 
 # scaler_name -> 'scaler_{suffix}.pkl'  If does not exist will be created 
 # mask_name -> 'mask_{suffix}_{sample}.npy'  If does not exist will be created 
 scaler_name = 'scaler_'+suffix+'_'.join([str(era) for era in eras])+'.pkl'

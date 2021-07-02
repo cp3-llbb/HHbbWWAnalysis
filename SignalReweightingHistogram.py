@@ -8,6 +8,57 @@ from bamboo import treefunctions as op
 
 class SignalReweightingHistogramNano(NanoAODHistoModule,DataDrivenBackgroundHistogramsModule):
     """ Base module for NanoAOD mHH vs cos(theta*) histograms """
+    def __init__(self, args):
+        super(SignalReweightingHistogramNano, self).__init__(args)
+
+    def addArgs(self,parser):
+        super(SignalReweightingHistogramNano, self).addArgs(parser)
+        parser.add_argument("-s",
+                            "--subset", 
+                            type        = str,
+                            required    = False,
+                            help="Subset of samples to be run over, keys defined in the 'samples' entry of the yaml analysis config")
+        parser.add_argument("-r",
+                            "--reweighting", 
+                            action      = 'store_true',
+                            required    = False,
+                            default     = False,
+                            help="Whether to apply reweighting")
+
+
+    def initialize(self):
+        self._customizeAnalysisCfg(self.analysisConfig)
+        super(SignalReweightingHistogramNano, self).initialize()
+
+    def _customizeAnalysisCfg(self,analysisCfg):
+        import yaml
+        samples = {} 
+        if self.args.subset is None:
+            return
+        reqArgs = self.args.subset.split(',')
+        foundArgs = set()
+        subsets = []
+        for item in analysisCfg['samples']:
+            if not 'keys' in item.keys() or not 'config' in item.keys():
+                continue
+            keys = item['keys']
+            if not isinstance(keys,list):
+                keys = [keys]
+            if all([key in reqArgs for key in keys]) or 'all' in reqArgs:
+                foundArgs.update(keys)
+                subsets.append(item['config'])
+                with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'Yaml',item['config'])) as handle:
+                    samples.update(yaml.load(handle,yaml.SafeLoader))
+        self.analysisConfig['samples'] = samples
+        notFoundArgs = [arg for arg in reqArgs if arg not in foundArgs]
+        if len(notFoundArgs)>0:
+            raise RuntimeError('The following subsets have not been found in the keys of the analysis yaml file : '+', '.join(notFoundArgs))
+        if len(subsets) > 0:
+            print ("Imported following yaml subsets :")
+            for subset in subsets:
+                print ('... {}'.format(subset))
+
+
     def prepareTree(self, tree, sample=None, sampleCfg=None):
         era = sampleCfg.get("era") if sampleCfg else None
         isMC = self.isMC(sample)
@@ -40,6 +91,7 @@ class SignalReweightingHistogramNano(NanoAODHistoModule,DataDrivenBackgroundHist
             'Benchmark6',  
             'Benchmark7',  
             'Benchmark8',  
+            'Benchmark8a',  
             'Benchmark9',  
             'Benchmark10',  
             'Benchmark11',  
@@ -48,25 +100,34 @@ class SignalReweightingHistogramNano(NanoAODHistoModule,DataDrivenBackgroundHist
             'BenchmarkcHHH1',  
             'BenchmarkcHHH2p45',  
             'BenchmarkcHHH5',  
+            'Benchmarkcluster1',  
+            'Benchmarkcluster2',  
+            'Benchmarkcluster3',  
+            'Benchmarkcluster4',  
+            'Benchmarkcluster5',  
+            'Benchmarkcluster6',  
+            'Benchmarkcluster7',  
         ]
-
+        selections = {'':noSel}
         reweights = {}
-        for benchmark in benchmarks:
-            json_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data','ScaleFactors_GGF_LO','{}_to_{}_{}.json'.format(sample,benchmark,era))
-            if os.path.exists(json_file):
-                print("Found file {}".format(json_file))
-                reweightLO = get_scalefactor("lepton", json_file, paramDefs={'Eta': lambda x : mHH, 'Pt': lambda x : cosHH})
-                noSel = SelectionWithDataDriven.create(parent   = noSel,
-                                                       name     = 'noSel'+benchmark,
-                                                       ddSuffix = benchmark,
-                                                       cut      = op.c_bool(True),
-                                                       ddCut    = op.c_bool(True),
-                                                       weight   = op.c_float(1.),
-                                                       ddWeight = reweightLO(op.c_float(1.)),
-                                                       enable   = True)
-                reweights[benchmark] = reweightLO(op.c_float(1.))
-            else:
-                print("Could not find file {}".format(json_file))
+        if self.args.reweighting:
+            for benchmark in benchmarks:
+                json_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),'data','ScaleFactors_GGF_LO','{}_to_{}_{}.json'.format(sample,benchmark,era))
+                if os.path.exists(json_file):
+                    print("Found file {}".format(json_file))
+                    reweightLO = get_scalefactor("lepton", json_file, paramDefs={'Eta': lambda x : mHH, 'Pt': lambda x : cosHH})
+                    selections[benchmark] = SelectionWithDataDriven.create(
+                                                           parent   = noSel,
+                                                           name     = 'noSel'+benchmark,
+                                                           ddSuffix = benchmark,
+                                                           cut      = op.c_bool(True),
+                                                           ddCut    = op.c_bool(True),
+                                                           weight   = op.c_float(1.),
+                                                           ddWeight = reweightLO(op.c_float(1.)),
+                                                           enable   = True)
+                    reweights[benchmark] = reweightLO(op.c_float(1.))
+                else:
+                    print("Could not find file {}".format(json_file))
 
         # Plots #
         plots = []
@@ -75,39 +136,40 @@ class SignalReweightingHistogramNano(NanoAODHistoModule,DataDrivenBackgroundHist
             plots.append(Plot.make1D("weight_{}".format(name),
                                      reweight,
                                      noSel,
-                                     EquidistantBinning(1000,0,5.),
+                                     EquidistantBinning(100,0,5.),
                                      xTitle = 'weight'))
                     
-        plots.append(Plot.make2D("mHHvsCosThetaStar",
-                                 [mHH,cosHH],
-                                 noSel,
-                                 [VariableBinning([250.,270.,290.,310.,330.,
-                                                   350.,370.,390.,410.,430.,
-                                                   450.,470.,490.,510.,530.,
-                                                   550.,570.,590.,610.,630.,
-                                                   650.,670.,700.,750.,800.,
-                                                   850.,900.,950.,1000.,1100.,
-                                                   1200.,1300.,1400.,1500.,1750.,2000.,5000.]),
-                                  VariableBinning([ 0.0, 0.4, 0.6, 0.8, 1.0 ])],
-                                 xTitle = 'm_{HH}',
-                                 yTitle = 'cos(#theta^{*})'))
-        plots.append(Plot.make1D("mHH",
-                                 mHH,
-                                 noSel,
-                                 VariableBinning([250.,270.,290.,310.,330.,
-                                                  350.,370.,390.,410.,430.,
-                                                  450.,470.,490.,510.,530.,
-                                                  550.,570.,590.,610.,630.,
-                                                  650.,670.,700.,750.,800.,
-                                                  850.,900.,950.,1000.,1100.,
-                                                  1200.,1300.,1400.,1500.,1750.,2000.,5000.]),
-                                 xTitle = 'm_{HH}'))
-        plots.append(Plot.make1D("cosThetaStar",
-                                 cosHH,
-                                 noSel,
-                                 VariableBinning([ 0.0, 0.4, 0.6, 0.8, 1.0 ]),
-                                 xTitle = 'cos(#theta^{*})'))
-                
+        for selName,sel in selections.items():
+            plots.append(Plot.make2D(f"mHHvsCosThetaStar{selName}",
+                                     [mHH,cosHH],
+                                     sel,
+                                     [VariableBinning([250.,270.,290.,310.,330.,
+                                                       350.,370.,390.,410.,430.,
+                                                       450.,470.,490.,510.,530.,
+                                                       550.,570.,590.,610.,630.,
+                                                       650.,670.,700.,750.,800.,
+                                                       850.,900.,950.,1000.,1100.,
+                                                       1200.,1300.,1400.,1500.,1750.,2000.,5000.]),
+                                      VariableBinning([ 0.0, 0.4, 0.6, 0.8, 1.0 ])],
+                                     xTitle = 'm_{HH}',
+                                     yTitle = 'cos(#theta^{*})'))
+            plots.append(Plot.make1D(f"mHH{selName}",
+                                     mHH,
+                                     sel,
+                                     VariableBinning([250.,270.,290.,310.,330.,
+                                                      350.,370.,390.,410.,430.,
+                                                      450.,470.,490.,510.,530.,
+                                                      550.,570.,590.,610.,630.,
+                                                      650.,670.,700.,750.,800.,
+                                                      850.,900.,950.,1000.,1100.,
+                                                      1200.,1300.,1400.,1500.,1750.,2000.,5000.]),
+                                     xTitle = 'm_{HH}'))
+            plots.append(Plot.make1D(f"cosThetaStar{selName}",
+                                     cosHH,
+                                     sel,
+                                     VariableBinning([ 0.0, 0.4, 0.6, 0.8, 1.0 ]),
+                                     xTitle = 'cos(#theta^{*})'))
+                    
         return plots
 
 

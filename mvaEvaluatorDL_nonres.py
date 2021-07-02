@@ -93,9 +93,7 @@ def returnHighLevelMVAInputs(self,l1,l2,met,jets,bjets,electrons,muons,channel):
     else:
         raise RuntimeError("Wrong selection to be used by the DNN")
 
-    return {#('m_bb',                   'Di-bjet invariant mass [GeV]',            (100,0.,1000.))   : op.multiSwitch((op.rng_len(bjets) == 0, op.c_float(0.)),
-            #                                                                                                         (op.rng_len(bjets) == 1, bjets[0].p4.M()),
-            #                                                                                                         op.invariant_mass(bjets[0].p4,bjets[1].p4)),
+    return {
             ('m_bb_bregcorr',          'Di-bjet invariant mass (regcorr) [GeV]',  (100,0.,1000.))   : op.multiSwitch((op.rng_len(bjets) == 0, op.c_float(0.)),
                                                                                                                      (op.rng_len(bjets) == 1, self.HLL.getCorrBp4(bjets[0]).M()),
                                                                                                                      op.invariant_mass(self.HLL.getCorrBp4(bjets[0]),self.HLL.getCorrBp4(bjets[1]))),
@@ -112,19 +110,12 @@ def returnHighLevelMVAInputs(self,l1,l2,met,jets,bjets,electrons,muons,channel):
                                                                                                                 op.c_float(0.)),
             ('m_ll',                   'Dilepton invariant mass [GeV]',           (100,0.,1000.))   : op.invariant_mass(l1.p4,l2.p4),
             ('dr_ll',                  'Dilepton #Delta R',                       (25,0.,5.))       : op.deltaR(l1.p4,l2.p4),
-            #('dphi_ll',                'Dilepton #Delta #Phi',                    (32,-3.2,3.2))    : op.abs(op.deltaPhi(l1.p4,l2.p4)),
             ('min_dr_jet',             'Min(#Delta R(jets))',                     (25,0.,5.))       : op.switch(op.rng_len(dijets) > 0,
                                                                                                                 op.rng_min(dijets,lambda dijet : op.deltaR(dijet[0].p4,dijet[1].p4)),
                                                                                                                 op.c_float(0.)),
             ('min_dphi_jet',           'Min(#Delta #Phi(jets))',                  (16,0.,3.2))      : op.switch(op.rng_len(dijets) > 0,
                                                                                                                 rng_min(dijets,lambda dijet : op.abs(op.deltaPhi(dijet[0].p4,dijet[1].p4)),typeName='double'),
                                                                                                                 op.c_float(0.)),
-            #('m_hh_simplemet',         'M_{HH} (simple MET) [GeV]',               (100,0.,1000.))   : op.invariant_mass(op.rng_sum(bjets,
-            #                                                                                                                       lambda bjet : bjet.p4,
-            #                                                                                                                       start=self.HLL.empty_p4),
-            #                                                                                                            l1.p4,
-            #                                                                                                            l2.p4,
-            #                                                                                                            met.p4),
             ('m_hh_simplemet_bregcorr','M_{HH} (simple MET) (regcorr) [GeV]',     (100,0.,1000.))   : op.invariant_mass(op.rng_sum(bjets,
                                                                                                                                    lambda bjet : self.HLL.getCorrBp4(bjet),
                                                                                                                                    start=self.HLL.empty_p4),
@@ -135,9 +126,6 @@ def returnHighLevelMVAInputs(self,l1,l2,met,jets,bjets,electrons,muons,channel):
             ('dr_bb',                  'Di-bjet #Delta R',                        (25,0.,5.))       : op.switch(op.rng_len(bjets)>=2,
                                                                                                                 op.deltaR(bjets[0].p4,bjets[1].p4),
                                                                                                                 op.c_float(0.)),
-            #('dphi_bb',                'Di-bjet #Delta #Phi',                     (32,-3.2,3.2))    : op.switch(op.rng_len(bjets)>=2,
-            #                                                                                                    op.abs(op.deltaPhi(bjets[0].p4,bjets[1].p4)), 
-            #                                                                                                    op.c_float(0.)),
             ('min_dr_leps_b1',         'Min(#Delta R(lead bjet,dilepton))',       (25,0.,5.))       : op.switch(op.rng_len(bjets)>=1,
                                                                                                                 self.HLL.MinDR_part1_dipart(bjets[0],[l1,l2]),
                                                                                                                 op.c_float(0.)),
@@ -147,7 +135,6 @@ def returnHighLevelMVAInputs(self,l1,l2,met,jets,bjets,electrons,muons,channel):
             ('lep1_conept',            'Lead lepton cone-P_T [GeV]',              (40,0.,200.))     : op.switch(l1conept(l1) >= l2conept(l2) , l1conept(l1) , l2conept(l2)),
             ('lep2_conept',            'Sublead lepton cone-P_T [GeV]',           (40,0.,200.))     : op.switch(l1conept(l1) >= l2conept(l2) , l2conept(l2) , l1conept(l1)),
             ('mww_simplemet',          'M_{WW} (simple MET) [GeV]',               (100,0.,1000.))   : op.invariant_mass(l1.p4,l2.p4,met.p4),
-            #('n_btag',                 'N_b',                                     (6,0.,5.))        : op.static_cast("UInt_t",op.rng_len(self.ak4BJets)),
             ('vbf_tag',                'VBF tag',                                 (2,0.,2.))        : VBF_tag,
             ('boosted_tag',            'Boosted tag',                             (2,0.,2.))        : op.c_int(op.OR(op.rng_len(self.ak8BJets) > 0,           # Boosted 1B
                                                                                                                      op.AND(op.rng_len(self.ak8BJets) == 0,   # Boosted 0B
