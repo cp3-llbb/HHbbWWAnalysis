@@ -1,6 +1,8 @@
 import os
+import re
 import sys
 import json
+import yaml
 import copy
 from itertools import chain
 from functools import partial
@@ -9,7 +11,7 @@ from bamboo import treefunctions as op
 from bamboo.analysismodules import NanoAODModule, NanoAODHistoModule, NanoAODSkimmerModule
 from bamboo.analysisutils import makeMultiPrimaryDatasetTriggerSelection
 from bamboo.scalefactors import binningVariables_nano, BtagSF, get_scalefactor
-from bamboo.plots import SelectionWithDataDriven,CutFlowReport
+from bamboo.plots import Plot, EquidistantBinning, SelectionWithDataDriven, CutFlowReport
 from bamboo.analysisutils import forceDefine
 from bamboo.root import loadLibrary, loadHeader
 
@@ -142,6 +144,11 @@ One lepton and and one jet argument must be specified in addition to the require
                             action      = "store_true",
                             default     = False,
                             help        = "Select the events do not have any tau overlapped with fakeable leptons")
+        parser.add_argument("--SS", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Same sign leptons")
+
 
         #----- Jet selection arguments -----#
         parser.add_argument("--Ak4", 
@@ -329,7 +336,6 @@ One lepton and and one jet argument must be specified in addition to the require
     #                                   customizeAnalysisCfg                                    #
     #-------------------------------------------------------------------------------------------#
     def _customizeAnalysisCfg(self,analysisCfg):
-        import yaml
         samples = {} 
         if self.args.subset is None:
             return
@@ -346,7 +352,13 @@ One lepton and and one jet argument must be specified in addition to the require
                 foundArgs.update(keys)
                 subsets.append(item['config'])
                 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'Yaml',item['config'])) as handle:
-                    samples.update(yaml.load(handle,yaml.SafeLoader))
+                    subsetDict = yaml.load(handle,yaml.SafeLoader)
+                for sampleName,sampleCfg in subsetDict.items():
+                    if self.args.analysis == 'res' and 'type' in sampleCfg.keys() and sampleCfg['type'] == 'signal':
+                        mass = float(re.findall('M-\d+',sampleName)[0].replace('M-',''))
+                        if mass not in self.args.mass:
+                            continue
+                    samples[sampleName] = sampleCfg
         self.analysisConfig['samples'] = samples
         notFoundArgs = [arg for arg in reqArgs if arg not in foundArgs]
         if len(notFoundArgs)>0:
@@ -355,6 +367,24 @@ One lepton and and one jet argument must be specified in addition to the require
             print ("Imported following yaml subsets :")
             for subset in subsets:
                 print ('... {}'.format(subset))
+
+    #-------------------------------------------------------------------------------------------#
+    #                                        counters                                           #
+    #-------------------------------------------------------------------------------------------#
+    def readCounters(self, resultsFile):
+        counters = super(BaseNanoHHtobbWW, self).readCounters(resultsFile)
+        # TH samples correction #
+        if 'generated_sum_corrected' in [key.GetName() for key in resultsFile.GetListOfKeys()]:
+            counters["genEventSumw_fixed"] = resultsFile.Get('generated_sum_corrected').GetBinContent(1)
+        return counters
+
+    def mergeCounters(self, outF, infileNames, sample=None):
+        super(BaseNanoHHtobbWW, self).mergeCounters(outF, infileNames, sample)
+        if 'generated_sum_corrected' in [key.GetName() for key in outF.GetListOfKeys()]: # Main file
+            self.generated_sum_corrected = copy.deepcopy(outF.Get('generated_sum_corrected'))
+        else: # All the additional files ("datadriven")
+            if hasattr(self,'generated_sum_corrected'): 
+                self.generated_sum_corrected.Write()
 
     #-------------------------------------------------------------------------------------------#
     #                                       prepareTree                                         #
@@ -377,7 +407,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                                                  isMC            = self.is_MC,
                                                                                                  systVariations  = [ (nanoJetMETCalc_METFixEE2017 if era == "2017" else nanoJetMETCalc), nanoFatJetCalc]),
                                                                                                  # will do Jet and MET variations, and not the Rochester correction
-                                                                               lazyBackend   = (self.args.backend == "lazy" or self.args.onlypost))
+                                                                               backend       = ("lazy" if self.args.onlypost else self.args.backend))
     
 
         #----- Helper classes declaration ----#
@@ -456,6 +486,10 @@ One lepton and and one jet argument must be specified in addition to the require
             # len(LHEScaleWeight) different (usually 44 ?!)
             #   -> nominal = up = down = 1.
             if hasattr(tree,"LHEScaleWeight"):
+                factor = 1.
+                if sample.startswith('DYToLL_0J') or sample.startswith('DYToLL_1J'):
+                    # Bug of factor 0.5, see https://hypernews.cern.ch/HyperNews/CMS/get/generators/4383.html?inline=-1
+                    factor = 2.
                 self.scaleWeight = op.multiSwitch((op.AND(op.rng_len(tree.LHEScaleWeight) == 9, tree.LHEScaleWeight[4] != 0.),
                                                                         op.systematic(op.c_float(1.),    #tree.LHEScaleWeight[4],
                                                                                       name       = "ScaleWeight",
@@ -584,6 +618,7 @@ One lepton and and one jet argument must be specified in addition to the require
                                   smear                 = "Summer16_25nsV1_MC", 
                                   jesUncertaintySources = "Merged",
                                   uncertaintiesFallbackJetType = "AK4PFchs",
+                                  mcYearForFatJets      = era, 
                                   regroupTag            = "V2",
                                   enableSystematics     = lambda v : not "jesTotal" in v,
                                   mayWriteCache         = isNotWorker, 
@@ -622,6 +657,7 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
+                                  mcYearForFatJets      = era, 
                                   regroupTag            = "V2",
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
@@ -849,6 +885,8 @@ One lepton and and one jet argument must be specified in addition to the require
         self.era = era
         self.tree = t
 
+        self.base_plots = []
+
         ###########################################################################
         #                              Pseudo-data                                #
         ###########################################################################
@@ -959,12 +997,19 @@ One lepton and and one jet argument must be specified in addition to the require
         ###########################################################################
         #                               tH samples                                #
         ###########################################################################
-        #if sample.startswith('TH'):
-        #    # https://twiki.cern.ch/twiki/bin/viewauth/CMS/SingleTopHiggsGeneration13TeV
-        #    # https://twiki.cern.ch/twiki/pub/CMS/SingleTopHiggsGeneration13TeV/reweight_encondig.txt
-        #    # 
-        #    print ('Applied tH LHE weights')
-        #    noSel = noSel.refine("tHWeight",weight=t.LHEReweightingWeight[11])
+        if sample.startswith('TH'):
+            # https://twiki.cern.ch/twiki/bin/viewauth/CMS/SingleTopHiggsGeneration13TeV
+            # https://twiki.cern.ch/twiki/pub/CMS/SingleTopHiggsGeneration13TeV/reweight_encondig.txt
+            # 
+            print ('Applied tH LHE weights')
+            noSel = noSel.refine("tHWeight",weight=t.LHEReweightingWeight[11])
+            # Record value for generated-sum
+            self.base_plots.append(Plot.make1D("generated_sum_corrected",
+                                               op.c_float(0.5),
+                                               noSel,
+                                               EquidistantBinning(1,0.,1.),
+                                               weight=t.LHEReweightingWeight[11]*t.genWeight, 
+                                               autoSyst=False))
 
         #############################################################################
         #                            Pre-firing rates                               #
@@ -1446,8 +1491,8 @@ One lepton and and one jet argument must be specified in addition to the require
 
             ####  Electrons ####
             if era == "2016" or era == "2017": # Electron reco eff depend on Pt for 2016 and 2017
-                self.elLooseRecoPtLt20 = self.SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptlt20'), combine="weight", systName="el_looserecoptlt20", defineOnFirstUse=(not forSkimmer))
-                self.elLooseRecoPtGt20 = self.SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptgt20'), combine="weight", systName="el_looserecoptgt20", defineOnFirstUse=(not forSkimmer))
+                self.elLooseRecoPtLt20 = self.SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptlt20'), combine="weight", systName="el_loosereco", defineOnFirstUse=(not forSkimmer))
+                self.elLooseRecoPtGt20 = self.SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptgt20'), combine="weight", systName="el_loosereco", defineOnFirstUse=(not forSkimmer))
                 # /!\ In analysis YAML file 2016 and 2017 for systematics : must use el_looserecoptlt20 and el_looserecoptgt20
 
             elif era == "2018": # Does not depend on pt for 2018
@@ -1875,7 +1920,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                 continue
                             crossSection = [sampleCfg['cross-section'] for sampleCfg in contribPerChannel.values()]
                             if len(set(crossSection)) != 1:
-                                raise RuntimeError(f"Not all LO samples for channel {channel} have the same cross-section")
+                                print(f"Not all LO samples for channel {channel} have the same cross-section, will use 1. as default")
+                                crossSection = 1.
                             else:
                                 crossSection = crossSection[0]
                             if all(['branching-ratio' in sampleCfg for sampleCfg in contribPerChannel.values()]):
@@ -1900,7 +1946,6 @@ One lepton and and one jet argument must be specified in addition to the require
                                     hist = None
                                     for sample,f in files.items():
                                         h = f.Get(hName)
-                                        #h.Scale(generatedEventsSum/(generatedEvents[sample]*len(generatedEvents)))
                                         h.Scale(1./(generatedEvents[sample]))
                                         if hist is None:
                                             hist = copy.deepcopy(h)
@@ -1936,17 +1981,41 @@ One lepton and and one jet argument must be specified in addition to the require
     ###########################################################################
     #                                  HME                                    #
     ###########################################################################
-    def computeHMEAfterLeptonSelections(self, sel, l1, l2, bjets, met):
+    def computeResolvedHMEAfterLeptonSelections(self, sel, l1, l2, bjets, met):
         if self.args.analysis != 'res':
             raise RuntimeError('HME was only implemented for resonant analysis')
 
-        hme_pair = self.hmeEval.runHME(l1.p4, l2.p4, bjets[0].p4, bjets[1].p4, met.p4, self.tree.event)
-        hme_pair = op.switch(op.rng_len(bjets) >= 2, hme_pair, op.construct(op.typeOf(hme_pair), [op.c_float(0.), op.c_float(0.)]))
+        hme_pair = self.hmeEval.runHME(l1.p4, l2.p4, bjets[0].p4, bjets[1].p4, met.p4, self.tree.event, op.c_bool(False))
+        hme_pair = op.switch(op.rng_len(bjets) >= 2, 
+                             hme_pair, 
+                             op.construct(op.typeOf(hme_pair), [op.c_float(0.), op.c_float(0.)]))
+
         hme_pair = op.forSystematicVariation(hme_pair, "jet", "nominal")   # no variations, always nominal
         forceDefine(hme_pair, sel)
         hme = hme_pair.first
         eff = hme_pair.second
         forceDefine(hme, sel)
+        forceDefine(eff, sel)
+
+        return hme,eff
+
+    def computeBoostedHMEAfterLeptonSelections(self, sel, l1, l2, fatjets, met):
+        if self.args.analysis != 'res':
+            raise RuntimeError('HME was only implemented for resonant analysis')
+
+        empty_p4 = op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >",([op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.)]))
+
+        hme_pair = self.hmeEval.runHME(l1.p4, l2.p4, fatjets[0].subJet1.p4, fatjets[0].subJet2.p4, met.p4, self.tree.event, op.c_bool(True))
+        hme_pair = op.switch(op.rng_len(fatjets) >= 1, 
+                             hme_pair, 
+                             op.construct(op.typeOf(hme_pair), [op.c_float(0.), op.c_float(0.)]))
+
+        hme_pair = op.forSystematicVariation(hme_pair, "jet", "nominal")   # no variations, always nominal
+        forceDefine(hme_pair, sel)
+        hme = hme_pair.first
+        eff = hme_pair.second
+        forceDefine(hme, sel)
+        forceDefine(eff, sel)
 
         return hme,eff
 

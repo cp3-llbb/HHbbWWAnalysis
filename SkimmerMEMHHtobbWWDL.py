@@ -11,7 +11,6 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)))) # Add 
 from BaseHHtobbWW import BaseNanoHHtobbWW
 from selectionDef import *
 from highlevelLambdas import *
-from mvaEvaluatorDL import *
 
 #===============================================================================================#
 #                                 SkimmerHHtobbWW                                               #
@@ -106,8 +105,9 @@ class SkimmerMEMNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         varsToKeep['is_ee'] = op.static_cast("UInt_t",op.rng_len(self.ElElTightSel)>0)
         varsToKeep['is_mm'] = op.static_cast("UInt_t",op.rng_len(self.MuMuTightSel)>0)
         varsToKeep['is_em'] = op.static_cast("UInt_t",op.rng_len(self.ElMuTightSel)>0)
-        varsToKeep['resolved_tag'] = op.static_cast("UInt_t",op.AND(op.rng_len(self.ak4BJets)>=1,op.rng_len(self.ak8BJets)==0))
-        varsToKeep['boosted_tag'] = op.static_cast("UInt_t",op.AND(op.rng_len(self.ak8BJets)>0))
+        varsToKeep['resolved1b_tag'] = op.static_cast("UInt_t",op.AND(op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0))
+        varsToKeep['resolved2b_tag'] = op.static_cast("UInt_t",op.AND(op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0))
+        varsToKeep['boosted1b_tag'] = op.static_cast("UInt_t",op.AND(op.rng_len(self.ak8BJets)>0))
 
         l1 = dilepton[0]
         l2 = dilepton[1]
@@ -133,77 +133,58 @@ class SkimmerMEMNanoHHtobbWWDL(BaseNanoHHtobbWW,SkimmerModule):
         varsToKeep['l2_charge'] = l2.charge
 
         #----- Jet variables -----#
-        empty_p4 = op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >",([op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.)]))
-        if any([self.args.__dict__[item] for item in ["Resolved0Btag","Resolved1Btag","Resolved2Btag"]]):
-#            if self.args.Resolved0Btag:
-#                j1 = self.ak4LightJetsByBtagScore[0]
-#                j2 = self.ak4LightJetsByBtagScore[1]
-#            if self.args.Resolved1Btag:
-#                j1 = self.ak4BJets[0]
-#                j2 = self.ak4LightJetsByBtagScore[0]
-#            if self.args.Resolved2Btag:
-#                j1 = self.ak4BJets[0]
-#                j2 = self.ak4BJets[1]
-            jets = self.ak4JetsByBtagScore
-
-            for idx in range(1,5):
-                varsToKeep[f'j{idx}_Px']  = op.switch(op.rng_len(jets)>=idx, jets[idx-1].p4.Px(), op.c_float(-9999))
-                varsToKeep[f'j{idx}_Py']  = op.switch(op.rng_len(jets)>=idx, jets[idx-1].p4.Py(), op.c_float(-9999))
-                varsToKeep[f'j{idx}_Pz']  = op.switch(op.rng_len(jets)>=idx, jets[idx-1].p4.Pz(), op.c_float(-9999))
-                varsToKeep[f'j{idx}_E']   = op.switch(op.rng_len(jets)>=idx, jets[idx-1].p4.E(), op.c_float(-9999))
-                varsToKeep[f'j{idx}_pt']  = op.switch(op.rng_len(jets)>=idx, jets[idx-1].pt, op.c_float(-9999))
-                varsToKeep[f'j{idx}_eta'] = op.switch(op.rng_len(jets)>=idx, jets[idx-1].eta, op.c_float(-9999))
-                varsToKeep[f'j{idx}_phi'] = op.switch(op.rng_len(jets)>=idx, jets[idx-1].phi, op.c_float(-9999))
-                varsToKeep[f'j{idx}_btag']= op.switch(op.rng_len(jets)>=idx, jets[idx-1].btagDeepFlavB, op.c_float(-9999))
+        jets = self.ak4JetsByBtagScore
+        for idx in range(1,5):
+            varsToKeep[f'j{idx}_Px']  = op.switch(op.rng_len(jets)>=idx, jets[idx-1].p4.Px(), op.c_float(-9999))
+            varsToKeep[f'j{idx}_Py']  = op.switch(op.rng_len(jets)>=idx, jets[idx-1].p4.Py(), op.c_float(-9999))
+            varsToKeep[f'j{idx}_Pz']  = op.switch(op.rng_len(jets)>=idx, jets[idx-1].p4.Pz(), op.c_float(-9999))
+            varsToKeep[f'j{idx}_E']   = op.switch(op.rng_len(jets)>=idx, jets[idx-1].p4.E(), op.c_float(-9999))
+            varsToKeep[f'j{idx}_pt']  = op.switch(op.rng_len(jets)>=idx, jets[idx-1].pt, op.c_float(-9999))
+            varsToKeep[f'j{idx}_eta'] = op.switch(op.rng_len(jets)>=idx, jets[idx-1].eta, op.c_float(-9999))
+            varsToKeep[f'j{idx}_phi'] = op.switch(op.rng_len(jets)>=idx, jets[idx-1].phi, op.c_float(-9999))
+            varsToKeep[f'j{idx}_btag']= op.switch(op.rng_len(jets)>=idx, jets[idx-1].btagDeepFlavB, op.c_float(-9999))
 
 
-            varsToKeep['n_ak4'] = op.static_cast("UInt_t",op.rng_len(self.ak4Jets))
-            varsToKeep['n_ak4_btag'] = op.static_cast("UInt_t",op.rng_len(self.ak4BJets))
+        varsToKeep['n_ak4'] = op.static_cast("UInt_t",op.rng_len(self.ak4Jets))
+        varsToKeep['n_ak4_btag'] = op.static_cast("UInt_t",op.rng_len(self.ak4BJets))
 
 
         #----- Fatjet variables -----#
-        if any([self.args.__dict__[item] for item in ["Ak8","Boosted0Btag","Boosted1Btag"]]):
-            if self.args.Ak8:
-                fatjet = self.ak8Jets[0]
-            if self.args.Boosted0Btag:
-                fatjet = self.ak8Jets[0]
-            if self.args.Boosted1Btag:
-                fatjet = self.ak8BJets[0]
+        fatjets = self.ak8BJets
+        subJet1 = fatjets[0].subJet1
+        subJet2 = fatjets[0].subJet2
 
-            j1 = fatjet.subJet1
-            j2 = fatjet.subJet2
+        varsToKeep['fatj_sub1_Px']   = op.switch(op.rng_len(fatjets)>0, subJet1.p4.Px(), op.c_float(-9999))
+        varsToKeep['fatj_sub1_Py']   = op.switch(op.rng_len(fatjets)>0, subJet1.p4.Py(), op.c_float(-9999))
+        varsToKeep['fatj_sub1_Pz']   = op.switch(op.rng_len(fatjets)>0, subJet1.p4.Pz(), op.c_float(-9999))
+        varsToKeep['fatj_sub1_E']    = op.switch(op.rng_len(fatjets)>0, subJet1.p4.E(), op.c_float(-9999))
+        varsToKeep['fatj_sub1_pt']   = op.switch(op.rng_len(fatjets)>0, subJet1.pt, op.c_float(-9999))
+        varsToKeep['fatj_sub1_eta']  = op.switch(op.rng_len(fatjets)>0, subJet1.eta, op.c_float(-9999))
+        varsToKeep['fatj_sub1_phi']  = op.switch(op.rng_len(fatjets)>0, subJet1.phi, op.c_float(-9999))
+        varsToKeep['fatj_sub1_btag'] = op.switch(op.rng_len(fatjets)>0, subJet1.btagDeepB, op.c_float(-9999))
 
-            varsToKeep['j1_Px']  = j1.p4.Px()
-            varsToKeep['j1_Py']  = j1.p4.Py()
-            varsToKeep['j1_Pz']  = j1.p4.Pz()
-            varsToKeep['j1_E']   = j1.p4.E()
-            varsToKeep['j1_pt']  = j1.pt
-            varsToKeep['j1_eta'] = j1.eta
-            varsToKeep['j1_phi'] = j1.phi
-            varsToKeep['j1_btag']= j1.btagDeepB
+        varsToKeep['fatj_sub2_Px']   = op.switch(op.rng_len(fatjets)>0, subJet2.p4.Px(), op.c_float(-9999))
+        varsToKeep['fatj_sub2_Py']   = op.switch(op.rng_len(fatjets)>0, subJet2.p4.Py(), op.c_float(-9999))
+        varsToKeep['fatj_sub2_Pz']   = op.switch(op.rng_len(fatjets)>0, subJet2.p4.Pz(), op.c_float(-9999))
+        varsToKeep['fatj_sub2_E']    = op.switch(op.rng_len(fatjets)>0, subJet2.p4.E(), op.c_float(-9999))
+        varsToKeep['fatj_sub2_pt']   = op.switch(op.rng_len(fatjets)>0, subJet2.pt, op.c_float(-9999))
+        varsToKeep['fatj_sub2_eta']  = op.switch(op.rng_len(fatjets)>0, subJet2.eta, op.c_float(-9999))
+        varsToKeep['fatj_sub2_phi']  = op.switch(op.rng_len(fatjets)>0, subJet2.phi, op.c_float(-9999))
+        varsToKeep['fatj_sub2_btag'] = op.switch(op.rng_len(fatjets)>0, subJet2.btagDeepB, op.c_float(-9999))
 
-            varsToKeep['j2_Px']  = j2.p4.Px()
-            varsToKeep['j2_Py']  = j2.p4.Py()
-            varsToKeep['j2_Pz']  = j2.p4.Pz()
-            varsToKeep['j2_E']   = j2.p4.E()
-            varsToKeep['j2_pt']  = j2.pt
-            varsToKeep['j2_eta'] = j2.eta
-            varsToKeep['j2_phi'] = j2.phi
-            varsToKeep['j2_btag']= j2.btagDeepB
+        varsToKeep['fatj_Px']             = op.switch(op.rng_len(fatjets)>0, fatjets[0].p4.Px(), op.c_float(-9999))
+        varsToKeep['fatj_Py']             = op.switch(op.rng_len(fatjets)>0, fatjets[0].p4.Py(), op.c_float(-9999))
+        varsToKeep['fatj_Pz']             = op.switch(op.rng_len(fatjets)>0, fatjets[0].p4.Pz(), op.c_float(-9999))
+        varsToKeep['fatj_E']              = op.switch(op.rng_len(fatjets)>0, fatjets[0].p4.E(), op.c_float(-9999))
+        varsToKeep['fatj_pt']             = op.switch(op.rng_len(fatjets)>0, fatjets[0].pt, op.c_float(-9999))
+        varsToKeep['fatj_eta']            = op.switch(op.rng_len(fatjets)>0, fatjets[0].eta, op.c_float(-9999))
+        varsToKeep['fatj_phi']            = op.switch(op.rng_len(fatjets)>0, fatjets[0].phi, op.c_float(-9999))
+        varsToKeep['fatj_softdropMass']   = op.switch(op.rng_len(fatjets)>0, fatjets[0].msoftdrop, op.c_float(-9999))
+        varsToKeep['fatj_btagDeepB']      = op.switch(op.rng_len(fatjets)>0, fatjets[0].btagDeepB, op.c_float(-9999))
+        varsToKeep['fatj_btagHbb']        = op.switch(op.rng_len(fatjets)>0, fatjets[0].btagHbb, op.c_float(-9999))
 
-            varsToKeep['fatjet_Px']  = fatjet.p4.Px()
-            varsToKeep['fatjet_Py']  = fatjet.p4.Py()
-            varsToKeep['fatjet_Pz']  = fatjet.p4.Pz()
-            varsToKeep['fatjet_E']   = fatjet.p4.E()
-            varsToKeep['fatjet_pt']  = fatjet.pt
-            varsToKeep['fatjet_eta'] = fatjet.eta
-            varsToKeep['fatjet_phi'] = fatjet.phi
-            varsToKeep['fatjet_softdropMass'] = fatjet.msoftdrop
-            varsToKeep['fatjet_btagDeepB'] = fatjet.btagDeepB
-            varsToKeep['fatjet_btagHbb'] = fatjet.btagHbb
-
-            varsToKeep['n_ak8'] = op.static_cast("UInt_t",op.rng_len(self.ak8Jets))
-            varsToKeep['n_ak8_btag'] = op.static_cast("UInt_t",op.rng_len(self.ak8BJets))
+        varsToKeep['n_ak8'] = op.static_cast("UInt_t",op.rng_len(self.ak8Jets))
+        varsToKeep['n_ak8_btag'] = op.static_cast("UInt_t",op.rng_len(self.ak8BJets))
 
         #----- Additional variables -----#
         if self.is_MC:

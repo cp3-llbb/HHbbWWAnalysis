@@ -26,12 +26,12 @@ class NonClosureSystematic:
         eigenValues , eigenVectors = np.linalg.eigh(cov)
 
         self.shape1_up   = lambda x : (self.coefficients[0] + np.sqrt(eigenValues[0]) * eigenVectors[0][0]) \
-                                    + (self.coefficients[1] + np.sqrt(eigenValues[0]) * eigenVectors[0][1]) * x
+                                    + (self.coefficients[1] + np.sqrt(eigenValues[0]) * eigenVectors[1][0]) * x
         self.shape1_down = lambda x : (self.coefficients[0] - np.sqrt(eigenValues[0]) * eigenVectors[0][0]) \
-                                    + (self.coefficients[1] - np.sqrt(eigenValues[0]) * eigenVectors[0][1]) * x
-        self.shape2_up   = lambda x : (self.coefficients[0] + np.sqrt(eigenValues[1]) * eigenVectors[1][0]) \
+                                    + (self.coefficients[1] - np.sqrt(eigenValues[0]) * eigenVectors[1][0]) * x
+        self.shape2_up   = lambda x : (self.coefficients[0] + np.sqrt(eigenValues[1]) * eigenVectors[0][1]) \
                                     + (self.coefficients[1] + np.sqrt(eigenValues[1]) * eigenVectors[1][1]) * x
-        self.shape2_down = lambda x : (self.coefficients[0] - np.sqrt(eigenValues[1]) * eigenVectors[1][0]) \
+        self.shape2_down = lambda x : (self.coefficients[0] - np.sqrt(eigenValues[1]) * eigenVectors[0][1]) \
                                     + (self.coefficients[1] - np.sqrt(eigenValues[1]) * eigenVectors[1][1]) * x
 
     def _makeTGraphs(self):

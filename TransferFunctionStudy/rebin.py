@@ -2,6 +2,17 @@ import numpy as np
 from array import array
 import ROOT
 
+def correctArray(array):
+    idx = np.logical_or(np.isinf(array),np.isnan(array))
+    if (idx*1).sum() > 0:
+        avg = (np.hstack((np.zeros((array.shape[0],1)),array[:,:-1])) + \
+               np.hstack((array[:,1:],np.zeros((array.shape[0],1))))  + \
+               np.vstack((np.zeros(array.shape[1]),array[:-1,:]))     + \
+               np.vstack((array[1:,:],np.zeros(array.shape[1])))) / 4
+        array[idx] = avg[idx]
+
+
+
 def getArray(h):
     xAxis = h.GetXaxis()
     yAxis = h.GetYaxis()
@@ -15,6 +26,8 @@ def getArray(h):
             error[ix,iy] = h.GetBinError(ix+1,iy+1)
     edges = [np.array([xAxis.GetBinLowEdge(i) for i in range(1,Nx+2)]),
              np.array([yAxis.GetBinLowEdge(i) for i in range(1,Ny+2)])]
+    correctArray(content)
+    correctArray(error)
     return content,error,edges
 
 
@@ -30,6 +43,7 @@ def fillHist(content,error,edges,name='h'):
 
     return h
 
+    
 
 
 def rebin2D(h,xnew,ynew,name='hist',capMin=None,capMax=None):
@@ -78,14 +92,10 @@ def rebin2D(h,xnew,ynew,name='hist',capMin=None,capMax=None):
     if capMax is not None: 
         arraynew[arraynew > capMax] = capMax
         errornew[errornew > capMax] = capMax
-    #import IPython
-    #IPython.embed()
-    print("Original bin content sum = {:0.6e}, rebinned content sum = {:0.6e} -> relative difference = {:0.6e}".format(array.sum(),arraynew.sum(),abs(arraynew.sum()-array.sum())/array.sum()))
-    print("Original bin error squared sum = {:0.6e}, rebinned error squared sum = {:0.6e} -> relative difference = {:0.6e}".format((error**2).sum(),(errornew**2).sum(),abs((errornew**2).sum()-(error**2).sum())/(error**2).sum()))
-    if abs(arraynew.sum()-array.sum())/array.sum() > 1e-5:
-        raise RuntimeError("Original bin content sum = {:0.6e}, rebinned content sum = {:0.6e} -> relative difference = {:0.6e} > 1e-5".format(array.sum(),arraynew.sum(),abs(arraynew.sum()-array.sum())/array.sum()))
-    if abs((errornew**2).sum()-(error**2).sum())/(error**2).sum() > 1e-5:
-        raise RuntimeError("Original bin error squared sum = {:0.6e}, rebinned error squared sum = {:0.6e} -> relative difference = {:0.6e} > 1e-5".format((error**2).sum(),(errornew**2).sum(),abs((errornew**2).sum()-(error**2).sum())/(error**2).sum()))
+    if abs(arraynew.sum()-array.sum())/array.sum() > 1e-3:
+        raise RuntimeError(f"Original bin content sum = {array.sum():0.6e}, rebinned content sum = {arraynew.sum():0.6e} -> relative difference = {abs(arraynew.sum()-array.sum())/array.sum():0.6e}")
+    if abs((errornew**2).sum()-(error**2).sum())/(error**2).sum() > 1e-3:
+        raise RuntimeError(f"Original bin error squared sum = {(error**2).sum():0.6e}, rebinned error squared sum = {(errornew**2).sum():0.6e} -> relative difference = {abs((errornew**2).sum()-(error**2).sum())/(error**2).sum():0.6e}")
 
     del array,error,edges
     hnew = fillHist(arraynew,errornew,edgesnew,name)

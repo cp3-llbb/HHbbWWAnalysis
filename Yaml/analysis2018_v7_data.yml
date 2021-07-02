@@ -10,7 +10,7 @@ SingleMuon_2018A:
   run_range:
   - 315252
   - 316995
-  split: 50
+  split: 20
 DoubleMuon_2018A:
   certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/DoubleMuon/Run2018A-02Apr2020-v1/NANOAOD
@@ -19,7 +19,7 @@ DoubleMuon_2018A:
   run_range:
   - 315252
   - 316995
-  split: 50
+  split: 20
 EGamma_2018A:
   certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/EGamma/Run2018A-02Apr2020-v1/NANOAOD
@@ -28,7 +28,7 @@ EGamma_2018A:
   run_range:
   - 315252
   - 316995
-  split: 50
+  split: 20
 MuonEG_2018A:
   certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/MuonEG/Run2018A-02Apr2020-v1/NANOAOD
@@ -37,7 +37,7 @@ MuonEG_2018A:
   run_range:
   - 315252
   - 316995
-  split: 50
+  split: 20
 
 ##### Run B
 SingleMuon_2018B:
@@ -48,7 +48,7 @@ SingleMuon_2018B:
   run_range:
   - 317080
   - 319310
-  split: 50
+  split: 20
 DoubleMuon_2018B:
   certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/DoubleMuon/Run2018B-02Apr2020-v1/NANOAOD
@@ -57,7 +57,7 @@ DoubleMuon_2018B:
   run_range:
   - 317080
   - 319310
-  split: 50
+  split: 20
 EGamma_2018B:
   certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/EGamma/Run2018B-02Apr2020-v1/NANOAOD
@@ -66,7 +66,7 @@ EGamma_2018B:
   run_range:
   - 317080
   - 319310
-  split: 50
+  split: 20
 MuonEG_2018B:
   certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/MuonEG/Run2018B-02Apr2020-v1/NANOAOD
@@ -75,7 +75,7 @@ MuonEG_2018B:
   run_range:
   - 317080
   - 319310
-  split: 50
+  split: 20
 
 ##### Run C
 SingleMuon_2018C:
@@ -86,7 +86,7 @@ SingleMuon_2018C:
   run_range:
   - 319337
   - 320065
-  split: 50
+  split: 20
 DoubleMuon_2018C:
   certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/DoubleMuon/Run2018C-02Apr2020-v1/NANOAOD
@@ -95,7 +95,7 @@ DoubleMuon_2018C:
   run_range:
   - 319337
   - 320065
-  split: 50
+  split: 20
 EGamma_2018C:
   certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/EGamma/Run2018C-02Apr2020-v1/NANOAOD
@@ -104,7 +104,7 @@ EGamma_2018C:
   run_range:
   - 319337
   - 320065
-  split: 50
+  split: 20
 MuonEG_2018C:
   certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/MuonEG/Run2018C-02Apr2020-v1/NANOAOD
@@ -113,7 +113,7 @@ MuonEG_2018C:
   run_range:
   - 319337
   - 320065
-  split: 50
+  split: 20
 
 ##### Run D
 SingleMuon_2018D:
@@ -124,7 +124,7 @@ SingleMuon_2018D:
   run_range:
   - 320673
   - 325175
-  split: 50
+  split: 20
 DoubleMuon_2018D:
   certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/DoubleMuon/Run2018D-02Apr2020-v1/NANOAOD
@@ -133,7 +133,7 @@ DoubleMuon_2018D:
   run_range:
   - 320673
   - 325175
-  split: 50
+  split: 20
 EGamma_2018D:
   certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/EGamma/Run2018D-02Apr2020-v1/NANOAOD
@@ -142,7 +142,7 @@ EGamma_2018D:
   run_range:
   - 320673
   - 325175
-  split: 50
+  split: 20
 MuonEG_2018D:
   certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
   db: das:/MuonEG/Run2018D-02Apr2020-v1/NANOAOD
@@ -151,5 +151,5 @@ MuonEG_2018D:
   run_range:
   - 320673
   - 325175
-  split: 50
+  split: 20
 

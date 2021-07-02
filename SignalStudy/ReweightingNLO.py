@@ -110,28 +110,30 @@ class ReweightingNLO:
             raise RuntimeError("There must be 5 couplings")
         self.couplings = couplings
 
-                
-converter = {
-    'node_SM' : 0,
-    'node_1'  : 1,
-    'node_2'  : 2,
-    'node_3'  : 3,
-    'node_4'  : 4,
-    'node_5'  : 5,
-    'node_6'  : 6,
-    'node_7'  : 7,
-    'node_8'  : 8,
-    'node_9'  : 9,
-    'node_10' : 10,
-    'node_11' : 11,
-    'node_12' : 12,
-}
-additional_couplings = {
+
+couplings = {
+    # Basic BM #
+    'SM'  : 0,
+    '1'   : 1,
+    '2'   : 2,
+    '3'   : 3,
+    '4'   : 4,
+    '5'   : 5,
+    '6'   : 6,
+    '7'   : 7,
+    '8'   : 8,
+    '9'   : 9,
+    '10'  : 10,
+    '11'  : 11,
+    '12'  : 12,
+    # Additional node for "classic" BM 
+    # -> https://link.springer.com/article/10.1007/JHEP09(2018)057
+    '8a'  : [1.,1.,0.5,0.8/3,0.],
     # NLO samples
-    'cHHH0'     : [0.,1.,0.,0.,0.],
-    'cHHH1'     : [1.,1.,0.,0.,0.],
-    'cHHH2p45'  : [2.45,1.,0.,0.,0.],
-    'cHHH5'     : [5.,1.,0.,0.,0.],
+    'cHHH0'    : [0.,1.,0.,0.,0.],
+    'cHHH1'    : [1.,1.,0.,0.,0.],
+    'cHHH2p45' : [2.45,1.,0.,0.,0.],
+    'cHHH5'    : [5.,1.,0.,0.,0.],
     # https://arxiv.org/pdf/1908.08923.pdf
     # -> to be reparameterized !!!
     # https://gitlab.cern.ch/hh/eft-benchmarks
@@ -142,9 +144,6 @@ additional_couplings = {
     'cluster5' : [3.95,1.17,-1./3,1./6*1.5,-0.5*(-3.)],
     'cluster6' : [5.68,0.83,1./3,-0.5*1.5,1./3*(-3.)],
     'cluster7' : [-0.10,0.94,1.,1./6*1.5,-1./6*(-3.)],
-    # Additional node for "classic" BM 
-    # -> https://link.springer.com/article/10.1007/JHEP09(2018)057
-    '8a'  : [1.,1.,0.5,0.8/3,0.],
 }
 
 
@@ -154,37 +153,21 @@ if __name__=="__main__":
                         help='Path to directory with the root files')
     parser.add_argument('--era', action='store', required=True, type=str,
                         help='era')
-    parser.add_argument('--one_to_one', action='store_true', required=False, default=False,
-                        help='LO->NLO with same couplings')
-    parser.add_argument('--one_to_many', action='store_true', required=False, default=False,
-                        help='LO-> all NLO')
     args = parser.parse_args()
 
-    for f in glob.glob(os.path.join(args.path,'*root')):
+    for f in sorted(glob.glob(os.path.join(args.path,'*root'))):
         if "__skeleton__" in f:
             continue
         sample = os.path.basename(f)
+        print (sample)
         reweight = ReweightingNLO(f,"mHHvsCosThetaStar")
-        if args.one_to_one:
-            idxBM = None
-            for node,idx in converter.items():
-                if node in sample:
-                    idxBM = idx
-            if idxBM is None:
-                raise RuntimeError("Could not identify the node")
-            reweight.SetBenchmark(idxBM)
-            reweight.SaveToJson("weights/{}_{}".format(sample.replace('.root',''),args.era))
-        if args.one_to_many:
-            for idxBM in range(0,13):
-                reweight.SetBenchmark(idxBM)
-                if idxBM == 0:
-                    idxBM = 'SM'
-                reweight.SaveToJson("weights/{}_to_Benchmark{}_{}".format(sample.replace('.root',''),idxBM,args.era))
-            for node, couplings in additional_couplings.items():
-                reweight.SetCouplings(couplings)
-                reweight.SaveToJson("weights/{}_to_Benchmark{}_{}".format(sample.replace('.root',''),node,args.era))
 
-
-
-
-
+        for BM,coupl in couplings.items():
+            if isinstance(coupl,int):
+                reweight.SetBenchmark(coupl)
+            elif isinstance(coupl,list):
+                assert len(coupl) == 5
+                reweight.SetCouplings(coupl)
+            else:
+                raise RuntimeError('Not understood couplings')
+            reweight.SaveToJson("weights/{}_to_Benchmark{}_{}".format(sample.replace('.root',''),BM,args.era))

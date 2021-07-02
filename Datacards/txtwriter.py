@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 from datetime import datetime
 
 from collections.abc import MutableMapping
@@ -94,7 +95,7 @@ class Processes(MutableMapping):
     def applyThreshold(self):
         for processName,process in self.items():
             if process.rate < threshold and process.index > 0: 
-                print (f"Bin {self.binName} - Process {processName} : yield {process.rate:0.5f} < threshold ({threshold})")
+                logging.debug(f"Bin {self.binName} - Process {processName} : yield {process.rate:0.5f} < threshold ({threshold})")
                 del self[processName]
 
     def getSystValuesPerProcess(self,systName):
@@ -116,6 +117,7 @@ class Writer:
         self.processes = {binName:Processes(binName) for binName in self.binNames}
         self.observations = {binName:-1 for binName in self.binNames}
         self.systNames = {}
+        self.footer = []
 
     def build(self):
         for processes in self.processes.values():
@@ -175,6 +177,10 @@ class Writer:
                      + sep)
             
 
+        # Footer #
+        for line in self.footer:
+            card.write(f"{line}{sep}")
+
         # AutoStats #
         for binName in self.binNames:
             card.write(f"{binName}".ljust(spaces)+"autoMCStats 10 0 1"+sep)
@@ -214,8 +220,8 @@ class Writer:
     def _addSystematic(self,binName,processName,**kwargs):
         if processName in self.processes[binName].keys():
             self.processes[binName].addSystematic(processName,**kwargs)
-        #else:
-        #    print (f'Process {processName} not found for systematic {kwargs["systName"]}')
+        else:
+            logging.debug(f'Process {processName} not found for systematic {kwargs["systName"]}')
 
     def addShapeSystematic(self,binName,processName,shapeName):
         self._addSystematic(binName,processName,systName=shapeName,systType='shape',systVal='1')
@@ -227,8 +233,12 @@ class Writer:
         elif isinstance(value,float):
             var = str(value)
         else:
-            raise RuntimeError("lnN systematic valu not understood")
+            raise RuntimeError("lnN systematic value not understood")
         self._addSystematic(binName,processName,systName=systName, systType='lnN',systVal=var)
+
+    def addFooter(self,line):
+        self.footer.append(line) 
+
         
 
 if __name__ == '__main__':

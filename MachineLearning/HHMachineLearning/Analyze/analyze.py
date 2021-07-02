@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import yaml
 import math
@@ -54,6 +55,15 @@ class Analyze:
             # Import arrays #
             data_dict = {}
 
+            if '$param' in self.inputs:
+                def findMassInSignal(sampleName):
+                    if "HH" not in sampleName:
+                        return None
+                    return float(re.findall('M-\d+',sampleName)[0].replace('M-',''))
+            else:
+                findMassInSignal = None
+
+
             for node in parameters.nodes:
                 logging.info('Starting data importation for class {}'.format(node))
                 data_node = None
@@ -73,6 +83,7 @@ class Analyze:
                                                       list_sample               = list_sample,
                                                       cut                       = parameters.cut,
                                                       eras                      = era,
+                                                      paramFun                  = findMassInSignal,
                                                       tree_name                 = parameters.tree_name,
                                                       additional_columns        = {'tag':node,'era':era},
                                                       stop                      = self.N) 
@@ -120,7 +131,7 @@ class Analyze:
 
     def loadDF(self):
         self.data = pd.read_pickle(self.cacheName)
-        logging.info("Loaded data from cache")
+        logging.info(f"Loaded data from cache : {self.cacheName}")
 
     def makeCorrelationMatrix(self):
         logging.info("Starting the correlation matrix plot")
@@ -206,7 +217,7 @@ class Analyze:
                     outputs_perm = self.model.predict(inputs_perm,batch_size=10000,verbose=0)
                 perm_f1_scores.append(f1_score(targets.argmax(1),outputs_perm.argmax(1),average='macro'))
             perm_f1_scores = np.array(perm_f1_scores)
-            f1_scores[idxPerm] = abs(perm_f1_scores.mean()-true_F1_score)
+            f1_scores[idxPerm] = abs(perm_f1_scores.mean()-true_F1_score)/true_F1_score
             f1_scores_err[idxPerm] = perm_f1_scores.std()
         
         idxSort = np.flip(np.argsort(f1_scores))

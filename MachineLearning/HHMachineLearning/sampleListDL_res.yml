@@ -140,7 +140,6 @@ sampleDict:
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-600.root
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-600.root
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-650.root
-      - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-650.root
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-750.root
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-800.root
@@ -283,7 +282,6 @@ sampleDict:
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-600.root
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-600.root
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-650.root
-      - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-650.root
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-750.root
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-800.root
@@ -426,7 +424,6 @@ sampleDict:
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-600.root
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-600.root
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-650.root
-      - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-650.root
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-750.root
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-800.root
@@ -569,7 +566,6 @@ sampleDict:
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-600.root
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-600.root
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-650.root
-      - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-650.root
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-750.root
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-800.root
@@ -712,7 +708,6 @@ sampleDict:
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-600.root
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-600.root
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-650.root
-      - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-650.root
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-750.root
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-800.root
@@ -855,7 +850,6 @@ sampleDict:
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-600.root
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-600.root
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-650.root
-      - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-650.root
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-750.root
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-800.root
@@ -998,7 +992,6 @@ sampleDict:
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-600.root
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-600.root
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-650.root
-      - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-650.root
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-750.root
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-800.root
@@ -1141,7 +1134,6 @@ sampleDict:
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-600.root
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-600.root
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-650.root
-      - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-650.root
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-750.root
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-800.root
@@ -1284,7 +1276,6 @@ sampleDict:
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-600.root
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-600.root
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-650.root
-      - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-650.root
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750.root
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-750.root
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-800.root

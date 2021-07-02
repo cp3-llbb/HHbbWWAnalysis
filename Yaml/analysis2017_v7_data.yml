@@ -10,7 +10,7 @@
     run_range:
     - 297046
     - 299329
-    split: 50
+    split: 20
   SingleElectron_2017B:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/SingleMuon/Run2017B-02Apr2020-v1/NANOAOD
@@ -19,7 +19,7 @@
     run_range:
     - 297046
     - 299329
-    split: 50
+    split: 20
   DoubleMuon_2017B:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleMuon/Run2017B-02Apr2020-v1/NANOAOD
@@ -28,7 +28,7 @@
     run_range:
     - 297046
     - 299329
-    split: 50
+    split: 20
   DoubleEGamma_2017B:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleEG/Run2017B-02Apr2020-v1/NANOAOD
@@ -37,7 +37,7 @@
     run_range:
     - 297046
     - 299329
-    split: 50
+    split: 20
   MuonEG_2017B:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/MuonEG/Run2017B-02Apr2020-v1/NANOAOD
@@ -46,7 +46,7 @@
     run_range:
     - 297046
     - 299329
-    split: 50
+    split: 20
 
 ####### Run C
   SingleMuon_2017C0:
@@ -58,7 +58,7 @@
     run_range:
     - 299368
     - 302029
-    split: 50
+    split: 20
   SingleMuon_2017C1:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/SingleMuon/Run2017C-02Apr2020-v1/NANOAOD
@@ -68,7 +68,7 @@
     run_range:
     - 299368
     - 302029
-    split: 5
+    split: 20
   SingleElectron_2017C0:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/SingleElectron/Run2017C-02Apr2020-v1/NANOAOD
@@ -78,7 +78,7 @@
     run_range:
     - 299368
     - 302029
-    split: 50
+    split: 20
   SingleElectron_2017C1:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/SingleElectron/Run2017C-02Apr2020-v1/NANOAOD
@@ -98,7 +98,7 @@
     run_range:
     - 299368
     - 302029
-    split: 50
+    split: 20
   DoubleMuon_2017C1:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/DoubleMuon/Run2017C-02Apr2020-v1/NANOAOD
@@ -108,7 +108,7 @@
     run_range:
     - 299368
     - 302029
-    split: 5
+    split: 20
   DoubleEGamma_2017C0:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/DoubleEG/Run2017C-02Apr2020-v1/NANOAOD
@@ -118,7 +118,7 @@
     run_range:
     - 299368
     - 302029
-    split: 50
+    split: 20
   DoubleEGamma_2017C1:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/DoubleEG/Run2017C-02Apr2020-v1/NANOAOD
@@ -138,7 +138,7 @@
     run_range:
     - 299368
     - 302029
-    split: 50
+    split: 20
   MuonEG_2017C1:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     #db: das:/MuonEG/Run2017C-02Apr2020-v1/NANOAOD
@@ -159,7 +159,7 @@
     run_range:
     - 302030
     - 303434
-    split: 50
+    split: 20
   SingleElectron_2017D:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/SingleElectron/Run2017D-02Apr2020-v1/NANOAOD
@@ -168,7 +168,7 @@
     run_range:
     - 302030
     - 303434
-    split: 50
+    split: 20
   DoubleMuon_2017D:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleMuon/Run2017D-02Apr2020-v1/NANOAOD
@@ -177,7 +177,7 @@
     run_range:
     - 302030
     - 303434
-    split: 50
+    split: 20
   DoubleEGamma_2017D:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleEG/Run2017D-02Apr2020-v1/NANOAOD
@@ -186,7 +186,7 @@
     run_range:
     - 302030
     - 303434
-    split: 50
+    split: 20
   MuonEG_2017D:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/MuonEG/Run2017D-02Apr2020-v1/NANOAOD
@@ -195,7 +195,7 @@
     run_range:
     - 302030
     - 303434
-    split: 50
+    split: 20
 
 ####### Run E
   SingleMuon_2017E:
@@ -206,7 +206,7 @@
     run_range:
     - 303824
     - 304826
-    split: 50
+    split: 20
   SingleElectron_2017E:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/SingleElectron/Run2017E-02Apr2020-v1/NANOAOD
@@ -215,7 +215,7 @@
     run_range:
     - 303824
     - 304826
-    split: 50
+    split: 20
   DoubleMuon_2017E:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleMuon/Run2017E-02Apr2020-v1/NANOAOD
@@ -224,7 +224,7 @@
     run_range:
     - 303824
     - 304826
-    split: 50
+    split: 20
   DoubleEGamma_2017E:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleEG/Run2017E-02Apr2020-v1/NANOAOD
@@ -233,7 +233,7 @@
     run_range:
     - 303824
     - 304826
-    split: 50
+    split: 20
   MuonEG_2017E:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/MuonEG/Run2017E-02Apr2020-v1/NANOAOD
@@ -242,7 +242,7 @@
     run_range:
     - 303824
     - 304826
-    split: 50
+    split: 20
 
 ####### Run F
   SingleMuon_2017F:
@@ -253,7 +253,7 @@
     run_range:
     - 305040
     - 306462
-    split: 50
+    split: 20
   SingleElectron_2017F:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/SingleElectron/Run2017F-02Apr2020-v1/NANOAOD
@@ -262,7 +262,7 @@
     run_range:
     - 305040
     - 306462
-    split: 50
+    split: 20
   DoubleMuon_2017F:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleMuon/Run2017F-02Apr2020-v1/NANOAOD
@@ -271,7 +271,7 @@
     run_range:
     - 305040
     - 306462
-    split: 50
+    split: 20
   DoubleEGamma_2017F:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/DoubleEG/Run2017F-02Apr2020-v1/NANOAOD
@@ -280,7 +280,7 @@
     run_range:
     - 305040
     - 306462
-    split: 50
+    split: 20
   MuonEG_2017F:
     certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
     db: das:/MuonEG/Run2017F-02Apr2020-v1/NANOAOD
@@ -289,5 +289,5 @@
     run_range:
     - 305040
     - 306462
-    split: 50
+    split: 20
 

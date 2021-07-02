@@ -16,41 +16,31 @@ def plotNumber(contName,cont,sel,Nmax,xTitle):
                         EquidistantBinning(Nmax,0.,Nmax),
                         xTitle=xTitle)]
 
-def plotMatching(contName,cont,sel,partName,bregCorr=False):
+def plotMatching(contName,cont,sel,partName):
     plots = []
 
-    plots.append(Plot.make1D(contName+"_deltaR",
-                             op.map(cont,lambda m : op.deltaR(m[0].p4,m[1].p4)), 
-                             sel,
-                             EquidistantBinning(1000,0.,0.2),
-                             xTitle="#Delta R(%s_{gen},%s_{reco})"%(partName,partName)))
-    plots.append(Plot.make1D(contName+"_deltaPtRel",
-                             op.map(cont,lambda m : (m[1].pt-m[0].pt)/(m[0].pt+m[1].pt)),
-                             sel,
-                             EquidistantBinning(1000,-1.,1.),
-                             xTitle="P_{T}(%s_{reco})-P_{T}(%s_{gen})/P_{T}(%s_{reco})+P_{T}(%s_{gen})"%(partName,partName,partName,partName)))
-    plots.append(Plot.make2D(contName+"_Pt2D",
-                             [op.map(cont,lambda m : m[0].pt),op.map(cont,lambda m : m[1].pt)],
-                             sel,
-                             [EquidistantBinning(1000,0,1000),EquidistantBinning(1000,0,1000)],
-                             xTitle="P_{T}(gen)",
-                             yTitle="P_{T}(reco)"))
+#    plots.append(Plot.make1D(contName+"_deltaR",
+#                             op.map(cont,lambda m : op.deltaR(m[0].p4,m[1].p4)), 
+#                             sel,
+#                             EquidistantBinning(1000,0.,0.2),
+#                             xTitle="#Delta R(%s_{gen},%s_{reco})"%(partName,partName)))
+#    plots.append(Plot.make1D(contName+"_deltaPtRel",
+#                             op.map(cont,lambda m : (m[1].pt-m[0].pt)/(m[0].pt+m[1].pt)),
+#                             sel,
+#                             EquidistantBinning(1000,-1.,1.),
+#                             xTitle="P_{T}(%s_{reco})-P_{T}(%s_{gen})/P_{T}(%s_{reco})+P_{T}(%s_{gen})"%(partName,partName,partName,partName)))
+#    plots.append(Plot.make2D(contName+"_Pt2D",
+#                             [op.map(cont,lambda m : m[0].pt),op.map(cont,lambda m : m[1].pt)],
+#                             sel,
+#                             [EquidistantBinning(1000,0,1000),EquidistantBinning(1000,0,1000)],
+#                             xTitle="P_{T}(gen)",
+#                             yTitle="P_{T}(reco)"))
     plots.append(Plot.make2D(contName+"_TF",
                              (op.map(cont,lambda m : m[0].p4.E()),op.map(cont,lambda m : m[1].p4.E()-m[0].p4.E())),
                              sel,
                              [EquidistantBinning(3000,0.,3000.),EquidistantBinning(8000,-1000.,1000.)],
                              xTitle="E^{parton}(e^{-})",
                              yTitle="#Delta E = E^{reco}(%s)-E^{parton}(%s)"%(partName,partName)))
-    if bregCorr:
-        def getCorrBp4(j):
-            return  op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >", (j.pt*j.bRegCorr, j.eta, j.phi, j.mass*j.bRegCorr)) 
-        plots.append(Plot.make2D(contName+"_TF_bregCorr",
-                                 (op.map(cont,lambda m : m[0].p4.E()),op.map(cont,lambda m : getCorrBp4(m[1]).E()-m[0].p4.E())),
-                                 sel,
-                                 [EquidistantBinning(3000,0.,3000.),EquidistantBinning(8000,-1000.,1000.)],
-                                 xTitle="E^{parton}(e^{-})",
-                                 yTitle="#Delta E = E^{reco}(%s)-E^{parton}(%s)"%(partName,partName)))
-
 
     return plots
 
@@ -67,45 +57,89 @@ def plotRecoForGen(sel,gen,reco,lambda_match,name):
                        xTitle = "N reco {} for each gen".format(name))
 
     return plots 
+def plotFatjetMatching(cont,sel,sub1,sub2):
+    plots = []
+
+    plots.append(Plot.make1D(f"fatjet{sub1}{sub2}_sub1_dE",
+                             op.map(cont,lambda m : m[2].subJet1.p4.E()-m[0].p4.E()),
+                             sel,
+                             EquidistantBinning(1000,-1000.,1000.),
+                             xTitle=f"subJet1 {sub1} E - gen {sub1} E"))
+    plots.append(Plot.make2D(f"fatjet{sub1}{sub2}_sub1_TF",
+                             [op.map(cont,lambda m : m[0].p4.E()),op.map(cont,lambda m : m[2].subJet1.p4.E()-m[0].p4.E())],
+                             sel,
+                             [EquidistantBinning(3000,0.,3000.),EquidistantBinning(8000,-1000.,1000.)],
+                             xTitle="E^{{parton}}({sub1})",
+                             yTitle=f"#Delta E = E^{{reco}}({sub1})-E^{{parton}}({sub1})"))
+
+    plots.append(Plot.make1D(f"fatjet{sub1}{sub2}_sub2_dE",
+                             op.map(cont,lambda m : m[2].subJet2.p4.E()-m[1].p4.E()),
+                             sel,
+                             EquidistantBinning(1000,-1000.,1000.),
+                             xTitle=f"subJet2 {sub2} E - gen {sub2} E"))
+    plots.append(Plot.make2D(f"fatjet{sub1}{sub2}_sub2_TF",
+                             [op.map(cont,lambda m : m[1].p4.E()),op.map(cont,lambda m : m[2].subJet1.p4.E()-m[1].p4.E())],
+                             sel,
+                             [EquidistantBinning(3000,0.,3000.),EquidistantBinning(8000,-1000.,1000.)],
+                             xTitle="E^{{parton}}({sub2})",
+                             yTitle=f"#Delta E = E^{{reco}}({sub2})-E^{{parton}}({sub2})"))
+
+    plots.append(Plot.make2D(f"fatjet{sub1}{sub2}_dE2D",
+                             [op.map(cont,lambda m : m[2].subJet1.p4.E()-m[0].p4.E()),op.map(cont,lambda m : m[2].subJet2.p4.E()-m[1].p4.E())],
+                             sel,
+                             [EquidistantBinning(1000,-1000.,1000.),EquidistantBinning(1000,-1000.,1000.)],
+                             xTitle=f"subJet1 {sub1} E - gen {sub1} E",
+                             yTitle=f"subJet2 {sub2} E - gen {sub2} E"))
+
+
+    return plots
 
 def fatjetPlots(sel,fatjets,name):
     plots = []
-    plots.append(Plot.make2D(name+'_Pt2D',
-                             [op.map(fatjets, lambda fatjet : fatjet.subJet1.pt),op.map(fatjets, lambda fatjet : fatjet.subJet2.pt)],
-                             sel,
-                             [EquidistantBinning(1000,0.,1000.),EquidistantBinning(1000,0.,1000.)],
-                             xTitle = "subjet 1 P_{T}",
-                             yTitle = "subjet 2 P_{T}"))
+#    plots.append(Plot.make2D(name+'_Pt2D',
+#                             [op.map(fatjets, lambda fatjet : fatjet.subJet1.pt),op.map(fatjets, lambda fatjet : fatjet.subJet2.pt)],
+#                             sel,
+#                             [EquidistantBinning(1000,0.,1000.),EquidistantBinning(1000,0.,1000.)],
+#                             xTitle = "subjet 1 P_{T}",
+#                             yTitle = "subjet 2 P_{T}"))
     plots.append(Plot.make2D(name+'_E2D',
                              [op.map(fatjets, lambda fatjet : fatjet.subJet1.p4.E()),op.map(fatjets, lambda fatjet : fatjet.subJet2.p4.E())],
                              sel,
                              [EquidistantBinning(1000,0.,1000.),EquidistantBinning(1000,0.,1000.)],
                              xTitle = "subjet 1 E",
                              yTitle = "subjet 2 E"))
-    plots.append(Plot.make2D(name+'_subjet1VSFatjet_E2D',
-                             [op.map(fatjets, lambda fatjet : fatjet.subJet1.p4.E()),op.map(fatjets, lambda fatjet : fatjet.p4.E())],
-                             sel,
-                             [EquidistantBinning(1000,0.,1000.),EquidistantBinning(1000,0.,1000.)],
-                             xTitle = "subjet 1 E",
-                             yTitle = "fatjet E"))
-    plots.append(Plot.make2D(name+'_subjet2VSFatjet_E2D',
-                             [op.map(fatjets, lambda fatjet : fatjet.subJet2.p4.E()),op.map(fatjets, lambda fatjet : fatjet.p4.E())],
-                             sel,
-                             [EquidistantBinning(1000,0.,1000.),EquidistantBinning(1000,0.,1000.)],
-                             xTitle = "subjet 2 E",
-                             yTitle = "fatjet E"))
-    plots.append(Plot.make2D(name+'_Eta2D',
-                             [op.map(fatjets, lambda fatjet : fatjet.subJet1.p4.eta()),op.map(fatjets, lambda fatjet : fatjet.subJet2.p4.eta())],
-                             sel,
-                             [EquidistantBinning(500,-2.5,2.5),EquidistantBinning(500,-2.5,2.5)],
-                             xTitle = "subjet 1 #eta",
-                             yTitle = "subjet 2 #eta"))
-    plots.append(Plot.make2D(name+'_Phi2D',
-                             [op.map(fatjets, lambda fatjet : fatjet.subJet1.p4.phi()),op.map(fatjets, lambda fatjet : fatjet.subJet2.p4.phi())],
-                             sel,
-                             [EquidistantBinning(320,-3.2,3.2),EquidistantBinning(320,-3.2,3.2)],
-                             xTitle = "subjet 1 #phi",
-                             yTitle = "subjet 2 #phi"))
+#    plots.append(Plot.make2D(name+'_partonflavour2D',
+#                             [op.map(fatjets, lambda fatjet : fatjet.subJet1.partonFlavour),op.map(fatjets, lambda fatjet : fatjet.subJet2.partonFlavour)],
+#                             sel,
+#                             [EquidistantBinning(7,0.,6.),EquidistantBinning(7,0.,6.)],
+#                             xTitle = "subjet 1 P_{T}",
+#                             yTitle = "subjet 2 P_{T}"))
+
+#    plots.append(Plot.make2D(name+'_subjet1VSFatjet_E2D',
+#                             [op.map(fatjets, lambda fatjet : fatjet.subJet1.p4.E()),op.map(fatjets, lambda fatjet : fatjet.p4.E())],
+#                             sel,
+#                             [EquidistantBinning(1000,0.,1000.),EquidistantBinning(1000,0.,1000.)],
+#                             xTitle = "subjet 1 E",
+#                             yTitle = "fatjet E"))
+#    plots.append(Plot.make2D(name+'_subjet2VSFatjet_E2D',
+#                             [op.map(fatjets, lambda fatjet : fatjet.subJet2.p4.E()),op.map(fatjets, lambda fatjet : fatjet.p4.E())],
+#                             sel,
+#                             [EquidistantBinning(1000,0.,1000.),EquidistantBinning(1000,0.,1000.)],
+#                             xTitle = "subjet 2 E",
+#                             yTitle = "fatjet E"))
+#
+#    plots.append(Plot.make2D(name+'_Eta2D',
+#                             [op.map(fatjets, lambda fatjet : fatjet.subJet1.p4.eta()),op.map(fatjets, lambda fatjet : fatjet.subJet2.p4.eta())],
+#                             sel,
+#                             [EquidistantBinning(500,-2.5,2.5),EquidistantBinning(500,-2.5,2.5)],
+#                             xTitle = "subjet 1 #eta",
+#                             yTitle = "subjet 2 #eta"))
+#    plots.append(Plot.make2D(name+'_Phi2D',
+#                             [op.map(fatjets, lambda fatjet : fatjet.subJet1.p4.phi()),op.map(fatjets, lambda fatjet : fatjet.subJet2.p4.phi())],
+#                             sel,
+#                             [EquidistantBinning(320,-3.2,3.2),EquidistantBinning(320,-3.2,3.2)],
+#                             xTitle = "subjet 1 #phi",
+#                             yTitle = "subjet 2 #phi"))
 
     return plots
 
@@ -197,7 +231,7 @@ class TransferFunction(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModule):
         lambda_jet_match = lambda gen,reco : op.AND(op.deltaR(gen.p4,reco.p4)<0.2)
         reco_b_matched = op.select(recoJet_b, lambda jetb: op.rng_any(gen_b, lambda gb: lambda_jet_match(gb,jetb)))
         match_b = op.combine((gen_b,recoJet_b), pred = lambda gb,jetb : jetb.idx == op.rng_min_element_by(reco_b_matched,lambda rb_matched : op.deltaR(gb.p4,rb_matched.p4)).idx)
-        plots.extend(plotMatching("ak4b",match_b,noSel,"b",bregCorr=True))
+        plots.extend(plotMatching("ak4b",match_b,noSel,"b"))
 
         ##########################################################
         #                       Ak4 C jets                       #
@@ -239,22 +273,60 @@ class TransferFunction(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModule):
         match_l = op.combine((gen_l,recoJet_l), pred = lambda gl,jetl : jetl.idx == op.rng_min_element_by(reco_l_matched,lambda rl_matched : op.deltaR(gl.p4,rl_matched.p4)).idx)
         plots.extend(plotMatching("ak4l",match_l,noSel,"l"))
 
-#        ##########################################################
-#        #                        Ak8 jets                        #
-#        ##########################################################
-#        #----- RecoJets -----#
-#        recoFatJet = op.select(t.FatJet, lambda j : op.AND(j.pt>=100,
-#                                                           op.abs(j.eta)<2.4,
-#                                                           op.AND(j.subJet1.isValid, j.subJet1.pt >= 20. , op.abs(j.subJet1.eta)<=2.4,
-#                                                                  j.subJet2.isValid, j.subJet2.pt >= 20. , op.abs(j.subJet2.eta)<=2.4),
-#                                                           op.AND(j.msoftdrop >= 30, j.msoftdrop <= 210),
-#                                                           j.tau2/j.tau1 <= 0.75))
-#        #recoFatJet_b = op.select(recoFatJet, lambda j : op.abs(j.partonFlavour) == 5)
-#        #recoFatJet_c = op.select(recoFatJet, lambda j : op.abs(j.partonFlavour) == 4)
-#        #recoFatJet_l = op.select(recoFatJet, lambda j : op.OR(op.abs(j.partonFlavour) == 1,
-#        #                                                   op.abs(j.partonFlavour) == 2, 
-#        #                                                   op.abs(j.partonFlavour) == 3))
-#
-#        plots.extend(fatjetPlots(noSel,recoFatJet,"fatjet"))
+        ##########################################################
+        #                        Ak8 jets                        #
+        ##########################################################
+        #----- RecoJets -----#
+        recoFatJet = op.select(t.FatJet, lambda j : op.AND(j.pt>=100,
+                                                           op.abs(j.eta)<2.4,
+                                                           op.AND(j.subJet1.isValid, j.subJet1.pt >= 20. , op.abs(j.subJet1.eta)<=2.4,
+                                                                  j.subJet2.isValid, j.subJet2.pt >= 20. , op.abs(j.subJet2.eta)<=2.4),
+                                                           op.AND(j.msoftdrop >= 30, j.msoftdrop <= 210),
+                                                           j.tau2/j.tau1 <= 0.75))
+
+        #plots.extend(fatjetPlots(noSel,recoFatJet,"fatjet"))
+
+        reco_subJet1_b_matched = op.select(recoFatJet, lambda fat: op.rng_any(gen_b, lambda gb: lambda_jet_match(gb,fat.subJet1)))
+        reco_subJet2_b_matched = op.select(recoFatJet, lambda fat: op.rng_any(gen_b, lambda gb: lambda_jet_match(gb,fat.subJet2)))
+        reco_subJet1_c_matched = op.select(recoFatJet, lambda fat: op.rng_any(gen_c, lambda gc: lambda_jet_match(gc,fat.subJet1)))
+        reco_subJet2_c_matched = op.select(recoFatJet, lambda fat: op.rng_any(gen_c, lambda gc: lambda_jet_match(gc,fat.subJet2)))
+        reco_subJet1_l_matched = op.select(recoFatJet, lambda fat: op.rng_any(gen_l, lambda gl: lambda_jet_match(gl,fat.subJet1)))
+        reco_subJet2_l_matched = op.select(recoFatJet, lambda fat: op.rng_any(gen_l, lambda gl: lambda_jet_match(gl,fat.subJet2)))
+
+        def makeFatjetMatch(gen1,gen2,recoFatJet):
+            return op.combine((gen1,gen2,recoFatJet), pred = lambda g1,g2,fat : op.AND(
+                                                                  fat.subJet1.idx == op.rng_min_element_by(reco_subJet1_b_matched,
+                                                                                                           lambda sub1_matched : op.deltaR(g1.p4,sub1_matched.p4)).idx,
+                                                                  fat.subJet2.idx == op.rng_min_element_by(reco_subJet2_b_matched,
+                                                                                                           lambda sub2_matched : op.deltaR(g2.p4,sub2_matched.p4)).idx))
+        match_fat_bb = makeFatjetMatch(gen_b,gen_b,recoFatJet)
+        match_fat_bc = makeFatjetMatch(gen_b,gen_c,recoFatJet)
+        match_fat_bl = makeFatjetMatch(gen_b,gen_l,recoFatJet)
+        match_fat_cb = makeFatjetMatch(gen_c,gen_b,recoFatJet)
+        match_fat_cc = makeFatjetMatch(gen_c,gen_c,recoFatJet)
+        match_fat_cl = makeFatjetMatch(gen_c,gen_l,recoFatJet)
+        match_fat_lb = makeFatjetMatch(gen_l,gen_b,recoFatJet)
+        match_fat_lc = makeFatjetMatch(gen_l,gen_c,recoFatJet)
+        match_fat_ll = makeFatjetMatch(gen_l,gen_l,recoFatJet)
+#        match_fat_bb = op.combine((gen_b,gen_b,recoFatJet), pred = lambda g1,g2,fat : op.AND(
+#                                                fat.subJet1.idx == op.rng_min_element_by(reco_subJet1_b_matched,
+#                                                                                         lambda sub1_matched : op.deltaR(gb1.p4,sub1_matched.p4)).idx,
+#                                                fat.subJet2.idx == op.rng_min_element_by(reco_subJet2_b_matched,
+#                                                                                         lambda sub2_matched : op.deltaR(gb2.p4,sub2_matched.p4)).idx))
+#        match_fat_bc = op.combine((gen_b,gen_b,recoFatJet), pred = lambda gb1,gb2,fat : op.AND(
+#                                                fat.subJet1.idx == op.rng_min_element_by(reco_subJet1_b_matched,
+#                                                                                         lambda sub1_matched : op.deltaR(gb1.p4,sub1_matched.p4)).idx,
+#                                                fat.subJet2.idx == op.rng_min_element_by(reco_subJet2_b_matched,
+#                                                                                         lambda sub2_matched : op.deltaR(gb2.p4,sub2_matched.p4)).idx))
+
+        plots.extend(plotFatjetMatching(match_fat_bb,noSel,'b','b'))
+        plots.extend(plotFatjetMatching(match_fat_bc,noSel,'b','c'))
+        plots.extend(plotFatjetMatching(match_fat_bl,noSel,'b','l'))
+        plots.extend(plotFatjetMatching(match_fat_cb,noSel,'c','b'))
+        plots.extend(plotFatjetMatching(match_fat_cc,noSel,'c','c'))
+        plots.extend(plotFatjetMatching(match_fat_cl,noSel,'c','l'))
+        plots.extend(plotFatjetMatching(match_fat_bb,noSel,'l','b'))
+        plots.extend(plotFatjetMatching(match_fat_bc,noSel,'l','c'))
+        plots.extend(plotFatjetMatching(match_fat_bl,noSel,'l','l'))
 
         return plots

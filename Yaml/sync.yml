@@ -1,0 +1,81 @@
+tree: Events
+eras:
+  '2016': 
+    luminosity: 1.
+  '2017': 
+    luminosity: 1.
+  '2018': 
+    luminosity: 1.
+samples:
+  ##### 2016 #####
+  TTTo2L2Nu:
+    files: [/storage/data/cms/store/mc/RunIISummer16NanoAODv7/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/NANOAODSIM/PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/60000/1A959884-ABD8-D04E-99C1-2068A961164D.root]
+    generated-events: 1.
+    cross-section: 1.
+    era: '2016'
+  GluGluToHHTo2B2VTo2L2Nu_node_cHHH1:
+    files: [/storage/data/cms/store/mc/RunIISummer16NanoAODv7/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8/NANOAODSIM/PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/10000/37B88CB0-5027-9344-A5BD-80A1A6998FA7.root]
+    generated-events: 1.
+    cross-section: 1.
+    era: '2016'
+  DoubleMuon_2016B0:
+    files: 
+      - /storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/240000/07BC7450-8B7C-BF4C-B325-C6D57CEF04B4.root
+      - /storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/240000/45604E49-D4C6-2C4D-A7A1-6B98CE800E62.root
+      - /storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/240000/457E188B-CB9E-2045-BBA3-675BAD190A9F.root
+      - /storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/240000/639A83D8-7818-2C45-8671-1BCE70F07649.root
+      - /storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/240000/792E70B0-2715-F24B-A8DE-1327E9F6480B.root
+      - /storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/240000/7985E7AF-EC8F-C34D-9848-44A5E3EDE0A2.root
+      - /storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/240000/8466163B-390F-C443-B11E-54136A81DA99.root
+      - /storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/240000/982BDE86-B51A-6E44-9021-17637C32B1A9.root
+      - /storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/240000/C4804A85-5EE9-ED4A-8F87-FE23D9A682AE.root
+      - /storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/240000/C7D042D5-6F64-DB43-99D9-D8657D95F0B7.root
+      - /storage/data/cms/store/data/Run2016B/DoubleMuon/NANOAOD/02Apr2020_ver2-v1/240000/F0D59613-7817-DC4E-B5A5-D948D5DE47C9.root
+    group: data
+    era: '2016'
+    run_range: [272007, 275376]
+    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
+
+
+#  ##### 2017 #####
+#  TTTo2L2Nu:
+#    files: [/storage/data/cms/store/mc/RunIIFall17NanoAODv7/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_new_pmx_102X_mc2017_realistic_v8-v1/60000/0DF1198A-CE85-E64E-8A4A-093D376CBBF0.root]
+#    generated-events: 1.
+#    cross-section: 1.
+#    era: '2017'
+#  GluGluToHHTo2B2VTo2L2Nu_node_cHHH1:
+#    files: [/storage/data/cms/store/mc/RunIIFall17NanoAODv7/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/100000/983A0436-48F1-9843-BA52-CF0FDD252EF0.root]
+#    generated-events: 1.
+#    cross-section: 1.
+#    era: '2017'
+#  DoubleMuon_2017B:
+#    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt
+#    files: [/storage/data/cms/store/data/Run2017B/DoubleMuon/NANOAOD/02Apr2020-v1/40000/7133E3E8-0323-8444-88FB-DD0338C20B45.root]
+#    era: '2017'
+#    group: data
+#    run_range:
+#    - 297046 
+#    - 299329
+#
+#
+#  ##### 2018 #####
+#  TTTo2L2Nu:
+#    files: [/storage/data/cms/store/mc/RunIIAutumn18NanoAODv7/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/C4BB0AC4-2D9A-514E-8701-C6B56F31E3ED.root]
+#    generated-events: 1.
+#    cross-section: 1.
+#    era: '2018'
+#  GluGluToHHTo2B2VTo2L2Nu_node_cHHH1:
+#    files: [/storage/data/cms/store/mc/RunIIAutumn18NanoAODv7/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/E726B23B-4179-7042-8570-457C445C51FE.root]
+#    generated-events: 1.
+#    cross-section: 1.
+#    era: '2018'
+#  DoubleMuon_2018A:
+#    certified_lumi_file: https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
+#    files: [/storage/data/cms/store/data/Run2018A/DoubleMuon/NANOAOD/02Apr2020-v1/30000/AD8A8927-5783-C243-8E59-C2281E510D0F.root]
+#    era: '2018'
+#    group: data
+#    run_range:
+#    - 315252
+#    - 316995
+
+

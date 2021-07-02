@@ -479,6 +479,7 @@ def makeDoubleLeptonSelection(self,baseSel,use_dd=True,fake_selection=False):
     """
     #---- Common lambdas ----#
     lambdaOSDilepton = lambda dilep : dilep[0].charge != dilep[1].charge
+    lambdaSSDilepton = lambda dilep : dilep[0].charge == dilep[1].charge
     # Mll cut lambdas #
     ZMass = 91.1876
     lambda_lowMllCut    = lambda dileptons: op.NOT(op.rng_any(dileptons, lambda dilep : op.invariant_mass(dilep[0].p4, dilep[1].p4)<12.))
@@ -570,16 +571,29 @@ def makeDoubleLeptonSelection(self,baseSel,use_dd=True,fake_selection=False):
 
 
     #---- Opposite sign ----#
-    ElElSelObj.selName += "OS"
-    MuMuSelObj.selName += "OS"
-    ElMuSelObj.selName += "OS"
-    ElElSelObj.yieldTitle += " + OS"
-    MuMuSelObj.yieldTitle += " + OS"
-    ElMuSelObj.yieldTitle += " + OS"
+    if self.args.SS:
+        ElElSelObj.selName += "SS"
+        MuMuSelObj.selName += "SS"
+        ElMuSelObj.selName += "SS"
+        ElElSelObj.yieldTitle += " + SS"
+        MuMuSelObj.yieldTitle += " + SS"
+        ElMuSelObj.yieldTitle += " + SS"
 
-    ElElSelObj.refine(cut = [lambdaOSDilepton(self.ElElFakeSel[0])])
-    MuMuSelObj.refine(cut = [lambdaOSDilepton(self.MuMuFakeSel[0])])
-    ElMuSelObj.refine(cut = [lambdaOSDilepton(self.ElMuFakeSel[0])])
+        ElElSelObj.refine(cut = [lambdaSSDilepton(self.ElElFakeSel[0])])
+        MuMuSelObj.refine(cut = [lambdaSSDilepton(self.MuMuFakeSel[0])])
+        ElMuSelObj.refine(cut = [lambdaSSDilepton(self.ElMuFakeSel[0])])
+    else:
+        ElElSelObj.selName += "OS"
+        MuMuSelObj.selName += "OS"
+        ElMuSelObj.selName += "OS"
+        ElElSelObj.yieldTitle += " + OS"
+        MuMuSelObj.yieldTitle += " + OS"
+        ElMuSelObj.yieldTitle += " + OS"
+
+        ElElSelObj.refine(cut = [lambdaOSDilepton(self.ElElFakeSel[0])])
+        MuMuSelObj.refine(cut = [lambdaOSDilepton(self.MuMuFakeSel[0])])
+        ElMuSelObj.refine(cut = [lambdaOSDilepton(self.ElMuFakeSel[0])])
+
 
     #---- Triggers ----#
     ElElSelObj.selName += "WithTriggers"
@@ -643,21 +657,6 @@ def makeDoubleLeptonSelection(self,baseSel,use_dd=True,fake_selection=False):
 
         ElElSelObj.refine(cut = [lambda_inZ(self.ElElFakeSel[0])])
         MuMuSelObj.refine(cut = [lambda_inZ(self.MuMuFakeSel[0])])
-
-#        #---- Tau veto ----#
-#        if not self.args.NoTauVeto: # nTau (isolated from fakeable leptons) = 0
-#            # All the preselected leptons outside Z peak region within 10 GeV
-#            ElElSelObj.selName += "NoTau"
-#            MuMuSelObj.selName += "NoTau"
-#            ElMuSelObj.selName += "NoTau"
-#            ElElSelObj.yieldTitle += " + Tau Veto"
-#            MuMuSelObj.yieldTitle += " + Tau Veto"
-#            ElMuSelObj.yieldTitle += " + Tau Veto"
-#    
-#            ElElSelObj.refine(cut = [op.rng_len(self.tauCleanSel) == 0])
-#            MuMuSelObj.refine(cut = [op.rng_len(self.tauCleanSel) == 0])
-#            ElMuSelObj.refine(cut = [op.rng_len(self.tauCleanSel) == 0])
-
     
     #---- Tight selection ----#
     ElElSelObj.selName += "TightSelected"

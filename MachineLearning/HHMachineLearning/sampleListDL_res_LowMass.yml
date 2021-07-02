@@ -103,6 +103,8 @@ sampleDict:
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-260.root
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-270.root
@@ -115,6 +117,8 @@ sampleDict:
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b MuMu #######
     Resolved1B_MuMu_DY:
       - Skim2016_background_Resolved1B_MuMu/results/DYJetsToLL_M-10to50.root
@@ -214,6 +218,8 @@ sampleDict:
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-260.root
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-270.root
@@ -226,6 +232,8 @@ sampleDict:
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b ElEl  #######
     Resolved1B_ElMu_DY:
       - Skim2016_background_Resolved1B_ElMu/results/DYJetsToLL_M-10to50.root
@@ -325,6 +333,8 @@ sampleDict:
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-260.root
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-270.root
@@ -337,6 +347,8 @@ sampleDict:
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b ElEl  #######
     Resolved2B_ElEl_DY:
       - Skim2016_background_Resolved2B_ElEl/results/DYJetsToLL_M-10to50.root
@@ -436,6 +448,8 @@ sampleDict:
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-260.root
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-270.root
@@ -448,6 +462,8 @@ sampleDict:
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b MuMu #######
     Resolved2B_MuMu_DY:
       - Skim2016_background_Resolved2B_MuMu/results/DYJetsToLL_M-10to50.root
@@ -547,6 +563,8 @@ sampleDict:
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-260.root
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-270.root
@@ -559,6 +577,8 @@ sampleDict:
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b ElEl  #######
     Resolved2B_ElMu_DY:
       - Skim2016_background_Resolved2B_ElMu/results/DYJetsToLL_M-10to50.root
@@ -658,6 +678,8 @@ sampleDict:
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-260.root
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-270.root
@@ -670,6 +692,8 @@ sampleDict:
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b ElEl  #######
     Boosted1B_ElEl_DY:
       - Skim2016_background_Boosted1B_ElEl/results/DYJetsToLL_M-10to50.root
@@ -769,6 +793,8 @@ sampleDict:
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-260.root
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-270.root
@@ -781,6 +807,8 @@ sampleDict:
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b MuMu #######
     Boosted1B_MuMu_DY:
       - Skim2016_background_Boosted1B_MuMu/results/DYJetsToLL_M-10to50.root
@@ -880,6 +908,8 @@ sampleDict:
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-260.root
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-270.root
@@ -892,6 +922,8 @@ sampleDict:
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b ElEl  #######
     Boosted1B_ElMu_DY:
       - Skim2016_background_Boosted1B_ElMu/results/DYJetsToLL_M-10to50.root
@@ -991,6 +1023,8 @@ sampleDict:
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-260.root
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-270.root
@@ -1003,6 +1037,8 @@ sampleDict:
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2016_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
   #####################
   #       2017        # 
   #####################
@@ -1112,6 +1148,8 @@ sampleDict:
       - Skim2017_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2017_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2017_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2017_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -1128,6 +1166,8 @@ sampleDict:
       - Skim2017_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b MuMu #######
     Resolved1B_MuMu_DY:
       - Skim2017_background_Resolved1B_MuMu/results/DYJetsToLL_M-10to50.root
@@ -1233,6 +1273,8 @@ sampleDict:
       - Skim2017_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2017_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2017_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2017_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -1249,6 +1291,8 @@ sampleDict:
       - Skim2017_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b ElMu #######
     Resolved1B_ElMu_DY:
       - Skim2017_background_Resolved1B_ElMu/results/DYJetsToLL_M-10to50.root
@@ -1354,6 +1398,8 @@ sampleDict:
       - Skim2017_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2017_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2017_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2017_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -1370,6 +1416,8 @@ sampleDict:
       - Skim2017_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b ElEl  #######
     Resolved2B_ElEl_DY:
       - Skim2017_background_Resolved2B_ElEl/results/DYJetsToLL_M-10to50.root
@@ -1475,6 +1523,8 @@ sampleDict:
       - Skim2017_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2017_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2017_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2017_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -1491,6 +1541,8 @@ sampleDict:
       - Skim2017_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b MuMu  #######
     Resolved2B_MuMu_DY:
       - Skim2017_background_Resolved2B_MuMu/results/DYJetsToLL_M-10to50.root
@@ -1596,6 +1648,8 @@ sampleDict:
       - Skim2017_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2017_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2017_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2017_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -1612,6 +1666,8 @@ sampleDict:
       - Skim2017_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved2b ElMu  #######
     Resolved2B_ElMu_DY:
       - Skim2017_background_Resolved2B_ElMu/results/DYJetsToLL_M-10to50.root
@@ -1717,6 +1773,8 @@ sampleDict:
       - Skim2017_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2017_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2017_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2017_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -1733,6 +1791,8 @@ sampleDict:
       - Skim2017_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Boosted1b ElEl  #######
     Boosted1B_ElEl_DY:
       - Skim2017_background_Boosted1B_ElEl/results/DYJetsToLL_M-10to50.root
@@ -1838,6 +1898,8 @@ sampleDict:
       - Skim2017_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2017_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2017_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2017_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -1854,6 +1916,8 @@ sampleDict:
       - Skim2017_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Boosted1b MuMu #######
     Boosted1B_MuMu_DY:
       - Skim2017_background_Boosted1B_MuMu/results/DYJetsToLL_M-10to50.root
@@ -1959,6 +2023,8 @@ sampleDict:
       - Skim2017_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2017_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2017_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2017_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -1975,6 +2041,8 @@ sampleDict:
       - Skim2017_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Boosted1B ElMu #######
     Boosted1B_ElMu_DY:
       - Skim2017_background_Boosted1B_ElMu/results/DYJetsToLL_M-10to50.root
@@ -2080,6 +2148,8 @@ sampleDict:
       - Skim2017_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2017_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2017_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2017_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -2096,6 +2166,8 @@ sampleDict:
       - Skim2017_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
       - Skim2017_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2017_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-450.root
+      - Skim2017_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2017_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
   #####################
   #       2018        # 
   #####################
@@ -2206,6 +2278,8 @@ sampleDict:
       - Skim2018_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2018_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2018_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2018_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Resolved1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2018_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2018_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2018_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -2222,6 +2296,8 @@ sampleDict:
       - Skim2018_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-350.root
       - Skim2018_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-400.root
       - Skim2018_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-400.root
+      - Skim2018_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Resolved1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b MuMu  #######
     Resolved1B_MuMu_DY:
       - Skim2018_background_Resolved1B_MuMu/results/DYJetsToLL_M-10to50.root
@@ -2328,6 +2404,8 @@ sampleDict:
       - Skim2018_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2018_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2018_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2018_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Resolved1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2018_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2018_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2018_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -2344,6 +2422,8 @@ sampleDict:
       - Skim2018_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-350.root
       - Skim2018_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-400.root
       - Skim2018_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
+      - Skim2018_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Resolved1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b ElMu  #######
     Resolved1B_ElMu_DY:
       - Skim2018_background_Resolved1B_ElMu/results/DYJetsToLL_M-10to50.root
@@ -2450,6 +2530,8 @@ sampleDict:
       - Skim2018_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2018_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2018_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2018_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Resolved1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2018_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2018_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2018_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -2466,6 +2548,8 @@ sampleDict:
       - Skim2018_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-350.root
       - Skim2018_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-400.root
       - Skim2018_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
+      - Skim2018_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Resolved1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
 #####  Resolved1b ElEl  #######
     Resolved2B_ElEl_DY:
       - Skim2018_background_Resolved2B_ElEl/results/DYJetsToLL_M-10to50.root
@@ -2572,6 +2656,8 @@ sampleDict:
       - Skim2018_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2018_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2018_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2018_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Resolved2B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2018_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2018_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2018_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -2588,6 +2674,8 @@ sampleDict:
       - Skim2018_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-350.root
       - Skim2018_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-400.root
       - Skim2018_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-400.root
+      - Skim2018_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Resolved2B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b MuMu  #######
     Resolved2B_MuMu_DY:
       - Skim2018_background_Resolved2B_MuMu/results/DYJetsToLL_M-10to50.root
@@ -2694,6 +2782,8 @@ sampleDict:
       - Skim2018_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2018_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2018_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2018_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Resolved2B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2018_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2018_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2018_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -2710,6 +2800,8 @@ sampleDict:
       - Skim2018_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-350.root
       - Skim2018_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-400.root
       - Skim2018_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
+      - Skim2018_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Resolved2B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b ElMu  #######
     Resolved2B_ElMu_DY:
       - Skim2018_background_Resolved2B_ElMu/results/DYJetsToLL_M-10to50.root
@@ -2816,6 +2908,8 @@ sampleDict:
       - Skim2018_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2018_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2018_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2018_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Resolved2B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2018_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2018_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2018_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -2832,6 +2926,8 @@ sampleDict:
       - Skim2018_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-350.root
       - Skim2018_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-400.root
       - Skim2018_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
+      - Skim2018_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Resolved2B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
 #####  Resolved1b ElEl  #######
     Boosted1B_ElEl_DY:
       - Skim2018_background_Boosted1B_ElEl/results/DYJetsToLL_M-10to50.root
@@ -2938,6 +3034,8 @@ sampleDict:
       - Skim2018_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2018_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2018_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2018_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Boosted1B_ElEl/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2018_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2018_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2018_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -2954,6 +3052,8 @@ sampleDict:
       - Skim2018_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-350.root
       - Skim2018_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-400.root
       - Skim2018_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-400.root
+      - Skim2018_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Boosted1B_ElEl/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b MuMu  #######
     Boosted1B_MuMu_DY:
       - Skim2018_background_Boosted1B_MuMu/results/DYJetsToLL_M-10to50.root
@@ -3060,6 +3160,8 @@ sampleDict:
       - Skim2018_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2018_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2018_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2018_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Boosted1B_MuMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2018_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2018_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2018_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -3076,6 +3178,8 @@ sampleDict:
       - Skim2018_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-350.root
       - Skim2018_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-400.root
       - Skim2018_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
+      - Skim2018_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Boosted1B_MuMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
     #######  Resolved1b ElMu  #######
     Boosted1B_ElMu_DY:
       - Skim2018_background_Boosted1B_ElMu/results/DYJetsToLL_M-10to50.root
@@ -3182,6 +3286,8 @@ sampleDict:
       - Skim2018_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-400.root
       - Skim2018_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-450.root
       - Skim2018_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-450.root
+      - Skim2018_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Boosted1B_ElMu/results/GluGluToBulkGravitonToHHTo2B2Tau_M-500.root
       - Skim2018_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250.root
       - Skim2018_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-250.root
       - Skim2018_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260.root
@@ -3198,4 +3304,6 @@ sampleDict:
       - Skim2018_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-350.root
       - Skim2018_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-400.root
       - Skim2018_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-400.root
+      - Skim2018_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500.root
+      - Skim2018_signal_Boosted1B_ElMu/results/GluGluToRadionToHHTo2B2Tau_M-500.root
 

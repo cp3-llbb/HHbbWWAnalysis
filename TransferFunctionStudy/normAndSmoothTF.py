@@ -151,10 +151,10 @@ def normAndSmooth(TFset, inFile, outFile, plot):
         for hist in inputHists[1:]:
             DeltaEvsE.Add(hist)
 
-
         DeltaEvsE.SetTitle("Hist 2D from bamboo")
         DeltaEvsE.GetXaxis().SetTitle("E_{gen}")
         DeltaEvsE.GetYaxis().SetTitle("E_{rec} - E_{gen}")
+        DeltaEvsE.GetZaxis().SetRangeUser(DeltaEvsE.GetMinimum(),DeltaEvsE.GetMaximum())
 
         #findAndCorrectArtifacts(DeltaEvsE,10)
 
@@ -177,16 +177,15 @@ def normAndSmooth(TFset, inFile, outFile, plot):
             if not os.path.exists(path_out):
                 os.makedirs(path_out)
             pdfName = os.path.join(path_out,"{}.pdf".format(TF["norm"]))
-            list_hist, g_mean, g_std, g_res = plotSlices(DeltaEvsE_Norm,TF["title"])
             C = ROOT.TCanvas("C","C",800,600)
             C.Print(pdfName+"[")
 
             # Draw TF #
             C.SetLogz(True)
-            DeltaEvsE.SetContour(100)
-            DeltaEvsE.Draw("colz")
-            C.Print(pdfName)
-            C.Clear()
+#            DeltaEvsE.SetContour(100)
+#            DeltaEvsE.Draw("colz")
+#            C.Print(pdfName)
+#            C.Clear()
             C.SetLogx(True)
             DeltaEvsE_rebin.SetContour(100)
             DeltaEvsE_rebin.Draw("colz")
@@ -199,6 +198,7 @@ def normAndSmooth(TFset, inFile, outFile, plot):
             C.SetLogx(False)
 
             # Draw graphs #
+            list_hist, g_mean, g_std, g_res = plotSlices(DeltaEvsE_Norm,TF["title"])
             C.Clear()
             g_mean.Draw()
             C.Print(pdfName)
@@ -211,6 +211,7 @@ def normAndSmooth(TFset, inFile, outFile, plot):
             C.Print(pdfName)
             C.Clear()
             #C.SetLogy(True)
+            g_res.GetYaxis().SetRangeUser(0.,5.)
             g_res.Draw()
             C.Print(pdfName)
             #C.SetLogy(False)
@@ -256,51 +257,79 @@ if __name__ == "__main__":
     TFset = [
                 {
                     "histNames": ['ak4b_TF'],
-                    "base" : "b_TF",
-                    "norm" : "b_TF_norm",
+                    "base" : "ak4_b_TF_raw",
+                    "norm" : "ak4_b_TF",
                     "title": "b transfer function",
                     "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
                     "rebinY": np.r_[-1000:-500:50, -500:-300:10, -300:-200:5, -200:-100:2, -100:100:1, 100:200:2, 200:300:5, 300:500:10, 500:1001:50],
                 },
                 {
-                    "histNames": ['ak4b_TF_bregCorr'],
-                    "base" : "b_TF_bregCorr",
-                    "norm" : "b_TF_bregCorr_norm",
-                    "title": "b transfer function (with regression correction)",
-                    "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
-                    "rebinY": np.r_[-1000:-500:50, -500:-300:10, -300:-200:5, -200:-100:2, -100:100:1, 100:200:2, 200:300:5, 300:500:10, 500:1001:50],
-                },
-                {
                     "histNames": ['ak4c_TF'],
-                    "base" : "c_TF",
-                    "norm" : "c_TF_norm",
+                    "base" : "ak4_c_TF_raw",
+                    "norm" : "ak4_c_TF",
                     "title": "c transfer function",
                     "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
                     "rebinY": np.r_[-1000:-500:50, -500:-300:10, -300:-200:5, -200:-100:2, -100:100:1, 100:200:2, 200:300:5, 300:500:10, 500:1001:50],
                 },
                 {
                     "histNames": ['ak4l_TF'],
-                    "base" : "l_TF",
-                    "norm" : "l_TF_norm",
+                    "base" : "ak4_l_TF_raw",
+                    "norm" : "ak4_l_TF",
                     "title": "lightjet transfer function",
                     "rebinX": np.r_[0:100:5, 100:200:10, 200:300:20, 300:500:50, 500:1001:250, 3000 ],
                     "rebinY": np.r_[-1000:-500:50, -500:-300:10, -300:-200:5, -200:-100:2, -100:100:1, 100:200:2, 200:300:5, 300:500:10, 500:1001:50],
                 },
                 {
                     "histNames": ['e_TF'],
-                    "base" : "e_TF",
-                    "norm" : "e_TF_norm",
+                    "base" : "e_TF_raw",
+                    "norm" : "e_TF",
                     "title": "e^{#pm} transfer function",
                     "rebinX": np.r_[0:100:5, 100:200:10, 200:400:20, 400:501:50, 1000, 3000 ],
                     "rebinY": np.r_[-1000, -500:-300:100, -300:-200:50, -200:-100:10, -100:-10:1, -10:10:0.25, 10:100:1, 100:200:10, 200:300:50, 300:500:100, 500,1000],
                 },
                 {
                     "histNames": ['m_TF'],
-                    "base" : "mu_TF",
-                    "norm" : "mu_TF_norm",
+                    "base" : "mu_TF_raw",
+                    "norm" : "mu_TF",
                     "title": "#mu^{#pm} transfer function",
                     "rebinX": np.r_[0:100:5, 100:200:10, 200:400:20, 400:501:50, 1000, 3000 ],
                     "rebinY": np.r_[-1000:-500:250, -500:-300:100, -300:-200:50, -200:-100:10, -100:-10:1, -10:-5:0.5, -5:5:0.25, 5:10:0.5, 10:100:1, 100:200:10, 200:300:50, 300:500:100, 500:1001:250],
+                },
+                {
+                    "histNames": [
+                                    'fatjetbb_sub1_TF',
+                                    'fatjetbl_sub1_TF',
+                                    'fatjetbc_sub1_TF',
+                                    'fatjetcb_sub1_TF',
+                                    'fatjetcl_sub1_TF',
+                                    'fatjetcc_sub1_TF',
+                                    'fatjetlb_sub1_TF',
+                                    'fatjetll_sub1_TF',
+                                    'fatjetlc_sub1_TF',
+                                 ],
+                    "base" : "ak8_sub1_TF_raw",
+                    "norm" : "ak8_sub1_TF",
+                    "title": "Ak8 subjet 1 transfer function",
+                    "rebinX": np.r_[0:100:10, 100:200:20, 200:300:30, 300:500:50, 500:1001:250, 3000 ],
+                    "rebinY": np.r_[-1000:-500:50, -500:-300:30, -300:-100:20, -100:100:10, 100:300:20, 300:500:30, 500:1001:50],
+                },
+                {
+                    "histNames": [
+                                    'fatjetbb_sub2_TF',
+                                    'fatjetbl_sub2_TF',
+                                    'fatjetbc_sub2_TF',
+                                    'fatjetcb_sub2_TF',
+                                    'fatjetcl_sub2_TF',
+                                    'fatjetcc_sub2_TF',
+                                    'fatjetlb_sub2_TF',
+                                    'fatjetll_sub2_TF',
+                                    'fatjetlc_sub2_TF',
+                                 ],
+                    "base" : "ak8_sub2_TF_raw",
+                    "norm" : "ak8_sub2_TF",
+                    "title": "Ak8 subjet 2 transfer function",
+                    "rebinX": np.r_[0:100:10, 100:200:20, 200:300:30, 300:500:50, 500:1001:250, 3000 ],
+                    "rebinY": np.r_[-1000:-500:50, -500:-300:30, -300:-100:20, -100:100:10, 100:300:20, 300:500:30, 500:1001:50],
                 },
             ]
 
