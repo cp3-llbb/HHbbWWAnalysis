@@ -212,15 +212,6 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_sel
                                          self.muonsTightSel[0].idx == self.muonsFakeSel[0].idx],
                                weight = MuTightSF(self.muonsTightSel[0]))
         else :
-            '''
-            ElSelObject.create(cut    = [lambda_fake_ele(self.electronsFakeSel[0]), 
-                                         op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel)<=1],
-                               weight = ElTightSF(self.electronsFakeSel[0]))
-            MuSelObject.create(cut    = [lambda_fake_mu(self.muonsFakeSel[0]), 
-                                         op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel)<=1],
-                               weight = MuTightSF(self.muonsFakeSel[0]))
-
-            '''
             ElSelObject.refine(cut    = [op.rng_len(self.electronsFakeSel) == 1,
                                          op.rng_len(self.muonsFakeSel) == 0],
                                weight = ElTightSF(self.electronsFakeSel[0]))
@@ -272,6 +263,7 @@ def makeBoostedSelection(self,selObject,copy_sel=False,plot_yield=False):
     selObject.selName += "Boosted"
     selObject.yieldTitle += " + Ak8 jets $\geq 1$ Ak4jets $\geq 1$"
     selObject.refine(cut=[op.rng_len(self.ak8BJets) >= 1, op.rng_len(self.ak4JetsCleanedFromAk8b) >= 1])
+    #selObject.refine(cut=[op.rng_len(self.ak8BJets) >= 1])
     #if plot_yield:
     #    selObject.makeYield(self.yieldPlots)
     if copy_sel:
@@ -438,7 +430,29 @@ def makeExclusiveResolvedJetComboSelection(self,selObject,nbJet,nJet,copy_sel=Fa
                              weight = None)
 
         else: raise RuntimeError ("Error in Jet Selection!!!")
+
+def makeExclusiveResolvedSelection(self,selObject,nbJet,copy_sel=False):
+    if copy_sel:
+        selObject = copy(selObject)
         
+    if nbJet == 1:    
+        AppliedSF = None
+        selObject.selName += "ExclusiveResolved1b"
+        selObject.yieldTitle += " + Exclusive Resolved (nbjet = 1)"
+        selObject.refine(cut    = [op.rng_len(self.ak4BJets) == 1],
+                         weight = AppliedSF)
+        
+    elif nbJet == 2:
+        AppliedSF = None
+        selObject.selName += "ExclusiveResolved2b"
+        selObject.yieldTitle += " + Exclusive Resolved (nbjet $\geq 2$)"
+        selObject.refine(cut   = [op.rng_len(self.ak4BJets) >= 2],
+                         weight = AppliedSF)
+        
+    else: raise RuntimeError ("Error in Jet Selection!!!")
+    
+    if copy_sel:
+        return selObject
 
 def makeSemiBoostedHbbSelection(self,selObject,nNonb,copy_sel=False):
     """

@@ -24,7 +24,6 @@ class highlevelLambdas:
         self.lep3j_p4 = lambda lep,j1,j2,j3 : lep.p4+j1.p4+j2.p4+j3.p4
         self.lep4j_p4 = lambda lep,j1,j2,j3,j4 : lep.p4+j1.p4+j2.p4+j3.p4+j4.p4
         
-
         # bReg corr 4 momenta of ak4-bTagged jet #
         self.bJetCorrP4 = lambda j : op._to.Construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >", (j.pt*j.bRegCorr, j.eta, j.phi, j.mass*j.bRegCorr)).result
         
@@ -258,6 +257,27 @@ class highlevelLambdas:
         self.MET_LD_DL = lambda met, jets, electrons, muons : 0.6 * met.pt +\
                     0.4* (op.rng_sum(jets, (lambda j : j.p4), start=self.empty_p4) + op.rng_sum(electrons, (lambda e : e.p4), start=self.empty_p4) + op.rng_sum(muons, (lambda m : m.p4), start=self.empty_p4)).Pt()
 
+        self.isBoosted  = op.AND(op.rng_len(HHself.ak8BJets) >= 1, op.rng_len(HHself.ak4JetsCleanedFromAk8b) >= 1)
+        #self.isBoosted  = op.rng_len(HHself.ak8BJets) >= 1
+        self.isResolved = op.AND(op.rng_len(HHself.ak4Jets)  >= 3,op.rng_len(HHself.ak4BJets) >= 1,op.rng_len(HHself.ak8BJets) == 0)
+        self.has1Wj     = op.rng_len(HHself.probableWJets) == 1
+        self.has2Wj     = op.rng_len(HHself.wJetsPairs) >= 1
+        self.isFullReco = op.AND(op.rng_len(HHself.bJetsByScore) >= 2, op.rng_len(HHself.wJetsPairs) >= 1)
+        self.isMissReco = op.AND(op.rng_len(HHself.bJetsByScore) >= 2, op.rng_len(HHself.probableWJets) == 1)
+
+        self.comp_m_hh_bregcorr = lambda bjets, wjets, lep, met : (op.rng_sum(bjets, (lambda bj : self.bJetCorrP4(bj)), start=empty_p4) + 
+                                                                   op.rng_sum(wjets, (lambda wj : self.bJetCorrP4(wj)), start=empty_p4) + 
+                                                                   met.p4 + 
+                                                                   lep.p4).M()
+        self.comp_pt_hh         = lambda bjets, wjets, lep, met : (op.rng_sum(bjets, (lambda bj : bj.p4), start=empty_p4) + 
+                                                                   op.rng_sum(wjets, (lambda wj : wj.p4), start=empty_p4) + 
+                                                                   met.p4 + 
+                                                                   lep.p4).Pt()
+        self.comp_dphi_hbb_hww  = lambda bjets, wjets, lep, met : op.deltaPhi((op.rng_sum(wjets, (lambda wj : wj.p4), start=empty_p4) + met.p4 + lep.p4),
+                                                                              op.rng_sum(bjets, (lambda bj : bj.p4), start=empty_p4))
+        self.comp_dphi_hbb_hwwvis = lambda bjets, wjets, lep : op.deltaPhi((op.rng_sum(wjets, (lambda wj : wj.p4), start=empty_p4) + lep.p4),
+                                                                           op.rng_sum(bjets, (lambda bj : bj.p4), start=empty_p4))
+
     def getCorrBp4(self,j):
         return  op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >", (j.pt*j.bRegCorr, j.eta, j.phi, j.mass*j.bRegCorr)) 
 
@@ -272,3 +292,23 @@ class highlevelLambdas:
         cosTheta1 = op.switch(op.rng_len(genh)==2, op.abs(boosted_h1.Pz()/boosted_h1.P()) , op.c_float(-9999))
         cosTheta2 = op.switch(op.rng_len(genh)==2, op.abs(boosted_h1.Pz()/boosted_h2.P()) , op.c_float(-9999))
         return [mHH, cosTheta1, cosTheta2]
+
+    def comp_smin(self,lep,met,jets,bjets,wjets):
+        self.blank_p4 = op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >",([op.c_float(0.),op.c_float(0.),op.c_float(0.),op.c_float(0.)]))
+        #vis = op.multiSwitch((op.rng_len(jets) >= 4, bjets[0].p4+bjets[1].p4+wjets[0].p4+wjets[1].p4+lep.p4),
+        #                     (op.rng_len(jets) == 3, bjets[0].p4+bjets[1].p4+wjets[0].p4+lep.p4),
+        #                     op.construct("ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float> >", (op.c_float(0.),
+        #                                                                                                 op.c_float(0.),
+        #                                                                                                 op.c_float(0.),
+        #                                                                                                 op.c_float(0.))))
+        vis = op.rng_sum(bjets, (lambda bj : bj.p4), start=self.blank_p4) + op.rng_sum(wjets, (lambda wj : wj.p4), start=self.blank_p4) + lep.p4
+
+        vis_pt = vis.Pt()
+        vis_m  = vis.M()
+        vis_et = op.sqrt(op.pow(vis_m, 2) + op.pow(vis_pt, 2))
+        met_et = met.p4.E()
+        return op.sqrt(op.pow(vis_m, 2) + 2 * (vis_et * met_et - (vis.Px() * met.p4.Px() + vis.Py() * met.p4.Py())))
+        
+
+
+    
