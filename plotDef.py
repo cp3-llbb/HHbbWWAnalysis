@@ -432,6 +432,7 @@ def makeDeltaRPlots(sel,cont1,cont2,suffix,channel,isMC):
 
 ##########################  JETS SEPARATE PLOTS #################################
 def makeAk4JetsPlots (sel,jet1,jet2,jet3,jet4,channel,suffix,nJet,nbJet,HLL,is_MC=False):
+#def makeAk4JetsPlots (sel,bjets,wjets,channel,suffix,nJet,nbJet,HLL,is_MC=False):
 
     #print ("===============>>>Ak4Jet Plots__channel:%s__sel:%s"%(channel,suffix))
     plots = []
@@ -868,6 +869,9 @@ def makeAk4JetsPlots (sel,jet1,jet2,jet3,jet4,channel,suffix,nJet,nbJet,HLL,is_M
         #                         plotopts = channelLabel))        
 
     return plots
+
+
+
 
 
 def makeTwoAk4JetsPlots(sel, leadjet, subleadjet, suffix, channel, lead_is_b=False, sublead_is_b=False,is_MC=False):
@@ -2326,10 +2330,7 @@ def makeJPAtestPlots(sel, JPAscorePerCat, JPAjetIdxsPerCat, JPAnodeList, channel
                              EquidistantBinning(10, 0.0, 10.0),
                              xTitle = 'BDT output nNodes',
                              plotopts = channelLabel))
-    
-
     return plots
-
 
 
 def plotBDTout(channel, out, jets, sel, suffix):
@@ -2508,6 +2509,18 @@ def makeDoubleLeptonSelectedBoostedVariables(sel,l1,l2,B,jets,met,suffix,channel
 def makeDoubleLeptonMachineLearningInputPlots(sel,suffix,channel,inputs):
     plots = []
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
+    for (varname,vartitle,binning),variable in inputs.items():
+        plots.append(Plot.make1D("%s_%s_DNNInput_%s"%(channel,suffix,varname),
+                                 variable,
+                                 sel,
+                                 EquidistantBinning(*binning),
+                                 xTitle = vartitle,
+                                 plotopts = channelLabel))
+    return plots
+
+def makeSingleLeptonMachineLearningInputPlots(sel,suffix,channel,inputs):
+    plots = []
+    channelLabel = SingleLeptonChannelTitleLabel(channel)
     for (varname,vartitle,binning),variable in inputs.items():
         plots.append(Plot.make1D("%s_%s_DNNInput_%s"%(channel,suffix,varname),
                                  variable,
