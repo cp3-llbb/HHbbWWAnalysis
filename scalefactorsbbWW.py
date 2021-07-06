@@ -125,7 +125,7 @@ class ScaleFactorsbbWW:
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'Btag_SF',
                                                 entry_key   = 'ak8btag_eff',
                                                 base_key    = 'eff_{flav}_{era}',
-                                                base_str    = 'BtagEff_{flav}_{era}.json',
+                                                base_str    = 'BtagEff_ak8_{flav}_{era}.json',
                                                 format_dict = {'flav':['bjets','cjets','lightjets'],'era':['2016','2017','2018']})
 
         #----- 2017 -----#

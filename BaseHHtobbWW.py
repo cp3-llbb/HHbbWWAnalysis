@@ -485,10 +485,22 @@ One lepton and and one jet argument must be specified in addition to the require
             #   -> Mixed    : up = LHEScaleWeight[7] and down = LHEScaleWeight[0]
             # len(LHEScaleWeight) different (usually 44 ?!)
             #   -> nominal = up = down = 1.
+            # Meaning :
+            #        [' LHE scale variation weights (w_var / w_nominal)',         
+            #         ' [0] is renscfact=0.5d0 facscfact=0.5d0 ',         
+            #         ' [1] is renscfact=0.5d0 facscfact=1d0 ',         
+            #         ' [2] is renscfact=0.5d0 facscfact=2d0 ',         
+            #         ' [3] is renscfact=1d0 facscfact=0.5d0 ',         
+            #         ' [4] is renscfact=1d0 facscfact=1d0 ',         
+            #         ' [5] is renscfact=1d0 facscfact=2d0 ',         
+            #         ' [6] is renscfact=2d0 facscfact=0.5d0 ',         
+            #         ' [7] is renscfact=2d0 facscfact=1d0 ',         
+            #         ' [8] is renscfact=2d0 facscfact=2d0 ']    
+            # Clipping is done to avoid malicious files in ST samples
             if hasattr(tree,"LHEScaleWeight"):
                 factor = 1.
                 if sample.startswith('DYToLL_0J') or sample.startswith('DYToLL_1J'):
-                    # Bug of factor 0.5, see https://hypernews.cern.ch/HyperNews/CMS/get/generators/4383.html?inline=-1
+                    # Bug of factor 0.5, see https://hypernews.cern.ch/HyperNews/CMS/get/generators/4383.html?inline=-1 (only in the "8" weights case)
                     factor = 2.
                 self.scaleWeight = op.multiSwitch((op.AND(op.rng_len(tree.LHEScaleWeight) == 9, tree.LHEScaleWeight[4] != 0.),
                                                                         op.systematic(op.c_float(1.),    #tree.LHEScaleWeight[4],
@@ -503,12 +515,12 @@ One lepton and and one jet argument must be specified in addition to the require
                                                   (op.rng_len(tree.LHEScaleWeight) == 8, 
                                                                op.systematic(op.c_float(1.),
                                                                              name       = "ScaleWeight",
-                                                                             Factup     = tree.LHEScaleWeight[4],
-                                                                             Factdown   = tree.LHEScaleWeight[3],
-                                                                             Renormup   = tree.LHEScaleWeight[6],
-                                                                             Renormdown = tree.LHEScaleWeight[1],
-                                                                             Mixedup    = tree.LHEScaleWeight[7],
-                                                                             Mixeddown  = tree.LHEScaleWeight[0])),
+                                                                             Factup     = factor * tree.LHEScaleWeight[4],
+                                                                             Factdown   = factor * tree.LHEScaleWeight[3],
+                                                                             Renormup   = factor * tree.LHEScaleWeight[6],
+                                                                             Renormdown = factor * tree.LHEScaleWeight[1],
+                                                                             Mixedup    = factor * tree.LHEScaleWeight[7],
+                                                                             Mixeddown  = factor * tree.LHEScaleWeight[0])),
                                                   op.systematic(op.c_float(1.),
                                                                 name       = "ScaleWeight",
                                                                 Factup     = op.c_float(1.),
