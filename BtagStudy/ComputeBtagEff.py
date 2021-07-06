@@ -28,14 +28,17 @@ class ComputeBtagEff:
 
     def recoverHistograms(self):
         self.dict_hist = {cat:{typ:None for typ in self.dict_names[cat].keys()} for cat in self.dict_names.keys()} 
-        files = sorted(glob.glob(os.path.join(self.path,'results','*root')))
+        #files = sorted(glob.glob(os.path.join(self.path,'results','*root')))
+        files = sorted(glob.glob(self.path))
         if len(files) == 0:
             raise RuntimeError('Could not find files in path')
         for f in files:
             if '__skeleton__' in f:
                 continue
             r = ROOT.TFile(f)
-            print (f'Looking at{f}')
+#            if 'TTTo' not in f: # TODO : remove
+#                continue
+            print (f'Looking at {f}')
             for cat in self.dict_names.keys():
                 # Get hist #
                 h_truth = r.Get(self.dict_names[cat]['truth'])
@@ -99,7 +102,7 @@ class ComputeBtagEff:
         
 
     def produceROOT(self):
-        root_path = f"Efficiency/Btag_{self.suffix}_{self.era}.root"
+        root_path = f"Efficiency/root/Btag_{self.suffix}_{self.era}.root"
         f = ROOT.TFile(root_path,'recreate')
         for cat in self.dict_hist.keys():
             print (f'Producing root file for category {cat}')
@@ -112,6 +115,8 @@ class ComputeBtagEff:
     def producePlots(self):
         for cat in self.dict_hist.keys():
             print (f'Plotting category {cat}')
+            pdfName = f"Efficiency/pdf/BtagEff_{self.suffix}_{cat}_{self.era}.pdf"
+            # 1D projections #
             truthx = self.dict_hist[cat]['truth'].Project3D("x")
             truthy = self.dict_hist[cat]['truth'].Project3D("y")
             truthz = self.dict_hist[cat]['truth'].Project3D("z")
@@ -129,36 +134,80 @@ class ComputeBtagEff:
             btagz.SetTitle(f'Btagged {cat};Btag discriminant')
 
             # /!\ for efficiency profile : cannot project ratio !!! -> Need to do ratio of profiles
-    
-            ratiox = btagx.Clone("ratiox") #self.dict_hist[cat]['ratio'].Project3D("x")
+            ratiox = btagx.Clone("ratiox") 
             ratiox.Divide(truthx)
-            ratioy = btagy.Clone("ratioy") #self.dict_hist[cat]['ratio'].Project3D("y")
+            ratioy = btagy.Clone("ratioy")
             ratioy.Divide(truthy)
-            ratioz = btagz.Clone("ratioz") #self.dict_hist[cat]['ratio'].Project3D("z")
+            ratioz = btagz.Clone("ratioz")
             ratioz.Divide(truthz)
 
             ratiox.SetTitle(f'Efficiency {cat};#eta')
             ratioy.SetTitle(f'Efficiency {cat};P_{{T}}')
             ratioz.SetTitle(f'Efficiency {cat};Btag discriminant')
 
-            ratiox.GetYaxis().SetRangeUser(0.,1.) 
-            ratioy.GetYaxis().SetRangeUser(0.,1.)
-            ratioz.GetYaxis().SetRangeUser(0.,1.)
+            # 2D projections #
+            truthxy = self.dict_hist[cat]['truth'].Project3D("yx")
+            truthxz = self.dict_hist[cat]['truth'].Project3D("zx")
+            truthyz = self.dict_hist[cat]['truth'].Project3D("zy")
 
-            list_hist = [truthx,truthy,truthz,
-                         btagx,btagy,btagz,
-                         ratiox,ratioy,ratioz]
+            truthxy.SetTitle(f'True {cat};#eta;P_{{T}}')
+            truthxz.SetTitle(f'True {cat};#eta;Btag discriminant')
+            truthyz.SetTitle(f'True {cat};P_{{T}};Btag discriminant')
+
+            btagxy = self.dict_hist[cat]['btagged'].Project3D("yx")
+            btagxz = self.dict_hist[cat]['btagged'].Project3D("zx")
+            btagyz = self.dict_hist[cat]['btagged'].Project3D("zy")
+
+            btagxy.SetTitle(f'Btagged {cat};#eta;P_{{T}}')
+            btagxz.SetTitle(f'Btagged {cat};#eta;Btag discriminant')
+            btagyz.SetTitle(f'Btagged {cat};P_{{T}};Btag discriminant')
+
+            # /!\ for efficiency profile : cannot project ratio !!! -> Need to do ratio of profiles
+            ratioxy = btagxy.Clone("ratioxy") 
+            ratioxy.Divide(truthxy)
+            ratioxz = btagxz.Clone("ratioxy") 
+            ratioxz.Divide(truthxz)
+            ratioyz = btagyz.Clone("ratioyz") 
+            ratioyz.Divide(truthyz)
+
+            ratioxy.SetTitle(f'Efficiency {cat};#eta;P_{{T}}')
+            ratioxz.SetTitle(f'Efficiency {cat};#eta;Btag discriminant')
+            ratioyz.SetTitle(f'Efficiency {cat};P_{{T}};Btag discriminant')
+
+            list_1D = [truthx,truthy,truthz,
+                       btagx,btagy,btagz,
+                       ratiox,ratioy,ratioz]
 
             C = ROOT.TCanvas('c','c',2100,2100)
             C.Divide(3,3)
+            C.Print(pdfName+'[')
 
-            for idx, h in enumerate(list_hist,1):
+            for idx, h in enumerate(list_1D,1):
                 C.cd(idx)
                 h.Draw("H")
+                h.SetMaximum(h.GetMaximum()*1.1)
+                h.SetMinimum(0.)
                 h.SetLineWidth(2)
                 h.GetXaxis().SetTitleOffset(1.2)
 
-            C.Print(f"Efficiency/BtagEff_{self.suffix}_{cat}_{self.era}.pdf")
+            C.Print(pdfName)
+            C.Clear()
+            C.Divide(3,3)
+
+            list_2D = [truthxy,truthxz,truthyz,
+                       btagxy,btagxz,btagyz,
+                       ratioxy,ratioxz,ratioyz]
+
+            for idx, h in enumerate(list_2D,1):
+                C.cd(idx)
+                h.Draw("colz")
+                h.SetMaximum(h.GetMaximum()*1.1)
+                h.SetMinimum(0.)
+                h.GetXaxis().SetTitleOffset(1.2)
+                h.GetYaxis().SetTitleOffset(1.2)
+            C.Print(pdfName)
+            C.Print(pdfName+']')
+
 
     def produceJson(self):
         for cat in self.dict_hist.keys():
@@ -197,8 +246,10 @@ class ComputeBtagEff:
                             DiscBinning.append(DiscLow)
                         if DiscHigh not in DiscBinning:
                             DiscBinning.append(DiscHigh)
+                        if ratio.GetBinContent(x,y,z) > 1 or ratio.GetBinContent(x,y,z) < 0:
+                            print (f'[WARNING] Efficiency = {ratio.GetBinContent(x,y,z):0.5f} at eta = [{etaLow:0.3f},{etaHigh:0.3f}], PT = [{PtLow:0.3f},{PtHigh:0.3f}] and Btag = [{DiscLow:0.3f},{DiscHigh:0.3f}], will use absolute value')
                         DiscDict = {'bin' : [DiscLow,DiscHigh],
-                                    'value' : ratio.GetBinContent(x,y,z),
+                                    'value' : abs(ratio.GetBinContent(x,y,z)),
                                     'error_low' : 0., 
                                     'error_high' : 0} 
                         PtDict['values'].append(DiscDict)
@@ -208,7 +259,7 @@ class ComputeBtagEff:
             json_dict['data'] = data
 
             # Save to json #
-            json_path = f"Efficiency/BtagEff_{self.suffix}_{cat}_{self.era}.json"
+            json_path = f"Efficiency/json/BtagEff_{self.suffix}_{cat}_{self.era}.json"
             with open(json_path,'w') as f:
                 json.dump(json_dict,f,indent=2)
             print (f"Saved json to {json_path}")
@@ -238,8 +289,8 @@ hist_names_ak8 = {'bjets'    : {'truth' : 'N_ak8_truth_bjets',      'btagged': '
 instances = [
 #    ComputeBtagEff(path=args.path,dict_names=hist_names_ak4,suffix='ak4_raw',era=args.era),
 #    ComputeBtagEff(path=args.path,dict_names=hist_names_ak8,suffix='ak8_raw',era=args.era),
-    ComputeBtagEff(path=args.path,dict_names=hist_names_ak4,suffix='ak4',era=args.era,rebinX=20,rebinY=20,rebinZ=20),
-    ComputeBtagEff(path=args.path,dict_names=hist_names_ak8,suffix='ak8',era=args.era,rebinX=20,rebinY=20,rebinZ=20),
+    ComputeBtagEff(path=args.path,dict_names=hist_names_ak4,suffix='ak4',era=args.era,rebinX=5,rebinY=5,rebinZ=1),
+    ComputeBtagEff(path=args.path,dict_names=hist_names_ak8,suffix='ak8',era=args.era,rebinX=5,rebinY=5,rebinZ=1),
 ]
 
 
