@@ -260,10 +260,10 @@ class highlevelLambdas:
         self.isBoosted  = op.AND(op.rng_len(HHself.ak8BJets) >= 1, op.rng_len(HHself.ak4JetsCleanedFromAk8b) >= 1)
         #self.isBoosted  = op.rng_len(HHself.ak8BJets) >= 1
         self.isResolved = op.AND(op.rng_len(HHself.ak4Jets)  >= 3,op.rng_len(HHself.ak4BJets) >= 1,op.rng_len(HHself.ak8BJets) == 0)
-        self.has1Wj     = op.rng_len(HHself.probableWJets) == 1
-        self.has2Wj     = op.rng_len(HHself.wJetsPairs) >= 1
-        self.isFullReco = op.AND(op.rng_len(HHself.bJetsByScore) >= 2, op.rng_len(HHself.wJetsPairs) >= 1)
-        self.isMissReco = op.AND(op.rng_len(HHself.bJetsByScore) >= 2, op.rng_len(HHself.probableWJets) == 1)
+        #self.has1Wj     = op.rng_len(HHself.probableWJets) == 1
+        #self.has2Wj     = op.rng_len(HHself.wJetsPairs) >= 1
+        #self.isFullReco = op.AND(op.rng_len(HHself.bJetsByScore) >= 2, op.rng_len(HHself.wJetsPairs) >= 1)
+        #self.isMissReco = op.AND(op.rng_len(HHself.bJetsByScore) >= 2, op.rng_len(HHself.probableWJets) == 1)
 
         self.comp_m_hh_bregcorr = lambda bjets, wjets, lep, met : (op.rng_sum(bjets, (lambda bj : self.bJetCorrP4(bj)), start=empty_p4) + 
                                                                    op.rng_sum(wjets, (lambda wj : self.bJetCorrP4(wj)), start=empty_p4) + 

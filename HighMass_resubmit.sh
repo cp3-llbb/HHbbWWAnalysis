@@ -1,0 +1,16 @@
+#!/bin/sh
+sbatch --licenses=cms_storage:3  --array=264,265,266,267,269,270,271,273,274,276,277,278,279,280,281,285,286,287,288,289,291,295,296,297,298,300,301,303,304,305,307,311,312,313,314,315,316,321,2507,2531 --time=12:00:00 --mem-per-cpu=8000 /nfs/scratch/fynu/gsaha/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_v2_HighMass_M_300/batch/slurmSubmission.sh
+
+sbatch --licenses=cms_storage:3  --array=262,263,265,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,283,285,286,287,288,289,291,293,295,296,297,298,300,301,303,304,305,309,311,312,313,314,315,319,321,747,2347,2530 --time=12:00:00 --mem-per-cpu=8000 /nfs/scratch/fynu/gsaha/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_v2_HighMass_M_250/batch/slurmSubmission.sh
+
+sbatch --licenses=cms_storage:3  --array=262,264,265,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,284,285,286,287,288,289,291,293,294,295,296,297,298,300,301,303,304,305,306,308,309,311,312,313,314,315,316,317,319,321,747,2111,2112 --time=12:00:00 --mem-per-cpu=8000 /nfs/scratch/fynu/gsaha/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_v2_HighMass_M_700/batch/slurmSubmission.sh
+
+sbatch --licenses=cms_storage:3  --array=262,263,265,266,267,268,269,270,271,273,274,275,276,277,278,279,280,281,283,284,286,287,288,289,291,292,293,295,296,297,298,299,300,301,303,304,305,307,313,314,315,318,319,321,747,1371,1372,2117,2127,2133,2135,2527,2540,2757 --time=12:00:00 --mem-per-cpu=8000 /nfs/scratch/fynu/gsaha/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_v2_HighMass_M_600/batch/slurmSubmission.sh
+
+sbatch --licenses=cms_storage:3  --array=266,267,268,269,270,271,273,274,275,276,277,278,279,280,281,284,286,287,288,291,294,295,296,297,298,299,300,301,303,304,305,306,307,313,314,315,317,318,319,321,747,2127,2129,2134,2354 --time=12:00:00 --mem-per-cpu=8000 /nfs/scratch/fynu/gsaha/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_v2_HighMass_M_400/batch/slurmSubmission.sh
+
+sbatch --licenses=cms_storage:3  --array=262,263,264,265,266,267,268,269,270,271,273,274,275,276,277,278,279,280,281,283,284,285,286,287,288,289,291,293,295,296,297,298,299,301,303,304,305,306,311,313,314,315,318,319,321,747,2111,2127,2130,2134,2347,2530 --time=12:00:00 --mem-per-cpu=8000 /nfs/scratch/fynu/gsaha/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_v2_HighMass_M_800/batch/slurmSubmission.sh
+
+sbatch --licenses=cms_storage:3  --array=262,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,284,285,286,287,288,291,293,294,295,296,297,298,299,300,301,303,304,305,306,307,311,312,313,314,315,316,318,321,2071,2129,2347,2537 --time=12:00:00 --mem-per-cpu=8000 /nfs/scratch/fynu/gsaha/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_v2_HighMass_M_900/batch/slurmSubmission.sh
+
+sbatch --licenses=cms_storage:3  --array=264,265,266,267,268,269,270,271,273,274,275,276,277,278,279,280,281,285,286,287,288,291,295,296,297,298,299,301,303,304,305,308,309,311,312,313,314,315,316,318,319,320,321,747,2076,2096,2110,2344,2347,2524,2532,2764 --time=12:00:00 --mem-per-cpu=8000 /nfs/scratch/fynu/gsaha/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_v2_HighMass_M_500/batch/slurmSubmission.sh
