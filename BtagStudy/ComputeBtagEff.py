@@ -13,8 +13,9 @@ ROOT.gStyle.SetOptStat(0)
 
 
 class ComputeBtagEff:
-    def __init__(self,path,dict_names,era,rebinX=None,rebinY=None,rebinZ=None):
+    def __init__(self,path,suffix,dict_names,era,rebinX=None,rebinY=None,rebinZ=None):
         self.path = os.path.abspath(path)
+        self.suffix = suffix
         self.dict_names = dict_names
         self.era = era
         self.rebinX = rebinX
@@ -26,37 +27,43 @@ class ComputeBtagEff:
         self.makeRatio()
 
     def recoverHistograms(self):
-        self.dict_hist = {}
-        for f in glob.glob(os.path.join(self.path,'results','*root')):
+        self.dict_hist = {cat:{typ:None for typ in self.dict_names[cat].keys()} for cat in self.dict_names.keys()} 
+        #files = sorted(glob.glob(os.path.join(self.path,'results','*root')))
+        files = sorted(glob.glob(self.path))
+        if len(files) == 0:
+            raise RuntimeError('Could not find files in path')
+        for f in files:
             if '__skeleton__' in f:
                 continue
             r = ROOT.TFile(f)
-            print ('Looking at ',f)
+#            if 'TTTo' not in f: # TODO : remove
+#                continue
+            print (f'Looking at {f}')
             for cat in self.dict_names.keys():
                 # Get hist #
-                h_tot = r.Get(self.dict_names[cat]['truth'])
-                h_btag = r.Get(self.dict_names[cat]['btagged'])
+                h_truth = r.Get(self.dict_names[cat]['truth'])
+                h_btagged = r.Get(self.dict_names[cat]['btagged'])
 
                 # Generate subdict #
                 if cat not in self.dict_hist.keys():
                     self.dict_hist[cat] = {}
 
                 # Total hist #
-                if 'truth' not in self.dict_hist[cat]:
-                    self.dict_hist[cat]['truth'] = copy.deepcopy(h_tot.Clone(cat+'_truth'))
+                if self.dict_hist[cat]['truth'] is None:
+                    self.dict_hist[cat]['truth'] = copy.deepcopy(h_truth)
                 else:
-                    self.dict_hist[cat]['truth'].Add(h_tot)
+                    self.dict_hist[cat]['truth'].Add(h_truth)
 
                 # Btagged hist #
-                if 'btagged' not in self.dict_hist[cat]:
-                    self.dict_hist[cat]['btagged'] = copy.deepcopy(h_btag.Clone(cat+'_btagged'))
+                if self.dict_hist[cat]['btagged'] is None:
+                    self.dict_hist[cat]['btagged'] = copy.deepcopy(h_btagged)
                 else:
-                    self.dict_hist[cat]['btagged'].Add(h_btag)
+                    self.dict_hist[cat]['btagged'].Add(h_btagged)
             r.Close()
-                    
+
     def rebinHistograms(self):
         for cat in self.dict_names.keys():
-            print ("Rebinning category %s"%cat)
+            print (f"Rebinning category {cat}")
             assert  self.dict_hist[cat]['btagged'].GetNbinsX() == self.dict_hist[cat]['truth'].GetNbinsX()
             assert  self.dict_hist[cat]['btagged'].GetNbinsY() == self.dict_hist[cat]['truth'].GetNbinsY()
             assert  self.dict_hist[cat]['btagged'].GetNbinsZ() == self.dict_hist[cat]['truth'].GetNbinsZ()
@@ -64,97 +71,148 @@ class ComputeBtagEff:
             NbinsY = self.dict_hist[cat]['btagged'].GetNbinsY()
             NbinsZ = self.dict_hist[cat]['btagged'].GetNbinsZ()
 
-            assert NbinsX % self.rebinX == 0
-            assert NbinsY % self.rebinY == 0
-            assert NbinsZ % self.rebinZ == 0
-            
-            groupX = NbinsX // self.rebinX
-            groupY = NbinsY // self.rebinY
-            groupZ = NbinsZ // self.rebinZ
+            if self.rebinX is not None:
+                assert NbinsX % self.rebinX == 0
+                groupX = NbinsX // self.rebinX
+            else:
+                groupX = 1
+
+            if self.rebinY is not None:
+                assert NbinsY % self.rebinY == 0
+                groupY = NbinsY // self.rebinY
+            else:
+                groupY = 1
+
+            if self.rebinZ is not None:
+                assert NbinsZ % self.rebinZ == 0
+                groupZ = NbinsZ // self.rebinZ
+            else:
+                groupZ = 1
 
             self.dict_hist[cat]['btagged'] = self.dict_hist[cat]['btagged'].Rebin3D(groupX,groupY,groupZ)
             self.dict_hist[cat]['truth'] = self.dict_hist[cat]['truth'].Rebin3D(groupX,groupY,groupZ)
 
     def makeRatio(self):
-#        # Add btag mistag rate #
-#        self.dict_hist['mistag'] = {'truth' : copy.deepcopy(self.dict_hist['cjets']['truth']),
-#                                    'btagged' : copy.deepcopy(self.dict_hist['cjets']['btagged'])}
-#        self.dict_hist['mistag']['truth'].Add(self.dict_hist['lightjets']['truth'])
-#        self.dict_hist['mistag']['btagged'].Add(self.dict_hist['lightjets']['btagged'])
-
         # Produce ratio for each category #
         for cat in self.dict_hist.keys():
-            ratio = self.dict_hist[cat]['btagged'].Clone(cat+'_ratio')
+            ratio = copy.deepcopy(self.dict_hist[cat]['btagged'])
             ratio.Divide(self.dict_hist[cat]['truth'])
             self.dict_hist[cat]['ratio'] = ratio
 
         
 
     def produceROOT(self):
-        f = ROOT.TFile("Btag_%.root"%self.era,'recreate')
+        root_path = f"Efficiency/root/Btag_{self.suffix}_{self.era}.root"
+        f = ROOT.TFile(root_path,'recreate')
         for cat in self.dict_hist.keys():
-            print ('Producing root file for category %s'%cat)
+            print (f'Producing root file for category {cat}')
             for name in ['truth','btagged','ratio']:
-                self.dict_hist[cat][name].Write(cat+name)
+                self.dict_hist[cat][name].Write(f'{cat}_{name}')
         f.Write()
         f.Close()
-        print ("Produced file Btag_%s.root"%self.era)
+        print (f"Produced file {root_path}")
 
     def producePlots(self):
         for cat in self.dict_hist.keys():
-            print ('Plotting category %s'%cat)
+            print (f'Plotting category {cat}')
+            pdfName = f"Efficiency/pdf/BtagEff_{self.suffix}_{cat}_{self.era}.pdf"
+            # 1D projections #
             truthx = self.dict_hist[cat]['truth'].Project3D("x")
             truthy = self.dict_hist[cat]['truth'].Project3D("y")
             truthz = self.dict_hist[cat]['truth'].Project3D("z")
 
-            truthx.SetTitle('True %s;#eta'%cat)
-            truthy.SetTitle('True %s;P_{T}'%cat)
-            truthz.SetTitle('True %s;Btag discriminant'%cat)
+            truthx.SetTitle(f'True {cat};#eta')
+            truthy.SetTitle(f'True {cat};P_{{T}}')
+            truthz.SetTitle(f'True {cat};Btag discriminant')
 
             btagx = self.dict_hist[cat]['btagged'].Project3D("x")
             btagy = self.dict_hist[cat]['btagged'].Project3D("y")
             btagz = self.dict_hist[cat]['btagged'].Project3D("z")
 
-            btagx.SetTitle('Btagged %s;#eta'%cat)
-            btagy.SetTitle('Btagged %s;P_{T}'%cat)
-            btagz.SetTitle('Btagged %s;Btag discriminant'%cat)
+            btagx.SetTitle(f'Btagged {cat};#eta')
+            btagy.SetTitle(f'Btagged {cat};P_{{T}}')
+            btagz.SetTitle(f'Btagged {cat};Btag discriminant')
 
             # /!\ for efficiency profile : cannot project ratio !!! -> Need to do ratio of profiles
-    
-            ratiox = btagx.Clone("ratiox") #self.dict_hist[cat]['ratio'].Project3D("x")
+            ratiox = btagx.Clone("ratiox") 
             ratiox.Divide(truthx)
-            ratioy = btagy.Clone("ratioy") #self.dict_hist[cat]['ratio'].Project3D("y")
+            ratioy = btagy.Clone("ratioy")
             ratioy.Divide(truthy)
-            ratioz = btagz.Clone("ratioz") #self.dict_hist[cat]['ratio'].Project3D("z")
+            ratioz = btagz.Clone("ratioz")
             ratioz.Divide(truthz)
 
-            ratiox.SetTitle('Efficiency %s;#eta'%cat)
-            ratioy.SetTitle('Efficiency %s;P_{T}'%cat)
-            ratioz.SetTitle('Efficiency %s;Btag discriminant'%cat)
+            ratiox.SetTitle(f'Efficiency {cat};#eta')
+            ratioy.SetTitle(f'Efficiency {cat};P_{{T}}')
+            ratioz.SetTitle(f'Efficiency {cat};Btag discriminant')
 
-            ratiox.GetYaxis().SetRangeUser(0.,1.) 
-            ratioy.GetYaxis().SetRangeUser(0.,1.)
-            ratioz.GetYaxis().SetRangeUser(0.,1.)
+            # 2D projections #
+            truthxy = self.dict_hist[cat]['truth'].Project3D("yx")
+            truthxz = self.dict_hist[cat]['truth'].Project3D("zx")
+            truthyz = self.dict_hist[cat]['truth'].Project3D("zy")
 
-            list_hist = [truthx,truthy,truthz,
-                         btagx,btagy,btagz,
-                         ratiox,ratioy,ratioz]
+            truthxy.SetTitle(f'True {cat};#eta;P_{{T}}')
+            truthxz.SetTitle(f'True {cat};#eta;Btag discriminant')
+            truthyz.SetTitle(f'True {cat};P_{{T}};Btag discriminant')
+
+            btagxy = self.dict_hist[cat]['btagged'].Project3D("yx")
+            btagxz = self.dict_hist[cat]['btagged'].Project3D("zx")
+            btagyz = self.dict_hist[cat]['btagged'].Project3D("zy")
+
+            btagxy.SetTitle(f'Btagged {cat};#eta;P_{{T}}')
+            btagxz.SetTitle(f'Btagged {cat};#eta;Btag discriminant')
+            btagyz.SetTitle(f'Btagged {cat};P_{{T}};Btag discriminant')
+
+            # /!\ for efficiency profile : cannot project ratio !!! -> Need to do ratio of profiles
+            ratioxy = btagxy.Clone("ratioxy") 
+            ratioxy.Divide(truthxy)
+            ratioxz = btagxz.Clone("ratioxy") 
+            ratioxz.Divide(truthxz)
+            ratioyz = btagyz.Clone("ratioyz") 
+            ratioyz.Divide(truthyz)
+
+            ratioxy.SetTitle(f'Efficiency {cat};#eta;P_{{T}}')
+            ratioxz.SetTitle(f'Efficiency {cat};#eta;Btag discriminant')
+            ratioyz.SetTitle(f'Efficiency {cat};P_{{T}};Btag discriminant')
+
+            list_1D = [truthx,truthy,truthz,
+                       btagx,btagy,btagz,
+                       ratiox,ratioy,ratioz]
 
             C = ROOT.TCanvas('c','c',2100,2100)
             C.Divide(3,3)
+            C.Print(pdfName+'[')
 
-            for idx, h in enumerate(list_hist,1):
+            for idx, h in enumerate(list_1D,1):
                 C.cd(idx)
                 h.Draw("H")
+                h.SetMaximum(h.GetMaximum()*1.1)
+                h.SetMinimum(0.)
                 h.SetLineWidth(2)
                 h.GetXaxis().SetTitleOffset(1.2)
 
-            C.Print("BtagEff_%s_%s.pdf"%(cat,self.era))
+            C.Print(pdfName)
+            C.Clear()
+            C.Divide(3,3)
+
+            list_2D = [truthxy,truthxz,truthyz,
+                       btagxy,btagxz,btagyz,
+                       ratioxy,ratioxz,ratioyz]
+
+            for idx, h in enumerate(list_2D,1):
+                C.cd(idx)
+                h.Draw("colz")
+                h.SetMaximum(h.GetMaximum()*1.1)
+                h.SetMinimum(0.)
+                h.GetXaxis().SetTitleOffset(1.2)
+                h.GetYaxis().SetTitleOffset(1.2)
+            C.Print(pdfName)
+            C.Print(pdfName+']')
+
 
     def produceJson(self):
         for cat in self.dict_hist.keys():
-            print ('Producing json file for category %s'%cat)
-            json_dict = {'dimension': 3, 'variables': ['Eta','Pt','BTagDiscri'], 'error_type': 'absolute'}
+            print (f'Producing json file for category {cat}')
+            json_dict = {'dimension': 3, 'variables': ['AbsEta','Pt','BTagDiscri'], 'error_type': 'absolute'}
             ratio = self.dict_hist[cat]['ratio']
             xAxis = ratio.GetXaxis()
             yAxis = ratio.GetYaxis()
@@ -188,10 +246,12 @@ class ComputeBtagEff:
                             DiscBinning.append(DiscLow)
                         if DiscHigh not in DiscBinning:
                             DiscBinning.append(DiscHigh)
+                        if ratio.GetBinContent(x,y,z) > 1 or ratio.GetBinContent(x,y,z) < 0:
+                            print (f'[WARNING] Efficiency = {ratio.GetBinContent(x,y,z):0.5f} at eta = [{etaLow:0.3f},{etaHigh:0.3f}], PT = [{PtLow:0.3f},{PtHigh:0.3f}] and Btag = [{DiscLow:0.3f},{DiscHigh:0.3f}], will use absolute value')
                         DiscDict = {'bin' : [DiscLow,DiscHigh],
-                                    'value' : ratio.GetBinContent(x,y,z),
-                                    'error_low' : 0., #ratio.GetBinError(x,y,z),
-                                    'error_high' : 0} #ratio.GetBinError(x,y,z)}
+                                    'value' : abs(ratio.GetBinContent(x,y,z)),
+                                    'error_low' : 0., 
+                                    'error_high' : 0} 
                         PtDict['values'].append(DiscDict)
                     etaDict['values'].append(PtDict)
                 data.append(etaDict)
@@ -199,12 +259,13 @@ class ComputeBtagEff:
             json_dict['data'] = data
 
             # Save to json #
-            with open("BtagEff_%s_%s.json"%(cat,self.era),'w') as f:
+            json_path = f"Efficiency/json/BtagEff_{self.suffix}_{cat}_{self.era}.json"
+            with open(json_path,'w') as f:
                 json.dump(json_dict,f,indent=2)
-            print ("Saved json to BtagEff_%s_%s.json"%(cat,self.era))
+            print (f"Saved json to {json_path}")
 
 
-parser = argparse.ArgumentParser(description='Produce plots and json files of btagging efficiency and mistage rate')
+parser = argparse.ArgumentParser(description='Produce plots and json files of tagging efficiencies')
 parser.add_argument('--path', action='store', required=True, type=str, 
                     help='Path to bamboo output')
 parser.add_argument('--era', action='store', required=True, type=str, 
@@ -218,16 +279,26 @@ parser.add_argument('--root', action='store_true', required=False, default=False
 args = parser.parse_args()
 
 
-hist_names = {'bjets'   : {'truth' : 'N_truth_bjets', 'btagged': 'N_btagged_bjets'},
-              'cjets'    : {'truth' : 'N_truth_cjets', 'btagged': 'N_btagged_cjets'},
-              'lightjets': {'truth' : 'N_truth_lightjets', 'btagged': 'N_btagged_lightjets'}}
+hist_names_ak4 = {'bjets'    : {'truth' : 'N_ak4_truth_bjets',      'btagged': 'N_ak4_btagged_bjets'},
+                  'cjets'    : {'truth' : 'N_ak4_truth_cjets',      'btagged': 'N_ak4_btagged_cjets'},
+                  'lightjets': {'truth' : 'N_ak4_truth_lightjets',  'btagged': 'N_ak4_btagged_lightjets'}}
+hist_names_ak8 = {'bjets'    : {'truth' : 'N_ak8_truth_bjets',      'btagged': 'N_ak8_btagged_bjets'},
+                  'cjets'    : {'truth' : 'N_ak8_truth_cjets',      'btagged': 'N_ak8_btagged_cjets'},
+                  'lightjets': {'truth' : 'N_ak8_truth_lightjets',  'btagged': 'N_ak8_btagged_lightjets'}}
 
-instance = ComputeBtagEff(args.path,hist_names,era=args.era,rebinX=10,rebinY=20,rebinZ=1)
+instances = [
+#    ComputeBtagEff(path=args.path,dict_names=hist_names_ak4,suffix='ak4_raw',era=args.era),
+#    ComputeBtagEff(path=args.path,dict_names=hist_names_ak8,suffix='ak8_raw',era=args.era),
+    ComputeBtagEff(path=args.path,dict_names=hist_names_ak4,suffix='ak4',era=args.era,rebinX=5,rebinY=5,rebinZ=1),
+    ComputeBtagEff(path=args.path,dict_names=hist_names_ak8,suffix='ak8',era=args.era,rebinX=5,rebinY=5,rebinZ=1),
+]
 
-if args.plots:
-    instance.producePlots()
-if args.json:
-    instance.produceJson()
-if args.root:
-    instance.produceROOT()
+
+for instance in instances:
+    if args.plots:
+        instance.producePlots()
+    if args.json:
+        instance.produceJson()
+    if args.root:
+        instance.produceROOT()
 

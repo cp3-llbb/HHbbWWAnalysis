@@ -152,8 +152,6 @@ class BambooLauncher:
                     completed = sum(completed),
                     successes = sum([ec == 0 for ec in exitcodes if ec is not None]),
                     failures  = sum([ec != 0 for ec in exitcodes if ec is not None])))
-
-
             time.sleep(10)
 
 

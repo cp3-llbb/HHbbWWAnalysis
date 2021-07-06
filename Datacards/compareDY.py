@@ -4,6 +4,7 @@ import glob
 import copy
 import json 
 import math
+import argparse
 from array import array
 import numpy as np
 import ROOT
@@ -11,44 +12,23 @@ import ROOT
 ROOT.gStyle.SetOptStat(0)
 ROOT.gROOT.SetBatch(True)
 
-def saveToJson(weight,name):
-    json_dict = {'dimension': 2, 'variables': ['Eta','Pt'], 'error_type': 'absolute'}
-    # Fill data #
-    binning = []
-    data = []
-    xAxis = weight.GetXaxis()
-    for i in range(1,weight.GetNbinsX()+1):
-        # Get content #
-        cont = weight.GetBinContent(i)
-        if cont <= 0:
-            continue
-        # Get error #
-        err = weight.GetBinError(i)
+parser = argparse.ArgumentParser(description='Comparing DY')
+parser.add_argument('--mc', action='store', required=True, type=str,
+                    help='Path to DY MC shapes')
+parser.add_argument('--dd', action='store', required=True, type=str,
+                    help='Path to DY datadriven shapes')
+parser.add_argument('--cl', action='store', required=True, type=str,
+                    help='Path to DY closure shapes')
+parser.add_argument('--name', action='store', required=True, type=str,
+                    help='Name of the output files')
+args = parser.parse_args()
 
-        # Get binning #
-        xLow  = xAxis.GetBinLowEdge(i)
-        xHigh = xAxis.GetBinUpEdge(i)
-        
-        if len(binning) == 0:
-            binning.append(xLow)
-        binning.append(xHigh)
-
-        # Save data #
-        #data.append({'bin':[xLow,xHigh],'value':cont,'error_low':err,'error_high':err}) 
-        data.append({'bin':[xLow,xHigh],'value':1.,'error_low':abs(1.-cont),'error_high':abs(cont-1.)})
-   
-    json_dict['binning'] = {'x':[-2.5,2.5],'y':binning}
-    json_dict['data'] = [{'bin':[-2.5,2.5],'values':data}]
-    
-    with open(f'{name}.json','w') as f:
-        json.dump(json_dict,f,indent=4)
-    print (f"Saved json to {name}.json")
-
-def saveToRoot(weight,name):
-    F = ROOT.TFile(f'{name}.root','RECREATE')
-    weight.Write()
-    F.Write()
-    F.Close()
+if '{era}' not in args.mc:
+    raise RuntimeError(f'Missing {{era}} in {args.mc}')
+if '{era}' not in args.dd:
+    raise RuntimeError(f'Missing {{era}} in {args.dd}')
+if '{era}' not in args.cl:
+    raise RuntimeError(f'Missing {{era}} in {args.cl}')
 
 factors = {}
 
@@ -59,9 +39,9 @@ plotDict_DD = {era:{} for era in eras}
 plotDict_CL = {era:{} for era in eras}
 
 for era in eras:
-    path_DY_MC  = f"/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/Datacards/datacards/datacard_fit_TTHIDLoose_DNN11_DY_MC_{era}/"
-    path_DY_DD  = f"/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/Datacards/datacards/datacard_fit_TTHIDLoose_DNN11_DY_datadrivenHT_{era}/"
-    path_DY_CL  = f"/home/ucl/cp3/fbury/bamboodev/HHbbWWAnalysis/Datacards/datacards/datacard_fit_TTHIDLoose_DNN11_DY_closureHT_{era}/"
+    path_DY_MC  = args.mc.format(era=era)
+    path_DY_DD  = args.dd.format(era=era)
+    path_DY_CL  = args.cl.format(era=era)
     print (path_DY_MC)
     print (path_DY_DD)
     print (path_DY_CL)
@@ -139,7 +119,7 @@ def plotCategory(C,h_MC,h_DD,h_CL,title='',method=''):
     factor_DD = computeFactor(N_MC,N_DD,Nerr_MC,Nerr_DD)
     factor_CL = computeFactor(N_MC,N_CL,Nerr_MC,Nerr_CL)
 
-    h_MC.SetTitle("{};;Events / {:0.2f}".format(title,h_MC.GetXaxis().GetBinWidth(1)))
+    h_MC.SetTitle(f"{title};;Events / {h_MC.GetXaxis().GetBinWidth(1):0.2f}")
     hmax = max([h.GetMaximum() for h in [h_MC,h_DD,h_CL]])
     h_MC.SetMaximum(hmax*10)
 
@@ -254,7 +234,7 @@ def plotCategory(C,h_MC,h_DD,h_CL,title='',method=''):
     line = ROOT.TLine(0,1.,1,1.)
     line.Draw()
 
-    C.Print(f"CompareDY/ComparisonDY.pdf","Title:"+title)
+    C.Print(f"CompareDY/ComparisonDY_{args.name}.pdf","Title:"+title)
 
     if method == 'factor':
         return factor_CL[0]
@@ -265,7 +245,7 @@ def plotCategory(C,h_MC,h_DD,h_CL,title='',method=''):
 
 
 C = ROOT.TCanvas("C","C",700,800)
-C.Print(f"CompareDY/ComparisonDY.pdf[")
+C.Print(f"CompareDY/ComparisonDY_{args.name}.pdf[")
 numerics = {}
 factors = {}
 fit_results = {}
@@ -310,11 +290,11 @@ for cat in sorted(categories):
     else:
         raise RuntimeError('Not understood category')
 
-C.Print(f"CompareDY/ComparisonDY.pdf]")
+C.Print(f"CompareDY/ComparisonDY_{args.name}.pdf]")
 
-with open('CompareDY/factors.json','w') as handle:
+with open(f'CompareDY/factors_{args.name}.json','w') as handle:
     json.dump(factors,handle,indent=4)
-with open('CompareDY/fit_results.json','w') as handle:
+with open(f'CompareDY/fit_results_{args.name}.json','w') as handle:
     json.dump(fit_results,handle,indent=4)
-print ('Saved numerical factors to CompareDY/factors.json')
-print ('Saved fit results to CompareDY/fit_results.json')
+print (f'Saved numerical factors to CompareDY/factors_{args.name}.json')
+print (f'Saved fit results to CompareDY/fit_results_{args.name}.json')

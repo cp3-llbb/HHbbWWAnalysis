@@ -145,6 +145,12 @@ namespace {
     return std::make_pair(c, c);
   }
 
+  float fatjetCorrections(const hme::LorentzVectorF fatb, float mh) {
+    return mh / fatb.M();
+  }
+
+
+
   std::pair<float, float> bjetCorrectionsSliding(const hme::LorentzVectorF b1,
                                                  const hme::LorentzVectorF b2,
                                                  hme::HMEEvaluator::Sampler gen,
@@ -154,9 +160,10 @@ namespace {
     float c2 = 0;
 
     /* Loop to find solution until found */
-    while (true) {
+    for (int i=0; i<1000 ; i++){
       /* Get c1 from pdf */
       c1 = gen.getRandom(rg);
+
       /* Get c2 from mbb = mh */
       hme::LorentzVectorF leadingbjet;
       hme::LorentzVectorF trailingbjet;
@@ -171,12 +178,12 @@ namespace {
       float x2 = 2 * c1 * (leadingbjet.Dot(trailingbjet));
       float x3 = c1 * c1 * leadingbjet.M2() - mh * mh;
       /*
-           [c1*P1 + c2*P2]^2 = mH^2
-           c2^2 * (m2^2) + c2 * (2*c1*P1.P2) + c1*m1 - mh^2 = 0
-           x1 = m2^2
-           x2 = 2*c1*P1.P2
-           x3 = c1^2 * m1^2 - mh^2
-           */
+         [c1*P1 + c2*P2]^2 = mH^2
+         c2^2 * (m2^2) + c2 * (2*c1*P1.P2) + c1*m1 - mh^2 = 0
+         x1 = m2^2
+         x2 = 2*c1*P1.P2
+         x3 = c1^2 * m1^2 - mh^2
+      */
 
       /* Check solutions */
       if (x2 < 0.)
@@ -196,71 +203,91 @@ namespace {
         return std::make_pair(c1, c2);
       else
         return std::make_pair(c2, c1);
+
     }
+    return bjetCorrectionsSimple(b1, b2, mh); 
   }
 
 }  // namespace
 
 std::pair<float, float> hme::HMEEvaluator::runHME(const hme::LorentzVectorF l1,
-                                                  const hme::LorentzVectorF l2,
-                                                  const hme::LorentzVectorF b1,
-                                                  const hme::LorentzVectorF b2,
-                                                  const hme::LorentzVectorF met,
-                                                  const std::uint32_t eventnr,
-                                                  bool verbose) const {
-  //LogDebug<<"Running HME"<<std::endl;
-  /* Initialize */
-  TRandom3& rg = rdfhelpers::getTRandom3(eventnr);
-  double met_sigma = 25.2;
-  int iterations = 10000;
-  int converged = 0;
+        const hme::LorentzVectorF l2,
+        const hme::LorentzVectorF b1,
+        const hme::LorentzVectorF b2,
+        const hme::LorentzVectorF met,
+        const std::uint32_t eventnr,
+        bool boosted_tag) const {
 
-  float xmin = 0.;
-  float xmax = 5000.;
-  float xdelta = 1.;
-  std::vector<float> bins(int((xmax - xmin) / xdelta), 0.);
+    /* Initialize */
+    TRandom3& rg = rdfhelpers::getTRandom3(eventnr);
+    double met_sigma = 25.2;
+    int iterations = 10000;
+    int converged = 0;
 
-  /* Iteration loop */
-  int it = 0;
-  while (it < iterations) {
-    it += 1;
+    float xmin = 0.;
+    float xmax = 5000.;
+    float xdelta = 1.;
+    std::vector<float> bins(int((xmax - xmin) / xdelta), 0.);
 
-    /* Random draws */
-    float eta_gen = rg.Uniform(-6, 6);
-    float phi_gen = rg.Uniform(-3.1415926, 3.1415926);
-    float mh = rg.Gaus(125.03, 0.004);
-    float mw = m_mw_gen.getRandom(rg);
-    float met_dpx = rg.Gaus(0.0, met_sigma);
-    float met_dpy = rg.Gaus(0.0, met_sigma);
-    LogDebug << "-----------------------------------" << std::endl;
-    LogDebug << "Iteration " << it << " - eta = " << eta_gen << " - phi = " << phi_gen << std::endl;
+    /* Iteration loop */
+    int it = 0;
+    while (it < iterations) {
+        it += 1;
 
-    /* bjets corrections */
+        /* Random draws */
+        float eta_gen = rg.Uniform(-6, 6);
+        float phi_gen = rg.Uniform(-3.1415926, 3.1415926);
+        float mh = rg.Gaus(125.03, 0.004);
+        float mw = m_mw_gen.getRandom(rg);
+        float met_dpx = rg.Gaus(0.0, met_sigma);
+        float met_dpy = rg.Gaus(0.0, met_sigma);
+        LogDebug << "-----------------------------------" << std::endl;
+        LogDebug << "Iteration " << it << " - eta = " << eta_gen << " - phi = " << phi_gen << std::endl;
+
+        /* bjets corrections */
+        LorentzVectorF tmp_b1;
+        LorentzVectorF tmp_b2;
+        LorentzVectorF tmp_fatb;
+        float met_Px_corr;
+        float met_Py_corr;
 
     LogDebug << "  Before corrections" << std::endl;
-    LogDebug << "    MET : " << met << std::endl;
-    LogDebug << "    b1  : " << b1 << std::endl;
-    LogDebug << "    b2  : " << b2 << std::endl;
-
+    LogDebug << "    MET  : " << met << std::endl;
+    //if (boosted_tag){
+    //    LogDebug << "    fatb : " << fatb << std::endl;
+    //    float c = fatjetCorrections(fatb, mh);
+    //    tmp_fatb = fatb * c;
+    //    met_Px_corr = -(c - 1) * fatb.Px();
+    //    met_Py_corr = -(c - 1) * fatb.Py();
+    //    LogDebug << "  Correction : c = " << c << std::endl;
+    //}
+    //else{
+    LogDebug << "    b1   : " << b1 << std::endl;
+    LogDebug << "    b2   : " << b2 << std::endl;
     std::pair<float, float> c = bjetCorrectionsSliding(b1, b2, m_brescale_gen, rg, mh);
-    LorentzVectorF tmp_b1;
-    LorentzVectorF tmp_b2;
     tmp_b1 = b1 * c.first;
     tmp_b2 = b2 * c.second;
+    met_Px_corr = -(c.first - 1) * b1.Px() - (c.second - 1) * b2.Px();
+    met_Py_corr = -(c.first - 1) * b1.Py() - (c.second - 1) * b2.Py();
+    LogDebug << "  Corrections : c1 = " << c.first << " - c2 = " << c.second << std::endl;
+    //}
 
     /* MET corrections */
-    float met_Px_corr = -(c.first - 1) * b1.Px() - (c.second - 1) * b2.Px();
-    float met_Py_corr = -(c.first - 1) * b1.Py() - (c.second - 1) * b2.Py();
     LorentzVectorF tmp_met;
     tmp_met.SetPxPyPzE(met.Px() + met_dpx + met_Px_corr, met.Px() + met_dpx + met_Px_corr, met.Pz(), met.E());
-    LogDebug << "  Corrections : c1 = " << c.first << " - c2 = " << c.second << std::endl;
+
     LogDebug << "  After corrections" << std::endl;
-    LogDebug << "    MET : " << tmp_met << std::endl;
-    LogDebug << "    b1  : " << tmp_b1 << std::endl;
-    LogDebug << "    b2  : " << tmp_b2 << std::endl;
+    LogDebug << "    MET  : " << tmp_met << std::endl;
+    //if (boosted_tag)
+    //    LogDebug << "    fatb : " << tmp_fatb << std::endl;
+    //else{
+    LogDebug << "    b1   : " << tmp_b1 << std::endl;
+    LogDebug << "    b2   : " << tmp_b2 << std::endl;
+    //}
+
 
     /* H->WW */
-    float hme = 0.;
+    std::vector<float> hmes;
     int solutions = 0;  // number of valid solutions
 
     for (int j = 0; j < 4; j++) {
@@ -311,9 +338,13 @@ std::pair<float, float> hme::HMEEvaluator::runHME(const hme::LorentzVectorF l1,
       LogDebug << "\tOff-shell W : " << w_offshell << std::endl;
 
       /* Produce Higgs p4 */
-      auto hToww = w_onshell + w_offshell;
-      auto hTobb = tmp_b1 + tmp_b2;
-      auto h2Tohh = hTobb + hToww;
+      LorentzVectorF hToww = w_onshell + w_offshell;
+      LorentzVectorF hTobb;
+      //if (boosted_tag)
+      //    hTobb = tmp_fatb;
+      //else
+      hTobb = tmp_b1 + tmp_b2;
+      LorentzVectorF h2Tohh = hTobb + hToww;
 
       LogDebug << "\th->bb : " << hTobb << std::endl;
       LogDebug << "\th->WW : " << hToww << std::endl;
@@ -328,25 +359,24 @@ std::pair<float, float> hme::HMEEvaluator::runHME(const hme::LorentzVectorF l1,
         LogDebug << "W off-shell mass " << w_offshell.M() << " > mHH/2" << std::endl;
         continue;  // W offshell should not be larger than mH/2
       }
-      if (verbose) {
         LogDebug << "\tmW (on-shell)  = " << w_onshell.M() << std::endl;
         LogDebug << "\tmW (off-shell) = " << w_offshell.M() << std::endl;
         LogDebug << "\tmH (h->WW)     = " << hToww.M() << std::endl;
         LogDebug << "\tmH (h->bb)     = " << hTobb.M() << std::endl;
         LogDebug << "\tmH (H->hh)     = " << h2Tohh.M() << std::endl;
-      }
 
       /* If valid solution, record value */
-      hme += h2Tohh.M();
-      solutions++;
+      if (h2Tohh.M()>0.){
+        hmes.push_back(h2Tohh.M());
+        solutions++;
+      }
     }
-    if (solutions > 0) {
-      hme /= solutions;  // average over all possible solutions
-    }
-    if (hme != 0.) {
-      // If we have a value, put it in the binning
-      bins[int(std::min(hme, xmax) / xdelta)]++;
-      converged++;
+    // Add each solution with weight
+    if (solutions > 0) { 
+        for (auto hme: hmes){
+            bins[int(std::min(hme, xmax) / xdelta)] += 1./solutions;
+        }
+        converged++;
     }
   }
   /* Efficiency */

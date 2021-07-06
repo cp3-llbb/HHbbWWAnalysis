@@ -11,7 +11,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-250:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 250)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -24,7 +24,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-260:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 260)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -37,7 +37,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-270:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 270)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -50,7 +50,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-280:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 280)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -63,7 +63,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-300:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 300)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -76,7 +76,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-320:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 320)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -89,7 +89,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-350:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 350)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -102,7 +102,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-400:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 400)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -115,7 +115,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-450:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 450)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -128,7 +128,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-500:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 500)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -141,7 +141,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-550:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 550)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -154,7 +154,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-600:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 600)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -167,7 +167,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-650:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 650)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -180,7 +180,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-700:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 700)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -193,7 +193,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-750:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 750)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -206,7 +206,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-800:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 800)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -219,7 +219,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-850:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 850)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -232,7 +232,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-900:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 900)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -245,7 +245,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-1000:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 1000)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -258,7 +258,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-1250:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 1250)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -271,7 +271,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-1500:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 1500)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -284,7 +284,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-1750:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 1750)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -297,7 +297,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-2000:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 2000)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -310,7 +310,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-2500:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 2500)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True
@@ -323,7 +323,7 @@ GluGluToRadionToHHTo2B2WToLNu2J_M-3000:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 3000)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 5
   order: 10
   type: signal
   hide: True

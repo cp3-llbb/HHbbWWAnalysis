@@ -85,13 +85,16 @@ weight_groups = [
 quantile = 0.95 # repeat weights with too high learning weights
 
 # Input plots options #
-#node_colors = {
-#            'Ewk'  : '#610596',
-#            'GGF'   : '#288a24',
-#            'H'     : '#06b894',
-#            'Top'    : '#cc7a16',
-#            'WJets' : '#d95564',
-#             }
+node_colors = {
+               'DY'     : '#1a83a1',
+               'GGF'    : '#42c71a',
+               'H'      : '#06b894',
+               'Rare'   : '#610596',
+               'ST'     : '#99053d',
+               'TT'     : '#cc7a16',
+               'TTVX'   : '#174704',
+               'VVV'    : '#ccbf45',
+             }
 
 # Tree name #
 tree_name = 'Events'

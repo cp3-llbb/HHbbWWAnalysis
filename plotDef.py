@@ -4,10 +4,7 @@ from bamboo import treefunctions as op
 from copy import copy
 from bamboo.plots import CutFlowReport
 from highlevelLambdas import highlevelLambdas
-#from JPA import bJetCorrPT
 from JPA import *
-#from bamboo.root import loadHeader
-#loadHeader("/home/ucl/cp3/gsaha/bamboodev/HHbbWWAnalysis/jpa.h")
 
 ########################   Channel title   #############################
 def SingleLeptonChannelTitleLabel(channel):
@@ -2508,21 +2505,6 @@ def makeDoubleLeptonSelectedBoostedVariables(sel,l1,l2,B,jets,met,suffix,channel
 
     return plots
 
-def makeDoubleLeptonHMEPlots(sel,suffix,channel,HME):
-    plots = []
-    channelLabel = DoubleLeptonChannelTitleLabel(channel)
-    plots.append(Plot.make1D("%s_%s_HME"%(channel,suffix),
-                             HME,
-                             sel,
-                             EquidistantBinning(200,0.,2000.),
-                             xTitle = "HME [GeV]",
-                             plotopts = channelLabel))
-
-    return plots
-
-
-
-
 def makeDoubleLeptonMachineLearningInputPlots(sel,suffix,channel,inputs):
     plots = []
     channelLabel = DoubleLeptonChannelTitleLabel(channel)
@@ -2576,6 +2558,19 @@ def makeDoubleLeptonMachineLearningExclusiveOutputPlotsWithHME(selObjNodesDict,o
                                  plotopts = plotopts))
 
     return plots    
+
+
+def makeDoubleLeptonHMEPlots(sel,suffix,channel,HME):
+    plots = []
+    channelLabel = DoubleLeptonChannelTitleLabel(channel)
+    plots.append(Plot.make1D("%s_%s_HME"%(channel,suffix),
+                             HME,
+                             sel,
+                             EquidistantBinning(200,0.,2000.),
+                             xTitle = "HME [GeV]",
+                             plotopts = channelLabel))
+
+    return plots
 
 
 def makeDoubleLeptonMachineLearningInclusiveOutputPlots(selObjNodesDict,output,nodes,channel):
