@@ -17,7 +17,7 @@ from grouped_entropy import GroupedXEnt
 ##################################  Path variables ####################################
 
 main_path = os.path.abspath(os.path.dirname(__file__))
-path_out = '/nfs/scratch/fynu/gsaha/HHMachineLearning_output_resDL/'
+path_out = '/nfs/scratch/fynu/fbury/HHMachineLearning_output/'
 path_model = os.path.join(main_path,'model')
 
 ##############################  Datasets proportion   #################################
@@ -72,7 +72,7 @@ nodes = ['DY','GGF','H','Rare','ST','TT','TTVX','VVV']
 
 weight_groups = [
                   (1.0, ('DY')),
-                  (0.1, ('GGF')),
+                  (1.0, ('GGF')),
                   (1.0, ('H')),
                   (1.0, ('Rare')),
                   (1.0, ('ST')),

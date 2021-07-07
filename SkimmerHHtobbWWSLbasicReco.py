@@ -15,7 +15,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)))) # Add 
 from BaseHHtobbWW import BaseNanoHHtobbWW
 from selectionDef import *
 from highlevelLambdas import *
-from variableMakerSL_Basic import *
+from variableMakerSLbasicReco import *
 from bamboo.root import gbl
 import ROOT
 
