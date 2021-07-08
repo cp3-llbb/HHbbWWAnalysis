@@ -16,6 +16,8 @@ def get_options():
     p = argparse.ArgumentParser(description='Skimmer Ntuples Check')
     p.add_argument("-v", "--verbose", action="store_true", default=False,
                    help="increase output verbosity")
+    p.add_argument('--config', action='store', required=True, type=str,
+                   help = 'Name of Config File')
     p.add_argument('--era', action='store', required=True, type=str,
                    help = 'Era')
     p.add_argument('--category', action='store', required=True, type=str,
@@ -86,7 +88,7 @@ def make_stack(histDict, nodeList, partName):
         d.SaveAs(partName+'/'+var+'.root')
 
 
-def make_norm(histDict, nodeList, partName):
+def make_norm(histDict, nodeList, partName, colors):
     if not os.path.exists(partName):
         os.mkdir(partName)
     for var, nodehist in histDict.items():
@@ -105,7 +107,8 @@ def make_norm(histDict, nodeList, partName):
         legend.SetTextSize(0.03)
         for i,node in enumerate(nodeList):
             nodehist[i].Scale(1/nodehist[i].Integral())
-            nodehist[i].SetLineColor(2*i + 3)
+            #nodehist[i].SetLineColor(i + 1)
+            nodehist[i].SetLineColor(colors[i])
             nodehist[i].SetLineWidth(2)
             if i == 0 : 
                 nodehist[i].Draw('HIST')
@@ -127,8 +130,13 @@ def main():
     logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(levelname)s - %(message)s',datefmt='%m/%d/%Y %H:%M:%S')
     if args.verbose:
         logging.getLogger().setLevel(logging.INFO)
-    
-    infoDict  = load_input('sampleListSL.yml')
+
+    pwd = os.getcwd()    
+    configPath = os.path.join(pwd, args.config)
+    if not os.path.exists(configPath):
+        logging.info('Config file does not exist')
+    #infoDict  = load_input('sampleListSL.yml')
+    infoDict  = load_input(configPath)
     basepath  = str(infoDict.get('sampleDir'))
     channels  = infoDict.get('channelList')
     variablesInfo = infoDict.get('variableList')
@@ -136,6 +144,8 @@ def main():
     xsecs     = infoDict.get('xSecDict')
     logging.info('Eras: %s'%(eras))
     lumiDict = {'2016':35922, '2017':41529.152060112, '2018':59740.565201546}
+    colors = infoDict.get('colors')
+    print(colors)
     catSampleDict = infoDict.get('sampleDict').get(args.era)
 
     nodes = []
@@ -152,6 +162,8 @@ def main():
                 continue
             ntuple = os.path.join(basepath,sample)
             tfile = ROOT.TFile.Open(ntuple, "READ")
+            #evTree = tfile.Get("Events")
+            #print(tfile.GetListOfKeys)
             rdf = ROOT.RDataFrame("Events", tfile)
             rdfRuns = ROOT.RDataFrame("Runs", tfile)
             eventWtSum = rdfRuns.Sum("genEventSumw").GetValue()
@@ -182,7 +194,7 @@ def main():
     if args.dostack : 
         make_stack(histsToStack,nodes,fname_stack)
     if args.donorm : 
-        make_norm(histsToStack,nodes,fname_norm)
+        make_norm(histsToStack,nodes,fname_norm,colors)
         
 
 if __name__ == "__main__":

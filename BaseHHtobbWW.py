@@ -1362,11 +1362,21 @@ One lepton and and one jet argument must be specified in addition to the require
         # Sorted by btag score because for 0 and 1 btag categories, 
 
         # Doesn't contain the leading bTag scored Light Jet
+        # --------------- not used -------------------- #
         self.remainingJets = op.select(self.ak4LightJetsByPt, lambda jet : jet.idx != self.ak4LightJetsByBtagScore[0].idx)
-        self.remainingJetPairs = lambda jets : op.combine(jets, N=2)
-        #self.remainingJets = op.select(self.ak4Jets, lambda jet : op.NOT(op.OR(jet.idx == self.ak4JetsByBtagScore[0].idx,
-        #                                                                       jet.idx == self.ak4JetsByBtagScore[1].idx)))
-        #self.remainingJetPairs = lambda jets : op.combine(jets, N=2)
+        self.makeJetPairs  = lambda jets : op.combine(jets, N=2, pred=lambda j1, j2 : j1.pt > j2.pt, samePred=lambda j1,j2 : j1.idx != j2.idx)
+        # --------------------------------------------- #
+        self.bJetsByScore        = self.ak4JetsByBtagScore[:op.min(op.rng_len(self.ak4JetsByBtagScore),op.static_cast("std::size_t",op.c_int(2)))]
+        self.probableWJets       = op.select(self.ak4Jets, lambda jet : op.NOT(op.rng_any(self.bJetsByScore, lambda bjet : jet.idx == bjet.idx)))
+        self.wJetsByPt           = self.probableWJets[:op.min(op.rng_len(self.probableWJets),op.static_cast("std::size_t",op.c_int(2)))] # used as real wjets, not used for VBF
+
+        #wMassWindow              = lambda dijet : op.abs(op.invariant_mass(dijet[0].p4,dijet[1].p4)-80.4)
+        #probableWJetPairs        = op.combine(self.probableWJets, N=2)
+        #wJetsByPtPair            = op.combine(self.wJetsByPt, N=2)
+        #self.wJetsPairs          = op.sort(op.select(probableWJetPairs, lambda dijet : wMassWindow(dijet) < op.c_float(15.0)), 
+        #                                   lambda dijet : wMassWindow(dijet)) # used for VBF selection
+
+        self.lambda_passWMassCut = lambda wjets : op.switch(op.rng_len(wjets) == 2, op.abs(op.invariant_mass(wjets[0].p4, wjets[1].p4)-80.4) < op.c_float(15.0), op.c_bool(False))
 
         #############################################################################
         #                                AK8 Jets                                   #
@@ -1465,12 +1475,19 @@ One lepton and and one jet argument must be specified in addition to the require
             self.VBFJetPairsBoosted  = op.sort(op.combine(self.VBFJetsBoosted,  N=2, pred=self.lambda_VBFPair), lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
 
         if channel == "SL":
-            #def cleanVBFwithJPA_Resolved(self, jpaJets, nJpaJets):
-            #    return lambda j : op.OR(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets)))
-            #def cleanVBFwithJPA_Boosted(self, jpaJets, nJpaJets):
-            #    return lambda j : op.AND(op.rng_len(self.ak8BJets) >= 1, op.OR(op.OR(*(op.deltaR(jpaJets[i].p4, j.p4) > 0.8 for i in range(nJpaJets))),
-            #                                                                   op.deltaR(self.ak8Jets[0].p4, j.p4) > 1.2))
-            print('VBF <<>> ak4/8-jets  cleaning is in Plotter and Skimmer now!!! Would need to move them here')
+            #lambda_isOverlappedWithWjets  = lambda j : op.rng_any(self.wJetsPairs, lambda wjp : op.OR(op.deltaR(wjp[0].p4, j.p4) <= 0.8, op.deltaR(wjp[1].p4, j.p4) <= 0.8))
+            lambda_isOverlappedWithWjets  = lambda j : op.switch(self.lambda_passWMassCut(self.wJetsByPt), 
+                                                                 op.OR(op.deltaR(self.wJetsByPt[0].p4, j.p4) <= 0.8, op.deltaR(self.wJetsByPt[1].p4, j.p4) <= 0.8),
+                                                                 op.c_bool(False))
+            lambda_isOverlappedWithBjets  = lambda j : op.rng_any(self.bJetsByScore, lambda bj : op.deltaR(bj.p4, j.p4) <= 0.8)
+            self.lambda_cleanVBFAk4       = lambda j : op.NOT(op.OR(lambda_isOverlappedWithBjets(j), lambda_isOverlappedWithWjets(j)))
+            self.lambda_cleanVBFAk8       = lambda j : op.NOT(op.deltaR(j.p4, self.ak8BJets[0].p4) <= 1.2)
+            
+            self.VBFJetsResolved          = op.select(self.VBFJets, self.lambda_cleanVBFAk4)
+            self.VBFJetsBoosted           = op.select(self.VBFJets, self.lambda_cleanVBFAk8)
+
+            self.VBFJetPairsResolved      = op.sort(op.combine(self.VBFJetsResolved, N=2, pred=self.lambda_VBFPair), lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
+            self.VBFJetPairsBoosted       = op.sort(op.combine(self.VBFJetsBoosted,  N=2, pred=self.lambda_VBFPair), lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
 
         #############################################################################
         #                             Scalefactors                                  #
@@ -2030,8 +2047,3 @@ One lepton and and one jet argument must be specified in addition to the require
         forceDefine(eff, sel)
 
         return hme,eff
-
-
-
-        
-

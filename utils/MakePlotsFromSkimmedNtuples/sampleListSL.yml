@@ -2,255 +2,394 @@ channelList:
   - El
   - Mu
 variableList:
-  - HWW_Mass/80/0.0/800.0
+  #- HWW_Mass/200/0.0/600.0
+  - hT/200/0.0/1000.0
+  #- bj2_bTagDeepFlavB/20/0./1.0
+  - MET_LD/100/0./500.0
+  #- bj1bj2_DR/50/0./5.0
+  #- L2_2b2Wj/20/0./1.0
+  #- L2_2b1Wj/20/0./1.0
+  #- L2_2b0Wj/20/0./1.0
+  #- L2_1b2Wj/20/0./1.0
+  #- L2_1b1Wj/20/0./1.0
+  #- L2_1b0Wj/20/0./1.0
+  #- L2_0b/20/0./1.0
+  - METpt/100/0/300.0
+  #- minDR_lep_allJets/50/0/5.0
+  #- bj1bj2_M/100/0./300
+  #- bj1_pt/100/0/300
+  #- bj2_pt/100/0/300
+  #- bj1LepDR/50/0/5
+  #- bj2LepDR/50/0/5
+  #- wj1_pt/100/0/300
+  #- wj2_pt/100/0/300
+  #- HWW_Simple_Mass/200/0.0/600.0
+  #- mHH/400/0/1000
+  - VBFj1pt/100/0/300
+  - VBFj2pt/100/0/300
+  - VBFj1j2invM/100/0/300
+  - zeppenfeldVar/100/0/100
+  - VBF_tag/2/0/2
 xSecDict:
-  DYJetsToLL_M-10to50.root : 18610.0
-  DYJetsToLL_M-50.root : 6077.22
-  DYToLL_0J.root : 4843.6
-  DYToLL_1J.root : 897.8  
-  DYToLL_2J.root : 335.8
-  TTTo2L2Nu.root : 88.4
-  TTToHadronic.root : 377.85
-  TTToSemiLeptonic.root : 365.52
-  W1JetsToLNu.root : 9442.49
-  W2JetsToLNu.root : 3252.49
-  W3JetsToLNu.root : 1153.42
-  W4JetsToLNu.root : 634.05
-  WJetsToLNu.root : 61526.7
-  WJetsToLNu_HT-100To200.root : 1625.08
-  WJetsToLNu_HT-1200To2500.root : 1.2658
-  WJetsToLNu_HT-200To400.root : 477.96
-  WJetsToLNu_HT-2500ToInf.root : 0.009405
-  WJetsToLNu_HT-400To600.root : 67.441
-  WJetsToLNu_HT-600To800.root : 15.096
-  WJetsToLNu_HT-70To100.root : 1504.92
-  WJetsToLNu_HT-800To1200.root : 6.3626
-  GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root : 0.00326156
-  VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 0.0001886003 
+  #DYJetsToLL_M-10to50.root : 18610.0
+  #DYJetsToLL_M-50.root : 6077.22
+  #DYToLL_0J.root : 4843.6
+  #DYToLL_1J.root : 897.8  
+  #DYToLL_2J.root : 335.8
+  #TTTo2L2Nu.root : 88.4
+  #TTToHadronic.root : 377.85
+  #TTToSemiLeptonic.root : 365.52
+  #W1JetsToLNu.root : 9442.49
+  #W2JetsToLNu.root : 3252.49
+  #W3JetsToLNu.root : 1153.42
+  #W4JetsToLNu.root : 634.05
+  #WJetsToLNu.root : 61526.7
+  #WJetsToLNu_HT-100To200.root : 1625.08
+  #WJetsToLNu_HT-1200To2500.root : 1.2658
+  #WJetsToLNu_HT-200To400.root : 477.96
+  #WJetsToLNu_HT-2500ToInf.root : 0.009405
+  #WJetsToLNu_HT-400To600.root : 67.441
+  #WJetsToLNu_HT-600To800.root : 15.096
+  #WJetsToLNu_HT-70To100.root : 1504.92
+  #WJetsToLNu_HT-800To1200.root : 1.0
+  GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root : 1.0
+  GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root : 1.0
+  GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root : 1.0
+  GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root : 1.0
+  GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root : 1.0
+  GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root : 1.0
+  GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root : 1.0
+  GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root : 1.0
+  GluGluToHHTo2B2Tau_node_cHHH0_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root : 1.0
+  GluGluToHHTo2B2Tau_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root : 1.0
+  GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root : 1.0
+  GluGluToHHTo2B2Tau_node_cHHH5_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root : 1.0
+  GluGluHToBB.root : 1.0
+  GluGluHToGG.root : 1.0
+  GluGluHToMuMu.root : 1.0
+  GluGluHToTauTau.root : 1.0
+  GluGluHToWWTo2L2Nu.root : 1.0
+  GluGluHToWWToLNuQQ.root : 1.0
+  GluGluHToZZTo4L.root : 1.0
+  HZJ_HToWW.root : 1.0
+  VBFHToBB.root : 1.0
+  VBFHToGG.root : 1.0
+  VBFHToMuMu.root : 1.0
+  VBFHToTauTau.root : 1.0
+  VBFHToWWTo2L2Nu.root : 1.0
+  VBFHToWWToLNuQQ.root : 1.0
+  VBFHToZZTo4L.root : 1.0
+  VHToNonbb.root : 1.0
+  WminusH_HToBB_WToLNu.root : 1.0
+  WplusH_HToBB_WToLNu.root : 1.0
+  THQ.root : 1.0
+  THW.root : 1.0
+  ttHJetTobb.root : 1.0
+  ttHJetToNonbb.root : 1.0
+  ZH_HToBB_ZToLL.root : 1.0
+  ZHToTauTau.root : 1.0
+  DYJetsToLL_M-10to50.root : 1.0
+  DYJetsToLL_M-50.root : 1.0
+  DYToLL_0J.root : 1.0
+  DYToLL_1J.root : 1.0
+  DYToLL_2J.root : 1.0
+  TGJets.root : 1.0
+  TTGJets.root : 1.0
+  TTTT.root : 1.0
+  TTWH.root : 1.0
+  TTWJetsToLNu.root : 1.0
+  TTWJetsToQQ.root : 1.0
+  TTWW.root : 1.0
+  TTZH.root : 1.0
+  TTZToLL_M-1to10.root : 1.0
+  TTZToLLNuNu_M-10.root : 1.0
+  TTZToQQ.root : 1.0
+  tZq_ll.root : 1.0
+  WGToLNuG.root : 1.0
+  WpWpJJ.root : 1.0
+  WWTo2L2Nu_DoubleScattering.root : 1.0
+  WWTo2L2Nu.root : 1.0
+  WWToLNuQQ.root : 1.0
+  WWW.root : 1.0
+  WWZ.root : 1.0
+  WZG.root : 1.0
+  WZTo2L2Q.root : 1.0
+  WZTo3LNu.root : 1.0
+  WZZ.root : 1.0
+  ZGTo2LG.root : 1.0
+  ZZTo2L2Q.root : 1.0
+  ZZTo4L.root : 1.0
+  ZZZ.root : 1.0
+  ST_schannel_4f.root : 1.0
+  ST_tchannel_antitop_4f.root : 1.0
+  ST_tchannel_top_4f.root : 1.0
+  ST_tW_antitop_5f.root : 1.0
+  ST_tWll_5f.root : 1.0
+  ST_tW_top_5f.root : 1.0
+  TTTo2L2Nu.root : 1.0
+  TTToHadronic.root : 1.0
+  TTToSemiLeptonic.root : 1.0
+  VBFHHTo2B2WToLNu2J_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2WToLNu2J_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2WToLNu2J_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2VTo2L2Nu_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root : 1.0
+  W1JetsToLNu.root : 1.0
+  W2JetsToLNu.root : 1.0
+  W3JetsToLNu.root : 1.0
+  W4JetsToLNu.root : 1.0
+  WJetsToLNu_HT-100To200.root : 1.0
+  WJetsToLNu_HT-1200To2500.root : 1.0
+  WJetsToLNu_HT-200To400.root : 1.0
+  WJetsToLNu_HT-2500ToInf.root : 1.0
+  WJetsToLNu_HT-400To600.root : 1.0
+  WJetsToLNu_HT-600To800.root : 1.0
+  WJetsToLNu_HT-70To100.root : 1.0
+  WJetsToLNu_HT-800To1200.root : 1.0
+  WJetsToLNu.root : 1.0
+colors:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 32
+  - 6
+  - 7
+  - 36
+  - 49
+  - 51
+  - 5
 sampleDict:
-  '2016':
-    resolved2b2j_El_DY:
-    - Skim2016_Background_Resolved2b2Wj_El/results/DYJetsToLL_M-10to50.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/DYJetsToLL_M-50.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/DYToLL_0J.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/DYToLL_1J.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/DYToLL_2J.root
-    resolved2b1j_El_DY:
-    - Skim2016_Background_Resolved2b1Wj_El/results/DYJetsToLL_M-10to50.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/DYJetsToLL_M-50.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/DYToLL_0J.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/DYToLL_1J.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/DYToLL_2J.root
-    resolved1b2j_El_DY:
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/DYJetsToLL_M-10to50.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/DYJetsToLL_M-50.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/DYToLL_0J.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/DYToLL_1J.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/DYToLL_2J.root
-    resolved2b0j_El_DY:
-    - Skim2016_Background_Resolved2b0Wj_El/results/DYJetsToLL_M-10to50.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/DYJetsToLL_M-50.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/DYToLL_0J.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/DYToLL_1J.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/DYToLL_2J.root
-    resolved2b2j_El_TT:
-    - Skim2016_Background_Resolved2b2Wj_El/results/TTTo2L2Nu.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/TTToHadronic.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/TTToSemiLeptonic.root
-    resolved2b1j_El_TT:
-    - Skim2016_Background_Resolved2b1Wj_El/results/TTTo2L2Nu.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/TTToHadronic.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/TTToSemiLeptonic.root
-    resolved1b2j_El_TT:
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/TTTo2L2Nu.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/TTToHadronic.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/TTToSemiLeptonic.root
-    resolved2b0j_El_TT:
-    - Skim2016_Background_Resolved2b0Wj_El/results/TTTo2L2Nu.root
-    - XXSkim2016_Background_Resolved2b0Wj_El/results/TTToHadronic.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/TTToSemiLeptonic.root
-    resolved2b2j_El_WJets:
-    - Skim2016_Background_Resolved2b2Wj_El/results/W1JetsToLNu.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/W2JetsToLNu.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/W3JetsToLNu.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/W4JetsToLNu.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/WJetsToLNu_HT-100To200.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/WJetsToLNu_HT-1200To2500.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/WJetsToLNu_HT-200To400.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/WJetsToLNu_HT-2500ToInf.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/WJetsToLNu_HT-400To600.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/WJetsToLNu_HT-600To800.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/WJetsToLNu_HT-70To100.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/WJetsToLNu_HT-800To1200.root
-    - Skim2016_Background_Resolved2b2Wj_El/results/WJetsToLNu.root
-    resolved2b1j_El_WJets:
-    - Skim2016_Background_Resolved2b1Wj_El/results/W1JetsToLNu.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/W2JetsToLNu.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/W3JetsToLNu.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/W4JetsToLNu.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/WJetsToLNu_HT-100To200.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/WJetsToLNu_HT-1200To2500.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/WJetsToLNu_HT-200To400.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/WJetsToLNu_HT-2500ToInf.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/WJetsToLNu_HT-400To600.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/WJetsToLNu_HT-600To800.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/WJetsToLNu_HT-70To100.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/WJetsToLNu_HT-800To1200.root
-    - Skim2016_Background_Resolved2b1Wj_El/results/WJetsToLNu.root
-    resolved1b2j_El_WJets:
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/W1JetsToLNu.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/W2JetsToLNu.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/W3JetsToLNu.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/W4JetsToLNu.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/WJetsToLNu_HT-100To200.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/WJetsToLNu_HT-1200To2500.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/WJetsToLNu_HT-200To400.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/WJetsToLNu_HT-2500ToInf.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/WJetsToLNu_HT-400To600.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/WJetsToLNu_HT-600To800.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/WJetsToLNu_HT-70To100.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/WJetsToLNu_HT-800To1200.root
-    - Skim2016_SLBackground_Resolved1b2Wj_El/results/WJetsToLNu.root
-    resolved2b0j_El_WJets:
-    - Skim2016_Background_Resolved2b0Wj_El/results/W1JetsToLNu.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/W2JetsToLNu.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/W3JetsToLNu.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/W4JetsToLNu.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/WJetsToLNu_HT-100To200.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/WJetsToLNu_HT-1200To2500.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/WJetsToLNu_HT-200To400.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/WJetsToLNu_HT-2500ToInf.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/WJetsToLNu_HT-400To600.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/WJetsToLNu_HT-600To800.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/WJetsToLNu_HT-70To100.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/WJetsToLNu_HT-800To1200.root
-    - Skim2016_Background_Resolved2b0Wj_El/results/WJetsToLNu.root
-    resolved2b2j_El_GGFHH:
-    - Skim2016_Signal_SL_Resolved2b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root
-    resolved2b1j_El_GGFHH:
-    - Skim2016_Signal_SL_Resolved2b1Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root
-    resolved1b2j_El_GGFHH:
-    - Skim2016_SLSignal_Resolved1b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root
-    resolved2b0j_El_GGFHH:
-    - Skim2016_Signal_SL_Resolved2b0Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root
-    resolved2b2j_El_VBFHH:
-    - Skim2016_Signal_SL_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root
-    resolved2b1j_El_VBFHH:
-    - Skim2016_Signal_SL_Resolved2b1Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root
-    resolved1b2j_El_VBFHH:
-    - Skim2016_SLSignal_Resolved1b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root
-    resolved2b0j_El_VBFHH:
-    - Skim2016_Signal_SL_Resolved2b0Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root
-    resolved2b2j_Mu_DY:
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/DYJetsToLL_M-10to50.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/DYJetsToLL_M-50.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/DYToLL_0J.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/DYToLL_1J.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/DYToLL_2J.root
-    resolved2b1j_Mu_DY:
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/DYJetsToLL_M-10to50.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/DYJetsToLL_M-50.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/DYToLL_0J.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/DYToLL_1J.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/DYToLL_2J.root
-    resolved1b2j_Mu_DY:
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/DYJetsToLL_M-10to50.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/DYJetsToLL_M-50.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/DYToLL_0J.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/DYToLL_1J.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/DYToLL_2J.root
-    resolved2b0j_Mu_DY:
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/DYJetsToLL_M-10to50.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/DYJetsToLL_M-50.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/DYToLL_0J.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/DYToLL_1J.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/DYToLL_2J.root
-    resolved2b2j_Mu_TT:
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/TTTo2L2Nu.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/TTToHadronic.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/TTToSemiLeptonic.root
-    resolved2b1j_Mu_TT:
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/TTTo2L2Nu.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/TTToHadronic.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/TTToSemiLeptonic.root
-    resolved1b2j_Mu_TT:
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/TTTo2L2Nu.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/TTToHadronic.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/TTToSemiLeptonic.root
-    resolved2b0j_Mu_TT:
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/TTTo2L2Nu.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/TTToHadronic.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/TTToSemiLeptonic.root
-    resolved2b2j_Mu_WJets:
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/W1JetsToLNu.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/W2JetsToLNu.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/W3JetsToLNu.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/W4JetsToLNu.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/WJetsToLNu_HT-100To200.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/WJetsToLNu_HT-1200To2500.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/WJetsToLNu_HT-200To400.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/WJetsToLNu_HT-2500ToInf.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/WJetsToLNu_HT-400To600.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/WJetsToLNu_HT-600To800.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/WJetsToLNu_HT-70To100.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/WJetsToLNu_HT-800To1200.root
-    - Skim2016_Background_Resolved2b2Wj_Mu/results/WJetsToLNu.root
-    resolved2b1j_Mu_WJets:
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/W1JetsToLNu.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/W2JetsToLNu.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/W3JetsToLNu.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/W4JetsToLNu.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/WJetsToLNu_HT-100To200.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/WJetsToLNu_HT-1200To2500.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/WJetsToLNu_HT-200To400.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/WJetsToLNu_HT-2500ToInf.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/WJetsToLNu_HT-400To600.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/WJetsToLNu_HT-600To800.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/WJetsToLNu_HT-70To100.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/WJetsToLNu_HT-800To1200.root
-    - Skim2016_Background_Resolved2b1Wj_Mu/results/WJetsToLNu.root
-    resolved1b2j_Mu_WJets:
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/W1JetsToLNu.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/W2JetsToLNu.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/W3JetsToLNu.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/W4JetsToLNu.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/WJetsToLNu_HT-100To200.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/WJetsToLNu_HT-1200To2500.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/WJetsToLNu_HT-200To400.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/WJetsToLNu_HT-2500ToInf.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/WJetsToLNu_HT-400To600.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/WJetsToLNu_HT-600To800.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/WJetsToLNu_HT-70To100.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/WJetsToLNu_HT-800To1200.root
-    - Skim2016_SLBackground_Resolved1b2Wj_Mu/results/WJetsToLNu.root
-    resolved2b0j_Mu_WJets:
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/W1JetsToLNu.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/W2JetsToLNu.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/W3JetsToLNu.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/W4JetsToLNu.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/WJetsToLNu_HT-100To200.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/WJetsToLNu_HT-1200To2500.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/WJetsToLNu_HT-200To400.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/WJetsToLNu_HT-2500ToInf.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/WJetsToLNu_HT-400To600.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/WJetsToLNu_HT-600To800.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/WJetsToLNu_HT-70To100.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/WJetsToLNu_HT-800To1200.root
-    - Skim2016_Background_Resolved2b0Wj_Mu/results/WJetsToLNu.root
-    resolved2b2j_Mu_GGFHH:
-    - Skim2016_Signal_SL_Resolved2b2Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root
-    resolved2b1j_Mu_GGFHH:
-    - Skim2016_Signal_SL_Resolved2b1Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root
-    resolved1b2j_Mu_GGFHH:
-    - Skim2016_SLSignal_Resolved1b2Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root
-    resolved2b0j_Mu_GGFHH:
-    - Skim2016_Signal_SL_Resolved2b0Wj_Mu/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCUETP8M1_PSWeights_13TeV-powheg-pythia8.root
-    resolved2b2j_Mu_VBFHH:
-    - Skim2016_Signal_SL_Resolved2b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root
-    resolved2b1j_Mu_VBFHH:
-    - Skim2016_Signal_SL_Resolved2b1Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root
-    resolved1b2j_Mu_VBFHH:
-    - Skim2016_SLSignal_Resolved1b2Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root
-    resolved2b0j_Mu_VBFHH:
-    - Skim2016_Signal_SL_Resolved2b0Wj_Mu/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCUETP8M1_PSweights_13TeV-madgraph-pythia8.root
-sampleDir: /nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA
+  '2018':
+    resolved2b2Wj_El_Ewk:
+      #- Skim2018_Resolved2b2Wj_El/results/DYJetsToLL_M-10to50.root
+      #- Skim2018_Resolved2b2Wj_El/results/DYJetsToLL_M-50.root
+      #- Skim2018_Resolved2b2Wj_El/results/DYToLL_0J.root
+      #- Skim2018_Resolved2b2Wj_El/results/DYToLL_1J.root
+      #- Skim2018_Resolved2b2Wj_El/results/DYToLL_2J.root
+      - Skim2018_Resolved2b2Wj_El/results/TGJets.root
+      - Skim2018_Resolved2b2Wj_El/results/WGToLNuG.root
+      - Skim2018_Resolved2b2Wj_El/results/WpWpJJ.root
+      - Skim2018_Resolved2b2Wj_El/results/WWTo2L2Nu_DoubleScattering.root
+      - Skim2018_Resolved2b2Wj_El/results/WWTo2L2Nu.root
+      - Skim2018_Resolved2b2Wj_El/results/WWToLNuQQ.root
+      - Skim2018_Resolved2b2Wj_El/results/WWW.root
+      - Skim2018_Resolved2b2Wj_El/results/WWZ.root
+      - Skim2018_Resolved2b2Wj_El/results/WZG.root
+      - Skim2018_Resolved2b2Wj_El/results/WZTo3LNu.root
+      - Skim2018_Resolved2b2Wj_El/results/WZZ.root
+      #- Skim2018_Resolved2b2Wj_El/results/ZGToLLG.root
+      - Skim2018_Resolved2b2Wj_El/results/ZZTo2L2Q.root
+      - Skim2018_Resolved2b2Wj_El/results/ZZTo4L.root
+      - Skim2018_Resolved2b2Wj_El/results/ZZZ.root
+      - Skim2018_Resolved2b2Wj_El/results/tZq_ll.root
+    resolved2b2Wj_El_GGF_ggfSM:
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+    resolved2b2Wj_El_GGF_ggfBSM:
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+    resolved2b2Wj_El_H:
+      - Skim2018_Resolved2b2Wj_El/results/GluGluHToBB.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluHToGG.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluHToMuMu.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluHToTauTau.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluHToWWTo2L2Nu.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluHToWWToLNuQQ.root
+      - Skim2018_Resolved2b2Wj_El/results/GluGluHToZZTo4L.root
+      - Skim2018_Resolved2b2Wj_El/results/HZJ_HToWW.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHToBB.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHToGG.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHToMuMu.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHToTauTau.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHToWWTo2L2Nu.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHToWWToLNuQQ.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHToZZTo4L.root
+      - Skim2018_Resolved2b2Wj_El/results/VHToNonbb.root
+      - Skim2018_Resolved2b2Wj_El/results/WminusH_HToBB_WToLNu.root
+      - Skim2018_Resolved2b2Wj_El/results/WplusH_HToBB_WToLNu.root
+      - Skim2018_Resolved2b2Wj_El/results/THQ.root
+      - Skim2018_Resolved2b2Wj_El/results/THW.root
+      - Skim2018_Resolved2b2Wj_El/results/ttHJetTobb.root
+      - Skim2018_Resolved2b2Wj_El/results/ttHJetToNonbb.root
+      - Skim2018_Resolved2b2Wj_El/results/ZH_HToBB_ZToLL.root
+      - Skim2018_Resolved2b2Wj_El/results/ZHToTauTau.root
+    resolved2b2Wj_El_Top:
+      - Skim2018_Resolved2b2Wj_El/results/TTTo2L2Nu.root
+      - Skim2018_Resolved2b2Wj_El/results/TTToHadronic.root
+      - Skim2018_Resolved2b2Wj_El/results/TTToSemiLeptonic.root
+      - Skim2018_Resolved2b2Wj_El/results/ST_schannel_4f.root
+      - Skim2018_Resolved2b2Wj_El/results/ST_tchannel_antitop_4f.root
+      - Skim2018_Resolved2b2Wj_El/results/ST_tchannel_top_4f.root
+      - Skim2018_Resolved2b2Wj_El/results/ST_tW_antitop_5f.root
+      - Skim2018_Resolved2b2Wj_El/results/ST_tWll_5f.root
+      - Skim2018_Resolved2b2Wj_El/results/ST_tW_top_5f.root
+      - Skim2018_Resolved2b2Wj_El/results/TTGJets.root
+      - Skim2018_Resolved2b2Wj_El/results/TTTT.root
+      - Skim2018_Resolved2b2Wj_El/results/TTWH.root
+      - Skim2018_Resolved2b2Wj_El/results/TTWJetsToLNu.root
+      - Skim2018_Resolved2b2Wj_El/results/TTWJetsToQQ.root
+      - Skim2018_Resolved2b2Wj_El/results/TTWW.root
+      - Skim2018_Resolved2b2Wj_El/results/TTZH.root
+      - Skim2018_Resolved2b2Wj_El/results/TTZToLL_M-1to10.root
+      - Skim2018_Resolved2b2Wj_El/results/TTZToLLNuNu_M-10.root
+      - Skim2018_Resolved2b2Wj_El/results/TTZToQQ.root
+    resolved2b2Wj_El_VBF_vbfSM:
+      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+    resolved2b2Wj_El_VBF_vbfBSM:
+      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_Resolved2b2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+    resolved2b2Wj_El_WJets:
+      - Skim2018_Resolved2b2Wj_El/results/W1JetsToLNu.root
+      - Skim2018_Resolved2b2Wj_El/results/W2JetsToLNu.root
+      - Skim2018_Resolved2b2Wj_El/results/W3JetsToLNu.root
+      - Skim2018_Resolved2b2Wj_El/results/W4JetsToLNu.root
+      - Skim2018_Resolved2b2Wj_El/results/WJetsToLNu_HT-100To200.root
+      - Skim2018_Resolved2b2Wj_El/results/WJetsToLNu_HT-1200To2500.root
+      - Skim2018_Resolved2b2Wj_El/results/WJetsToLNu_HT-200To400.root
+      - Skim2018_Resolved2b2Wj_El/results/WJetsToLNu_HT-2500ToInf.root
+      - Skim2018_Resolved2b2Wj_El/results/WJetsToLNu_HT-400To600.root
+      - Skim2018_Resolved2b2Wj_El/results/WJetsToLNu_HT-600To800.root
+      - Skim2018_Resolved2b2Wj_El/results/WJetsToLNu_HT-70To100.root
+      - Skim2018_Resolved2b2Wj_El/results/WJetsToLNu_HT-800To1200.root
+      - Skim2018_Resolved2b2Wj_El/results/WJetsToLNu.root
+
+
+    boosted2b2Wj_El_Ewk:
+      - Skim2018_BoostedHbb2Wj_El/results/DYJetsToLL_M-10to50.root
+      - Skim2018_BoostedHbb2Wj_El/results/DYJetsToLL_M-50.root
+      - Skim2018_BoostedHbb2Wj_El/results/DYToLL_0J.root
+      - Skim2018_BoostedHbb2Wj_El/results/DYToLL_1J.root
+      - Skim2018_BoostedHbb2Wj_El/results/DYToLL_2J.root
+      - Skim2018_BoostedHbb2Wj_El/results/TGJets.root
+      - Skim2018_BoostedHbb2Wj_El/results/WGToLNuG.root
+      - Skim2018_BoostedHbb2Wj_El/results/WpWpJJ.root
+      - Skim2018_BoostedHbb2Wj_El/results/WWTo2L2Nu_DoubleScattering.root
+      - Skim2018_BoostedHbb2Wj_El/results/WWTo2L2Nu.root
+      - Skim2018_BoostedHbb2Wj_El/results/WWToLNuQQ.root
+      - Skim2018_BoostedHbb2Wj_El/results/WWW.root
+      - Skim2018_BoostedHbb2Wj_El/results/WWZ.root
+      - Skim2018_BoostedHbb2Wj_El/results/WZG.root
+      - Skim2018_BoostedHbb2Wj_El/results/WZTo3LNu.root
+      - Skim2018_BoostedHbb2Wj_El/results/WZZ.root
+      - Skim2018_BoostedHbb2Wj_El/results/ZGToLLG.root
+      - Skim2018_BoostedHbb2Wj_El/results/ZZTo2L2Q.root
+      - Skim2018_BoostedHbb2Wj_El/results/ZZTo4L.root
+      - Skim2018_BoostedHbb2Wj_El/results/ZZZ.root
+      - Skim2018_BoostedHbb2Wj_El/results/tZq_ll.root
+    boosted2b2Wj_El_GGF:
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluToHHTo2B2VLNu2J_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluToHHTo2B2Tau_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+    boosted2b2Wj_El_H:
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluHToBB.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluHToGG.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluHToMuMu.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluHToTauTau.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluHToWWTo2L2Nu.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluHToWWToLNuQQ.root
+      - Skim2018_BoostedHbb2Wj_El/results/GluGluHToZZTo4L.root
+      - Skim2018_BoostedHbb2Wj_El/results/HZJ_HToWW.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHToBB.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHToGG.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHToMuMu.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHToTauTau.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHToWWTo2L2Nu.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHToWWToLNuQQ.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHToZZTo4L.root
+      - Skim2018_BoostedHbb2Wj_El/results/VHToNonbb.root
+      - Skim2018_BoostedHbb2Wj_El/results/WminusH_HToBB_WToLNu.root
+      - Skim2018_BoostedHbb2Wj_El/results/WplusH_HToBB_WToLNu.root
+      - Skim2018_BoostedHbb2Wj_El/results/THQ.root
+      - Skim2018_BoostedHbb2Wj_El/results/THW.root
+      - Skim2018_BoostedHbb2Wj_El/results/ttHJetTobb.root
+      - Skim2018_BoostedHbb2Wj_El/results/ttHJetToNonbb.root
+      - Skim2018_BoostedHbb2Wj_El/results/ZH_HToBB_ZToLL.root
+      - Skim2018_BoostedHbb2Wj_El/results/ZHToTauTau.root
+    boosted2b2Wj_El_Top:
+      - Skim2018_BoostedHbb2Wj_El/results/TTTo2L2Nu.root
+      - Skim2018_BoostedHbb2Wj_El/results/TTToHadronic.root
+      - Skim2018_BoostedHbb2Wj_El/results/TTToSemiLeptonic.root
+      - Skim2018_BoostedHbb2Wj_El/results/ST_schannel_4f.root
+      - Skim2018_BoostedHbb2Wj_El/results/ST_tchannel_antitop_4f.root
+      - Skim2018_BoostedHbb2Wj_El/results/ST_tchannel_top_4f.root
+      - Skim2018_BoostedHbb2Wj_El/results/ST_tW_antitop_5f.root
+      - Skim2018_BoostedHbb2Wj_El/results/ST_tWll_5f.root
+      - Skim2018_BoostedHbb2Wj_El/results/ST_tW_top_5f.root
+      - Skim2018_BoostedHbb2Wj_El/results/TTGJets.root
+      - Skim2018_BoostedHbb2Wj_El/results/TTTT.root
+      - Skim2018_BoostedHbb2Wj_El/results/TTWH.root
+      - Skim2018_BoostedHbb2Wj_El/results/TTWJetsToLNu.root
+      - Skim2018_BoostedHbb2Wj_El/results/TTWJetsToQQ.root
+      - Skim2018_BoostedHbb2Wj_El/results/TTWW.root
+      - Skim2018_BoostedHbb2Wj_El/results/TTZH.root
+      - Skim2018_BoostedHbb2Wj_El/results/TTZToLL_M-1to10.root
+      - Skim2018_BoostedHbb2Wj_El/results/TTZToLLNuNu_M-10.root
+      - Skim2018_BoostedHbb2Wj_El/results/TTZToQQ.root
+    boosted2b2Wj_El_VBF:
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2WToLNu2J_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+      - Skim2018_BoostedHbb2Wj_El/results/VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+    boosted2b2Wj_El_WJets:
+      - Skim2018_BoostedHbb2Wj_El/results/W1JetsToLNu.root
+      - Skim2018_BoostedHbb2Wj_El/results/W2JetsToLNu.root
+      - Skim2018_BoostedHbb2Wj_El/results/W3JetsToLNu.root
+      - Skim2018_BoostedHbb2Wj_El/results/W4JetsToLNu.root
+      - Skim2018_BoostedHbb2Wj_El/results/WJetsToLNu_HT-100To200.root
+      - Skim2018_BoostedHbb2Wj_El/results/WJetsToLNu_HT-1200To2500.root
+      - Skim2018_BoostedHbb2Wj_El/results/WJetsToLNu_HT-200To400.root
+      - Skim2018_BoostedHbb2Wj_El/results/WJetsToLNu_HT-2500ToInf.root
+      - Skim2018_BoostedHbb2Wj_El/results/WJetsToLNu_HT-400To600.root
+      - Skim2018_BoostedHbb2Wj_El/results/WJetsToLNu_HT-600To800.root
+      - Skim2018_BoostedHbb2Wj_El/results/WJetsToLNu_HT-70To100.root
+      - Skim2018_BoostedHbb2Wj_El/results/WJetsToLNu_HT-800To1200.root
+      - Skim2018_BoostedHbb2Wj_El/results/WJetsToLNu.root
+
+sampleDir: /nfs/scratch/fynu/gsaha/SkimmedNtuplesJPA_Corr
