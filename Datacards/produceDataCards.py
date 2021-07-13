@@ -938,16 +938,24 @@ class DataCard:
         # Compute stack values #
         inMean = {'backgrounds':[]}
         histMax = {}
+        histMin = {}
         for histName in self.content.keys():
             hstack = ROOT.THStack(histName+"stack",histName+"stack")
             for group in self.content[histName].keys():
                 if self.groups[group]['type'] == 'mc':
                     hstack.Add(self.content[histName][group]['nominal'])
                 elif self.groups[group]['type'] == 'signal':
+                    if 'hide' in self.groups[group].keys() and self.groups[group]['hide']:
+                        continue
                     if group not in inMean.keys():
                         inMean[group] = [self.content[histName][group]['nominal'].Integral()]
                     else:
                         inMean[group].append(self.content[histName][group]['nominal'].Integral())
+                    if histName not in histMin.keys():
+                        histMin[histName] = self.content[histName][group]['nominal'].Integral()
+                    else:
+                        histMin[histName] = min(histMin[histName],self.content[histName][group]['nominal'].Integral())
+                        
             if hstack.GetNhists() > 0:
                 inMean['backgrounds'].append(hstack.GetStack().Last().Integral())
                 histMax[histName] = hstack.GetMaximum()
@@ -973,9 +981,9 @@ class DataCard:
                 plotGroup = group if 'group' not in gconfig.keys() else gconfig['group']
                 config['files'][group+'.root'].update({'group':plotGroup})
             else:
-                if inMean['backgrounds'] != 0.:
-                    config['files'][group+'.root'].update({k:v for k,v in gconfig.items() if k not in ['files','type']})
-                    config['files'][group+'.root'].update({'scale':0.01*inMean['backgrounds']/inMean[group]})
+                config['files'][group+'.root'].update({k:v for k,v in gconfig.items() if k not in ['files','type']})
+#                if inMean['backgrounds'] != 0.:
+#                    config['files'][group+'.root'].update({'scale':0.01*inMean['backgrounds']/inMean[group]})
 
         # Groups informations #
         config['groups'] = {}
@@ -1023,7 +1031,7 @@ class DataCard:
                 config['plots'][h1].pop('blinded-range',None)
             if histMax[h1] != 0.:
                 config['plots'][h1]['y-axis-range'] = [0.,histMax[h1]*1.5]
-                config['plots'][h1]['log-y-axis-range'] = [1.e-1,histMax[h1]*100]
+                config['plots'][h1]['log-y-axis-range'] = [min(1.e-1,histMin[h1]*0.1),histMax[h1]*100]
                 config['plots'][h1]['ratio-y-axis-range'] = [0.8,1.2]
             config['plots'][h1]['sort-by-yields'] = True
             config['plots'][h1]['show-overflow'] = True
@@ -1246,7 +1254,7 @@ class DataCard:
                     if 'submit' in combineCfg.keys() and not self.worker:
                         params = combineCfg['submit']
                         args = {'combine':entry}
-                        array = None
+                        arrayIds = None
                         # Create slurm directories
                         slurmDir  = os.path.join(subdirBin,'batch')
                         logDir    = os.path.join(slurmDir,'logs')
@@ -1311,26 +1319,29 @@ class DataCard:
                                     jobArrayArgs.append(jobArgs)
                                 subScript = self.writeSbatchCommand(slurmDir,params,jobArrayArgs)
                         else:
-                            array = []
+                            arrayIds = []
                             logging.info(f'{entry}: found batch script, will look for unfinished jobs')
                             for idx in idxs:
                                 subsubdir = os.path.join(outputDir,str(idx))
                                 rootfile = glob.glob(os.path.join(subsubdir,'higgs*.root')) 
                                 if len(rootfile) == 0:
                                     logging.debug(f'Root output not found in {subsubdir}')
-                                    array.append(str(idx))
+                                    arrayIds.append(str(idx))
                                 else:
                                     if not fileChecker(rootfile[0],idx):
-                                        array.append(str(idx))
-                        if array is None:
+                                        arrayIds.append(str(idx))
+                        if arrayIds is None:
                             slurmCmd = f'sbatch {subScript}'
                         else:
-                            if len(array) > 0:
-                                logging.info('... will resubmit the following array ids : '+','.join(array))
+                            if len(arrayIds) > 0:
+                                logging.info('... will resubmit the following array ids : '+','.join(arrayIds))
                                 if combineMode == 'pulls_impact':
-                                    for arrayId in array:
-                                        logging.info(f'\t{arrayId:4s} -> {systNames[int(arrayId)-2]}')
-                                slurmCmd = f"sbatch --array={','.join(array)} {subScript}"
+                                    for arrayId in arrayIds:
+                                        if int(arrayId) == 1: 
+                                            logging.info(f'\t{arrayId:4s} -> initial fit')
+                                        else:
+                                            logging.info(f'\t{arrayId:4s} -> {systNames[int(arrayId)-2]}')
+                                slurmCmd = f"sbatch --array={','.join(arrayIds)} {subScript}"
                             else:
                                 logging.info('... all jobs have succeeded')
                                 slurmCmd = ''
@@ -1350,7 +1361,10 @@ class DataCard:
                                 logging.error('Slurm job id could not be found')
                             else:
                                 slurmIdPerEntry[entry].append(slurm_id)
-                            continue
+                            if arrayIds is None or len(arrayIds) == len(idxs): 
+                                # For single job we want to wait until something has finished before going to finalize
+                                # For array job, as soon at least one job has run, produce finalize with intermediate results
+                                continue
 
                     # Produce command #
                     combineCmd = combineCfg['command'].format(workspacePath)
@@ -1465,7 +1479,7 @@ class DataCard:
 
                     # Find algorithm #
                     algorithm = None
-                    for i,arg in enumerate(combineCmd.split()):
+                    for i,arg in enumerate(combineCfg['command'].split()):
                         if arg == '--algo': # Used --algo ...
                             algorithm = combineCmd.split()[i+1]
                         if '--algo' in arg and arg != '--algo': # Used --algo=...
@@ -1546,6 +1560,7 @@ class DataCard:
                         'paths'     : [path_pdf],
                         'data'      : data,
                         'poi'       : 'r',
+                        'campaign'  : self.era,
                     }
                     if 'plotting' in combineCfg.keys():
                         content.update(combineCfg['plotting'])
@@ -1594,6 +1609,58 @@ class DataCard:
 #                    else:
 #                        logging.info(f'Produced plots in {subdirBin}')
 
+                    # Nuisances likelihoods #
+                    if 'postfit' in combineMode:
+                        fit_name = None
+                        if combineMode == 'postfit_b':
+                            fit_name = 'fit_b'
+                        if combineMode == 'postfit_s':
+                            fit_name = 'fit_s'
+                        path_pdf = os.path.join(subdirBin,'nuisances.pdf')
+                        resultFile = glob.glob(os.path.join(subdirBin,'higgs*root'))
+                        if len(resultFile) == 0:
+                            raise RuntimeError(f'Could not find result file in {subdirBin}')
+
+                        content = {
+                            'paths'                 : [path_pdf],
+                            'poi'                   : 'r',
+                            'fit_name'              : fit_name,
+                            'workspace'             : resultFile[0],
+                            'dataset'               : resultFile[0],
+                            'fit_diagnostics_path'  : fitdiagFile,
+                            'y_min'                 : 0.,
+                            'y_max'                 : 5.,
+                        }
+                        path_json = os.path.join(subdirBin,'nuisances.json')
+                        with open(path_json,'w') as handle:
+                            json.dump(content,handle,indent=4)
+                        getter = {
+                            'workspace'     : {'type':'ROOT','name':'w'},
+                            'dataset'       : {'type':'ROOT','name':'toys/toy_asimov'},
+                        }
+                        path_getter = os.path.join(subdirBin,'nuisances_getter.json')
+                        with open(path_getter,'w') as handle:
+                            json.dump(getter,handle,indent=4)
+
+                        pull_cmd = f"cd {setup_dir}; "
+                        pull_cmd += f"env -i bash -c 'source {setup_script} && cd {script_dir} && python helperInference.py dhi.plots.likelihoods.plot_nuisance_likelihood_scans {path_json} {path_getter}'"
+                        rc,output = self.run_command(pull_cmd,shell=True, return_output=True)
+                        if rc != 0: 
+                            if logging.root.level > 10:
+                                for line in output:
+                                    logging.info(line.strip())
+                            logging.error('Failed to produce nuisance plots, see log above')
+                        else:
+                            logging.info(f'Produced {path_pdf}')
+
+#                        content_log = {
+#                            'paths'                 : [os.path.join(subdirBin,'nuisances_log.pdf')],
+#                            'poi'                   : 'r',
+#                            'fit_name'              : fit_name,
+#                            'workspace'             : resultFile[0],
+#                            'fit_diagnostics_path'  : fitdiagFile,
+#                            'y_log'                 : True,
+#                        }
 
                     from fitdiag_plots import create_postfit_plots
                     from collections import OrderedDict
@@ -1622,6 +1689,9 @@ class DataCard:
                                              bin                     = binCfg,
                                              binToRead               = key,
                                              unblind                 = unblind)
+
+
+                        
                                         
             # Combined finalize mode for all bins (in case there was) #
             if len(subdirBinPaths) > 1 and not self.worker:
@@ -1914,6 +1984,8 @@ if __name__=="__main__":
                         help='Run combine on the txt datacard only')
     parser.add_argument('--combine_args', action='store', required=False, default=[], nargs='*',
                         help='Additional args for the combine commands (used in jobs, keep for debug)')
+    parser.add_argument('--custom', action='store', required=False, default=None, nargs='*',
+                        help='Format the yaml file')
     parser.add_argument('-v','--verbose', action='store_true', required=False, default=False,
                         help='Verbose mode')
     parser.add_argument('--worker', action='store_true', required=False, default=False,
@@ -1930,15 +2002,25 @@ if __name__=="__main__":
 
     if args.yaml is None:
         raise RuntimeError("Must provide the YAML file")
-    with open(args.yaml,'r') as handle:
-        f = yaml.load(handle,Loader=YMLIncludeLoader)
     if not os.path.isfile(args.yaml):
         raise RuntimeError("YAML file {} is not a valid file".format(args.yaml))
+    if args.custom is not None:
+        formatting = {}
+        for arg in args.custom:
+            if '=' in arg:
+                formatting[arg.split('=')[0]] = arg.split('=')[1]
+            else:
+                logging.warning(f'`--custom {arg}` will be ignored because no `=`')
+        d = yaml.load({'filename':args.yaml,'formatting':formatting},
+                      Loader=YMLIncludeLoader)
+    else:
+        with open(args.yaml,'r') as handle:
+            d = yaml.load(handle,Loader=YMLIncludeLoader)
     instance = DataCard(datacardName    = os.path.basename(args.yaml).replace('.yml',''),
                         configPath      = os.path.abspath(args.yaml),
                         worker          = args.worker,
                         pseudodata      = args.pseudodata,
-                        **f)
+                        **d)
     if args.combine is not None: 
         combine_args = {}
         for arg in args.combine_args:

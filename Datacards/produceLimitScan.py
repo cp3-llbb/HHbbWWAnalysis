@@ -365,11 +365,18 @@ if __name__=="__main__":
         subdirName = suffixes[0]
         suffixes = suffixes[1:]
 
-        if args.multilabels is None:
-            raise RuntimeError('--multiconfigs requires --multilabels')
-        if not all([':' in label for label in args.multilabels]):
-            raise RuntimeError("Not correct format for --multilabels")
-        labels = [label.split(':') for label in args.multilabels]
+        if args.multilabels is None and args.labels is None:
+            raise RuntimeError('--multiconfigs requires either --multilabels or --labels')
+        if args.multilabels is not None and args.labels is not None:
+            raise RuntimeError('You have to choose either --multilabels or --labels')
+        if args.labels is not None:
+            if ':' not in args.labels:  
+                raise RuntimeError("Not correct format for --labels")
+            labels = args.labels.split(':')
+        if args.multilabels is not None:
+            if not all([':' in label for label in args.multilabels]):
+                raise RuntimeError("Not correct format for --multilabels")
+            labels = [label.split(':') for label in args.multilabels]
             
     if configs is not None:
         # Create output directory #
