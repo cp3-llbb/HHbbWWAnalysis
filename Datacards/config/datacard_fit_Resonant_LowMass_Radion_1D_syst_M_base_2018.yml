@@ -1,0 +1,139 @@
+path: 
+- /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_Boosted1B_{branch}_syst_M_{mass}/
+- /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_Resolved1B_{branch}_syst_M_{mass}/
+- /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_Resolved2B_{branch}_syst_M_{mass}/
+
+use_syst: True
+
+yamlName: plots_DYEstimation_FakeExtrapolation.yml
+
+produce_plots: True
+
+era: 2018
+
+legend:
+  position:
+  - 0.2
+  - 0.7
+  - 0.9
+  - 0.9
+  columns: 3
+
+combineConfigs: !include combine_Res.yml
+
+normSyst  : 
+  - !include norm_lumi.yml
+  - !include norm_BR.yml
+  - !include norm_QCDscale.yml
+  - !include norm_alpha_s.yml
+  - !include norm_pdf.yml
+  - !include norm_misc.yml
+  - !include norm_process.yml
+  - !include norm_fakes_2018.yml
+  - !include norm_DY_Res{branch}.yml
+  - footer:
+      - "nuisance edit rename TT * ps_fsr ps_fsr_TT"
+      - "nuisance edit rename DY * ps_fsr ps_fsr_DY"
+      - "nuisance edit rename TT * ps_isr ps_isr_TT"
+      - "nuisance edit rename DY * ps_isr ps_isr_DY"
+
+
+shapeSyst  : !include shape_systematics.yml
+
+
+quantiles : 
+  - &quant5 [0., 0.2, 0.4, 0.6, 0.8 ,1.]
+  - &quant3 [0., 0.33, 0.66, 1.]
+backgrounds : &back [TT,ST,DY,WJets,VV,VVV,Other_bbWW,ggH_hbb,ggH_hgg,ggH_hmm,ggH_htt,ggH_hww,ggH_hzz,qqH_hbb,qqH_hgg,qqH_hmm,qqH_htt,qqH_hww,qqH_hzz,ttH_hbb,ttH_hww,WH_hbb,ZH_hbb,ZH_htt,ZH_hww,tHq_hww,tHW_hww,VH_hww]
+thresh: &thresh [1.e-05, 1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100., 121., 144., 169., 196., 225.]
+
+rebin:
+  HH_{mass}_resolved1b_GGF:
+    method: threshold 
+    params: 
+      - *thresh
+      - [TT,ST,DY]
+      - 10
+      - 0.05
+      - [ggHH_M_{mass}_hbbhwwdl,ggHH_M_{mass}_hbbhtt]
+  HH_{mass}_resolved2b_GGF:
+    method: threshold 
+    params: 
+      - *thresh
+      - [TT,ST,DY]
+      - 10
+      - 0.1
+      - [ggHH_M_{mass}_hbbhwwdl,ggHH_M_{mass}_hbbhtt]
+  HH_{mass}_boosted_GGF:
+    method: threshold 
+    params: 
+      - *thresh
+      - [TT,ST,DY]
+      - 10
+      - 0.2
+      - [ggHH_M_{mass}_hbbhwwdl,ggHH_M_{mass}_hbbhtt]
+  
+  HH_{mass}_resolved_DY_VVV:
+    method : quantile
+    params : [*quant5, *back]
+  HH_{mass}_boosted_DY_VVV:
+    method : quantile
+    params : [*quant3, *back]
+
+  HH_{mass}_resolved_other:
+    method : quantile
+    params : [*quant5, *back]
+  HH_{mass}_boosted_other:
+    method : quantile
+    params : [*quant3, *back]
+
+  
+DYnonclosure:
+  path : config/fit_results_Res{branch}.json
+  hist:
+    HH_{mass}_resolved_DY_VVV : 
+      entry: HH_{mass}_resolved_DY_VVV_2018
+      name: dy_resolved_nonclosure_dy_vvv
+    HH_{mass}_boosted_DY_VVV : 
+      entry: HH_{mass}_boosted_DY_VVV
+      name: dy_boosted_nonclosure_dy_vvv
+    HH_{mass}_resolved_other: 
+      entry: HH_{mass}_resolved_other_2018
+      name: dy_resolved_nonclosure_other
+    HH_{mass}_boosted_other: 
+      entry: HH_{mass}_boosted_other
+      name: dy_boosted_nonclosure_other
+  group: DY
+
+hist_conv: !include resonant_cat_param_1D_mass.yml
+
+groups:
+  - !include groups_DL_bkg_2018.yml
+  - !include groups_DY_datadriven_2018.yml
+  - !include groups_Fakes_2018.yml
+  - !include groups_data_2018.yml
+  - ggHH_M_{mass}_hbbhwwdl:
+      type: signal
+      legend: "Radion {mass} GeV #rightarrowHH#rightarrowbbWW [1 pb]"
+      scale: 100
+      order: 14
+      line-color: '#288a24'
+      fill-color: '#288a24'
+      line-type: 1
+      line-width: 2
+      fill-type: 3345
+      files:
+        - GluGluToRadionToHHTo2B2VTo2L2Nu_M-{mass}.root
+    ggHH_M_{mass}_hbbhtt:
+      type: signal
+      legend: "Radion {mass} GeV #rightarrowHH#rightarrowbb#tau#tau [1 pb]"
+      scale: 100
+      order: 14
+      line-color: '#c91a26'
+      fill-color: '#c91a26'
+      line-type: 1
+      line-width: 2
+      fill-type: 3354
+      files:
+        - GluGluToRadionToHHTo2B2Tau_M-{mass}.root
+

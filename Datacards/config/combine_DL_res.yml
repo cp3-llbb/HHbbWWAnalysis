@@ -1,0 +1,212 @@
+  limits:
+    mode: limits
+    command: "combine -M AsymptoticLimits -t -1 -d {}"
+    submit :  
+      time: '0-06:00:00'
+      mem : 3000
+    bins:
+      - HH_resolved1b_GGF
+      - HH_resolved2b_GGF
+      - HH_boosted_GGF
+      - HH_resolved1b_H
+      - HH_resolved2b_H
+      - HH_boosted_H
+      - HH_resolved_DY_VVV
+      - HH_boosted_DY_VVV
+      - HH_resolved_other
+      - HH_boosted_other
+  gof:
+    mode: gof
+    command: "combine -M GoodnessOfFit -d {} --algo=saturated --toysFrequentist"
+    toys: 500
+    toys-per-job: 10
+    combine_bins: True
+    split_bins: True
+    plotting:
+      n_bins        : 32
+      #left_margin   : 200
+      #right_margin  : 20
+    submit :  
+      time: '0-01:00:00'
+      mem : 2000
+    bins:
+      - HH_resolved1b_H
+      - HH_resolved2b_H
+      - HH_boosted_H
+      - HH_resolved_DY_VVV
+      - HH_boosted_DY_VVV
+      - HH_resolved_other
+      - HH_boosted_other
+  pulls:
+    mode: pulls_impact
+    command: "combine -M MultiDimFit -d {} --verbose 3 --redefineSignalPOIs r  --setParameterRanges r=-6000.0,6000.0 --keepFailures --robustFit 1 --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 --X-rtd MINIMIZER_no_analytic"
+    mc_stats: False
+    unblind: True
+    submit :  
+      time: '0-01:00:00'
+      mem : 2000
+    plotting:
+      left_margin           : 400
+      right_margin          : 20
+      label_size            : 18
+      parameters_per_page   : 30
+      order_by_impact       : True
+    bins:
+      - HH_resolved1b_H
+      - HH_resolved2b_H
+      - HH_boosted_H
+      - HH_resolved_DY_VVV
+      - HH_boosted_DY_VVV
+      - HH_resolved_other
+      - HH_boosted_other
+  impacts:
+    mode: pulls_impact
+    command: "combine -M MultiDimFit -d {} --verbose 3 --redefineSignalPOIs r  --setParameterRanges r=-6000.0,6000.0 --keepFailures --robustFit 1 --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 --X-rtd MINIMIZER_no_analytic "
+        #   --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 --X-rtd MINIMIZER_no_analytic --robustHesse true
+    mc_stats: False
+    submit :  
+      time: '0-01:00:00'
+      mem : 2000
+    plotting:
+      left_margin           : 400
+      right_margin          : 20
+      label_size            : 18
+      parameters_per_page   : 30
+      order_by_impact       : True
+    bins:
+      - HH_resolved1b_GGF
+      - HH_resolved2b_GGF
+      - HH_boosted_GGF
+      - HH_resolved1b_H
+      - HH_resolved2b_H
+      - HH_boosted_H
+      - HH_resolved_DY_VVV
+      - HH_boosted_DY_VVV
+      - HH_resolved_other
+      - HH_boosted_other
+  prefit:
+    mode: prefit 
+    command: "combine -M FitDiagnostics {} --verbose 3 --mass 125  --redefineSignalPOIs r --setParameters r=1.0 --setParameterRanges r=-1000,1000 --saveShapes --saveWithUncertainties --saveNormalizations --saveWorkspace --saveToys --saveNLL --saveOverallShapes --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 --X-rtd MINIMIZER_no_analytic --keepFailures  --skipSBFit --skipBOnlyFit --ignoreCovWarning -n HHbbWW"
+    submit :  
+      time: '1-00:00:00'
+      mem : 15000
+    bins:
+      - HH_resolved1b_GGF
+      - HH_resolved2b_GGF
+      - HH_boosted_GGF
+      - HH_resolved1b_H
+      - HH_resolved2b_H
+      - HH_boosted_H
+      - HH_resolved_DY_VVV
+      - HH_boosted_DY_VVV
+      - HH_resolved_other
+      - HH_boosted_other
+    plotting:
+        main: !include prefit_DL_res_main.yml
+        plots: 
+          - name: GGFnode
+            header: GGF node
+            bins : [HH_resolved1b_GGF,HH_resolved2b_GGF,HH_boosted_GGF]
+            labels: ['Resolved 1b','Resolved 2b','Boosted']
+            labelpos: [1,11,18]
+            unblind: False
+          - name: Hnode
+            header: single H node
+            bins : [HH_resolved1b_H,HH_resolved2b_H,HH_boosted_H]
+            labels: ['Resolved 1b','Resolved 2b','Boosted']
+            labelpos: [0.5, 5.5, 10]
+            unblind: True
+          - name: DYnode
+            header: DY + VV(V) node
+            bins : [HH_resolved_DY_VVV,HH_boosted_DY_VVV]
+            labels: ['Resolved','Boosted']
+            labelpos: [1, 5]
+            unblind: True
+          - name: Othernode
+            header: TT + Other BKG node
+            bins : [HH_resolved_other,HH_boosted_other]
+            labels: ['Resolved','Boosted']
+            labelpos: [1, 5]
+            unblind: True
+  postfit_b:
+    mode: postfit_b
+    command: "combine -M FitDiagnostics {} --verbose 3 --mass 125  --redefineSignalPOIs r --setParameters r=1.0 --setParameterRanges r=-1000,1000 --saveShapes --saveWithUncertainties --saveNormalizations --saveWorkspace --saveToys --saveNLL --saveOverallShapes --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 --X-rtd MINIMIZER_no_analytic --keepFailures  --skipSBFit --ignoreCovWarning -n HHbbWW"
+    submit :  
+      time: '1-00:00:00'
+      mem : 15000
+    bins:
+      - HH_resolved1b_H
+      - HH_resolved2b_H
+      - HH_boosted_H
+      - HH_resolved_DY_VVV
+      - HH_boosted_DY_VVV
+      - HH_resolved_other
+      - HH_boosted_other
+    plotting:
+        main: !include postfit_DL_res_main.yml
+        plots: 
+          - name: Hnode
+            header: single H node
+            bins : [HH_resolved1b_H,HH_resolved2b_H,HH_boosted_H]
+            labels: ['Resolved 1b','Resolved 2b','Boosted']
+            labelpos: [0.5, 5.5, 10]
+            unblind: True
+          - name: DYnode
+            header: DY + VV(V) node
+            bins : [HH_resolved_DY_VVV,HH_boosted_DY_VVV]
+            labels: ['Resolved','Boosted']
+            labelpos: [1, 5]
+            unblind: True
+          - name: Othernode
+            header: TT + Other BKG node
+            bins : [HH_resolved_other,HH_boosted_other]
+            labels: ['Resolved','Boosted']
+            labelpos: [1, 5]
+            unblind: True
+
+#  postfit_s:
+#    mode: postfit_s
+#    command: "combine -M FitDiagnostics {} --verbose 3 --mass 125  --redefineSignalPOIs r --setParameters r=1.0 --setParameterRanges r=-1000,1000 --saveShapes --saveWithUncertainties --saveNormalizations --saveWorkspace --saveToys --saveNLL --saveOverallShapes --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 --X-rtd MINIMIZER_no_analytic --keepFailures  --skipBOnlyFit --ignoreCovWarning -n HHbbWW"
+#    submit :  
+#      time: '1-00:00:00'
+#      mem : 15000
+#    bins:
+#      - HH_resolved1b_GGF
+#      - HH_resolved2b_GGF
+#      - HH_boosted_GGF
+#      - HH_resolved1b_H
+#      - HH_resolved2b_H
+#      - HH_boosted_H
+#      - HH_resolved_DY_VVV
+#      - HH_boosted_DY_VVV
+#      - HH_resolved_other
+#      - HH_boosted_other
+#    plotting:
+#        main: !include postfit_main.yml
+#        plots: 
+#          - name: GGFnode
+#            header: GGF node
+#            bins : [HH_resolved1b_GGF,HH_resolved2b_GGF,HH_boosted_GGF]
+#            labels: ['Resolved 1b','Resolved 2b','Boosted']
+#            labelpos: [0.5, 8.5, 17]
+#            unblind: False
+#          - name: Hnode
+#            header: single H node
+#            bins : [HH_resolved1b_H,HH_resolved2b_H,HH_boosted_H]
+#            labels: ['Resolved 1b','Resolved 2b','Boosted']
+#            labelpos: [0.5, 8.5, 17]
+#            unblind: True
+#          - name: DYnode
+#            header: DY + VV(V) node
+#            bins : [HH_resolved_DY_VVV,HH_boosted_DY_VVV]
+#            labels: ['Resolved','Boosted']
+#            labelpos: [2, 10]
+#            unblind: True
+#          - name: Othernode
+#            header: TT + Other BKG node
+#            bins : [HH_resolved_other,HH_boosted_other]
+#            labels: ['Resolved','Boosted']
+#            labelpos: [2, 8]
+#            unblind: True
+
+

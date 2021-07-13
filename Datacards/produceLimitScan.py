@@ -7,6 +7,7 @@ import subprocess
 import ROOT
 import numpy as np
 import multiprocess as mp
+from IPython import embed
 
 from yamlLoader import YMLIncludeLoader
 
@@ -23,7 +24,8 @@ def runSingleLimit(config):
                               'limits.json')
     if not os.path.exists(limit_path):
         print (f'Limits for config {config} not found -> will compute them')
-        process = subprocess.Popen(['python','-u','produceDataCards.py','--worker','--combine','limits','--yaml',config],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,universal_newlines=True)
+        #process = subprocess.Popen(['python','-u','produceDataCards.py','--worker','--combine','limits','--yaml',config],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,universal_newlines=True)
+        process = subprocess.Popen(['python','-u','produceDataCards.py','--combine','--yaml',config],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,universal_newlines=True)
         while True:
             nextline = process.stdout.readline()
             if nextline == '' and process.poll() is not None:
@@ -53,6 +55,13 @@ class LimitScan:
         else:
             raise RuntimeError("Not correct configs")
 
+        self.labels = labels
+        if all([isinstance(label,list) for label in self.labels]):
+            self.multilabel = True
+        elif all([isinstance(label,str) for label in self.labels]):
+            self.multilabel = False
+        else:
+            raise RuntimeError("Not correct labels")
 
         if len(labels) == 0:
             labels = [str(i) for i in range(1,len(self.configs)+1)]
@@ -60,8 +69,13 @@ class LimitScan:
         if self.multiscan:
             N = 0
             for config in self.configs:
-                if len(labels) != len(config):
-                    raise RuntimeError(f"You provided {len(config)} configs but {len(labels)} labels")
+                if self.multilabel:
+                    for labels,configs in zip(self.labels,self.configs):
+                        if len(labels) != len(config):
+                            raise RuntimeError(f"You provided {len(config)} configs but {len(labels)} labels")
+                else:
+                    if len(labels) != len(config):
+                        raise RuntimeError(f"You provided {len(config)} configs but {len(labels)} labels")
                 N += len(config)
 
         else:
@@ -69,7 +83,6 @@ class LimitScan:
                 raise RuntimeError(f"You provided {len(self.configs)} configs but {len(labels)} labels")
             N = len(self.configs)
 
-        self.labels = labels
         self.path_out = path_out
 
         self.jobs = jobs
@@ -82,7 +95,10 @@ class LimitScan:
             
         if self.multiscan:
             results = self.getLimits([config for configs in self.configs for config in configs])
-            limitsPerPoint = [{self.labels[i]:results[config] for i,config in enumerate(configs)} for configs in self.configs] 
+            if self.multilabel:
+                limitsPerPoint = [{labels[i]:results[config] for i,config in enumerate(configs)} for labels,configs in zip(self.labels,self.configs)] 
+            else:
+                limitsPerPoint = [{self.labels[i]:results[config] for i,config in enumerate(configs)} for configs in self.configs] 
             graphsList = []
             for i in range(len(limitsPerPoint)):
                 graphs,labelConv = self.produceLimitGraphs(limitsPerPoint[i])
@@ -265,7 +281,7 @@ class LimitScan:
         c1.SetTicky()  
 
         # Plot #
-        xpoints = list(graphs[0].GetX())
+        xpoints = sorted(list(set([val for graph in graphs for val in list(graph.GetX())])))
         minx = min(xpoints)*0.9
         maxx = max(xpoints)*1.1
         b1 = ROOT.TH1F("b2","b2", len(xpoints)*2, minx, maxx)
@@ -313,8 +329,10 @@ if __name__=="__main__":
                         help='Yaml config files for single scan with uncertainty bands, separated by ":"')
     parser.add_argument('--multiconfigs', nargs='+', required=False, default=None,
                         help='Yaml config files for multiple scans without uncertainty bands')
-    parser.add_argument('--labels', nargs='+', required=False, default=[],
+    parser.add_argument('--labels', required=False, type=str, default=None,
                         help='Labels for each config')
+    parser.add_argument('--multilabels', nargs='+', required=False, default=None,
+                        help='Labels for multiconfigs (can either be one string if labels are the same, or one string per configs)')
     parser.add_argument('--suffix', required=True, type=str,
                         help='Suffix for the subdirectory (one per sets for multiconfigs, separated by ":"')
     parser.add_argument('-j','--jobs', action='store', required=False, type=int, default=1,
@@ -330,6 +348,13 @@ if __name__=="__main__":
         subdirName = args.suffix
         suffixes = args.suffix
 
+        if args.labels is None:
+            raise RuntimeError('--configs requires --labels')
+        if ':' not in args.labels:  
+            raise RuntimeError("Not correct format for --labels")
+        labels = args.labels.split(':')
+
+
     if args.multiconfigs is not None:
         if not all([':' in config for config in args.multiconfigs]):
             raise RuntimeError("Not correct format for --multiconfigs")
@@ -340,6 +365,12 @@ if __name__=="__main__":
         subdirName = suffixes[0]
         suffixes = suffixes[1:]
 
+        if args.multilabels is None:
+            raise RuntimeError('--multiconfigs requires --multilabels')
+        if not all([':' in label for label in args.multilabels]):
+            raise RuntimeError("Not correct format for --multilabels")
+        labels = [label.split(':') for label in args.multilabels]
+            
     if configs is not None:
         # Create output directory #
         path_out = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -354,16 +385,19 @@ if __name__=="__main__":
         for key,val in args.__dict__.items():
             if isinstance(val,list):
                 val = ' '.join([str(v) for v in val])
+                cmd += f"--{key} {val} "
             elif isinstance(val,bool):
                 if not val:
                     continue
                 else:
                     val = ""
+                cmd += f"--{key} {val} "
+            elif isinstance(val,str):
+                cmd += f'--{key} "{val}" '
             elif val is None:
                 continue
-            cmd += f"--{key} {val} "
         with open(os.path.join(path_out,'command.txt'),'w') as handle:
             handle.write(cmd)
 
         # Run #
-        instance = LimitScan(suffixes,configs,args.labels,args.jobs,args.unblind,path_out)
+        instance = LimitScan(suffixes,configs,labels,args.jobs,args.unblind,path_out)

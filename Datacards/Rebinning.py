@@ -6,7 +6,11 @@ import scipy.interpolate
 from array import array
 import ROOT
 
+from hist_interface import PythonInterface, CppInterface
+
 def compareTwoAxes(x1,x2):
+    if x1.dtype != x2.dtype:
+        x2 = x2.astype(x1.dtype)
     if x1[0] != x2[0]:
         raise RuntimeError("Axis first edge not matching : {} != {}".format(x1[0],x2[0]))
     if x1[-1] != x2[-1]:
@@ -75,15 +79,7 @@ class Rebin:
                 s : errors  (GetBinError)
             return [e,w,s]
         """
-        assert isinstance(h,ROOT.TH1)
-        e = [h.GetXaxis().GetBinUpEdge(0)]
-        w = []
-        s = []
-        for i in range(1,h.GetNbinsX()+1):
-            e.append(h.GetXaxis().GetBinUpEdge(i))
-            w.append(h.GetBinContent(i))
-            s.append(h.GetBinError(i))
-        return np.array(e).round(9),np.array(w),np.array(s)
+        return CppInterface.getContent1D(h)
 
     @staticmethod
     def rebin1D(e,w,s,ne):
@@ -107,8 +103,11 @@ class Rebin:
             nw[i] += w[idx == i].sum()
             ns[i] += (s[idx == i]**2).sum()
         ns = np.sqrt(ns)
-        assert w.sum()==0. or abs(w.sum()-nw.sum())/w.sum() < 1e-9
-        assert s.sum()==0. or abs((s**2).sum()-(ns**2).sum())/(s**2).sum() < 1e-9
+        if w.sum() != 0. and abs(w.sum()-nw.sum())/w.sum() > 1e-6:
+            logging.warning(f'Rebin 1D difference in bin content total : original = {w.sum():.5e}, rebinned = {nw.sum():.5e} -> relative difference = {abs(w.sum()-nw.sum())/w.sum():.3e}')
+        if s.sum() != 0. and abs((s**2).sum()-(ns**2).sum())/(s**2).sum() > 1e-6:
+            logging.warning(f'Rebin 1D difference in bin error total : original (squared) = {(s**2).sum():.5e}, rebinned (squared) = {(ns**2).sum():.5e} -> relative difference = {abs((s**2).sum()-(ns**2).sum())/(s**2).sum():.3e}')
+        assert s.sum()==0. or abs((s**2).sum()-(ns**2).sum())/(s**2).sum() < 1e-6
         return nw,ns
 
     @staticmethod
@@ -121,11 +120,7 @@ class Rebin:
             name : name to be used in the TH1 instantiation (default = '')
             return : TH1
         """
-        h = ROOT.TH1F(name,name,e.shape[0]-1,array('d',e))
-        for i in range(w.shape[0]):
-            h.SetBinContent(i+1,w[i])
-            h.SetBinError(i+1,s[i])
-        return h
+        return CppInterface.fillHistogram1D(e,w,s,name)
 
     def __call__(self,h):
         """
@@ -137,7 +132,7 @@ class Rebin:
             logging.warning('Warning : nan found in hist %s'%h.GetName())
             return None
         if not hasattr(self,'ne'):
-            raise RuntimeError('New bin edges have not been computed, is the rebin_method() not implemented')
+            raise RuntimeError('New bin edges have not been computed, is the rebin_method() not implemented ?')
         nw,ns = self.rebin1D(e,w,s,self.ne)
         return self.fillHistogram1D(self.ne,nw,ns,h.GetName()+'rebin')
         
@@ -242,11 +237,6 @@ class Threshold(Rebin):
             if len(idx) > 0 and w[0 : idx[0]].sum() < w[idx[0] : (idx[1] if len(idx) > 1 else None)].sum(): # merge two first bins in case rising in content
                 idx = idx[1:]     
             self.ne = np.unique(np.r_[e[0], e[idx] , e[-1]])
-#            nw,ns = self.rebin1D(e,w,s,self.ne)
-#            import IPython
-#            IPython.embed()
-#            inc_bins = ((nw[1:] > nw[:-1])*1).sum()
-#            print (self.ne.shape[0],inc_bins,0.9*self.ne.shape[0],inc_bins > 0.9*self.ne.shape[0])
             if nbins is not None and self.ne.shape[0] > nbins :#and inc_bins > 0.9*self.ne.shape[0]:
                 break
 
@@ -317,20 +307,7 @@ class Rebin2D(Rebin):
                 s : errors  (GetBinError)
             return [e,w,s]
         """
-        assert isinstance(h,ROOT.TH2)
-        xAxis = h.GetXaxis()
-        yAxis = h.GetYaxis()
-        Nx = xAxis.GetNbins() 
-        Ny = yAxis.GetNbins()
-        w = np.zeros((Nx,Ny))
-        s = np.zeros((Nx,Ny))
-        for ix in range(0,Nx):
-            for iy in range(0,Ny):
-                w[ix,iy] = h.GetBinContent(ix+1,iy+1)
-                s[ix,iy] = h.GetBinError(ix+1,iy+1)
-        e = [np.array([xAxis.GetBinLowEdge(i) for i in range(1,Nx+2)]).round(9),
-             np.array([yAxis.GetBinLowEdge(i) for i in range(1,Ny+2)]).round(9)]
-        return e,w,s
+        return CppInterface.getContent2D(h)
 
     def __call__(self,h):
         """
@@ -374,8 +351,10 @@ class Rebin2D(Rebin):
                 nw[ix,iy] += w[np.ix_(idx==ix,idy==iy)].sum()
                 ns[ix,iy] += (s[np.ix_(idx==ix,idy==iy)]**2).sum()
         ns = np.sqrt(ns)
-        assert w.sum()==0. or abs(w.sum()-nw.sum())/w.sum() < 1e-9
-        assert s.sum()==0. or abs((s**2).sum()-(ns**2).sum())/(s**2).sum() < 1e-9
+        if w.sum() != 0. and abs(w.sum()-nw.sum())/w.sum() > 1e-6:
+            logging.warning(f'Rebin 2D difference in bin content total : original = {w.sum():.5e}, rebinned = {nw.sum():.5e} -> relative difference = {abs(w.sum()-nw.sum())/w.sum():.3e}')
+        if s.sum() != 0. and abs((s**2).sum()-(ns**2).sum())/(s**2).sum() > 1e-6:
+            logging.warning(f'Rebin 2D difference in bin error total : original (squared) = {(s**2).sum():.5e}, rebinned (squared) = {(ns**2).sum():.5e} -> relative difference = {abs((s**2).sum()-(ns**2).sum())/(s**2).sum():.3e}')
         return nw,ns
 
     @staticmethod
@@ -388,13 +367,7 @@ class Rebin2D(Rebin):
             name : name to be used in the TH2 instantiation (default = '')
             return : TH2
         """
-        assert len(e) == 2
-        h = ROOT.TH2F(name,name,e[0].shape[0]-1,array('d',e[0]),e[1].shape[0]-1,array('d',e[1]))
-        for ix in range(w.shape[0]):
-            for iy in range(0,w.shape[1]):
-                h.SetBinContent(ix+1,iy+1,w[ix,iy])
-                h.SetBinError(ix+1,iy+1,s[ix,iy])
-        return h
+        return CppInterface.fillHistogram2D(e,w,s,name)
 
 class Boundary2D(Rebin2D):
     """
