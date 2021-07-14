@@ -80,6 +80,7 @@ class Rebin:
             return [e,w,s]
         """
         return CppInterface.getContent1D(h)
+       # return PythonInterface.getContent1D(h)
 
     @staticmethod
     def rebin1D(e,w,s,ne):
@@ -121,6 +122,7 @@ class Rebin:
             return : TH1
         """
         return CppInterface.fillHistogram1D(e,w,s,name)
+        #return PythonInterface.fillHistogram1D(e,w,s,name)
 
     def __call__(self,h):
         """

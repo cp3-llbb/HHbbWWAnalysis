@@ -19,7 +19,7 @@ legend:
   - 0.9
   columns: 3
 
-combineConfigs: !include combine_Res.yml
+combineConfigs: !include combine_DL_res.yml
 
 normSyst  : 
   - !include norm_lumi.yml
@@ -28,7 +28,7 @@ normSyst  :
   - !include norm_alpha_s.yml
   - !include norm_pdf.yml
   - !include norm_misc.yml
-  - !include norm_process.yml
+  - !include norm_DL_res_process.yml
   - !include norm_fakes_2018.yml
   - !include norm_DY_Res{branch}.yml
   - footer:

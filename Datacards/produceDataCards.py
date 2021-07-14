@@ -38,8 +38,8 @@ COMBINE_ENV = os.path.join(INFERENCE_PATH,
                           'env_standalone.sh')
 
 class DataCard:
-    def __init__(self,datacardName=None,configPath=None,path=None,yamlName=None,worker=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,produce_plots=False,legend=None,combineConfigs=None,**kwargs):
-        self.datacardName   = datacardName
+    def __init__(self,outputDir=None,configPath=None,path=None,yamlName=None,worker=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,produce_plots=False,legend=None,combineConfigs=None,**kwargs):
+        self.outputDir      = outputDir
         self.configPath     = configPath
         self.path           = path
         self.worker         = worker
@@ -64,7 +64,7 @@ class DataCard:
         self.yaml_dict = self.loadYaml(self.path,yamlName)
 
         # Create output directory #
-        self.datacardPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),'datacards',self.datacardName)
+        self.datacardPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),self.outputDir)
         if not os.path.exists(self.datacardPath):
             os.makedirs(self.datacardPath)
 
@@ -77,8 +77,8 @@ class DataCard:
         if self.pseudodata:
             logging.info('Will use pseudodata')
             self.groups = self.generatePseudoData(self.groups)
-            if self.datacardName is not None:
-                self.datacardName += "_pseudodata"
+            if self.outputDir is not None:
+                self.outputDir += "_pseudodata"
 
         # Initialise containers #
         self.content = {histName:{g:{} for g in self.groups.keys()} for histName in self.hist_conv.keys()}
@@ -92,7 +92,7 @@ class DataCard:
             self.applyDYNonClosure()
         if self.rebin is not None:
             self.applyRebinning()
-        if self.datacardName is not None:
+        if self.outputDir is not None:
             self.saveDatacard()
         if self.produce_plots:
             self.preparePlotIt()
@@ -354,7 +354,7 @@ class DataCard:
 
     def saveDatacard(self):
         from txtwriter import Writer
-        if self.datacardName is None:
+        if self.outputDir is None:
             raise RuntimeError("Datacard name is not set")
 
         shapes = {histName:os.path.join(self.datacardPath,f"{histName}_{self.era}.root") for histName in self.content.keys()}
@@ -470,8 +470,6 @@ class DataCard:
                         if not isinstance(systList,list):
                             systList = [systList]
                         if systName == 'footer':
-                            for line in systList:
-                                writer.addFooter(line)
                             continue
                         for systContent in systList:
                             if systContent is None:
@@ -497,7 +495,10 @@ class DataCard:
                                     continue
                             for process in processes:
                                 writer.addLnNSystematic(binName,process,systName,systContent['val'])
-
+            # Add potential footer #
+            if self.use_syst and "footer" in self.normSyst.keys():
+                for footer in self.normSyst['footer']:
+                    writer.addFooter(footer)
                 
             if '{}' in self.textfiles:
                 textPath = os.path.join(self.datacardPath,self.textfiles.format(f"{histName}_{self.era}"))
@@ -653,6 +654,11 @@ class DataCard:
         hists_for_binning = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in groups_for_binning if histDict['nominal'] is not None]
         return hists_for_binning
 
+    def countPerHistName(self,histName):
+        N = 0
+        for group in self.content[histName].keys():
+            N += len(self.content[histName][group])
+        return N
         
     def rebinClassic(self,histName,params):
         """
@@ -663,23 +669,27 @@ class DataCard:
         assert isinstance(params,list)
         assert len(params) == 1
         assert isinstance(params[0],int)
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group,histDict in self.content[histName].items():
             for systName,hist in histDict.items():
                 self.content[histName][group][systName].Rebin(params[0])
+                pbar.update()
 
     def rebinClassic2D(self,histName,params):
         """
             Using the classic ROOT rebinning (2D)
             histName: name of histogram in keys of self.content
-            params : (list) [groups(int),grousp(int)]
+            params : (list) [groups(int),groups(int)]
         """
         assert isinstance(params,list)
         assert len(params) == 2
         assert isinstance(params[0],int)
         assert isinstance(params[1],int)
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group,histDict in self.content[histName].items():
             for systName,hist in histDict.items():
                 self.content[histName][group][systName].Rebin(params[0],params[1])
+                pbar.update()
 
 
     def rebinBoundary(self,histName,params):
@@ -693,9 +703,11 @@ class DataCard:
         assert len(params) == 1
         assert isinstance(params[0],list)
         boundObj = Boundary(boundaries=params[0])
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = boundObj(hist) 
+                pbar.update()
 
     def rebinBoundary2D(self,histName,params):
         """
@@ -709,9 +721,11 @@ class DataCard:
         assert isinstance(params[0],list)
         assert isinstance(params[1],list)
         boundObj = Boundary2D(params[0],params[1])
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = boundObj(hist) 
+                pbar.update()
 
 
     def rebinInQuantile(self,histName,params):
@@ -729,9 +743,11 @@ class DataCard:
         groups_for_binning = params[1]
         hists_for_binning = self.rebinGetHists(histName,groups_for_binning)
         qObj = Quantile(hists_for_binning,quantiles)
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = qObj(hist) 
+                pbar.update()
 
     def rebinInQuantile2D(self,histName,params):
         """
@@ -750,9 +766,11 @@ class DataCard:
         groups_for_binning = params[2]
         hists_for_binning = self.rebinGetHists(histName,groups_for_binning)
         qObj = Quantile2D(hists_for_binning,qx,qy)
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = qObj(hist) 
+                pbar.update()
 
 
     def rebinThreshold(self,histName,params):
@@ -777,9 +795,11 @@ class DataCard:
         hists_for_binning   = self.rebinGetHists(histName,groups_for_binning)
         hists_extra         = self.rebinGetHists(histName,extra)
         tObj = Threshold(hists_for_binning,thresholds,hists_extra,nbins,rsut)
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = tObj(hist) 
+                pbar.update()
                 
     def rebinThreshold2D(self,histName,params):
         """
@@ -806,9 +826,11 @@ class DataCard:
         hists_for_binning   = self.rebinGetHists(histName,groups_for_binning)
         hists_extra         = self.rebinGetHists(histName,extra)
         tObj = Threshold(hists_for_binning,threshx,threshy,hists_extra,nbins,rsut)
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = tObj(hist) 
+                pbar.update()
 
     def rebinLinearize2D(self,histName,params):
         """
@@ -821,9 +843,11 @@ class DataCard:
         assert len(params) == 1
         assert params[0] in ['x','y']
         lObj = Linearize2D(major=params[0])
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = lObj(hist)
+                pbar.update()
         if not hasattr(self,'plotLinearizeData'):
             self.plotLinearizeData = {histName:lObj.getPlotData()}
         else:
@@ -877,9 +901,11 @@ class DataCard:
                                      minor_class  = minor_class,
                                      minor_params = minor_params,
                                      h            = hists_for_binning)
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = lObj(hist)
+                pbar.update()
 
         # Save linearized info for plotIt #
         if not hasattr(self,'plotLinearizeData'):
@@ -1088,7 +1114,7 @@ class DataCard:
             logging.warning("plotIt not found")
 
     def run_combine(self,entries,additional_args={},debug=False):
-        logging.info(f'Running combine on {self.datacardName}')
+        logging.info(f'Running combine on {self.outputDir}')
         if self.combineConfigs is None:
             logging.warning("No combine command in the yaml config file")
             return
@@ -1184,7 +1210,6 @@ class DataCard:
                 rootFiles = glob.glob(os.path.join(subdirBin,'*.root'))
                 if len(rootFiles) == 0 or rootFiles == [workspacePath]:
                     logging.info(f'No root file found in {subdirBin}, will run the command for mode {combineMode}')
-
                     txtPathsForCombination = []
                     if binNames == 'all':
                         txtPathsForCombination = list(txtPaths.values())
@@ -2016,8 +2041,7 @@ if __name__=="__main__":
     else:
         with open(args.yaml,'r') as handle:
             d = yaml.load(handle,Loader=YMLIncludeLoader)
-    instance = DataCard(datacardName    = os.path.basename(args.yaml).replace('.yml',''),
-                        configPath      = os.path.abspath(args.yaml),
+    instance = DataCard(configPath      = os.path.abspath(args.yaml),
                         worker          = args.worker,
                         pseudodata      = args.pseudodata,
                         **d)

@@ -7,6 +7,12 @@ import numpy as np
 
 from hist_interface import PythonInterface, CppInterface
 
+from ROOT import gErrorIgnoreLevel
+gErrorIgnoreLevel = 2000
+ROOT.TH1.AddDirectory(False)
+
+from IPython import embed
+
 TIMER_EVAL = 10
 N_BINS = 400
 
@@ -54,7 +60,7 @@ def assertTH2(h1,h2,atol=0.,rtol=1e-7):
             if abs(a-b) > atol + rtol * abs(b):
                 raise RuntimeError(f'Position ({x},{y}) : {a} not close to {b}')
 
-# Extracting #
+## Extracting #
 e1p,w1p,s1p = timer(PythonInterface.getContent1D)(h1)
 e1c,w1c,s1c = timer(CppInterface.getContent1D)(h1)
 
@@ -71,7 +77,7 @@ np.testing.assert_allclose(e2p[1],e2c[1])
 np.testing.assert_allclose(w2p,w2c)
 np.testing.assert_allclose(s2p,s2c)
 
-# Filling #
+## Filling #
 h1p = timer(PythonInterface.fillHistogram1D)(e1p,w1p,s1p,'h1p')
 h1c = timer(CppInterface.fillHistogram1D)(e1c,w1c,s1c,'h1c')
 
@@ -81,3 +87,4 @@ h2p = timer(PythonInterface.fillHistogram2D)(e2p,w2p,s2p,'h2p')
 h2c = timer(CppInterface.fillHistogram2D)(e2c,w2c,s2c,'h2c')
 
 assertTH2(h2p,h2c)
+

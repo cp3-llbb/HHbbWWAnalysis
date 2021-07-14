@@ -1,83 +1,48 @@
 template <typename T>
-std::vector<std::vector<float>> getContentFromTH1(const T& h)
+float* getContentFromTH1(const T& h)
 {
-    std::vector<float> values;
-    std::vector<float> errors;
-    std::vector<float> edges;
     int Nx = h.GetNbinsX();
-    values.reserve(Nx);
-    errors.reserve(Nx);
-    edges.reserve(Nx+1);
-    for (int i = 1 ; i <= Nx ; i++)
+    float* content = new float[3*Nx+1];
+        // [0:Nx] -> bin content (len = Nx)
+        // [Nx:2*Nx] -> bin error (len = Nx)
+        // [2*Nx:3*Nx+1] -> bin edges (len = Nx+1)
+    for (int i = 0 ; i < Nx ; i++)
     {
-        values.emplace_back(h.GetBinContent(i));
-        errors.emplace_back(h.GetBinError(i));
-        edges.emplace_back(h.GetBinLowEdge(i));
+        content[i]        = h.GetBinContent(i+1);
+        content[Nx+i]     = h.GetBinError(i+1);
+        content[2*Nx+i]   = h.GetBinLowEdge(i+1);
     }
-    edges.emplace_back(h.GetBinLowEdge(Nx+1));
+    content[3*Nx] = h.GetBinLowEdge(Nx+1);
     
-    return std::vector<std::vector<float>> {edges,values,errors};
+    return content;
 }
 
-//std::vector<std::vector<std::vector<float>>> getContentFromTH2D(TH2D& h)
-//{
-//    std::vector<std::vector<float>> values;
-//    std::vector<std::vector<float>> errors;
-//    std::vector<std::vector<float>> edges {std::vector<float>(),std::vector<float>()};
-//    int Nx = h.GetNbinsX();
-//    int Ny = h.GetNbinsY();
-//    values.reserve(Nx);
-//    errors.reserve(Nx);
-//    edges[0].reserve(Nx+1);
-//    edges[1].reserve(Ny+1);
-//    for (int x = 1 ; x <= Nx; x++)
-//    {
-//        edges[0].emplace_back(h.GetXaxis()->GetBinLowEdge(x));
-//        values.emplace_back(std::vector<float>());
-//        errors.emplace_back(std::vector<float>());
-//        values.back().reserve(Ny);
-//        errors.back().reserve(Ny);
-//        for (int y = 1 ; y <= Ny; y++)
-//        {
-//            values.back().emplace_back(h.GetBinContent(x,y));
-//            errors.back().emplace_back(h.GetBinError(x,y));
-//            if (x == 1)
-//                edges[1].emplace_back(h.GetYaxis()->GetBinLowEdge(y));
-//        }
-//        if (x == 1)
-//            edges[1].emplace_back(h.GetYaxis()->GetBinLowEdge(Ny+1));
-//    }
-//    edges[0].emplace_back(h.GetXaxis()->GetBinLowEdge(Nx+1));
-//    std::cout<<"finished"<<std::endl;
-//    return std::vector<std::vector<std::vector<float>>> {edges,values,errors};
-//}
 template <typename T>
-std::vector<std::vector<float>> getContentFromTH2(const T& h)
+float* getContentFromTH2(const T& h)
 {
-    std::vector<float> values;
-    std::vector<float> errors;
-    std::vector<float> edges;
     int Nx = h.GetNbinsX();
     int Ny = h.GetNbinsY();
-    values.reserve(Nx*Ny);
-    errors.reserve(Nx*Ny);
-    edges.reserve(Nx+Ny+2);
-    for (int x = 1 ; x <= Nx; x++)
+    float* content = new float[2*Nx*Ny+Nx+Ny+2];
+        // [0:Nx*Ny] -> bin content (len = Nx*Ny) : rows = y values, columns = x values
+        // [Nx*Ny:2*Nx*Ny] -> bin error (len = Nx*Ny)
+        // [2*Nx*Ny:2*Nx*Ny+Nx+Ny+2] -> bin edges (len = Nx+Ny+2)
+    for (int x = 0 ; x < Nx; x++)
     {
-        for (int y = 1 ; y <= Ny; y++)
+        for (int y = 0 ; y < Ny; y++)
         {
-            values.emplace_back(h.GetBinContent(x,y));
-            errors.emplace_back(h.GetBinError(x,y));
-            if (x == 1)
-                edges.emplace_back(h.GetYaxis()->GetBinLowEdge(y));
+            content[y + Ny*x] = h.GetBinContent(x+1,y+1);
+            content[Nx*Ny + y + Ny*x] = h.GetBinError(x+1,y+1);
+            if (x == 0)
+                content[2*Nx*Ny + Nx + 1 + y] = h.GetXaxis()->GetBinLowEdge(y+1);
         }
-        if (x == 1)
-            edges.emplace_back(h.GetYaxis()->GetBinLowEdge(Ny+1));
-        edges.emplace_back(h.GetXaxis()->GetBinLowEdge(x));
+        if (x == 0)
+            content[2*Nx*Ny + Nx + Ny + 1] =  h.GetXaxis()->GetBinLowEdge(Ny+1);
+        content[2*Nx*Ny + x] = h.GetXaxis()->GetBinLowEdge(x+1);
     }
-    edges.emplace_back(h.GetXaxis()->GetBinLowEdge(Nx+1));
-    return std::vector<std::vector<float>> {edges,values,errors};
+    content[2*Nx*Ny + Nx] = h.GetXaxis()->GetBinLowEdge(Nx+1);
+    return content;
 }
+
 
 TH1F fillTH1(const float* edges, const float* values, const float * errors, int N, std::string name)
 {
@@ -128,5 +93,3 @@ TH2D fillTH2(const double* xedges, const double* yedges, const double* values, c
     }    
     return h;
 }
-
-

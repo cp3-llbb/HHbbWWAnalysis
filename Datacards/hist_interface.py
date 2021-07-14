@@ -61,10 +61,13 @@ class CppInterface:
     @classmethod
     def getContent1D(self,h):
         assert isinstance(h,ROOT.TH1)
+        Nx = h.GetNbinsX() 
         content = ROOT.getContentFromTH1(h)
-        w = np.array(content[1])
-        e = np.array(content[0]).round(5).astype(w.dtype)
-        s = np.array(content[2]).astype(w.dtype)
+        content.reshape((3*Nx+1,))
+        arr = np.frombuffer(content, dtype=np.float32, count=3*Nx+1)
+        w = arr[:Nx]
+        s = arr[Nx:2*Nx]
+        e = arr[2*Nx:].round(5)
         return e,w,s
 
     @classmethod
@@ -73,15 +76,12 @@ class CppInterface:
         content = ROOT.getContentFromTH2(h)
         Nx = h.GetNbinsX()
         Ny = h.GetNbinsY()
-        w = np.array(content[1])
-        assert w.shape[0] == Nx*Ny
-        w = w.reshape(Nx,Ny)
-        e = np.array(content[0]).astype(w.dtype)
-        assert e.shape[0] == Nx+Ny+2
-        e = [e[-Nx-1:].round(5),e[:Ny+1].round(5)]
-        s = np.array(content[2]).astype(w.dtype)
-        assert s.shape[0] == Nx*Ny
-        s = s.reshape(Nx,Ny)
+        content.reshape((2*Nx*Ny+Nx+Ny+2,)) 
+        arr = np.frombuffer(content, dtype=np.float32, count=2*Nx*Ny+Nx+Ny+2)
+        w = arr[:Nx*Ny].reshape(Nx,Ny)
+        s = arr[Nx*Ny:2*Nx*Ny].reshape(Nx,Ny)
+        e = arr[2*Nx*Ny:]
+        e = [e[:Nx+1],e[Nx+1:]]
         return e,w,s
 
     @classmethod

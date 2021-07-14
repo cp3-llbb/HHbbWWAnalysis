@@ -3,6 +3,8 @@ path:
 - /nfs/scratch/fynu/gsaha/Sync_Aachen/PlotOutWithFullSyst2018_Resolved1B
 - /nfs/scratch/fynu/gsaha/Sync_Aachen/PlotOutWithFullSyst2018_Resolved2B
 
+outputDir: datacards/datacard_fit_NonResonant_SL_DNN001_2018
+
 use_syst: True
 
 yamlName: plots_FakeExtrapolation.yml
@@ -19,7 +21,7 @@ legend:
   - 0.9
   columns: 3
 
-combineConfigs: !include combine_Res.yml
+#combineConfigs: !include combine_Res.yml
 
 normSyst  : 
   - !include norm_lumi.yml
@@ -28,13 +30,14 @@ normSyst  :
   - !include norm_alpha_s.yml
   - !include norm_pdf.yml
   - !include norm_misc.yml
-  - !include norm_process.yml
+  - !include norm_SL_nonres_process.yml
   # Footer #
   - footer:
-      - "nuisance edit rename TT * ps_fsr ps_fsr_TT"
-      - "nuisance edit rename DY * ps_fsr ps_fsr_DY"
-      - "nuisance edit rename TT * ps_isr ps_isr_TT"
-      - "nuisance edit rename DY * ps_isr ps_isr_DY"
+      - "nuisance edit rename TT    * CMS_bbwwdl_PS_FSR CMS_bbwwdl_PS_FSR_TT"
+      - "nuisance edit rename ST    * CMS_bbwwdl_PS_FSR CMS_bbwwdl_PS_FSR_ST"
+      - "nuisance edit rename WJets * CMS_bbwwdl_PS_ISR CMS_bbwwdl_PS_ISR_WJets"
+      - "nuisance edit rename TT    * CMS_bbwwdl_PS_ISR CMS_bbwwdl_PS_ISR_TT"
+      - "nuisance edit rename ST    * CMS_bbwwdl_PS_ISR CMS_bbwwdl_PS_ISR_ST"
 
 
 shapeSyst  : !include shape_systematics.yml

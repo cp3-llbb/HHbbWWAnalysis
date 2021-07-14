@@ -1,7 +1,7 @@
 #################################
 #         Ad hoc norm           # 
 #################################
-CMS_bbWW_TT_norm:
+CMS_bbww_TT_norm:
   proc: 
     - ST
     - TT
