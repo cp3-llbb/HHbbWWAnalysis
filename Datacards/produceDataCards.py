@@ -458,7 +458,7 @@ class DataCard:
 
                             # Get convention naming #
                             if systName not in self.shapeSyst.keys():
-                                raise RuntimeError("Could not find {} in systematic dict".format(baseSyst))
+                                raise RuntimeError("Could not find {systName} in systematic dict".format(systName))
                             CMSName = self.shapeSyst[systName]
                             if '{era}' in CMSName:
                                 CMSName = CMSName.format(era=self.era)

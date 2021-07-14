@@ -40,7 +40,7 @@ normSyst  :
       - "nuisance edit rename ST    * CMS_bbwwdl_PS_ISR CMS_bbwwdl_PS_ISR_ST"
 
 
-shapeSyst  : !include shape_systematics.yml
+shapeSyst  : !include shape_SL_systematics.yml
 
 
 rebin: !include rebin_SL_nonresonant.yml

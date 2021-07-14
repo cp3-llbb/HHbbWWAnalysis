@@ -104,11 +104,10 @@ class Rebin:
             nw[i] += w[idx == i].sum()
             ns[i] += (s[idx == i]**2).sum()
         ns = np.sqrt(ns)
-        if w.sum() != 0. and abs(w.sum()-nw.sum())/w.sum() > 1e-6:
+        if w.sum() != 0. and abs(w.sum()-nw.sum())/w.sum() > 1e-4:
             logging.warning(f'Rebin 1D difference in bin content total : original = {w.sum():.5e}, rebinned = {nw.sum():.5e} -> relative difference = {abs(w.sum()-nw.sum())/w.sum():.3e}')
-        if s.sum() != 0. and abs((s**2).sum()-(ns**2).sum())/(s**2).sum() > 1e-6:
+        if s.sum() != 0. and abs((s**2).sum()-(ns**2).sum())/(s**2).sum() > 1e-4:
             logging.warning(f'Rebin 1D difference in bin error total : original (squared) = {(s**2).sum():.5e}, rebinned (squared) = {(ns**2).sum():.5e} -> relative difference = {abs((s**2).sum()-(ns**2).sum())/(s**2).sum():.3e}')
-        assert s.sum()==0. or abs((s**2).sum()-(ns**2).sum())/(s**2).sum() < 1e-6
         return nw,ns
 
     @staticmethod
@@ -353,9 +352,9 @@ class Rebin2D(Rebin):
                 nw[ix,iy] += w[np.ix_(idx==ix,idy==iy)].sum()
                 ns[ix,iy] += (s[np.ix_(idx==ix,idy==iy)]**2).sum()
         ns = np.sqrt(ns)
-        if w.sum() != 0. and abs(w.sum()-nw.sum())/w.sum() > 1e-6:
+        if w.sum() != 0. and abs(w.sum()-nw.sum())/w.sum() > 1e-4:
             logging.warning(f'Rebin 2D difference in bin content total : original = {w.sum():.5e}, rebinned = {nw.sum():.5e} -> relative difference = {abs(w.sum()-nw.sum())/w.sum():.3e}')
-        if s.sum() != 0. and abs((s**2).sum()-(ns**2).sum())/(s**2).sum() > 1e-6:
+        if s.sum() != 0. and abs((s**2).sum()-(ns**2).sum())/(s**2).sum() > 1e-4:
             logging.warning(f'Rebin 2D difference in bin error total : original (squared) = {(s**2).sum():.5e}, rebinned (squared) = {(ns**2).sum():.5e} -> relative difference = {abs((s**2).sum()-(ns**2).sum())/(s**2).sum():.3e}')
         return nw,ns
 

@@ -38,7 +38,7 @@ normSyst  :
       - "nuisance edit rename DY * ps_isr ps_isr_DY"
 
 
-shapeSyst  : !include shape_systematics.yml
+shapeSyst  : !include shape_DL_systematics.yml
 
 
 quantiles : 
