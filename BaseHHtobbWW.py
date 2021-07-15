@@ -1611,6 +1611,11 @@ One lepton and and one jet argument must be specified in addition to the require
                                              additionalVariables={'Pt' : lambda obj : self.electron_conept[obj.idx]}) for syst in FRSysts]
         self.muonFRList = [self.SF.get_scalefactor("lepton", ('muon_fakerates_'+era, syst), combine="weight", systName="mu_FR_"+syst, defineOnFirstUse=(not forSkimmer),
                                          additionalVariables={'Pt' : lambda obj : self.muon_conept[obj.idx]}) for syst in FRSysts ] 
+        if self.analysis == 'SL': # Not needed for DL
+            self.electronFRNC = self.SF.get_scalefactor("lepton", ("fakerates_nonclosure_2018",'Loose_Electron_SL_{}'.format(self.era)), defineOnFirstUse=(not forSkimmer))
+            self.muonFRNC     = self.SF.get_scalefactor("lepton", ("fakerates_nonclosure_2018",'Loose_Muon_SL_{}'.format(self.era)), defineOnFirstUse=(not forSkimmer))
+
+            self.ttH_singleElectron_trigSF = self.SF.get_scalefactor("lepton", 'singleTrigger_electron_{}'.format(era) , combine="weight", systName="ttH_singleElectron_trigSF", defineOnFirstUse=(not forSkimmer))
 
         def returnFFSF(obj,list_SF,systName):
             """ Helper when several systematics are present  """

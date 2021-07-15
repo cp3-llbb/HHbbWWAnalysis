@@ -109,6 +109,12 @@ class ScaleFactorsbbWW:
                                                 base_key    = '{wp}_{channel}_{syst}_syst',
                                                 base_str    = 'TTHFakeRates_{wp}MVA_{channel}_Muon_2016_{syst}Syst.json',
                                                 format_dict = {'wp':['Loose'],'channel':['DL','SL'],'syst':['pt','barrel','norm']})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
+                                                entry_key   = 'fakerates_nonclosure_2016',
+                                                base_key    = '{wp}_{lepton}_SL_2016',
+                                                base_str    = 'TTHFakeRates_{wp}MVA_SL_{lepton}_2016_QCD.json',
+                                                format_dict = {'wp':['Loose'],'lepton':['Electron','Muon']})
+
         # PU ID SF #
         instance.AddScaleFactorWithWorkingPoint(path_key    = 'POG_SF',
                                                 entry_key   = 'jet_puid_eff',
@@ -207,6 +213,11 @@ class ScaleFactorsbbWW:
                                                 base_key    = '{wp}_{channel}_{syst}_syst',
                                                 base_str    = 'TTHFakeRates_{wp}MVA_{channel}_Muon_2017_{syst}Syst.json',
                                                 format_dict = {'wp':['Loose'],'channel':['DL','SL'],'syst':['pt','barrel','norm']})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
+                                                entry_key   = 'fakerates_nonclosure_2017',
+                                                base_key    = '{wp}_{lepton}_SL_2017',
+                                                base_str    = 'TTHFakeRates_{wp}MVA_SL_{lepton}_2017_QCD.json',
+                                                format_dict = {'wp':['Loose'],'lepton':['Electron','Muon']})
 
         #----- 2018 -----#
         # Check links of 2016 #
@@ -284,6 +295,12 @@ class ScaleFactorsbbWW:
                                                 base_key    = '{wp}_{channel}_{syst}_syst',
                                                 base_str    = 'TTHFakeRates_{wp}MVA_{channel}_Muon_2018_{syst}Syst.json',
                                                 format_dict = {'wp':['Loose'],'channel':['DL','SL'],'syst':['pt','barrel','norm']})
+        instance.AddScaleFactorWithWorkingPoint(path_key    = 'FR',
+                                                entry_key   = 'fakerates_nonclosure_2018',
+                                                base_key    = '{wp}_{lepton}_SL_2018',
+                                                base_str    = 'TTHFakeRates_{wp}MVA_SL_{lepton}_2018_QCD.json',
+                                                format_dict = {'wp':['Loose'],'lepton':['Electron','Muon']})
+
 
         # Get full dict #
         self.all_scalefactors = instance.GetScaleFactorsDict()
