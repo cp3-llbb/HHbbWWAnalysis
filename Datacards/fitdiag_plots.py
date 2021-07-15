@@ -190,13 +190,13 @@ def create_postfit_plots(
         )
 
     ## declare canvases sizes accordingly
-    WW = 600
-    HH = 700
+    WW = 900
+    HH = 800
     TT = 0.08 * HH
     BB = 0.12 * HH
     RR = 0.04 * WW
     if do_bottom:
-        LL = 0.13 * WW
+        LL = 0.12 * WW
         canvas = ROOT.TCanvas("canvas", "canvas", WW, HH)
         canvas.SetBorderMode(0)
         canvas.SetLeftMargin(LL / WW)
@@ -207,7 +207,7 @@ def create_postfit_plots(
         canvas.SetTicky(0)
         # canvas.SetGrid()
     else:
-        LL = 0.14 * WW
+        LL = 0.13 * WW
         canvas = ROOT.TCanvas("canvas", "canvas", WW, WW)
         canvas.SetBorderMode(0)
         canvas.SetLeftMargin(LL / WW)
@@ -461,22 +461,6 @@ def create_postfit_plots(
     logging.info(f'... saved {savepdf}.png')
     del dumb
     canvas.IsA().Destructor(canvas)
-
-
-#def ordered_dict_prepend(dct, key, value, dict_setitem=dict.__setitem__):
-#    root = dct._OrderedDict__root
-#    first = root[1]
-#    if key in dct:
-#        link = dct._OrderedDict__map[key]
-#        link_prev, link_next, _ = link
-#        link_prev[1] = link_next
-#        link_next[0] = link_prev
-#        link[0] = root
-#        link[1] = first
-#        root[1] = first[0] = link
-#    else:
-#        root[1] = first[0] = dct._OrderedDict__map[key] = [root, first, key]
-#        dict_setitem(dct, key, value)
 
 def ordered_dict_prepend(dct, key, value):
     dct.update({key:value})

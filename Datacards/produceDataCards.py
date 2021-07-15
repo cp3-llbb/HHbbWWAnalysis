@@ -38,8 +38,8 @@ COMBINE_ENV = os.path.join(INFERENCE_PATH,
                           'env_standalone.sh')
 
 class DataCard:
-    def __init__(self,datacardName=None,configPath=None,path=None,yamlName=None,worker=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,produce_plots=False,legend=None,combineConfigs=None,**kwargs):
-        self.datacardName   = datacardName
+    def __init__(self,outputDir=None,configPath=None,path=None,yamlName=None,worker=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,produce_plots=False,legend=None,combineConfigs=None,**kwargs):
+        self.outputDir      = outputDir
         self.configPath     = configPath
         self.path           = path
         self.worker         = worker
@@ -64,7 +64,7 @@ class DataCard:
         self.yaml_dict = self.loadYaml(self.path,yamlName)
 
         # Create output directory #
-        self.datacardPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),'datacards',self.datacardName)
+        self.datacardPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),self.outputDir)
         if not os.path.exists(self.datacardPath):
             os.makedirs(self.datacardPath)
 
@@ -77,8 +77,8 @@ class DataCard:
         if self.pseudodata:
             logging.info('Will use pseudodata')
             self.groups = self.generatePseudoData(self.groups)
-            if self.datacardName is not None:
-                self.datacardName += "_pseudodata"
+            if self.outputDir is not None:
+                self.outputDir += "_pseudodata"
 
         # Initialise containers #
         self.content = {histName:{g:{} for g in self.groups.keys()} for histName in self.hist_conv.keys()}
@@ -92,7 +92,7 @@ class DataCard:
             self.applyDYNonClosure()
         if self.rebin is not None:
             self.applyRebinning()
-        if self.datacardName is not None:
+        if self.outputDir is not None:
             self.saveDatacard()
         if self.produce_plots:
             self.preparePlotIt()
@@ -354,7 +354,7 @@ class DataCard:
 
     def saveDatacard(self):
         from txtwriter import Writer
-        if self.datacardName is None:
+        if self.outputDir is None:
             raise RuntimeError("Datacard name is not set")
 
         shapes = {histName:os.path.join(self.datacardPath,f"{histName}_{self.era}.root") for histName in self.content.keys()}
@@ -458,7 +458,7 @@ class DataCard:
 
                             # Get convention naming #
                             if systName not in self.shapeSyst.keys():
-                                raise RuntimeError("Could not find {} in systematic dict".format(baseSyst))
+                                raise RuntimeError("Could not find {systName} in systematic dict".format(systName))
                             CMSName = self.shapeSyst[systName]
                             if '{era}' in CMSName:
                                 CMSName = CMSName.format(era=self.era)
@@ -470,8 +470,6 @@ class DataCard:
                         if not isinstance(systList,list):
                             systList = [systList]
                         if systName == 'footer':
-                            for line in systList:
-                                writer.addFooter(line)
                             continue
                         for systContent in systList:
                             if systContent is None:
@@ -497,7 +495,10 @@ class DataCard:
                                     continue
                             for process in processes:
                                 writer.addLnNSystematic(binName,process,systName,systContent['val'])
-
+            # Add potential footer #
+            if self.use_syst and "footer" in self.normSyst.keys():
+                for footer in self.normSyst['footer']:
+                    writer.addFooter(footer)
                 
             if '{}' in self.textfiles:
                 textPath = os.path.join(self.datacardPath,self.textfiles.format(f"{histName}_{self.era}"))
@@ -653,6 +654,11 @@ class DataCard:
         hists_for_binning = [histDict['nominal'] for group,histDict in self.content[histName].items() if group in groups_for_binning if histDict['nominal'] is not None]
         return hists_for_binning
 
+    def countPerHistName(self,histName):
+        N = 0
+        for group in self.content[histName].keys():
+            N += len(self.content[histName][group])
+        return N
         
     def rebinClassic(self,histName,params):
         """
@@ -663,23 +669,27 @@ class DataCard:
         assert isinstance(params,list)
         assert len(params) == 1
         assert isinstance(params[0],int)
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group,histDict in self.content[histName].items():
             for systName,hist in histDict.items():
                 self.content[histName][group][systName].Rebin(params[0])
+                pbar.update()
 
     def rebinClassic2D(self,histName,params):
         """
             Using the classic ROOT rebinning (2D)
             histName: name of histogram in keys of self.content
-            params : (list) [groups(int),grousp(int)]
+            params : (list) [groups(int),groups(int)]
         """
         assert isinstance(params,list)
         assert len(params) == 2
         assert isinstance(params[0],int)
         assert isinstance(params[1],int)
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group,histDict in self.content[histName].items():
             for systName,hist in histDict.items():
                 self.content[histName][group][systName].Rebin(params[0],params[1])
+                pbar.update()
 
 
     def rebinBoundary(self,histName,params):
@@ -693,9 +703,11 @@ class DataCard:
         assert len(params) == 1
         assert isinstance(params[0],list)
         boundObj = Boundary(boundaries=params[0])
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = boundObj(hist) 
+                pbar.update()
 
     def rebinBoundary2D(self,histName,params):
         """
@@ -709,9 +721,11 @@ class DataCard:
         assert isinstance(params[0],list)
         assert isinstance(params[1],list)
         boundObj = Boundary2D(params[0],params[1])
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = boundObj(hist) 
+                pbar.update()
 
 
     def rebinInQuantile(self,histName,params):
@@ -729,9 +743,11 @@ class DataCard:
         groups_for_binning = params[1]
         hists_for_binning = self.rebinGetHists(histName,groups_for_binning)
         qObj = Quantile(hists_for_binning,quantiles)
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = qObj(hist) 
+                pbar.update()
 
     def rebinInQuantile2D(self,histName,params):
         """
@@ -750,9 +766,11 @@ class DataCard:
         groups_for_binning = params[2]
         hists_for_binning = self.rebinGetHists(histName,groups_for_binning)
         qObj = Quantile2D(hists_for_binning,qx,qy)
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = qObj(hist) 
+                pbar.update()
 
 
     def rebinThreshold(self,histName,params):
@@ -777,9 +795,11 @@ class DataCard:
         hists_for_binning   = self.rebinGetHists(histName,groups_for_binning)
         hists_extra         = self.rebinGetHists(histName,extra)
         tObj = Threshold(hists_for_binning,thresholds,hists_extra,nbins,rsut)
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = tObj(hist) 
+                pbar.update()
                 
     def rebinThreshold2D(self,histName,params):
         """
@@ -806,9 +826,11 @@ class DataCard:
         hists_for_binning   = self.rebinGetHists(histName,groups_for_binning)
         hists_extra         = self.rebinGetHists(histName,extra)
         tObj = Threshold(hists_for_binning,threshx,threshy,hists_extra,nbins,rsut)
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = tObj(hist) 
+                pbar.update()
 
     def rebinLinearize2D(self,histName,params):
         """
@@ -821,9 +843,11 @@ class DataCard:
         assert len(params) == 1
         assert params[0] in ['x','y']
         lObj = Linearize2D(major=params[0])
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = lObj(hist)
+                pbar.update()
         if not hasattr(self,'plotLinearizeData'):
             self.plotLinearizeData = {histName:lObj.getPlotData()}
         else:
@@ -877,9 +901,11 @@ class DataCard:
                                      minor_class  = minor_class,
                                      minor_params = minor_params,
                                      h            = hists_for_binning)
+        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = lObj(hist)
+                pbar.update()
 
         # Save linearized info for plotIt #
         if not hasattr(self,'plotLinearizeData'):
@@ -938,16 +964,24 @@ class DataCard:
         # Compute stack values #
         inMean = {'backgrounds':[]}
         histMax = {}
+        histMin = {}
         for histName in self.content.keys():
             hstack = ROOT.THStack(histName+"stack",histName+"stack")
             for group in self.content[histName].keys():
                 if self.groups[group]['type'] == 'mc':
                     hstack.Add(self.content[histName][group]['nominal'])
                 elif self.groups[group]['type'] == 'signal':
+                    if 'hide' in self.groups[group].keys() and self.groups[group]['hide']:
+                        continue
                     if group not in inMean.keys():
                         inMean[group] = [self.content[histName][group]['nominal'].Integral()]
                     else:
                         inMean[group].append(self.content[histName][group]['nominal'].Integral())
+                    if histName not in histMin.keys():
+                        histMin[histName] = self.content[histName][group]['nominal'].Integral()
+                    else:
+                        histMin[histName] = min(histMin[histName],self.content[histName][group]['nominal'].Integral())
+                        
             if hstack.GetNhists() > 0:
                 inMean['backgrounds'].append(hstack.GetStack().Last().Integral())
                 histMax[histName] = hstack.GetMaximum()
@@ -973,9 +1007,9 @@ class DataCard:
                 plotGroup = group if 'group' not in gconfig.keys() else gconfig['group']
                 config['files'][group+'.root'].update({'group':plotGroup})
             else:
-                if inMean['backgrounds'] != 0.:
-                    config['files'][group+'.root'].update({k:v for k,v in gconfig.items() if k not in ['files','type']})
-                    config['files'][group+'.root'].update({'scale':0.01*inMean['backgrounds']/inMean[group]})
+                config['files'][group+'.root'].update({k:v for k,v in gconfig.items() if k not in ['files','type']})
+#                if inMean['backgrounds'] != 0.:
+#                    config['files'][group+'.root'].update({'scale':0.01*inMean['backgrounds']/inMean[group]})
 
         # Groups informations #
         config['groups'] = {}
@@ -1023,7 +1057,7 @@ class DataCard:
                 config['plots'][h1].pop('blinded-range',None)
             if histMax[h1] != 0.:
                 config['plots'][h1]['y-axis-range'] = [0.,histMax[h1]*1.5]
-                config['plots'][h1]['log-y-axis-range'] = [1.e-1,histMax[h1]*100]
+                config['plots'][h1]['log-y-axis-range'] = [min(1.e-1,histMin[h1]*0.1),histMax[h1]*100]
                 config['plots'][h1]['ratio-y-axis-range'] = [0.8,1.2]
             config['plots'][h1]['sort-by-yields'] = True
             config['plots'][h1]['show-overflow'] = True
@@ -1080,7 +1114,7 @@ class DataCard:
             logging.warning("plotIt not found")
 
     def run_combine(self,entries,additional_args={},debug=False):
-        logging.info(f'Running combine on {self.datacardName}')
+        logging.info(f'Running combine on {self.outputDir}')
         if self.combineConfigs is None:
             logging.warning("No combine command in the yaml config file")
             return
@@ -1176,7 +1210,6 @@ class DataCard:
                 rootFiles = glob.glob(os.path.join(subdirBin,'*.root'))
                 if len(rootFiles) == 0 or rootFiles == [workspacePath]:
                     logging.info(f'No root file found in {subdirBin}, will run the command for mode {combineMode}')
-
                     txtPathsForCombination = []
                     if binNames == 'all':
                         txtPathsForCombination = list(txtPaths.values())
@@ -1246,7 +1279,7 @@ class DataCard:
                     if 'submit' in combineCfg.keys() and not self.worker:
                         params = combineCfg['submit']
                         args = {'combine':entry}
-                        array = None
+                        arrayIds = None
                         # Create slurm directories
                         slurmDir  = os.path.join(subdirBin,'batch')
                         logDir    = os.path.join(slurmDir,'logs')
@@ -1311,26 +1344,29 @@ class DataCard:
                                     jobArrayArgs.append(jobArgs)
                                 subScript = self.writeSbatchCommand(slurmDir,params,jobArrayArgs)
                         else:
-                            array = []
+                            arrayIds = []
                             logging.info(f'{entry}: found batch script, will look for unfinished jobs')
                             for idx in idxs:
                                 subsubdir = os.path.join(outputDir,str(idx))
                                 rootfile = glob.glob(os.path.join(subsubdir,'higgs*.root')) 
                                 if len(rootfile) == 0:
                                     logging.debug(f'Root output not found in {subsubdir}')
-                                    array.append(str(idx))
+                                    arrayIds.append(str(idx))
                                 else:
                                     if not fileChecker(rootfile[0],idx):
-                                        array.append(str(idx))
-                        if array is None:
+                                        arrayIds.append(str(idx))
+                        if arrayIds is None:
                             slurmCmd = f'sbatch {subScript}'
                         else:
-                            if len(array) > 0:
-                                logging.info('... will resubmit the following array ids : '+','.join(array))
+                            if len(arrayIds) > 0:
+                                logging.info('... will resubmit the following array ids : '+','.join(arrayIds))
                                 if combineMode == 'pulls_impact':
-                                    for arrayId in array:
-                                        logging.info(f'\t{arrayId:4s} -> {systNames[int(arrayId)-2]}')
-                                slurmCmd = f"sbatch --array={','.join(array)} {subScript}"
+                                    for arrayId in arrayIds:
+                                        if int(arrayId) == 1: 
+                                            logging.info(f'\t{arrayId:4s} -> initial fit')
+                                        else:
+                                            logging.info(f'\t{arrayId:4s} -> {systNames[int(arrayId)-2]}')
+                                slurmCmd = f"sbatch --array={','.join(arrayIds)} {subScript}"
                             else:
                                 logging.info('... all jobs have succeeded')
                                 slurmCmd = ''
@@ -1350,7 +1386,10 @@ class DataCard:
                                 logging.error('Slurm job id could not be found')
                             else:
                                 slurmIdPerEntry[entry].append(slurm_id)
-                            continue
+                            if arrayIds is None or len(arrayIds) == len(idxs): 
+                                # For single job we want to wait until something has finished before going to finalize
+                                # For array job, as soon at least one job has run, produce finalize with intermediate results
+                                continue
 
                     # Produce command #
                     combineCmd = combineCfg['command'].format(workspacePath)
@@ -1465,7 +1504,7 @@ class DataCard:
 
                     # Find algorithm #
                     algorithm = None
-                    for i,arg in enumerate(combineCmd.split()):
+                    for i,arg in enumerate(combineCfg['command'].split()):
                         if arg == '--algo': # Used --algo ...
                             algorithm = combineCmd.split()[i+1]
                         if '--algo' in arg and arg != '--algo': # Used --algo=...
@@ -1546,6 +1585,7 @@ class DataCard:
                         'paths'     : [path_pdf],
                         'data'      : data,
                         'poi'       : 'r',
+                        'campaign'  : self.era,
                     }
                     if 'plotting' in combineCfg.keys():
                         content.update(combineCfg['plotting'])
@@ -1594,6 +1634,58 @@ class DataCard:
 #                    else:
 #                        logging.info(f'Produced plots in {subdirBin}')
 
+                    # Nuisances likelihoods #
+                    if 'postfit' in combineMode:
+                        fit_name = None
+                        if combineMode == 'postfit_b':
+                            fit_name = 'fit_b'
+                        if combineMode == 'postfit_s':
+                            fit_name = 'fit_s'
+                        path_pdf = os.path.join(subdirBin,'nuisances.pdf')
+                        resultFile = glob.glob(os.path.join(subdirBin,'higgs*root'))
+                        if len(resultFile) == 0:
+                            raise RuntimeError(f'Could not find result file in {subdirBin}')
+
+                        content = {
+                            'paths'                 : [path_pdf],
+                            'poi'                   : 'r',
+                            'fit_name'              : fit_name,
+                            'workspace'             : resultFile[0],
+                            'dataset'               : resultFile[0],
+                            'fit_diagnostics_path'  : fitdiagFile,
+                            'y_min'                 : 0.,
+                            'y_max'                 : 5.,
+                        }
+                        path_json = os.path.join(subdirBin,'nuisances.json')
+                        with open(path_json,'w') as handle:
+                            json.dump(content,handle,indent=4)
+                        getter = {
+                            'workspace'     : {'type':'ROOT','name':'w'},
+                            'dataset'       : {'type':'ROOT','name':'toys/toy_asimov'},
+                        }
+                        path_getter = os.path.join(subdirBin,'nuisances_getter.json')
+                        with open(path_getter,'w') as handle:
+                            json.dump(getter,handle,indent=4)
+
+                        pull_cmd = f"cd {setup_dir}; "
+                        pull_cmd += f"env -i bash -c 'source {setup_script} && cd {script_dir} && python helperInference.py dhi.plots.likelihoods.plot_nuisance_likelihood_scans {path_json} {path_getter}'"
+                        rc,output = self.run_command(pull_cmd,shell=True, return_output=True)
+                        if rc != 0: 
+                            if logging.root.level > 10:
+                                for line in output:
+                                    logging.info(line.strip())
+                            logging.error('Failed to produce nuisance plots, see log above')
+                        else:
+                            logging.info(f'Produced {path_pdf}')
+
+#                        content_log = {
+#                            'paths'                 : [os.path.join(subdirBin,'nuisances_log.pdf')],
+#                            'poi'                   : 'r',
+#                            'fit_name'              : fit_name,
+#                            'workspace'             : resultFile[0],
+#                            'fit_diagnostics_path'  : fitdiagFile,
+#                            'y_log'                 : True,
+#                        }
 
                     from fitdiag_plots import create_postfit_plots
                     from collections import OrderedDict
@@ -1622,6 +1714,9 @@ class DataCard:
                                              bin                     = binCfg,
                                              binToRead               = key,
                                              unblind                 = unblind)
+
+
+                        
                                         
             # Combined finalize mode for all bins (in case there was) #
             if len(subdirBinPaths) > 1 and not self.worker:
@@ -1914,6 +2009,8 @@ if __name__=="__main__":
                         help='Run combine on the txt datacard only')
     parser.add_argument('--combine_args', action='store', required=False, default=[], nargs='*',
                         help='Additional args for the combine commands (used in jobs, keep for debug)')
+    parser.add_argument('--custom', action='store', required=False, default=None, nargs='*',
+                        help='Format the yaml file')
     parser.add_argument('-v','--verbose', action='store_true', required=False, default=False,
                         help='Verbose mode')
     parser.add_argument('--worker', action='store_true', required=False, default=False,
@@ -1930,15 +2027,24 @@ if __name__=="__main__":
 
     if args.yaml is None:
         raise RuntimeError("Must provide the YAML file")
-    with open(args.yaml,'r') as handle:
-        f = yaml.load(handle,Loader=YMLIncludeLoader)
     if not os.path.isfile(args.yaml):
         raise RuntimeError("YAML file {} is not a valid file".format(args.yaml))
-    instance = DataCard(datacardName    = os.path.basename(args.yaml).replace('.yml',''),
-                        configPath      = os.path.abspath(args.yaml),
+    if args.custom is not None:
+        formatting = {}
+        for arg in args.custom:
+            if '=' in arg:
+                formatting[arg.split('=')[0]] = arg.split('=')[1]
+            else:
+                logging.warning(f'`--custom {arg}` will be ignored because no `=`')
+        d = yaml.load({'filename':args.yaml,'formatting':formatting},
+                      Loader=YMLIncludeLoader)
+    else:
+        with open(args.yaml,'r') as handle:
+            d = yaml.load(handle,Loader=YMLIncludeLoader)
+    instance = DataCard(configPath      = os.path.abspath(args.yaml),
                         worker          = args.worker,
                         pseudodata      = args.pseudodata,
-                        **f)
+                        **d)
     if args.combine is not None: 
         combine_args = {}
         for arg in args.combine_args:

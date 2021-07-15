@@ -148,7 +148,7 @@ couplings = {
 
 
 if __name__=="__main__":
-    parser = argparse.ArgumentParser(description='Produce LO weights')
+    parser = argparse.ArgumentParser(description='Produce HH weights')
     parser.add_argument('--path', action='store', required=True, type=str,
                         help='Path to directory with the root files')
     parser.add_argument('--era', action='store', required=True, type=str,
