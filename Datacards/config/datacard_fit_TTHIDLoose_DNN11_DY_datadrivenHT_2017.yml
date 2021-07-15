@@ -1,0 +1,403 @@
+path: /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_DNN11_DYEstimation/
+use_syst: False
+
+yamlName: plots_DYEstimation.yml
+
+produce_plots: True
+
+era: 2017
+
+legend:
+  position:
+  - 0.8
+  - 0.6
+  - 0.99
+  - 0.99
+
+
+hist_conv: !include type2_cat_nonresonant.yml
+
+
+  
+groups:
+  TT:
+    fill-color: '#cc7a16'
+    legend: 't#bar{t}'
+    order: 1
+    type: mc
+    files:
+      - TTTo2L2Nu.root
+      - TTToHadronic.root
+      - TTToSemiLeptonic.root
+  ST:
+    fill-color: '#99053d'
+    legend: Single Top
+    order: 2
+    type: mc
+    files:
+      - ST_schannel_4f.root
+      - ST_tchannel_antitop_4f.root
+      - ST_tchannel_top_4f.root
+      - ST_tW_antitop_5f.root
+      - ST_tWll_5f.root
+      - ST_tW_top_5f.root
+  DY:
+    fill-color: '#1a83a1'
+    legend: Drell-Yan (from data)
+    order: 3
+    type: mc
+    files:
+      - DoubleEGamma_2017BDYEstimation.root
+      - DoubleEGamma_2017C0DYEstimation.root
+      - DoubleEGamma_2017C1DYEstimation.root
+      - DoubleEGamma_2017DDYEstimation.root
+      - DoubleEGamma_2017EDYEstimation.root
+      - DoubleEGamma_2017FDYEstimation.root
+      - DoubleMuon_2017BDYEstimation.root
+      - DoubleMuon_2017C0DYEstimation.root
+      - DoubleMuon_2017C1DYEstimation.root
+      - DoubleMuon_2017DDYEstimation.root
+      - DoubleMuon_2017EDYEstimation.root
+      - DoubleMuon_2017FDYEstimation.root
+      - GluGluHToBBDYEstimation.root
+      - GluGluHToGGDYEstimation.root
+      - GluGluHToMuMuDYEstimation.root
+      - GluGluHToTauTauDYEstimation.root
+      - GluGluHToWWTo2L2NuDYEstimation.root
+      - GluGluHToWWToLNuQQDYEstimation.root
+      - GluGluHToZZTo2L2QDYEstimation.root
+      - GluGluHToZZTo4LDYEstimation.root
+      - HZJ_HToWWDYEstimation.root
+      - MuonEG_2017BDYEstimation.root
+      - MuonEG_2017C0DYEstimation.root
+      - MuonEG_2017C1DYEstimation.root
+      - MuonEG_2017DDYEstimation.root
+      - MuonEG_2017EDYEstimation.root
+      - MuonEG_2017FDYEstimation.root
+      - SingleElectron_2017BDYEstimation.root
+      - SingleElectron_2017C0DYEstimation.root
+      - SingleElectron_2017C1DYEstimation.root
+      - SingleElectron_2017DDYEstimation.root
+      - SingleElectron_2017EDYEstimation.root
+      - SingleElectron_2017FDYEstimation.root
+      - SingleMuon_2017BDYEstimation.root
+      - SingleMuon_2017C0DYEstimation.root
+      - SingleMuon_2017C1DYEstimation.root
+      - SingleMuon_2017DDYEstimation.root
+      - SingleMuon_2017EDYEstimation.root
+      - SingleMuon_2017FDYEstimation.root
+      - ST_schannel_4fDYEstimation.root
+      - ST_tchannel_antitop_4fDYEstimation.root
+      - ST_tchannel_top_4fDYEstimation.root
+      - ST_tW_antitop_5fDYEstimation.root
+      - ST_tWll_5fDYEstimation.root
+      - ST_tW_top_5fDYEstimation.root
+      - TGJetsDYEstimation.root
+      - THQDYEstimation.root
+      - THWDYEstimation.root
+      - TTGJetsDYEstimation.root
+      - ttHJetTobbDYEstimation.root
+      - ttHJetToNonbbDYEstimation.root
+      - TTTo2L2NuDYEstimation.root
+      - TTToHadronicDYEstimation.root
+      - TTToSemiLeptonicDYEstimation.root
+      - TTTTDYEstimation.root
+      - TTWHDYEstimation.root
+      - TTWJetsToLNuDYEstimation.root
+      - TTWJetsToQQDYEstimation.root
+      - TTWWDYEstimation.root
+      - TTZHDYEstimation.root
+      - TTZToLL_M-1to10DYEstimation.root
+      - TTZToLLNuNu_M-10DYEstimation.root
+      - TTZToQQDYEstimation.root
+      - tZq_llDYEstimation.root
+      - VBFHToBBDYEstimation.root
+      - VBFHToGGDYEstimation.root
+      - VBFHToMuMuDYEstimation.root
+      - VBFHToTauTauDYEstimation.root
+      - VBFHToWWTo2L2NuDYEstimation.root
+      - VBFHToWWToLNuQQDYEstimation.root
+      - VBFHToZZTo4LDYEstimation.root
+      - VHToNonbbDYEstimation.root
+      - W1JetsToLNuDYEstimation.root
+      - W2JetsToLNuDYEstimation.root
+      - W3JetsToLNuDYEstimation.root
+      - W4JetsToLNuDYEstimation.root
+      - WGToLNuGDYEstimation.root
+      - WJetsToLNuDYEstimation.root
+      - WJetsToLNu_HT-100To200DYEstimation.root
+      - WJetsToLNu_HT-1200To2500DYEstimation.root
+      - WJetsToLNu_HT-200To400DYEstimation.root
+      - WJetsToLNu_HT-2500ToInfDYEstimation.root
+      - WJetsToLNu_HT-400To600DYEstimation.root
+      - WJetsToLNu_HT-600To800DYEstimation.root
+      - WJetsToLNu_HT-70To100DYEstimation.root
+      - WJetsToLNu_HT-800To1200DYEstimation.root
+      - WminusH_HToBB_WToLNuDYEstimation.root
+      - WplusH_HToBB_WToLNuDYEstimation.root
+      - WpWpJJDYEstimation.root
+      - WWTo2L2Nu_DoubleScatteringDYEstimation.root
+      - WWTo2L2NuDYEstimation.root
+      - WWToLNuQQDYEstimation.root
+      - WWWDYEstimation.root
+      - WWZDYEstimation.root
+      - WZGDYEstimation.root
+      - WZTo3LNuDYEstimation.root
+      - WZZDYEstimation.root
+      - ZGToLLGDYEstimation.root
+      - ZH_HToBB_ZToLLDYEstimation.root
+      - ZHToTauTauDYEstimation.root
+      - ZZTo2L2QDYEstimation.root
+      - ZZTo4LDYEstimation.root
+      - ZZZDYEstimation.root
+  WJets:
+    fill-color: '#d95564'
+    legend: W+jets
+    order: 4
+    type: mc
+    files:
+      - WJetsToLNu_HT-100To200.root
+      - WJetsToLNu_HT-1200To2500.root
+      - WJetsToLNu_HT-200To400.root
+      - WJetsToLNu_HT-2500ToInf.root
+      - WJetsToLNu_HT-400To600.root
+      - WJetsToLNu_HT-600To800.root
+      - WJetsToLNu_HT-70To100.root
+      - WJetsToLNu_HT-800To1200.root
+      - WJetsToLNu.root
+      - W1JetsToLNu.root
+      - W2JetsToLNu.root
+      - W3JetsToLNu.root
+      - W4JetsToLNu.root
+  VV:  
+    fill-color: '#ccbf45'
+    legend: VV
+    order: 5
+    type: mc
+    files:
+      - WWTo2L2Nu_DoubleScattering.root
+      - WWTo2L2Nu.root
+      - WWToLNuQQ.root
+      - WZG.root
+      - WZTo2L2Q.root
+      - WZTo3LNu.root
+      - ZZTo2L2Q.root
+      - ZZTo4L.root
+  VVV:  
+    fill-color: '#ccbf45'
+    legend: VVV
+    order: 5
+    type: mc
+    files:
+      - WWW.root
+      - WWZ.root
+      - WZZ.root
+      - ZZZ.root
+  ggH_hbb:
+    legend: ggH->bb
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToBB.root
+  ggH_hgg:
+    legend: ggH->gg
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToGG.root
+  ggH_hmm:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToMuMu.root
+  ggH_htt:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToTauTau.root
+  ggH_hww:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToWWTo2L2Nu.root
+      - GluGluHToWWToLNuQQ.root
+  ggH_hzz:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToZZTo4L.root
+      - GluGluHToZZTo2L2Q.root
+  qqH_hbb:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToBB.root
+  qqH_hgg:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToGG.root
+  qqH_hmm:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToMuMu.root
+  qqH_htt:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToTauTau.root
+  qqH_hww:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToWWTo2L2Nu.root
+      - VBFHToWWToLNuQQ.root
+  qqH_hzz:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToZZTo4L.root
+  ttH_hbb:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 9
+    type: mc
+    files:
+      - ttHJetTobb.root
+  ttH_hww:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 9
+    type: mc
+    files:
+      - ttHJetToNonbb.root
+  WH_hbb:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 10
+    type: mc
+    files:
+      - WminusH_HToBB_WToLNu.root
+      - WplusH_HToBB_WToLNu.root
+  ZH_hbb:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 11
+    type: mc
+    files:
+      - ZH_HToBB_ZToLL.root
+  ZH_htt:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 11
+    type: mc
+    files:
+      - ZHToTauTau.root
+  ZH_hww:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 11
+    type: mc
+    files:
+      - HZJ_HToWW.root
+  SM H_hww:
+    fill-color: '#06b894'
+    legend: SM H
+    order: 7
+    type: mc
+    files:
+      - THQ.root
+  SM H_hww:
+    fill-color: '#06b894'
+    legend: SM H
+    order: 7
+    type: mc
+    files:
+      - THW.root
+  VH_hww:
+    fill-color: '#06b894'
+    legend: VH->non-bb
+    order: 7
+    type: mc
+    files:
+      - VHToNonbb.root
+
+  Other_bbWW:
+    fill-color: '#610596'
+    legend: Rares 
+    order: 12
+    type: mc
+    files:
+      - TTGJets.root
+      - TGJets.root
+      - TTTT.root
+      - WGToLNuG.root
+      - ZGToLLG.root
+      - WpWpJJ.root
+      - tZq_ll.root
+      - TTWH.root
+      - TTWJetsToLNu.root
+      - TTWJetsToQQ.root
+      - TTWW.root
+      - TTZH.root
+      - TTZToLL_M-1to10.root
+      - TTZToLLNuNu_M-10.root
+      - TTZToQQ.root
+  data_obs: 
+    legend: data
+    type: data
+    files:
+      - DoubleEGamma_2017B.root
+      - DoubleEGamma_2017C0.root
+      - DoubleEGamma_2017C1.root
+      - DoubleEGamma_2017D.root
+      - DoubleEGamma_2017E.root
+      - DoubleEGamma_2017F.root
+      - DoubleMuon_2017B.root
+      - DoubleMuon_2017C0.root
+      - DoubleMuon_2017C1.root
+      - DoubleMuon_2017D.root
+      - DoubleMuon_2017E.root
+      - DoubleMuon_2017F.root
+      - MuonEG_2017B.root
+      - MuonEG_2017C0.root
+      - MuonEG_2017C1.root
+      - MuonEG_2017D.root
+      - MuonEG_2017E.root
+      - MuonEG_2017F.root
+      - SingleElectron_2017B.root
+      - SingleElectron_2017C0.root
+      - SingleElectron_2017C1.root
+      - SingleElectron_2017D.root
+      - SingleElectron_2017E.root
+      - SingleElectron_2017F.root
+      - SingleMuon_2017B.root
+      - SingleMuon_2017C0.root
+      - SingleMuon_2017C1.root
+      - SingleMuon_2017D.root
+      - SingleMuon_2017E.root
+      - SingleMuon_2017F.root
+

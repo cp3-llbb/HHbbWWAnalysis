@@ -36,8 +36,6 @@ class ComputeBtagEff:
             if '__skeleton__' in f:
                 continue
             r = ROOT.TFile(f)
-#            if 'TTTo' not in f: # TODO : remove
-#                continue
             print (f'Looking at {f}')
             for cat in self.dict_names.keys():
                 # Get hist #
