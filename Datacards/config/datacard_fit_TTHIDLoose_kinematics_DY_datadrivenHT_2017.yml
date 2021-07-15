@@ -1,0 +1,829 @@
+path: /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_DNN10_DYEstimation_HT/
+use_syst: False
+
+yamlName: plots_DYEstimation_FakeExtrapolation.yml
+
+produce_plots: True
+
+era: 2017
+
+legend:
+  position:
+  - 0.8
+  - 0.6
+  - 0.99
+  - 0.99
+
+hist_conv:
+    # RESOLVED
+  HH_resolved1b_GGF:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11GGFnode_DNNOutput_GGF
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11GGFnode_DNNOutput_GGF
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11GGFnode_DNNOutput_GGF
+  HH_resolved2b_VBF:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11VBFnode_DNNOutput_VBF
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11VBFnode_DNNOutput_VBF
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11VBFnode_DNNOutput_VBF
+  HH_resolved1b_GGF:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11GGFnode_DNNOutput_GGF
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11GGFnode_DNNOutput_GGF
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11GGFnode_DNNOutput_GGF
+  HH_resolved2b_VBF:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11VBFnode_DNNOutput_VBF
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11VBFnode_DNNOutput_VBF
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11VBFnode_DNNOutput_VBF
+  HH_resolved_TT:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11TTnode_DNNOutput_TT
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11TTnode_DNNOutput_TT
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11TTnode_DNNOutput_TT
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11TTnode_DNNOutput_TT
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11TTnode_DNNOutput_TT
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11TTnode_DNNOutput_TT
+  HH_resolved_DY:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11DYnode_DNNOutput_DY
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11DYnode_DNNOutput_DY
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11DYnode_DNNOutput_DY
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11DYnode_DNNOutput_DY
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11DYnode_DNNOutput_DY
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11DYnode_DNNOutput_DY
+  HH_resolved_ST:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11STnode_DNNOutput_ST
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11STnode_DNNOutput_ST
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11STnode_DNNOutput_ST
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11STnode_DNNOutput_ST
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11STnode_DNNOutput_ST
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11STnode_DNNOutput_ST
+  HH_resolved_Other:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11TTVXnode_DNNOutput_TTVX
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11TTVXnode_DNNOutput_TTVX
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11TTVXnode_DNNOutput_TTVX
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11TTVXnode_DNNOutput_TTVX
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11TTVXnode_DNNOutput_TTVX
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11TTVXnode_DNNOutput_TTVX
+
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11VVVnode_DNNOutput_VVV
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11VVVnode_DNNOutput_VVV
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11VVVnode_DNNOutput_VVV
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11VVVnode_DNNOutput_VVV
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11VVVnode_DNNOutput_VVV
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11VVVnode_DNNOutput_VVV
+
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11Rarenode_DNNOutput_Rare
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11Rarenode_DNNOutput_Rare
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11Rarenode_DNNOutput_Rare
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11Rarenode_DNNOutput_Rare
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11Rarenode_DNNOutput_Rare
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11Rarenode_DNNOutput_Rare
+
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11Hnode_DNNOutput_H
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11Hnode_DNNOutput_H
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11Hnode_DNNOutput_H
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11Hnode_DNNOutput_H
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11Hnode_DNNOutput_H
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags11Hnode_DNNOutput_H
+
+  # BOOSTED
+  HH_boosted_GGF:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11GGFnode_DNNOutput_GGF
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11GGFnode_DNNOutput_GGF
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11GGFnode_DNNOutput_GGF
+  HH_boosted_VBF:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11VBFnode_DNNOutput_VBF
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11VBFnode_DNNOutput_VBF
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11VBFnode_DNNOutput_VBF
+  HH_boosted_TT:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11TTnode_DNNOutput_TT
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11TTnode_DNNOutput_TT
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11TTnode_DNNOutput_TT
+  HH_boosted_DY:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11DYnode_DNNOutput_DY
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11DYnode_DNNOutput_DY
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11DYnode_DNNOutput_DY
+  HH_boosted_ST:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11STnode_DNNOutput_ST
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11STnode_DNNOutput_ST
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11STnode_DNNOutput_ST
+  HH_boosted_Other:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11TTVXnode_DNNOutput_TTVX
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11TTVXnode_DNNOutput_TTVX
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11TTVXnode_DNNOutput_TTVX
+
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11VVVnode_DNNOutput_VVV
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11VVVnode_DNNOutput_VVV
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11VVVnode_DNNOutput_VVV
+
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11Rarenode_DNNOutput_Rare
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11Rarenode_DNNOutput_Rare
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11Rarenode_DNNOutput_Rare
+
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11Hnode_DNNOutput_H
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11Hnode_DNNOutput_H
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag11Hnode_DNNOutput_H
+
+
+
+
+groups:
+  TT:
+    fill-color: '#cc7a16'
+    legend: 't#bar{t}'
+    order: 1
+    type: mc
+    files:
+      - TTTo2L2Nu.root
+      - TTToHadronic.root
+      - TTToSemiLeptonic.root
+  ST:
+    fill-color: '#99053d'
+    legend: Single Top
+    order: 2
+    type: mc
+    files:
+      - ST_schannel_4f.root
+      - ST_tchannel_antitop_4f.root
+      - ST_tchannel_top_4f.root
+      - ST_tW_antitop_5f.root
+      - ST_tWll_5f.root
+      - ST_tW_top_5f.root
+  DY:
+    fill-color: '#1a83a1'
+    legend: Drell-Yan (from data)
+    order: 3
+    type: mc
+    files:
+      - DoubleEGamma_2017BDYEstimation.root
+      - DoubleEGamma_2017C0DYEstimation.root
+      - DoubleEGamma_2017C1DYEstimation.root
+      - DoubleEGamma_2017DDYEstimation.root
+      - DoubleEGamma_2017EDYEstimation.root
+      - DoubleEGamma_2017FDYEstimation.root
+      - DoubleMuon_2017BDYEstimation.root
+      - DoubleMuon_2017C0DYEstimation.root
+      - DoubleMuon_2017C1DYEstimation.root
+      - DoubleMuon_2017DDYEstimation.root
+      - DoubleMuon_2017EDYEstimation.root
+      - DoubleMuon_2017FDYEstimation.root
+      - GluGluHToBBDYEstimation.root
+      - GluGluHToGGDYEstimation.root
+      - GluGluHToMuMuDYEstimation.root
+      - GluGluHToTauTauDYEstimation.root
+      - GluGluHToWWTo2L2NuDYEstimation.root
+      - GluGluHToWWToLNuQQDYEstimation.root
+      - GluGluHToZZTo2L2QDYEstimation.root
+      - GluGluHToZZTo4LDYEstimation.root
+      - HZJ_HToWWDYEstimation.root
+      - MuonEG_2017BDYEstimation.root
+      - MuonEG_2017C0DYEstimation.root
+      - MuonEG_2017C1DYEstimation.root
+      - MuonEG_2017DDYEstimation.root
+      - MuonEG_2017EDYEstimation.root
+      - MuonEG_2017FDYEstimation.root
+      - SingleElectron_2017BDYEstimation.root
+      - SingleElectron_2017C0DYEstimation.root
+      - SingleElectron_2017C1DYEstimation.root
+      - SingleElectron_2017DDYEstimation.root
+      - SingleElectron_2017EDYEstimation.root
+      - SingleElectron_2017FDYEstimation.root
+      - SingleMuon_2017BDYEstimation.root
+      - SingleMuon_2017C0DYEstimation.root
+      - SingleMuon_2017C1DYEstimation.root
+      - SingleMuon_2017DDYEstimation.root
+      - SingleMuon_2017EDYEstimation.root
+      - SingleMuon_2017FDYEstimation.root
+      - ST_schannel_4fDYEstimation.root
+      - ST_tchannel_antitop_4fDYEstimation.root
+      - ST_tchannel_top_4fDYEstimation.root
+      - ST_tW_antitop_5fDYEstimation.root
+      - ST_tWll_5fDYEstimation.root
+      - ST_tW_top_5fDYEstimation.root
+      - TGJetsDYEstimation.root
+      - THQDYEstimation.root
+      - THWDYEstimation.root
+      - TTGJetsDYEstimation.root
+      - ttHJetTobbDYEstimation.root
+      - ttHJetToNonbbDYEstimation.root
+      - TTTo2L2NuDYEstimation.root
+      - TTToHadronicDYEstimation.root
+      - TTToSemiLeptonicDYEstimation.root
+      - TTTTDYEstimation.root
+      - TTWHDYEstimation.root
+      - TTWJetsToLNuDYEstimation.root
+      - TTWJetsToQQDYEstimation.root
+      - TTWWDYEstimation.root
+      - TTZHDYEstimation.root
+      - TTZToLL_M-1to10DYEstimation.root
+      - TTZToLLNuNu_M-10DYEstimation.root
+      - TTZToQQDYEstimation.root
+      - tZq_llDYEstimation.root
+      - VBFHToBBDYEstimation.root
+      - VBFHToGGDYEstimation.root
+      - VBFHToMuMuDYEstimation.root
+      - VBFHToTauTauDYEstimation.root
+      - VBFHToWWTo2L2NuDYEstimation.root
+      - VBFHToWWToLNuQQDYEstimation.root
+      - VBFHToZZTo4LDYEstimation.root
+      - VHToNonbbDYEstimation.root
+      - W1JetsToLNuDYEstimation.root
+      - W2JetsToLNuDYEstimation.root
+      - W3JetsToLNuDYEstimation.root
+      - W4JetsToLNuDYEstimation.root
+      - WGToLNuGDYEstimation.root
+      - WJetsToLNuDYEstimation.root
+      - WJetsToLNu_HT-100To200DYEstimation.root
+      - WJetsToLNu_HT-1200To2500DYEstimation.root
+      - WJetsToLNu_HT-200To400DYEstimation.root
+      - WJetsToLNu_HT-2500ToInfDYEstimation.root
+      - WJetsToLNu_HT-400To600DYEstimation.root
+      - WJetsToLNu_HT-600To800DYEstimation.root
+      - WJetsToLNu_HT-70To100DYEstimation.root
+      - WJetsToLNu_HT-800To1200DYEstimation.root
+      - WminusH_HToBB_WToLNuDYEstimation.root
+      - WplusH_HToBB_WToLNuDYEstimation.root
+      - WpWpJJDYEstimation.root
+      - WWTo2L2Nu_DoubleScatteringDYEstimation.root
+      - WWTo2L2NuDYEstimation.root
+      - WWToLNuQQDYEstimation.root
+      - WWWDYEstimation.root
+      - WWZDYEstimation.root
+      - WZGDYEstimation.root
+      - WZTo3LNuDYEstimation.root
+      - WZZDYEstimation.root
+      - ZGToLLGDYEstimation.root
+      - ZH_HToBB_ZToLLDYEstimation.root
+      - ZHToTauTauDYEstimation.root
+      - ZZTo2L2QDYEstimation.root
+      - ZZTo4LDYEstimation.root
+      - ZZZDYEstimation.root
+  WJets:
+    fill-color: '#d95564'
+    legend: W+jets
+    order: 4
+    type: mc
+    files:
+      - WJetsToLNu_HT-100To200.root
+      - WJetsToLNu_HT-1200To2500.root
+      - WJetsToLNu_HT-200To400.root
+      - WJetsToLNu_HT-2500ToInf.root
+      - WJetsToLNu_HT-400To600.root
+      - WJetsToLNu_HT-600To800.root
+      - WJetsToLNu_HT-70To100.root
+      - WJetsToLNu_HT-800To1200.root
+      - WJetsToLNu.root
+      - W1JetsToLNu.root
+      - W2JetsToLNu.root
+      - W3JetsToLNu.root
+      - W4JetsToLNu.root
+  VV:  
+    fill-color: '#ccbf45'
+    legend: VV
+    order: 5
+    type: mc
+    files:
+      - WWTo2L2Nu_DoubleScattering.root
+      - WWTo2L2Nu.root
+      - WWToLNuQQ.root
+      - WZG.root
+      - WZTo2L2Q.root
+      - WZTo3LNu.root
+      - ZZTo2L2Q.root
+      - ZZTo4L.root
+  VVV:  
+    fill-color: '#ccbf45'
+    legend: VVV
+    order: 5
+    type: mc
+    files:
+      - WWW.root
+      - WWZ.root
+      - WZZ.root
+      - ZZZ.root
+  ggH_hbb:
+    legend: ggH->bb
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToBB.root
+  ggH_hgg:
+    legend: ggH->gg
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToGG.root
+  ggH_hmm:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToMuMu.root
+  ggH_htt:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToTauTau.root
+  ggH_hww:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToWWTo2L2Nu.root
+      - GluGluHToWWToLNuQQ.root
+  ggH_hzz:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToZZTo4L.root
+      - GluGluHToZZTo2L2Q.root
+  qqH_hbb:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToBB.root
+  qqH_hgg:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToGG.root
+  qqH_hmm:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToMuMu.root
+  qqH_htt:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToTauTau.root
+  qqH_hww:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToWWTo2L2Nu.root
+      - VBFHToWWToLNuQQ.root
+  qqH_hzz:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToZZTo4L.root
+  ttH_hbb:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 9
+    type: mc
+    files:
+      - ttHJetTobb.root
+  ttH_hww:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 9
+    type: mc
+    files:
+      - ttHJetToNonbb.root
+  WH_hbb:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 10
+    type: mc
+    files:
+      - WminusH_HToBB_WToLNu.root
+      - WplusH_HToBB_WToLNu.root
+  ZH_hbb:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 11
+    type: mc
+    files:
+      - ZH_HToBB_ZToLL.root
+  ZH_htt:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 11
+    type: mc
+    files:
+      - ZHToTauTau.root
+  ZH_hww:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 11
+    type: mc
+    files:
+      - HZJ_HToWW.root
+  SM H_hww:
+    fill-color: '#06b894'
+    legend: SM H
+    order: 7
+    type: mc
+    files:
+      - THQ.root
+  SM H_hww:
+    fill-color: '#06b894'
+    legend: SM H
+    order: 7
+    type: mc
+    files:
+      - THW.root
+  VH_hww:
+    fill-color: '#06b894'
+    legend: VH->non-bb
+    order: 7
+    type: mc
+    files:
+      - VHToNonbb.root
+
+  Other_bbWW:
+    fill-color: '#610596'
+    legend: Rares 
+    order: 12
+    type: mc
+    files:
+      - TTGJets.root
+      - TGJets.root
+      - TTTT.root
+      - WGToLNuG.root
+      - ZGToLLG.root
+      - WpWpJJ.root
+      - tZq_ll.root
+      - TTWH.root
+      - TTWJetsToLNu.root
+      - TTWJetsToQQ.root
+      - TTWW.root
+      - TTZH.root
+      - TTZToLL_M-1to10.root
+      - TTZToLLNuNu_M-10.root
+      - TTZToQQ.root
+
+  Fakes: 
+    fill-color: '#6e3303'
+    legend: Fakes
+    order: 13
+    type: mc
+    files:
+      - DoubleEGamma_2017BFakeExtrapolation.root
+      - DoubleEGamma_2017C0FakeExtrapolation.root
+      - DoubleEGamma_2017C1FakeExtrapolation.root
+      - DoubleEGamma_2017DFakeExtrapolation.root
+      - DoubleEGamma_2017EFakeExtrapolation.root
+      - DoubleEGamma_2017FFakeExtrapolation.root
+      - DoubleMuon_2017BFakeExtrapolation.root
+      - DoubleMuon_2017C0FakeExtrapolation.root
+      - DoubleMuon_2017C1FakeExtrapolation.root
+      - DoubleMuon_2017DFakeExtrapolation.root
+      - DoubleMuon_2017EFakeExtrapolation.root
+      - DoubleMuon_2017FFakeExtrapolation.root
+      - DYJetsToLL_M-10to50FakeExtrapolation.root
+      - DYJetsToLL_M-50FakeExtrapolation.root
+      - DYToLL_0JFakeExtrapolation.root
+      - DYToLL_1JFakeExtrapolation.root
+      - DYToLL_2JFakeExtrapolation.root
+      - GluGluHToBBFakeExtrapolation.root
+      - GluGluHToGGFakeExtrapolation.root
+      - GluGluHToMuMuFakeExtrapolation.root
+      - GluGluHToTauTauFakeExtrapolation.root
+      - GluGluHToWWTo2L2NuFakeExtrapolation.root
+      - GluGluHToWWToLNuQQFakeExtrapolation.root
+      - GluGluHToZZTo2L2QFakeExtrapolation.root
+      - GluGluHToZZTo4LFakeExtrapolation.root
+      - HZJ_HToWWFakeExtrapolation.root
+      - MuonEG_2017BFakeExtrapolation.root
+      - MuonEG_2017C0FakeExtrapolation.root
+      - MuonEG_2017C1FakeExtrapolation.root
+      - MuonEG_2017DFakeExtrapolation.root
+      - MuonEG_2017EFakeExtrapolation.root
+      - MuonEG_2017FFakeExtrapolation.root
+      - SingleElectron_2017BFakeExtrapolation.root
+      - SingleElectron_2017C0FakeExtrapolation.root
+      - SingleElectron_2017C1FakeExtrapolation.root
+      - SingleElectron_2017DFakeExtrapolation.root
+      - SingleElectron_2017EFakeExtrapolation.root
+      - SingleElectron_2017FFakeExtrapolation.root
+      - SingleMuon_2017BFakeExtrapolation.root
+      - SingleMuon_2017C0FakeExtrapolation.root
+      - SingleMuon_2017C1FakeExtrapolation.root
+      - SingleMuon_2017DFakeExtrapolation.root
+      - SingleMuon_2017EFakeExtrapolation.root
+      - SingleMuon_2017FFakeExtrapolation.root
+      - ST_schannel_4fFakeExtrapolation.root
+      - ST_tchannel_antitop_4fFakeExtrapolation.root
+      - ST_tchannel_top_4fFakeExtrapolation.root
+      - ST_tW_antitop_5fFakeExtrapolation.root
+      - ST_tWll_5fFakeExtrapolation.root
+      - ST_tW_top_5fFakeExtrapolation.root
+      - TGJetsFakeExtrapolation.root
+      - THQFakeExtrapolation.root
+      - THWFakeExtrapolation.root
+      - TTGJetsFakeExtrapolation.root
+      - ttHJetTobbFakeExtrapolation.root
+      - ttHJetToNonbbFakeExtrapolation.root
+      - TTTo2L2NuFakeExtrapolation.root
+      - TTToHadronicFakeExtrapolation.root
+      - TTToSemiLeptonicFakeExtrapolation.root
+      - TTTTFakeExtrapolation.root
+      - TTWHFakeExtrapolation.root
+      - TTWJetsToLNuFakeExtrapolation.root
+      - TTWJetsToQQFakeExtrapolation.root
+      - TTWWFakeExtrapolation.root
+      - TTZHFakeExtrapolation.root
+      - TTZToLL_M-1to10FakeExtrapolation.root
+      - TTZToLLNuNu_M-10FakeExtrapolation.root
+      - TTZToQQFakeExtrapolation.root
+      - tZq_llFakeExtrapolation.root
+      - VBFHToBBFakeExtrapolation.root
+      - VBFHToGGFakeExtrapolation.root
+      - VBFHToMuMuFakeExtrapolation.root
+      - VBFHToTauTauFakeExtrapolation.root
+      - VBFHToWWTo2L2NuFakeExtrapolation.root
+      - VBFHToWWToLNuQQFakeExtrapolation.root
+      - VBFHToZZTo4LFakeExtrapolation.root
+      - VHToNonbbFakeExtrapolation.root
+      - W1JetsToLNuFakeExtrapolation.root
+      - W2JetsToLNuFakeExtrapolation.root
+      - W3JetsToLNuFakeExtrapolation.root
+      - W4JetsToLNuFakeExtrapolation.root
+      - WGToLNuGFakeExtrapolation.root
+      - WJetsToLNuFakeExtrapolation.root
+      - WJetsToLNu_HT-100To200FakeExtrapolation.root
+      - WJetsToLNu_HT-1200To2500FakeExtrapolation.root
+      - WJetsToLNu_HT-200To400FakeExtrapolation.root
+      - WJetsToLNu_HT-2500ToInfFakeExtrapolation.root
+      - WJetsToLNu_HT-400To600FakeExtrapolation.root
+      - WJetsToLNu_HT-600To800FakeExtrapolation.root
+      - WJetsToLNu_HT-70To100FakeExtrapolation.root
+      - WJetsToLNu_HT-800To1200FakeExtrapolation.root
+      - WminusH_HToBB_WToLNuFakeExtrapolation.root
+      - WplusH_HToBB_WToLNuFakeExtrapolation.root
+      - WpWpJJFakeExtrapolation.root
+      - WWTo2L2Nu_DoubleScatteringFakeExtrapolation.root
+      - WWTo2L2NuFakeExtrapolation.root
+      - WWToLNuQQFakeExtrapolation.root
+      - WWWFakeExtrapolation.root
+      - WWZFakeExtrapolation.root
+      - WZGFakeExtrapolation.root
+      - WZTo3LNuFakeExtrapolation.root
+      - WZZFakeExtrapolation.root
+      - ZGToLLGFakeExtrapolation.root
+      - ZH_HToBB_ZToLLFakeExtrapolation.root
+      - ZHToTauTauFakeExtrapolation.root
+      - ZZTo2L2QFakeExtrapolation.root
+      - ZZTo4LFakeExtrapolation.root
+      - ZZZFakeExtrapolation.root
+  data_obs: 
+    legend: data
+    type: data
+    files:
+      - DoubleEGamma_2017B.root
+      - DoubleEGamma_2017C0.root
+      - DoubleEGamma_2017C1.root
+      - DoubleEGamma_2017D.root
+      - DoubleEGamma_2017E.root
+      - DoubleEGamma_2017F.root
+      - DoubleMuon_2017B.root
+      - DoubleMuon_2017C0.root
+      - DoubleMuon_2017C1.root
+      - DoubleMuon_2017D.root
+      - DoubleMuon_2017E.root
+      - DoubleMuon_2017F.root
+      - MuonEG_2017B.root
+      - MuonEG_2017C0.root
+      - MuonEG_2017C1.root
+      - MuonEG_2017D.root
+      - MuonEG_2017E.root
+      - MuonEG_2017F.root
+      - SingleElectron_2017B.root
+      - SingleElectron_2017C0.root
+      - SingleElectron_2017C1.root
+      - SingleElectron_2017D.root
+      - SingleElectron_2017E.root
+      - SingleElectron_2017F.root
+      - SingleMuon_2017B.root
+      - SingleMuon_2017C0.root
+      - SingleMuon_2017C1.root
+      - SingleMuon_2017D.root
+      - SingleMuon_2017E.root
+      - SingleMuon_2017F.root
+
+
+  ggHH_kl_0_kt_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW GGF (cHHH0) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2VTo2L2Nu_node_cHHH0.root
+  ggHH_kl_1_kt_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW GGF (cHHH1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2VTo2L2Nu_node_cHHH1.root
+  ggHH_kl_2p45_kt_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW GGF (cHHH2p45) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45.root
+  ggHH_kl_5_kt_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW GGF (cHHH5) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2VTo2L2Nu_node_cHHH5.root
+
+  ggHH_kl_0_kt_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau GGF (cHHH0) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2Tau_node_cHHH0.root
+  ggHH_kl_1_kt_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau GGF (cHHH1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2Tau_node_cHHH1.root
+  ggHH_kl_2p45_kt_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau GGF (cHHH2p45) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2Tau_node_cHHH2p45.root
+  ggHH_kl_5_kt_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau GGF (cHHH5) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2Tau_node_cHHH5.root
+
+
+
+  qqHH_CV_0p5_C2V_1_kl_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW VBF (CV 0.5 - C2V 1 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1_dipoleRecoilOff.root
+  qqHH_CV_1p5_C2V_1_kl_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW VBF (CV 1.5 - C2V 1 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_dipoleRecoilOff.root
+  qqHH_CV_1_C2V_0_kl_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW VBF (CV 1 - C2V 0 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_0_C3_1_dipoleRecoilOff.root
+  qqHH_CV_1_C2V_1_kl_0_hbbhwwdl:
+    type: signal
+    legend: HH bbWW VBF (CV 1 - C2V 1 - C3 0) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_dipoleRecoilOff.root
+  qqHH_CV_1_C2V_1_kl_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW VBF (CV 1 - C2V 1 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff.root
+  qqHH_CV_1_C2V_1_kl_2_hbbhwwdl:
+    type: signal
+    legend: HH bbWW VBF (CV 1 - C2V 1 - C3 2) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_dipoleRecoilOff.root
+  qqHH_CV_1_C2V_2_kl_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW VBF (CV 1 - C2V 2 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff.root
+
+
+  qqHH_CV_0p5_C2V_1_kl_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau VBF (CV 0.5 - C2V 1 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff.root
+  qqHH_CV_1p5_C2V_1_kl_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau VBF (CV 1.5 - C2V 1 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff.root
+  qqHH_CV_1_C2V_0_kl_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau VBF (CV 1 - C2V 0 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff.root
+  qqHH_CV_1_C2V_1_kl_0_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau VBF (CV 1 - C2V 1 - C3 0) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff.root
+  qqHH_CV_1_C2V_1_kl_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau VBF (CV 1 - C2V 1 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff.root
+  qqHH_CV_1_C2V_1_kl_2_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau VBF (CV 1 - C2V 1 - C3 2) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff.root
+  qqHH_CV_1_C2V_2_kl_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau VBF (CV 1 - C2V 2 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff.root
+
+

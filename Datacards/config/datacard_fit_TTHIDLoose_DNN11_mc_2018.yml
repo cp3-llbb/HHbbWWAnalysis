@@ -1,0 +1,32 @@
+path: 
+  - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_DNN11_DYEstimation_HT_Resolved1B/
+  - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_DNN11_DYEstimation_HT_Resolved2B/
+  - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_DNN11_DYEstimation_HT_Boosted1B/
+use_syst: True
+
+yamlName: plots_FakeExtrapolation.yml
+
+produce_plots: True
+
+era: 2018
+
+legend:
+  position:
+  - 0.8
+  - 0.6
+  - 0.99
+  - 0.99
+
+shapeSyst : !include shape_systematics.yml
+normSyst  : !include norm_mc_systematics.yml
+
+rebin: !include type2_rebin_nonresonant.yml
+
+hist_conv: !include type2_cat_nonresonant.yml
+
+  
+groups:
+  - !include groups_DL_bkg_2018.yml
+  - !include groups_DY_MC.yml
+  - !include groups_data_2018.yml
+  - !include groups_DL_nonres.yml

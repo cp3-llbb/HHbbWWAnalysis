@@ -1,0 +1,632 @@
+path: /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_DNN10/
+use_syst: False
+
+yamlName: plots_FakeExtrapolation.yml
+
+produce_plots: True
+
+era: 2017
+
+legend:
+  position:
+  - 0.8
+  - 0.6
+  - 0.99
+  - 0.99
+
+hist_conv:
+  HH_cat_mm_resolved1b_HT:  MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag_combined_HT
+  HH_cat_mm_resolved2b_HT:  MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags_combined_HT
+  HH_cat_mm_boosted1b_B_M:  MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag_B_M
+
+  HH_cat_ee_resolved1b_HT:  ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag_combined_HT
+  HH_cat_ee_resolved2b_HT:  ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags_combined_HT
+  HH_cat_ee_boosted1b_B_M:  ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag_B_M
+
+  
+groups:
+  TT:
+    fill-color: '#cc7a16'
+    legend: 't#bar{t}'
+    order: 1
+    type: mc
+    files:
+      - TTTo2L2Nu.root
+      - TTToHadronic.root
+      - TTToSemiLeptonic.root
+  ST:
+    fill-color: '#99053d'
+    legend: Single Top
+    order: 2
+    type: mc
+    files:
+      - ST_schannel_4f.root
+      - ST_tchannel_antitop_4f.root
+      - ST_tchannel_top_4f.root
+      - ST_tW_antitop_5f.root
+      - ST_tWll_5f.root
+      - ST_tW_top_5f.root
+  DY:
+    fill-color: '#1a83a1'
+    legend: Drell-Yan (from data)
+    order: 3
+    type: mc
+    files:
+      - DYJetsToLL_M-10to50.root
+      - DYJetsToLL_M-50.root
+      - DYToLL_0J.root
+      - DYToLL_1J.root
+      - DYToLL_2J.root
+  WJets:
+    fill-color: '#d95564'
+    legend: W+jets
+    order: 4
+    type: mc
+    files:
+      - WJetsToLNu_HT-100To200.root
+      - WJetsToLNu_HT-1200To2500.root
+      - WJetsToLNu_HT-200To400.root
+      - WJetsToLNu_HT-2500ToInf.root
+      - WJetsToLNu_HT-400To600.root
+      - WJetsToLNu_HT-600To800.root
+      - WJetsToLNu_HT-70To100.root
+      - WJetsToLNu_HT-800To1200.root
+      - WJetsToLNu.root
+      - W1JetsToLNu.root
+      - W2JetsToLNu.root
+      - W3JetsToLNu.root
+      - W4JetsToLNu.root
+  VV:  
+    fill-color: '#ccbf45'
+    legend: VV
+    order: 5
+    type: mc
+    files:
+      - WWTo2L2Nu_DoubleScattering.root
+      - WWTo2L2Nu.root
+      - WWToLNuQQ.root
+      - WZG.root
+      - WZTo2L2Q.root
+      - WZTo3LNu.root
+      - ZZTo2L2Q.root
+      - ZZTo4L.root
+  VVV:  
+    fill-color: '#ccbf45'
+    legend: VVV
+    order: 5
+    type: mc
+    files:
+      - WWW.root
+      - WWZ.root
+      - WZZ.root
+      - ZZZ.root
+  ggH_hbb:
+    legend: ggH->bb
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToBB.root
+  ggH_hgg:
+    legend: ggH->gg
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToGG.root
+  ggH_hmm:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToMuMu.root
+  ggH_htt:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToTauTau.root
+  ggH_hww:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToWWTo2L2Nu.root
+      - GluGluHToWWToLNuQQ.root
+  ggH_hzz:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 7
+    type: mc
+    files:
+      - GluGluHToZZTo4L.root
+      - GluGluHToZZTo2L2Q.root
+  qqH_hbb:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToBB.root
+  qqH_hgg:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToGG.root
+  qqH_hmm:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToMuMu.root
+  qqH_htt:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToTauTau.root
+  qqH_hww:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToWWTo2L2Nu.root
+      - VBFHToWWToLNuQQ.root
+  qqH_hzz:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 8
+    type: mc
+    files:
+      - VBFHToZZTo4L.root
+  ttH_hbb:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 9
+    type: mc
+    files:
+      - ttHJetTobb.root
+  ttH_hww:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 9
+    type: mc
+    files:
+      - ttHJetToNonbb.root
+  WH_hbb:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 10
+    type: mc
+    files:
+      - WminusH_HToBB_WToLNu.root
+      - WplusH_HToBB_WToLNu.root
+  ZH_hbb:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 11
+    type: mc
+    files:
+      - ZH_HToBB_ZToLL.root
+  ZH_htt:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 11
+    type: mc
+    files:
+      - ZHToTauTau.root
+  ZH_hww:
+    legend: SM H
+    fill-color: '#06b894'
+    order: 11
+    type: mc
+    files:
+      - HZJ_HToWW.root
+  SM H_hww:
+    fill-color: '#06b894'
+    legend: SM H
+    order: 7
+    type: mc
+    files:
+      - THQ.root
+  SM H_hww:
+    fill-color: '#06b894'
+    legend: SM H
+    order: 7
+    type: mc
+    files:
+      - THW.root
+  VH_hww:
+    fill-color: '#06b894'
+    legend: VH->non-bb
+    order: 7
+    type: mc
+    files:
+      - VHToNonbb.root
+
+  Other_bbWW:
+    fill-color: '#610596'
+    legend: Rares 
+    order: 12
+    type: mc
+    files:
+      - TTGJets.root
+      - TGJets.root
+      - TTTT.root
+      - WGToLNuG.root
+      - ZGToLLG.root
+      - WpWpJJ.root
+      - tZq_ll.root
+      - TTWH.root
+      - TTWJetsToLNu.root
+      - TTWJetsToQQ.root
+      - TTWW.root
+      - TTZH.root
+      - TTZToLL_M-1to10.root
+      - TTZToLLNuNu_M-10.root
+      - TTZToQQ.root
+
+  Fakes: 
+    fill-color: '#6e3303'
+    legend: Fakes
+    order: 13
+    type: mc
+    files:
+      - DoubleEGamma_2017BFakeExtrapolation.root
+      - DoubleEGamma_2017C0FakeExtrapolation.root
+      - DoubleEGamma_2017C1FakeExtrapolation.root
+      - DoubleEGamma_2017DFakeExtrapolation.root
+      - DoubleEGamma_2017EFakeExtrapolation.root
+      - DoubleEGamma_2017FFakeExtrapolation.root
+      - DoubleMuon_2017BFakeExtrapolation.root
+      - DoubleMuon_2017C0FakeExtrapolation.root
+      - DoubleMuon_2017C1FakeExtrapolation.root
+      - DoubleMuon_2017DFakeExtrapolation.root
+      - DoubleMuon_2017EFakeExtrapolation.root
+      - DoubleMuon_2017FFakeExtrapolation.root
+      - DYJetsToLL_M-10to50FakeExtrapolation.root
+      - DYJetsToLL_M-50FakeExtrapolation.root
+      - DYToLL_0JFakeExtrapolation.root
+      - DYToLL_1JFakeExtrapolation.root
+      - DYToLL_2JFakeExtrapolation.root
+      - GluGluHToBBFakeExtrapolation.root
+      - GluGluHToGGFakeExtrapolation.root
+      - GluGluHToMuMuFakeExtrapolation.root
+      - GluGluHToTauTauFakeExtrapolation.root
+      - GluGluHToWWTo2L2NuFakeExtrapolation.root
+      - GluGluHToWWToLNuQQFakeExtrapolation.root
+      - GluGluHToZZTo2L2QFakeExtrapolation.root
+      - GluGluHToZZTo4LFakeExtrapolation.root
+      - HZJ_HToWWFakeExtrapolation.root
+      - MuonEG_2017BFakeExtrapolation.root
+      - MuonEG_2017C0FakeExtrapolation.root
+      - MuonEG_2017C1FakeExtrapolation.root
+      - MuonEG_2017DFakeExtrapolation.root
+      - MuonEG_2017EFakeExtrapolation.root
+      - MuonEG_2017FFakeExtrapolation.root
+      - SingleElectron_2017BFakeExtrapolation.root
+      - SingleElectron_2017C0FakeExtrapolation.root
+      - SingleElectron_2017C1FakeExtrapolation.root
+      - SingleElectron_2017DFakeExtrapolation.root
+      - SingleElectron_2017EFakeExtrapolation.root
+      - SingleElectron_2017FFakeExtrapolation.root
+      - SingleMuon_2017BFakeExtrapolation.root
+      - SingleMuon_2017C0FakeExtrapolation.root
+      - SingleMuon_2017C1FakeExtrapolation.root
+      - SingleMuon_2017DFakeExtrapolation.root
+      - SingleMuon_2017EFakeExtrapolation.root
+      - SingleMuon_2017FFakeExtrapolation.root
+      - ST_schannel_4fFakeExtrapolation.root
+      - ST_tchannel_antitop_4fFakeExtrapolation.root
+      - ST_tchannel_top_4fFakeExtrapolation.root
+      - ST_tW_antitop_5fFakeExtrapolation.root
+      - ST_tWll_5fFakeExtrapolation.root
+      - ST_tW_top_5fFakeExtrapolation.root
+      - TGJetsFakeExtrapolation.root
+      - THQFakeExtrapolation.root
+      - THWFakeExtrapolation.root
+      - TTGJetsFakeExtrapolation.root
+      - ttHJetTobbFakeExtrapolation.root
+      - ttHJetToNonbbFakeExtrapolation.root
+      - TTTo2L2NuFakeExtrapolation.root
+      - TTToHadronicFakeExtrapolation.root
+      - TTToSemiLeptonicFakeExtrapolation.root
+      - TTTTFakeExtrapolation.root
+      - TTWHFakeExtrapolation.root
+      - TTWJetsToLNuFakeExtrapolation.root
+      - TTWJetsToQQFakeExtrapolation.root
+      - TTWWFakeExtrapolation.root
+      - TTZHFakeExtrapolation.root
+      - TTZToLL_M-1to10FakeExtrapolation.root
+      - TTZToLLNuNu_M-10FakeExtrapolation.root
+      - TTZToQQFakeExtrapolation.root
+      - tZq_llFakeExtrapolation.root
+      - VBFHToBBFakeExtrapolation.root
+      - VBFHToGGFakeExtrapolation.root
+      - VBFHToMuMuFakeExtrapolation.root
+      - VBFHToTauTauFakeExtrapolation.root
+      - VBFHToWWTo2L2NuFakeExtrapolation.root
+      - VBFHToWWToLNuQQFakeExtrapolation.root
+      - VBFHToZZTo4LFakeExtrapolation.root
+      - VHToNonbbFakeExtrapolation.root
+      - W1JetsToLNuFakeExtrapolation.root
+      - W2JetsToLNuFakeExtrapolation.root
+      - W3JetsToLNuFakeExtrapolation.root
+      - W4JetsToLNuFakeExtrapolation.root
+      - WGToLNuGFakeExtrapolation.root
+      - WJetsToLNuFakeExtrapolation.root
+      - WJetsToLNu_HT-100To200FakeExtrapolation.root
+      - WJetsToLNu_HT-1200To2500FakeExtrapolation.root
+      - WJetsToLNu_HT-200To400FakeExtrapolation.root
+      - WJetsToLNu_HT-2500ToInfFakeExtrapolation.root
+      - WJetsToLNu_HT-400To600FakeExtrapolation.root
+      - WJetsToLNu_HT-600To800FakeExtrapolation.root
+      - WJetsToLNu_HT-70To100FakeExtrapolation.root
+      - WJetsToLNu_HT-800To1200FakeExtrapolation.root
+      - WminusH_HToBB_WToLNuFakeExtrapolation.root
+      - WplusH_HToBB_WToLNuFakeExtrapolation.root
+      - WpWpJJFakeExtrapolation.root
+      - WWTo2L2Nu_DoubleScatteringFakeExtrapolation.root
+      - WWTo2L2NuFakeExtrapolation.root
+      - WWToLNuQQFakeExtrapolation.root
+      - WWWFakeExtrapolation.root
+      - WWZFakeExtrapolation.root
+      - WZGFakeExtrapolation.root
+      - WZTo3LNuFakeExtrapolation.root
+      - WZZFakeExtrapolation.root
+      - ZGToLLGFakeExtrapolation.root
+      - ZH_HToBB_ZToLLFakeExtrapolation.root
+      - ZHToTauTauFakeExtrapolation.root
+      - ZZTo2L2QFakeExtrapolation.root
+      - ZZTo4LFakeExtrapolation.root
+      - ZZZFakeExtrapolation.root
+  data_obs: 
+    legend: data
+    type: data
+    files:
+      - DoubleEGamma_2017B.root
+      - DoubleEGamma_2017C0.root
+      - DoubleEGamma_2017C1.root
+      - DoubleEGamma_2017D.root
+      - DoubleEGamma_2017E.root
+      - DoubleEGamma_2017F.root
+      - DoubleMuon_2017B.root
+      - DoubleMuon_2017C0.root
+      - DoubleMuon_2017C1.root
+      - DoubleMuon_2017D.root
+      - DoubleMuon_2017E.root
+      - DoubleMuon_2017F.root
+      - MuonEG_2017B.root
+      - MuonEG_2017C0.root
+      - MuonEG_2017C1.root
+      - MuonEG_2017D.root
+      - MuonEG_2017E.root
+      - MuonEG_2017F.root
+      - SingleElectron_2017B.root
+      - SingleElectron_2017C0.root
+      - SingleElectron_2017C1.root
+      - SingleElectron_2017D.root
+      - SingleElectron_2017E.root
+      - SingleElectron_2017F.root
+      - SingleMuon_2017B.root
+      - SingleMuon_2017C0.root
+      - SingleMuon_2017C1.root
+      - SingleMuon_2017D.root
+      - SingleMuon_2017E.root
+      - SingleMuon_2017F.root
+
+
+  ggHH_kl_0_kt_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW GGF (cHHH0) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2VTo2L2Nu_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+  ggHH_kl_1_kt_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW GGF (cHHH1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2VTo2L2Nu_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+  ggHH_kl_2p45_kt_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW GGF (cHHH2p45) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2VTo2L2Nu_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+  ggHH_kl_5_kt_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW GGF (cHHH5) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2VTo2L2Nu_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+
+  ggHH_kl_0_kt_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau GGF (cHHH0) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2Tau_node_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+  ggHH_kl_1_kt_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau GGF (cHHH1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2Tau_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+  ggHH_kl_2p45_kt_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau GGF (cHHH2p45) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2Tau_node_cHHH2p45_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+  ggHH_kl_5_kt_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau GGF (cHHH5) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#288a24'
+    line-type: 1
+    files:
+      - GluGluToHHTo2B2Tau_node_cHHH5_TuneCP5_PSWeights_13TeV-powheg-pythia8.root
+
+
+
+  qqHH_CV_0p5_C2V_1_kl_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW VBF (CV 0.5 - C2V 1 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+  qqHH_CV_1p5_C2V_1_kl_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW VBF (CV 1.5 - C2V 1 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+  qqHH_CV_1_C2V_0_kl_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW VBF (CV 1 - C2V 0 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+  qqHH_CV_1_C2V_1_kl_0_hbbhwwdl:
+    type: signal
+    legend: HH bbWW VBF (CV 1 - C2V 1 - C3 0) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+  qqHH_CV_1_C2V_1_kl_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW VBF (CV 1 - C2V 1 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+  qqHH_CV_1_C2V_1_kl_2_hbbhwwdl:
+    type: signal
+    legend: HH bbWW VBF (CV 1 - C2V 1 - C3 2) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+  qqHH_CV_1_C2V_2_kl_1_hbbhwwdl:
+    type: signal
+    legend: HH bbWW VBF (CV 1 - C2V 2 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+
+
+  qqHH_CV_0p5_C2V_1_kl_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau VBF (CV 0.5 - C2V 1 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2Tau_CV_0_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+  qqHH_CV_1p5_C2V_1_kl_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau VBF (CV 1.5 - C2V 1 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2Tau_CV_1_5_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+  qqHH_CV_1_C2V_0_kl_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau VBF (CV 1 - C2V 0 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2Tau_CV_1_C2V_0_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+  qqHH_CV_1_C2V_1_kl_0_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau VBF (CV 1 - C2V 1 - C3 0) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2Tau_CV_1_C2V_1_C3_0_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+  qqHH_CV_1_C2V_1_kl_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau VBF (CV 1 - C2V 1 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+  qqHH_CV_1_C2V_1_kl_2_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau VBF (CV 1 - C2V 1 - C3 2) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2Tau_CV_1_C2V_1_C3_2_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+  qqHH_CV_1_C2V_2_kl_1_hbbhtt:
+    type: signal
+    legend: HH bb#tau#tau VBF (CV 1 - C2V 2 - C3 1) (x10^{4})
+    order: 14
+    scale: 10000
+    line-color: '#fc0505'
+    line-type: 1
+    files:
+      - VBFHHTo2B2Tau_CV_1_C2V_2_C3_1_dipoleRecoilOff-TuneCP5_PSweights_13TeV-madgraph-pythia8.root
+
+

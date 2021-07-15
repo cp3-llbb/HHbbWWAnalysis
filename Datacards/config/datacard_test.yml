@@ -1,0 +1,108 @@
+path: 
+  - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_Fake_DNN11_DYEstimation_HT_Resolved1B/
+  - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_Fake_DNN11_Resolved1B_GGFLO_BenchmarkSM/
+use_syst: True
+
+textfile: datacard_SM.txt
+
+yamlName: 
+  - plots_DYEstimation_FakeExtrapolation.yml
+  - plots.yml
+
+produce_plots: True
+
+era: 2016
+
+legend:
+  position:
+  - 0.8
+  - 0.6
+  - 0.99
+  - 0.99
+
+
+shapeSyst : !include shape_systematics.yml
+normSyst  : !include norm_datadriven_systematics.yml
+
+rebin: !include type2_rebin.yml
+  
+DYnonclosure:
+  path : config/fit_results.json
+  hist:
+    HH_resolved_DY_VVV : 
+      entry: HH_resolved_DY_VVV_2016
+      name: dy_resolved_nonclosure_dy_vvv
+    HH_boosted_DY_VVV : 
+      entry: HH_boosted_DY_VVV
+      name: dy_boosted_nonclosure_dy_vvv
+    HH_inclusive_other: 
+      entry: HH_inclusive_other_2016
+      name: dy_nonclosure_other
+  group: DY
+
+
+hist_conv: 
+#  HH_resolved1b_GGF:
+#    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11GGFnode_DNNOutput_GGF
+#    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11GGFnode_DNNOutput_GGF
+#    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11GGFnode_DNNOutput_GGF
+#  HH_resolved1b_VBF:
+#    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11VBFnode_DNNOutput_VBF
+#    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11VBFnode_DNNOutput_VBF
+#    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11VBFnode_DNNOutput_VBF
+#  HH_resolved1b_H:
+#    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11Hnode_DNNOutput_H
+#    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11Hnode_DNNOutput_H
+#    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11Hnode_DNNOutput_H
+   
+  # Background nodes #
+  HH_resolved_DY_VVV:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11DYnode_DNNOutput_DY
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11DYnode_DNNOutput_DY
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11DYnode_DNNOutput_DY
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11VVVnode_DNNOutput_VVV
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11VVVnode_DNNOutput_VVV
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11VVVnode_DNNOutput_VVV
+  
+  HH_inclusive_other:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11TTnode_DNNOutput_TT
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11TTnode_DNNOutput_TT
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11TTnode_DNNOutput_TT
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11STnode_DNNOutput_ST
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11STnode_DNNOutput_ST
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11STnode_DNNOutput_ST
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11TTVXnode_DNNOutput_TTVX
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11TTVXnode_DNNOutput_TTVX
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11TTVXnode_DNNOutput_TTVX
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11Rarenode_DNNOutput_Rare
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11Rarenode_DNNOutput_Rare
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag11Rarenode_DNNOutput_Rare
+
+
+
+  
+groups: 
+  - !include groups_DL_bkg_2016.yml
+  - !include groups_DY_datadriven_2016.yml
+  - !include groups_data_2016.yml
+  - !include groups_DL_BM_qqHH.yml
+  - ggHH_BM_SM_hbbhwwdl:
+      type: signal
+      legend: HH bbWW GGF (BM SM) 
+      order: 14
+      line-color: '#288a24'
+      line-type: 1
+      files:
+        - GluGluToHHTo2B2VTo2L2Nu_NLOBenchmarkSM.root
+  
+    ggHH_BM_SM_hbbhtt:
+      type: signal
+      legend: HH bbWW GGF (BM SM) 
+      order: 14
+      line-color: '#288a24'
+      line-type: 1
+      files:
+        - GluGluToHHTo2B2Tau_NLOBenchmarkSM.root
+
+
+

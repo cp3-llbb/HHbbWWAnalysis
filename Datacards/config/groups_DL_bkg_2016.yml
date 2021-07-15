@@ -1,0 +1,280 @@
+TT:
+  fill-color: '#cc7a16'
+  legend: 't#bar{t}'
+  order: 1
+  type: mc
+  group: TT
+  files:
+    - TTTo2L2Nu.root
+    - TTToHadronic.root
+    - TTToSemiLeptonic.root
+ST:
+  fill-color: '#99053d'
+  legend: Single Top
+  order: 2
+  type: mc
+  group: ST
+  files:
+    - ST_schannel_4f.root
+    - ST_tchannel_antitop_4f.root
+    - ST_tchannel_top_4f.root
+    - ST_tW_antitop_5f.root
+    - ST_tWll_5f.root
+    - ST_tW_top_5f.root
+WJets:
+  fill-color: '#d95564'
+  legend: W+jets
+  order: 4
+  type: mc
+  group: WJets
+  files:
+    - WJetsToLNu_HT-100To200.root
+    - WJetsToLNu_HT-1200To2500.root
+    - WJetsToLNu_HT-200To400.root
+    - WJetsToLNu_HT-2500ToInf.root
+    - WJetsToLNu_HT-400To600.root
+    - WJetsToLNu_HT-600To800.root
+    - WJetsToLNu_HT-70To100.root
+    - WJetsToLNu_HT-800To1200.root
+    - WJetsToLNu.root
+    - W1JetsToLNu.root
+    - W2JetsToLNu.root
+    - W3JetsToLNu.root
+    - W4JetsToLNu.root
+VV:  
+  fill-color: '#ccbf45'
+  legend: VV(V)
+  group: VVV
+  order: 5
+  type: mc
+  files:
+    - WWTo2L2Nu_DoubleScattering.root
+    - WWTo2L2Nu.root
+    - WWToLNuQQ.root
+    - WZG.root
+    - WZTo2L2Q.root
+    - WZTo3LNu.root
+    - ZZTo2L2Q.root
+    - ZZTo4L.root
+VVV:  
+  fill-color: '#ccbf45'
+  legend: VV(V)
+  group: VVV
+  order: 5
+  type: mc
+  files:
+    - WWW.root
+    - WWZ.root
+    - WZZ.root
+    - ZZZ.root
+ggH_hbb:
+  legend: ggH->bb
+  fill-color: '#06b894'
+  group: SM
+  order: 7
+  type: mc
+  files:
+    - GluGluHToBB.root
+ggH_hgg:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 7
+  type: mc
+  files:
+    - GluGluHToGG.root
+ggH_hmm:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 7
+  type: mc
+  files:
+    - GluGluHToMuMu.root
+ggH_htt:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 7
+  type: mc
+  files:
+    - GluGluHToTauTau.root
+ggH_hww:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 7
+  type: mc
+  files:
+    - GluGluHToWWTo2L2Nu.root
+    - GluGluHToWWToLNuQQ.root
+ggH_hzz:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 7
+  type: mc
+  files:
+    - GluGluHToZZTo4L.root
+    - GluGluHToZZTo2L2Q.root
+qqH_hbb:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 8
+  type: mc
+  files:
+    - VBFHToBB.root
+qqH_hgg:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 8
+  type: mc
+  files:
+    - VBFHToGG.root
+qqH_hmm:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 8
+  type: mc
+  files:
+    - VBFHToMuMu.root
+qqH_htt:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 8
+  type: mc
+  files:
+    - VBFHToTauTau.root
+qqH_hww:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 8
+  type: mc
+  files:
+    - VBFHToWWTo2L2Nu.root
+    - VBFHToWWToLNuQQ.root
+qqH_hzz:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 8
+  type: mc
+  files:
+    - VBFHToZZTo4L.root
+ttH_hbb:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 9
+  type: mc
+  files:
+    - ttHJetTobb.root
+ttH_hww:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 9
+  type: mc
+  files:
+    - ttHJetToNonbb.root
+WH_hbb:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 10
+  type: mc
+  files:
+    - WminusH_HToBB_WToLNu.root
+    - WplusH_HToBB_WToLNu.root
+ZH_hbb:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 11
+  type: mc
+  files:
+    - ZH_HToBB_ZToLL.root
+ZH_htt:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 11
+  type: mc
+  files:
+    - ZHToTauTau.root
+ZH_hww:
+  legend: SM H
+  fill-color: '#06b894'
+  group: SM
+  order: 11
+  type: mc
+  files:
+    - HZJ_HToWW.root
+tHq_hww:
+  fill-color: '#06b894'
+  legend: SM H
+  group: SM
+  order: 7
+  type: mc
+  files:
+    - THQ.root
+tHW_hww:
+  fill-color: '#06b894'
+  legend: SM H
+  group: SM
+  order: 7
+  type: mc
+  files:
+    - THW.root
+VH_hww:
+  fill-color: '#06b894'
+  legend: VH->non-bb
+  group: SM
+  order: 7
+  type: mc
+  files:
+    - VHToNonbb.root
+
+ttZ:
+  fill-color: '#610596'
+  legend: ttZ
+  order: 12
+  type: mc
+  group: Rares
+  files:
+    - TTZH.root
+    - TTZToLL_M-1to10.root
+    - TTZToLLNuNu_M-10.root
+    - TTZToQQ.root
+
+ttW:
+  fill-color: '#610596'
+  legend: ttW
+  order: 12
+  type: mc
+  group: Rares
+  files:
+    - TTWH.root
+    - TTWJetsToLNu.root
+    - TTWJetsToQQ.root
+    - TTWW.root
+
+Other_bbWW:
+  fill-color: '#610596'
+  legend: Rares 
+  order: 12
+  type: mc
+  group: Rares
+  files:
+    - TTGJets.root
+    - TGJets.root
+    - TTTT.root
+    - WGToLNuG.root
+    - ZGToLLG.root
+    - WpWpJJ.root
+    - tZq_ll.root

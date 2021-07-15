@@ -1,0 +1,36 @@
+data_obs: 
+  legend: data
+  type: data
+  files:
+    - DoubleEGamma_2017B.root
+    - DoubleEGamma_2017C0.root
+    - DoubleEGamma_2017C1.root
+    - DoubleEGamma_2017D.root
+    - DoubleEGamma_2017E.root
+    - DoubleEGamma_2017F.root
+    - DoubleMuon_2017B.root
+    - DoubleMuon_2017C0.root
+    - DoubleMuon_2017C1.root
+    - DoubleMuon_2017D.root
+    - DoubleMuon_2017E.root
+    - DoubleMuon_2017F.root
+    - MuonEG_2017B.root
+    - MuonEG_2017C0.root
+    - MuonEG_2017C1.root
+    - MuonEG_2017D.root
+    - MuonEG_2017E.root
+    - MuonEG_2017F.root
+    - SingleElectron_2017B.root
+    - SingleElectron_2017C0.root
+    - SingleElectron_2017C1.root
+    - SingleElectron_2017D.root
+    - SingleElectron_2017E.root
+    - SingleElectron_2017F.root
+    - SingleMuon_2017B.root
+    - SingleMuon_2017C0.root
+    - SingleMuon_2017C1.root
+    - SingleMuon_2017D.root
+    - SingleMuon_2017E.root
+    - SingleMuon_2017F.root
+
+

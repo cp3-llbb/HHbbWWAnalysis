@@ -46,6 +46,10 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         noSel = super(PlotterNanoHHtobbWWSL,self).prepareObjects(t, noSel, sample, sampleCfg, 'SL')
         era = sampleCfg['era']
         plots = []
+
+        if hasattr(self,'base_plots'):
+            plots.extend(self.base_plots)
+
         cutFlowPlots = []
         
         #----- Machine Learning Model -----#                
@@ -293,19 +297,19 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             inputsParam   = mvaEvaluatorSL_nonres.returnParamMVAInputs    (self)
             inputsEventNr = mvaEvaluatorSL_nonres.returnEventNrMVAInputs  (self,t)
 
-            print ("Lepton variables : %d"%len(inputsLeps))                                                                                                                                             
-            print ("Jet variables    : %d"%len(inputsJets))                                                                                                                                             
-            print ("Fatjet variables : %d"%len(inputsFatjet))                                                                                                                                           
-            print ("MET variables    : %d"%len(inputsMET))                                                                                                                                              
-            print ("HL variables     : %d"%len(inputsHL))                                                                                                                                               
-            print ("Param variables  : %d"%len(inputsParam))                                                                                                                                            
-            print ("Event variables  : %d"%len(inputsEventNr))                                                                                                                                          
+            #print ("Lepton variables : %d"%len(inputsLeps))                                                                                                                                             
+            #print ("Jet variables    : %d"%len(inputsJets))                                                                                                                                             
+            #print ("Fatjet variables : %d"%len(inputsFatjet))                                                                                                                                           
+            #print ("MET variables    : %d"%len(inputsMET))                                                                                                                                              
+            #print ("HL variables     : %d"%len(inputsHL))                                                                                                                                               
+            #print ("Param variables  : %d"%len(inputsParam))                                                                                                                                            
+            #print ("Event variables  : %d"%len(inputsEventNr))                                                                                                                                          
             
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLeps))                              
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets))                              
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))                            
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsMET))                               
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL))                                
+            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLeps))                              
+            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets))                              
+            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))                            
+            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsMET))                               
+            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL))                                
             #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam))                             
             #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsEventNr))                           
             

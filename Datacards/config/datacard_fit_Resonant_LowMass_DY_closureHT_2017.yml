@@ -1,0 +1,24 @@
+path: /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_Resonant_LowMass_DYEstimation_PseudoData_allmass/
+use_syst: False
+
+yamlName: plots_pseudodata.yml
+
+produce_plots: True
+
+era: 2017
+
+legend:
+  position:
+  - 0.8
+  - 0.6
+  - 0.99
+  - 0.99
+
+
+hist_conv: !include resonant_cat_allmass.yml
+
+groups:
+  - !include groups_DL_bkg_2017.yml
+  - !include groups_DL_PseudoData_2017.yml
+  - !include groups_DY_datadriven_closure.yml
+
