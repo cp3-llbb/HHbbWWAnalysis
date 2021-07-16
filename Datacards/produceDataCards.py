@@ -14,8 +14,7 @@ import logging
 import subprocess
 import numpy as np
 import math
-from itertools import chain
-from pprint import pprint
+import multiprocessing as mp
 import numpy as np
 import enlighten
 import ROOT
@@ -43,17 +42,17 @@ class DataCard:
         self.configPath     = configPath
         self.path           = path
         self.worker         = worker
-        self.hist_conv      = hist_conv
         self.era            = str(era)
         self.use_syst       = use_syst
         self.root_subdir    = root_subdir
         self.pseudodata     = pseudodata
+        self.hist_conv      = hist_conv
         self.DYnonclosure   = DYnonclosure
         self.rebin          = rebin
         self.textfiles      = textfiles
         self.produce_plots  = produce_plots
         self.legend         = legend
-        self.combineConfigs    = combineConfigs
+        self.combineConfigs = combineConfigs
 
         # Get entries that can either be dicts or list of dicts (eg with !include in yaml) #
         self.groups = self.includeEntry(groups,'Groups')
@@ -62,6 +61,13 @@ class DataCard:
                
         # Load Yaml configs from bamboo #
         self.yaml_dict = self.loadYaml(self.path,yamlName)
+
+        # Apply pseudo-data #
+        if self.pseudodata:
+            logging.info('Will use pseudodata')
+            self.groups = self.generatePseudoData(self.groups)
+            if self.outputDir is not None:
+                self.outputDir += "_pseudodata"
 
         # Create output directory #
         self.datacardPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),self.outputDir)
@@ -73,18 +79,15 @@ class DataCard:
         logger = logging.getLogger()
         logger.addHandler(handler)
 
-        # Apply pseudo-data #
-        if self.pseudodata:
-            logging.info('Will use pseudodata')
-            self.groups = self.generatePseudoData(self.groups)
-            if self.outputDir is not None:
-                self.outputDir += "_pseudodata"
-
         # Initialise containers #
         self.content = {histName:{g:{} for g in self.groups.keys()} for histName in self.hist_conv.keys()}
         self.systPresent = {histName:{group:[] for group in self.groups.keys()} for histName in self.hist_conv.keys()}
 
     def run_production(self):
+        logging.info('Running production over following categories')
+        for cat in self.hist_conv.keys():
+            logging.info(f'... {cat}')
+
         self.loopOverFiles()
         if self.pseudodata:
             self.roundFakeData()
@@ -160,6 +163,7 @@ class DataCard:
                 self.addSampleToGroup(copy.deepcopy(hist_dict),group)
                 # deepcopy is needed so that if the histogram is in two groups
                 # acting on one version will not change the other
+            del hist_dict
 
         for histName in self.content.keys(): # renaming to avoid overwritting ROOT warnings
             for group in self.content[histName].keys():
@@ -297,7 +301,8 @@ class DataCard:
             h.Scale(lumi*xsec*br/sumweight)
         return h
              
-    def loadYaml(self,paths,yamlNames):
+    @staticmethod
+    def loadYaml(paths,yamlNames):
         if not isinstance(paths,list):
             paths = [paths]
         if not isinstance(yamlNames,list):
@@ -460,6 +465,9 @@ class DataCard:
                             if systName not in self.shapeSyst.keys():
                                 raise RuntimeError("Could not find {systName} in systematic dict".format(systName))
                             CMSName = self.shapeSyst[systName]
+                            if CMSName == 'discard':
+                                logging.debug(f'Discarding systematic {systName}')
+                                continue
                             if '{era}' in CMSName:
                                 CMSName = CMSName.format(era=self.era)
                             # Record #
@@ -2005,6 +2013,11 @@ if __name__=="__main__":
                         help='Yaml containing parameters')
     parser.add_argument('--pseudodata', action='store_true', required=False, default=False,
                         help='Whether to use pseudo data (data = sum of MC)')
+    parser.add_argument('--split', action='store', required=False, default=None, nargs='*',
+                        help='If used without argument, will process all categories in serie, \
+                              otherwise will process the categories given in argument')
+    parser.add_argument('-j,','--jobs', action='store', required=False, default=None, type=int,
+                        help='Number of parallel processes (only useful with `--split`)')
     parser.add_argument('--combine', action='store', required=False, default=None, nargs='*',
                         help='Run combine on the txt datacard only')
     parser.add_argument('--combine_args', action='store', required=False, default=[], nargs='*',
@@ -2022,30 +2035,64 @@ if __name__=="__main__":
     logging.basicConfig(level   = logging.DEBUG,
                         format  = '%(asctime)s - %(levelname)s - %(message)s',
                         datefmt = '%m/%d/%Y %H:%M:%S')
+
+    # Verbose level #
     if not args.verbose:
         logging.getLogger().setLevel(logging.INFO)
 
+    # File checking #
     if args.yaml is None:
         raise RuntimeError("Must provide the YAML file")
     if not os.path.isfile(args.yaml):
         raise RuntimeError("YAML file {} is not a valid file".format(args.yaml))
+
+    # Yaml parsing #
     if args.custom is not None:
+        # Custom command line argument for parsing #
         formatting = {}
         for arg in args.custom:
             if '=' in arg:
                 formatting[arg.split('=')[0]] = arg.split('=')[1]
             else:
                 logging.warning(f'`--custom {arg}` will be ignored because no `=`')
-        d = yaml.load({'filename':args.yaml,'formatting':formatting},
+        config = yaml.load({'filename':args.yaml,'formatting':formatting},
                       Loader=YMLIncludeLoader)
     else:
+        # Classic parse #
         with open(args.yaml,'r') as handle:
-            d = yaml.load(handle,Loader=YMLIncludeLoader)
-    instance = DataCard(configPath      = os.path.abspath(args.yaml),
-                        worker          = args.worker,
-                        pseudodata      = args.pseudodata,
-                        **d)
+            config = yaml.load(handle,Loader=YMLIncludeLoader)
+
+    # Content checks #
+    required_items = ['path','outputDir','yamlName','hist_conv','groups']
+    if any(item not in config.keys() for item in required_items): 
+        raise RuntimeError('Your config is missing the following items :'+ \
+                ','.join([item for item in required_items if item not in d.keys()]))
+
+    # Splitting #
+    global_hist_conv = copy.deepcopy(config['hist_conv']) # Run all at once
+    categoriesToRun = [config['hist_conv'].keys()]
+    if args.split is not None:
+        if len(args.split) == 0:  # run all sequantially
+            categoriesToRun = [[cat] for cat in categoriesToRun[0]]
+        else: # Run only requested
+            if not all([item in config['hist_conv'].keys() for item in args.split]):
+                raise RuntimeError('Category(ies) requested in split not found : '+\
+                        ','.join([item for item in args.split if item not in hist_conv.keys()]))
+            categoriesToRun = [[cat] for cat in args.split]
+
+    # Instantiate #
+    instances = []
+    for categories in categoriesToRun:
+        config['hist_conv'] = {cat:global_hist_conv[cat] for cat in categories}
+        instances.append(DataCard(configPath      = os.path.abspath(args.yaml),
+                                  worker          = args.worker,
+                                  pseudodata      = args.pseudodata,
+                                  **config) )
     if args.combine is not None: 
+        if args.split is not None:
+            raise RuntimeError('Safer not to use `--split` with `--combine`')
+        assert len(instances) == 1
+        instance = instances[0]
         combine_args = {}
         for arg in args.combine_args:
             if '=' in arg:
@@ -2054,4 +2101,11 @@ if __name__=="__main__":
                 logging.warning(f'`--combine_args {arg}` will be ignored because no `=`')
         instance.run_combine(args.combine,combine_args,debug=args.debug)
     else:
-        instance.run_production()
+        if args.jobs is None:
+            for instance in instances:
+                instance.run_production()
+        else:
+            def run(instance):
+                instance.run_production()
+            with mp.Pool(processes=args.jobs) as pool:
+                pool.map(run,instances)

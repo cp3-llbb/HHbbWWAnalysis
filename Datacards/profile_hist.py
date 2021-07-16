@@ -8,7 +8,6 @@ import numpy as np
 from hist_interface import PythonInterface, CppInterface
 
 from ROOT import gErrorIgnoreLevel
-gErrorIgnoreLevel = 2000
 ROOT.TH1.AddDirectory(False)
 
 from IPython import embed
@@ -17,7 +16,7 @@ TIMER_EVAL = 10
 N_BINS = 400
 
 h1 = ROOT.TH1F('h1','h1',N_BINS,0,100)
-h2 = ROOT.TH2F('h2','h2',N_BINS,0.,100.,N_BINS,0.,100.)
+h2 = ROOT.TH2F('h2','h2',N_BINS,0.,100.,N_BINS,0.,200.)
 
 rg = ROOT.TRandom3()
 for _ in range(100000):
@@ -66,7 +65,6 @@ e1c,w1c,s1c = timer(CppInterface.getContent1D)(h1)
 
 e2p,w2p,s2p = timer(PythonInterface.getContent2D)(h2)
 e2c,w2c,s2c = timer(CppInterface.getContent2D)(h2)
-
 # Testing #
 np.testing.assert_allclose(e1p,e1c)
 np.testing.assert_allclose(w1p,w1c)

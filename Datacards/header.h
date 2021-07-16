@@ -33,10 +33,10 @@ float* getContentFromTH2(const T& h)
             content[y + Ny*x] = h.GetBinContent(x+1,y+1);
             content[Nx*Ny + y + Ny*x] = h.GetBinError(x+1,y+1);
             if (x == 0)
-                content[2*Nx*Ny + Nx + 1 + y] = h.GetXaxis()->GetBinLowEdge(y+1);
+                content[2*Nx*Ny + Nx + 1 + y] = h.GetYaxis()->GetBinLowEdge(y+1);
         }
         if (x == 0)
-            content[2*Nx*Ny + Nx + Ny + 1] =  h.GetXaxis()->GetBinLowEdge(Ny+1);
+            content[2*Nx*Ny + Nx + Ny + 1] =  h.GetYaxis()->GetBinLowEdge(Ny+1);
         content[2*Nx*Ny + x] = h.GetXaxis()->GetBinLowEdge(x+1);
     }
     content[2*Nx*Ny + Nx] = h.GetXaxis()->GetBinLowEdge(Nx+1);
