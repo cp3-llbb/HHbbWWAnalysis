@@ -49,8 +49,8 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         cutFlowPlots = []
         
         #----- Machine Learning Model -----#                
-        model_num = "12"
-        path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','multi-classification','dnn',model_num,'model','model.pb')
+        model_num = "01"
+        path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','SL',model_num,'model','model.pb')
         input_names = ["lep","jet","fat","met","hl","param","eventnr"]
         output_name = "Identity"
         
@@ -69,24 +69,6 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         
         self.yieldPlots = makeYieldPlots(self.args.Synchronization)
         
-        #----- Ratio reweighting variables (before lepton and jet selection) -----#
-        #if self.args.BtagReweightingOff or self.args.BtagReweightingOn:
-        #    #plots.append(objectsNumberPlot(channel="NoChannel",suffix='NoSelection',sel=noSel,objCont=self.ak4Jets,objName='Ak4Jets',Nmax=15,xTitle='N(Ak4 jets)'))
-        #    #plots.append(CutFlowReport("BtagReweightingCutFlowReport",noSel))
-        #    return plots
-            
-        #----- Stitching study -----#
-        if self.args.DYStitchingPlots or self.args.WJetsStitchingPlots:
-            if self.args.DYStitchingPlots and sampleCfg['group'] != 'DY':
-                raise RuntimeError("Stitching is only done on DY MC samples")
-            if self.args.WJetsStitchingPlots and sampleCfg['group'] != 'Wjets':
-                raise RuntimeError("Stitching is only done on WJets MC samples")
-            #plots.extend(makeLHEPlots(noSel,t.LHE))
-            #plots.append(objectsNumberPlot(channel="NoChannel",suffix='NoSelection',sel=noSel,objCont=self.ak4Jets,objName='Ak4Jets',Nmax=15,xTitle='N(Ak4 jets)'))
-            #plots.append(CutFlowReport("DYStitchingCutFlowReport",noSel))
-            return plots
-            
-            
         #----- Singleleptons -----#
         ElSelObj,MuSelObj = makeSingleLeptonSelection(self,noSel,plot_yield=True)
 
@@ -301,13 +283,13 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             print ("Param variables  : %d"%len(inputsParam))                                                                                                                                            
             print ("Event variables  : %d"%len(inputsEventNr))                                                                                                                                          
             
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLeps))                              
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets))                              
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))                            
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsMET))                               
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL))                                
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam))                             
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsEventNr))                           
+            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLeps))
+            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets)) 
+            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))
+            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsMET)) 
+            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL)) 
+            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam)) 
+            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsEventNr))
             
             from  mvaEvaluatorSL_nonres import inputStaticCast
 
@@ -330,7 +312,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             
 
         #----- Add the Yield plots -----#
-        plots.append(self.yields)
+        #plots.append(self.yields)
         #plots.extend(cutFlowPlots)
         return plots
 

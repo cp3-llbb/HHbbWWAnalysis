@@ -63,7 +63,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_sel
     Produces the requested lepton selection (encapsulated in SelectionObject class objects)
     Will produce a dict :
         - key = level required (Preselected, Fakeable, Tight and/or FakeExtrapolation)
-        - value = list of SelectionObject class objects per channel [ElEl,MuMu,ElMu] 
+        - value = list of SelectionObject class objects per channel [El,Mu] 
     We start by leptons so no need to pass selObject
     Code organized such that selections are not repeated and hopefully optimzed the RooDataFrame
     """
@@ -76,8 +76,33 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_sel
     lambda_tight_ele = lambda ele : op.AND(self.lambda_is_matched(ele) , self.lambda_electronTightSel(ele))
     lambda_tight_mu  = lambda mu  : op.AND(self.lambda_is_matched(mu)  , self.lambda_muonTightSel(mu))
     
-    lambda_fake_ele = lambda ele : op.AND(self.lambda_is_matched(ele) , op.NOT(self.lambda_electronTightSel(ele)))
-    lambda_fake_mu  = lambda mu  : op.AND(self.lambda_is_matched(mu)  , op.NOT(self.lambda_muonTightSel(mu)))
+    if self.args.FakeRateNonClosureMCFakes:
+        # MC fakes are events in the SR (tight) but non-prompt (the actual MC fakes, very unreliable, hence our datadriven estimate) #
+        lambda_fake_ele = lambda ele : op.AND(op.NOT(self.lambda_is_matched(ele)) , self.lambda_electronTightSel(ele))
+        lambda_fake_mu  = lambda mu  : op.AND(op.NOT(self.lambda_is_matched(mu))  , self.lambda_muonTightSel(mu))
+        # We use unit-weight Fake Factors, because the events are actually taken from SR #
+        lambda_FF_ele   = lambda ele : [op.c_float(1.)]
+        lambda_FF_mu    = lambda mu  : [op.c_float(1.)]
+        # Override the selections #
+        fake_selection = True
+        use_dd = False
+    elif self.args.FakeRateNonClosureMCClosure:
+        # MC closure are events in the CR (non-tight) but non-prompt -> used with MC QCD fake rates to evaluate closure #
+        lambda_fake_ele = lambda ele : op.AND(op.NOT(self.lambda_is_matched(ele)) , op.NOT(self.lambda_electronTightSel(ele)))
+        lambda_fake_mu  = lambda mu  : op.AND(op.NOT(self.lambda_is_matched(mu))  , op.NOT(self.lambda_muonTightSel(mu)))
+        # We use the mc-driven Fake Factors #
+        lambda_FF_ele   = lambda ele : [self.ElFakeFactorNonClosure(ele)]
+        lambda_FF_mu    = lambda mu  : [self.MuFakeFactorNonClosure(mu)]
+        # Override the selections #
+        fake_selection = True
+        use_dd = False
+    else:
+        # SR events used for Fake estimation are in the Fake CR (non-tight) and prompt for MC (for data, both prompt and non prompt, indistinguishable) #
+        lambda_fake_ele = lambda ele : op.AND(self.lambda_is_matched(ele) , op.NOT(self.lambda_electronTightSel(ele)))
+        lambda_fake_mu  = lambda mu  : op.AND(self.lambda_is_matched(mu)  , op.NOT(self.lambda_muonTightSel(mu)))
+        # We use the datadriven Fake Factors  #
+        lambda_FF_ele   = lambda ele : [self.ElFakeFactor(ele)]
+        lambda_FF_mu    = lambda mu  : [self.MuFakeFactor(mu)]
 
     #Z-nominal mass
     Zmass = 91.1876
@@ -180,6 +205,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_sel
 
 
     if use_dd:
+        # Use the datadriven in parallel of the SR selection #
         enable = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg)
         ElSelObject.create(cut      = [lambda_tight_ele(self.electronsFakeSel[0]),
                                        op.rng_len(self.electronsTightSel) == 1,
@@ -188,7 +214,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_sel
                            weight   = ElTightSF(self.electronsTightSel[0]),
                            ddSuffix = "FakeExtrapolation",
                            ddCut    = [lambda_fake_ele(self.electronsFakeSel[0]), op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel)<=1],
-                           ddWeight = [self.ElFakeFactor(self.electronsFakeSel[0])]+ElTightSF(self.electronsFakeSel[0]),
+                           ddWeight = lambda_FF_ele(self.electronsFakeSel[0])+ElTightSF(self.electronsFakeSel[0]),
                            enable   = enable)
         MuSelObject.create(cut      = [lambda_tight_mu(self.muonsFakeSel[0]),
                                        op.rng_len(self.muonsTightSel) == 1,
@@ -197,29 +223,28 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_sel
                            weight   = MuTightSF(self.muonsTightSel[0]),
                            ddSuffix = "FakeExtrapolation",
                            ddCut    = [lambda_fake_mu(self.muonsFakeSel[0]), op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel)<=1],
-                           ddWeight = [self.MuFakeFactor(self.muonsFakeSel[0])]+MuTightSF(self.muonsFakeSel[0]),
+                           ddWeight = lambda_FF_mu(self.muonsFakeSel[0])+MuTightSF(self.muonsFakeSel[0]),
                            enable   = enable)
+    if fake_selection:
+        # Only return the datadriven CR selection (eg, skimmer or non closure) #
+        ElSelObject.refine(cut    = [lambda_fake_ele(self.electronsFakeSel[0]), op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel)<=1],
+                           weight = lambda_FF_ele(self.electronsFakeSel[0])+ElTightSF(self.electronsFakeSel[0]))
+        MuSelObject.refine(cut    = [lambda_fake_mu(self.muonsFakeSel[0]), op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel)<=1],
+                           weight = lambda_FF_mu(self.muonsFakeSel[0])+MuTightSF(self.muonsFakeSel[0]))
+        # -> in SR : lead lepton is self.electronsTightSel[0] or self.muonsTightSel[0]
+        # -> in Fake CR : lead lepton is self.electronsFakeSel[0] or self.muonsFakeSel[0]
     else:
-        if not fake_selection:
-            ElSelObject.refine(cut    = [lambda_tight_ele(self.electronsFakeSel[0]),
-                                         op.rng_len(self.electronsTightSel) == 1,
-                                         op.rng_len(self.muonsTightSel) == 0,
-                                         self.electronsTightSel[0].idx == self.electronsFakeSel[0].idx],
-                               weight = ElTightSF(self.electronsTightSel[0]))
-            MuSelObject.refine(cut    = [lambda_tight_mu(self.muonsFakeSel[0]),
-                                         op.rng_len(self.muonsTightSel) == 1,
-                                         op.rng_len(self.electronsTightSel) == 0,
-                                         self.muonsTightSel[0].idx == self.muonsFakeSel[0].idx],
-                               weight = MuTightSF(self.muonsTightSel[0]))
-        else :
-            ElSelObject.refine(cut    = [op.rng_len(self.electronsFakeSel) == 1,
-                                         op.rng_len(self.muonsFakeSel) == 0],
-                               weight = ElTightSF(self.electronsFakeSel[0]))
-            MuSelObject.refine(cut    = [op.rng_len(self.electronsFakeSel) == 0,
-                                         op.rng_len(self.muonsFakeSel) == 1],
-                               weight = MuTightSF(self.muonsFakeSel[0]))
-            # -> in SR : lead lepton is self.electronsTightSel[0] or self.muonsTightSel[0]
-            # -> in Fake CR : lead lepton is self.electronsFakeSel[0] or self.muonsFakeSel[0]
+        # Only return the SR selection #
+        ElSelObject.refine(cut    = [lambda_tight_ele(self.electronsFakeSel[0]),
+                                     op.rng_len(self.electronsTightSel) == 1,
+                                     op.rng_len(self.muonsTightSel) == 0,
+                                     self.electronsTightSel[0].idx == self.electronsFakeSel[0].idx],
+                           weight = ElTightSF(self.electronsTightSel[0]))
+        MuSelObject.refine(cut    = [lambda_tight_mu(self.muonsFakeSel[0]),
+                                     op.rng_len(self.muonsTightSel) == 1,
+                                     op.rng_len(self.electronsTightSel) == 0,
+                                     self.muonsTightSel[0].idx == self.muonsFakeSel[0].idx],
+                           weight = MuTightSF(self.muonsTightSel[0]))
 
     # Return # 
     return [ElSelObject,MuSelObject]
@@ -512,7 +537,6 @@ def makeDoubleLeptonSelection(self,baseSel,use_dd=True,fake_selection=False):
     """
     #---- Common lambdas ----#
     lambdaOSDilepton = lambda dilep : dilep[0].charge != dilep[1].charge
-    lambdaSSDilepton = lambda dilep : dilep[0].charge == dilep[1].charge
     # Mll cut lambdas #
     ZMass = 91.1876
     lambda_lowMllCut    = lambda dileptons: op.NOT(op.rng_any(dileptons, lambda dilep : op.invariant_mass(dilep[0].p4, dilep[1].p4)<12.))
@@ -604,28 +628,16 @@ def makeDoubleLeptonSelection(self,baseSel,use_dd=True,fake_selection=False):
 
 
     #---- Opposite sign ----#
-    if self.args.SS:
-        ElElSelObj.selName += "SS"
-        MuMuSelObj.selName += "SS"
-        ElMuSelObj.selName += "SS"
-        ElElSelObj.yieldTitle += " + SS"
-        MuMuSelObj.yieldTitle += " + SS"
-        ElMuSelObj.yieldTitle += " + SS"
+    ElElSelObj.selName += "OS"
+    MuMuSelObj.selName += "OS"
+    ElMuSelObj.selName += "OS"
+    ElElSelObj.yieldTitle += " + OS"
+    MuMuSelObj.yieldTitle += " + OS"
+    ElMuSelObj.yieldTitle += " + OS"
 
-        ElElSelObj.refine(cut = [lambdaSSDilepton(self.ElElFakeSel[0])])
-        MuMuSelObj.refine(cut = [lambdaSSDilepton(self.MuMuFakeSel[0])])
-        ElMuSelObj.refine(cut = [lambdaSSDilepton(self.ElMuFakeSel[0])])
-    else:
-        ElElSelObj.selName += "OS"
-        MuMuSelObj.selName += "OS"
-        ElMuSelObj.selName += "OS"
-        ElElSelObj.yieldTitle += " + OS"
-        MuMuSelObj.yieldTitle += " + OS"
-        ElMuSelObj.yieldTitle += " + OS"
-
-        ElElSelObj.refine(cut = [lambdaOSDilepton(self.ElElFakeSel[0])])
-        MuMuSelObj.refine(cut = [lambdaOSDilepton(self.MuMuFakeSel[0])])
-        ElMuSelObj.refine(cut = [lambdaOSDilepton(self.ElMuFakeSel[0])])
+    ElElSelObj.refine(cut = [lambdaOSDilepton(self.ElElFakeSel[0])])
+    MuMuSelObj.refine(cut = [lambdaOSDilepton(self.MuMuFakeSel[0])])
+    ElMuSelObj.refine(cut = [lambdaOSDilepton(self.ElMuFakeSel[0])])
 
 
     #---- Triggers ----#
@@ -700,6 +712,7 @@ def makeDoubleLeptonSelection(self,baseSel,use_dd=True,fake_selection=False):
     ElMuSelObj.yieldTitle += " + Tight selection"
     
     if use_dd:
+        # Use datadriven in parrallel of actual selection #
         enable = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg)
         ElElSelObj.create(cut      = [self.lambda_tightpair_ElEl(self.ElElFakeSel[0]),
                                       op.rng_len(self.electronsTightSel) == 2,
@@ -734,36 +747,37 @@ def makeDoubleLeptonSelection(self,baseSel,use_dd=True,fake_selection=False):
                                       op.rng_len(self.electronsTightSel) + op.rng_len(self.muonsTightSel)<=2],
                           ddWeight = [self.ElMuFakeFactor(self.ElMuFakeSel[0])]+ElMuTightSF(self.ElMuFakeSel[0]),
                           enable   = enable)
+    elif fake_selection:
+        # Return only the selection fot the fake datadriven (eg for skimmer) #
+        ElElSelObj.refine(cut    = [self.lambda_fakepair_ElEl(self.ElElFakeSel[0]),
+                                    op.rng_len(self.electronsTightSel) + op.rng_len(self.muonsTightSel)<=2],
+                          weight = ElElTightSF(self.ElElFakeSel[0]))
+        MuMuSelObj.refine(cut    = [self.lambda_fakepair_MuMu(self.MuMuFakeSel[0]),
+                                    op.rng_len(self.electronsTightSel) + op.rng_len(self.muonsTightSel)<=2],
+                          weight = MuMuTightSF(self.MuMuFakeSel[0]))
+        ElMuSelObj.refine(cut    = [self.lambda_fakepair_ElMu(self.ElMuFakeSel[0]),
+                                    op.rng_len(self.electronsTightSel) + op.rng_len(self.muonsTightSel)<=2],
+                          weight = ElMuTightSF(self.ElMuFakeSel[0]))
     else:
-        if not fake_selection:
-            ElElSelObj.refine(cut    = [self.lambda_tightpair_ElEl(self.ElElFakeSel[0]),
-                                           op.rng_len(self.electronsTightSel) == 2,
-                                           op.rng_len(self.muonsTightSel) == 0,
-                                           self.ElElTightSel[0][0].idx == self.ElElFakeSel[0][0].idx,
-                                           self.ElElTightSel[0][1].idx == self.ElElFakeSel[0][1].idx],
-                              weight = ElElTightSF(self.ElElFakeSel[0]))
-            MuMuSelObj.refine(cut    = [self.lambda_tightpair_MuMu(self.MuMuFakeSel[0]),
-                                           op.rng_len(self.electronsTightSel) == 0,
-                                           op.rng_len(self.muonsTightSel) == 2,
-                                           self.MuMuTightSel[0][0].idx == self.MuMuFakeSel[0][0].idx,
-                                           self.MuMuTightSel[0][1].idx == self.MuMuFakeSel[0][1].idx],
-                              weight = MuMuTightSF(self.MuMuFakeSel[0]))
-            ElMuSelObj.refine(cut    = [self.lambda_tightpair_ElMu(self.ElMuFakeSel[0]),
-                                           op.rng_len(self.electronsTightSel) == 1,
-                                           op.rng_len(self.muonsTightSel) == 1,
-                                           self.ElMuTightSel[0][0].idx == self.ElMuFakeSel[0][0].idx,
-                                           self.ElMuTightSel[0][1].idx == self.ElMuFakeSel[0][1].idx],
-                              weight = ElMuTightSF(self.ElMuFakeSel[0]))
-        else:
-            ElElSelObj.refine(cut    = [self.lambda_fakepair_ElEl(self.ElElFakeSel[0]),
-                                        op.rng_len(self.electronsTightSel) + op.rng_len(self.muonsTightSel)<=2],
-                              weight = ElElTightSF(self.ElElFakeSel[0]))
-            MuMuSelObj.refine(cut    = [self.lambda_fakepair_MuMu(self.MuMuFakeSel[0]),
-                                        op.rng_len(self.electronsTightSel) + op.rng_len(self.muonsTightSel)<=2],
-                              weight = MuMuTightSF(self.MuMuFakeSel[0]))
-            ElMuSelObj.refine(cut    = [self.lambda_fakepair_ElMu(self.ElMuFakeSel[0]),
-                                        op.rng_len(self.electronsTightSel) + op.rng_len(self.muonsTightSel)<=2],
-                              weight = ElMuTightSF(self.ElMuFakeSel[0]))
+        # Return only the selection for the SR #
+        ElElSelObj.refine(cut    = [self.lambda_tightpair_ElEl(self.ElElFakeSel[0]),
+                                       op.rng_len(self.electronsTightSel) == 2,
+                                       op.rng_len(self.muonsTightSel) == 0,
+                                       self.ElElTightSel[0][0].idx == self.ElElFakeSel[0][0].idx,
+                                       self.ElElTightSel[0][1].idx == self.ElElFakeSel[0][1].idx],
+                          weight = ElElTightSF(self.ElElFakeSel[0]))
+        MuMuSelObj.refine(cut    = [self.lambda_tightpair_MuMu(self.MuMuFakeSel[0]),
+                                       op.rng_len(self.electronsTightSel) == 0,
+                                       op.rng_len(self.muonsTightSel) == 2,
+                                       self.MuMuTightSel[0][0].idx == self.MuMuFakeSel[0][0].idx,
+                                       self.MuMuTightSel[0][1].idx == self.MuMuFakeSel[0][1].idx],
+                          weight = MuMuTightSF(self.MuMuFakeSel[0]))
+        ElMuSelObj.refine(cut    = [self.lambda_tightpair_ElMu(self.ElMuFakeSel[0]),
+                                       op.rng_len(self.electronsTightSel) == 1,
+                                       op.rng_len(self.muonsTightSel) == 1,
+                                       self.ElMuTightSel[0][0].idx == self.ElMuFakeSel[0][0].idx,
+                                       self.ElMuTightSel[0][1].idx == self.ElMuFakeSel[0][1].idx],
+                          weight = ElMuTightSF(self.ElMuFakeSel[0]))
 
 
 
@@ -823,7 +837,7 @@ def makeExclusiveResolvedNoBtagSelection(self,selObject,copy_sel=False,use_dd=Tr
     if copy_sel:
         return selObject
 
-def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,use_dd=True):
+def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,use_dd=True,dy_selection=False):
     """
     Produces the exclusive resolved selection with only one btagging
     inputs :
@@ -839,6 +853,7 @@ def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,use_dd=T
     selObject.selName += "ExclusiveResolvedOneBtag"
     selObject.yieldTitle += " + Exclusive Resolved (1 bjet)"
     if use_dd:
+        # Use the datadriven selection in parallel of the SR one #
         enable = "DYEstimation" in self.datadrivenContributions and self.datadrivenContributions["DYEstimation"].usesSample(self.sample, self.sampleCfg) 
         selObject.create(ddSuffix  = "DYEstimation",
                          cut       = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0], 
@@ -849,15 +864,19 @@ def makeExclusiveResolvedOneBtagSelection(self,selObject,copy_sel=False,use_dd=T
                                       (self.tree.event//5)%2==0],
                          ddWeight  = 2*self.ResolvedDYReweighting1b(self.ak4Jets),
                          enable    = enable)
-
+    elif dy_selection:
+        # Only return the datadriven selection (eg for Skimmer) #
+        selObject.refine(cut    = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0,op.rng_len(self.ak8Jets)==0,(self.tree.event//5)%2==0],
+                         weight = 2*self.ResolvedDYReweighting1b(self.ak4Jets))
     else:
+        # Only return the SR selection #
         selObject.refine(cut    = [op.rng_len(self.ak4BJets)==1,op.rng_len(self.ak8BJets)==0], 
                          weight = AppliedSF)
 
     if copy_sel:
         return selObject
 
-def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,use_dd=True):
+def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,use_dd=True,dy_selection=False):
     """
     Produces the exclusive resolved selection with no btagging
     inputs :
@@ -874,6 +893,7 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,use_dd=
     selObject.yieldTitle += " + Exclusive Resolved (2 bjets)"
 
     if use_dd:
+        # Use the datadriven selection in parallel of the SR one #
         enable = "DYEstimation" in self.datadrivenContributions and self.datadrivenContributions["DYEstimation"].usesSample(self.sample, self.sampleCfg) 
         selObject.create(ddSuffix  = "DYEstimation",
                          cut       = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0],
@@ -885,7 +905,12 @@ def makeExclusiveResolvedTwoBtagsSelection(self,selObject,copy_sel=False,use_dd=
                          ddWeight  = 2*self.ResolvedDYReweighting2b(self.ak4Jets),
                          enable    = enable)
 
+    elif dy_selection:
+        # Only return the datadriven selection (eg for Skimmer) #
+        selObject.refine(cut    = [op.rng_len(self.ak4BJets)==0,op.rng_len(self.ak8BJets)==0,op.rng_len(self.ak8Jets)==0,(self.tree.event//5)%2==1],
+                         weight = 2*self.ResolvedDYReweighting2b(self.ak4Jets))
     else:
+        # Only return the SR selection #
         selObject.refine(cut    = [op.rng_len(self.ak4BJets)>=2,op.rng_len(self.ak8BJets)==0], 
                          weight = AppliedSF)
 
@@ -913,7 +938,7 @@ def makeInclusiveBoostedNoBtagSelection(self,selObject,copy_sel=False):
     if copy_sel:
         return selObject
 
-def makeInclusiveBoostedOneBtagSelection(self,selObject,copy_sel=False,use_dd=True):
+def makeInclusiveBoostedOneBtagSelection(self,selObject,copy_sel=False,use_dd=True,dy_selection=False):
     """
     Produces the inclusive boosted selection (1 btag)
     inputs :
@@ -929,6 +954,7 @@ def makeInclusiveBoostedOneBtagSelection(self,selObject,copy_sel=False,use_dd=Tr
     selObject.yieldTitle += " + Inclusive Boosted 1 Btag"
 
     if use_dd:
+        # Use the datadriven selection in parallel of the SR one #
         enable = "DYEstimation" in self.datadrivenContributions and self.datadrivenContributions["DYEstimation"].usesSample(self.sample, self.sampleCfg) 
         selObject.create(ddSuffix  = "DYEstimation",
                          cut       = [op.rng_len(self.ak8BJets) >= 1],
@@ -936,7 +962,12 @@ def makeInclusiveBoostedOneBtagSelection(self,selObject,copy_sel=False,use_dd=Tr
                          ddCut     = [op.rng_len(self.ak8BJets) == 0,op.rng_len(self.ak4BJets) == 0],
                          ddWeight  = self.BoostedDYReweighting1b(self.ak8Jets[0]), 
                          enable    = enable)
+    elif dy_selection:
+        # Only return the datadriven selection (eg for Skimmer) #
+        selObject.refine(cut    = [op.rng_len(self.ak8BJets) == 0,op.rng_len(self.ak4BJets) == 0],
+                         weight = self.BoostedDYReweighting1b(self.ak8Jets[0]))
     else:
+        # Only return the SR selection #
         selObject.refine(cut    = [op.rng_len(self.ak8BJets)>=1],
                          weight = AppliedSF)
         
