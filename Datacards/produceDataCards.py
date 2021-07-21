@@ -37,7 +37,7 @@ COMBINE_ENV = os.path.join(INFERENCE_PATH,
                           'env_standalone.sh')
 
 class DataCard:
-    def __init__(self,outputDir=None,configPath=None,path=None,yamlName=None,worker=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,produce_plots=False,legend=None,combineConfigs=None,**kwargs):
+    def __init__(self,outputDir=None,configPath=None,path=None,yamlName=None,worker=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,legend=None,combineConfigs=None,**kwargs):
         self.outputDir      = outputDir
         self.configPath     = configPath
         self.path           = path
@@ -50,7 +50,6 @@ class DataCard:
         self.DYnonclosure   = DYnonclosure
         self.rebin          = rebin
         self.textfiles      = textfiles
-        self.produce_plots  = produce_plots
         self.legend         = legend
         self.combineConfigs = combineConfigs
 
@@ -97,8 +96,6 @@ class DataCard:
             self.applyRebinning()
         if self.outputDir is not None:
             self.saveDatacard()
-        if self.produce_plots:
-            self.preparePlotIt()
 
     @staticmethod
     def includeEntry(entries,name):
@@ -360,7 +357,7 @@ class DataCard:
     def saveDatacard(self):
         from txtwriter import Writer
         if self.outputDir is None:
-            raise RuntimeError("Datacard name is not set")
+            raise RuntimeError("Datacard output path is not set")
 
         shapes = {histName:os.path.join(self.datacardPath,f"{histName}_{self.era}.root") for histName in self.content.keys()}
 
@@ -389,6 +386,9 @@ class DataCard:
                         CMSName = self.shapeSyst[systName]
                         if '{era}' in CMSName:
                             CMSName = CMSName.format(era=self.era)
+
+                        if CMSName == 'discard':
+                            continue
         
                         systNameUp   = systName + "Up"
                         systNameDown = systName + "Down"
@@ -404,8 +404,8 @@ class DataCard:
                                             hdown = self.content[histName][group][systNameDown])
 
                         # Write to file #
-                        CMSNameUp   = f"{group}_{CMSName}Up"
-                        CMSNameDown = f"{group}_{CMSName}Down"
+                        CMSNameUp   = f"{group}__{CMSName}Up"
+                        CMSNameDown = f"{group}__{CMSName}Down"
 
                         self.content[histName][group][systNameUp].SetTitle(CMSNameUp)
                         self.content[histName][group][systNameUp].SetName(CMSNameUp)
@@ -923,31 +923,65 @@ class DataCard:
          
 
 
-    def preparePlotIt(self,suffix=''):
-        logging.info("Preparing plotIt root files")
+    def prepare_plotIt(self):
+        logging.info("Preparing plotIt root files for categories")
+        for cat in self.hist_conv.keys():
+            logging.info(f"... {cat}")
+
+        # Initialize containers #
+        content = {cat:{group:{} for group in self.groups.keys()} for cat in self.hist_conv.keys()}
+        systematics = []
 
         # Make new directory with root files for plotIt #
         path_plotIt = os.path.join(self.datacardPath,'plotit')
         path_rootfiles = os.path.join(path_plotIt,'root')
-        systematics = []
         if not os.path.exists(path_rootfiles):
             os.makedirs(path_rootfiles)
-        for group in self.groups.keys():    
-            if self.pseudodata and group == 'data_real':
+            
+        # Loop over root files to get content #
+        datacardRoots = glob.glob(os.path.join(self.datacardPath,"*root"))
+        for f in glob.glob(os.path.join(self.datacardPath,"*root")):
+            category = os.path.basename(f).replace('.root','').replace(f'_{self.era}','')
+            logging.debug(f"Looking at {f} -> category {category}")
+            if category not in content.keys():
                 continue
-            rootfile = ROOT.TFile(os.path.join(path_rootfiles,group+'.root'),'recreate')
-            for histName in self.content.keys():
-                for systName,hist in self.content[histName][group].items():
+            F = ROOT.TFile(f)
+            for key in F.GetListOfKeys():
+                name = key.GetName()
+                if '__' in name: # systematic histogram
+                    group,systName = name.split('__')
+                    systName = systName.replace('Up','up').replace('Down','down')
+                    baseSyst = systName.replace('up','').replace('down','')
+                else:   # nominal histogram
+                    group = name
+                    systName = 'nominal'
+                    baseSyst = None
+                content[category][group][systName] = copy.deepcopy(F.Get(name))
+                if baseSyst is not None and baseSyst not in systematics:
+                    systematics.append(baseSyst)
+            F.Close()
+
+        valid_content = True
+        for cat in self.hist_conv.keys():
+            for group in self.groups.keys():
+                if len(content[cat][group]) == 0:
+                    logging.error(f"Group {group} in category {cat} is empty")
+                    valid_content = False
+        if not valid_content:
+            raise RuntimeError('Failed to run plotIt')
+
+                    
+
+        # Write to file #
+        for group in self.groups.keys():
+            F = ROOT.TFile(os.path.join(path_rootfiles,group+'.root'),'update')
+            for histName in content.keys():
+                for systName,hist in content[histName][group].items():
                     if hist is None:
                         continue
-                    if systName == "nominal":
-                        hist.Write(histName)
-                    else:
-                        baseSyst = systName.replace('Up','').replace('Down','')
-                        if baseSyst not in systematics:
-                            systematics.append(baseSyst)
-                        hist.Write(histName+'__'+systName.replace('Up','up').replace('Down','down'))
-            rootfile.Close()
+                    outName = histName if systName == "nominal" else f'{histName}__{systName}'
+                    hist.Write(outName,ROOT.TObject.kOverwrite)
+            F.Close()
 
         # Create yaml file #
         lumi = self.yaml_dict["luminosity"][self.era]
@@ -969,42 +1003,33 @@ class DataCard:
                                    'root'                     : 'root',
                                    'show-overflow'            : 'true'}
 
-        # Compute stack values #
-        inMean = {'backgrounds':[]}
+        # Compute min-max values for plots #
+        def getMinNonEmptyBins(h):
+            hmin = math.inf
+            for i in range(1,h.GetNbinsX()+1):
+                if h.GetBinContent(i) > 0:
+                    hmin = min(hmin,h.GetBinContent(i))
+            return hmin
+            
         histMax = {}
         histMin = {}
-        for histName in self.content.keys():
+        for histName in content.keys():
+            histMax[histName] = -math.inf
+            histMin[histName] = 0.1
             hstack = ROOT.THStack(histName+"stack",histName+"stack")
-            for group in self.content[histName].keys():
+            for group in content[histName].keys():
                 if self.groups[group]['type'] == 'mc':
-                    hstack.Add(self.content[histName][group]['nominal'])
-                elif self.groups[group]['type'] == 'signal':
+                    hstack.Add(content[histName][group]['nominal'])
+                if self.groups[group]['type'] == 'signal':
                     if 'hide' in self.groups[group].keys() and self.groups[group]['hide']:
                         continue
-                    if group not in inMean.keys():
-                        inMean[group] = [self.content[histName][group]['nominal'].Integral()]
-                    else:
-                        inMean[group].append(self.content[histName][group]['nominal'].Integral())
-                    if histName not in histMin.keys():
-                        histMin[histName] = self.content[histName][group]['nominal'].Integral()
-                    else:
-                        histMin[histName] = min(histMin[histName],self.content[histName][group]['nominal'].Integral())
-                        
-            if hstack.GetNhists() > 0:
-                inMean['backgrounds'].append(hstack.GetStack().Last().Integral())
-                histMax[histName] = hstack.GetMaximum()
-            else:
-                inMean['backgrounds'] = [0.]
-                histMax[histName] = 0.
-        inMean = {k:sum(values)/len(values) for k,values in inMean.items()} 
-
-
+                    histMin[histName] = min(histMin[histName],getMinNonEmptyBins(content[histName][group]['nominal']))
+                    histMax[histName] = max(histMax[histName],content[histName][group]['nominal'].GetMaximum())
+            histMax[histName] = max(hstack.GetMaximum(),histMax[histName])
 
         # Files informations #
         config['files'] = {}
         for group,gconfig in self.groups.items():
-            if self.pseudodata and group == 'data_real':
-                continue
             if 'hide' in gconfig.keys() and gconfig['hide']:
                 continue
             config['files'][group+'.root'] = {'cross-section'   : 1./lumi,
@@ -1016,14 +1041,10 @@ class DataCard:
                 config['files'][group+'.root'].update({'group':plotGroup})
             else:
                 config['files'][group+'.root'].update({k:v for k,v in gconfig.items() if k not in ['files','type']})
-#                if inMean['backgrounds'] != 0.:
-#                    config['files'][group+'.root'].update({'scale':0.01*inMean['backgrounds']/inMean[group]})
 
         # Groups informations #
         config['groups'] = {}
         for group,gconfig in self.groups.items():
-            if self.pseudodata and group == 'data_real':
-                continue
             if gconfig['type'] != 'signal':
                 plotGroup = group if 'group' not in gconfig.keys() else gconfig['group']
                 if plotGroup not in config['groups'].keys():
@@ -1034,7 +1055,7 @@ class DataCard:
         config['plots'] = {}
         for h1,h2 in self.hist_conv.items():
             # Check histogram dimension #
-            hist = self.content[h1][list(self.groups.keys())[0]]['nominal']
+            hist = content[h1][list(self.groups.keys())[0]]['nominal']
             if isinstance(hist,ROOT.TH2F) or isinstance(hist,ROOT.TH2D):
                 logging.error(f'Histogram {h1} is a TH2 and can therefore not be used in plotIt')
                 continue
@@ -1060,12 +1081,12 @@ class DataCard:
                     config['plots'][h1] = baseCfg
             if 'VBF' in h1 or 'GGF' in h1:
                 xmin, xmax = config['plots'][h1]['x-axis-range']
-                config['plots'][h1]['blinded-range'] = [xmin,xmax] #[(xmax-xmin)/2,xmax]
+                config['plots'][h1]['blinded-range'] = [xmin,xmax] 
             else:
                 config['plots'][h1].pop('blinded-range',None)
             if histMax[h1] != 0.:
                 config['plots'][h1]['y-axis-range'] = [0.,histMax[h1]*1.5]
-                config['plots'][h1]['log-y-axis-range'] = [min(1.e-1,histMin[h1]*0.1),histMax[h1]*100]
+                config['plots'][h1]['log-y-axis-range'] = [histMin[h1],histMax[h1]*100]
                 config['plots'][h1]['ratio-y-axis-range'] = [0.8,1.2]
             config['plots'][h1]['sort-by-yields'] = True
             config['plots'][h1]['show-overflow'] = True
@@ -1079,23 +1100,41 @@ class DataCard:
                 if 'columns' in self.legend.keys():
                     config['plots'][h1]['legend-columns'] = self.legend['columns']
 
-            if hasattr(self,'plotLinearizeData'):
-                if h1 in self.plotLinearizeData.keys():
-                    margin_left = config['configuration']['margin-left']
-                    margin_right = 1-config['configuration']['margin-right']
-                    extraItems = self.plotLinearizeData[h1]
-                    for idx in range(len(extraItems['labels'])):
-                        extraItems['labels'][idx]['position'][0] = margin_left + extraItems['labels'][idx]['position'][0] * (margin_right-margin_left)
-                    for idx in range(len(extraItems['lines'])):
-                        extraItems['lines'][idx] = [[extraItems['lines'][idx],0.],[extraItems['lines'][idx],histMax[h1]*1.1]]
-                    config['plots'][h1].update(extraItems)
-                    #config['plots'][h1]['x-axis-hide-ticks'] = True
-                    #config['plots'][h1]['blinded-range'] = [[0.5,1.],[1.5,2.]]
+#            if hasattr(self,'plotLinearizeData'):
+#                if h1 in self.plotLinearizeData.keys():
+#                    margin_left = config['configuration']['margin-left']
+#                    margin_right = 1-config['configuration']['margin-right']
+#                    extraItems = self.plotLinearizeData[h1]
+#                    for idx in range(len(extraItems['labels'])):
+#                        extraItems['labels'][idx]['position'][0] = margin_left + extraItems['labels'][idx]['position'][0] * (margin_right-margin_left)
+#                    for idx in range(len(extraItems['lines'])):
+#                        extraItems['lines'][idx] = [[extraItems['lines'][idx],0.],[extraItems['lines'][idx],histMax[h1]*1.1]]
+#                    config['plots'][h1].update(extraItems)
 
         if len(systematics) > 0:
             config['systematics'] = systematics
+        return config
 
+    @staticmethod
+    def merge_plotIt(configs):
+        mainConfig = {}
+        for config in configs:
+            for key in ['configuration','files','groups','plots']:
+                if key not in mainConfig.keys():
+                    mainConfig[key] = config[key]
+                else:
+                    mainConfig[key].update(**config[key])
+            if 'systematics' in config:
+                if 'systematics' not in mainConfig.keys():
+                    mainConfig['systematics'] = []
+                for syst in config['systematics']:
+                    if syst not in mainConfig['systematics']:
+                        mainConfig['systematics'].append(syst)
+        return mainConfig
+
+    def run_plotIt(self,config):
         # Write yaml file #
+        path_plotIt = os.path.join(self.datacardPath,'plotit')
         path_yaml = os.path.join(path_plotIt,'plots.yml')
         with open(path_yaml,'w') as handle:
             yaml.dump(config,handle)
@@ -1106,18 +1145,18 @@ class DataCard:
         if not os.path.exists(path_pdf):
             os.makedirs(path_pdf)
         logging.info("plotIt command :")
-        cmd = "plotIt -i {input} -o {output} -e {era} {yaml}".format(**{'input': path_plotIt,
-                                                                        'output': path_pdf,   
-                                                                        'era': self.era,
-                                                                        'yaml': path_yaml})
+        cmd = f"plotIt -i {path_plotIt} -o {path_pdf} -e {self.era} {path_yaml}"
         print (cmd)
         if self.which('plotIt') is not None:
             logging.info("Calling plotIt")
-            rc = self.run_command(shlex.split(cmd))
-            if rc == 0:
-                logging.info('... success')
+            exitCode,output = self.run_command(shlex.split(cmd),return_output=True)
+            if exitCode != 0:
+                if logging.root.level > 10:
+                    for line in output:
+                        logging.info(line.strip())
+                logging.info('... failure (see log above)')
             else:
-                logging.info('... failure')
+                logging.info('... success')
         else:
             logging.warning("plotIt not found")
 
@@ -1132,9 +1171,9 @@ class DataCard:
             if not os.path.exists(txtPath):
                 missingTxts.append(txtPath)
         if len(missingTxts) > 0:
-            logging.debug('Missing following datacards :')
+            logging.info('Missing following datacards :')
             for missingTxt in missingTxts:
-                logging.debug(f'... {missingTxt}')
+                logging.info(f'... {missingTxt}')
             logging.info('Datacard not found, will produce it')
             self.run_production()
         
@@ -2012,7 +2051,10 @@ if __name__=="__main__":
     parser.add_argument('--yaml', action='store', required=True, type=str,
                         help='Yaml containing parameters')
     parser.add_argument('--pseudodata', action='store_true', required=False, default=False,
-                        help='Whether to use pseudo data (data = sum of MC)')
+                        help='Whether to use pseudo data (data = sum of MC) [default = False]')
+    parser.add_argument('--plotIt', action='store_true', required=False, default=False,
+                        help='Browse datacard files and produce plots via plotIt \
+                              (note : produced by default when datacards are produced) ') 
     parser.add_argument('--split', action='store', required=False, default=None, nargs='*',
                         help='If used without argument, will process all categories in serie, \
                               otherwise will process the categories given in argument')
@@ -2066,7 +2108,7 @@ if __name__=="__main__":
     required_items = ['path','outputDir','yamlName','hist_conv','groups']
     if any(item not in config.keys() for item in required_items): 
         raise RuntimeError('Your config is missing the following items :'+ \
-                ','.join([item for item in required_items if item not in d.keys()]))
+                ','.join([item for item in required_items if item not in config.keys()]))
 
     # Splitting #
     global_hist_conv = copy.deepcopy(config['hist_conv']) # Run all at once
@@ -2102,10 +2144,26 @@ if __name__=="__main__":
         instance.run_combine(args.combine,combine_args,debug=args.debug)
     else:
         if args.jobs is None:
+            plotIt_configs = []
             for instance in instances:
-                instance.run_production()
+                if not args.plotIt:
+                    instance.run_production()
+                plotIt_configs.append(instance.prepare_plotIt())
         else:
-            def run(instance):
-                instance.run_production()
+            def run(instance,methods):
+                for method in methods:
+                    assert hasattr(instance,method)
+                    output = getattr(instance,method)()
+                return output
+                    
+            methods = ['prepare_plotIt']
+            if not args.plotIt:
+                methods.insert(0,'run_production')
             with mp.Pool(processes=args.jobs) as pool:
-                pool.map(run,instances)
+                plotIt_configs = pool.starmap(run,[(instance,methods) for instance in instances])
+
+
+        # Merge and run plotit (single thread anyway) #
+        plotIt_config = DataCard.merge_plotIt(plotIt_configs)
+        instances[0].run_plotIt(plotIt_config)
+

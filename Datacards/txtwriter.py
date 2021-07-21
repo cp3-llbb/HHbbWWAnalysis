@@ -146,7 +146,7 @@ class Writer:
 
         # Shapes #
         for binName,shapes in zip(self.binNames,shapePaths):
-            card.write(f"shapes * {binName} {shapes} $PROCESS $PROCESS_$SYSTEMATIC{sep}")
+            card.write(f"shapes * {binName} {shapes} $PROCESS $PROCESS__$SYSTEMATIC{sep}")
         card.write(f"{dashes}{sep}")
 
         # Bins #
