@@ -144,10 +144,15 @@ One lepton and and one jet argument must be specified in addition to the require
                             action      = "store_true",
                             default     = False,
                             help        = "Select the events do not have any tau overlapped with fakeable leptons")
-        parser.add_argument("--SS", 
+        parser.add_argument("--FakeRateNonClosureMCFakes", 
                             action      = "store_true",
                             default     = False,
-                            help        = "Same sign leptons")
+                            help        = "Use tight non-prompt lepton to estimate MC fakes [Only on TTHardronic events]")
+        parser.add_argument("--FakeRateNonClosureMCClosure", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Use tight non-prompt lepton to estimate MC closure [Only on TTHardronic events]")
+
 
 
         #----- Jet selection arguments -----#
@@ -277,6 +282,11 @@ One lepton and and one jet argument must be specified in addition to the require
                             action      = "store_true",
                             default     = False,
                             help        = "Use the Fake CR instead of the SR")
+        parser.add_argument("--DYCR", 
+                            action      = "store_true",
+                            default     = False,
+                            help        = "Use the DY CR instead of the SR")
+
 
         #----- Plotter arguments -----#
         parser.add_argument("--OnlyYield", 
@@ -294,7 +304,7 @@ One lepton and and one jet argument must be specified in addition to the require
 
 
     #-------------------------------------------------------------------------------------------#
-    #                                   customizeAnalysisCfg                                    #
+    #                                      initialize                                           #
     #-------------------------------------------------------------------------------------------#
     def initialize(self,forSkimmer=False):
         # Include all the contributions from the subsets in the yaml #
@@ -356,7 +366,7 @@ One lepton and and one jet argument must be specified in addition to the require
                 for sampleName,sampleCfg in subsetDict.items():
                     if self.args.analysis == 'res' and 'type' in sampleCfg.keys() and sampleCfg['type'] == 'signal':
                         mass = float(re.findall('M-\d+',sampleName)[0].replace('M-',''))
-                        if mass not in self.args.mass:
+                        if self.args.mass is not None and mass not in self.args.mass:
                             continue
                     samples[sampleName] = sampleCfg
         self.analysisConfig['samples'] = samples
@@ -411,11 +421,11 @@ One lepton and and one jet argument must be specified in addition to the require
     
 
         #----- Helper classes declaration ----#
-        loadLibrary(os.path.join(os.path.dirname(os.path.abspath(__file__)),'HMEStudy','build','libBambooHMEEvaluator'))
-        loadHeader(os.path.join(os.path.dirname(os.path.abspath(__file__)),'HMEStudy','include','HME.h'))
-        self.hmeEval = op.define("hme::HMEEvaluator", "hme::HMEEvaluator <<name>>{{}}; // for {sample}".format(sample=sample.replace('-','')), nameHint="bamboo_hmeEval{sample}".format(sample=sample.replace('-','')))
-        #hmeCalcName = backend.symbol(f"hme::HMEEvaluator <<name>>{{}}; // for {sample}", nameHint=f"bamboo_hmeEval{sample}")
-        #self.hmeEval = op.extVar("hme::HMEEvaluator", hmeCalcName)  # then you can use self.hmeEval.runHME in your code
+        if self.args.analysis == "res":
+            loadLibrary(os.path.join(os.path.dirname(os.path.abspath(__file__)),'HMEStudy','build','libBambooHMEEvaluator'))
+            loadHeader(os.path.join(os.path.dirname(os.path.abspath(__file__)),'HMEStudy','include','HME.h'))
+            loadHeader(os.path.join(os.path.dirname(os.path.abspath(__file__)),'HMEStudy','include','Reader.h'))
+            self.hmeEval = op.define("hme::HMEEvaluator", "hme::HMEEvaluator <<name>>{{}}; // for {sample}".format(sample=sample.replace('-','')), nameHint="bamboo_hmeEval{sample}".format(sample=sample.replace('-','')))
 
         #----- Triggers and yields -----#
         self.triggersPerPrimaryDataset = {}
@@ -1611,11 +1621,11 @@ One lepton and and one jet argument must be specified in addition to the require
                                              additionalVariables={'Pt' : lambda obj : self.electron_conept[obj.idx]}) for syst in FRSysts]
         self.muonFRList = [self.SF.get_scalefactor("lepton", ('muon_fakerates_'+era, syst), combine="weight", systName="mu_FR_"+syst, defineOnFirstUse=(not forSkimmer),
                                          additionalVariables={'Pt' : lambda obj : self.muon_conept[obj.idx]}) for syst in FRSysts ] 
-        if self.analysis == 'SL': # Not needed for DL
-            self.electronFRNC = self.SF.get_scalefactor("lepton", ("fakerates_nonclosure_2018",'Loose_Electron_SL_{}'.format(self.era)), defineOnFirstUse=(not forSkimmer))
-            self.muonFRNC     = self.SF.get_scalefactor("lepton", ("fakerates_nonclosure_2018",'Loose_Muon_SL_{}'.format(self.era)), defineOnFirstUse=(not forSkimmer))
-
-            self.ttH_singleElectron_trigSF = self.SF.get_scalefactor("lepton", 'singleTrigger_electron_{}'.format(era) , combine="weight", systName="ttH_singleElectron_trigSF", defineOnFirstUse=(not forSkimmer))
+        if channel == 'SL': # Not needed for DL
+            #self.electronFRNC = self.SF.get_scalefactor("lepton", ("fakerates_nonclosure_{}".format(self.era),'Loose_Electron_SL_{}'.format(self.era)), combine="weight", defineOnFirstUse=(not forSkimmer))
+            #self.muonFRNC     = self.SF.get_scalefactor("lepton", ("fakerates_nonclosure_{}".format(self.era),'Loose_Muon_SL_{}'.format(self.era)), combine="weight", defineOnFirstUse=(not forSkimmer))
+            self.electronFRNC = self.SF.get_scalefactor("lepton", ("fakerates_nonclosure_{}".format(self.era),'Loose_Electron_SL_{}'.format(self.era)), combine="weight", defineOnFirstUse=(not forSkimmer))
+            self.muonFRNC     = self.SF.get_scalefactor("lepton", ("fakerates_nonclosure_{}".format(self.era),'Loose_Muon_SL_{}'.format(self.era)), combine="weight",defineOnFirstUse=(not forSkimmer))
 
         def returnFFSF(obj,list_SF,systName):
             """ Helper when several systematics are present  """
@@ -1624,6 +1634,22 @@ One lepton and and one jet argument must be specified in addition to the require
             systArgs.update({SF._systName+'up':SF.sfOp.get(*(args+[op.extVar("int", "Up")])) for SF in list_SF})
             systArgs.update({SF._systName+'down':SF.sfOp.get(*(args+[op.extVar("int", "Down")])) for SF in list_SF})
             return op.systematic(**systArgs)
+             
+        #----- DY reweighting -----#
+        mode = 'data'
+        if hasattr(self,'datadrivenContributions') and "PseudoData" in self.datadrivenContributions:
+            mode = 'mc'
+        # Resolved 
+        self.ResolvedDYReweighting1b = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'SF_HT_{}_1b'.format(mode)), combine="weight", 
+                                                              systName="dy_resolved_1b", 
+                                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
+        self.ResolvedDYReweighting2b = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'SF_HT_{}_2b'.format(mode)), combine="weight", 
+                                                              systName="dy_resolved_2b", 
+                                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
+        # Boosted
+        self.BoostedDYReweighting1b =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'SF_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
+                                                              systName="dy_boosted_1b", 
+                                                              additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
 
 
         #############################################################################
@@ -1646,15 +1672,17 @@ One lepton and and one jet argument must be specified in addition to the require
             self.electronCorrFR = op.systematic(op.c_float(1.325), name="electronCorrFR",up=op.c_float(1.325*1.325),down=op.c_float(1.))
             self.muonCorrFR     = op.systematic(op.c_float(1.067), name="muonCorrFR",up=op.c_float(1.067*1.067),down=op.c_float(1.))
 
-        self.lambda_FR_el       = lambda el : returnFFSF(el,self.electronFRList,"el_FR")
-        self.lambda_FR_mu       = lambda mu : returnFFSF(mu,self.muonFRList,"mu_FR")
+        self.lambda_FR_el = lambda el : returnFFSF(el,self.electronFRList,"el_FR")
+        self.lambda_FR_mu = lambda mu : returnFFSF(mu,self.muonFRList,"mu_FR")
 
 
         if channel == "SL":
-            self.lambda_FF_el = lambda el : self.lambda_FR_el(el)/(1-self.lambda_FR_el(el))
-            self.lambda_FF_mu = lambda mu : self.lambda_FR_mu(mu)/(1-self.lambda_FR_mu(mu))
-            self.ElFakeFactor = lambda el : self.lambda_FF_el(el)
-            self.MuFakeFactor = lambda mu : self.lambda_FF_mu(mu)
+#            self.lambda_FF_el = lambda el : self.lambda_FR_el(el)/(1-self.lambda_FR_el(el))
+#            self.lambda_FF_mu = lambda mu : self.lambda_FR_mu(mu)/(1-self.lambda_FR_mu(mu))
+            self.ElFakeFactor = lambda el : self.lambda_FR_el(el)/(1-self.lambda_FR_el(el))
+            self.MuFakeFactor = lambda mu : self.lambda_FR_mu(mu)/(1-self.lambda_FR_mu(mu))
+            self.ElFakeFactorNonClosure = lambda el : self.electronFRNC(el)/(1-self.electronFRNC(el))
+            self.MuFakeFactorNonClosure = lambda mu : self.muonFRNC(mu)/(1-self.muonFRNC(mu))
         if channel == "DL":
             # Correction factor only for DL #
             self.lambda_FRcorr_el   = lambda el : self.lambda_FR_el(el)*self.electronCorrFR
