@@ -1,37 +1,6 @@
 from bamboo import treefunctions as op
 from highlevelLambdas import highlevelLambdas
 
-# ----------------------------------------- VBF ---------------------------------------- #
-'''
-def VBFJetPairs_Resolved(self,bjets, wjets):
-    lambda_isNotClean   = lambda j, xjets : op.rng_any(xjets, lambda xj : op.deltaR(xj.p4, j.p4) < 0.8) 
-    lambda_vbfTag    = lambda j : op.NOT(op.OR(lambda_isNotClean(j, bjets), lambda_isNotClean(j, wjets)))
-    cleanVbfJetPairs = op.combine(op.select(self.VBFJets, lambda_vbfTag), N=2, pred=self.lambda_VBFPair)
-    return op.sort(cleanVbfJetPairs, lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
-
-def VBFJetPairs_Boosted(self,fatJet, wjets):
-    lambda_isNotClean   = lambda j, xjets : op.rng_any(xjets, lambda xj : op.deltaR(xj.p4, j.p4) < 0.8) 
-    lambda_vbfTag    = lambda j : op.NOT(op.OR(lambda_isNotClean(j, wjets), op.deltaR(j.p4, fatJet.p4) < 1.2))
-    cleanVbfJetPairs = op.combine(op.select(self.VBFJets, lambda_vbfTag), N=2, pred=self.lambda_VBFPair)
-    return op.sort(cleanVbfJetPairs, lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
-
-def VBFJetPairs_Resolved(self):
-    #lambda_isNotCleanedAgainstWjets  = lambda j : op.switch(op.rng_len(self.probableWJets) == 1, op.deltaR(self.probableWJets[0].p4, j.p4) < 0.8,
-    #                                                        op.rng_any(self.wJetsPairs, lambda xp : op.OR(op.deltaR(xp[0].p4, j.p4) < 0.8, op.deltaR(xp[1].p4, j.p4) < 0.8)))
-    lambda_isOverlappedWithWjets  = lambda j : op.rng_any(self.wJetsPairs, lambda wjp : op.OR(op.deltaR(wjp[0].p4, j.p4) < 0.8, op.deltaR(wjp[1].p4, j.p4) < 0.8))
-    lambda_isOverlappedWithBjets  = lambda j : op.rng_any(self.bJetsByScore, lambda bj : op.deltaR(bj.p4, j.p4) < 0.8) 
-    lambda_vbfTag                 = lambda j : op.NOT(op.OR(lambda_isOverlappedWithBjets(j), lambda_isOverlappedWithWjets(j)))   
-    cleanVbfJetPairs              = op.combine(op.select(self.VBFJets, lambda_vbfTag), N=2, pred=self.lambda_VBFPair)
-    return op.sort(cleanVbfJetPairs, lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
-
-def VBFJetPairs_Boosted(self):
-    #lambda_isNotClean   = lambda j : op.rng_any(self.ak4JetsCleanedFromAk8b, lambda xj : op.deltaR(xj.p4, j.p4) < 0.8) 
-    #lambda_vbfTag    = lambda j : op.switch(op.rng_len(self.ak4JetsCleanedFromAk8b) > 0, op.NOT(op.OR(lambda_isNotClean(j), op.deltaR(j.p4, self.ak8BJets[0].p4) < 1.2)),
-    #                                        op.NOT(op.deltaR(j.p4, self.ak8BJets[0].p4) < 1.2))
-    lambda_vbfTag    = lambda j : op.NOT(op.deltaR(j.p4, self.ak8BJets[0].p4) < 1.2)
-    cleanVbfJetPairs = op.combine(op.select(self.VBFJets, lambda_vbfTag), N=2, pred=self.lambda_VBFPair)
-    return op.sort(cleanVbfJetPairs, lambda dijet : -op.invariant_mass(dijet[0].p4,dijet[1].p4))
-'''
 def returnLeptonsMVAInputs(self,lep):
     return {('lep_E',        'Lead lepton E [GeV]',          (50,0.,500.))        : lep.p4.E(),
             ('lep_Px',       'Lead lepton P_x [GeV]',        (40,-200.,200.))     : lep.p4.Px(),
@@ -177,3 +146,4 @@ def returnEventNr(self,t):
 def inputStaticCast(inputDict,cast='float'):
     return [op.static_cast(cast,v) for v in inputDict.values()]
 '''
+    
