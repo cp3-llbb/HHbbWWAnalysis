@@ -211,12 +211,12 @@ namespace {
 }  // namespace
 
 std::pair<float, float> hme::HMEEvaluator::runHME(const hme::LorentzVectorF l1,
-        const hme::LorentzVectorF l2,
-        const hme::LorentzVectorF b1,
-        const hme::LorentzVectorF b2,
-        const hme::LorentzVectorF met,
-        const std::uint32_t eventnr,
-        bool boosted_tag) const {
+                                                  const hme::LorentzVectorF l2,
+                                                  const hme::LorentzVectorF b1,
+                                                  const hme::LorentzVectorF b2,
+                                                  const hme::LorentzVectorF met,
+                                                  const std::uint32_t eventnr,
+                                                  bool boosted_tag) const {
 
     /* Initialize */
     TRandom3& rg = rdfhelpers::getTRandom3(eventnr);
@@ -253,15 +253,6 @@ std::pair<float, float> hme::HMEEvaluator::runHME(const hme::LorentzVectorF l1,
 
     LogDebug << "  Before corrections" << std::endl;
     LogDebug << "    MET  : " << met << std::endl;
-    //if (boosted_tag){
-    //    LogDebug << "    fatb : " << fatb << std::endl;
-    //    float c = fatjetCorrections(fatb, mh);
-    //    tmp_fatb = fatb * c;
-    //    met_Px_corr = -(c - 1) * fatb.Px();
-    //    met_Py_corr = -(c - 1) * fatb.Py();
-    //    LogDebug << "  Correction : c = " << c << std::endl;
-    //}
-    //else{
     LogDebug << "    b1   : " << b1 << std::endl;
     LogDebug << "    b2   : " << b2 << std::endl;
     std::pair<float, float> c = bjetCorrectionsSliding(b1, b2, m_brescale_gen, rg, mh);
@@ -270,7 +261,6 @@ std::pair<float, float> hme::HMEEvaluator::runHME(const hme::LorentzVectorF l1,
     met_Px_corr = -(c.first - 1) * b1.Px() - (c.second - 1) * b2.Px();
     met_Py_corr = -(c.first - 1) * b1.Py() - (c.second - 1) * b2.Py();
     LogDebug << "  Corrections : c1 = " << c.first << " - c2 = " << c.second << std::endl;
-    //}
 
     /* MET corrections */
     LorentzVectorF tmp_met;
@@ -278,12 +268,8 @@ std::pair<float, float> hme::HMEEvaluator::runHME(const hme::LorentzVectorF l1,
 
     LogDebug << "  After corrections" << std::endl;
     LogDebug << "    MET  : " << tmp_met << std::endl;
-    //if (boosted_tag)
-    //    LogDebug << "    fatb : " << tmp_fatb << std::endl;
-    //else{
     LogDebug << "    b1   : " << tmp_b1 << std::endl;
     LogDebug << "    b2   : " << tmp_b2 << std::endl;
-    //}
 
 
     /* H->WW */
