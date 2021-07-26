@@ -7,11 +7,12 @@ import copy
 from itertools import chain
 from functools import partial
 
+import bamboo
 from bamboo import treefunctions as op
 from bamboo.analysismodules import NanoAODModule, NanoAODHistoModule, NanoAODSkimmerModule
 from bamboo.analysisutils import makeMultiPrimaryDatasetTriggerSelection
 from bamboo.scalefactors import binningVariables_nano, BtagSF, get_scalefactor
-from bamboo.plots import Plot, EquidistantBinning, SelectionWithDataDriven, CutFlowReport
+from bamboo.plots import Plot, EquidistantBinning, Selection, SelectionWithDataDriven, CutFlowReport
 from bamboo.analysisutils import forceDefine
 from bamboo.root import loadLibrary, loadHeader
 
@@ -21,6 +22,7 @@ from btagHelper import makeBtagRatioReweighting
 from triggers import returnTriggerRanges
 from highlevelLambdas import highlevelLambdas
 from DDHelper import DataDrivenPseudoData, DataDrivenLOReweighting
+from selectionDef import SelectionObject
 
 import logging
 logger = logging.getLogger(__name__)
@@ -128,6 +130,10 @@ One lepton and and one jet argument must be specified in addition to the require
                             type        = float,
                             default     = None,
                             help="Mass to use for the parametric DNN (can be several)")
+        parser.add_argument("--PrintYield", 
+                            action      = "store_true",
+                            default     = False,
+                            help="Print yield to screen (for debugging)")
 
 
 
@@ -427,11 +433,19 @@ One lepton and and one jet argument must be specified in addition to the require
             loadHeader(os.path.join(os.path.dirname(os.path.abspath(__file__)),'HMEStudy','include','Reader.h'))
             self.hmeEval = op.define("hme::HMEEvaluator", "hme::HMEEvaluator <<name>>{{}}; // for {sample}".format(sample=sample.replace('-','')), nameHint="bamboo_hmeEval{sample}".format(sample=sample.replace('-','')))
 
-        #----- Triggers and yields -----#
-        self.triggersPerPrimaryDataset = {}
-        from bamboo.analysisutils import configureJets ,configureRochesterCorrection, configureType1MET 
+        #----- CutFlow report -----#
+        self.yields = CutFlowReport("yields",printInLog=self.args.PrintYield,recursive=self.args.PrintYield)
 
-        self.yields = CutFlowReport("yields",printInLog=self.args.Events is not None,recursive=self.args.Events is not None)
+        #----- Genweight -----#
+        if self.is_MC:
+            noSel = noSel.refine("genWeight", weight=tree.genWeight)
+            if self.args.PrintYield:
+                self.yields.add(noSel)
+
+
+#        if self.args.PrintYield:
+#            noSel = noSel.refine("initial",cut=op.c_bool(True)) # To note start for the yield table printout
+#            self.yields.add(noSel)
 
         # Event cut #
         if self.args.Events:
@@ -439,10 +453,14 @@ One lepton and and one jet argument must be specified in addition to the require
             for e in self.args.Events:
                 print ('... %d'%e)
             noSel = noSel.refine('eventcut',cut = [op.OR(*[tree.event == e for e in self.args.Events])])
+            if self.args.PrintYield:
+                self.yields.add(noSel)
 
         # Safeguards for signals #
         if "HH" in sample:
             noSel = noSel.refine('HHMCWeight',cut=[op.abs(tree.genWeight)<100])
+            if self.args.PrintYield:
+                self.yields.add(noSel)
 
         # Save some useful stuff in self #
         self.sample = sample
@@ -455,6 +473,8 @@ One lepton and and one jet argument must be specified in addition to the require
         # Turn off systs #
         if self.args.NoSystematics:
             noSel = noSel.refine('SystOff',autoSyst=False)
+            if self.args.PrintYield:
+                self.yields.add(noSel)
 
         # Check era #
         if era != "2016" and era != "2017" and era != "2018":
@@ -552,6 +572,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                                  Mixeddown  = op.c_float(1.))
 
             noSel = noSel.refine("PDFScaleWeights", weight = [self.scaleWeight])
+            if self.args.PrintYield:
+                self.yields.add(noSel)
 
             # PDF #
             #noSel = noSel.refine("PDFWeights", weight = [tree.LHEPdfWeight])
@@ -571,6 +593,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                        op.systematic(op.c_float(1.), name="psFSR", up=tree.PSWeight[3], down=tree.PSWeight[1]),
                                        op.systematic(op.c_float(1.), name="psFSR", up=op.c_float(1.), down=op.c_float(1.)))
             noSel = noSel.refine("PSweights", weight = [self.psISRSyst, self.psFSRSyst])
+            if self.args.PrintYield:
+                self.yields.add(noSel)
 
         #----- Triggers and Corrections -----#
         self.triggersPerPrimaryDataset = {}
@@ -582,6 +606,7 @@ One lepton and and one jet argument must be specified in addition to the require
             except AttributeError:
                 print ("Could not find branch tree.HLT.%s, will omit it"%HLT)
 
+        from bamboo.analysisutils import configureJets ,configureRochesterCorrection, configureType1MET 
         ############################################################################################
         # ERA 2016 #
         ############################################################################################
@@ -957,6 +982,8 @@ One lepton and and one jet argument must be specified in addition to the require
                     print("Found file {} -> Will apply for LO->NLO reweighting".format(json_file))
                     reweightLO = get_scalefactor("lepton", json_file, paramDefs=signalReweightParams)(None)
                     noSel = noSel.refine("LoToNLO",weight = self.reweightLO)
+                    if self.args.PrintYield:
+                        self.yields.add(noSel)
 
             else:
                 # For the Plotter we want the many-to-many worfklow.
@@ -995,6 +1022,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                            down = op.c_float(1))                                                  # Down = not apply
             # Apply correction to TT #
             noSel = noSel.refine("ttbarWeight",weight=self.ttbar_sys)
+            if self.args.PrintYield:
+                self.yields.add(noSel)
 
         ###########################################################################
         #                               Stitching                                 #
@@ -1015,6 +1044,9 @@ One lepton and and one jet argument must be specified in addition to the require
                 else:
                     raise RuntimeError("Stitching weight format not understood")
                 noSel = noSel.refine("DYStitching",weight = stitch_op)
+                if self.args.PrintYield:
+                    self.yields.add(noSel)
+                print ('Applied stitching')
                 
         ###########################################################################
         #                               tH samples                                #
@@ -1023,8 +1055,10 @@ One lepton and and one jet argument must be specified in addition to the require
             # https://twiki.cern.ch/twiki/bin/viewauth/CMS/SingleTopHiggsGeneration13TeV
             # https://twiki.cern.ch/twiki/pub/CMS/SingleTopHiggsGeneration13TeV/reweight_encondig.txt
             # 
-            print ('Applied tH LHE weights')
             noSel = noSel.refine("tHWeight",weight=t.LHEReweightingWeight[11])
+            print ('Applied tH LHE weights')
+            if self.args.PrintYield:
+                self.yields.add(noSel)
             # Record value for generated-sum
             self.base_plots.append(Plot.make1D("generated_sum_corrected",
                                                op.c_float(0.5),
@@ -1043,6 +1077,8 @@ One lepton and and one jet argument must be specified in addition to the require
                                              down = t.L1PreFiringWeight_Dn)
             
             noSel = noSel.refine("L1PreFiringRate", weight = self.L1Prefiring)
+            if self.args.PrintYield:
+                self.yields.add(noSel)
 
         #############################################################################
         #                             Pile-up                                       #
@@ -1056,6 +1092,8 @@ One lepton and and one jet argument must be specified in addition to the require
             from bamboo.analysisutils import makePileupWeight
             PUWeight = makePileupWeight(puWeightsFile, t.Pileup_nTrueInt, systName="pileup",nameHint=f"puweightFromFile{sample}".replace('-','_'))
             noSel = noSel.refine("puWeight", weight = PUWeight)
+            if self.args.PrintYield:
+                self.yields.add(noSel)
 
         #############################################################################
         #                                 MET                                       #
@@ -1063,6 +1101,8 @@ One lepton and and one jet argument must be specified in addition to the require
         # MET filter #
         if not self.inclusive_sel:
             noSel = noSel.refine("passMETFlags", cut=METFilter(t.Flag, era, self.is_MC) )
+            if self.args.PrintYield:
+                self.yields.add(noSel)
 
         # MET corrections #
         self.rawMET = t.MET if era != "2017" else t.METFixEE2017
@@ -1250,9 +1290,6 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                               Triggers                                    #
         #############################################################################
-        #----- Genweight -----#
-        if self.is_MC:
-            noSel = noSel.refine("genWeight", weight=t.genWeight)
           
         #----- Trigger mask for data -----#
         if not self.is_MC:
@@ -1262,8 +1299,10 @@ One lepton and and one jet argument must be specified in addition to the require
                 noSel = noSel.refine("DataMaskTriggers", cut=[makeMultiPrimaryDatasetTriggerSelection(sample, trigger_per_pd)])
             else:
                 noSel = noSel.refine("DataMaskTriggers", cut=[makeMultiPrimaryDatasetTriggerSelection(sample, self.triggersPerPrimaryDataset)])
+            if self.args.PrintYield:
+                self.yields.add(noSel)
             # makeMultiPrimaryDatasetTriggerSelection must be done first, to make sure an event is not passed several times from several datasets
-            # Then the trigger selection is based on fakeable leptons
+            # Then the trigger selection is based on fakeable leptons ->  done at lepton selection (before jet forceDefine)
 
         ##############################################################################
         #                                  Tau                                       #
@@ -1617,15 +1656,21 @@ One lepton and and one jet argument must be specified in addition to the require
                     op.systematic(op.c_float(1.00), name="ttH_electronMuon_trigSF", up=op.c_float(1.01), down=op.c_float(0.99)))
         #----- Fake rates -----#
         FRSysts = [f'Loose_{channel}_pt_syst',f'Loose_{channel}_barrel_syst',f'Loose_{channel}_norm_syst']
-        self.electronFRList = [self.SF.get_scalefactor("lepton", ('electron_fakerates_'+era, syst), combine="weight", systName="el_FR_"+syst, defineOnFirstUse=(not forSkimmer),
+        #self.electronFRList = [self.SF.get_scalefactor("lepton", ('electron_fakerates_'+era, syst), combine="weight", systName="el_FR_"+syst, defineOnFirstUse=(not forSkimmer),
+        #                                     additionalVariables={'Pt' : lambda obj : self.electron_conept[obj.idx]}) for syst in FRSysts]
+        #self.muonFRList = [self.SF.get_scalefactor("lepton", ('muon_fakerates_'+era, syst), combine="weight", systName="mu_FR_"+syst, defineOnFirstUse=(not forSkimmer),
+        #                                 additionalVariables={'Pt' : lambda obj : self.muon_conept[obj.idx]}) for syst in FRSysts ] 
+        self.electronFRList = [self.SF.get_scalefactor("lepton", ('electron_fakerates_'+era, syst), combine="weight", systName="el_FR_"+syst, 
                                              additionalVariables={'Pt' : lambda obj : self.electron_conept[obj.idx]}) for syst in FRSysts]
-        self.muonFRList = [self.SF.get_scalefactor("lepton", ('muon_fakerates_'+era, syst), combine="weight", systName="mu_FR_"+syst, defineOnFirstUse=(not forSkimmer),
+        self.muonFRList = [self.SF.get_scalefactor("lepton", ('muon_fakerates_'+era, syst), combine="weight", systName="mu_FR_"+syst, 
                                          additionalVariables={'Pt' : lambda obj : self.muon_conept[obj.idx]}) for syst in FRSysts ] 
         if channel == 'SL': # Not needed for DL
-            #self.electronFRNC = self.SF.get_scalefactor("lepton", ("fakerates_nonclosure_{}".format(self.era),'Loose_Electron_SL_{}'.format(self.era)), combine="weight", defineOnFirstUse=(not forSkimmer))
-            #self.muonFRNC     = self.SF.get_scalefactor("lepton", ("fakerates_nonclosure_{}".format(self.era),'Loose_Muon_SL_{}'.format(self.era)), combine="weight", defineOnFirstUse=(not forSkimmer))
-            self.electronFRNC = self.SF.get_scalefactor("lepton", ("fakerates_nonclosure_{}".format(self.era),'Loose_Electron_SL_{}'.format(self.era)), combine="weight", defineOnFirstUse=(not forSkimmer))
-            self.muonFRNC     = self.SF.get_scalefactor("lepton", ("fakerates_nonclosure_{}".format(self.era),'Loose_Muon_SL_{}'.format(self.era)), combine="weight",defineOnFirstUse=(not forSkimmer))
+            self.electronFRNC = self.SF.get_scalefactor("lepton", ("fakerates_nonclosure_{}".format(self.era),'Loose_Electron_SL_{}'.format(self.era)), combine="weight",
+                                                        defineOnFirstUse=False,
+                                                        additionalVariables={'AbsEta': lambda x : op.abs(x.eta),'Pt': lambda x : x.pt})
+            self.muonFRNC     = self.SF.get_scalefactor("lepton", ("fakerates_nonclosure_{}".format(self.era),'Loose_Muon_SL_{}'.format(self.era)), combine="weight",
+                                                        defineOnFirstUse=False,
+                                                        additionalVariables={'AbsEta': lambda x : op.abs(x.eta),'Pt': lambda x : x.pt})
 
         def returnFFSF(obj,list_SF,systName):
             """ Helper when several systematics are present  """
@@ -1642,13 +1687,16 @@ One lepton and and one jet argument must be specified in addition to the require
         # Resolved 
         self.ResolvedDYReweighting1b = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'SF_HT_{}_1b'.format(mode)), combine="weight", 
                                                               systName="dy_resolved_1b", 
+                                                              defineOnFirstUse=(not forSkimmer),
                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
         self.ResolvedDYReweighting2b = self.SF.get_scalefactor("lepton", ('DY_resolved_{}'.format(era),'SF_HT_{}_2b'.format(mode)), combine="weight", 
                                                               systName="dy_resolved_2b", 
+                                                              defineOnFirstUse=(not forSkimmer),
                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda jets: op.rng_sum(jets, lambda j : j.pt)})
         # Boosted
         self.BoostedDYReweighting1b =  self.SF.get_scalefactor("lepton", ('DY_boosted_{}'.format(era),'SF_fatjetsoftDropmass_{}_1b'.format(mode)), combine="weight", 
                                                               systName="dy_boosted_1b", 
+                                                              defineOnFirstUse=(not forSkimmer),
                                                               additionalVariables={'Eta': lambda x : op.c_float(0.),'Pt': lambda x: x.msoftdrop})
 
 
@@ -1677,8 +1725,6 @@ One lepton and and one jet argument must be specified in addition to the require
 
 
         if channel == "SL":
-#            self.lambda_FF_el = lambda el : self.lambda_FR_el(el)/(1-self.lambda_FR_el(el))
-#            self.lambda_FF_mu = lambda mu : self.lambda_FR_mu(mu)/(1-self.lambda_FR_mu(mu))
             self.ElFakeFactor = lambda el : self.lambda_FR_el(el)/(1-self.lambda_FR_el(el))
             self.MuFakeFactor = lambda mu : self.lambda_FR_mu(mu)/(1-self.lambda_FR_mu(mu))
             self.ElFakeFactorNonClosure = lambda el : self.electronFRNC(el)/(1-self.electronFRNC(el))
@@ -1808,16 +1854,30 @@ One lepton and and one jet argument must be specified in addition to the require
 
 
     def beforeJetselection(self,sel,name=''):
+        if isinstance(sel,SelectionWithDataDriven) or isinstance(sel,Selection):
+            is_refine = True
+        elif isinstance(sel,SelectionObject):
+            is_refine = False
+            selObj = sel
+        else:
+            raise RuntimeError(f"Could not understand type of selection {type(sel)}")
+
         ##############################################################################
         #                             Jets forceDefines                              #
         ##############################################################################
         from bamboo.analysisutils import forceDefine
         # Forcedefine : calculate once per event (for every event) #
         if not self.args.Synchronization:
-            #forceDefine(t._Muon.calcProd, sel) # Muons for Rochester corrections
-            forceDefine(self.tree._Jet.calcProd, sel)  # Jets for configureJets
-            forceDefine(self.tree._FatJet.calcProd, sel)  # FatJets for configureJets
-            forceDefine(getattr(self.tree, "_{0}".format("MET" if self.era != "2017" else "METFixEE2017")).calcProd,sel) # MET for configureMET
+            if is_refine:
+                #forceDefine(t._Muon.calcProd, sel) # Muons for Rochester corrections
+                forceDefine(self.tree._Jet.calcProd, sel)  # Jets for configureJets
+                forceDefine(self.tree._FatJet.calcProd, sel)  # FatJets for configureJets
+                forceDefine(getattr(self.tree, "_{0}".format("MET" if self.era != "2017" else "METFixEE2017")).calcProd,sel) # MET for configureMET
+            else:
+                #forceDefine(t._Muon.calcProd, sel) # Muons for Rochester corrections
+                forceDefine(self.tree._Jet.calcProd, selObj.sel)  # Jets for configureJets
+                forceDefine(self.tree._FatJet.calcProd, selObj.sel)  # FatJets for configureJets
+                forceDefine(getattr(self.tree, "_{0}".format("MET" if self.era != "2017" else "METFixEE2017")).calcProd,selObj.sel) # MET for configureMET
         else:
             print ("No jet corrections applied")
 
@@ -1849,8 +1909,15 @@ One lepton and and one jet argument must be specified in addition to the require
                     # Sync purposes
             self.puid_reweighting_mistag = op.rng_product(self.ak4JetsForPUID, lambda j : lambda_puid_mistag(j)) * op.rng_product(self.VBFJetsForPUID, lambda j : lambda_puid_mistag(j))
                     # Sync purposes
-       
-            sel = sel.refine("jetPUIDReweighting"+name,weight=self.puid_reweighting)
+            if is_refine: 
+                sel = sel.refine("jetPUIDReweighting"+name,weight=self.puid_reweighting)
+            else:
+                selObj.selName += "jetPUIDReweighting"
+                selObj.yieldTitle += " + Jet PU ID reweighting "
+                selObj.refine(weight=self.puid_reweighting)
+        else:
+            if not is_refine:
+                selObj.selName += "jetPUIDReweighting"
 
         ###########################################################################
         #                    b-tagging efficiency scale factors                   #
@@ -1880,7 +1947,13 @@ One lepton and and one jet argument must be specified in addition to the require
                 self.BtagRatioWeight = makeBtagRatioReweighting(jsonFile = ReweightingFileName,
                                                                 numJets  = op.rng_len(self.ak4Jets),
                                                                 nameHint = "bamboo_nJetsWeight_{}".format(self.sample.replace('-','_')))
-                sel = sel.refine("BtagAk4SF"+name , weight = [self.btagAk4SF,self.BtagRatioWeight])
+
+                if is_refine: 
+                    sel = sel.refine("BtagAk4SF"+name , weight = [self.btagAk4SF,self.BtagRatioWeight])
+                else:
+                    selObj.selName += "BtagAk4SF"
+                    selObj.yieldTitle += " + Btag Ak4 SF "
+                    selObj.refine(weight = [self.btagAk4SF,self.BtagRatioWeight])
 
             if not self.args.BtagReweightingOff and not self.args.BtagReweightingOn:
                 #----- AK8 jets -> using Method 1.a -----#
@@ -1909,9 +1982,19 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                                 self.DeepCsvSubjetMediumSF(subjet),                                           # Tag : return SF_i
                                                                                 wFail(self.DeepCsvSubjetMediumSF(subjet),self.Ak8Eff_lightjets(subjet))))     # Not tagged : return (1-SF_jxeff_j)/(1-eff_j)
                 self.ak8BtagReweighting = op.rng_product(self.ak8Jets, lambda j : lambda_subjetWeight(j.subJet1)*lambda_subjetWeight(j.subJet2))
-                sel = sel.refine("BtagAk8SF"+name , weight = [self.ak8BtagReweighting])
+                if is_refine: 
+                    sel = sel.refine("BtagAk8SF"+name , weight = [self.ak8BtagReweighting])
+                else:
+                    selObj.selName += "BtagAk8SF"
+                    selObj.yieldTitle += " + Btag Ak8 SF "
+                    selObj.refine(weight = [self.ak8BtagReweighting])
+        else:
+            if not is_refine:
+                selObj.selName += "BtagAk4SFBtagAk8SF"
+            
         
-        return sel
+        if is_refine:
+            return sel
        
 
 
