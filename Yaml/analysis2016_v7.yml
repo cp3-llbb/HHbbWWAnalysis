@@ -39,13 +39,16 @@ samples:
     keys: [bbww1l,graviton]
   - config: analysis2016_v7_bbtautau_graviton.yml
     keys: [bbtautau,graviton]
-        # RADION #
+    # RADION #
   - config: analysis2016_v7_bbww2l_radion.yml
     keys: [bbww2l,radion]
   - config: analysis2016_v7_bbww1l_radion.yml
     keys: [bbww1l,radion]
   - config: analysis2016_v7_bbtautau_radion.yml
     keys: [bbtautau,radion]
+    # TTToHadronic (For SL fake non closure) #
+  - config: analysis2016_v7_TTHadronic.yml
+    keys: tt
 
   
 datadriven: !include datadriven.yml

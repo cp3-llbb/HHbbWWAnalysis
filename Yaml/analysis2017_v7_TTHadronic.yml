@@ -1,0 +1,8 @@
+
+TTToHadronic:
+  cross-section: 377.85
+  db: das:/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_new_pmx_102X_mc2017_realistic_v8-v1/NANOAODSIM
+  era: '2017'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 20

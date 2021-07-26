@@ -1,0 +1,17 @@
+module: PlotterHHtobbWWDL.py:PlotterNanoHHtobbWWDL
+config: 
+  era:
+    - 2016: Yaml/analysis2016_v7.yml
+    - 2017: Yaml/analysis2017_v7.yml
+    - 2018: Yaml/analysis2018_v7.yml
+
+args:
+  - "--analysis=res"
+  - "--Resolved1Btag --Resolved2Btag --Boosted1Btag"
+  - "--mass 250 260 270 280 300 320 350 400 450 500 550 600 650 700 750 800 850 900"
+  - type:
+    - DYEstimation: "--datadriven=DYEstimation --subset=mc,data"
+    - DYEstimation_PseudoData: "--datadriven=DYEstimation,PseudoData --subset=mc"
+  - --NoSystematics
+
+output: /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full{era}NanoV7_TTHIDLoose_Fake_Resonant_HighMass_{type}_allmass
