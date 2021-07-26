@@ -6,6 +6,7 @@ project(BambooHMEEvaluator LANGUAGES CXX)
 find_package(ROOT REQUIRED COMPONENTS Physics)
 find_package(bamboo REQUIRED COMPONENTS BambooRandom)
 
-add_library(BambooHMEEvaluator SHARED ../src/HME.cc)
+add_library(BambooHMEEvaluator SHARED ../src/HME.cc ../src/Reader.cc)
+#add_library(BambooHMEEvaluator SHARED ../src/Reader.cc)
 target_include_directories(BambooHMEEvaluator PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
 target_link_libraries(BambooHMEEvaluator ROOT::Physics BambooRandom)
