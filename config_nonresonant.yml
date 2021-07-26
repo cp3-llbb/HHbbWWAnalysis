@@ -1,0 +1,17 @@
+module: PlotterHHtobbWWDL.py:PlotterNanoHHtobbWWDL
+config: 
+  era:
+    - 2016: Yaml/analysis2016_v7.yml
+    - 2017: Yaml/analysis2017_v7.yml
+    - 2018: Yaml/analysis2018_v7.yml
+
+args:
+  - "--subset=mc,data,VBFLO,GGFNLO,bbww2l,bbtautau"
+  - "--analysis=nonres"
+  - cat:
+      - Resolved1B: "--Resolved1Btag"
+      - Resolved2B: "--Resolved2Btag"
+      - Boosted1B:  "--Boosted1Btag"
+  - "--datadriven=FakeExtrapolation,DYEstimation"
+ 
+output: /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full{era}NanoV7_TTHIDLoose_Fake_DNN11_DYEstimation_{cat}/

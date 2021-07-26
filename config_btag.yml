@@ -1,0 +1,14 @@
+module: BtagEffAndMistag.py:BtagEffAndMistagNano
+config: 
+  era:
+    - 2016: Yaml/analysis2016_v7.yml
+    - 2017: Yaml/analysis2017_v7.yml
+    - 2018: Yaml/analysis2018_v7.yml
+
+args:
+  - --analysis=nonres
+  - "--subset=mc,GGFLO,GGFNLO,VBFLO,graviton,radion,bbww2l,bbww1l,bbtautau"
+  - --NoSystematics
+ 
+output: /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/Btag{era}_Ak4_Ak8
+

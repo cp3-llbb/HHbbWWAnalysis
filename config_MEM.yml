@@ -1,0 +1,21 @@
+module: SkimmerMEMHHtobbWWDL.py:SkimmerMEMNanoHHtobbWWDL
+config: 
+  era:
+    - 2016: Yaml/analysis2016_v7.yml
+    - 2017: Yaml/analysis2017_v7.yml
+    - 2018: Yaml/analysis2018_v7.yml
+
+args:
+  - --subset=mc,bbww2l,bbtautau,graviton,radion,GGFLO,GGFNLO,VBFLO
+  - cat:
+    - Resolved1B: --Resolved1Btag
+    - Resolved2B: --Resolved2Btag
+    - Boosted1B:  --Boosted1Btag
+  - channel:
+    - ElEl: --Channel=ElEl
+    - MuMu: --Channel=MuMu
+    - ElMu: --Channel=ElMu
+  - --NoSystematics
+  - --analysis=nonres
+
+output: /home/ucl/cp3/fbury/scratch/SkimsMEM/Skim{era}_{cat}_{channel}

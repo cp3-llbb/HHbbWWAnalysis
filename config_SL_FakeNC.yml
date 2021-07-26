@@ -1,0 +1,17 @@
+module: PlotterHHtobbWWSLbasic.py:PlotterNanoHHtobbWWSL
+config:
+  era:
+    - 2016: Yaml/analysis2016_v7.yml
+    - 2017: Yaml/analysis2017_v7.yml
+    - 2018: Yaml/analysis2018_v7.yml
+
+args:
+  - --Resolved1Btag --Resolved2Btag --Boosted
+  - --subset=tt
+  - type:
+    - MCFakes : --FakeRateNonClosureMCFakes
+    - MCClosure: --FakeRateNonClosureMCClosure
+  - --analysis=nonres
+  - --NoSystematics
+
+output: /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/FakeNC_SL_{era}_{type}
