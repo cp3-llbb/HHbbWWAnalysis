@@ -104,6 +104,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_sel
         lambda_FF_ele   = lambda ele : [self.ElFakeFactor(ele)]
         lambda_FF_mu    = lambda mu  : [self.MuFakeFactor(mu)]
 
+
     #Z-nominal mass
     Zmass = 91.1876
     # Mll cut lambdas #
@@ -132,12 +133,12 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_sel
                                   selName      = "Has1FakeableEl",
                                   yieldTitle   = "Fakeable lepton (channel $e^{\pm}$)",
                                   yieldObj     = self.yields,
-                                  record_yields = not self.args.onlypost)
+                                  record_yields = self.args.PrintYield or self.args.OnlyYield)
     MuSelObject = SelectionObject(sel          = baseSel,
                                   selName      = "Has1FakeableMu",
                                   yieldTitle   = "Fakeable lepton (channel $\mu^{\pm}$)",
                                   yieldObj     = self.yields,
-                                  record_yields = not self.args.onlypost)
+                                  record_yields = self.args.PrintYield or self.args.OnlyYield)
     ElSelObject.refine(cut = [op.rng_len(self.electronsFakeSel) >= 1,
                               op.OR(op.rng_len(self.muonsFakeSel) == 0,
                                     self.electron_conept[self.electronsFakeSel[0].idx] > self.muon_conept[self.muonsFakeSel[0].idx])])
@@ -203,7 +204,6 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_sel
     ElSelObject.yieldTitle += " + Tight selection"
     MuSelObject.yieldTitle += " + Tight selection"
 
-
     if use_dd:
         # Use the datadriven in parallel of the SR selection #
         enable = "FakeExtrapolation" in self.datadrivenContributions and self.datadrivenContributions["FakeExtrapolation"].usesSample(self.sample, self.sampleCfg)
@@ -225,7 +225,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_sel
                            ddCut    = [lambda_fake_mu(self.muonsFakeSel[0]), op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel)<=1],
                            ddWeight = lambda_FF_mu(self.muonsFakeSel[0])+MuTightSF(self.muonsFakeSel[0]),
                            enable   = enable)
-    if fake_selection:
+    elif fake_selection:
         # Only return the datadriven CR selection (eg, skimmer or non closure) #
         ElSelObject.refine(cut    = [lambda_fake_ele(self.electronsFakeSel[0]), op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel)<=1],
                            weight = lambda_FF_ele(self.electronsFakeSel[0])+ElTightSF(self.electronsFakeSel[0]))
@@ -581,17 +581,17 @@ def makeDoubleLeptonSelection(self,baseSel,use_dd=True,fake_selection=False):
                                  selName       = "Has2FakeableElEl",
                                  yieldTitle    = "Fakeable dilepton (channel $e^+e^-$)          ",
                                  yieldObj      = self.yields,
-                                 record_yields = not self.args.onlypost)
+                                 record_yields = self.args.PrintYield or self.args.OnlyYield)
     MuMuSelObj = SelectionObject(sel           = baseSel,
                                  selName       = "Has2FakeableMuMu",
                                  yieldTitle    = "Fakeable dilepton (channel $\mu^+\mu^-$)      ",
                                  yieldObj      = self.yields,
-                                 record_yields = not self.args.onlypost)
+                                 record_yields = self.args.PrintYield or self.args.OnlyYield)
     ElMuSelObj = SelectionObject(sel           = baseSel,
                                  selName       = "Has2FakeableElMu",
                                  yieldTitle    = "Fakeable dilepton (channel $e^{\pm}\mu^{\mp}$)",
                                  yieldObj      = self.yields,
-                                 record_yields = not self.args.onlypost)
+                                 record_yields = self.args.PrintYield or self.args.OnlyYield)
     ElElSelObj.refine(cut = [op.rng_len(self.ElElFakeSel) >= 1,
                              op.OR(op.rng_len(self.muonsFakeSel) == 0,
                                    op.AND(op.rng_len(self.muonsFakeSel) == 1,

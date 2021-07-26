@@ -1,0 +1,14 @@
+module: SignalReweightingHistogram.py:SignalReweightingHistogramNano
+config: 
+  era:
+    - 2016: Yaml/analysis2016_v7.yml
+    - 2017: Yaml/analysis2017_v7.yml
+    - 2018: Yaml/analysis2018_v7.yml
+
+args:
+  - --subset=bbtautau,bbww2l,bbww1l,GGFLO,GGFNLO
+  - weight:
+    - Histograms : ""
+    - ReweightedHistograms : "--reweighting"
+      
+output: /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/Signal{weight}_{era}

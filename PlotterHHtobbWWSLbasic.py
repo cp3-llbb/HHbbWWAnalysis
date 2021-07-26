@@ -77,8 +77,8 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         ElSelObj,MuSelObj = makeSingleLeptonSelection(self,noSel,plot_yield=True)
 
         #----- Apply jet corrections -----#
-        ElSelObj.sel = self.beforeJetselection(ElSelObj.sel,'El')
-        MuSelObj.sel = self.beforeJetselection(MuSelObj.sel,'Mu')
+        self.beforeJetselection(ElSelObj.sel,'El')
+        self.beforeJetselection(MuSelObj.sel,'Mu')
 
         # selObjectDict : keys -> level (str)
         #                 values -> [El,Mu] x Selection object
@@ -322,10 +322,15 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 node.sel = self.addSignalReweighting(node.sel)
                 
             plots.extend(makeDoubleLeptonMachineLearningExclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
+            if self.args.PrintYield:
+                for selNode in selObjNodesDict.values():
+                    self.yields.add(selNode.sel)
+
             
 
         #----- Add the Yield plots -----#
-        #plots.append(self.yields)
-        #plots.extend(cutFlowPlots)
+        if self.args.PrintYield or self.args.OnlyYield:
+            plots.append(self.yields)
+
         return plots
 
