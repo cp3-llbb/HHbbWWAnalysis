@@ -63,6 +63,15 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
             input_names = ["lep","jet","fat","met","hl","param","eventnr"]
             output_name = "Identity"
+
+            print ("DNN model : %s"%path_model)
+            if not os.path.exists(path_model):
+                raise RuntimeError('Could not find model file %s'%path_model)
+            try:
+                DNN = op.mvaEvaluator(path_model,mvaType='Tensorflow',otherArgs=(input_names, output_name))
+            except:
+                raise RuntimeError('Could not load model %s'%path_model)
+
         if self.args.analysis == 'res':
             dnn_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ResonantModels')
             path_model_HighMass = os.path.join(dnn_dir,'Resonant_HighMass_Final_512x4_w0p1.pb')
@@ -77,7 +86,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     input_names_LowMass.append(line.split()[0])
             output_name = "Identity"
 
-        if not self.args.OnlyYield:
             print ("DNN model : %s"%path_model_HighMass)
             print ("DNN model : %s"%path_model_LowMass)
             if not os.path.exists(path_model_HighMass):
@@ -113,10 +121,11 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         OSMuMuDilepton = self.MuMuFakeSel
         OSElMuDilepton = self.ElMuFakeSel
 
-        ElElSelObj.sel = self.beforeJetselection(ElElSelObj.sel,'ElEl')
-        MuMuSelObj.sel = self.beforeJetselection(MuMuSelObj.sel,'MuMu')
-        ElMuSelObj.sel = self.beforeJetselection(ElMuSelObj.sel,'ElMu')
+        self.beforeJetselection(ElElSelObj,'ElEl')
+        self.beforeJetselection(MuMuSelObj,'MuMu')
+        self.beforeJetselection(ElMuSelObj,'ElMu')
 
+        print (ElElSelObj.selName)
         #----- Boolean to know what datadriven is applied -----#
         DYCR   = 'DYEstimation' in self.datadrivenContributions.keys() and self.datadrivenContributions['DYEstimation'].usesSample(self.sample,self.sampleCfg)
         FakeCR = 'FakeExtrapolation'  in self.datadrivenContributions.keys() and self.datadrivenContributions['FakeExtrapolation'].usesSample(self.sample,self.sampleCfg) 
@@ -460,9 +469,10 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 #                ChannelDictList.append({'channel': 'MuMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'B':container1fatb[0],'sel':MuMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':MuMuSelObjAk8JetsInclusiveBoostedOneBtag.selName})
 #                ChannelDictList.append({'channel': 'ElMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'B':container1fatb[0],'sel':ElMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':ElMuSelObjAk8JetsInclusiveBoostedOneBtag.selName})
 #
-#        for channelDict in ChannelDictList:
-#            channelDict["sel"] = self.addSignalReweighting(channelDict["sel"])
-#            plots.extend(makeDoubleLeptonSelectedBoostedVariables(**channelDict,HLL=self.HLL))
+#        if not self.args.OnlyYield:
+#            for channelDict in ChannelDictList:
+#                channelDict["sel"] = self.addSignalReweighting(channelDict["sel"])
+#                plots.extend(makeDoubleLeptonSelectedBoostedVariables(**channelDict,HLL=self.HLL))
 
         #----- Machine Learning plots -----#
         selObjectDictList = []
@@ -502,7 +512,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 category = "Boosted1B"
             assert category is not None
             dilepton = dileptonsCont[channel]
-            #self.yields.add(selObjectDict['selObject'].sel,title=selObjectDict['selObject'].yieldTitle)
 
             if self.args.analysis == 'nonres':
                 self.nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
@@ -567,8 +576,12 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 for node in selObjNodesDict.values():
                     node.sel = self.addSignalReweighting(node.sel)
     
-                plots.extend(makeDoubleLeptonMachineLearningExclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
-                #plots.extend(makeDoubleLeptonMachineLearningInclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
+                if not self.args.OnlyYield:
+                    plots.extend(makeDoubleLeptonMachineLearningExclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
+                    #plots.extend(makeDoubleLeptonMachineLearningInclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
+                if self.args.PrintYield:
+                    for selNode in selObjNodesDict.values():
+                        self.yields.add(selNode.sel)
 
             if self.args.analysis == 'res':
                 # Mass for resonance in parametric DNN #
@@ -639,7 +652,8 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     switchCond.insert(0,FakeCond)
                 HME = op.defineOnFirstUse(op.multiSwitch(*switchCond))
 
-                plots.extend(makeDoubleLeptonHMEPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],HME))
+                if not self.args.OnlyYield:
+                    plots.extend(makeDoubleLeptonHMEPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],HME))
 
                 inputsAll = mvaEvaluatorDL_res.returnResonantMVAInputs(
                                                 self      = self,
@@ -694,15 +708,21 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
                     output = DNN(*inputsArr)
                     selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,suffix="M{}".format(int(mass)))
-                    plots.extend(makeDoubleLeptonMachineLearningExclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
-                    plots.extend(makeDoubleLeptonMachineLearningExclusiveOutputPlotsWithHME(selObjNodesDict,output,['GGF'],channel=selObjectDict['channel'],HME=HME))
+                    if not self.args.OnlyYield:
+                        plots.extend(makeDoubleLeptonMachineLearningExclusiveOutputPlots(selObjNodesDict,output,self.nodes,channel=selObjectDict['channel']))
+                        plots.extend(makeDoubleLeptonMachineLearningExclusiveOutputPlotsWithHME(selObjNodesDict,output,['GGF'],channel=selObjectDict['channel'],HME=HME))
+                    if self.args.PrintYield:
+                        for selNode in selObjNodesDict.values():
+                            self.yields.add(selNode.sel)
+                            
+                            
 
                             
     
         #----- Add the Yield plots -----#
+        if self.args.PrintYield or self.args.OnlyYield:
+            plots.append(self.yields)
 
-        #plots.extend(cutFlowPlots)
-        #plots.append(self.yields)
             
         #----- Return -----#
         return plots
