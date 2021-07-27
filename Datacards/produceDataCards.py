@@ -1,4 +1,5 @@
 import os
+import io
 import sys
 import re
 import json
@@ -12,10 +13,12 @@ import string
 import argparse
 import logging
 import subprocess
+import importlib
 import numpy as np
 import math
 import multiprocessing as mp
 import numpy as np
+from functools import partial
 import enlighten
 import ROOT
 
@@ -23,7 +26,7 @@ from yamlLoader import YMLIncludeLoader
 
 from IPython import embed
 
-ROOT.gROOT.SetBatch(True) 
+#ROOT.gROOT.SetBatch(True) 
 
 INFERENCE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                              'inference')
@@ -37,7 +40,7 @@ COMBINE_ENV = os.path.join(INFERENCE_PATH,
                           'env_standalone.sh')
 
 class DataCard:
-    def __init__(self,outputDir=None,configPath=None,path=None,yamlName=None,worker=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,DYnonclosure=None,pseudodata=False,rebin=None,textfiles=None,legend=None,combineConfigs=None,**kwargs):
+    def __init__(self,outputDir=None,configPath=None,path=None,yamlName=None,worker=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,histCorrections=None,correctionBeforeAggregation=None,pseudodata=False,rebin=None,regroup=None,histEdit=None,textfiles=None,legend=None,combineConfigs=None,logName=None,**kwargs):
         self.outputDir      = outputDir
         self.configPath     = configPath
         self.path           = path
@@ -47,16 +50,18 @@ class DataCard:
         self.root_subdir    = root_subdir
         self.pseudodata     = pseudodata
         self.hist_conv      = hist_conv
-        self.DYnonclosure   = DYnonclosure
         self.rebin          = rebin
+        self.histEdit       = histEdit
         self.textfiles      = textfiles
         self.legend         = legend
         self.combineConfigs = combineConfigs
+        self.histCorrections = histCorrections
 
         # Get entries that can either be dicts or list of dicts (eg with !include in yaml) #
         self.groups = self.includeEntry(groups,'Groups')
         self.normSyst = self.includeEntry(normSyst,'Norm syst')
         self.shapeSyst = self.includeEntry(shapeSyst,'Shape syst')
+        self.regroup = self.includeEntry(regroup,'Regrouping')
                
         # Load Yaml configs from bamboo #
         self.yaml_dict = self.loadYaml(self.path,yamlName)
@@ -74,7 +79,7 @@ class DataCard:
             os.makedirs(self.datacardPath)
 
         # Add logging output to log file #
-        handler = logging.FileHandler(os.path.join(self.datacardPath,'log.out'),mode='w')
+        handler = logging.FileHandler(os.path.join(self.datacardPath,logName),mode='w')
         logger = logging.getLogger()
         logger.addHandler(handler)
 
@@ -90,8 +95,12 @@ class DataCard:
         self.loopOverFiles()
         if self.pseudodata:
             self.roundFakeData()
-        if self.DYnonclosure is not None:
-            self.applyDYNonClosure()
+        if self.histCorrections is not None:
+            self.applyCorrectionAfterAggregation()
+        if self.regroup is not None:
+            self.applyRegrouping()
+        if self.histEdit is not None:
+            self.applyEditing()
         if self.rebin is not None:
             self.applyRebinning()
         if self.outputDir is not None:
@@ -157,9 +166,9 @@ class DataCard:
                     self.systPresent[histName][group].append({'systematics': [systname for systname in hist_dict[histName].keys() if systname != 'nominal'],
                                                               'nominal': copy.deepcopy(hist_dict[histName]['nominal'])})
             for group in groups:
+                # if several groups, need to fetch for each group 
+                # -> need to have different memory adress
                 self.addSampleToGroup(copy.deepcopy(hist_dict),group)
-                # deepcopy is needed so that if the histogram is in two groups
-                # acting on one version will not change the other
             del hist_dict
 
         for histName in self.content.keys(): # renaming to avoid overwritting ROOT warnings
@@ -463,7 +472,7 @@ class DataCard:
 
                             # Get convention naming #
                             if systName not in self.shapeSyst.keys():
-                                raise RuntimeError("Could not find {systName} in systematic dict".format(systName))
+                                raise RuntimeError(f"Could not find {systName} in systematic dict")
                             CMSName = self.shapeSyst[systName]
                             if CMSName == 'discard':
                                 logging.debug(f'Discarding systematic {systName}')
@@ -522,9 +531,6 @@ class DataCard:
         val     = 1e-5 * min(1.,hnom.Integral()) 
         valup   = 1e-5 * min(1.,hup.Integral()) if hdown is not None else None
         valdown = 1e-5 * min(1.,hdown.Integral()) if hdown is not None else None
-        #val     = 0.
-        #valup   = 0.
-        #valdown = 0.
         # Loop over bins #
         for i in range(1,hnom.GetNbinsX()+1):
             # First clip to 0 all negative bin content #
@@ -565,43 +571,78 @@ class DataCard:
                         hup.SetBinContent(i,0.00001)
                         hdown.SetBinContent(i,0.00001)
 
+    def applyCorrectionAfterAggregation(self):
+        for corrConfig in self.histCorrections:
+            if ":" not in corrConfig['module']:
+                raise RuntimeError(f"`:` needs to be in the module arg {corrConfig['module']}")
+            lib, clsName = corrConfig['module'].split(':')
+            if not os.path.isfile(lib):
+                raise RuntimeError(f'File {lib} does not exist')
+            mod = importlib.import_module(lib.replace('.py',''))
+            cls = getattr(mod, clsName, None)(**corrConfig['init'])
+            logging.info(f"Applying {corrConfig['module']}")
+            for cat in self.content.keys():
+                if cat not in corrConfig['categories'].keys():
+                    continue
+                catCfg = corrConfig['categories'][cat]
+                logging.info(f'... Histogram {cat:20s} in {cls.group} group')
+                # Correct nominal and all syst hists #
+                if hasattr(cls,'modify'):
+                    logging.info(f'\t\t-> applying corrections')
+                    for systName,hist in self.content[cat][cls.group].items():
+                        cls.modify(hist,**catCfg)
+                # Add potential additional shapes #
+                if hasattr(cls,'additional') and self.use_syst:
+                    add = cls.additional(self.content[cat][cls.group]['nominal'],**catCfg)
+                    for key in add.keys():
+                        logging.info(f"\t\t-> Adding systematic shape {catCfg['systName']}")
+                    self.content[cat][cls.group].update(add)
 
-    def applyDYNonClosure(self):
-        logging.info('Applying DY non closure shift')
-        from DYNonClosure import NonClosureSystematic
-        dyObj = NonClosureSystematic.load_from_json(self.DYnonclosure['path'])
-        for histName in self.content.keys():
-            if histName not in self.DYnonclosure['hist'].keys():
-                continue
-            catName = self.DYnonclosure['hist'][histName]['entry']
-            closureSystName = self.DYnonclosure['hist'][histName]['name']
-            dyObj.SetCategory(catName)
-            logging.info("... Histogram {:20s} -> applying non closure with key {:20s}".format(histName,catName))
-            #dyObj.PlotFitToPdf('shapes_'+catName)
-            group = self.DYnonclosure['group']
+    def applyRegrouping(self):
+        logging.info('Applying Regrouping of categories')
+        self.checkForMissingNominals()
 
-            # Add non closure systematics #
-            if self.use_syst:
-                ((h_shape1_up,h_shape1_down),(h_shape2_up,h_shape2_down)) = dyObj.GetNonClosureShape(self.content[histName][group]['nominal'])
-                h_shape1_up.SetName(self.content[histName][group]['nominal'].GetName()+f'_{closureSystName}_shape1Up')
-                h_shape1_down.SetName(self.content[histName][group]['nominal'].GetName()+f'_{closureSystName}_shape1Down')
-                h_shape2_up.SetName(self.content[histName][group]['nominal'].GetName()+f'_{closureSystName}_shape2Up')
-                h_shape2_down.SetName(self.content[histName][group]['nominal'].GetName()+f'_{closureSystName}_shape2Down')
+        # Initialize and checks #
+        regroup_conv = {v:key for key,val in self.regroup.items() for v in val}
+        regrouped = {regroup_conv[histName]:{g:{} for g in self.groups.keys()} for histName in self.content.keys()}
+        innerCat = [v for val in self.regroup.values() for v in val]
+        if len(set(self.content.keys())-set(innerCat)) > 0:
+            raise RuntimeError("Regrouping has missing categories : "+','.join([cat for cat in self.content.keys() if cat not in innerCat]))
+        if len(set(self.content.keys())-set(innerCat)) < 0:
+            raise RuntimeError("Regrouping has excess categories : "+','.join([cat for cat in innerCat if cat not in self.content.keys()]))
+        #for outCat,inCats in self.regroup.items():
+        for outCat in regrouped.keys():
+            inCats = self.regroup[outCat]
+            logging.info(f"New category {outCat} will aggregate :")
+            for inCat in inCats:
+                logging.info(f'... {inCat}')
+        # Neeed to compensate missing systematics in categories to aggregate 
+        # Eg if someone wants to merge electron and muon channels, there will 
+        # be different systematics and we must use the nominal hist when one is missing
+        list_syst = {}
+        for group in self.groups.keys():
+            for outCat in regrouped.keys():
+                inCats = self.regroup[outCat]
+                list_syst = list(set([systName for cat in inCats for systName in self.content[cat][group].keys()]))
+                for cat in inCats:
+                    for systName in list_syst:
+                        if systName != 'nominal' and systName not in self.content[cat][group].keys():
+                            self.content[cat][group][systName] = copy.deepcopy(self.content[cat][group]['nominal'])
+                            self.content[cat][group][systName].SetName(self.content[cat][group][systName].GetName()+f'_{systName}')
+    
+        # Aggregate and save as new content #
+        for cat in self.content.keys():
+            recat = regroup_conv[cat] 
+            for group in self.content[cat].keys():
+                for systName,h in self.content[cat][group].items():
+                    if systName not in regrouped[recat][group].keys():
+                        regrouped[recat][group][systName] = self.content[cat][group][systName]
+                    else:
+                        regrouped[recat][group][systName].Add(self.content[cat][group][systName])
+        self.content = copy.deepcopy(regrouped)
+        
 
-                self.content[histName][group][f'{closureSystName}_shape1Up']   = h_shape1_up
-                self.content[histName][group][f'{closureSystName}_shape1Down'] = h_shape1_down
-                self.content[histName][group][f'{closureSystName}_shape2Up']   = h_shape2_up
-                self.content[histName][group][f'{closureSystName}_shape2Down'] = h_shape2_down
-
-            # Scale all DY histograms based on non closure #
-            for systName in self.content[histName][group].keys():
-                if closureSystName in systName:
-                    continue # avoid applying twice
-                dyObj(self.content[histName][group][systName])
-                
-
-    def applyRebinning(self):
-        logging.info('Applying rebinning')
+    def checkForMissingNominals(self):
         # Check at least one nominal per group #
         missings = []
         for histName in self.content.keys():
@@ -613,6 +654,95 @@ class DataCard:
             for histName,group in missings:
                 logging.error(f'... {group:20s} -> {histName}')
             raise RuntimeError('Some nominal files are missing')
+
+                
+    def applyEditing(self):
+        logging.info('Applying editing')
+        self.checkForMissingNominals()
+
+        # Apply editing schemes #
+        for histName in self.content.keys():
+            # Check name and type #
+            if histName not in self.histEdit.keys():
+                continue
+            histType = self.content[histName][list(self.groups.keys())[0]]['nominal'].__class__.__name__ 
+            if histType.startswith('TH1'):
+                valid_args = ['x','i','val']
+            elif histType.startswith('TH2'):
+                valid_args = ['x','y','i','j','val']
+            else:   
+                raise RuntimeError(f'Histogram {histName} type not understood : {histType}')
+
+            logging.info(f'Editing histogram {histName}')
+            
+            # Get the functions with partial #
+            editFuncs = []
+            for iedit,editCfg in enumerate(self.histEdit[histName]):
+                if 'val' not in editCfg.keys():
+                    logging.warning(f'Histogram editing for {histName} is missing the `val` key, will assume 0.')
+                    editCfg['val'] = 0.
+                if any([key not in valid_args for key in editCfg.keys()]):
+                    raise RuntimeError('Keys not understood for config {iedit} in histogram {histName} : '+\
+                                    ','.join([key not in valid_args for key in editCfg.keys()]))
+                if histType.startswith('TH1'):
+                    editFuncs.append(partial(self.editTH1,**editCfg))
+                if histType.startswith('TH2'):
+                    editFuncs.append(partial(self.editTH2,**editCfg))
+
+            # Apply editings #
+            for group in self.content[histName].keys():
+                for systName,hist in self.content[histName][group].items():
+                    if systName == 'nominal':
+                        oldInt = hist.Integral()
+                    for editFunc in editFuncs:
+                        editFunc(hist)
+                    if systName == 'nominal':
+                        newInt = hist.Integral()
+                logging.info(f'... group {group:20s} : Integral = {oldInt:9.3f} -> {newInt:9.3f} [{(oldInt-newInt)/(oldInt+1e-9)*100:5.2f}%]')
+
+    def editTH1(self,h,val,x=None,i=None):
+        assert (x is not None and i is None) or (x is None and i is not None)
+        if x is not None:
+            bins = [h.FindBin(x)]
+        if i is not None:
+            bins = [i]
+        self.editHistByBinNumber(h,bins,val)
+
+    def editTH2(self,h,val,x=None,y=None,i=None,j=None):
+        assert ((x is not None or y is not None) and (i is None and j is None)) or \
+               ((x is None and y is None) and (i is not None or j is not None))
+        yAxis = h.GetYaxis()
+        xAxis = h.GetXaxis()
+
+        if x is not None or y is not None:
+            if x is not None and y is None:
+                initBin = h.FindBin(x,yAxis.GetBinCenter(1))
+                bins = [initBin + k*(h.GetNbinsX()+2) for k in range(h.GetNbinsX()-1)]
+            elif x is None and y is not None:
+                initBin = h.FindBin(xAxis.GetBinCenter(1),y) 
+                bins = [initBin + k for k in range(h.GetNbinsX())]
+            else:
+                bins = [h.FindBin(x,y)]
+        if i is not None or j is not None:
+            if i is not None and j is None:
+                initBin = h.GetBin(i,1)
+                bins = [initBin + k*h.GetNbinsX()+1 for k in range(h.GetNbinsX()-1)]
+            elif i is None and j is not None:
+                initBin = h.GetBin(1,j)
+                bins = [initBin + k for k in range(h.GetNbinsX())]
+            else:
+                bins = [h.GetBin(i,j)]
+        self.editHistByBinNumber(h,bins,val)
+
+    @staticmethod
+    def editHistByBinNumber(h,bins,val):
+        assert isinstance(bins,list)
+        for b in bins:
+            h.SetBinContent(b,val)
+
+    def applyRebinning(self):
+        logging.info('Applying rebinning')
+        self.checkForMissingNominals()
 
         # Apply rebinning schemes #
         for histName in self.content.keys():
@@ -925,11 +1055,24 @@ class DataCard:
 
     def prepare_plotIt(self):
         logging.info("Preparing plotIt root files for categories")
-        for cat in self.hist_conv.keys():
+        if self.regroup is not None:
+            hist_conv = {}
+            regroup_conv = {v:key for key,val in self.regroup.items() for v in val}
+            for cat,hists in self.hist_conv.items():
+                recat = regroup_conv[cat]
+                if recat not in hist_conv.keys():
+                    hist_conv[recat] = hists
+                else:
+                    hist_conv[recat].extend(hists)
+        else:
+            hist_conv = self.hist_conv
+
+        categories = hist_conv.keys()
+        for cat in hist_conv.keys():
             logging.info(f"... {cat}")
 
         # Initialize containers #
-        content = {cat:{group:{} for group in self.groups.keys()} for cat in self.hist_conv.keys()}
+        content = {cat:{group:{} for group in self.groups.keys()} for cat in hist_conv.keys()}
         systematics = []
 
         # Make new directory with root files for plotIt #
@@ -962,7 +1105,7 @@ class DataCard:
             F.Close()
 
         valid_content = True
-        for cat in self.hist_conv.keys():
+        for cat in hist_conv.keys():
             for group in self.groups.keys():
                 if len(content[cat][group]) == 0:
                     logging.error(f"Group {group} in category {cat} is empty")
@@ -1053,7 +1196,7 @@ class DataCard:
 
         # Plots informations #
         config['plots'] = {}
-        for h1,h2 in self.hist_conv.items():
+        for h1,h2 in hist_conv.items():
             # Check histogram dimension #
             hist = content[h1][list(self.groups.keys())[0]]['nominal']
             if isinstance(hist,ROOT.TH2F) or isinstance(hist,ROOT.TH2D):
@@ -1811,36 +1954,6 @@ class DataCard:
             for entry,slurm_ids in slurmIdPerEntry.items():
                 logging.info(f'... Entry {entry} : '+' '.join(slurm_ids))
 
-                        
-#            if combineMode == 'fitdiag':
-#                # Add specific string to output file to avoid overwriting
-#                testName = 'Test'
-#                seed = '123456'
-#                mass = '120'
-#                def findArg(cmd,arg):
-#                    cmd_split = cmd.split(' ')
-#                    return cmd_split[cmd_split.index(arg)+1]
-#                if '-n ' in combineCmd:
-#                    testName = findArg(combineCmd,'-n')
-#                if '--name ' in combineCmd:
-#                    testName = findArg(combineCmd,'--name')
-#                if '-s ' in combineCmd:
-#                    seed = findArg(combineCmd,'-s')
-#                if '--seed ' in combineCmd:
-#                    seed = findArg(combineCmd,'--seed')
-#                if '-m ' in combineCmd:
-#                    mass = findArg(combineCmd,'-m')
-#                if '--mass ' in combineCmd:
-#                    mass = findArg(combineCmd,'--mass')
-#                if '--keyword-value' in combineCmd:
-#                    raise RuntimeError('The combine argument "--keyword-value" is not supported in this script')
-#
-#                random_str = ''.join(random.choice(string.ascii_uppercase) for i in range(6))
-#                combineCmd += f' --keyword-value WORD={random_str}' 
-#                outputFile = f'higgsCombine{testName}.FitDiagnostics.mH{mass}.WORD{random_str}.{seed}.root'
-
-
-
     def getTxtFilesPath(self):
         if self.textfiles is None:
             initTextFiles = {histName:os.path.join(self.datacardPath,f'{histName}_{self.era}.txt') 
@@ -2059,7 +2172,7 @@ if __name__=="__main__":
                         help='If used without argument, will process all categories in serie, \
                               otherwise will process the categories given in argument')
     parser.add_argument('-j,','--jobs', action='store', required=False, default=None, type=int,
-                        help='Number of parallel processes (only useful with `--split`)')
+                        help='Number of parallel processes (only useful with `--split`) [-1 = number of processes]')
     parser.add_argument('--combine', action='store', required=False, default=None, nargs='*',
                         help='Run combine on the txt datacard only')
     parser.add_argument('--combine_args', action='store', required=False, default=[], nargs='*',
@@ -2113,22 +2226,29 @@ if __name__=="__main__":
     # Splitting #
     global_hist_conv = copy.deepcopy(config['hist_conv']) # Run all at once
     categoriesToRun = [config['hist_conv'].keys()]
+        
     if args.split is not None:
         if len(args.split) == 0:  # run all sequantially
             categoriesToRun = [[cat] for cat in categoriesToRun[0]]
+            if 'regroup' in config.keys():
+                categoriesToRun = [val for val in config['regroup'].values()]
         else: # Run only requested
-            if not all([item in config['hist_conv'].keys() for item in args.split]):
-                raise RuntimeError('Category(ies) requested in split not found : '+\
-                        ','.join([item for item in args.split if item not in hist_conv.keys()]))
-            categoriesToRun = [[cat] for cat in args.split]
+            if 'regroup' not in config.keys():
+                if not all([item in config['hist_conv'].keys() for item in args.split]):
+                    raise RuntimeError('Category(ies) requested in split not found : '+\
+                            ','.join([item for item in args.split if item not in hist_conv.keys()]))
+                categoriesToRun = [[cat] for cat in args.split]
+            else:
+                categoriesToRun = [[val for key in args.split for val in config['regroup'][key]]]
 
     # Instantiate #
     instances = []
-    for categories in categoriesToRun:
+    for icat,categories in enumerate(categoriesToRun):
         config['hist_conv'] = {cat:global_hist_conv[cat] for cat in categories}
         instances.append(DataCard(configPath      = os.path.abspath(args.yaml),
                                   worker          = args.worker,
                                   pseudodata      = args.pseudodata,
+                                  logName         = f'log_{icat}.log',
                                   **config) )
     if args.combine is not None: 
         if args.split is not None:
@@ -2155,13 +2275,14 @@ if __name__=="__main__":
                     assert hasattr(instance,method)
                     output = getattr(instance,method)()
                 return output
-                    
+            if args.jobs == -1 or args.jobs > len(instances):
+                args.jobs = len(instances)
             methods = ['prepare_plotIt']
             if not args.plotIt:
                 methods.insert(0,'run_production')
             with mp.Pool(processes=args.jobs) as pool:
                 plotIt_configs = pool.starmap(run,[(instance,methods) for instance in instances])
-
+                
 
         # Merge and run plotit (single thread anyway) #
         plotIt_config = DataCard.merge_plotIt(plotIt_configs)

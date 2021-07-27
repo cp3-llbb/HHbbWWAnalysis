@@ -125,7 +125,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         self.beforeJetselection(MuMuSelObj,'MuMu')
         self.beforeJetselection(ElMuSelObj,'ElMu')
 
-        print (ElElSelObj.selName)
         #----- Boolean to know what datadriven is applied -----#
         DYCR   = 'DYEstimation' in self.datadrivenContributions.keys() and self.datadrivenContributions['DYEstimation'].usesSample(self.sample,self.sampleCfg)
         FakeCR = 'FakeExtrapolation'  in self.datadrivenContributions.keys() and self.datadrivenContributions['FakeExtrapolation'].usesSample(self.sample,self.sampleCfg) 
@@ -623,8 +622,9 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 elif category == "Boosted1B":
                     hmeInputs = [dilepton[0].p4,                   # l1
                                  dilepton[1].p4,                   # l2
-                                 self.ak8BJets[0].subJet1.p4,      # b1
-                                 self.ak8BJets[0].subJet2.p4,      # b1
+                                 op.switch(op.rng_len(self.ak8BJets)>0,self.ak8BJets[0].subJet1.p4,self.ak8Jets[0].subJet1.p4),      # b1
+                                 op.switch(op.rng_len(self.ak8BJets)>0,self.ak8BJets[0].subJet2.p4,self.ak8Jets[0].subJet1.p4),      # b2
+                                    # Because of DY we need the switch
                                  self.corrMET.p4,                  # met
                                  op.c_bool(True)]                  # boosted_tag
                     if DYCR:
