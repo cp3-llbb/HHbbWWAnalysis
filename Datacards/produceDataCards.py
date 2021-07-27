@@ -2172,7 +2172,7 @@ if __name__=="__main__":
                         help='If used without argument, will process all categories in serie, \
                               otherwise will process the categories given in argument')
     parser.add_argument('-j,','--jobs', action='store', required=False, default=None, type=int,
-                        help='Number of parallel processes (only useful with `--split`)')
+                        help='Number of parallel processes (only useful with `--split`) [-1 = number of processes]')
     parser.add_argument('--combine', action='store', required=False, default=None, nargs='*',
                         help='Run combine on the txt datacard only')
     parser.add_argument('--combine_args', action='store', required=False, default=[], nargs='*',
@@ -2275,19 +2275,16 @@ if __name__=="__main__":
                     assert hasattr(instance,method)
                     output = getattr(instance,method)()
                 return output
-                    
+            if args.jobs == -1 or args.jobs > len(instances):
+                args.jobs = len(instances)
             methods = ['prepare_plotIt']
             if not args.plotIt:
                 methods.insert(0,'run_production')
-            print ('starting pool')
             with mp.Pool(processes=args.jobs) as pool:
                 plotIt_configs = pool.starmap(run,[(instance,methods) for instance in instances])
-            print ('finished pool')
                 
 
         # Merge and run plotit (single thread anyway) #
         plotIt_config = DataCard.merge_plotIt(plotIt_configs)
-        print ('merged')
         instances[0].run_plotIt(plotIt_config)
-        print ('ran')
 
