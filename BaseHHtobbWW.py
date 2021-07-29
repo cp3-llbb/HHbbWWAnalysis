@@ -2045,11 +2045,14 @@ One lepton and and one jet argument must be specified in addition to the require
 
             ### HH reweighting ###
             if self.args.HHReweighting is not None:
+                print ('Starting HH reweighting postprocessing')
                 LOFiles = []
-                LOChannels = ['GluGluToHHTo2B2VTo2L2Nu','GluGluToHHTo2B2WToLNu2J','GluGluToHHTo2B2Tau']
+                channels = ['GluGluToHHTo2B2VTo2L2Nu','GluGluToHHTo2B2WToLNu2J','GluGluToHHTo2B2VLNu2J','GluGluToHHTo2B2Tau']
+                    # bbww1l signal samples have different naming depending on LO/NLO
                 ddScenarios = set(self.datadrivenScenarios)
                 attrToKeep = ['legend','line-color','line-type','order','type']
                 for contribName in self.analysisConfig['benchmarks']['targets']:
+                    print (contribName)
                     if contribName not in self.args.HHReweighting:
                         continue
                     contrib = self.datadrivenContributions[contribName]
@@ -2059,20 +2062,20 @@ One lepton and and one jet argument must be specified in addition to the require
                     if eras is None:
                         eras = list(config["eras"].keys())
                     for era in eras:
-                        for channel in LOChannels:
+                        for channel in channels:
                             contribPerChannel = {sample:sampleCfg for sample,sampleCfg in contribSamples.items() if channel in sample and sampleCfg['era']==era}
                             if len(contribPerChannel) == 0:
                                 continue
                             crossSection = [sampleCfg['cross-section'] for sampleCfg in contribPerChannel.values()]
                             if len(set(crossSection)) != 1:
-                                print(f"Not all LO samples for channel {channel} have the same cross-section, will use 1. as default")
+                                print(f"Not all samples for channel {channel} have the same cross-section, will use 1. as default")
                                 crossSection = 1.
                             else:
                                 crossSection = crossSection[0]
                             if all(['branching-ratio' in sampleCfg for sampleCfg in contribPerChannel.values()]):
                                 branchingRatio = [sampleCfg['branching-ratio'] for sampleCfg in contribPerChannel.values()]
                                 if len(set(branchingRatio)) != 1:
-                                    raise RuntimeError(f"Not all LO samples for channel {channel} have the same branching-ratio")
+                                    raise RuntimeError(f"Not all samples for channel {channel} have the same branching-ratio")
                                 else:
                                     branchingRatio = branchingRatio[0]
                             else:
@@ -2083,7 +2086,7 @@ One lepton and and one jet argument must be specified in addition to the require
                             generatedEvents = {sample:self.readCounters(files[sample])[contribPerChannel[sample]['generated-events']] for sample in contribPerChannel.keys()}
                             outPath = os.path.join(resultsdir,f"{channel}_NLO{contribName}.root")
                             if os.path.exists(outPath):
-                                print (f'NLO file {outPath} already exists, will not recompute')
+                                print (f'Aggregated file {outPath} already exists, will not recompute')
                             else:
                                 outFile = gbl.TFile.Open(outPath, "RECREATE")
                                 hNames = [key.GetName() for key in files[list(files.keys())[0]].GetListOfKeys() if 'TH' in key.GetClassName()]
@@ -2098,14 +2101,13 @@ One lepton and and one jet argument must be specified in addition to the require
                                             hist.Add(h)
                                     hist.Write()
                                 outFile.Close()
-                                print (f'NLO file {outPath} produced')
+                                print (f'Aggregated file {outPath} produced')
                                 for f in files.values():
                                     f.Close()
                             
                             config['samples'][f"{channel}_NLO{contribName}"] = {'cross-section'     : crossSection,
                                                                                 'era'               : era,
                                                                                 'generated-events'  : len(generatedEvents)}
-                                                                                #'generated-events'  : generatedEventsSum}
                             config['samples'][f"{channel}_NLO{contribName}"].update(attrLO)
                             if branchingRatio is not None:
                                 config['samples'][f"{channel}_NLO{contribName}"]['branching-ratio'] = branchingRatio

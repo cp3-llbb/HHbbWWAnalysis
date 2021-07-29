@@ -40,22 +40,23 @@ COMBINE_ENV = os.path.join(INFERENCE_PATH,
                           'env_standalone.sh')
 
 class DataCard:
-    def __init__(self,outputDir=None,configPath=None,path=None,yamlName=None,worker=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,histCorrections=None,correctionBeforeAggregation=None,pseudodata=False,rebin=None,regroup=None,histEdit=None,textfiles=None,legend=None,combineConfigs=None,logName=None,**kwargs):
-        self.outputDir      = outputDir
-        self.configPath     = configPath
-        self.path           = path
-        self.worker         = worker
-        self.era            = str(era)
-        self.use_syst       = use_syst
-        self.root_subdir    = root_subdir
-        self.pseudodata     = pseudodata
-        self.hist_conv      = hist_conv
-        self.rebin          = rebin
-        self.histEdit       = histEdit
-        self.textfiles      = textfiles
-        self.legend         = legend
-        self.combineConfigs = combineConfigs
-        self.histCorrections = histCorrections
+    def __init__(self,outputDir=None,configPath=None,path=None,yamlName=None,worker=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,histCorrections=None,correctionBeforeAggregation=None,pseudodata=False,rebin=None,regroup=None,histEdit=None,textfiles=None,legend=None,combineConfigs=None,logName=None,custom_args=None,**kwargs):
+        self.outputDir          = outputDir
+        self.configPath         = configPath
+        self.path               = path
+        self.worker             = worker
+        self.era                = str(era)
+        self.use_syst           = use_syst
+        self.root_subdir        = root_subdir
+        self.pseudodata         = pseudodata
+        self.hist_conv          = hist_conv
+        self.rebin              = rebin
+        self.histEdit           = histEdit
+        self.textfiles          = textfiles
+        self.legend             = legend
+        self.combineConfigs     = combineConfigs
+        self.histCorrections    = histCorrections
+        self.custom_args        = custom_args
 
         # Get entries that can either be dicts or list of dicts (eg with !include in yaml) #
         self.groups = self.includeEntry(groups,'Groups')
@@ -73,13 +74,9 @@ class DataCard:
             if self.outputDir is not None:
                 self.outputDir += "_pseudodata"
 
-        # Create output directory #
-        self.datacardPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),self.outputDir)
-        if not os.path.exists(self.datacardPath):
-            os.makedirs(self.datacardPath)
 
         # Add logging output to log file #
-        handler = logging.FileHandler(os.path.join(self.datacardPath,logName),mode='w')
+        handler = logging.FileHandler(os.path.join(self.outputDir,logName),mode='w')
         logger = logging.getLogger()
         logger.addHandler(handler)
 
@@ -368,7 +365,7 @@ class DataCard:
         if self.outputDir is None:
             raise RuntimeError("Datacard output path is not set")
 
-        shapes = {histName:os.path.join(self.datacardPath,f"{histName}_{self.era}.root") for histName in self.content.keys()}
+        shapes = {histName:os.path.join(self.outputDir,f"{histName}_{self.era}.root") for histName in self.content.keys()}
 
         # Save root file #
         for histName in self.content.keys():
@@ -518,13 +515,21 @@ class DataCard:
                     writer.addFooter(footer)
                 
             if '{}' in self.textfiles:
-                textPath = os.path.join(self.datacardPath,self.textfiles.format(f"{histName}_{self.era}"))
+                textPath = os.path.join(self.outputDir,self.textfiles.format(f"{histName}_{self.era}"))
                 writer.dump(textPath,os.path.basename(shapes[histName]))
                 logging.info(f"Saved file {textPath}")
         if '{}' not in self.textfiles:
-            textPath = os.path.join(self.datacardPath,self.textfiles)
+            textPath = os.path.join(self.outputDir,self.textfiles)
             writer.dump(textPath,[os.path.basename(shape) for shape in shapes.values()])
             logging.info(f"Saved file {textPath}")
+
+        # Save extra data #
+        if hasattr(self,'plotLinearizeData'):
+            for key,data in self.plotLinearizeData.items():
+                path_data = os.path.join(self.outputDir,f'{key}_{self.era}.json')
+                with open(path_data,'w') as handle:
+                    json.dump(data,handle,indent=4)
+                logging.info(f"Saved plot data info in {path_data}")
 
     @staticmethod
     def fixHistograms(hnom,hdown=None,hup=None):
@@ -1050,8 +1055,6 @@ class DataCard:
             self.plotLinearizeData = {histName:lObj.getPlotData()}
         else:
             self.plotLinearizeData[histName] = lObj.getPlotData()
-         
-
 
     def prepare_plotIt(self):
         logging.info("Preparing plotIt root files for categories")
@@ -1074,16 +1077,17 @@ class DataCard:
         # Initialize containers #
         content = {cat:{group:{} for group in self.groups.keys()} for cat in hist_conv.keys()}
         systematics = []
+        plotLinearizeData = {}
 
         # Make new directory with root files for plotIt #
-        path_plotIt = os.path.join(self.datacardPath,'plotit')
+        path_plotIt = os.path.join(self.outputDir,'plotit')
         path_rootfiles = os.path.join(path_plotIt,'root')
         if not os.path.exists(path_rootfiles):
             os.makedirs(path_rootfiles)
             
         # Loop over root files to get content #
-        datacardRoots = glob.glob(os.path.join(self.datacardPath,"*root"))
-        for f in glob.glob(os.path.join(self.datacardPath,"*root")):
+        datacardRoots = glob.glob(os.path.join(self.outputDir,"*root"))
+        for f in glob.glob(os.path.join(self.outputDir,"*root")):
             category = os.path.basename(f).replace('.root','').replace(f'_{self.era}','')
             logging.debug(f"Looking at {f} -> category {category}")
             if category not in content.keys():
@@ -1103,6 +1107,10 @@ class DataCard:
                 if baseSyst is not None and baseSyst not in systematics:
                     systematics.append(baseSyst)
             F.Close()
+            path_data = f.replace('.root','.json')
+            if os.path.exists(path_data):
+                with open(path_data,'r') as handle:
+                    plotLinearizeData[category] = json.load(handle)
 
         valid_content = True
         for cat in hist_conv.keys():
@@ -1112,8 +1120,6 @@ class DataCard:
                     valid_content = False
         if not valid_content:
             raise RuntimeError('Failed to run plotIt')
-
-                    
 
         # Write to file #
         for group in self.groups.keys():
@@ -1243,16 +1249,16 @@ class DataCard:
                 if 'columns' in self.legend.keys():
                     config['plots'][h1]['legend-columns'] = self.legend['columns']
 
-#            if hasattr(self,'plotLinearizeData'):
-#                if h1 in self.plotLinearizeData.keys():
-#                    margin_left = config['configuration']['margin-left']
-#                    margin_right = 1-config['configuration']['margin-right']
-#                    extraItems = self.plotLinearizeData[h1]
-#                    for idx in range(len(extraItems['labels'])):
-#                        extraItems['labels'][idx]['position'][0] = margin_left + extraItems['labels'][idx]['position'][0] * (margin_right-margin_left)
-#                    for idx in range(len(extraItems['lines'])):
-#                        extraItems['lines'][idx] = [[extraItems['lines'][idx],0.],[extraItems['lines'][idx],histMax[h1]*1.1]]
-#                    config['plots'][h1].update(extraItems)
+            if len(plotLinearizeData) > 0:
+                if h1 in plotLinearizeData.keys():
+                    margin_left = config['configuration']['margin-left']
+                    margin_right = 1-config['configuration']['margin-right']
+                    extraItems = plotLinearizeData[h1]
+                    for idx in range(len(extraItems['labels'])):
+                        extraItems['labels'][idx]['position'][0] = margin_left + extraItems['labels'][idx]['position'][0] * (margin_right-margin_left)
+                    for idx in range(len(extraItems['lines'])):
+                        extraItems['lines'][idx] = [[extraItems['lines'][idx],0.],[extraItems['lines'][idx],histMax[h1]*1.1]]
+                    config['plots'][h1].update(extraItems)
 
         if len(systematics) > 0:
             config['systematics'] = systematics
@@ -1277,7 +1283,7 @@ class DataCard:
 
     def run_plotIt(self,config):
         # Write yaml file #
-        path_plotIt = os.path.join(self.datacardPath,'plotit')
+        path_plotIt = os.path.join(self.outputDir,'plotit')
         path_yaml = os.path.join(path_plotIt,'plots.yml')
         with open(path_yaml,'w') as handle:
             yaml.dump(config,handle)
@@ -1318,7 +1324,8 @@ class DataCard:
             for missingTxt in missingTxts:
                 logging.info(f'... {missingTxt}')
             logging.info('Datacard not found, will produce it')
-            self.run_production()
+            return False
+            #self.run_production()
         
         if entries is None or (isinstance(entries,list) and len(entries)==0):
             entries = self.combineConfigs.keys()
@@ -1343,7 +1350,7 @@ class DataCard:
             logging.info(f'Running entry {entry} with mode {combineMode}')
             if combineMode not in combineModes:
                 raise RuntimeError(f'Combine mode {combineMode} not understood')
-            subdir = os.path.join(self.datacardPath,entry)
+            subdir = os.path.join(self.outputDir,entry)
             if os.path.exists(subdir) and len(os.listdir(subdir)) != 0:
                 logging.warning(f'Subdirectory {subdir} is not empty')
             if not os.path.exists(subdir):
@@ -1653,7 +1660,7 @@ class DataCard:
                                 level = float(re.findall("\d+.\d+",l_str)[0])
                             limits[level] = float(re.findall("\d+.\d+",r_str)[0])
                             
-                    path_limits = os.path.join(self.datacardPath,subdirBin,'limits.json')
+                    path_limits = os.path.join(self.outputDir,subdirBin,'limits.json')
                     with open(path_limits,'w') as handle:
                         json.dump(limits,handle,indent=4)
                     logging.info(f'Saved limits as {path_limits}') 
@@ -1954,17 +1961,19 @@ class DataCard:
             for entry,slurm_ids in slurmIdPerEntry.items():
                 logging.info(f'... Entry {entry} : '+' '.join(slurm_ids))
 
+        return True
+
     def getTxtFilesPath(self):
         if self.textfiles is None:
-            initTextFiles = {histName:os.path.join(self.datacardPath,f'{histName}_{self.era}.txt') 
+            initTextFiles = {histName:os.path.join(self.outputDir,f'{histName}_{self.era}.txt') 
                                 for histName in self.hist_conv.keys()}
         elif isinstance(self.textfiles,str):
             if '{}' in self.textfiles:
-                initTextFiles = {histName:os.path.join(self.datacardPath,
+                initTextFiles = {histName:os.path.join(self.outputDir,
                                               self.textfiles.format(f'{histName}_{self.era}.txt'))
                                     for histName in self.hist_conv.keys()}
             else:
-                initTextFiles = {'all',os.path.join(self.datacardPath,self.textfiles)}
+                initTextFiles = {'all',os.path.join(self.outputDir,self.textfiles)}
         else:
             raise RuntimeError('Format of "textfiles" entry not understood')
         return initTextFiles
@@ -2097,6 +2106,7 @@ class DataCard:
                         handle.write(' -v ')
                     for key,val in arg.items():
                         handle.write(f'--{key} {val} ')
+                    handle.write(f' {self.custom_args}')
                     handle.write('"\n')
                 handle.write(')\n')
                 handle.write('${cmds[$SLURM_ARRAY_TASK_ID-1]}\n')
@@ -2106,6 +2116,7 @@ class DataCard:
                     handle.write(' -v ')
                 for key,val in args.items():
                     handle.write(f'--{key} {val} ')
+                handle.write(f' {self.custom_args}')
                 handle.write("\n")
 
         logging.debug(f'Generated submission script {filepath}')
@@ -2156,7 +2167,22 @@ class DataCard:
         return None
 
 
-
+def parseYaml(yamlPath,custom=None):
+    if custom is not None:
+        # Custom command line argument for parsing #
+        formatting = {}
+        for arg in custom:
+            if '=' in arg:
+                formatting[arg.split('=')[0]] = arg.split('=')[1]
+            else:
+                logging.warning(f'`--custom {arg}` will be ignored because no `=`')
+        config = yaml.load({'filename':yamlPath,'formatting':formatting},
+                      Loader=YMLIncludeLoader)
+    else:
+        # Classic parse #
+        with open(yamlPath,'r') as handle:
+            config = yaml.load(handle,Loader=YMLIncludeLoader)
+    return config
  
 
 if __name__=="__main__":
@@ -2202,20 +2228,7 @@ if __name__=="__main__":
         raise RuntimeError("YAML file {} is not a valid file".format(args.yaml))
 
     # Yaml parsing #
-    if args.custom is not None:
-        # Custom command line argument for parsing #
-        formatting = {}
-        for arg in args.custom:
-            if '=' in arg:
-                formatting[arg.split('=')[0]] = arg.split('=')[1]
-            else:
-                logging.warning(f'`--custom {arg}` will be ignored because no `=`')
-        config = yaml.load({'filename':args.yaml,'formatting':formatting},
-                      Loader=YMLIncludeLoader)
-    else:
-        # Classic parse #
-        with open(args.yaml,'r') as handle:
-            config = yaml.load(handle,Loader=YMLIncludeLoader)
+    config = parseYaml(args.yaml,args.custom)
 
     # Content checks #
     required_items = ['path','outputDir','yamlName','hist_conv','groups']
@@ -2241,7 +2254,25 @@ if __name__=="__main__":
             else:
                 categoriesToRun = [[val for key in args.split for val in config['regroup'][key]]]
 
+    # Create output directory #
+    outputDir = config['outputDir']
+    if not os.path.isabs(outputDir):
+        outputDir = os.path.join(os.path.abspath(os.path.dirname(__file__)),outputDir)
+    if not os.path.exists(outputDir):
+        os.makedirs(outputDir)
+    config['outputDir'] = outputDir
+    plotIt_path = os.path.join(outputDir,'plotit','root')
+    if not os.path.exists(plotIt_path):
+        os.makedirs(plotIt_path)
+        # Need to be done prior to avood thread concurrences
+
+
+
     # Instantiate #
+    if args.custom is not None:
+        custom_args = "--custom "+' '.join(args.custom)
+    else:
+        custom_args = None
     instances = []
     for icat,categories in enumerate(categoriesToRun):
         config['hist_conv'] = {cat:global_hist_conv[cat] for cat in categories}
@@ -2249,20 +2280,17 @@ if __name__=="__main__":
                                   worker          = args.worker,
                                   pseudodata      = args.pseudodata,
                                   logName         = f'log_{icat}.log',
+                                  custom_args     = custom_args,
                                   **config) )
-    if args.combine is not None: 
-        if args.split is not None:
-            raise RuntimeError('Safer not to use `--split` with `--combine`')
-        assert len(instances) == 1
-        instance = instances[0]
-        combine_args = {}
-        for arg in args.combine_args:
-            if '=' in arg:
-                combine_args[arg.split('=')[0]] = arg.split('=')[1]
-            else:
-                logging.warning(f'`--combine_args {arg}` will be ignored because no `=`')
-        instance.run_combine(args.combine,combine_args,debug=args.debug)
-    else:
+
+    # Run #
+    def run_instance(instance,methods):
+        for method in methods:
+            assert hasattr(instance,method)
+            output = getattr(instance,method)()
+        return output
+
+    def run_all():
         if args.jobs is None:
             plotIt_configs = []
             for instance in instances:
@@ -2270,21 +2298,40 @@ if __name__=="__main__":
                     instance.run_production()
                 plotIt_configs.append(instance.prepare_plotIt())
         else:
-            def run(instance,methods):
-                for method in methods:
-                    assert hasattr(instance,method)
-                    output = getattr(instance,method)()
-                return output
             if args.jobs == -1 or args.jobs > len(instances):
                 args.jobs = len(instances)
             methods = ['prepare_plotIt']
             if not args.plotIt:
                 methods.insert(0,'run_production')
             with mp.Pool(processes=args.jobs) as pool:
-                plotIt_configs = pool.starmap(run,[(instance,methods) for instance in instances])
-                
-
+                plotIt_configs = pool.starmap(run_instance,[(instance,methods) for instance in instances])
         # Merge and run plotit (single thread anyway) #
         plotIt_config = DataCard.merge_plotIt(plotIt_configs)
         instances[0].run_plotIt(plotIt_config)
+
+    if args.combine is not None: 
+        config['hist_conv'] = global_hist_conv
+        combine_instance = DataCard(configPath      = os.path.abspath(args.yaml),
+                                    worker          = args.worker,
+                                    pseudodata      = args.pseudodata,
+                                    logName         = f'log_{icat}.log',
+                                    custom_args     = custom_args,
+                                    **config) 
+  
+        combine_args = {}
+        for arg in args.combine_args:
+            if '=' in arg:
+                combine_args[arg.split('=')[0]] = arg.split('=')[1]
+            else:
+                logging.warning(f'`{arg}` will be ignored because no `=`')
+        while True:
+            valid = combine_instance.run_combine(args.combine,combine_args,debug=args.debug)
+            if valid: 
+                break
+            logging.warning('Will restart datacard production')
+            run_all()
+    else:
+        run_all()
+                
+
 
