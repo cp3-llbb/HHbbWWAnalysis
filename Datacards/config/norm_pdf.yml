@@ -150,7 +150,5 @@ pdf_qqbar:
     val: [0.9884,1.0116]
   - proc: [VV]
     val: [0.954,1.046]
-  - proc: 
-    - ttW
-    - ttZ
+  - proc: [ttW]
     val: [0.98,1.02]
