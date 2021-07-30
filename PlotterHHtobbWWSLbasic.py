@@ -334,3 +334,6 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         return plots
 
+    ### PostProcess ###
+    def postProcess(self, taskList, config=None, workdir=None, resultsdir=None):
+        super(PlotterNanoHHtobbWWSL, self).postProcess(taskList, config, workdir, resultsdir, forSkimmer=False)
