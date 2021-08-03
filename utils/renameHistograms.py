@@ -8,23 +8,10 @@ import multiprocessing as mp
 
 from IPython import embed
 
+ROOT.gROOT.ProcessLine('#include "{}"'.format(os.path.join(os.path.dirname(__file__),'rename_header.h')))
+
 def rename_in_file(f,input,output,debug=False):
-    F = ROOT.TFile(f,"UPDATE")
-    histNames = [key.GetName() for key in F.GetListOfKeys() 
-                    if key.GetClassName().startswith('TH')]
-    count = 0
-    for histName in histNames:
-        if input not in histName:
-            continue
-        count += 1
-        if not debug:
-            outName = histName.replace(input,output)
-            h = F.Get(histName)
-            h.Write(outName,ROOT.TObject.kOverwrite)
-            F.Delete(histName+";1")
-    if count > 0:
-        print (f'Processing {f} : renamed {count}')
-    F.Close()
+    ROOT.rename(f,input,output,debug)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Renaming root files histograms')
@@ -41,7 +28,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
 
-    rootFiles = sorted(glob.glob(args.regex))
+    rootFiles = glob.glob(args.regex)
     if len(rootFiles) == 0:
         raise RuntimeError('Regex returned no file')
     print (f'Looking at {len(rootFiles)} root files')
