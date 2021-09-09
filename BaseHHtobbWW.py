@@ -1290,7 +1290,6 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                               Triggers                                    #
         #############################################################################
-          
         #----- Trigger mask for data -----#
         if not self.is_MC:
             if era == "2018": # For 2018 the electron samples are merged, need to build according dict for primary dataset

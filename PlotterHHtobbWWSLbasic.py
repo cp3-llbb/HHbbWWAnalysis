@@ -12,6 +12,7 @@ from bamboo.analysismodules import HistogramsModule, DataDrivenBackgroundHistogr
 
 from bamboo import treefunctions as op
 from bamboo.plots import CutFlowReport, Plot, EquidistantBinning, SummedPlot
+from bamboo.analysisutils import printCutFlowReports, addPrintout
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)))) # Add scripts in this directory
 from BaseHHtobbWW import BaseNanoHHtobbWW
@@ -24,6 +25,48 @@ from bamboo.root import gbl
 import ROOT
 from functools import partial
 
+if not hasattr(gbl, "bamboo_printEntry"):
+    gbl.gInterpreter.Declare("""
+    bool bamboo_printEntry(long entry, float val) {
+      std::cout << "Processing entry #" << entry << ": val " << val << std::endl;
+      return true;
+    }""")
+    gbl.gInterpreter.Declare("""
+    bool bamboo_printComb3_(long entry, const rdfhelpers::Combination<3>& comb, std::size_t idx, double value, UInt_t nJets, UInt_t nComb, const ROOT::VecOps::RVec<rdfhelpers::Combination<3>>& combs, const ROOT::VecOps::RVec<std::size_t>& rng) {
+      std::cout << "Combination #" << idx << " (value " << value << ") for " << entry << ": " << comb.get(0) << ", " << comb.get(1) << ", " << comb.get(2) << ", nJets=" << nJets << ", nSelJets=" << rng.size() << ", nCombinations=" << nComb << std::endl;
+      if ( ( comb.get(0) >= nJets ) || ( comb.get(1) >= nJets ) || ( comb.get(2) >= nJets ) ) {
+        std::cout << "All combinations: " << std::endl;
+        for ( const auto& icomb : combs ) {
+          std::cout << " - " << icomb.get(0) << ", " << icomb.get(1) << ", " << icomb.get(2) << std::endl;
+        }
+        std::cout << "From range with size " << rng.size() << ": ";
+        for ( auto idx : rng) {
+          std::cout << " " << idx;
+        }
+        std::cout << std::endl;
+      }
+      return true;
+    }""")
+'''
+def addPrint(nd, funName, *args):
+    callPrint = op.extMethod(funName, returnType="bool")(*args)
+    filterStr = nd(callPrint.op)
+    logger.debug(f"Adding printout with {filterStr}")
+    nd.df = nd.df.Filter(filterStr)
+
+def addPrintout(selection, funName, *args):
+    from bamboo import treefunctions as op
+    from bamboo import treeproxies as _tp
+    from bamboo import dataframebackend
+    be = selection._fbe
+    if selection.name not in be.selDFs:
+        raise RuntimeError("This method will only work with a dynamically constructed RDataFrame")
+    nd = be.selDFs[selection.name]
+    callPrint = op.extMethod(funName, returnType=_tp.boolType)(*args)
+    filterStr = nd(callPrint.op)
+    logger.debug(f"Adding printout with {filterStr}")
+    nd.df = nd.df.Filter(filterStr)
+'''
 #===============================================================================================#
 #                                       PlotterHHtobbWW                                         #
 #===============================================================================================#
@@ -73,8 +116,13 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         
         self.yieldPlots = makeYieldPlots(self.args.Synchronization)
         
+        #yields = CutFlowReport("yields")
+        #plots.append(yields)
+
+        
         #----- Singleleptons -----#
-        ElSelObj,MuSelObj = makeSingleLeptonSelection(self,noSel,plot_yield=True)
+        #ElSelObj,MuSelObj = makeSingleLeptonSelection(self,noSel,plot_yield=True)
+        ElSelObj,MuSelObj = makeSingleLeptonSelection(self,noSel,plot_yield=True,use_dd=False,fake_selection=self.args.FakeCR)
 
         #----- Apply jet corrections -----#
         self.beforeJetselection(ElSelObj.sel,'El')
@@ -120,11 +168,12 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         commonItems  = ['channel','sel','suffix']
             
         selObjectDictList = []
+        # ========================== Resolved Categories ========================= #
         if any(item in resolved_args for item in jetsel_level):
             ChannelDictListR = []
             logger.info ("... Processing Ak4Jets Selection for Resolved category : nAk4Jets >= 3 + nAk4BJets >= 1 + nAk8BJets == 0")
-            ElSelObjResolved = makeResolvedSelection(self,ElSelObj,copy_sel=True,plot_yield=True)
-            MuSelObjResolved = makeResolvedSelection(self,MuSelObj,copy_sel=True,plot_yield=True)
+            ElSelObjResolved = makeResolvedSelection(self,ElSelObj,copy_sel=True)
+            MuSelObjResolved = makeResolvedSelection(self,MuSelObj,copy_sel=True)
 
             if "Resolved2Btag" in jetplot_level:
                 logger.info ('Resolved2Btag Node Selection')
@@ -134,11 +183,17 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 selObjectDictList.append({'channel':'El','selObject':ElSelObjResolved2b,'category':'Resolved','VBFJets':self.VBFJetPairsResolved})
                 selObjectDictList.append({'channel':'Mu','selObject':MuSelObjResolved2b,'category':'Resolved','VBFJets':self.VBFJetPairsResolved})
 
-                if self.args.onlypost:
-                    ElSelObjResolved2b.record_yields = True
-                    MuSelObjResolved2b.record_yields = True
-                    ElSelObjResolved2b.yieldTitle = 'Resolved2b Channel $e^{\pm}$'
-                    MuSelObjResolved2b.yieldTitle = 'Resolved2b Channel $\mu^{\pm}$'
+                #if self.args.onlypost:
+                ElSelObjResolved2b.record_yields = True
+                MuSelObjResolved2b.record_yields = True
+                ElSelObjResolved2b.yieldTitle = 'Resolved2b Channel $e^{\pm}$'
+                MuSelObjResolved2b.yieldTitle = 'Resolved2b Channel $\mu^{\pm}$'
+                if self.args.PrintYield:
+                    self.yields.add(ElSelObjResolved2b.sel)
+                    self.yields.add(MuSelObjResolved2b.sel)
+
+                addPrintout(ElSelObjResolved2b.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
+                addPrintout(MuSelObjResolved2b.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
                 
                 if not self.args.OnlyYield:
                     ChannelDictListR.append({'channel':'El','selObj':ElSelObjResolved2b,'sel':ElSelObjResolved2b.sel,
@@ -159,14 +214,25 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 ElSelObjResolved1b        = makeExclusiveResolvedSelection(self, ElSelObjResolved, nbJet=1, copy_sel=True)
                 MuSelObjResolved1b        = makeExclusiveResolvedSelection(self, MuSelObjResolved, nbJet=1, copy_sel=True)
 
+                plots.append(CutFlowReport("ElSelObjResolved1b", ElSelObjResolved1b.sel))
+                plots.append(CutFlowReport("MuSelObjResolved1b", MuSelObjResolved1b.sel))
+
                 selObjectDictList.append({'channel':'El','selObject':ElSelObjResolved1b,'category':'Resolved','VBFJets':self.VBFJetPairsResolved})
                 selObjectDictList.append({'channel':'Mu','selObject':MuSelObjResolved1b,'category':'Resolved','VBFJets':self.VBFJetPairsResolved})
+                self.yields.add(ElSelObjResolved1b.sel, "ElSelObjResolved1b")
+                self.yields.add(MuSelObjResolved1b.sel, "MuSelObjResolved1b")
 
-                if self.args.onlypost:
-                    ElSelObjResolved1b.record_yields = True
-                    MuSelObjResolved1b.record_yields = True
-                    ElSelObjResolved1b.yieldTitle = 'Resolved1b Channel $e^{\pm}$'
-                    MuSelObjResolved1b.yieldTitle = 'Resolved1b Channel $\mu^{\pm}$'
+                #if self.args.onlypost:
+                ElSelObjResolved1b.record_yields = True
+                MuSelObjResolved1b.record_yields = True
+                ElSelObjResolved1b.yieldTitle = 'Resolved1b Channel $e^{\pm}$'
+                MuSelObjResolved1b.yieldTitle = 'Resolved1b Channel $\mu^{\pm}$'
+                if self.args.PrintYield:
+                    self.yields.add(ElSelObjResolved1b.sel)
+                    self.yields.add(MuSelObjResolved1b.sel)
+
+                addPrintout(ElSelObjResolved1b.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
+                addPrintout(MuSelObjResolved1b.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
                 
                 if not self.args.OnlyYield:
                     ChannelDictListR.append({'channel':'El','selObj':ElSelObjResolved1b,'sel':ElSelObjResolved1b.sel,
@@ -196,17 +262,28 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 ##plots.extend(makeHighLevelPlotsResolved(**{k:channelDict[k] for k in ResolvedKeys},HLL=self.HLL))
             '''
 
-        # ========================== JPA Boosted Categories ========================= #
+        # ========================== Boosted Categories ========================= #
         if any(item in boosted_args for item in jetsel_level):
             ChannelDictListB = []
             FatJetKeys  = ['channel','sel','jet1','jet2','jet3','jet4','has1fat1slim','has1fat2slim','suffix']
 
             logger.info ("...... Processing Boosted Category : nAk8BJets >= 1, nAk4JetsCleanedFromAk8b >= 1")
-            ElSelObjBoosted = makeBoostedSelection(self,ElSelObj,copy_sel=True,plot_yield=True)
-            MuSelObjBoosted = makeBoostedSelection(self,MuSelObj,copy_sel=True,plot_yield=True)
+            ElSelObjBoosted = makeBoostedSelection(self,ElSelObj,copy_sel=True)
+            MuSelObjBoosted = makeBoostedSelection(self,MuSelObj,copy_sel=True)
 
             selObjectDictList.append({'channel':'El','selObject':ElSelObjBoosted,'category':'Boosted','VBFJets':self.VBFJetPairsBoosted})
             selObjectDictList.append({'channel':'Mu','selObject':MuSelObjBoosted,'category':'Boosted','VBFJets':self.VBFJetPairsBoosted})
+
+            ElSelObjBoosted.record_yields = True
+            MuSelObjBoosted.record_yields = True
+            ElSelObjBoosted.yieldTitle = 'Boosted Channel $e^{\pm}$' 
+            MuSelObjBoosted.yieldTitle = 'Boosted Channel $\mu^{\pm}$'
+            if self.args.PrintYield:
+                self.yields.add(ElSelObjBoosted.sel)
+                self.yields.add(MuSelObjBoosted.sel)
+
+            addPrintout(ElSelObjBoosted.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
+            addPrintout(MuSelObjBoosted.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
 
             if not self.args.OnlyYield:
                 ChannelDictListB.append({'channel':'El','selObj':ElSelObjBoosted, 'sel':ElSelObjBoosted.sel,
@@ -279,30 +356,22 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             inputsParam   = mvaEvaluatorSL_nonres.returnParamMVAInputs    (self)
             inputsEventNr = mvaEvaluatorSL_nonres.returnEventNrMVAInputs  (self,t)
 
-            print ("Lepton variables : %d"%len(inputsLeps))                                                                                                                                             
-            print ("Jet variables    : %d"%len(inputsJets))                                                                                                                                             
-            print ("Fatjet variables : %d"%len(inputsFatjet))                                                                                                                                           
-            print ("MET variables    : %d"%len(inputsMET))                                                                                                                                              
-            print ("HL variables     : %d"%len(inputsHL))                                                                                                                                               
-            print ("Param variables  : %d"%len(inputsParam))                                                                                                                                            
-            print ("Event variables  : %d"%len(inputsEventNr))                                                                                                                                          
+            print ("Lepton variables : %d"%len(inputsLeps))                                 
+            print ("Jet variables    : %d"%len(inputsJets))
+            print ("Fatjet variables : %d"%len(inputsFatjet))                       
+            print ("MET variables    : %d"%len(inputsMET)) 
+            print ("HL variables     : %d"%len(inputsHL))
+            print ("Param variables  : %d"%len(inputsParam)) 
+            print ("Event variables  : %d"%len(inputsEventNr))
             
-            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLeps))
-            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets)) 
-            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))
-            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsMET)) 
-            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL)) 
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam)) 
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsEventNr))
+            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLeps))
+            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets)) 
+            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))
+            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsMET)) 
+            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL)) 
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam)) 
+            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsEventNr))
             
-            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLeps))
-            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets))
-            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))
-            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsMET))
-            #plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL)) 
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam)) 
-            #plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsEventNr)) 
-
             from  mvaEvaluatorSL_nonres import inputStaticCast
 
             inputs = [op.array("double",*inputStaticCast(inputsLeps,"float")),
@@ -331,6 +400,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         #----- Add the Yield plots -----#
         if self.args.PrintYield or self.args.OnlyYield:
             plots.append(self.yields)
+            #plots.append(yields)
 
         return plots
 

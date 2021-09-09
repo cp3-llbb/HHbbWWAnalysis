@@ -2,8 +2,8 @@ module: SkimmerHHtobbWWHME.py:SkimmerHME
 
 config: 
   era:
-    - 2016: Yaml/analysis2016_v7.yml
-#    - 2017: Yaml/analysis2017_v7.yml
+#    - 2016: Yaml/analysis2016_v7.yml
+    - 2017: Yaml/analysis2017_v7.yml
 #    - 2018: Yaml/analysis2018_v7.yml
 
 args:
@@ -17,10 +17,10 @@ args:
     - MuMu: --Channel=MuMu
     - ElMu: --Channel=ElMu
   - type:   
-    - "SR" : "" # SR
-    - "FakeCR": "--FakeCR"
+#    - "SR" : "" 
+#    - "FakeCR": "--FakeCR"
     - "DYCR"  : "--DYCR"
   - --NoSystematics
   - --analysis=res
 
-output: /home/ucl/cp3/fbury/scratch/SkimsHME/Skim{era}_{cat}_{channel}_{type}
+output: /nfs/scratch/fynu/gsaha/SkimsHME/Skim{era}_{cat}_{channel}_{type}

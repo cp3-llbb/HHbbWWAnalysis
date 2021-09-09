@@ -1,15 +1,15 @@
 module: PlotterHHtobbWWDL.py:PlotterNanoHHtobbWWDL
 config: 
   era:
-    - 2016: Yaml/analysis2016_v7.yml
+    #- 2016: Yaml/analysis2016_v7.yml
     - 2017: Yaml/analysis2017_v7.yml
-    - 2018: Yaml/analysis2018_v7.yml
+    #- 2018: Yaml/analysis2018_v7.yml
 
 args:
   - "--subset=mc,data,bbww2l,bbtautau,graviton,radion"
-  - cat:    
-      - Resolved1B : "--Resolved1Btag"
-      - Resolved2B : "--Resolved2Btag"
+  - cat:
+      #- Resolved1B : "--Resolved1Btag"
+      #- Resolved2B : "--Resolved2Btag"
       - Boosted1B  : "--Boosted1Btag"
   - "--datadriven=FakeExtrapolation,DYEstimation"
   - mass:
@@ -32,4 +32,4 @@ args:
     - 850 : "--mass 850"
     - 900 : "--mass 900"
 
-output: /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full{era}NanoV7_TTHIDLoose_Fake_Resonant_{cat}_syst_M_{mass}
+output: /nfs/scratch/fynu/gsaha/BambooOutputHHtobbWW_Master/full{era}NanoV7_TTHIDLoose_Fake_Resonant_{cat}_syst_M_{mass}

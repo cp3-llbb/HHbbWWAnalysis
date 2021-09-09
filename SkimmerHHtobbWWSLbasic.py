@@ -46,34 +46,36 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 raise RuntimeError("Channel must be either 'El' or 'Mu'")            
             
             #----- Machine Learning Model -----#                
-            model_nums  = ["01","12"]
-            path_model_01 = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','SL',model_nums[0],'model','model.pb')
-            path_model_12 = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','SL',model_nums[1],'model','model.pb')
-            input_names   = ["lep","jet","fat","met","hl","param","eventnr"]
-            output_name   = "Identity"
+            #model_nums  = ["01","12"]
+            #path_model_01 = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','SL',model_nums[0],'model','model.pb')
+            #path_model_12 = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','SL',model_nums[1],'model','model.pb')
+            #input_names   = ["lep","jet","fat","met","hl","param","eventnr"]
+            #output_name   = "Identity"
         
-            if not self.args.OnlyYield:
-                print ("DNN model : %s"%path_model_01)
-                if not os.path.exists(path_model_01):
-                    raise RuntimeError('Could not find model file %s'%path_model_01)
-                try:
-                    DNN_01 = op.mvaEvaluator(path_model_01,mvaType='Tensorflow',otherArgs=(input_names, output_name))
-                    DNN_12 = op.mvaEvaluator(path_model_12,mvaType='Tensorflow',otherArgs=(input_names, output_name))
-                except:
-                    raise RuntimeError('Could not load model %s'%path_model_01)
+            #if not self.args.OnlyYield:
+            #    print ("DNN model : %s"%path_model_01)
+            #    if not os.path.exists(path_model_01):
+            #        raise RuntimeError('Could not find model file %s'%path_model_01)
+            #    try:
+            #        DNN_01 = op.mvaEvaluator(path_model_01,mvaType='Tensorflow',otherArgs=(input_names, output_name))
+            #        DNN_12 = op.mvaEvaluator(path_model_12,mvaType='Tensorflow',otherArgs=(input_names, output_name))
+            #    except:
+            #        raise RuntimeError('Could not load model %s'%path_model_01)
 
-            self.nodes = ['GGF','VBF','TT','ST','WJets','H','Other']
+            #self.nodes = ['GGF','VBF','TT','ST','WJets','H','Other']
             #----- Lepton selection -----#
             # Args are passed within the self #
             #ElSelObj, MuSelObj = makeSingleLeptonSelection(self,noSel,use_dd=False)
             ElSelObj, MuSelObj = makeSingleLeptonSelection(self,noSel,use_dd=False,fake_selection=self.args.FakeCR)
             if self.args.Channel == "El":
                 selObj = ElSelObj
-                lepton = self.electronsTightSel[0]
+                #lepton = self.electronsTightSel[0]
+                lepton = self.electronsFakeSel[0]
                 
             if self.args.Channel == "Mu":
                 selObj = MuSelObj
-                lepton = self.muonsTightSel[0]
+                #lepton = self.muonsTightSel[0]
+                lepton = self.muonsFakeSel[0]
             
 
             #----- Jet selection -----#
@@ -105,11 +107,14 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
         if self.args.Synchronization:
             # Event variables #
             varsToKeep["event"]             = None # Already in tree
+            varsToKeep["eventnr_eventnr"]   = t.event
             varsToKeep["run"]               = None # Already in tree 
+            varsToKeep["hl_run"]            = t.run # Already in tree 
             varsToKeep["ls"]                = t.luminosityBlock
+            varsToKeep["hl_lumi"]           = t.luminosityBlock
 
-            varsToKeep["is_e"]          = op.c_float(1.) if self.args.Channel == 'El' else op.c_float(0.)
-            varsToKeep["is_m"]          = op.c_float(1.) if self.args.Channel == 'El' else op.c_float(0.)
+            varsToKeep["is_e"]          = op.c_bool(True) if self.args.Channel == 'El' else op.c_bool(False)
+            varsToKeep["is_m"]          = op.c_bool(True) if self.args.Channel == 'Mu' else op.c_bool(False)
 
             varsToKeep["n_presel_mu"]       = op.static_cast("UInt_t",op.rng_len(self.muonsPreSel))
             varsToKeep["n_fakeablesel_mu"]  = op.static_cast("UInt_t",op.rng_len(self.muonsFakeSel))
@@ -125,21 +130,37 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
             varsToKeep["n_ak4JetsCleanAk8b"]= op.static_cast("UInt_t",op.rng_len(self.ak4JetsCleanedFromAk8b))
             varsToKeep["n_presel_ak4JetVBF"]= op.static_cast("UInt_t",op.rng_len(self.VBFJetsPreSel))
  
-            varsToKeep["is_SR"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.electronsTightSel)==1,
-                                                                            op.rng_len(self.muonsTightSel)==1))
+            #varsToKeep["is_SR"]             = op.static_cast("UInt_t",op.OR(op.rng_len(self.electronsTightSel)==1,
+            #                                                                op.rng_len(self.muonsTightSel)==1))
 
+            varsToKeep["is_e_SR_prompt"] = op.switch(op.rng_len(self.electronsTightSel) == 1, op.c_bool(True), op.c_bool(False))  
+            varsToKeep["is_m_SR_prompt"] = op.switch(op.rng_len(self.muonsTightSel) == 1, op.c_bool(True), op.c_bool(False))
+            varsToKeep["is_e_FR_prompt"] = op.switch(op.AND(op.rng_len(self.electronsFakeSel) > 0, 
+                                                            op.AND(self.lambda_is_matched(self.electronsFakeSel[0]) , op.NOT(self.lambda_electronTightSel(self.electronsFakeSel[0])))),
+                                                     op.c_bool(True), op.c_bool(False))
+            varsToKeep["is_m_FR_prompt"] = op.switch(op.AND(op.rng_len(self.muonsFakeSel) > 0, 
+                                                            op.AND(self.lambda_is_matched(self.muonsFakeSel[0]),op.NOT(self.lambda_muonTightSel(self.muonsFakeSel[0])))),
+                                                     op.c_bool(True), op.c_bool(False))
 
-            varsToKeep["is_resolved"]   = op.switch(op.AND(op.rng_len(self.ak4Jets)>=3,
-                                                           op.rng_len(self.ak4BJets) >= 1,
-                                                           op.rng_len(self.ak8BJets)==0), op.c_bool(True), op.c_bool(False))
-            varsToKeep["is_boosted"]    = op.switch(op.AND(op.rng_len(self.ak8BJets)>=1,op.rng_len(self.ak4JetsCleanedFromAk8b)>=1), op.c_bool(True), op.c_bool(False))
+            varsToKeep["is_resolved"]    = op.switch(op.AND(op.rng_len(self.ak4Jets)>=3,
+                                                            op.rng_len(self.ak4BJets) >= 1,
+                                                            op.rng_len(self.ak8BJets)==0), op.c_bool(True), op.c_bool(False))
+            varsToKeep["is_boosted"]     = op.switch(op.AND(op.rng_len(self.ak8BJets)>=1,op.rng_len(self.ak4JetsCleanedFromAk8b)>=1), op.c_bool(True), op.c_bool(False))
             
+            varsToKeep["is_resolved_1b"] = op.switch(op.AND(op.rng_len(self.ak4Jets)>=3,
+                                                           op.rng_len(self.ak4BJets) == 1,
+                                                           op.rng_len(self.ak8BJets)==0), op.c_bool(True), op.c_bool(False))
+            varsToKeep["is_resolved_2b"] = op.switch(op.AND(op.rng_len(self.ak4Jets)>=3,
+                                                           op.rng_len(self.ak4BJets) >= 2,
+                                                           op.rng_len(self.ak8BJets)==0), op.c_bool(True), op.c_bool(False))
+            
+
             varsToKeep["n_tau"]         = op.static_cast("UInt_t", op.rng_len(self.tauCleanSel))
 
-            varsToKeep['resolved_tag']  = op.static_cast("UInt_t",op.AND(op.rng_len(self.ak4Jets) >= 3,
-                                                                         op.rng_len(self.ak4BJets) >= 1,
-                                                                         op.rng_len(self.ak8BJets) == 0))
-            varsToKeep['boosted_tag']   = op.static_cast("UInt_t",op.AND(op.rng_len(self.ak8BJets) >= 1,op.rng_len(self.ak4JetsCleanedFromAk8b) >= 1))
+            #varsToKeep['resolved_tag']  = op.static_cast("UInt_t",op.AND(op.rng_len(self.ak4Jets) >= 3,
+            #                                                             op.rng_len(self.ak4BJets) >= 1,
+            #                                                             op.rng_len(self.ak8BJets) == 0))
+            #varsToKeep['boosted_tag']   = op.static_cast("UInt_t",op.AND(op.rng_len(self.ak8BJets) >= 1,op.rng_len(self.ak4JetsCleanedFromAk8b) >= 1))
 
             # Triggers #
             '''
@@ -229,12 +250,12 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep["ak4Jet{}_phi".format(i)]                = op.switch(op.rng_len(self.ak4Jets) >= i, self.ak4Jets[i-1].phi, op.c_float(-9999.))
                 varsToKeep["ak4Jet{}_E".format(i)]                  = op.switch(op.rng_len(self.ak4Jets) >= i, self.ak4Jets[i-1].p4.E(), op.c_float(-9999.))
                 varsToKeep["ak4Jet{}_CSV".format(i)]                = op.switch(op.rng_len(self.ak4Jets) >= i, self.ak4Jets[i-1].btagDeepFlavB, op.c_float(-9999.))
-                varsToKeep["ak4Jet{}_hadronFlavour".format(i)]      = op.switch(op.rng_len(self.ak4Jets) >= i, self.ak4Jets[i-1].hadronFlavour, op.c_float(-9999.))
-                varsToKeep["ak4Jet{}_btagSF".format(i)]             = op.switch(op.rng_len(self.ak4Jets) >= i, self.DeepJetDiscReshapingSF(self.ak4Jets[i-1]), op.c_float(-9999.))
-                varsToKeep["ak4Jet{}_puid_eff".format(i)]           = op.switch(op.rng_len(self.ak4Jets) >= i, self.jetpuid_mc_eff(self.ak4Jets[i-1]), op.c_float(-9999.))
-                varsToKeep["ak4Jet{}_puid_sfeff".format(i)]         = op.switch(op.rng_len(self.ak4Jets) >= i, self.jetpuid_sf_eff(self.ak4Jets[i-1]), op.c_float(-9999.))
-                varsToKeep["ak4Jet{}_puid_mis".format(i)]           = op.switch(op.rng_len(self.ak4Jets) >= i, self.jetpuid_mc_mis(self.ak4Jets[i-1]), op.c_float(-9999.))
-                varsToKeep["ak4Jet{}_puid_sfmis".format(i)]         = op.switch(op.rng_len(self.ak4Jets) >= i, self.jetpuid_sf_mis(self.ak4Jets[i-1]), op.c_float(-9999.))
+                #varsToKeep["ak4Jet{}_hadronFlavour".format(i)]      = op.switch(op.rng_len(self.ak4Jets) >= i, self.ak4Jets[i-1].hadronFlavour, op.c_float(-9999.))
+                #varsToKeep["ak4Jet{}_btagSF".format(i)]             = op.switch(op.rng_len(self.ak4Jets) >= i, self.DeepJetDiscReshapingSF(self.ak4Jets[i-1]), op.c_float(-9999.))
+                #varsToKeep["ak4Jet{}_puid_eff".format(i)]           = op.switch(op.rng_len(self.ak4Jets) >= i, self.jetpuid_mc_eff(self.ak4Jets[i-1]), op.c_float(-9999.))
+                #varsToKeep["ak4Jet{}_puid_sfeff".format(i)]         = op.switch(op.rng_len(self.ak4Jets) >= i, self.jetpuid_sf_eff(self.ak4Jets[i-1]), op.c_float(-9999.))
+                #varsToKeep["ak4Jet{}_puid_mis".format(i)]           = op.switch(op.rng_len(self.ak4Jets) >= i, self.jetpuid_mc_mis(self.ak4Jets[i-1]), op.c_float(-9999.))
+                #varsToKeep["ak4Jet{}_puid_sfmis".format(i)]         = op.switch(op.rng_len(self.ak4Jets) >= i, self.jetpuid_sf_mis(self.ak4Jets[i-1]), op.c_float(-9999.))
 
             # VBF Jets #
             if not self.inclusive_sel:
@@ -264,8 +285,9 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 inputDict = {**inputsLeps, **inputsJets, **inputsMET, **inputsFatjet, **inputsHL} 
 
                 for (varname,_,_),var in inputDict.items():
+                    #varsToKeep['hl_'+varname] = var
                     varsToKeep[varname] = var
-
+                '''
                 from  mvaEvaluatorSL_nonres import inputStaticCast
 
                 inputs = [op.array("double",*inputStaticCast(inputsLeps,"float")),
@@ -277,13 +299,10 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                           op.array("long",*inputStaticCast(inputsEventNr,"long"))]
                 
                 output_01 = DNN_01(*inputs)
-                output_12 = DNN_12(*inputs)
                 
                 for node, output in zip(self.nodes,output_01):
                     varsToKeep['DNN_model_'+model_nums[0]+'_node_'+node] = output
-                for node, output in zip(self.nodes,output_12):
-                    varsToKeep['DNN_model_'+model_nums[1]+'_node_'+node] = output
-                        
+                '''
             # AK8 Jets #
             for i in range(1,3): # 2 leading fatjets 
                 varsToKeep["ak8Jet{}_pt".format(i)]                 = op.switch(op.rng_len(self.ak8BJets) >= i, self.ak8BJets[i-1].pt, op.c_float(-9999.))
@@ -311,7 +330,7 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
 
             # SF #
             electronMuon_cont        = op.combine((self.electronsFakeSel, self.muonsFakeSel))
-            
+            '''
             varsToKeep["trigger_SF"] = op.multiSwitch(
                 (op.AND(op.rng_len(self.electronsTightSel)==1,op.rng_len(self.muonsTightSel)==0) , self.ttH_singleElectron_trigSF(self.electronsTightSel[0])),
                 (op.AND(op.rng_len(self.electronsTightSel)==0,op.rng_len(self.muonsTightSel)==1) , self.ttH_singleMuon_trigSF(self.muonsTightSel[0])),
@@ -319,11 +338,11 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 (op.AND(op.rng_len(self.electronsTightSel)==0,op.rng_len(self.muonsTightSel)>=2) , self.lambda_ttH_doubleMuon_trigSF(self.muonsTightSel)),
                 (op.AND(op.rng_len(self.electronsTightSel)>=1,op.rng_len(self.muonsTightSel)>=1) , self.lambda_ttH_electronMuon_trigSF(electronMuon_cont[0])),
                 op.c_float(1.))
-            
+
             if not self.inclusive_sel:
-                varsToKeep["weight_trigger_el_sf"] = op.switch(op.rng_len(self.electronsTightSel)>0, self.ttH_singleElectron_trigSF(lepton),op.c_float(1.))
-                varsToKeep["weight_trigger_mu_sf"] = op.switch(op.rng_len(self.muonsTightSel)>0, self.ttH_singleMuon_trigSF(lepton),op.c_float(1.))
-                '''
+                #varsToKeep["weight_trigger_el_sf"] = op.switch(op.rng_len(self.electronsTightSel)>0, self.ttH_singleElectron_trigSF(lepton),op.c_float(1.))
+                #varsToKeep["weight_trigger_mu_sf"] = op.switch(op.rng_len(self.muonsTightSel)>0, self.ttH_singleMuon_trigSF(lepton),op.c_float(1.))
+
                 varsToKeep["lepton_IDSF"] = op.rng_product(self.electronsFakeSel, lambda el : reduce(mul,self.lambda_ElectronLooseSF(el)+self.lambda_ElectronTightSF(el))) * \
                                             op.rng_product(self.muonsFakeSel, lambda mu : reduce(mul,self.lambda_MuonLooseSF(mu)+self.lambda_MuonTightSF(mu))) 
                 
@@ -331,7 +350,7 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                                                         op.rng_product(self.muonsFakeSel, lambda mu : reduce(mul,self.lambda_MuonLooseSF(mu)))
                 varsToKeep["lepton_IDSF_looseToTight"] = op.rng_product(self.electronsFakeSel, lambda el : reduce(mul,self.lambda_ElectronTightSF(el))) * \
                                                          op.rng_product(self.muonsFakeSel, lambda mu : reduce(mul,self.lambda_MuonTightSF(mu)))
-                '''
+
                 if era == "2016" or era == "2017": 
                     if self.args.Channel == "El":
                         varsToKeep["weight_electron_reco_low"]    = op.switch(op.AND(self.lambda_is_matched(lepton),lepton.pt<=20.), self.elLooseRecoPtLt20(lepton), op.c_float(1.))
@@ -382,7 +401,7 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
             #varsToKeep["PU_jetID_SF"]                = self.puid_reweighting
             #varsToKeep["weight_jet_PUid_efficiency"] = self.puid_reweighting_efficiency
             #varsToKeep["weight_jet_PUid_mistag"]     = self.puid_reweighting_mistag
-            '''
+
             # Btagging SF #
             varsToKeep["btag_SF"]           = self.btagAk4SF
             varsToKeep["weight_btagWeight"] = self.btagAk4SF

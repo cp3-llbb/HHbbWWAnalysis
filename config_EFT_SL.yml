@@ -6,9 +6,11 @@ config:
     - 2018: Yaml/analysis2018_v7.yml
 
 args:
-  - "--subset=GGFNLO,bbww1l"
+  - "--subset=GGFNLO,bbww1l,bbww2l,bbtautau"
   - "--analysis=nonres"
   - "--Resolved1Btag --Resolved2Btag --Boosted"
+  - "--NoSystematics"
+  - "--datadriven=FakeExtrapolation"
   - BM:
     - SM:       "--HHReweighting BenchmarkSM"
     - 1:        "--HHReweighting Benchmark1"
@@ -36,4 +38,4 @@ args:
     - cluster6: "--HHReweighting Benchmarkcluster6"
     - cluster7: "--HHReweighting Benchmarkcluster7"
   
-output: /nfs/scratch/fynu/gsaha/Sync_Aachen_EFT_Output/full{era}NanoV7_TTHIDLoose_Fake_SL_DNN01_GGFNLO_Benchmark{BM}
+output: /nfs/scratch/fynu/gsaha/Sync_Aachen_EFT_Reweighted_NoSyst/full{era}NanoV7_TTHIDLoose_Fake_SL_DNN01_GGFNLO_Benchmark{BM}

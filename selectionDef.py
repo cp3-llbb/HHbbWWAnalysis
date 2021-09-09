@@ -69,8 +69,10 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_sel
     """
     #--- Lambdas ---#
     # Fakeable lambdas #
-    lambdaElPtCut = lambda lepColl: lepColl[0].pt > 32 
-    lambdaMuPtCut = lambda lepColl: lepColl[0].pt > 25 
+    #lambdaElPtCut = lambda lepColl: lepColl[0].pt > 32 
+    #lambdaMuPtCut = lambda lepColl: lepColl[0].pt > 25
+    lambdaElPtCut = lambda lepColl: self.electron_conept[lepColl[0].idx] > 32.0
+    lambdaMuPtCut = lambda lepColl: self.muon_conept[lepColl[0].idx] > 25.0
 
     # Tight #
     lambda_tight_ele = lambda ele : op.AND(self.lambda_is_matched(ele) , self.lambda_electronTightSel(ele))
@@ -228,9 +230,9 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_sel
     elif fake_selection:
         # Only return the datadriven CR selection (eg, skimmer or non closure) #
         ElSelObject.refine(cut    = [lambda_fake_ele(self.electronsFakeSel[0]), op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel)<=1],
-                           weight = lambda_FF_ele(self.electronsFakeSel[0])+ElTightSF(self.electronsFakeSel[0]))
+                           weight = lambda_FF_ele(self.electronsFakeSel[0]))
         MuSelObject.refine(cut    = [lambda_fake_mu(self.muonsFakeSel[0]), op.rng_len(self.electronsTightSel)+op.rng_len(self.muonsTightSel)<=1],
-                           weight = lambda_FF_mu(self.muonsFakeSel[0])+MuTightSF(self.muonsFakeSel[0]))
+                           weight = lambda_FF_mu(self.muonsFakeSel[0]))
         # -> in SR : lead lepton is self.electronsTightSel[0] or self.muonsTightSel[0]
         # -> in Fake CR : lead lepton is self.electronsFakeSel[0] or self.muonsFakeSel[0]
     else:
@@ -249,7 +251,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_sel
     # Return # 
     return [ElSelObject,MuSelObject]
 
-def makeResolvedSelection(self,selObject,copy_sel=False,plot_yield=False):
+def makeResolvedSelection(self,selObject,copy_sel=False):
     """
     Produces the Ak4 jet selection
     inputs :
@@ -274,7 +276,7 @@ def makeResolvedSelection(self,selObject,copy_sel=False,plot_yield=False):
     if copy_sel :
         return selObject 
 
-def makeBoostedSelection(self,selObject,copy_sel=False,plot_yield=False):
+def makeBoostedSelection(self,selObject,copy_sel=False):
     """
     Produces the Ak8b jet selection
     inputs :
