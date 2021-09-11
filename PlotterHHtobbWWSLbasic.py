@@ -122,7 +122,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         
         #----- Singleleptons -----#
         #ElSelObj,MuSelObj = makeSingleLeptonSelection(self,noSel,plot_yield=True)
-        ElSelObj,MuSelObj = makeSingleLeptonSelection(self,noSel,plot_yield=True,use_dd=False,fake_selection=self.args.FakeCR)
+        ElSelObj,MuSelObj = makeSingleLeptonSelection(self,noSel,plot_yield=True,use_dd=True,fake_selection=self.args.FakeCR)
 
         #----- Apply jet corrections -----#
         self.beforeJetselection(ElSelObj.sel,'El')
