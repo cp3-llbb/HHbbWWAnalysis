@@ -9,7 +9,7 @@ import time
 import subprocess
 import shutil
 import multiprocessing as mp
-
+from IPython import embed
 
 class YMLIncludeLoader(yaml.SafeLoader): 
     """Custom yaml loading to support including config files. Use `!include (file)` to insert content of `file` at that position."""
@@ -40,7 +40,6 @@ def which(program):
     return None
 
 def runBamboo(idx,cmd,queue):
-    #cmd = 'python3 -u test_run.py'
     process = subprocess.Popen(cmd.split(),universal_newlines=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
     # Poll process for new output until finished
     while True:
@@ -56,7 +55,7 @@ def runBamboo(idx,cmd,queue):
 
 
 class BambooLauncher:
-    def __init__(self,mode,module,config,args,output,cores):
+    def __init__(self,mode,module,config,args,output,cores,submit,debug):
         self.mode   = mode
         self.module = module
         self.config = config
@@ -65,11 +64,17 @@ class BambooLauncher:
 
         cmds = self.produceCommands()
 
-        if self.mode == 'debug':
+        if submit is not None:
+            assert isinstance(submit,dict)
+            scripts = self.generateSbatchScript(cmds,submit)
+            if not debug:
+                slurmIds = self.sendJobs(scripts,submit)
+                print ('Submitted : '+' '.join(slurmIds))
+        elif self.mode == 'debug':
             print ('Printing commands [{}]'.format(len(cmds)))
             for cmd in cmds:
                 print(cmd)
-        elif self.mode == 'driver' or self.mode  == 'finalize':
+        elif self.mode in ['driver','finalize','onlypost']:
             if which('bambooRun') is None:
                 raise RuntimeError('bamboo venv not setup, will stop here')
             if cores == -1:
@@ -82,6 +87,67 @@ class BambooLauncher:
             self.removeOutputs(cmds)
         else:
             raise RuntimeError(f'Mode {self.mode} not understood')
+
+    @staticmethod
+    def generateSbatchScript(cmds=[],params={}):
+        scriptsPath = []
+        for cmd in cmds:
+            # Find output directory #
+            cmdSplit = cmd.split(' ')
+            outputDir = None
+            if '-o' in cmdSplit:
+                outputDir = cmdSplit[cmdSplit.index('-o')+1]
+            if '--output' in cmdSplit:
+                outputDir = cmdSplit[cmdSplit.index('--output')+1]
+            if outputDir is None:
+                raise RuntimeError(f'Could not figure out output path from cmd {cmd}')
+            # Make launcher subdir # 
+            subdir = os.path.join(outputDir,'launcher')
+            if not os.path.exists(subdir):
+                os.makedirs(subdir)
+            # Make sbatch script #
+            filepath = os.path.join(subdir,f'slurmSubmission.sh')
+            scriptsPath.append(filepath)
+
+            # Write to file 
+            with open(filepath,'w') as handle:
+                # Write header #
+                handle.write('#!/bin/bash\n\n')
+                handle.write('#SBATCH --job-name=launcher\n')
+                handle.write(f'#SBATCH --output={os.path.join(subdir,"log-%j.out")}\n')
+                for key,val in params.items():
+                    handle.write(f'#SBATCH --{key}={val}\n')
+                handle.write('\n')
+                handle.write('\n')
+                handle.write(cmd)
+
+            print (f'Generated {filepath}')
+                    
+        return scriptsPath 
+
+    @staticmethod
+    def sendJobs(scripts=[],params={}):
+        slurmIds = []
+        for script in scripts:
+            sbatchCmd = ['sbatch'] + [f'--{key}={val}' for key,val in params.items()] + [script]
+            process = subprocess.Popen(sbatchCmd,universal_newlines=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            while True:
+                try:
+                    nextline = process.stdout.readline()
+                except UnicodeDecodeError:
+                    continue
+                if nextline == '' and process.poll() is not None:
+                    break
+                print (nextline.strip())
+                numbers = re.findall(r'\d+',nextline.strip()) 
+                slurm_id = None
+                if len(numbers) == 1:
+                    slurm_id = numbers[0]
+                    if len(slurm_id) != 8:
+                        slurm_id = None
+                if slurm_id is not None:
+                    slurmIds.append(str(slurm_id))
+        return slurmIds
 
     def removeOutputs(self,cmds):
         outputs = []
@@ -176,6 +242,8 @@ class BambooLauncher:
             mode = '--distributed=driver'
         elif self.mode == 'finalize':
             mode = '--distributed=finalize'
+        elif self.mode == 'onlypost':
+            mode = '--onlypost'
         else:
             mode = ''
 
@@ -258,7 +326,6 @@ class BambooLauncher:
                 cmds.append(cmd)
             
         return cmds
-            
         
 
 
@@ -269,17 +336,29 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Bamboo launcher')
     parser.add_argument('--yaml', action='store', required=True, type=str,
                         help='Yaml containing parameters')
-    parser.add_argument('--mode', action='store', required=True, type=str,
-                        help='Mode for launcher : driver | finalize | debug | remove')
+    parser.add_argument('--mode', action='store', required=True, type=str, choices = ['driver','finalize','print','remove','onlypost'],
+                        help='Mode for launcher : driver | finalize | print | remove | onlypost')
     parser.add_argument('-j', action='store', required=False, type=int, default=1,
                         help='Number of commands to run in parallel (default = 1), using -1 will spawn all the commands')
+    parser.add_argument('--submit', action='store', required=False, type=str, default=None, nargs='*',
+                        help='Submit to cluster, additional argument will be passed as arg to submission (eg `--submit time=0-02:00:00)')
+    parser.add_argument('--debug', action='store_true', required=False, default=False, 
+                        help='Does all the steps of the submission but does not send jobs')
     args = parser.parse_args()
 
     if args.yaml is None:
         raise RuntimeError("Must provide the YAML file")
     if not os.path.isfile(args.yaml):
         raise RuntimeError("YAML file {} is not a valid file".format(args.yaml))
+    if args.submit is not None:
+        submitArgs = {}
+        print (args.submit)
+        for item in args.submit:
+            if '=' not in item:
+                print(f'Warning : no `=` in {item}, will be ignored')
+            else:
+                submitArgs[item.split('=')[0]] = item.split('=')[1]
         
     with open(args.yaml,'r') as handle:
         f = yaml.load(handle,Loader=YMLIncludeLoader)
-    instance = BambooLauncher(**f,mode=args.mode,cores=args.j)
+    instance = BambooLauncher(**f,mode=args.mode,cores=args.j,submit=submitArgs,debug=args.debug)
