@@ -5,6 +5,7 @@ import re
 import json
 import glob
 import copy
+import ctypes
 import shlex
 import yaml
 import random
@@ -23,10 +24,12 @@ import enlighten
 import ROOT
 
 from yamlLoader import YMLIncludeLoader
+from interpolation import InterpolateContent
+from txtwriter import Writer
 
 from IPython import embed
 
-#ROOT.gROOT.SetBatch(True) 
+ROOT.gROOT.SetBatch(True) 
 
 INFERENCE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                              'inference')
@@ -39,33 +42,39 @@ COMBINE_ENV = os.path.join(INFERENCE_PATH,
                           'CombinedLimit',
                           'env_standalone.sh')
 
-class DataCard:
-    def __init__(self,outputDir=None,configPath=None,path=None,yamlName=None,worker=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,histCorrections=None,correctionBeforeAggregation=None,pseudodata=False,rebin=None,regroup=None,histEdit=None,textfiles=None,legend=None,combineConfigs=None,logName=None,custom_args=None,**kwargs):
+ULIMIT = "ulimit -S -s unlimited"
+
+class Datacard:
+    def __init__(self,outputDir=None,configPath=None,path=None,yamlName=None,worker=None,groups=None,shapeSyst=None,normSyst=None,hist_conv=None,era=None,use_syst=False,root_subdir=None,histCorrections=None,pseudodata=False,rebin=None,regroup=None,histEdit=None,textfiles=None,legend=None,combineConfigs=None,logName=None,custom_args=None,produce_plots=True,save_datacard=True,**kwargs):
         self.outputDir          = outputDir
         self.configPath         = configPath
         self.path               = path
         self.worker             = worker
-        self.era                = str(era)
+        self.era                = era
         self.use_syst           = use_syst
+        self.yamlName           = yamlName
         self.root_subdir        = root_subdir
         self.pseudodata         = pseudodata
         self.hist_conv          = hist_conv
+        self.groups             = groups
+        self.normSyst           = normSyst
+        self.shapeSyst          = shapeSyst
+        self.regroup            = regroup
         self.rebin              = rebin
         self.histEdit           = histEdit
         self.textfiles          = textfiles
         self.legend             = legend
         self.combineConfigs     = combineConfigs
         self.histCorrections    = histCorrections
+        self.save_datacard      = save_datacard
+        self.produce_plots      = produce_plots
         self.custom_args        = custom_args
 
-        # Get entries that can either be dicts or list of dicts (eg with !include in yaml) #
-        self.groups = self.includeEntry(groups,'Groups')
-        self.normSyst = self.includeEntry(normSyst,'Norm syst')
-        self.shapeSyst = self.includeEntry(shapeSyst,'Shape syst')
-        self.regroup = self.includeEntry(regroup,'Regrouping')
-               
-        # Load Yaml configs from bamboo #
-        self.yaml_dict = self.loadYaml(self.path,yamlName)
+        # Format eras as string #
+        if isinstance(self.era,list) or isinstance(era,tuple):
+            self.era = [str(era) for era in self.era]
+        else:
+            self.era = str(self.era)
 
         # Apply pseudo-data #
         if self.pseudodata:
@@ -74,19 +83,77 @@ class DataCard:
             if self.outputDir is not None:
                 self.outputDir += "_pseudodata"
 
-
         # Add logging output to log file #
         handler = logging.FileHandler(os.path.join(self.outputDir,logName),mode='w')
         logger = logging.getLogger()
         logger.addHandler(handler)
+        
+
+    def initialize(self):
+        # Get entries that can either be dicts or list of dicts (eg with !include in yaml) #
+        self.groups = self.includeEntry(self.groups,'Groups',self.era)
+        self.normSyst = self.includeEntry(self.normSyst,'Norm syst',self.era)
+        self.shapeSyst = self.includeEntry(self.shapeSyst,'Shape syst',self.era)
+        self.regroup = self.includeEntry(self.regroup,'Regrouping',self.era)
+               
+        # Load Yaml configs from bamboo #
+        self.yaml_dict = self.loadYaml(self.path,self.yamlName)
 
         # Initialise containers #
-        self.content = {histName:{g:{} for g in self.groups.keys()} for histName in self.hist_conv.keys()}
-        self.systPresent = {histName:{group:[] for group in self.groups.keys()} for histName in self.hist_conv.keys()}
+        self.content = {f'{histName}_{self.era}':{g:{} for g in self.groups.keys()} for histName in self.hist_conv.keys()}
+        self.systPresent = {histName:{group:[] for group in self.groups.keys()} for histName in self.content.keys()}
+        self.yields = {histName:{g:None for g in self.groups.keys()} for histName in self.content.keys()}
+
+    @staticmethod
+    def includeEntry(entries,name,eras=None):
+        if eras is not None:
+            multi_era = False
+            if isinstance(eras,list) or isinstance(eras,tuple):
+                multi_era = len(eras) > 1
+            else:
+                eras = [eras]
+        if isinstance(entries,dict):
+            # Check if the entries include era dependency #
+            keys = [str(key) for key in entries.keys()]
+            if eras is not None and len(set(keys).intersection(set(eras))) > 0:
+                combined = {}
+                for era in eras:
+                    subentry = entries[list(entries.keys())[keys.index(era)]]
+                    if isinstance(subentry,dict):
+                        combined[era] = subentry
+                    elif isinstance(subentry,tuple) or isinstance(subentry,list):
+                        combined[era] = {}
+                        for ientry,eraCfg in enumerate(subentry):
+                            if not isinstance(eraCfg,dict):
+                                raise RuntimeError(f'Subentry index {ientry} from era {era} and {name} is not a dict')
+                            combined[era].update(eraCfg)
+                    else:
+                        raise RuntimeError(f'Subentry with era {era} and name {name} is nor a dict neither a list/tuple')
+                if multi_era:
+                    return combined
+                else:
+                    return combined[eras[0]]
+            else:
+                return entries
+        elif isinstance(entries,list) or isinstance(entries,tuple):
+            combined = {}
+            for ientries,subentries in enumerate(entries):
+                if not isinstance(subentries,dict):
+                    raise RuntimeError(f'Subentry index {ientries} from {name} is not a dict')
+                combined.update(subentries)
+            return combined
+        elif entries is None:
+            return None
+        else: 
+            raise RuntimeError(f"{name} format {type(entries)} not understood")
+
 
     def run_production(self):
-        logging.info('Running production over following categories')
-        for cat in self.hist_conv.keys():
+        # Initialize #
+        self.initialize()
+
+        logging.info(f'Running production over following categories :')
+        for cat in self.content.keys():
             logging.info(f'... {cat}')
 
         self.loopOverFiles()
@@ -100,24 +167,11 @@ class DataCard:
             self.applyEditing()
         if self.rebin is not None:
             self.applyRebinning()
-        if self.outputDir is not None:
+        self.yieldPrintout()
+        if self.save_datacard:
             self.saveDatacard()
+        return
 
-    @staticmethod
-    def includeEntry(entries,name):
-        if isinstance(entries,dict):
-            return entries
-        elif isinstance(entries,list) or isinstance(entries,tuple):
-            combined = {}
-            for ientries,subentries in enumerate(entries):
-                if not isinstance(subentries,dict):
-                    raise RuntimeError(f'Subentry index {ientries} from {name} is not a dict')
-                combined.update(subentries)
-            return combined
-        elif entries is None:
-            return None
-        else: 
-            raise RuntimeError(f"{name} format {type(entries)} not understood")
 
     def generatePseudoData(self,groups):
         back_samples = [sample for sample,sampleCfg in self.yaml_dict['samples'].items() if sampleCfg['type']=='mc']
@@ -168,16 +222,33 @@ class DataCard:
                 self.addSampleToGroup(copy.deepcopy(hist_dict),group)
             del hist_dict
 
-        for histName in self.content.keys(): # renaming to avoid overwritting ROOT warnings
+        self.checkForMissingNominals()
+        self.yields = self.getYields(self.content)
+
+        # Correct for missing systematics #
+        for histName in self.systPresent.keys():
+            for group in self.systPresent[histName].keys():
+                for sampleDict in self.systPresent[histName][group]:
+                    for systName in self.content[histName][group].keys():
+                        if systName == "nominal":
+                            continue
+                        if systName not in sampleDict['systematics']:
+                            self.content[histName][group][systName].Add(sampleDict['nominal'])
+
+        # Renaming to avoid overwritting ROOT warnings #
+        for histName in self.content.keys(): 
             for group in self.content[histName].keys():
                 for systName,hist in self.content[histName][group].items():
                     if self.pseudodata and group == 'data_real':
                         continue
                     if hist is None:
                         continue
-                    hist.SetName(hist.GetName()+'_'+group+'__'+systName)
+                    name = f'{histName}__{group}__{systName}'
+                    hist.SetName(name)
+                    hist.SetTitle(name)
 
-        self.correctMissingSystematics()
+
+
 
     def addSampleToGroup(self,hist_dict,group):
         for histname,hists in hist_dict.items():
@@ -198,16 +269,6 @@ class DataCard:
                     else:
                         self.content[histname][group][systName].Add(hist)
 
-    def correctMissingSystematics(self):
-        for histName in self.systPresent.keys():
-            for group in self.systPresent[histName].keys():
-                for sampleDict in self.systPresent[histName][group]:
-                    for systName in self.content[histName][group].keys():
-                        if systName == "nominal":
-                            continue
-                        if systName not in sampleDict['systematics']:
-                            self.content[histName][group][systName].Add(sampleDict['nominal'])
-
     def findGroup(self,sample):
         group_of_sample = []
         for group in self.groups.keys():
@@ -224,7 +285,7 @@ class DataCard:
         f = ROOT.TFile(rootfile)
         sample = os.path.basename(rootfile)
         # Get config info #
-        lumi = self.yaml_dict["luminosity"][self.era]
+        lumi = self.yaml_dict["luminosity"][str(self.era)]
         sample_type = self.yaml_dict["samples"][sample]['type']
         if sample_type == "mc" or sample_type == "signal":
             xsec = self.yaml_dict["samples"][sample]['cross-section']
@@ -246,6 +307,7 @@ class DataCard:
         # Loop through hists #
         hist_dict = {}
         for datacardname, histnames in self.hist_conv.items():
+            datacardname += f'_{self.era}'
             hist_dict[datacardname] = {}
             if not isinstance(histnames,list):
                 histnames = [histnames]
@@ -360,14 +422,68 @@ class DataCard:
                             hist.SetBinContent(i,0)
                             hist.SetBinError(i,0)
 
+    @staticmethod
+    def getYields(content):
+        yields = {}
+        err = ctypes.c_double(0.)
+        for histName in content.keys(): 
+            yields[histName] = {}
+            for group in content[histName].keys():
+                h = content[histName][group]['nominal']
+                if h.__class__.__name__.startswith('TH1'):
+                    integral = h.IntegralAndError(1,h.GetNbinsX(),err)
+                elif h.__class__.__name__.startswith('TH2'):
+                    integral = h.IntegralAndError(1,h.GetNbinsX(),1,h.GetNbinsY(),err)
+                else:
+                    raise ValueError
+                yields[histName][group] = (integral,err.value)
+        return yields
+
+    def yieldPrintout(self):
+        # Printout of yields before and after operations #
+        logging.info('Yield printout : ')
+        yields_after = self.getYields(self.content)
+        len_groups = max([len(group) for group in self.groups.keys()]+[1])
+
+        def printout(group,y_before,y_after):
+            diff = abs(y_after[0]-y_before[0])/y_before[0]*100 if y_after[0] != 0 else 0.
+            string = f'{group:{len_groups+3}s} : yield (before operations) = {y_before[0]:10.3f} +/- {y_before[1]:8.3f} -> yield (after) = {y_after[0]:10.3f} +/- {y_after[1]:8.3f} [{diff:5.2f}%]'
+            logging.info(f'    {string}')
+            return len(string)
+
+        for histName in self.content.keys():
+            logging.info(f'   Category {histName}')
+            yields_tot_before = {'mc': [0.,0.],'signal': [0.,0.]}
+            yields_tot_after = copy.deepcopy(yields_tot_before)
+            group_to_split = {key:[group for group,groupCfg in self.groups.items() if groupCfg['type']==key] for key in yields_tot_before.keys()}
+            max_length = 0
+            for key in yields_tot_before.keys():
+                for group in group_to_split[key]:
+                    if self.groups[group]['type'] != key:
+                        continue
+                    y_before = self.yields[histName][group]
+                    y_after  = yields_after[histName][group]
+                    max_length = max(max_length,printout(group,y_before,y_after))
+                    yields_tot_before[key][0] += y_before[0]
+                    yields_tot_before[key][1] += y_before[1]**2
+                    yields_tot_after[key][0] += y_after[0]
+                    yields_tot_after[key][1] += y_after[1]**2
+                logging.info(f'   {"-"*max_length}')
+                yields_tot_before[key][1] = math.sqrt(yields_tot_before[key][1])
+                yields_tot_after[key][1] = math.sqrt(yields_tot_after[key][1])
+                printout(f"Total {key}",yields_tot_before[key],yields_tot_after[key])
+                logging.info(f'   {"="*max_length}')
+            if 'data_obs' in self.yields[histName].keys():
+                y_before = self.yields[histName]['data_obs']
+                y_after  = yields_after[histName]['data_obs']
+                printout('Total data',y_before,y_after)
+
     def saveDatacard(self):
-        from txtwriter import Writer
         if self.outputDir is None:
             raise RuntimeError("Datacard output path is not set")
 
-        shapes = {histName:os.path.join(self.outputDir,f"{histName}_{self.era}.root") for histName in self.content.keys()}
-
         # Save root file #
+        shapes = {histName:os.path.join(self.outputDir,f"{histName}.root") for histName in self.content.keys()}
         for histName in self.content.keys():
             f = ROOT.TFile(shapes[histName],'recreate')
             if self.root_subdir is not None:
@@ -428,6 +544,7 @@ class DataCard:
                     raise RuntimeError(f"Group {group} nominal histogram {histName} was not found")
                 self.fixHistograms(hnom=self.content[histName][group]['nominal'])
 
+
                 self.content[histName][group]['nominal'].SetTitle(group)
                 self.content[histName][group]['nominal'].SetName(group)
                 self.content[histName][group]['nominal'].Write(group)
@@ -441,11 +558,11 @@ class DataCard:
             self.textfiles = '{}.txt'
         if '{}' not in self.textfiles:
             logging.info('Will create a single datacard txt file for all the categories')
-            writer = Writer([f'{histName}_{self.era}' for histName in self.content.keys()])
+            writer = Writer([f'{histName}' for histName in self.content.keys()])
         else:
             logging.info('Will create one datacard txt file per category')
         for histName in self.content.keys():
-            binName = f'{histName}_{self.era}'
+            binName = f'{histName}'
             if '{}' in self.textfiles:
                 writer = Writer(binName)
             # Add processes #
@@ -515,7 +632,7 @@ class DataCard:
                     writer.addFooter(footer)
                 
             if '{}' in self.textfiles:
-                textPath = os.path.join(self.outputDir,self.textfiles.format(f"{histName}_{self.era}"))
+                textPath = os.path.join(self.outputDir,self.textfiles.format(f"{histName}"))
                 writer.dump(textPath,os.path.basename(shapes[histName]))
                 logging.info(f"Saved file {textPath}")
         if '{}' not in self.textfiles:
@@ -526,7 +643,7 @@ class DataCard:
         # Save extra data #
         if hasattr(self,'plotLinearizeData'):
             for key,data in self.plotLinearizeData.items():
-                path_data = os.path.join(self.outputDir,f'{key}_{self.era}.json')
+                path_data = os.path.join(self.outputDir,f'{key}.json')
                 with open(path_data,'w') as handle:
                     json.dump(data,handle,indent=4)
                 logging.info(f"Saved plot data info in {path_data}")
@@ -576,6 +693,15 @@ class DataCard:
                         hup.SetBinContent(i,0.00001)
                         hdown.SetBinContent(i,0.00001)
 
+        # TODO : check below -> remove when production
+#        for i in range(1,hnom.GetNbinsX()+1):
+#            hnom.SetBinError(i,0.)
+#            if hup is not None:
+#                hup.SetBinError(i,0.)
+#            if hdown is not None:
+#                hdown.SetBinError(i,0.)
+#        ####
+
     def applyCorrectionAfterAggregation(self):
         for corrConfig in self.histCorrections:
             if ":" not in corrConfig['module']:
@@ -587,21 +713,28 @@ class DataCard:
             cls = getattr(mod, clsName, None)(**corrConfig['init'])
             logging.info(f"Applying {corrConfig['module']}")
             for cat in self.content.keys():
-                if cat not in corrConfig['categories'].keys():
+                cat_no_era = cat.replace(f'_{self.era}','')
+                if cat_no_era not in corrConfig['categories'].keys():
                     continue
-                catCfg = corrConfig['categories'][cat]
+                catCfg = corrConfig['categories'][cat_no_era]
                 logging.info(f'... Histogram {cat:20s} in {cls.group} group')
+                # Check if group is there #
+                if cls.group not in self.content[cat].keys():
+                    continue
+                # Add potential additional shapes #
+                # To be done before the correction because syst will be corrected twice otherwise
+                additional_syst = {}
+                if hasattr(cls,'additional') and self.use_syst:
+                    additional_syst = cls.additional(self.content[cat][cls.group]['nominal'],**catCfg)
                 # Correct nominal and all syst hists #
                 if hasattr(cls,'modify'):
                     logging.info(f'\t\t-> applying corrections')
-                    for systName,hist in self.content[cat][cls.group].items():
+                    for hist in self.content[cat][cls.group].values():
                         cls.modify(hist,**catCfg)
-                # Add potential additional shapes #
-                if hasattr(cls,'additional') and self.use_syst:
-                    add = cls.additional(self.content[cat][cls.group]['nominal'],**catCfg)
-                    for key in add.keys():
-                        logging.info(f"\t\t-> Adding systematic shape {catCfg['systName']}")
-                    self.content[cat][cls.group].update(add)
+                # Add the additional syst to the content #
+                for key in additional_syst.keys():
+                    logging.info(f"\t\t-> Adding systematic shape {catCfg['systName']}")
+                self.content[cat][cls.group].update(additional_syst)
 
     def applyRegrouping(self):
         logging.info('Applying Regrouping of categories')
@@ -655,10 +788,10 @@ class DataCard:
                 if 'nominal' not in self.content[histName][group].keys():
                     missings.append([histName,group])
         if len(missings) != 0 :
-            logging.error('Following histograms are missing :')
+            error_message = 'Following histograms are missing :'
             for histName,group in missings:
-                logging.error(f'... {group:20s} -> {histName}')
-            raise RuntimeError('Some nominal files are missing')
+                error_message += f'\n... {group:20s} -> {histName}'
+            raise RuntimeError(error_message)
 
                 
     def applyEditing(self):
@@ -746,6 +879,7 @@ class DataCard:
             h.SetBinContent(b,val)
 
     def applyRebinning(self):
+        assert self.rebin is not None
         logging.info('Applying rebinning')
         self.checkForMissingNominals()
 
@@ -753,8 +887,8 @@ class DataCard:
         for histName in self.content.keys():
             histType = self.content[histName][list(self.groups.keys())[0]]['nominal'].__class__.__name__ 
             logging.info(f'... {histName:20s} ({histType})')
-            if histName in self.rebin.keys():
-                rebinSchemes = self.rebin[histName]
+            if histName.replace(f'_{self.era}','') in self.rebin.keys():
+                rebinSchemes = self.rebin[histName.replace(f'_{self.era}','')]
                 if not isinstance(rebinSchemes,list):
                     rebinSchemes = [rebinSchemes]
                 for rebinScheme in rebinSchemes:
@@ -812,11 +946,13 @@ class DataCard:
         assert isinstance(params,list)
         assert len(params) == 1
         assert isinstance(params[0],int)
-        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
+        if logging.root.level <= 10:
+            pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group,histDict in self.content[histName].items():
             for systName,hist in histDict.items():
                 self.content[histName][group][systName].Rebin(params[0])
-                pbar.update()
+                if logging.root.level <= 10:
+                    pbar.update()
 
     def rebinClassic2D(self,histName,params):
         """
@@ -828,11 +964,13 @@ class DataCard:
         assert len(params) == 2
         assert isinstance(params[0],int)
         assert isinstance(params[1],int)
-        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
+        if logging.root.level <= 10:
+            pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group,histDict in self.content[histName].items():
             for systName,hist in histDict.items():
                 self.content[histName][group][systName].Rebin(params[0],params[1])
-                pbar.update()
+                if logging.root.level <= 10:
+                    pbar.update()
 
 
     def rebinBoundary(self,histName,params):
@@ -846,11 +984,13 @@ class DataCard:
         assert len(params) == 1
         assert isinstance(params[0],list)
         boundObj = Boundary(boundaries=params[0])
-        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
+        if logging.root.level <= 10:
+            pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = boundObj(hist) 
-                pbar.update()
+                if logging.root.level <= 10:
+                    pbar.update()
 
     def rebinBoundary2D(self,histName,params):
         """
@@ -864,11 +1004,13 @@ class DataCard:
         assert isinstance(params[0],list)
         assert isinstance(params[1],list)
         boundObj = Boundary2D(params[0],params[1])
-        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
+        if logging.root.level <= 10:
+            pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = boundObj(hist) 
-                pbar.update()
+                if logging.root.level <= 10:
+                    pbar.update()
 
 
     def rebinInQuantile(self,histName,params):
@@ -886,11 +1028,13 @@ class DataCard:
         groups_for_binning = params[1]
         hists_for_binning = self.rebinGetHists(histName,groups_for_binning)
         qObj = Quantile(hists_for_binning,quantiles)
-        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
+        if logging.root.level <= 10:
+            pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = qObj(hist) 
-                pbar.update()
+                if logging.root.level <= 10:
+                    pbar.update()
 
     def rebinInQuantile2D(self,histName,params):
         """
@@ -909,11 +1053,13 @@ class DataCard:
         groups_for_binning = params[2]
         hists_for_binning = self.rebinGetHists(histName,groups_for_binning)
         qObj = Quantile2D(hists_for_binning,qx,qy)
-        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
+        if logging.root.level <= 10:
+            pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = qObj(hist) 
-                pbar.update()
+                if logging.root.level <= 10:
+                    pbar.update()
 
 
     def rebinThreshold(self,histName,params):
@@ -938,11 +1084,13 @@ class DataCard:
         hists_for_binning   = self.rebinGetHists(histName,groups_for_binning)
         hists_extra         = self.rebinGetHists(histName,extra)
         tObj = Threshold(hists_for_binning,thresholds,hists_extra,nbins,rsut)
-        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
+        if logging.root.level <= 10:
+            pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = tObj(hist) 
-                pbar.update()
+                if logging.root.level <= 10:
+                    pbar.update()
                 
     def rebinThreshold2D(self,histName,params):
         """
@@ -969,11 +1117,13 @@ class DataCard:
         hists_for_binning   = self.rebinGetHists(histName,groups_for_binning)
         hists_extra         = self.rebinGetHists(histName,extra)
         tObj = Threshold(hists_for_binning,threshx,threshy,hists_extra,nbins,rsut)
-        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
+        if logging.root.level <= 10:
+            pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = tObj(hist) 
-                pbar.update()
+                if logging.root.level <= 10:
+                    pbar.update()
 
     def rebinLinearize2D(self,histName,params):
         """
@@ -986,11 +1136,13 @@ class DataCard:
         assert len(params) == 1
         assert params[0] in ['x','y']
         lObj = Linearize2D(major=params[0])
-        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
+        if logging.root.level <= 10:
+            pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = lObj(hist)
-                pbar.update()
+                if logging.root.level <= 10:
+                    pbar.update()
         if not hasattr(self,'plotLinearizeData'):
             self.plotLinearizeData = {histName:lObj.getPlotData()}
         else:
@@ -1044,11 +1196,14 @@ class DataCard:
                                      minor_class  = minor_class,
                                      minor_params = minor_params,
                                      h            = hists_for_binning)
-        pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
+
+        if logging.root.level <= 10:
+            pbar = enlighten.Counter(total=self.countPerHistName(histName), desc='Progress', unit='histograms')
         for group in self.content[histName].keys():
             for systName,hist in self.content[histName][group].items():
                 self.content[histName][group][systName] = lObj(hist)
-                pbar.update()
+                if logging.root.level <= 10:
+                    pbar.update()
 
         # Save linearized info for plotIt #
         if not hasattr(self,'plotLinearizeData'):
@@ -1057,6 +1212,10 @@ class DataCard:
             self.plotLinearizeData[histName] = lObj.getPlotData()
 
     def prepare_plotIt(self):
+        if not self.produce_plots:
+            logging.warning('The entry `produce_plots` is False in the config, will skip the plotIt part')
+            return
+        self.initialize()
         logging.info("Preparing plotIt root files for categories")
         if self.regroup is not None:
             hist_conv = {}
@@ -1064,11 +1223,11 @@ class DataCard:
             for cat,hists in self.hist_conv.items():
                 recat = regroup_conv[cat]
                 if recat not in hist_conv.keys():
-                    hist_conv[recat] = hists
+                    hist_conv[f'{recat}_{self.era}'] = hists
                 else:
-                    hist_conv[recat].extend(hists)
+                    hist_conv[f'{recat}_{self.era}'].extend(hists)
         else:
-            hist_conv = self.hist_conv
+            hist_conv = {f'{key}_{self.era}': val for key,val in self.hist_conv.items()}
 
         categories = hist_conv.keys()
         for cat in hist_conv.keys():
@@ -1084,14 +1243,16 @@ class DataCard:
         path_rootfiles = os.path.join(path_plotIt,'root')
         if not os.path.exists(path_rootfiles):
             os.makedirs(path_rootfiles)
+
             
         # Loop over root files to get content #
         datacardRoots = glob.glob(os.path.join(self.outputDir,"*root"))
         for f in glob.glob(os.path.join(self.outputDir,"*root")):
-            category = os.path.basename(f).replace('.root','').replace(f'_{self.era}','')
+            category = os.path.basename(f).replace('.root','')
             logging.debug(f"Looking at {f} -> category {category}")
             if category not in content.keys():
                 continue
+            logging.debug('\t-> will be processed')
             F = ROOT.TFile(f)
             for key in F.GetListOfKeys():
                 name = key.GetName()
@@ -1103,6 +1264,8 @@ class DataCard:
                     group = name
                     systName = 'nominal'
                     baseSyst = None
+                if group not in content[category].keys():
+                    continue
                 content[category][group][systName] = copy.deepcopy(F.Get(name))
                 if baseSyst is not None and baseSyst not in systematics:
                     systematics.append(baseSyst)
@@ -1121,23 +1284,24 @@ class DataCard:
         if not valid_content:
             raise RuntimeError('Failed to run plotIt')
 
-        # Write to file #
+        # Write to files #
         for group in self.groups.keys():
-            F = ROOT.TFile(os.path.join(path_rootfiles,group+'.root'),'update')
+            F = ROOT.TFile(os.path.join(path_rootfiles,f'{group}_{self.era}.root'),'update')
             for histName in content.keys():
                 for systName,hist in content[histName][group].items():
                     if hist is None:
                         continue
+                    histName = histName.replace(f'_{self.era}','')
                     outName = histName if systName == "nominal" else f'{histName}__{systName}'
                     hist.Write(outName,ROOT.TObject.kOverwrite)
             F.Close()
 
         # Create yaml file #
-        lumi = self.yaml_dict["luminosity"][self.era]
+        lumi = self.yaml_dict["luminosity"][str(self.era)]
         config = {}
         config['configuration'] = {'eras'                     : [self.era],
                                    'experiment'               : 'CMS',
-                                   'extra-label'              : '%s Datacard'%self.era,
+                                   'extra-label'              : 'Preliminary datacard',
                                    'luminosity-label'         : '%1$.2f fb^{-1} (13 TeV)',
                                    'luminosity'               : {self.era:lumi},
                                    'luminosity-error'         : 0.025,
@@ -1179,17 +1343,18 @@ class DataCard:
         # Files informations #
         config['files'] = {}
         for group,gconfig in self.groups.items():
+            outFile = f'{group}_{self.era}.root'
             if 'hide' in gconfig.keys() and gconfig['hide']:
                 continue
-            config['files'][group+'.root'] = {'cross-section'   : 1./lumi,
+            config['files'][outFile] = {'cross-section'   : 1./lumi,
                                               'era'             : str(self.era),
                                               'generated-events': 1.,
                                               'type'            : gconfig['type']}
             if gconfig['type'] != 'signal':
                 plotGroup = group if 'group' not in gconfig.keys() else gconfig['group']
-                config['files'][group+'.root'].update({'group':plotGroup})
+                config['files'][outFile].update({'group':plotGroup})
             else:
-                config['files'][group+'.root'].update({k:v for k,v in gconfig.items() if k not in ['files','type']})
+                config['files'][outFile].update({k:v for k,v in gconfig.items() if k not in ['files','type']})
 
         # Groups informations #
         config['groups'] = {}
@@ -1198,7 +1363,6 @@ class DataCard:
                 plotGroup = group if 'group' not in gconfig.keys() else gconfig['group']
                 if plotGroup not in config['groups'].keys():
                     config['groups'][plotGroup] = {k:v for k,v in gconfig.items() if k not in ['files','type']}
-
 
         # Plots informations #
         config['plots'] = {}
@@ -1218,36 +1382,37 @@ class DataCard:
                        'show-ratio'         : True}
                        
             # Check if plots already in yaml #
+            h1n = h1.replace(f'_{self.era}','')
             if isinstance(h2,list):
                 if h2[0] in self.yaml_dict['plots'].keys():
-                    config['plots'][h1] = self.yaml_dict['plots'][h2[0]]
+                    config['plots'][h1n] = self.yaml_dict['plots'][h2[0]]
                 else:
-                    config['plots'][h1] = baseCfg
+                    config['plots'][h1n] = baseCfg
             else:
                 if h2 in self.yaml_dict['plots'].keys():
-                    config['plots'][h1] = self.yaml_dict['plots'][h2]
+                    config['plots'][h1n] = self.yaml_dict['plots'][h2]
                 else:
-                    config['plots'][h1] = baseCfg
+                    config['plots'][h1n] = baseCfg
             if 'VBF' in h1 or 'GGF' in h1:
-                xmin, xmax = config['plots'][h1]['x-axis-range']
-                config['plots'][h1]['blinded-range'] = [xmin,xmax] 
+                xmin, xmax = config['plots'][h1n]['x-axis-range']
+                config['plots'][h1n]['blinded-range'] = [xmin,xmax] 
             else:
-                config['plots'][h1].pop('blinded-range',None)
+                config['plots'][h1n].pop('blinded-range',None)
             if histMax[h1] != 0.:
-                config['plots'][h1]['y-axis-range'] = [0.,histMax[h1]*1.5]
-                config['plots'][h1]['log-y-axis-range'] = [histMin[h1],histMax[h1]*100]
-                config['plots'][h1]['ratio-y-axis-range'] = [0.8,1.2]
-            config['plots'][h1]['sort-by-yields'] = True
-            config['plots'][h1]['show-overflow'] = True
-            if 'labels' in config['plots'][h1].keys():
-                del config['plots'][h1]['labels']
+                config['plots'][h1n]['y-axis-range'] = [0.,histMax[h1]*1.5]
+                config['plots'][h1n]['log-y-axis-range'] = [histMin[h1],histMax[h1]*100]
+                config['plots'][h1n]['ratio-y-axis-range'] = [0.8,1.2]
+            config['plots'][h1n]['sort-by-yields'] = True
+            config['plots'][h1n]['show-overflow'] = True
+            if 'labels' in config['plots'][h1n].keys():
+                del config['plots'][h1n]['labels']
 
             if self.legend is not None:
                 if 'position' in self.legend.keys():
                     assert len(self.legend['position']) == 4
-                    config['plots'][h1]['legend-position'] = self.legend['position']
+                    config['plots'][h1n]['legend-position'] = self.legend['position']
                 if 'columns' in self.legend.keys():
-                    config['plots'][h1]['legend-columns'] = self.legend['columns']
+                    config['plots'][h1n]['legend-columns'] = self.legend['columns']
 
             if len(plotLinearizeData) > 0:
                 if h1 in plotLinearizeData.keys():
@@ -1258,7 +1423,7 @@ class DataCard:
                         extraItems['labels'][idx]['position'][0] = margin_left + extraItems['labels'][idx]['position'][0] * (margin_right-margin_left)
                     for idx in range(len(extraItems['lines'])):
                         extraItems['lines'][idx] = [[extraItems['lines'][idx],0.],[extraItems['lines'][idx],histMax[h1]*1.1]]
-                    config['plots'][h1].update(extraItems)
+                    config['plots'][h1n].update(extraItems)
 
         if len(systematics) > 0:
             config['systematics'] = systematics
@@ -1266,13 +1431,24 @@ class DataCard:
 
     @staticmethod
     def merge_plotIt(configs):
-        mainConfig = {}
+        mainConfig = {'configuration':{}}
         for config in configs:
-            for key in ['configuration','files','groups','plots']:
+            for key in ['files','groups','plots']:
                 if key not in mainConfig.keys():
                     mainConfig[key] = config[key]
                 else:
                     mainConfig[key].update(**config[key])
+            for key,values in config['configuration'].items():
+                if key not in mainConfig['configuration'].keys():
+                    mainConfig['configuration'][key] = values
+                elif isinstance(values,list):
+                    for val in values:
+                        if val not in mainConfig['configuration'][key]:
+                            mainConfig['configuration'][key].append(val)
+                elif isinstance(values,dict):
+                    for k,val in values.items():
+                        if k not in mainConfig['configuration'][key].keys():
+                            mainConfig['configuration'][key][k] = val
             if 'systematics' in config:
                 if 'systematics' not in mainConfig.keys():
                     mainConfig['systematics'] = []
@@ -1281,7 +1457,7 @@ class DataCard:
                         mainConfig['systematics'].append(syst)
         return mainConfig
 
-    def run_plotIt(self,config):
+    def run_plotIt(self,config,eras):
         # Write yaml file #
         path_plotIt = os.path.join(self.outputDir,'plotit')
         path_yaml = os.path.join(path_plotIt,'plots.yml')
@@ -1290,43 +1466,49 @@ class DataCard:
         logging.info("New yaml file for plotIt : %s"%path_yaml)
 
         # PlotIt command #
-        path_pdf = os.path.join(path_plotIt,'plots_%s'%self.era)
-        if not os.path.exists(path_pdf):
-            os.makedirs(path_pdf)
-        logging.info("plotIt command :")
-        cmd = f"plotIt -i {path_plotIt} -o {path_pdf} -e {self.era} {path_yaml}"
-        print (cmd)
-        if self.which('plotIt') is not None:
-            logging.info("Calling plotIt")
-            exitCode,output = self.run_command(shlex.split(cmd),return_output=True)
-            if exitCode != 0:
-                if logging.root.level > 10:
-                    for line in output:
-                        logging.info(line.strip())
-                logging.info('... failure (see log above)')
+        for era in eras:
+            path_pdf = os.path.join(path_plotIt,f'plots_{era}')
+            if not os.path.exists(path_pdf):
+                os.makedirs(path_pdf)
+            logging.info("plotIt command :")
+            cmd = f"plotIt -i {path_plotIt} -o {path_pdf} -e {era} {path_yaml}"
+            print (cmd)
+            if self.which('plotIt') is not None:
+                logging.info("Calling plotIt")
+                exitCode,output = self.run_command(shlex.split(cmd),return_output=True)
+                if exitCode != 0:
+                    if logging.root.level > 10:
+                        for line in output:
+                            logging.info(line.strip())
+                    logging.info('... failure (see log above)')
+                else:
+                    logging.info('... success')
             else:
-                logging.info('... success')
-        else:
-            logging.warning("plotIt not found")
+                logging.warning("plotIt not found")
+
+    def check_datacards(self):
+        txtPaths = self.getTxtFilesPath()
+        missingCats = {}
+        for txtCat,txtPath in txtPaths.items():
+            if not os.path.exists(txtPath):
+                #missingCat = os.path.basename(txtPath).replace('.txt','')
+                era = txtCat.split('_')[-1]
+                cat = txtCat.replace(f'_{era}','')
+                if era not in missingCats:
+                    missingCats[era] = [cat]
+                else:
+                    missingCats[era].append(cat)
+        return missingCats
 
     def run_combine(self,entries,additional_args={},debug=False):
         logging.info(f'Running combine on {self.outputDir}')
+        if not isinstance(self.era, list):
+            self.era = [self.era]
         if self.combineConfigs is None:
             logging.warning("No combine command in the yaml config file")
             return
         txtPaths = self.getTxtFilesPath()
-        missingTxts = []
-        for txtPath in txtPaths.values():
-            if not os.path.exists(txtPath):
-                missingTxts.append(txtPath)
-        if len(missingTxts) > 0:
-            logging.info('Missing following datacards :')
-            for missingTxt in missingTxts:
-                logging.info(f'... {missingTxt}')
-            logging.info('Datacard not found, will produce it')
-            return False
-            #self.run_production()
-        
+
         if entries is None or (isinstance(entries,list) and len(entries)==0):
             entries = self.combineConfigs.keys()
 
@@ -1369,13 +1551,34 @@ class DataCard:
 
             binsToUse = []
             if 'bins' in combineCfg.keys():
-                if not ('combine_bins' in combineCfg.keys() and not combineCfg['combine_bins']): 
-                    # Unless combine_bins == False : use all bins 
-                    binsToUse.append(combineCfg['bins'])
-                if ('split_bins' in combineCfg.keys() and combineCfg['split_bins']):
-                    # If split_bins == True : do once per bin
-                    for b in combineCfg['bins']:
-                        binsToUse.append([b])
+                combine_bins = 'combine_bins' in combineCfg.keys() and combineCfg['combine_bins']
+                combine_eras = 'combine_eras' in combineCfg.keys() and combineCfg['combine_eras']
+                split_bins   = 'split_bins' in combineCfg.keys() and combineCfg['split_bins'] 
+                split_eras   = 'split_eras' in combineCfg.keys() and combineCfg['split_eras']
+                if (combine_bins and len(combineCfg['bins']) > 1) and (combine_eras and len(self.era) > 1):
+                    binsToUse.append([f'{b}_{era}' for b in combineCfg['bins'] for era in self.era])
+
+                if combine_bins and len(combineCfg['bins']) > 1:
+                    if split_eras:
+                        binsToUse.extend([[f'{b}_{era}' for b in combineCfg['bins']] for era in self.era])
+                    else:
+                        binsToUse.append([f'{b}_{era}' for b in combineCfg['bins'] for era in self.era])
+                if combine_eras and len(self.era) > 1:
+                    if split_bins:
+                        binsToUse.extend([[f'{b}_{era}' for era in self.era] for b in combineCfg['bins']])
+                    else:
+                        binsToUse.append([f'{b}_{era}' for era in self.era for b in combineCfg['bins']])
+                     
+                if split_bins and split_eras:
+                    binsToUse.extend([[f'{b}_{era}'] for b in combineCfg['bins'] for era in self.era])
+                if split_bins and not split_eras:
+                    binsToUse.extend([[f'{b}_{era}' for era in self.era]for b in combineCfg['bins']])
+                if not split_bins and split_eras:
+                    binsToUse.extend([[f'{b}_{era}' for b in combineCfg['bins']] for era in self.era])
+
+                if not combine_bins and not combine_eras and not split_bins and not split_eras:
+                    binsToUse = [[f'{b}_{era}' for b in combineCfg['bins'] for era in self.era]]
+
             else:
                 binsToUse.append('all')
 
@@ -1386,11 +1589,31 @@ class DataCard:
                 if len(binsToUse) == 1:
                     subdirBin = subdir
                     binSuffix = ''
+                    eras_in_bins = None
+                    cats_in_bins = None
                 else:
+                    # Get eras and cats from bin names #
+                    eras_in_bins = set()
+                    cats_in_bins = set()
+                    for binName in binNames:
+                        for era in self.era:
+                            if str(era) in binName:
+                                eras_in_bins.add(str(era))
+                                cats_in_bins.add(binName.replace(f'_{era}',''))
+
                     if len(binNames) == 1:
                         binSuffix = binNames[0]
                     else:
-                        binSuffix = 'combination'
+                        # Check if one cat / several eras 
+                        if len(cats_in_bins) == 1 and len(eras_in_bins) > 1:
+                            binSuffix = f'combination_{list(cats_in_bins)[0]}'
+                        # Check if several cats / one era
+                        elif len(cats_in_bins) > 1 and len(eras_in_bins) == 1:
+                            binSuffix = f'combination_{list(eras_in_bins)[0]}'
+                        # Check if several cats / several eras
+                        else:
+                            binSuffix = 'combination'
+
                     subdirBin = os.path.join(subdir,binSuffix)
                     if not os.path.exists(subdirBin):
                         os.makedirs(subdirBin)
@@ -1430,12 +1653,14 @@ class DataCard:
                             os.remove(combinedTxtPath)
                         self.combineCards(txtPathsForCombination,combinedTxtPath)
                         logging.info('... done')
+                    else:
+                        logging.info(f'Found combined datacard : {combinedTxtPath}')
                         
                     # Create workspace #
                     if not os.path.exists(workspacePath):
                         logging.info('Producing workspace')
                         workspaceCmd = f"cd {combine_dir}; "
-                        workspaceCmd += f"env -i bash -c 'source {env_script} && cd {subdirBin} && text2workspace.py {combinedTxtPath} -o {workspacePath}'"
+                        workspaceCmd += f"env -i bash -c 'source {env_script} && {ULIMIT} && cd {subdirBin} && text2workspace.py {combinedTxtPath} -o {workspacePath}'"
                         exitCode,output = self.run_command(workspaceCmd,return_output=True,shell=True)
                         if exitCode != 0:
                             if logging.root.level > 10:
@@ -1443,13 +1668,15 @@ class DataCard:
                                     logging.info(line.strip())
                             raise RuntimeError('Could not produce the workspace, see log above')
                         logging.info('... done')
+                    else:
+                        logging.info(f'Found workspace : {workspacePath}')
 
                     # List systematics for the pulls and impacts #
                     if combineMode == 'pulls_impact':
                         workspaceJson = workspacePath.replace('.root','.json')
                         if not os.path.exists(workspaceJson):
                             worspace_cmd = f"cd {setup_dir}; "
-                            worspace_cmd += f"env -i bash -c 'source {setup_script} && cd {script_dir} && python helperWorkspace.py {workspacePath} {workspaceJson}'"
+                            worspace_cmd += f"env -i bash -c 'source {setup_script} && {ULIMIT} && cd {script_dir} && python helperWorkspace.py {workspacePath} {workspaceJson}'"
                             rc,output = self.run_command(worspace_cmd,shell=True,return_output=True)
                             if rc != 0: 
                                 if logging.root.level > 10:
@@ -1528,8 +1755,13 @@ class DataCard:
                         if not os.path.exists(subScript):
                             logging.info(f'{entry} : submitting {n_jobs} jobs')
                             jobArrayArgs = []
+                            args['worker'] = ''
+                            args['yaml'] = self.configPath
+                            args['era'] = self.era
+                            if self.custom_args is not None:
+                                args['custom'] = self.custom_args
                             if n_jobs == 1:
-                                subScript = self.writeSbatchCommand(slurmDir,params,args)
+                                subScript = self.writeSbatchCommand(slurmDir,log=True,params=params,args=args)
                             else:
                                 for idx in idxs:
                                     subsubdir = os.path.join(outputDir,str(idx))
@@ -1539,7 +1771,7 @@ class DataCard:
                                     if binSuffix != '':
                                         jobArgs['combine_args'] += f' bin={binSuffix}'
                                     jobArrayArgs.append(jobArgs)
-                                subScript = self.writeSbatchCommand(slurmDir,params,jobArrayArgs)
+                                subScript = self.writeSbatchCommand(slurmDir,log=True,params=params,args=jobArrayArgs)
                         else:
                             arrayIds = []
                             logging.info(f'{entry}: found batch script, will look for unfinished jobs')
@@ -1606,7 +1838,7 @@ class DataCard:
                                     combineCmd += " --algo singles"
                                 else: # One job per systematic
                                     systName = systNames[int(additional_args['idx'])-2] # Offset 0->1 (for array id) + #1 is for initial fit
-                                    combineCmd += f" --algo impact -P {systName}  --floatOtherPOIs 1 --saveInactivePOI 1 "
+                                    combineCmd += f" --algo impact -P {systName} "
                                 if 'unblind' in combineCfg.keys() and combineCfg['unblind']:
                                     if '--toys' in combineCmd or '-t' in combineCmd:
                                         raise RuntimeError(f'You want to unblind entry {entry} but used `--toys` in the combine command, these are exclusive')
@@ -1616,7 +1848,7 @@ class DataCard:
 
                     if combineCmd != '':
                         fullCombineCmd  = f"cd {combine_dir}; "
-                        fullCombineCmd += f"env -i bash -c 'source {env_script} && cd {subdirBin} && {combineCmd}'"
+                        fullCombineCmd += f"env -i bash -c 'source {env_script} && {ULIMIT} && cd {subdirBin} && {combineCmd}'"
 
                         logging.info('Extensive command is below')
                         logging.info(fullCombineCmd)
@@ -1639,31 +1871,72 @@ class DataCard:
                     continue
 
                 # Per bin mode finalize #
-                # Saving limit values in json #
+                # Get campaign era #
+                campaign = list(eras_in_bins) if eras_in_bins is not None else None
+                if campaign  is None:
+                    pass
+                elif len(campaign) == 1:
+                    campaign = str(campaign[0])
+                else:
+                    campaign = 'run2'
+
+                # Producing limits #
                 if combineMode == 'limits':
+                    # Saving as json #
                     limits = {}
-                    with open(os.path.join(subdirBin,'log_combine.out'),'r') as output:
-                        for line in output:
-                            l_str = None
-                            r_str = None
-                            if line.startswith('Observed'):
-                                logging.info("\t"+line.strip())
-                                r_str = line.split(':')[1]
-                            elif line.startswith('Expected'):
-                                logging.info("\t"+line.strip())
-                                l_str,r_str = line.split(':')
+                    log_file = os.path.join(subdirBin,'log_combine.out')
+                    if os.path.exists(log_file):
+                        with open(log_file,'r') as output:
+                            for line in output:
+                                l_str = None
+                                r_str = None
+                                if line.startswith('Observed'):
+                                    logging.info("\t"+line.strip())
+                                    r_str = line.split(':')[1]
+                                elif line.startswith('Expected'):
+                                    logging.info("\t"+line.strip())
+                                    l_str,r_str = line.split(':')
+                                else:
+                                    continue
+                                if l_str is None: 
+                                    level = -1.
+                                else:   
+                                    level = float(re.findall("\d+.\d+",l_str)[0])
+                                limits[level] = float(re.findall("\d+.\d+",r_str)[0])
+                                
+                        path_limits = os.path.join(self.outputDir,subdirBin,'limits.json')
+                        with open(path_limits,'w') as handle:
+                            json.dump(limits,handle,indent=4)
+                        logging.info(f'Saved limits as {path_limits}') 
+
+                        # Produce plots #
+                        if len(limits) > 0:
+                            path_plots = [os.path.join(subdirBin,'limits.pdf'),os.path.join(subdirBin,'limits.png')]
+                            data = {"expected" : (limits[50.0],limits[84.0],limits[16.0],limits[97.5],limits[2.5]),
+                                    "observed" : limits[-1.0],
+                                    "name"     : binSuffix}
+                            content = {'paths'      : path_plots,
+                                       'poi'        : 'r',
+                                       'data'       : [data],
+                                       'campaign'   : campaign}
+                            if 'plotting' in combineCfg.keys():
+                                content.update(combineCfg['plotting'])
+                            path_json = os.path.join(subdirBin,'limits_plot.json')
+                            logging.info(f'Saved {os.path.basename(subdirBin)} data in {path_json}')
+                            with open(path_json,'w') as handle:
+                                json.dump(content,handle,indent=4)
+
+                            limit_cmd = f"cd {setup_dir}; "
+                            limit_cmd += f"env -i bash -c 'source {setup_script} && {ULIMIT} && cd {script_dir} && python helperInference.py dhi.plots.limits.plot_limit_points {path_json}'"
+                            rc,output = self.run_command(limit_cmd,shell=True, return_output=True)
+                            if rc != 0: 
+                                if logging.root.level > 10:
+                                    for line in output:
+                                        logging.info(line.strip())
+                                logging.error('Failed to produce limit plot, see log above')
                             else:
-                                continue
-                            if l_str is None: 
-                                level = -1.
-                            else:   
-                                level = float(re.findall("\d+.\d+",l_str)[0])
-                            limits[level] = float(re.findall("\d+.\d+",r_str)[0])
-                            
-                    path_limits = os.path.join(self.outputDir,subdirBin,'limits.json')
-                    with open(path_limits,'w') as handle:
-                        json.dump(limits,handle,indent=4)
-                    logging.info(f'Saved limits as {path_limits}') 
+                                for path_plot in path_plots:
+                                    logging.info(f'Produced {path_plot}')
 
                 # Producing GoF #
                 if combineMode == 'gof':
@@ -1679,12 +1952,12 @@ class DataCard:
                                 hadd_cmd.append(rootfile)
                         rc = self.run_command(hadd_cmd)
                         if rc != 0:
-                            raise RuntimeError("Hadd command `{' '.join(hadd_cmd)}` failed")
+                            raise RuntimeError(f"Hadd command `{' '.join(hadd_cmd)}` failed")
                         logging.debug(f'Created {toys_file}')
                     if not os.path.exists(data_file):
                         rootfile = glob.glob(os.path.join(subdirBin,'batch','output','1','*root'))
                         if len(rootfile) != 1:
-                            raise RuntimeError(f'Cannot find file {rootfile.__repr__}()')
+                            raise RuntimeError(f'Cannot find file {rootfile.__repr__()}')
                         shutil.copy(rootfile[0],data_file)
                         logging.debug(f'Created {data_file}')
 
@@ -1710,12 +1983,12 @@ class DataCard:
                         raise RuntimeError('Could not understand algorithm in combine command, did you use `--algo=...` or `--algo ...` ?')
 
                     # Produce plots #
-                    path_pdf = os.path.join(subdirBin,'gof.pdf')
-                    content = {'paths'      : path_pdf,
+                    path_plots = [os.path.join(subdirBin,'gof.pdf'),os.path.join(subdirBin,'gof.png')]
+                    content = {'paths'      : path_plots,
                                'data'       : limit_data[0],
                                'toys'       : limit_toys,
                                'algorithm'  : algorithm,
-                               'campaign'   : self.era}
+                               'campaign'   : campaign}
                     if 'plotting' in combineCfg.keys():
                         content.update(combineCfg['plotting'])
                     path_json = os.path.join(subdirBin,'gof.json')
@@ -1724,7 +1997,7 @@ class DataCard:
                         json.dump(content,handle,indent=4)
 
                     gof_cmd = f"cd {setup_dir}; "
-                    gof_cmd += f"env -i bash -c 'source {setup_script} && cd {script_dir} && python helperInference.py dhi.plots.gof.plot_gof_distribution {path_json}'"
+                    gof_cmd += f"env -i bash -c 'source {setup_script} && {ULIMIT} && cd {script_dir} && python helperInference.py dhi.plots.gof.plot_gof_distribution {path_json}'"
                     rc,output = self.run_command(gof_cmd,shell=True, return_output=True)
                     if rc != 0: 
                         if logging.root.level > 10:
@@ -1732,7 +2005,8 @@ class DataCard:
                                 logging.info(line.strip())
                         logging.error('Failed to produce gof plot, see log above')
                     else:
-                        logging.info(f'Produced {path_pdf}')
+                        for path_plot in path_plots:
+                            logging.info(f'Produced {path_plot}')
 
                 # Pulls and impacts #
                 if combineMode == 'pulls_impact':
@@ -1777,12 +2051,12 @@ class DataCard:
 
                             data['params'].append(d)
 
-                    path_pdf = os.path.join(subdirBin,'pulls_impact.pdf')
+                    path_plots = [os.path.join(subdirBin,'pulls_impact.pdf'), os.path.join(subdirBin,'pulls_impact.png')]
                     content = {
-                        'paths'     : [path_pdf],
+                        'paths'     : path_plots,
                         'data'      : data,
                         'poi'       : 'r',
-                        'campaign'  : self.era,
+                        'campaign'  : campaign,
                     }
                     if 'plotting' in combineCfg.keys():
                         content.update(combineCfg['plotting'])
@@ -1791,7 +2065,7 @@ class DataCard:
                         json.dump(content,handle,indent=4)
 
                     pull_cmd = f"cd {setup_dir}; "
-                    pull_cmd += f"env -i bash -c 'source {setup_script} && cd {script_dir} && python helperInference.py dhi.plots.pulls_impacts.plot_pulls_impacts {path_json}'"
+                    pull_cmd += f"env -i bash -c 'source {setup_script} && {ULIMIT} && cd {script_dir} && python helperInference.py dhi.plots.pulls_impacts.plot_pulls_impacts {path_json}'"
                     rc,output = self.run_command(pull_cmd,shell=True, return_output=True)
                     if rc != 0: 
                         if logging.root.level > 10:
@@ -1799,7 +2073,8 @@ class DataCard:
                                 logging.info(line.strip())
                         logging.error('Failed to produce pulls and impact plot, see log above')
                     else:
-                        logging.info(f'Produced {path_pdf}')
+                        for path_plot in path_plots:
+                            logging.info(f'Produced {path_plot}')
 
                 # Producing prefit and postfit plots #
                 if 'prefit' in combineMode or 'postfit' in combineMode:
@@ -1838,13 +2113,13 @@ class DataCard:
                             fit_name = 'fit_b'
                         if combineMode == 'postfit_s':
                             fit_name = 'fit_s'
-                        path_pdf = os.path.join(subdirBin,'nuisances.pdf')
+                        path_plots = [os.path.join(subdirBin,'nuisances.pdf'), os.path.join(subdirBin,'nuisances.png')]
                         resultFile = glob.glob(os.path.join(subdirBin,'higgs*root'))
                         if len(resultFile) == 0:
                             raise RuntimeError(f'Could not find result file in {subdirBin}')
 
                         content = {
-                            'paths'                 : [path_pdf],
+                            'paths'                 : path_plots,
                             'poi'                   : 'r',
                             'fit_name'              : fit_name,
                             'workspace'             : resultFile[0],
@@ -1873,7 +2148,8 @@ class DataCard:
                                     logging.info(line.strip())
                             logging.error('Failed to produce nuisance plots, see log above')
                         else:
-                            logging.info(f'Produced {path_pdf}')
+                            for path_plot in path_plots:
+                                logging.info(f'Produced {path_plot}')
 
 #                        content_log = {
 #                            'paths'                 : [os.path.join(subdirBin,'nuisances_log.pdf')],
@@ -1917,15 +2193,51 @@ class DataCard:
                                         
             # Combined finalize mode for all bins (in case there was) #
             if len(subdirBinPaths) > 1 and not self.worker:
+                # Limits : combine into one plot #
+                if combineMode == 'limits':
+                    # Produce plots #
+                    path_plots = [os.path.join(subdir,'limits.pdf'),os.path.join(subdir,'limits.png')]
+
+                    content = {'paths'      : path_plots,
+                               'poi'        : 'r',
+                               'data'       : [],
+                               'campaign'   : 'run2'}
+                    for subdirBinPath in subdirBinPaths:
+                        path_json = os.path.join(subdirBinPath,'limits_plot.json')
+                        if not os.path.exists(path_json):
+                            logging.warning(f'Could not load {path_json}, will continue')
+                            continue
+                        logging.info(f'Loading {path_json}')
+                        with open(path_json,'r') as handle:
+                            subCont = json.load(handle)
+                            content['data'].extend(subCont['data'])
+                    if 'plotting' in combineCfg.keys():
+                        content.update(combineCfg['plotting'])
+                    path_json = os.path.join(subdir,'limits_plot.json')
+                    logging.info(f'Saved {os.path.basename(subdirBin)} data in {path_json}')
+                    with open(path_json,'w') as handle:
+                        json.dump(content,handle,indent=4)
+                    limit_cmd = f"cd {setup_dir}; "
+                    limit_cmd += f"env -i bash -c 'source {setup_script} && {ULIMIT} && cd {script_dir} && python helperInference.py dhi.plots.limits.plot_limit_points {path_json}'"
+                    rc,output = self.run_command(limit_cmd,shell=True, return_output=True)
+                    if rc != 0: 
+                        if logging.root.level > 10:
+                            for line in output:
+                                logging.info(line.strip())
+                        logging.error('Failed to produce limit plot, see log above')
+                    else:
+                        for path_plot in path_plots:
+                            logging.info(f'Produced {path_plot}')
+
                 # Goodness of fit : combine into one plot
                 if combineMode == 'gof':
                     logging.info('GoF combination :')
-                    path_pdf = os.path.join(subdir,'gof.pdf')
-                    content = {'paths'      : path_pdf,
+                    path_plots = [os.path.join(subdir,'gof.pdf'),os.path.join(subdir,'gof.png')]
+                    content = {'paths'      : path_plots,
                                'n_bins'     : 32,
                                'data'       : [],
                                'algorithm'  : 'saturated',
-                               'campaign'   : self.era}
+                               'campaign'   : campaign}
                     for subdirBinPath in subdirBinPaths:
                         path_json = os.path.join(subdirBinPath,'gof.json')
                         if not os.path.exists(path_json):
@@ -1953,7 +2265,8 @@ class DataCard:
                                     logging.info(line.strip())
                             logging.error('Failed to produce gof plot, see log above')
                         else:
-                            logging.info(f'Produced {path_pdf}')
+                            for path_plot in path_plots:
+                                logging.info(f'Produced {path_plot}')
 
         # Slurm ID printout #
         if len([v for key,val in slurmIdPerEntry.items() for v in val]) > 0: # If any slurm Id has been registered
@@ -1961,21 +2274,31 @@ class DataCard:
             for entry,slurm_ids in slurmIdPerEntry.items():
                 logging.info(f'... Entry {entry} : '+' '.join(slurm_ids))
 
-        return True
+        return []
 
     def getTxtFilesPath(self):
-        if self.textfiles is None:
-            initTextFiles = {histName:os.path.join(self.outputDir,f'{histName}_{self.era}.txt') 
-                                for histName in self.hist_conv.keys()}
-        elif isinstance(self.textfiles,str):
-            if '{}' in self.textfiles:
-                initTextFiles = {histName:os.path.join(self.outputDir,
-                                              self.textfiles.format(f'{histName}_{self.era}.txt'))
-                                    for histName in self.hist_conv.keys()}
+        initTextFiles = {}
+        for era in self.era:
+            keys = [str(key) for key in self.hist_conv.keys()]
+            if len(set(self.era).intersection(set(keys)))>0: # keys are eras
+                hist_conv = self.hist_conv[list(self.hist_conv.keys())[keys.index(era)]]
+            else: # keys are not eras
+                hist_conv = self.hist_conv
+            if self.textfiles is None:
+                initTextFiles.update(**{f'{histName}_{era}':os.path.join(self.outputDir,f'{histName}_{era}.txt') 
+                                        for histName in hist_conv.keys()})
+            elif isinstance(self.textfiles,str):
+                if '{}' in self.textfiles:
+                    initTextFiles.update(**{f'{histName}_{era}':os.path.join(self.outputDir,
+                                                        self.textfiles.format(f'{histName}_{era}.txt'))
+                                                for histName in self.hist_conv.keys()})
+                else:
+                    initTextFiles.update(**{f'all_{era}',os.path.join(self.outputDir,self.textfiles)})
             else:
-                initTextFiles = {'all',os.path.join(self.outputDir,self.textfiles)}
-        else:
-            raise RuntimeError('Format of "textfiles" entry not understood')
+                raise RuntimeError('Format of "textfiles" entry not understood')
+        for key,val in initTextFiles.items(): # Crrect in case the user put the `.txt` in the textFiles
+            if val.count('.txt') > 1:
+                initTextFiles[key] = val.replace('.txt','') + '.txt'
         return initTextFiles
 
         
@@ -2062,11 +2385,18 @@ class DataCard:
                 handle.write("\t},")
             handle.write("}")
 
-    def writeSbatchCommand(self,subdir,params={},args={}):
+
+    @staticmethod
+    def writeSbatchCommand(mainDir,log=False,params={},args={}):
         # Generate file path #
-        filepath = os.path.join(subdir,f'slurmSubmission.sh')
+        filepath = os.path.join(mainDir,f'slurmSubmission.sh')
         scriptName = os.path.abspath(__file__)
-        log_dir = os.path.join(subdir,'logs')
+        if log:
+            log_dir = os.path.join(mainDir,'logs')
+        else:
+            log_dir = mainDir
+        if not os.path.exists(mainDir):
+            raise RuntimeError(f'Directory {mainDir} does not exist')
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
 
@@ -2074,14 +2404,15 @@ class DataCard:
         if isinstance(args,list): # Array submission
             for arg in args:
                 if not isinstance(arg,dict):
-                    raise RuntimeError('Argument needs to be a dict : '+arg.__repr__())
+                    raise RuntimeError('Arguments need to be a dict : '+arg.__repr__())
             N_arrays = len(args)
         elif isinstance(args,dict): # single job submission
             N_arrays = 0
+            args = [args]
         else:
             raise RuntimeError('Either a dict or a list needs to be used for args')
 
-
+        # Write to file 
         with open(filepath,'w') as handle:
             # Write header #
             handle.write('#!/bin/bash\n\n')
@@ -2100,26 +2431,33 @@ class DataCard:
             # command #
             if N_arrays > 0:
                 handle.write('cmds=(\n')
-                for arg in args:
-                    handle.write(f'"python3 {scriptName} --yaml {self.configPath} --worker ')
-                    if logging.root.level == 10:
-                        handle.write(' -v ')
-                    for key,val in arg.items():
-                        handle.write(f'--{key} {val} ')
-                    handle.write(f' {self.custom_args}')
-                    handle.write('"\n')
-                handle.write(')\n')
-                handle.write('${cmds[$SLURM_ARRAY_TASK_ID-1]}\n')
-            else:
-                handle.write(f'python3 {scriptName} --yaml {self.configPath} --worker ')
+            for arg in args:
+                if N_arrays > 0:
+                    handle.write('"')
+                handle.write(f'python3 {scriptName} ')
                 if logging.root.level == 10:
                     handle.write(' -v ')
-                for key,val in args.items():
-                    handle.write(f'--{key} {val} ')
-                handle.write(f' {self.custom_args}')
-                handle.write("\n")
+                for key,val in arg.items():
+                    if val is None:
+                        continue
+                    if isinstance(val,bool) and not val:
+                        continue
+                    handle.write(f'--{key} ')
+                    if isinstance(val,list) or isinstance(val,tuple):
+                        for v in val:
+                            handle.write(f'{v} ')
+                    elif isinstance(val,bool):
+                        pass
+                    else:
+                        handle.write(f'{val} ')
+                if N_arrays > 0:
+                    handle.write('"')
+                handle.write('\n')
+            if N_arrays > 0:
+                handle.write(')\n')
+                handle.write('${cmds[$SLURM_ARRAY_TASK_ID-1]}\n')
 
-        logging.debug(f'Generated submission script {filepath}')
+        logging.info(f'Generated submission script {filepath}')
         return filepath
 
  
@@ -2136,8 +2474,6 @@ class DataCard:
             if nextline == '' and process.poll() is not None:
                 break
             logging.debug(nextline.strip())
-#                sys.stdout.write(nextline)
-#                sys.stdout.flush()
             if return_output:
                 output.append(nextline)
         process.communicate()
@@ -2189,22 +2525,37 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Produce datacards')
     parser.add_argument('--yaml', action='store', required=True, type=str,
                         help='Yaml containing parameters')
+    parser.add_argument('--era', action='store', required=False, type=str, default=None, nargs='*',
+                        help='List of eras to restrict production to')
     parser.add_argument('--pseudodata', action='store_true', required=False, default=False,
                         help='Whether to use pseudo data (data = sum of MC) [default = False]')
     parser.add_argument('--plotIt', action='store_true', required=False, default=False,
                         help='Browse datacard files and produce plots via plotIt \
-                              (note : produced by default when datacards are produced) ') 
+#                              (note : done by default when datacards are produced, except in submit mode)') 
     parser.add_argument('--split', action='store', required=False, default=None, nargs='*',
                         help='If used without argument, will process all categories in serie, \
                               otherwise will process the categories given in argument')
     parser.add_argument('-j,','--jobs', action='store', required=False, default=None, type=int,
                         help='Number of parallel processes (only useful with `--split`) [-1 = number of processes]')
+    parser.add_argument('--submit', action='store', required=False, default=None, nargs='*',
+                        help="""Whether to submit the production to the cluster, \n
+                                 combined with `--split` will submit one job per category otherwise will submit a single job, \n
+                                 combined with `--j` will submit a multithreaded job, \n
+                                 used `--split time=... and/or `--split mem-per-cpu=... to modify the default values (or any sbatch arg)""")
     parser.add_argument('--combine', action='store', required=False, default=None, nargs='*',
                         help='Run combine on the txt datacard only')
     parser.add_argument('--combine_args', action='store', required=False, default=[], nargs='*',
                         help='Additional args for the combine commands (used in jobs, keep for debug)')
     parser.add_argument('--custom', action='store', required=False, default=None, nargs='*',
                         help='Format the yaml file')
+    parser.add_argument('--interpolation', action='store', required=False, default=None, nargs='*',
+                        help='Config for the matching interpolation')
+    parser.add_argument('--interpolation_config1', action='store', required=False, default=None, nargs='*',
+                        help='First config for the interpolation (to be used with `--interpolation`)')
+    parser.add_argument('--interpolation_config2', action='store', required=False, default=None, nargs='*',
+                        help='Second config for the interpolation (to be used with `--interpolation`)')
+    parser.add_argument('--interpolation_era', action='store', required=False, default=None, type=str, nargs='*',
+                        help='Era for the interpolation [default : done for each era in the initial config] (to be used with `--interpolation`)')
     parser.add_argument('-v','--verbose', action='store_true', required=False, default=False,
                         help='Verbose mode')
     parser.add_argument('--worker', action='store_true', required=False, default=False,
@@ -2228,110 +2579,453 @@ if __name__=="__main__":
         raise RuntimeError("YAML file {} is not a valid file".format(args.yaml))
 
     # Yaml parsing #
-    config = parseYaml(args.yaml,args.custom)
+    configMain = parseYaml(args.yaml,args.custom)
 
     # Content checks #
-    required_items = ['path','outputDir','yamlName','hist_conv','groups']
-    if any(item not in config.keys() for item in required_items): 
-        raise RuntimeError('Your config is missing the following items :'+ \
-                ','.join([item for item in required_items if item not in config.keys()]))
-
-    # Splitting #
-    global_hist_conv = copy.deepcopy(config['hist_conv']) # Run all at once
-    categoriesToRun = [config['hist_conv'].keys()]
-        
-    if args.split is not None:
-        if len(args.split) == 0:  # run all sequantially
-            categoriesToRun = [[cat] for cat in categoriesToRun[0]]
-            if 'regroup' in config.keys():
-                categoriesToRun = [val for val in config['regroup'].values()]
-        else: # Run only requested
-            if 'regroup' not in config.keys():
-                if not all([item in config['hist_conv'].keys() for item in args.split]):
-                    raise RuntimeError('Category(ies) requested in split not found : '+\
-                            ','.join([item for item in args.split if item not in hist_conv.keys()]))
-                categoriesToRun = [[cat] for cat in args.split]
-            else:
-                categoriesToRun = [[val for key in args.split for val in config['regroup'][key]]]
+    required_items = ['path','outputDir','yamlName','hist_conv','groups','era']
+    if any(item not in configMain.keys() for item in required_items): 
+        raise RuntimeError('Your configMain is missing the following items :'+ \
+                ','.join([item for item in required_items if item not in configMain.keys()]))
 
     # Create output directory #
-    outputDir = config['outputDir']
+    outputDir = configMain['outputDir']
     if not os.path.isabs(outputDir):
         outputDir = os.path.join(os.path.abspath(os.path.dirname(__file__)),outputDir)
     if not os.path.exists(outputDir):
         os.makedirs(outputDir)
-    config['outputDir'] = outputDir
+    configMain['outputDir'] = outputDir
     plotIt_path = os.path.join(outputDir,'plotit','root')
-    if not os.path.exists(plotIt_path):
-        os.makedirs(plotIt_path)
-        # Need to be done prior to avood thread concurrences
+    logging.info(f"Output path : {outputDir}")
 
-
-
-    # Instantiate #
-    if args.custom is not None:
-        custom_args = "--custom "+' '.join(args.custom)
+    # Eras #
+    eras = configMain['era']
+    if isinstance(configMain['era'],list):
+        eras = [str(era) for era in configMain['era']]
     else:
-        custom_args = None
+        eras = [str(configMain['era'])]
+    if args.era is not None:
+        if len(set(args.era) - set(eras)) > 0:
+            raise RuntimeError(f'You asked for eras {",".join(args.era)} while the eras in the configs are {",".join(eras)}')
+        eras = args.era
+        configMain['era'] = eras
+        
+
+    # Interpolation #
+    if args.interpolation is not None:
+        # Check for the other args #
+        if args.interpolation_config1 is None:
+            raise RuntimeError("You need to also provide `--interpolation_config1`")
+        if args.interpolation_config2 is None:
+            raise RuntimeError("You need to also provide `--interpolation_config2`")
+        # Check for formatting in the arg #
+        if len(args.interpolation) > 1:
+            configInt = parseYaml(args.interpolation[0],custom=args.interpolation[1:])
+        else:
+            configInt = parseYaml(args.interpolation[0])
+        if len(args.interpolation_config1) > 1:
+            config1 = parseYaml(args.interpolation_config1[0],custom=args.interpolation_config1[1:])
+        else:
+            config1 = parseYaml(args.interpolation_config1[0])
+        if len(args.interpolation_config2) > 1:
+            config2 = parseYaml(args.interpolation_config2[0],custom=args.interpolation_config2[1:])
+        else:
+            config2 = parseYaml(args.interpolation_config2[0])
+
+        configPartial = copy.deepcopy(configMain) # What is to be used as main for interpolation
+        # Remove steps not necessary for config1 and config2 #
+        # (will be done only for the interpolated one)
+        to_remove = ['rebin']
+        for key in to_remove:
+            for conf in [config1,config2,configPartial]:
+                if key in conf.keys():
+                    del conf[key]
+        # Cross checks #
+        # (make sure content is common to both main and the configs)
+        to_check = []
+        for key in to_check:
+            if set(config1[key]) != set(config2[key]) or set(config1[key]) != set(configPartial[key]) or set(config2[key]) != set(configPartial[key]):
+                raise RuntimeError(f'Need same content key {key} between the main config and the two configs for the interpolation')
+        # Equalization #
+        # (set some content to two configs from the main)
+        to_equalize  = ['outputDir','era']
+        for key in to_equalize:
+            for conf in [config1,config2,configPartial]:
+                conf[key] = configMain[key] 
+        # Avoid saving datacards for the two config #
+        # (only done on the fly and used for interpolation) #
+        config1['save_datacard'] = False
+        config2['save_datacard'] = False
+        configPartial['save_datacard'] = False
+        config1['produce_plots'] = False
+        config2['produce_plots'] = False
+        configPartial['produce_plots'] = False
+        # Use the correct groups for interpolation #
+        def editGroups(config,groups_to_keep=[],groups_to_remove=[],eras=None):
+            groups = Datacard.includeEntry(config['groups'],'groups',eras)
+            if eras is not None and len(set(groups.keys())-set(eras))==0:
+                groupsNew = dict()  
+                for era,groupEntries in groups.items():
+                    groupsNew[era] = dict()
+                    for group,groupCfg in groupEntries.items():
+                        if (len(groups_to_keep)>0 and group in groups_to_keep) \
+                                or (len(groups_to_remove)>0 and group not in groups_to_remove):
+                            groupsNew[era][group] = groupCfg
+                    if len(groupsNew[era]) == 0:
+                        raise RuntimeError(f'Empty groups in era {era} -> to keep = ['+','.join(groups_to_keep)+'], to remove = ['+','.join(groups_to_remove)+'], but initial ['+','.join([str(group) for group in groups[era].keys()])+']')
+            else:
+                groupsNew = dict()
+                for group,groupCfg in groups.items():
+                    if (len(groups_to_keep)>0 and group in groups_to_keep) \
+                            or (len(groups_to_remove)>0 and group not in groups_to_remove):
+                        groupsNew[group] = groupCfg
+                if len(groupsNew) == 0:
+                    logging.warning('Empty groups -> to keep = ['+','.join(groups_to_keep)+'], to remove = ['+','.join(groups_to_remove)+'], but initial ['+','.join([str(group) for group in groups.keys()])+']')
+            config['groups'] = groupsNew
+
+        groups1_to_keep = []            
+        groups2_to_keep = []            
+        groupsInt_to_remove = []            
+        for groupInt, groupPair in configInt['matchingGroup'].items():
+            groups1_to_keep.append(groupPair[configInt['param1']])
+            groups2_to_keep.append(groupPair[configInt['param2']])
+            groupsInt_to_remove.append(groupInt)
+        editGroups(config1,groups_to_keep=groups1_to_keep,eras=eras)
+        editGroups(config2,groups_to_keep=groups2_to_keep,eras=eras)
+        editGroups(configPartial,groups_to_remove=groupsInt_to_remove,eras=eras)
+
+        configs = [configPartial,config1,config2,configMain]
+    else:
+        configs = [configMain]
+
+
+    # Producing the instances #
     instances = []
-    for icat,categories in enumerate(categoriesToRun):
-        config['hist_conv'] = {cat:global_hist_conv[cat] for cat in categories}
-        instances.append(DataCard(configPath      = os.path.abspath(args.yaml),
-                                  worker          = args.worker,
-                                  pseudodata      = args.pseudodata,
-                                  logName         = f'log_{icat}.log',
-                                  custom_args     = custom_args,
-                                  **config) )
+    categoriesToSubmit  = []
+    for era in eras:
+        for iconf,config in enumerate(configs):
+            if args.interpolation is not None:
+                if args.interpolation_era is not None and str(era) not in args.interpolation_era:
+                    if iconf <= 2:
+                        continue
+                else:
+                    if iconf > 2:
+                        continue
+            config_era = {}
+            for itemName,itemCfg in config.items():
+                if isinstance(itemCfg,dict): # Dict -> check if common or per era
+                    keys = [str(key) for key in itemCfg.keys()]
+                    if len(keys) == 0:
+                        config_era[itemName] = dict()
+                    elif len(set(keys).intersection(set(eras))) > 0: # keys are eras -> era specific  
+                        config_era[itemName] = itemCfg[list(itemCfg)[keys.index(era)]]
+                    else:
+                        config_era[itemName] = itemCfg
+                else:   # Common item for all eras
+                    config_era[itemName] = itemCfg
+            
+            config_era['era'] = era
+
+            # Splitting #
+            global_hist_conv = copy.deepcopy(config_era['hist_conv']) # Run all at once
+            categoriesToRun = [config_era['hist_conv'].keys()]
+                
+            if args.split is not None:
+                if len(args.split) == 0:  # run all sequentially
+                    categoriesToRun = [[cat] for cat in categoriesToRun[0]]
+                    if 'regroup' in config.keys():
+                        categoriesToRun = [val for val in config_era['regroup'].values()]
+                else: # Run only requested
+                    if args.interpolation is None:
+                        splitCats = args.split
+                    else:
+                        if iconf == 0 or iconf == 3:
+                            splitCats = args.split
+                        elif iconf == 1:
+                            splitCats = [configInt['matchingHist'][cat][configInt['param1']] for cat in args.split]
+                        elif iconf == 2:
+                            splitCats = [configInt['matchingHist'][cat][configInt['param2']] for cat in args.split]
+                        else:
+                            raise ValueError
+                    if 'regroup' not in config_era.keys():
+                        if not all([cat in config_era['hist_conv'].keys() for cat in splitCats]):
+                            raise RuntimeError('Category(ies) requested in split not found : '+\
+                                    ','.join([cat for cat in splitCats if cat not in config_era['hist_conv'].keys()]))
+                        categoriesToRun = [splitCats]
+                    else:
+                        categoriesToRun = [[val for key in splitCats for val in config_era['regroup'][key]]]
+
+            if iconf == 0:
+                categoriesToSubmit.extend(categoriesToRun)
+
+            # Instantiate #
+            if args.custom is not None:
+                custom_args = args.custom
+            else:
+                custom_args = None
+            for icat,categories in enumerate(categoriesToRun):
+                config_era['hist_conv'] = {cat:global_hist_conv[cat] for cat in categories}
+                ilog = icat + iconf * len(categories) 
+                instance = Datacard(configPath      = os.path.abspath(args.yaml),
+                                    worker          = args.worker,
+                                    pseudodata      = args.pseudodata,
+                                    logName         = f'log_{ilog}.log',
+                                    custom_args     = custom_args,
+                                    **config_era)
+                instances.append(instance)
 
     # Run #
     def run_instance(instance,methods):
         for method in methods:
             assert hasattr(instance,method)
-            output = getattr(instance,method)()
-        return output
+            getattr(instance,method)()
+        return instance 
 
-    def run_all():
+    def run_interpolation(instance1,instance2,instanceInt,configMain,configInt):
+        contentInt = InterpolateContent(content1        = instance1.content,
+                                        content2        = instance2.content,
+                                        era             = instance1.era,
+                                        param1          = configInt['param1'],
+                                        param2          = configInt['param2'],
+                                        paramInt        = configInt['paramInt'],
+                                        matchingHist    = configInt['matchingHist'],
+                                        matchingGroup   = configInt['matchingGroup'])
+
+        contentMain = instanceInt.content
+        for cat in contentInt.keys():
+            if cat not in contentMain.keys():
+                contentMain[cat] = {}
+            for group, histCfg in contentInt[cat].items():
+                contentMain[cat][group] = histCfg
+                    
+        instanceInt.rebin       = configMain['rebin'] if 'rebin' in configMain.keys() else None
+        instanceInt.groups      = configMain['groups']
+        instanceInt.initialize()
+        instanceInt.content     = contentMain
+        if instanceInt.rebin is not None:
+            instanceInt.applyRebinning()
+        instanceInt.saveDatacard()
+
+        return instanceInt
+
+    def run_all(instances):
+        if not args.worker:
+            if os.path.exists(plotIt_path):
+                shutil.rmtree(plotIt_path)
+            os.makedirs(plotIt_path)
+        # Need to be done prior to avoid thread concurrences
+        plotIt_configs = []
+        # Serial processing #
         if args.jobs is None:
             plotIt_configs = []
             for instance in instances:
                 if not args.plotIt:
                     instance.run_production()
-                plotIt_configs.append(instance.prepare_plotIt())
+                if not args.worker:
+                    plotIt_config = instance.prepare_plotIt()
+                    if plotIt_config is not None:
+                        plotIt_configs.append(plotIt_config)
+        # Parallel processing #
         else:
             if args.jobs == -1 or args.jobs > len(instances):
                 args.jobs = len(instances)
-            methods = ['prepare_plotIt']
+            methods = ['run_production']
             if not args.plotIt:
-                methods.insert(0,'run_production')
-            with mp.Pool(processes=args.jobs) as pool:
-                plotIt_configs = pool.starmap(run_instance,[(instance,methods) for instance in instances])
-        # Merge and run plotit (single thread anyway) #
-        plotIt_config = DataCard.merge_plotIt(plotIt_configs)
-        instances[0].run_plotIt(plotIt_config)
+                with mp.Pool(processes=args.jobs) as pool:
+                    instances = pool.starmap(run_instance,[(instance,methods) for instance in instances])
+            if not args.worker:
+                for instance in instances:
+                    plotIt_config = instance.prepare_plotIt()
+                    if plotIt_config is not None:
+                        plotIt_configs.append(plotIt_config)
 
-    if args.combine is not None: 
-        config['hist_conv'] = global_hist_conv
-        combine_instance = DataCard(configPath      = os.path.abspath(args.yaml),
-                                    worker          = args.worker,
-                                    pseudodata      = args.pseudodata,
-                                    logName         = f'log_{icat}.log',
-                                    custom_args     = custom_args,
-                                    **config) 
-  
-        combine_args = {}
-        for arg in args.combine_args:
-            if '=' in arg:
-                combine_args[arg.split('=')[0]] = arg.split('=')[1]
+        # Interpolation #
+        if args.interpolation is not None:
+            # Split by era #
+            instancesPerEra = {}
+            instanceMatches = []
+            for instance in instances:
+                if instance.era not in instancesPerEra.keys():
+                    instancesPerEra[instance.era] = [instance]
+                else:
+                    instancesPerEra[instance.era].append(instance)
+            # Interpolate based on era #
+            for era,instancesEra in instancesPerEra.items():
+                if args.interpolation_era is not None and str(era) not in args.interpolation_era:
+                    continue
+                assert len(instancesEra) % 3 == 0
+                N = len(instancesEra)
+                instancesInt = instancesEra[:N//3]
+                instances1 = instancesEra[N//3:2*N//3]
+                instances2 = instancesEra[2*N//3:] # by construction
+                # Build tuples of instances with histograms to be used for interpolation #
+                paramInt = configInt['paramInt']
+                param1 = configInt['param1']
+                param2 = configInt['param2']
+                for instanceInt in instancesInt:
+                    if instanceInt.era != era:
+                        continue
+                    keysInt = list(instanceInt.hist_conv.keys())
+                    # Find equivalent keys in instances1 & instances2
+                    keys1 = []
+                    keys2 = []
+                    for keyInt in configInt['matchingHist'].keys():
+                        key1 = configInt['matchingHist'][keyInt][param1]
+                        key2 = configInt['matchingHist'][keyInt][param2]
+                        if keyInt in keysInt:
+                            keys1.append(key1)
+                            keys2.append(key2)
+                    # Build the triplets #
+                    found_match = False
+                    for instance1 in instances1:
+                        if instance1.era == era and set(instance1.hist_conv.keys()) == set(keys1):
+                            for instance2 in instances2:
+                                if instance2.era == era and set(instance2.hist_conv.keys()) == set(keys2):
+                                    instanceMatches.append((instance1,instance2,instanceInt))
+                                    found_match = True
+                                    break
+                            if found_match:
+                                break
+                    if not found_match:
+                        raise RuntimeError(f'Could not find match to instance Int with hist conv keys in era {era} : '+','.join(keys1)+' (config 1) and '+','.join(keys2)+' (config 2)')
+
+            # Serial processing #
+            if args.jobs is None:
+                for instance1,instance2,instanceInt in instanceMatches:
+                    if not args.plotIt:
+                        instanceInt = run_interpolation(instance1,instance2,instanceInt,configMain,configInt)
+                    if not args.worker:
+                        instanceInt.produce_plots = True
+                        instanceInt.groups.update(configInt['plotIt'])
+                        plotIt_config = instanceInt.prepare_plotIt()
+                        if plotIt_config is not None:
+                            plotIt_configs.append(plotIt_config)
+            # Parallel processing #
             else:
-                logging.warning(f'`{arg}` will be ignored because no `=`')
-        while True:
-            valid = combine_instance.run_combine(args.combine,combine_args,debug=args.debug)
-            if valid: 
-                break
-            logging.warning('Will restart datacard production')
-            run_all()
-    else:
-        run_all()
-                
+                if args.jobs == -1 or args.jobs > len(instancesInt):
+                    args.jobs = len(instancesInt)
+                if not args.plotIt:
+                    with mp.Pool(processes=args.jobs) as pool:
+                        instancesInt = pool.starmap(run_interpolation,[(*instanceMatch,configMain,configInt) for instanceMatch in instanceMatches])
+                for instance in instancesInt:
+                    instance.produce_plots = True
+                    instanceInt.groups.update(configInt['plotIt'])
+                    if not args.worker:
+                        plotIt_config = instance.prepare_plotIt()
+                        if plotIt_config is not None:
+                            plotIt_configs.append(plotIt_config)
 
+        if len(plotIt_configs) > 0:
+            # Merge and run plotit (single thread anyway) #
+            plotIt_config = Datacard.merge_plotIt(plotIt_configs)
+            instances[0].run_plotIt(plotIt_config,eras)
+
+    # instance for combine #
+    combine_instance = Datacard(configPath      = os.path.abspath(args.yaml),
+                                worker          = args.worker,
+                                pseudodata      = args.pseudodata,
+                                logName         = f'log_{icat}.log',
+                                custom_args     = custom_args,
+                                **configMain) 
+
+    ### SUBMIT ###
+    if args.submit is not None:
+        argsToSubmit = []
+        argsToDelete = ['combine','submit']
+        missingCats = combine_instance.check_datacards()
+        missingIdx = []
+        if len(missingCats) == 0:
+            logging.info('All datacards have been produced, will not resubmit')
+        else:
+            for icat,cats in enumerate(categoriesToSubmit):
+                argEntry = {k:v for k,v in args.__dict__.items() if k not in argsToDelete}
+                # Add categories on which to run #
+                argEntry['split'] = cats
+                argEntry['worker'] = ''
+                if args.split is None:
+                    argEntry['era'] = eras
+                    argsToSubmit.append(argEntry)
+                    missingIdx.append(str(icat+1))
+                else:
+                    for iera,era in enumerate(eras):
+                        argsToSubmit.append({**argEntry,'era':era})
+                        # Check if category is done #
+                        if era in missingCats.keys() and len(set(missingCats[era]).intersection(set(cats))) > 0:
+                            missingIdx.append(str(icat*len(eras)+iera+1))
+
+            # Get slurm parameters #
+            paramsToSubmit = {}
+            if args.jobs is not None:
+                paramsToSubmit['cpus-per-task'] = args.jobs
+            for submitArg in args.submit:
+                if not '=' in submitArg:
+                    logging.warning(f'Argument of `--submit` {submitArg} does not contain `=`  sign, will ignore')
+                    continue
+                paramsToSubmit[submitArg.split('=')[0]] = submitArg.split('=')[1]
+            # Write sbatch script #
+            slurmScript = os.path.join(outputDir,'slurmSubmission.sh')
+            if not os.path.exists(slurmScript):
+                slurmScript = Datacard.writeSbatchCommand(outputDir,params=paramsToSubmit,args=argsToSubmit,log=True)
+
+            #Submit #
+            if not args.debug:
+                if len(missingIdx) == 0:
+                    logging.info('All datacard files are present, will not resubmit')
+                else:
+                    if len(missingIdx) < len(argsToSubmit):
+                        logging.info('Some array ids did not succeed, resubmitting them : '+','.join(missingIdx))
+                        slurmCmd = f'sbatch --array={",".join(missingIdx)} '
+                        for key,val in paramsToSubmit.items():
+                            slurmCmd += f"--{key}={val} "
+                        slurmCmd += f"{slurmScript}"
+                    else:
+                        slurmCmd = f'sbatch {slurmScript}'
+                    logging.info(f'Sbatch command : {slurmCmd}')
+                    logging.debug(f'Submitting {slurmScript}')
+                    rc,output = Datacard.run_command(slurmCmd,return_output=True,shell=True)
+                    for line in output:
+                        logging.info(line.strip())
+
+        ### PLOTIT ###
+        if len(missingCats) == 0 and args.plotIt:
+                run_all(instances)
+
+    ### COMBINE ###
+    if args.combine is not None:
+        # Find missing jobs and if none missing, start combine #
+        if args.submit is not None and len(missingIdx) > 0:
+            logging.info('In submit mode and not all jobs have succeeded, will stop here')
+        else:
+            combine_args = {}
+            for arg in args.combine_args:
+                if '=' in arg:
+                    combine_args[arg.split('=')[0]] = arg.split('=')[1]
+                else:
+                    logging.warning(f'`{arg}` will be ignored because no `=`')
+            while True:
+                missingCats = combine_instance.check_datacards()
+                if len(missingCats) == 0:
+                    combine_instance.run_combine(args.combine,combine_args,debug=args.debug) 
+                    break
+                else:
+                    logging.info('Missing following categories in txt files :')
+                    for era,cats in missingCats.items():
+                        add_cats = []
+                        for cat in cats:
+                            logging.info(f'... {cat} [{era}]')
+                            if args.interpolation is not None: # add the other two configs cats
+                                add_cats.extend(configInt['matchingHist'][cat].values())
+                        missingCats[era].extend(add_cats)
+                        
+                    logging.info('Some categories are missing, will produce them')
+                    # Find associated instances #
+                    remainingInstances = []
+                    for instance in instances:
+                        if str(instance.era) in missingCats.keys() and len(set(missingCats[str(instance.era)]).intersection(set(instance.hist_conv.keys()))):
+                            remainingInstances.append(instance)
+                                # if any category in the instance is in the missing ones, reproduce
+                    run_all(remainingInstances)
+    ### RUN ###
+    else:
+        if args.submit is None:
+            run_all(instances)
 

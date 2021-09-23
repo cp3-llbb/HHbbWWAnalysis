@@ -11,19 +11,82 @@ import multiprocess as mp
 from IPython import embed
 
 from yamlLoader import YMLIncludeLoader
-from produceDataCards import parseYaml
 
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 ROOT.gStyle.SetPalette(55)
 
 
-def runSingleLimit(config,combine_args=None,custom_args=None,additional_args=None):
+def runCommand(command,subdir,combine_args=None,debug=False):
+    # Modify command #
+    command = command.split(' ')
+    if '--combine' in command:
+        raise RuntimeError('Please do not use --combine in your commands')
+    if '-u' not in command:
+        command.insert(1,'-u')
+    if combine_args is not None and isinstance(combine_args,list):
+        command += ['--combine'] + combine_args
+    if debug:
+        command.append('--debug')
+
+    #command += ['--plotIt']
+
+    #print (' '.join(command))
+
+    # Run command #
+    process = subprocess.Popen(command,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT,
+                               universal_newlines=True)
+
+    # Browse output #
+    output_path = None
+    while True:
+        nextline = process.stdout.readline().strip()
+        if "Output path" in nextline:
+            output_path = nextline.split(' ')[-1]
+        if nextline == '' and process.poll() is not None:
+            break
+        sys.stdout.write(nextline+'\n')
+        sys.stdout.flush()
+    process.communicate()
+
+    # Finalize #
+    if output_path is None:
+        print ('Could not find output path from command')
+    elif not os.path.isdir(output_path):
+        print (output_path)
+        print (f'Output path {output_path} not valid')
+    else:
+        limit_json = os.path.join(output_path,subdir,'limits.json')
+        if not os.path.exists(limit_json):
+            print (f'Limit file {limit_json} does not exist')
+        else:
+            with open(limit_json,'r') as handle:
+                limits = json.load(handle)
+            limits = {float(key):float(val) for key,val in limits.items()}
+            return limits
+
+    return None
+            
+
+            
+
+
+def runSingleLimit(config,combine_args=None,custom_args=None,additional_args=None,debug=False):
     content = parseYaml(config,custom_args)
-    limit_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                              content['outputDir'],
-                              'limits',
-                              'limits.json')
+
+    path_single = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               content['outputDir'],
+                               'limits',
+                               'limits.json')
+
+    path_combine = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                content['outputDir'],
+                                'limits',
+                                'combination',
+                                'limits.json')
+
     print (f"Running {content['outputDir']}")
     cmd = ['python','-u','produceDataCards.py','--yaml',config]
     if combine_args is not None and isinstance(combine_args,list):
@@ -43,93 +106,206 @@ def runSingleLimit(config,combine_args=None,custom_args=None,additional_args=Non
         sys.stdout.write(nextline)
         sys.stdout.flush()
     process.communicate()
-    if not os.path.exists(limit_path):
+
+    path_found = None
+    for path in [path_single,path_combine]:
+        if os.path.exists(path):
+            path_found = path
+    if path_found is None:
         limits = {}
     else:
-        print (f'Limits for config {config} found')
-        with open(limit_path,'r') as handle:
+        print (f'Limits for config {config} found in {path_found}')
+        with open(path_found,'r') as handle:
             limits = json.load(handle)
         limits = {float(key):float(val) for key,val in limits.items()}
     return limits
             
 
 class LimitScan:
-    def __init__(self,configs,jobs,unblind,path_out,combine_args,additional_args):
-        self.configs = configs
-        self.combine_args = combine_args
-        self.additional_args = additional_args
-        self.unblind = unblind
-        self.path_out = path_out
-        self.jobs = jobs
+    def __init__(self,curves,legend,combine_args,path_out,jobs,force,unblind,debug):
+        self.curves         = curves
+        self.legend         = legend
+        self.combine_args   = combine_args
+        self.path_out       = path_out
+        self.jobs           = jobs
+        self.force          = force
+        self.unblind        = unblind
+        self.debug          = debug
+        #self.configs = {name:config['configs'] for name,config in configs.items()}
+        #self.attributes = {name:{key:val for key,val in config.items() if key != 'configs'} for name,config in configs.items()}
+        #self.additional_args = additional_args
+
 
         # Make directory #
         if not os.path.isdir(self.path_out):
             os.makedirs(self.path_out)
 
-        # Multi scan or not #
-        if isinstance(self.configs,dict) and \
-           all([isinstance(config,list) for config in self.configs.values()]) and \
-           all([isinstance(innerCfg,dict)  for outerCfg in self.configs.values() for innerCfg in outerCfg]):
-            self.multiscan = True
-        elif isinstance(self.configs,list) and \
-             all([isinstance(config,dict) for config in self.configs]):
-            self.multiscan = False
-        else:
-            raise RuntimeError("Not correct configs")
+        path_save = os.path.join(self.path_out,'graphs.root')
+        is_save = os.path.exists(path_save) and not self.force
 
-        # Run the processes #
-        if self.multiscan:
-            configs_to_run = [{'config': innerCfg['config'],
-                               'custom': innerCfg['custom'] if 'custom' in innerCfg.keys() else None} 
-                                    for outerCfg in self.configs.values() for innerCfg in outerCfg]
-        else:
-            configs_to_run = [{'config': config['config'],
-                               'custom': config['custom'] if 'custom' in config.keys() else None} 
-                                    for config in self.configs]
-        N = len(configs_to_run) 
-        if jobs == -1:
-            jobs = N
-        self.jobs = min(N,jobs,mp.cpu_count())
-        results = self.getLimits(configs_to_run)
+#        # Multi scan or not #
+#        if isinstance(self.configs,dict) and \
+#           all([isinstance(config,list) for config in self.configs.values()]) and \
+#           all([isinstance(innerCfg,dict)  for outerCfg in self.configs.values() for innerCfg in outerCfg]):
+#            self.multiscan = True
+#        elif isinstance(self.configs,list) and \
+#             all([isinstance(config,dict) for config in self.configs]):
+#            self.multiscan = False
+#        else:
+#            raise RuntimeError("Not correct configs")
 
-        # Plotting #
-        if self.multiscan:
-            idx = 0
-            multiLimitsPerPoint = {}
-            for suffix,outerCfg in self.configs.items():
-                multiLimitsPerPoint[suffix] = {}
-                for innerCfg in outerCfg:
-                    multiLimitsPerPoint[suffix][innerCfg['label']] = results[idx]
-                    idx += 1
-            # Single scan plots #
-            multiGraphs = []
-            for suffix,limitsPerPoint in multiLimitsPerPoint.items():
-                print (f'Running suffix {suffix}')
+        if not is_save:
+            if self.force:
+                print ('Root save found, but will produce it anyway')
+            else:
+                print ('Root save not found, will produce it')
+#            # Run the processes #
+#            if self.multiscan:
+#                configs_to_run = [{'config': innerCfg['config'],
+#                                   'custom': innerCfg['custom'] if 'custom' in innerCfg.keys() else None} 
+#                                        for outerCfg in self.configs.values() for innerCfg in outerCfg if 'config' in innerCfg.keys()]
+#            else:
+#                configs_to_run = [{'config': config['config'],
+#                                   'custom': config['custom'] if 'custom' in config.keys() else None}
+#                                        for config in self.configs if 'config' in config.keys()]
+#            N = len(configs_to_run) 
+#            if jobs == -1:
+#                jobs = N
+#            self.jobs = min(N,jobs,mp.cpu_count())
+#            results = self.getLimits(configs_to_run)
+            self.getLimits()
+
+#            # Get harcoded values #
+#            if self.multiscan:
+#                configs_values = {suffix:[innerCfg for innerCfg in outerCfg if 'values' in innerCfg.keys()] for suffix,outerCfg in self.configs.items()}
+#            else:
+#                configs_values = [config for config in self.configs if 'values' in config.keys()]
+
+        else:
+            print ('Root save found, will load it')
+            graphs_save = {}
+            F = ROOT.TFile(path_save,'READ')
+            for key in F.GetListOfKeys():
+                if key.GetClassName() == "TDirectoryFile":
+                    curveName = key.GetName()
+                    self.curves[curveName]['graphs'] = [F.Get(f'{curveName}/{name}') for name in ['data','central','onesigma','twosigma']]
+            
+
+        # Computing graphs #
+        if not is_save:
+            for curveName in self.curves.keys():
+                limitsPerPoint = {point['label']:point['limit'] for point in self.curves[curveName]['points'] if point['limit'] is not None}
                 graphs,labelConv = self.produceLimitGraphs(limitsPerPoint)
-                self.plotLimits(graphs,labelConv,suffix)
-                multiGraphs.append(graphs[1])
-            self.plotMultipleLimits(multiGraphs,labelConv,multiLimitsPerPoint.keys())
+                self.curves[curveName]['graphs'] = graphs 
+                self.curves[curveName]['labelConv'] = labelConv
                 
 
-        else:
-            limitsPerPoint = {config['label']:results[i] 
-                                    for i,config in enumerate(self.configs)} 
-            graphs,labelConv = self.produceLimitGraphs(limitsPerPoint)
-            self.plotLimits(graphs,labelConv)
- 
+        # Per curve limit plot #
+        for curveName in self.curves.keys():
+            if 'labelConv' in self.curves[curveName].keys():
+                labelConv = self.curves[curveName]['labelConv']
+            else:
+                labelConv = None
+            self.plotLimits(graphs=self.curves[curveName]['graphs'],suffix=curveName,labelConv=labelConv)
 
-    def getLimits(self,configs):
-        pool = mp.Pool(min(mp.cpu_count(),self.jobs))
-        pool_args = [(config['config'],
-                      self.combine_args,
-                      config['custom'],
-                      self.additional_args)
-                            for config in configs]
-        with mp.Pool(processes=self.jobs) as pool:
-            results = pool.starmap(runSingleLimit, pool_args)
-        return results
+        # Multi limit plot #
+        multiGraphs = []
+        curveNames = []
+        attributes = []
+        for curveName in self.curves.keys():
+            if self.curves[curveName]['graphs'] is not None:
+                curveNames.append(curveName)
+                multiGraphs.append(self.curves[curveName]['graphs'][1])
+                attributes.append(self.curves[curveName]['attributes'])
+        self.plotMultipleLimits(graphs=multiGraphs,suffixes=curveNames,attributes=attributes,labelConv=labelConv)
+
+#        if self.multiscan:
+#            if not is_save:
+#                idx = 0
+#                multiLimitsPerPoint = {}
+#                for suffix,outerCfg in self.configs.items():
+#                    multiLimitsPerPoint[suffix] = {}
+#                    for innerCfg in outerCfg:
+#                        if 'values' in innerCfg:
+#                            continue
+#                        multiLimitsPerPoint[suffix][innerCfg['label']] = results[idx]
+#                        idx += 1
+#                for suffix, values in configs_values.items():
+#                    if len(values) == 0:
+#                        continue
+#                    for value in values:
+#                        multiLimitsPerPoint[suffix][value['label']] = value['values']
+#                # Single scan plots #
+#                multiGraphs = []
+#                suffixes = []
+#                attributes = []
+#                for suffix,limitsPerPoint in multiLimitsPerPoint.items():
+#                    print (f'Running suffix {suffix}')
+#                    suffixes.append(suffix)
+#                    attributes.append(self.attributes[suffix])
+#                    graphs,labelConv = self.produceLimitGraphs(limitsPerPoint)
+#                    graphs_save[suffix] = graphs
+#                    self.plotLimits(graphs,suffix,labelConv)
+#                    multiGraphs.append(graphs[1])
+#                self.plotMultipleLimits(graphs=multiGraphs,suffixes=suffixes,attributes=attributes,labelConv=labelConv)
+#            else:
+#                multiGraphs = []
+#                suffixes = []
+#                attributes = []
+#                for suffix, graphs in graphs_save.items():
+#                    suffixes.append(suffix)
+#                    attributes.append(self.attributes[suffix])
+#                    self.plotLimits(graphs=graphs,suffix=suffix)
+#                    multiGraphs.append(graphs[1])
+#                self.plotMultipleLimits(graphs=multiGraphs,suffixes=suffixes,attributes=attributes)
+#        else:
+#            if not is_save:
+#                limitsPerPoint = {config['label']:results[i] 
+#                                        for i,config in enumerate(self.configs) if 'values' not in config.keys()} 
+#                for values in configs_values:
+#                    for value in values:
+#                        limitsPerPoint[value['label']] = value['values']
+#                graphs,labelConv = self.produceLimitGraphs(limitsPerPoint)
+#                graphs_save['limits'] = graphs
+#                self.plotLimits(graphs,labelConv)
+#            else:
+#                graphs = graphs_save['limits']
+#                self.plotLimits(graphs)
+
+        # Save root files #
+        if not is_save:
+            print ('Root save created')
+            F = ROOT.TFile(path_save,'RECREATE')
+            for curveName in self.curves.keys():
+                if self.curves[curveName]['graphs'] is not None:
+                    d = F.mkdir(curveName,curveName)
+                    d.cd()
+                    for graph in self.curves[curveName]['graphs']:
+                        graph.Write(graph.GetName())
+            F.Close()
+
+ 
+    def getLimits(self):
+        # Run the pool #
+        pool_cmds = [(point['command'],point['subdir'],self.combine_args,self.debug) 
+                            for values in self.curves.values() for point in values['points'] 
+                            if 'command' in point.keys() ]
+        with mp.Pool(processes=min(mp.cpu_count(),self.jobs)) as pool:
+            results = pool.starmap(runCommand, pool_cmds)
+        # Add values to curves dict #
+        idx = 0
+        for icurve,curveName in enumerate(self.curves.keys()):
+            for ipoint in range(len(self.curves[curveName]['points'])):
+                if 'command' in self.curves[curveName]['points'][ipoint].keys():
+                    self.curves[curveName]['points'][ipoint]['limit'] = \
+                            results[idx]
+                            #results[icurve*len(self.curves[curveName]['points'])+ipoint]
+                    idx += 1
 
     def produceLimitGraphs(self,limitsPerPoint):
+        if len(limitsPerPoint) == 0:
+            return None,None
+
         # Init #
         onesigma_up = []
         twosigma_up = []
@@ -155,6 +331,8 @@ class LimitScan:
             
         # Loop over limits #    
         for label,limits in limitsPerPoint.items():
+            if limits is None:
+                continue
             if len(limits.keys()) < 6:
                 print(f'[WARNING] Not all limits found for label {label}')
                 continue
@@ -187,6 +365,20 @@ class LimitScan:
             g_onesigma = ROOT.TGraph(len(xpoints)*2,  np.array(xpoints_all),  np.array(onesigma_all))
             g_twosigma = ROOT.TGraph(len(xpoints)*2,  np.array(xpoints_all),  np.array(twosigma_all))
 
+        if floatLabels:
+            labelConv = None
+
+        return (g_data,g_central,g_onesigma,g_twosigma),labelConv
+
+    def plotLimits(self,graphs,suffix="",labelConv=None):
+        if graphs is None:
+            print (f'No graph found for label {suffix}')
+            return 
+
+        suffix = str(suffix)
+        suffix = suffix.replace(' ','_')
+        g_data,g_central,g_onesigma,g_twosigma = graphs
+
         g_twosigma.SetFillColorAlpha(ROOT.kOrange, 0.5)
         g_twosigma.SetLineStyle(2)
         g_onesigma.SetFillColorAlpha(ROOT.kGreen+2, 0.5)
@@ -195,23 +387,15 @@ class LimitScan:
         g_central.SetLineStyle(7)
         g_central.SetLineColor(9)
         g_central.SetMarkerStyle(20)
-        g_central.SetMarkerSize(1)
+        g_central.SetMarkerSize(0.6)
         g_central.SetMarkerColor(9)
         g_data.SetLineWidth(2)
         g_data.SetLineStyle(1)
         g_data.SetLineColor(ROOT.kBlack)
         g_data.SetMarkerStyle(20)
-        g_data.SetMarkerSize(1)
+        g_data.SetMarkerSize(0.6)
         g_data.SetMarkerColor(ROOT.kBlack)
 
-        if floatLabels:
-            labelConv = None
-
-        return (g_data,g_central,g_onesigma,g_twosigma),labelConv
-
-    def plotLimits(self,graphs,labelConv,suffix=""):
-        suffix = suffix.replace(' ','_')
-        g_data,g_central,g_onesigma,g_twosigma = graphs
 
         if g_central.GetN() == 0:
             return
@@ -231,6 +415,9 @@ class LimitScan:
         c1.SetGridy()  
         c1.SetTickx()  
         c1.SetTicky()  
+
+        pdfPath = os.path.join(self.path_out,f'limits{suffix}.pdf')
+        c1.Print(pdfPath+'[')
 
         # Plot #
         xpoints = list(g_central.GetX())
@@ -269,7 +456,7 @@ class LimitScan:
 
         
         # Legend #
-        leg = ROOT.TLegend(0.60,0.75,0.85,0.92)
+        leg = ROOT.TLegend(*self.legend['position'])
         leg.SetFillColor(ROOT.kWhite)
         leg.SetTextFont(42)
         if self.unblind:
@@ -287,9 +474,18 @@ class LimitScan:
 #        tex1.Draw("same")
         
         leg.Draw("same")
-        c1.Print(os.path.join(self.path_out,f'limits{suffix}.pdf'))
+        c1.Print(pdfPath)
 
-    def plotMultipleLimits(self,graphs,labelConv,suffixes):
+        c1.SetLogy(False)
+        c1.Print(pdfPath)
+
+        c1.Print(pdfPath+']')
+
+    def plotMultipleLimits(self,graphs,suffixes,attributes,labelConv=None):
+        if len(graphs) == 0:
+            print (f'No multi graph found for label {suffix}')
+            return 
+
         # Canvas #
         c1 = ROOT.TCanvas("c1","c1",600, 600)
         c1.SetLeftMargin(0.15)
@@ -302,8 +498,11 @@ class LimitScan:
         c1.SetTickx()  
         c1.SetTicky()  
 
+        pdfPath = os.path.join(self.path_out,f'limits.pdf')
+        c1.Print(pdfPath+'[')
+
         # Plot #
-        xpoints = sorted(list(set([val for graph in graphs for val in list(graph.GetX())])))
+        xpoints = sorted(list(set([val for graph in graphs for val in list(graph.GetX()) if graph is not None])))
         minx = min(xpoints)*0.9
         maxx = max(xpoints)*1.1
         b1 = ROOT.TH1F("b2","b2", len(xpoints)*2, minx, maxx)
@@ -320,18 +519,43 @@ class LimitScan:
         b1.LabelsDeflate("X")
         b1.LabelsDeflate("Y")
 
-        b1.Draw()
-        for g in graphs:
-            g.Draw("lpsame PLC")
-        
+        # Check if color set anywhere, otherwise use Palette #
+        custom_color = False
+        for attribute in attributes:
+            for key in attribute.keys():
+                if 'Color' in key:
+                    custom_color = True
+
         # Legend #
         N = len(graphs)
-        leg = ROOT.TLegend(0.50,0.55,0.85,0.90)
+        leg = ROOT.TLegend(*self.legend['position'])
         leg.SetFillColor(ROOT.kWhite)
         leg.SetTextFont(42)
-        leg.SetTextSize(0.1/N)
-        for g,suffix in zip(graphs,suffixes):
-            leg.AddEntry(g,f"#splitline{{Expected 95% upper limit}}{{{suffix}}}","l")
+        leg.SetTextSize(self.legend['textsize'])
+        b1.Draw()
+        for g in graphs:
+            g.SetLineWidth(2)
+            g.SetLineStyle(7)
+            g.SetLineColor(9)
+            g.SetMarkerStyle(20)
+            g.SetMarkerSize(0.6)
+            g.SetMarkerColor(9)
+            if custom_color:
+                g.Draw("lpsame")
+            else:
+                g.Draw("lpsame PLC")
+
+        # Attributes #
+        for g,suffix,attribute in zip(graphs,suffixes,attributes):
+            for funcName,val in attribute.items():
+                if not hasattr(g,funcName):
+                    raise RuntimeError(f'Graph {g.GetName()} of type {g.__class__.__name__} has not method called {funcName}')
+                if isinstance(val,str) and val.startswith('#'):
+                    val = ROOT.TColor.GetColor(val)
+                getattr(g,funcName)(val)
+            leg.AddEntry(g,f"#splitline{{Expected 95% upper limit}}{{{str(suffix)}}}","l")
+
+       
 #        tex0 = ROOT.TLatex(0.08,0.91, "#scale[1.4]{#font[61]{CMS}} Internal"+" "*5+"35.87 fb^{-1}(13 TeV),2016")
 #        tex0.SetNDC()
 #        tex0.SetTextSize(.04)
@@ -342,29 +566,26 @@ class LimitScan:
 #        tex1.Draw("same")
         
         leg.Draw("same")
-        c1.Print(os.path.join(self.path_out,f'limits.pdf'))
+        c1.Print(pdfPath)
 
+        c1.SetLogy(False)
+        c1.Print(pdfPath)
 
+        c1.Print(pdfPath+']')
 
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Limit scans')
     parser.add_argument('--yaml', action='store', required=True, type=str,
                         help='Yaml containing parameters')
-#    parser.add_argument('--configs', required=False, type=str, default=None,
-#                        help='Yaml config files for single scan with uncertainty bands, separated by ":"')
-#    parser.add_argument('--multiconfigs', nargs='+', required=False, default=None,
-#                        help='Yaml config files for multiple scans without uncertainty bands')
-#    parser.add_argument('--labels', required=False, type=str, default=None,
-#                        help='Labels for each config')
-#    parser.add_argument('--multilabels', nargs='+', required=False, default=None,
-#                        help='Labels for multiconfigs (can either be one string if labels are the same, or one string per configs)')
-#    parser.add_argument('--suffix', required=True, type=str,
-#                        help='Suffix for the subdirectory (one per sets for multiconfigs, separated by ":"')
     parser.add_argument('-j','--jobs', action='store', required=False, type=int, default=1,
                         help='Number of commands to run in parallel (default = 1), using -1 will spawn all the commands')
     parser.add_argument('--unblind', action='store_true', required=False, default=False,
                         help='Unblind data')
+    parser.add_argument('--force', action='store_true', required=False, default=False,
+                        help='Force recreation of save')
+    parser.add_argument('--debug', action='store_true', required=False, default=False,
+                        help='Avoids sending jobs')
     parser.add_argument('-a','--additional', action='store', required=False, default=None, type=str,
                         help='Additional arguments to pass to the commands [as a string, beware to include a space right before]')
     args = parser.parse_args()
@@ -372,85 +593,14 @@ if __name__=="__main__":
     with open(args.yaml,'r') as handle:
         content = yaml.load(handle,Loader=YMLIncludeLoader)
 
-    
-    configs = content['configs']
-    outputDir = content['outputDir']
-    combine_args = content['combine']
-    if not isinstance(combine_args,list):
-        combine_args = list(combine_args)
-
-    instance = LimitScan(configs         = configs,
+   
+    instance = LimitScan(curves          = content['curves'],
+                         legend          = content['legend'],
+                         combine_args    = content['combine'],
+                         path_out        = content['outputDir'],
                          jobs            = args.jobs,
-                         unblind         = args.unblind,
-                         combine_args    = combine_args,
-                         additional_args = args.additional,
-                         path_out        = outputDir)
+                         force           = args.force,
+                         debug           = args.debug,
+                         unblind         = args.unblind)
 
-#    configs = None
-#    if args.configs is not None:
-#        if ':' not in args.configs:
-#            raise RuntimeError("Not correct format for --configs")
-#        configs = args.configs.split(':')
-#        subdirName = args.suffix
-#        suffixes = args.suffix
-#
-#        if args.labels is None:
-#            raise RuntimeError('--configs requires --labels')
-#        if ':' not in args.labels:  
-#            raise RuntimeError("Not correct format for --labels")
-#        labels = args.labels.split(':')
-#
-#
-#    if args.multiconfigs is not None:
-#        if not all([':' in config for config in args.multiconfigs]):
-#            raise RuntimeError("Not correct format for --multiconfigs")
-#        configs = [config.split(':') for config in args.multiconfigs]
-#        suffixes = args.suffix.split(':')
-#        if len(suffixes) != len(args.multiconfigs) +1:
-#            raise RuntimeError("For multiconfigs the format for thr suffix should be : subdir:label1:label2:...")
-#        subdirName = suffixes[0]
-#        suffixes = suffixes[1:]
-#
-#        if args.multilabels is None and args.labels is None:
-#            raise RuntimeError('--multiconfigs requires either --multilabels or --labels')
-#        if args.multilabels is not None and args.labels is not None:
-#            raise RuntimeError('You have to choose either --multilabels or --labels')
-#        if args.labels is not None:
-#            if ':' not in args.labels:  
-#                raise RuntimeError("Not correct format for --labels")
-#            labels = args.labels.split(':')
-#        if args.multilabels is not None:
-#            if not all([':' in label for label in args.multilabels]):
-#                raise RuntimeError("Not correct format for --multilabels")
-#            labels = [label.split(':') for label in args.multilabels]
-#            
-#    if configs is not None:
-#        # Create output directory #
-#        path_out = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-#                                'Limits',
-#                                subdirName)
-#        if os.path.exists(path_out):
-#            shutil.rmtree(path_out)
-#        os.makedirs(path_out)
-#
-#        # Save command #
-#        cmd = "python produceLimitScan.py "
-#        for key,val in args.__dict__.items():
-#            if isinstance(val,list):
-#                val = ' '.join([str(v) for v in val])
-#                cmd += f"--{key} {val} "
-#            elif isinstance(val,bool):
-#                if not val:
-#                    continue
-#                else:
-#                    val = ""
-#                cmd += f"--{key} {val} "
-#            elif isinstance(val,str):
-#                cmd += f'--{key} "{val}" '
-#            elif val is None:
-#                continue
-#        with open(os.path.join(path_out,'command.txt'),'w') as handle:
-#            handle.write(cmd)
-#
-#        # Run #
-#        instance = LimitScan(suffixes,configs,labels,args.jobs,args.unblind,path_out)
+
