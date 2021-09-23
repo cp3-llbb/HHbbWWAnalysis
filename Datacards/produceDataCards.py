@@ -363,6 +363,7 @@ class Datacard:
         h = copy.deepcopy(f.Get(histnom))
         # Normalize hist to data #
         if lumi is not None and xsec is not None and br is not None and sumweight is not None:
+            print (lumi,xsec,br,sumweight,lumi*xsec*br/sumweight)
             h.Scale(lumi*xsec*br/sumweight)
         return h
              
@@ -2440,11 +2441,15 @@ class Datacard:
                 for key,val in arg.items():
                     if val is None:
                         continue
-                    if isinstance(val,bool) and not val:
+                    elif isinstance(val,bool) and not val:
                         continue
+                    elif isinstance(val,str) and os.path.exists(val):
+                        val = os.path.abspath(val)
                     handle.write(f'--{key} ')
                     if isinstance(val,list) or isinstance(val,tuple):
                         for v in val:
+                            if isinstance(v,str) and os.path.exists(v):
+                                v = os.path.abspath(v)
                             handle.write(f'{v} ')
                     elif isinstance(val,bool):
                         pass
