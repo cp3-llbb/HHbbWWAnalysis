@@ -97,7 +97,7 @@ class Datacard:
         self.regroup = self.includeEntry(self.regroup,'Regrouping',self.era)
                
         # Load Yaml configs from bamboo #
-        self.yaml_dict = self.loadYaml(self.path,self.yamlName)
+        self.yaml_dict = self.loadYaml()
 
         # Initialise containers #
         self.content = {f'{histName}_{self.era}':{g:{} for g in self.groups.keys()} for histName in self.hist_conv.keys()}
@@ -270,16 +270,23 @@ class Datacard:
                         self.content[histname][group][systName].Add(hist)
 
     def findGroup(self,sample):
-        group_of_sample = []
-        for group in self.groups.keys():
-            if 'files' not in self.groups[group]:
-                raise RuntimeError("No 'files' item in group {}".format(group))
-            files = self.groups[group]['files']
-            if not isinstance(files,list):
-                raise RuntimeError("Group %s does not consist in a list"%group)
-            if sample in files:
-                group_of_sample.append(group)
-        return group_of_sample
+        if not hasattr(self,'sampleToGroup'):
+            self.sampleToGroup = {}
+            for group in self.groups.keys():
+                if 'files' not in self.groups[group]:
+                    raise RuntimeError("No 'files' item in group {}".format(group))
+                files = self.groups[group]['files']
+                if not isinstance(files,list):
+                    raise RuntimeError("Group %s does not consist in a list"%group)
+                for f in files:
+                    if f in self.sampleToGroup.keys():
+                        self.sampleToGroup[f].append(group)
+                    else:
+                        self.sampleToGroup[f] = [group]
+        if sample in self.sampleToGroup.keys():
+            return self.sampleToGroup[sample]
+        else:
+            return []
                 
     def getHistograms(self,rootfile):
         f = ROOT.TFile(rootfile)
@@ -363,19 +370,17 @@ class Datacard:
         h = copy.deepcopy(f.Get(histnom))
         # Normalize hist to data #
         if lumi is not None and xsec is not None and br is not None and sumweight is not None:
-            print (lumi,xsec,br,sumweight,lumi*xsec*br/sumweight)
             h.Scale(lumi*xsec*br/sumweight)
         return h
              
-    @staticmethod
-    def loadYaml(paths,yamlNames):
-        if not isinstance(paths,list):
-            paths = [paths]
-        if not isinstance(yamlNames,list):
-            yamlNames = [yamlNames]
+    def loadYaml(self):
+        if not isinstance(self.path,list):
+            self.path = [self.path]
+        if not isinstance(self.yamlName,list):
+            self.yamlName = [self.yamlName]
         yamlDict = {}
-        for path in paths:
-            for yamlName in yamlNames:
+        for path in self.path:
+            for yamlName in self.yamlName:
                 yamlPath = os.path.join(path,yamlName)
                 if not os.path.exists(yamlPath):
                     logging.warning("{} -> not found, skipped".format(yamlPath))
@@ -408,6 +413,22 @@ class Datacard:
                     yamlDict['plots'] = full_dict['plots']
                 else:
                     yamlDict['plots'].update(full_dict['plots'])
+        # Overwrite some values based on config #
+        info_to_override = ['cross-section','generated-events','branching-ratio']
+        for sample in yamlDict['samples'].keys():
+            groups = self.findGroup(sample)
+            for key in info_to_override:
+                overrideFlag = [i for i,group in enumerate(groups) if key in self.groups[group].keys()]
+                if len(overrideFlag) == 1: # One group overrides the default values
+                    yamlDict['samples'][sample][key] = self.groups[groups[overrideFlag[0]]][key]
+                    if len(groups) > 1:
+                        logging.warning(f'Sample {sample} parameter {key} has been overwritten to the value {self.groups[groups[overrideFlag[0]]][key]} from the config but is present in several groups ({",".join(groups)}) that will all be impacted')
+                elif len(overrideFlag) > 1: # Several groups override the default valeues 
+                    values = [self.groups[groups[flag]][key] for flag in overrideFlag]
+                    if values.count(values[0]) != len(values): # different override values 
+                        raise RuntimeError(f'Sample {sample} parameter {key} will be overwritten from the config but is present in several groups ({",".join(groups)}) that have defined several values ({",".join([str(val) for val in values])}, will stop here as this can lead to undefined behaviour )')
+                    else: # same override values
+                        yamlDict['samples'][sample][key] = values[0]
 
         return yamlDict
 
@@ -2753,14 +2774,16 @@ if __name__=="__main__":
                             raise ValueError
                     if 'regroup' not in config_era.keys():
                         if not all([cat in config_era['hist_conv'].keys() for cat in splitCats]):
-                            raise RuntimeError('Category(ies) requested in split not found : '+\
-                                    ','.join([cat for cat in splitCats if cat not in config_era['hist_conv'].keys()]))
+                            error_message = 'Category(ies) requested in split not found : '
+                            error_message += ','.join([cat for cat in splitCats if cat not in config_era['hist_conv'].keys()])
+                            error_message += '\nAvailable categories :\n' + '\n'.join([f'... {key}' for key in config_era['hist_conv'].keys()])
+                            raise RuntimeError(error_message)
                         categoriesToRun = [splitCats]
                     else:
                         categoriesToRun = [[val for key in splitCats for val in config_era['regroup'][key]]]
 
             if iconf == 0:
-                categoriesToSubmit.extend(categoriesToRun)
+                categoriesToSubmit.extend([cat for cat in categoriesToRun if cat not in categoriesToSubmit])
 
             # Instantiate #
             if args.custom is not None:
@@ -2956,7 +2979,6 @@ if __name__=="__main__":
                         # Check if category is done #
                         if era in missingCats.keys() and len(set(missingCats[era]).intersection(set(cats))) > 0:
                             missingIdx.append(str(icat*len(eras)+iera+1))
-
             # Get slurm parameters #
             paramsToSubmit = {}
             if args.jobs is not None:
@@ -2968,8 +2990,10 @@ if __name__=="__main__":
                 paramsToSubmit[submitArg.split('=')[0]] = submitArg.split('=')[1]
             # Write sbatch script #
             slurmScript = os.path.join(outputDir,'slurmSubmission.sh')
+            new_script = False
             if not os.path.exists(slurmScript):
                 slurmScript = Datacard.writeSbatchCommand(outputDir,params=paramsToSubmit,args=argsToSubmit,log=True)
+                new_script = True
 
             #Submit #
             if not args.debug:
@@ -2979,11 +3003,12 @@ if __name__=="__main__":
                     if len(missingIdx) < len(argsToSubmit):
                         logging.info('Some array ids did not succeed, resubmitting them : '+','.join(missingIdx))
                         slurmCmd = f'sbatch --array={",".join(missingIdx)} '
+                    else:
+                        slurmCmd = f'sbatch '
+                    if not new_script:
                         for key,val in paramsToSubmit.items():
                             slurmCmd += f"--{key}={val} "
-                        slurmCmd += f"{slurmScript}"
-                    else:
-                        slurmCmd = f'sbatch {slurmScript}'
+                    slurmCmd += slurmScript
                     logging.info(f'Sbatch command : {slurmCmd}')
                     logging.debug(f'Submitting {slurmScript}')
                     rc,output = Datacard.run_command(slurmCmd,return_output=True,shell=True)
