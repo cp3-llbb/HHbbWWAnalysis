@@ -12,6 +12,7 @@ from bamboo.analysismodules import HistogramsModule, DataDrivenBackgroundHistogr
 
 from bamboo import treefunctions as op
 from bamboo.plots import CutFlowReport, Plot, EquidistantBinning, SummedPlot
+from bamboo.analysisutils import forceDefine
 
 from bamboo.root import gbl 
 
@@ -431,47 +432,47 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 #        for channelDict in ChannelDictList:
 #            plots.extend(makeDoubleLeptonHighLevelQuantities(**channelDict,HLL=self.HLL))
 
-#        #----- Selected variables : Resolved -----#
-#        ChannelDictList = []
-#        if not self.args.OnlyYield:
-#            # Resolved No Btag #
-#            if "Resolved0Btag" in jetplot_level:
-#                ChannelDictList.append({'channel': 'ElEl','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'b1':container0b2j[0],'b2':container0b2j[1],'sel':ElElSelObjAk4JetsExclusiveResolvedNoBtag.sel,'suffix':ElElSelObjAk4JetsExclusiveResolvedNoBtag.selName})
-#                ChannelDictList.append({'channel': 'MuMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'b1':container0b2j[0],'b2':container0b2j[1],'sel':MuMuSelObjAk4JetsExclusiveResolvedNoBtag.sel,'suffix':MuMuSelObjAk4JetsExclusiveResolvedNoBtag.selName})
-#                ChannelDictList.append({'channel': 'ElMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'b1':container0b2j[0],'b2':container0b2j[1],'sel':ElMuSelObjAk4JetsExclusiveResolvedNoBtag.sel,'suffix':ElMuSelObjAk4JetsExclusiveResolvedNoBtag.selName})
-#            if "Resolved1Btag" in jetplot_level:
-#                ChannelDictList.append({'channel': 'ElEl','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'b1':container1b1j[0],'b2':container1b1j[1],'sel':ElElSelObjAk4JetsExclusiveResolvedOneBtag.sel,'suffix':ElElSelObjAk4JetsExclusiveResolvedOneBtag.selName})
-#                ChannelDictList.append({'channel': 'MuMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'b1':container1b1j[0],'b2':container1b1j[1],'sel':MuMuSelObjAk4JetsExclusiveResolvedOneBtag.sel,'suffix':MuMuSelObjAk4JetsExclusiveResolvedOneBtag.selName})
-#                ChannelDictList.append({'channel': 'ElMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'b1':container1b1j[0],'b2':container1b1j[1],'sel':ElMuSelObjAk4JetsExclusiveResolvedOneBtag.sel,'suffix':ElMuSelObjAk4JetsExclusiveResolvedOneBtag.selName})
-#            # Resolved Two Btags  #
-#            if "Resolved2Btag" in jetplot_level:
-#                ChannelDictList.append({'channel': 'ElEl','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'b1':container2b0j[0],'b2':container2b0j[1],'sel':ElElSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':ElElSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
-#                ChannelDictList.append({'channel': 'MuMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'b1':container2b0j[0],'b2':container2b0j[1],'sel':MuMuSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':MuMuSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
-#                ChannelDictList.append({'channel': 'ElMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'b1':container2b0j[0],'b2':container2b0j[1],'sel':ElMuSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':ElMuSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
-#
-#        for channelDict in ChannelDictList:
-#            # Branch out the LO -> NLO reweighting #
-#            channelDict["sel"] = self.addSignalReweighting(channelDict["sel"])
-#            plots.extend(makeDoubleLeptonSelectedResolvedVariables(**channelDict,HLL=self.HLL))
-#
-#        #----- Selected variables : Boosted -----#
-#        ChannelDictList = []
-#        if not self.args.OnlyYield:
-#            # Boosted No Btag #
-#            if "Boosted0Btag" in jetplot_level:
-#                ChannelDictList.append({'channel': 'ElEl','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'B':container1fatb[0],'sel':ElElSelObjAk8JetsInclusiveBoostedNoBtag.sel,'suffix':ElElSelObjAk8JetsInclusiveBoostedNoBtag.selName})
-#                ChannelDictList.append({'channel': 'MuMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'B':container1fatb[0],'sel':MuMuSelObjAk8JetsInclusiveBoostedNoBtag.sel,'suffix':MuMuSelObjAk8JetsInclusiveBoostedNoBtag.selName})
-#                ChannelDictList.append({'channel': 'ElMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'B':container1fatb[0],'sel':ElMuSelObjAk8JetsInclusiveBoostedNoBtag.sel,'suffix':ElMuSelObjAk8JetsInclusiveBoostedNoBtag.selName})
-#            # Boosted One Btag #
-#            if "Boosted1Btag" in jetplot_level:
-#                ChannelDictList.append({'channel': 'ElEl','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'B':container1fatb[0],'sel':ElElSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':ElElSelObjAk8JetsInclusiveBoostedOneBtag.selName})
-#                ChannelDictList.append({'channel': 'MuMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'B':container1fatb[0],'sel':MuMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':MuMuSelObjAk8JetsInclusiveBoostedOneBtag.selName})
-#                ChannelDictList.append({'channel': 'ElMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'B':container1fatb[0],'sel':ElMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':ElMuSelObjAk8JetsInclusiveBoostedOneBtag.selName})
-#
-#        if not self.args.OnlyYield:
-#            for channelDict in ChannelDictList:
-#                channelDict["sel"] = self.addSignalReweighting(channelDict["sel"])
-#                plots.extend(makeDoubleLeptonSelectedBoostedVariables(**channelDict,HLL=self.HLL))
+        #----- Selected variables : Resolved -----#
+        ChannelDictList = []
+        if not self.args.OnlyYield:
+            # Resolved No Btag #
+            if "Resolved0Btag" in jetplot_level:
+                ChannelDictList.append({'channel': 'ElEl','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'b1':container0b2j[0],'b2':container0b2j[1],'sel':ElElSelObjAk4JetsExclusiveResolvedNoBtag.sel,'suffix':ElElSelObjAk4JetsExclusiveResolvedNoBtag.selName})
+                ChannelDictList.append({'channel': 'MuMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'b1':container0b2j[0],'b2':container0b2j[1],'sel':MuMuSelObjAk4JetsExclusiveResolvedNoBtag.sel,'suffix':MuMuSelObjAk4JetsExclusiveResolvedNoBtag.selName})
+                ChannelDictList.append({'channel': 'ElMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'b1':container0b2j[0],'b2':container0b2j[1],'sel':ElMuSelObjAk4JetsExclusiveResolvedNoBtag.sel,'suffix':ElMuSelObjAk4JetsExclusiveResolvedNoBtag.selName})
+            if "Resolved1Btag" in jetplot_level:
+                ChannelDictList.append({'channel': 'ElEl','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'b1':container1b1j[0],'b2':container1b1j[1],'sel':ElElSelObjAk4JetsExclusiveResolvedOneBtag.sel,'suffix':ElElSelObjAk4JetsExclusiveResolvedOneBtag.selName})
+                ChannelDictList.append({'channel': 'MuMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'b1':container1b1j[0],'b2':container1b1j[1],'sel':MuMuSelObjAk4JetsExclusiveResolvedOneBtag.sel,'suffix':MuMuSelObjAk4JetsExclusiveResolvedOneBtag.selName})
+                ChannelDictList.append({'channel': 'ElMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'b1':container1b1j[0],'b2':container1b1j[1],'sel':ElMuSelObjAk4JetsExclusiveResolvedOneBtag.sel,'suffix':ElMuSelObjAk4JetsExclusiveResolvedOneBtag.selName})
+            # Resolved Two Btags  #
+            if "Resolved2Btag" in jetplot_level:
+                ChannelDictList.append({'channel': 'ElEl','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'b1':container2b0j[0],'b2':container2b0j[1],'sel':ElElSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':ElElSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
+                ChannelDictList.append({'channel': 'MuMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'b1':container2b0j[0],'b2':container2b0j[1],'sel':MuMuSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':MuMuSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
+                ChannelDictList.append({'channel': 'ElMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'b1':container2b0j[0],'b2':container2b0j[1],'sel':ElMuSelObjAk4JetsExclusiveResolvedTwoBtags.sel,'suffix':ElMuSelObjAk4JetsExclusiveResolvedTwoBtags.selName})
+
+        for channelDict in ChannelDictList:
+            # Branch out the LO -> NLO reweighting #
+            channelDict["sel"] = self.addSignalReweighting(channelDict["sel"])
+            plots.extend(makeDoubleLeptonSelectedResolvedVariables(**channelDict,HLL=self.HLL))
+
+        #----- Selected variables : Boosted -----#
+        ChannelDictList = []
+        if not self.args.OnlyYield:
+            # Boosted No Btag #
+            if "Boosted0Btag" in jetplot_level:
+                ChannelDictList.append({'channel': 'ElEl','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'B':container1fatb[0],'sel':ElElSelObjAk8JetsInclusiveBoostedNoBtag.sel,'suffix':ElElSelObjAk8JetsInclusiveBoostedNoBtag.selName})
+                ChannelDictList.append({'channel': 'MuMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'B':container1fatb[0],'sel':MuMuSelObjAk8JetsInclusiveBoostedNoBtag.sel,'suffix':MuMuSelObjAk8JetsInclusiveBoostedNoBtag.selName})
+                ChannelDictList.append({'channel': 'ElMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'B':container1fatb[0],'sel':ElMuSelObjAk8JetsInclusiveBoostedNoBtag.sel,'suffix':ElMuSelObjAk8JetsInclusiveBoostedNoBtag.selName})
+            # Boosted One Btag #
+            if "Boosted1Btag" in jetplot_level:
+                ChannelDictList.append({'channel': 'ElEl','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElElDilepton[0][0],'l2':OSElElDilepton[0][1],'B':container1fatb[0],'sel':ElElSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':ElElSelObjAk8JetsInclusiveBoostedOneBtag.selName})
+                ChannelDictList.append({'channel': 'MuMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSMuMuDilepton[0][0],'l2':OSMuMuDilepton[0][1],'B':container1fatb[0],'sel':MuMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':MuMuSelObjAk8JetsInclusiveBoostedOneBtag.selName})
+                ChannelDictList.append({'channel': 'ElMu','jets':self.ak4Jets,'met': self.corrMET,'l1':OSElMuDilepton[0][0],'l2':OSElMuDilepton[0][1],'B':container1fatb[0],'sel':ElMuSelObjAk8JetsInclusiveBoostedOneBtag.sel,'suffix':ElMuSelObjAk8JetsInclusiveBoostedOneBtag.selName})
+
+        if not self.args.OnlyYield:
+            for channelDict in ChannelDictList:
+                channelDict["sel"] = self.addSignalReweighting(channelDict["sel"])
+                plots.extend(makeDoubleLeptonSelectedBoostedVariables(**channelDict,HLL=self.HLL))
 
         #----- Machine Learning plots -----#
         selObjectDictList = []
@@ -650,11 +651,17 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     switchCond.insert(0,DYCond)
                 if FakeCR:
                     switchCond.insert(0,FakeCond)
-                HME = op.defineOnFirstUse(op.multiSwitch(*switchCond))
 
+                HME = op.defineOnFirstUse(op.multiSwitch(*switchCond))
+                #HME = op.multiSwitch(*switchCond)
+                #HME = op.forSystematicVariation(HME, "jet", "nominal")
+                #forceDefine(HME,selObjectDict['selObject'].sel)
+
+                # Add HME plots #
                 if not self.args.OnlyYield:
                     plots.extend(makeDoubleLeptonHMEPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],HME))
 
+                # Inputs of MVA #
                 inputsAll = mvaEvaluatorDL_res.returnResonantMVAInputs(
                                                 self      = self,
                                                 l1        = dilepton[0],
