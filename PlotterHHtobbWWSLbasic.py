@@ -47,26 +47,6 @@ if not hasattr(gbl, "bamboo_printEntry"):
       }
       return true;
     }""")
-'''
-def addPrint(nd, funName, *args):
-    callPrint = op.extMethod(funName, returnType="bool")(*args)
-    filterStr = nd(callPrint.op)
-    logger.debug(f"Adding printout with {filterStr}")
-    nd.df = nd.df.Filter(filterStr)
-
-def addPrintout(selection, funName, *args):
-    from bamboo import treefunctions as op
-    from bamboo import treeproxies as _tp
-    from bamboo import dataframebackend
-    be = selection._fbe
-    if selection.name not in be.selDFs:
-        raise RuntimeError("This method will only work with a dynamically constructed RDataFrame")
-    nd = be.selDFs[selection.name]
-    callPrint = op.extMethod(funName, returnType=_tp.boolType)(*args)
-    filterStr = nd(callPrint.op)
-    logger.debug(f"Adding printout with {filterStr}")
-    nd.df = nd.df.Filter(filterStr)
-'''
 #===============================================================================================#
 #                                       PlotterHHtobbWW                                         #
 #===============================================================================================#
@@ -384,7 +364,6 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             
             output = DNN(*inputs)
             selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,suffix=model_num)
-            #selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,suffix=model_num_to_keep_hist_names_same)
             
             # Branch out the LO -> NLO reweighting #                                  
             for node in selObjNodesDict.values():
