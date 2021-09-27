@@ -527,50 +527,63 @@ One lepton and and one jet argument must be specified in addition to the require
             #         ' [7] is renscfact=2d0 facscfact=1d0 ',         
             #         ' [8] is renscfact=2d0 facscfact=2d0 ']    
             # Clipping is done to avoid malicious files in ST samples
-            if hasattr(tree,"LHEScaleWeight"):
+            basicScaleWeight = op.systematic(op.c_float(1.),
+                                             name         = "ScaleWeight",
+                                             Factup       = op.c_float(1.),
+                                             Factdown     = op.c_float(1.),
+                                             Renormup     = op.c_float(1.),
+                                             Renormdown   = op.c_float(1.),
+                                             Mixedup      = op.c_float(1.),
+                                             Mixeddown    = op.c_float(1.),
+                                             Envelopeup   = op.c_float(1.),
+                                             Envelopedown = op.c_float(1.))
+            if sample.startswith('ST'): # Dropped because bugs in the LHE scale weights
+                self.scaleWeight = basicScaleWeight
+            elif hasattr(tree,"LHEScaleWeight"): # If has tree -> find the values
                 factor = 1.
                 if sample.startswith('DYToLL_0J') or sample.startswith('DYToLL_1J'):
                     # Bug of factor 0.5, see https://hypernews.cern.ch/HyperNews/CMS/get/generators/4383.html?inline=-1 (only in the "8" weights case)
                     factor = 2.
                 self.scaleWeight = op.multiSwitch((op.AND(op.rng_len(tree.LHEScaleWeight) == 9, tree.LHEScaleWeight[4] != 0.),
                                                                         op.systematic(op.c_float(1.),    #tree.LHEScaleWeight[4],
-                                                                                      name       = "ScaleWeight",
-                                                                                      Factup     = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[5]/tree.LHEScaleWeight[4])),
-                                                                                      Factdown   = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[3]/tree.LHEScaleWeight[4])),
-                                                                                      Renormup   = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[7]/tree.LHEScaleWeight[4])),
-                                                                                      Renormdown = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[1]/tree.LHEScaleWeight[4])),
-                                                                                      Mixedup    = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[8]/tree.LHEScaleWeight[4])),
-                                                                                      Mixeddown  = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[0]/tree.LHEScaleWeight[4])))),
-                                                                        
+                                                                                      name          = "ScaleWeight",
+                                                                                      Factup        = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[5]/tree.LHEScaleWeight[4])),
+                                                                                      Factdown      = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[3]/tree.LHEScaleWeight[4])),
+                                                                                      Renormup      = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[7]/tree.LHEScaleWeight[4])),
+                                                                                      Renormdown    = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[1]/tree.LHEScaleWeight[4])),
+                                                                                      Mixedup       = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[8]/tree.LHEScaleWeight[4])),
+                                                                                      Mixeddown     = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[0]/tree.LHEScaleWeight[4])),
+                                                                                      Envelopeup    = op.min(op.c_float(10.),
+                                                                                                             op.max(op.max(op.max(tree.LHEScaleWeight[5]/tree.LHEScaleWeight[4], # Fact up 
+                                                                                                                                  tree.LHEScaleWeight[7]/tree.LHEScaleWeight[4]), # Renorm up
+                                                                                                                           tree.LHEScaleWeight[8]/tree.LHEScaleWeight[4]), # Mixed up
+                                                                                                                    op.c_float(0.))),
+                                                                                      Envelopedown  = op.max(op.c_float(0.),
+                                                                                                             op.min(op.min(op.min(tree.LHEScaleWeight[3]/tree.LHEScaleWeight[4], # Fact down
+                                                                                                                                  tree.LHEScaleWeight[1]/tree.LHEScaleWeight[4]), # Renorm down
+                                                                                                                           tree.LHEScaleWeight[0]/tree.LHEScaleWeight[4]), # Mixed own 
+                                                                                                                    op.c_float(10.))))),
                                                   (op.rng_len(tree.LHEScaleWeight) == 8, 
-                                                               op.systematic(op.c_float(1.),
-                                                                             name       = "ScaleWeight",
-                                                                             Factup     = factor * tree.LHEScaleWeight[4],
-                                                                             Factdown   = factor * tree.LHEScaleWeight[3],
-                                                                             Renormup   = factor * tree.LHEScaleWeight[6],
-                                                                             Renormdown = factor * tree.LHEScaleWeight[1],
-                                                                             Mixedup    = factor * tree.LHEScaleWeight[7],
-                                                                             Mixeddown  = factor * tree.LHEScaleWeight[0])),
-                                                  op.systematic(op.c_float(1.),
-                                                                name       = "ScaleWeight",
-                                                                Factup     = op.c_float(1.),
-                                                                Factdown   = op.c_float(1.),
-                                                                Renormup   = op.c_float(1.),
-                                                                Renormdown = op.c_float(1.),
-                                                                Mixedup    = op.c_float(1.),
-                                                                Mixeddown  = op.c_float(1.)))
+                                                              op.systematic(op.c_float(1.),
+                                                                            name         = "ScaleWeight",
+                                                                            Factup       = factor * tree.LHEScaleWeight[4],
+                                                                            Factdown     = factor * tree.LHEScaleWeight[3],
+                                                                            Renormup     = factor * tree.LHEScaleWeight[6],
+                                                                            Renormdown   = factor * tree.LHEScaleWeight[1],
+                                                                            Mixedup      = factor * tree.LHEScaleWeight[7],
+                                                                            Mixeddown    = factor * tree.LHEScaleWeight[0],
+                                                                            Envelopeup   = op.max(op.max(factor * tree.LHEScaleWeight[4],    # Fact up
+                                                                                                         factor * tree.LHEScaleWeight[6]),    # Renorm up
+                                                                                                  factor * tree.LHEScaleWeight[7]),   # Mixed up
+                                                                            Envelopedown = op.min(op.min(factor * tree.LHEScaleWeight[3],    # Fact down
+                                                                                                         factor * tree.LHEScaleWeight[1]),    # Renorm down
+                                                                                                  factor * tree.LHEScaleWeight[0]))), # Mixed down
+                                                  basicScaleWeight)
 
                                                                                                  
-            else:
-                self.scaleWeight = op.systematic(op.c_float(1.),
-                                                 name       = "ScaleWeight",
-                                                 Factup     = op.c_float(1.),
-                                                 Factdown   = op.c_float(1.),
-                                                 Renormup   = op.c_float(1.),
-                                                 Renormdown = op.c_float(1.),
-                                                 Mixedup    = op.c_float(1.),
-                                                 Mixeddown  = op.c_float(1.))
-
+            else: # No tree -> use 1
+                self.scaleWeight = basicScaleWeight
+                                          
             noSel = noSel.refine("PDFScaleWeights", weight = [self.scaleWeight])
             if self.args.PrintYield:
                 self.yields.add(noSel)
