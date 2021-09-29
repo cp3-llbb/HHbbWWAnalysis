@@ -389,14 +389,16 @@ One lepton and and one jet argument must be specified in addition to the require
     #-------------------------------------------------------------------------------------------#
     def readCounters(self, resultsFile):
         counters = super(BaseNanoHHtobbWW, self).readCounters(resultsFile)
-        # TH samples correction #
-        if 'generated_sum_corrected' in [key.GetName() for key in resultsFile.GetListOfKeys()]:
-            counters["genEventSumw_fixed"] = resultsFile.Get('generated_sum_corrected').GetBinContent(1)
+        # Corrections to the generated sum "
+        if resultsFile.GetListOfKeys().FindObject('generated_sum_corrected'):
+            sample = os.path.basename(resultsFile.GetName())
+            print (f'Sample {sample} : genEventSumw correction from {counters["genEventSumw"]:.3f} to {resultsFile.Get("generated_sum_corrected").GetBinContent(1):.3f}')
+            counters["genEventSumw"] = resultsFile.Get('generated_sum_corrected').GetBinContent(1)
         return counters
 
     def mergeCounters(self, outF, infileNames, sample=None):
         super(BaseNanoHHtobbWW, self).mergeCounters(outF, infileNames, sample)
-        if 'generated_sum_corrected' in [key.GetName() for key in outF.GetListOfKeys()]: # Main file
+        if outF.GetListOfKeys().FindObject('generated_sum_corrected'): # Main file 
             self.generated_sum_corrected = copy.deepcopy(outF.Get('generated_sum_corrected'))
         else: # All the additional files ("datadriven")
             if hasattr(self,'generated_sum_corrected'): 
@@ -425,6 +427,9 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                                                  # will do Jet and MET variations, and not the Rochester correction
                                                                                backend       = ("lazy" if self.args.onlypost else self.args.backend))
     
+        # Plots in base that need to be propagated to the Plotters #
+        self.base_plots = []
+
 
         #----- Helper classes declaration ----#
         if self.args.analysis == "res":
@@ -436,16 +441,25 @@ One lepton and and one jet argument must be specified in addition to the require
         #----- CutFlow report -----#
         self.yields = CutFlowReport("yields",printInLog=self.args.PrintYield,recursive=self.args.PrintYield)
 
+
+        #----- Safeguards for signals -----#
+        if "HH" in sample:
+            noSel = noSel.refine('HHMCWeight',cut=[op.abs(tree.genWeight)<100])
+            if self.args.PrintYield:
+                self.yields.add(noSel)
+            # Correct the gen event weight sum #
+            self.base_plots.append(Plot.make1D("generated_sum_corrected",
+                                               op.c_float(0.5),
+                                               noSel,
+                                               EquidistantBinning(1,0.,1.),
+                                               weight=tree.genWeight, 
+                                               autoSyst=False))
+
         #----- Genweight -----#
         if self.is_MC:
             noSel = noSel.refine("genWeight", weight=tree.genWeight)
             if self.args.PrintYield:
                 self.yields.add(noSel)
-
-
-#        if self.args.PrintYield:
-#            noSel = noSel.refine("initial",cut=op.c_bool(True)) # To note start for the yield table printout
-#            self.yields.add(noSel)
 
         # Event cut #
         if self.args.Events:
@@ -453,12 +467,6 @@ One lepton and and one jet argument must be specified in addition to the require
             for e in self.args.Events:
                 print ('... %d'%e)
             noSel = noSel.refine('eventcut',cut = [op.OR(*[tree.event == e for e in self.args.Events])])
-            if self.args.PrintYield:
-                self.yields.add(noSel)
-
-        # Safeguards for signals #
-        if "HH" in sample:
-            noSel = noSel.refine('HHMCWeight',cut=[op.abs(tree.genWeight)<100])
             if self.args.PrintYield:
                 self.yields.add(noSel)
 
@@ -945,7 +953,6 @@ One lepton and and one jet argument must be specified in addition to the require
         self.era = era
         self.tree = t
 
-        self.base_plots = []
 
         ###########################################################################
         #                              Pseudo-data                                #
