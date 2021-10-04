@@ -8,6 +8,9 @@ import argparse
 
 import  NonResonantModelNLO
 
+ROOT.gStyle.SetOptStat(0)
+ROOT.gStyle.SetPalette(ROOT.kRainBow)
+
 class ReweightingNLO:
     def __init__(self,filePath,histName):
         self.filePath = filePath
@@ -22,6 +25,7 @@ class ReweightingNLO:
         self.couplings = None
 
         self.mHHEdges,self.cosThetaEdges = self._getBinEdges(self.hist)
+
 
     @staticmethod
     def _getBinEdges(hist):
@@ -68,8 +72,8 @@ class ReweightingNLO:
         return content
 
     def SaveToJson(self, name):
-        content = self._loopOverBins()
         print ('Couplings : ',self.couplings)
+        content = self._loopOverBins()
 
         xbinning = []
         ybinning = []
@@ -98,6 +102,66 @@ class ReweightingNLO:
             json.dump(json_content,handle,indent=2)
         print (f"Saved to file {name}.json")
 
+    def SaveToPdf(self,name):
+        # Make histogram #
+        content = self._loopOverBins()
+        h = self.hist.Clone("weight")
+        for xl,xu in content.keys():
+            xb = self.hist.GetXaxis().FindBin((xl+xu)/2)
+            for yl,yu in content[(xl,xu)].keys():
+                yb = self.hist.GetYaxis().FindBin((yl+yu)/2)
+                val = content[(xl,xu)][(yl,yu)]
+                h.SetBinContent(xb,yb,val)
+        title = f'{os.path.basename(self.filePath)} -> Couplings {[round(c,2) for c in self.couplings]};M_{{HH}};cos(#theta_{{HH}}^{{*}})'
+        h.SetTitle(title)
+
+        # Produce PDF #
+        C = ROOT.TCanvas('c','c',800,600)
+        pdfName = name+".pdf"
+        C.Print(pdfName+'[')
+
+        C.Clear()
+        C.SetLogz(True)
+        h.Draw("colz")
+        C.Print(pdfName)
+
+        C.Clear()
+        C.SetLogy(True)
+        leg = ROOT.TLegend(0.75,0.3,0.88,0.88)
+        leg.SetBorderSize(0)
+        leg.SetFillStyle(4000)
+        opt = "PLC"
+        for x in range(1,h.GetNbinsX()+1):
+            hy = h.ProjectionY(h.GetName()+f'_py{x}',x,x)
+            hy.SetMaximum(h.GetMaximum()*1.1)
+            hy.SetTitle(f'{title};cos(#theta_{{HH}}^{{*}})')
+            hy.Draw(opt)
+            leg.AddEntry(hy,f'M_{{HH}} #in [{self.mHHEdges[x-1][0]:6.0f},{self.mHHEdges[x-1][1]:6.0f}]')
+            if 'same' not in opt:
+                opt += ' same' 
+        leg.Draw()
+        C.Print(pdfName)
+
+        C.Clear()
+        C.SetLogy(True)
+        leg = ROOT.TLegend(0.6,0.6,0.85,0.85)
+        leg.SetBorderSize(0)
+        leg.SetFillStyle(4000)
+        opt = "PLC"
+        for y in range(1,h.GetNbinsY()+1):
+            hx = h.ProjectionX(h.GetName()+f'_px{y}',y,y)
+            hx.SetMaximum(h.GetMaximum()*1.1)
+            hx.SetTitle(f'{title};M_{{HH}}')
+            hx.Draw(opt)
+            leg.AddEntry(hx,f'cos(#theta_{{HH}}^{{*}} #in [{self.cosThetaEdges[y-1][0]:3.2f},{self.cosThetaEdges[y-1][1]:3.2f}]')
+            if 'same' not in opt:
+                opt += ' same' 
+        leg.Draw()
+        C.Print(pdfName)
+
+        C.Print(pdfName+']')
+
+        print (f"Saved to file {name}.pdf")
 
     def SetBenchmark(self,idx):
         if idx not in [i for i in range(0,13)]:
@@ -159,7 +223,7 @@ if __name__=="__main__":
         if "__skeleton__" in f:
             continue
         sample = os.path.basename(f)
-        print (sample)
+        print ('Sample',sample)
         reweight = ReweightingNLO(f,"mHHvsCosThetaStar")
 
         for BM,coupl in couplings.items():
@@ -171,3 +235,4 @@ if __name__=="__main__":
             else:
                 raise RuntimeError('Not understood couplings')
             reweight.SaveToJson("weights/{}_to_Benchmark{}_{}".format(sample.replace('.root',''),BM,args.era))
+            reweight.SaveToPdf("weights/{}_to_Benchmark{}_{}".format(sample.replace('.root',''),BM,args.era))
