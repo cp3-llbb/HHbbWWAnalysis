@@ -8,6 +8,7 @@ import argparse
 from array import array
 import numpy as np
 import ROOT
+from IPython import embed
 
 ROOT.gStyle.SetOptStat(0)
 ROOT.gROOT.SetBatch(True)
@@ -42,18 +43,14 @@ for era in eras:
     path_DY_MC  = args.mc.format(era=era)
     path_DY_DD  = args.dd.format(era=era)
     path_DY_CL  = args.cl.format(era=era)
-    print (path_DY_MC)
-    print (path_DY_DD)
-    print (path_DY_CL)
 
-    plotNames = [os.path.basename(name) for name in glob.glob(os.path.join(path_DY_MC,'*root'))]
-
+    plotNames = [os.path.basename(name) for name in glob.glob(path_DY_MC)]
 
     for plotName in sorted(plotNames):
-        print (plotName)
-        f_MC = ROOT.TFile(os.path.join(path_DY_MC,plotName))
-        f_DD = ROOT.TFile(os.path.join(path_DY_DD,plotName))
-        f_CL = ROOT.TFile(os.path.join(path_DY_CL,plotName))
+        print (plotName,era)
+        f_MC = ROOT.TFile(os.path.join(os.path.dirname(path_DY_MC),plotName))
+        f_DD = ROOT.TFile(os.path.join(os.path.dirname(path_DY_DD),plotName))
+        f_CL = ROOT.TFile(os.path.join(os.path.dirname(path_DY_CL),plotName))
 
         plotName = plotName.replace('.root','').replace(f'_{era}','')
 
@@ -61,7 +58,11 @@ for era in eras:
         h_DD = f_DD.Get("DY")
         h_CL = f_CL.Get("DY")
 
-        xn = [0.,0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50,0.55,0.60,0.65,0.70,0.75,0.80,0.85,0.9,0.95,1.]
+        if 'boosted' in plotName:
+            #xn = [0.,0.10,0.20,0.30,0.40,0.50,0.60,0.70,0.80,0.90,1.]
+            xn = [0.,0.20,0.40,0.60,0.80,1.00]
+        else:
+            xn = [0.,0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50,0.55,0.60,0.65,0.70,0.75,0.80,0.85,0.9,0.95,1.]
 
         h_MC = h_MC.Rebin(len(xn)-1,'rebin',array('d',xn))
         h_DD = h_DD.Rebin(len(xn)-1,'rebin',array('d',xn))
@@ -99,12 +100,10 @@ def computeFactor(a,b,sa,sb):
     return factor,sfactor 
 
 
-categories = []
+categories = set(plotDict_MC['2016'])
 for plotDict in [plotDict_MC,plotDict_DD,plotDict_CL]:
     for era,histDict in plotDict.items():
-        for cat in histDict.keys():
-            if cat not in categories:
-                categories.append(cat)
+        categories = categories.intersection(set(histDict.keys()))
 
 def plotCategory(C,h_MC,h_DD,h_CL,title='',method=''):
     C.Clear()
@@ -193,10 +192,16 @@ def plotCategory(C,h_MC,h_DD,h_CL,title='',method=''):
     ratio_DY_CL.Draw("e1p same")
     ratio_DY_DD.GetYaxis().SetRangeUser(0.,2.)
     if method == 'fit':
+        xmins = []
+        xmaxs = []
+        for i in range(1,h_CL.GetNbinsX()+1):
+            if h_CL.GetBinContent(i) > 1.0 and h_DD.GetBinContent(i) > 1.0 and h_MC.GetBinContent(i) > 1.0:
+                xmins.append(ratio_DY_CL.GetXaxis().GetBinLowEdge(i))
+                xmaxs.append(ratio_DY_CL.GetXaxis().GetBinUpEdge(i))
+        #ratio_DY_DD.Fit("pol1","QR","",min(xmins),max(xmaxs))
+        #fitResult = ratio_DY_CL.Fit("pol1","QRS","",min(xmins),max(xmaxs))
         ratio_DY_DD.Fit("pol1","QR","",quantiles[0],quantiles[1])
         fitResult = ratio_DY_CL.Fit("pol1","QRS","",quantiles[0],quantiles[1])
-        #ratio_DY_DD.Fit("pol1","QR","")
-        #fitResult = ratio_DY_CL.Fit("pol1","QRS","")
         fit_DD = ratio_DY_DD.GetFunction('pol1')
         fit_CL = ratio_DY_CL.GetFunction('pol1')
         fit_DD.SetLineColor(600)
@@ -205,26 +210,15 @@ def plotCategory(C,h_MC,h_DD,h_CL,title='',method=''):
         params_CL = (fit_CL.GetParameter(0),fit_CL.GetParameter(1))
         covFit = fitResult.GetCovarianceMatrix()
         covMatrix = [[covFit[0][0],covFit[0][1]],[covFit[1][0],covFit[1][1]]]
-        #me = ROOT.TMatrixDSymEigen(covFit)
-        #eigenValues = me.GetEigenValues()
-        #eigenVectors = me.GetEigenVectors()
-        #import IPython
-        #IPython.embed()
 
     leg_down = ROOT.TLegend(0.55,0.65,0.9,1.0)
     if method == 'factor':
-        #leg_down.AddEntry(ratio_DY_DD,"\splitline{{#frac{{DY (MC) - DY (data)}}{{DY (data)}}}}{{Factor = {:0.5f} #pm {:0.5f}}}".format(*factor_DD))
-        #leg_down.AddEntry(ratio_DY_CL,"\splitline{{#frac{{DY (MC) - DY (closure)}}{{DY (closure)}}}}{{Factor = {:0.5f} #pm {:0.5f}}}".format(*factor_CL))
         leg_down.AddEntry(ratio_DY_DD,"\splitline{{#frac{{DY (MC)}}{{DY (data)}}}}{{Factor = {:0.5f} #pm {:0.5f}}}".format(*factor_DD))
         leg_down.AddEntry(ratio_DY_CL,"\splitline{{#frac{{DY (MC)}}{{DY (closure)}}}}{{Factor = {:0.5f} #pm {:0.5f}}}".format(*factor_CL))
     elif method == 'fit':
-        #leg_down.AddEntry(ratio_DY_DD,"\splitline{{#frac{{DY (MC) - DY (data)}}{{DY (data)}}}}{{Fit : {:0.5f} x +{:0.5f}}}".format(params_DD[1],params_DD[0]))
-        #leg_down.AddEntry(ratio_DY_CL,"\splitline{{#frac{{DY (MC) - DY (closure)}}{{DY (closure)}}}}{{Fit : {:0.5f} x + {:0.5f}}}".format(params_CL[1],params_CL[0]))
         leg_down.AddEntry(ratio_DY_DD,"\splitline{{#frac{{DY (MC)}}{{DY (data)}}}}{{Fit : {:0.5f} x +{:0.5f}}}".format(params_DD[1],params_DD[0]))
         leg_down.AddEntry(ratio_DY_CL,"\splitline{{#frac{{DY (MC)}}{{DY (closure)}}}}{{Fit : {:0.5f} x + {:0.5f}}}".format(params_CL[1],params_CL[0]))
     else:
-        #leg_down.AddEntry(ratio_DY_DD,"#frac{{DY (MC) - DY (data)}}{{DY (data)}}")
-        #leg_down.AddEntry(ratio_DY_CL,"#frac{{DY (MC) - DY (closure)}}{{DY (closure)}}}}{{Factor = {:0.5f} #pm {:0.5f}")
         leg_down.AddEntry(ratio_DY_DD,"#frac{{DY (MC)}}{{DY (data)}}")
         leg_down.AddEntry(ratio_DY_CL,"#frac{{DY (MC)}}{{DY (closure)}}}}{{Factor = {:0.5f} #pm {:0.5f}")
     leg_down.SetTextSize(0.04)

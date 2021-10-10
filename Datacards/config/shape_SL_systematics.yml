@@ -1,7 +1,7 @@
 # PDF #
-Fact:   pdf_fact
-Renorm: pdf_renorm
-Mixed:  pdf_mixed
+Fact:   scale_muF
+Renorm: scale_muR
+Mixed:  discard
 
 # PS #
 psFSR: CMS_bbwwsl_PS_FSR
@@ -88,4 +88,44 @@ jesRelativeSample_2018: CMS_JES_RelSample_2018
 jetpuid_eff:            CMS_PUJET_eff_{era}
 jetpuid_mistag:         CMS_PUJET_mistag_{era}
 
-
+# Fake non closure #
+fake_nc_e_res1b_GGF_nom:        CMS_bbwwsl_FakeRate_nc_nom_e_res1b_GGF
+fake_nc_e_res1b_GGF_slope:      CMS_bbwwsl_FakeRate_nc_slope_mu_res1b_GGF
+fake_nc_m_res1b_GGF_nom:        CMS_bbwwsl_FakeRate_nc_nom_mu_res1b_GGF
+fake_nc_m_res1b_GGF_slope:      CMS_bbwwsl_FakeRate_nc_slope_mu_res1b_GGF
+fake_nc_e_res1b_VBF_nom:        CMS_bbwwsl_FakeRate_nc_nom_e_res1b_VBF
+fake_nc_e_res1b_VBF_slope:      CMS_bbwwsl_FakeRate_nc_slope_e_res1b_VBF
+fake_nc_m_res1b_VBF_nom:        CMS_bbwwsl_FakeRate_nc_nom_mu_res1b_VBF
+fake_nc_m_res1b_VBF_slope:      CMS_bbwwsl_FakeRate_nc_slope_mu_res1b_VBF
+fake_nc_e_res2b_GGF_nom:        CMS_bbwwsl_FakeRate_nc_nom_e_res2b_GGF
+fake_nc_e_res2b_GGF_slope:      CMS_bbwwsl_FakeRate_nc_slope_e_res2b_GGF
+fake_nc_m_res2b_GGF_nom:        CMS_bbwwsl_FakeRate_nc_nom_mu_res2b_GGF
+fake_nc_m_res2b_GGF_slope:      CMS_bbwwsl_FakeRate_nc_slope_mu_res2b_GGF
+fake_nc_e_res2b_VBF_nom:        CMS_bbwwsl_FakeRate_nc_nom_e_res2b_VBF
+fake_nc_e_res2b_VBF_slope:      CMS_bbwwsl_FakeRate_nc_slope_e_res2b_VBF
+fake_nc_m_res2b_VBF_nom:        CMS_bbwwsl_FakeRate_nc_nom_mu_res2b_VBF
+fake_nc_m_res2b_VBF_slope:      CMS_bbwwsl_FakeRate_nc_slope_mu_res2b_VBF
+fake_nc_e_boosted_GGF_nom:      CMS_bbwwsl_FakeRate_nc_nom_e_boosted_GGF
+fake_nc_e_boosted_GGF_slope:    CMS_bbwwsl_FakeRate_nc_slope_e_boosted_GGF
+fake_nc_m_boosted_GGF_nom:      CMS_bbwwsl_FakeRate_nc_nom_mu_boosted_GGF
+fake_nc_m_boosted_GGF_slope:    CMS_bbwwsl_FakeRate_nc_slope_mu_boosted_GGF
+fake_nc_e_boosted_VBF_nom:      CMS_bbwwsl_FakeRate_nc_nom_e_boosted_VBF
+fake_nc_e_boosted_VBF_slope:    CMS_bbwwsl_FakeRate_nc_slope_e_boosted_VBF
+fake_nc_m_boosted_VBF_nom:      CMS_bbwwsl_FakeRate_nc_nom_mu_boosted_VBF
+fake_nc_m_boosted_VBF_slope:    CMS_bbwwsl_FakeRate_nc_slope_mu_boosted_VBF
+fake_nc_e_inc_wjets_nom:        CMS_bbwwsl_FakeRate_nc_nom_e_inc_wjets
+fake_nc_e_inc_wjets_slope:      CMS_bbwwsl_FakeRate_nc_slope_e_inc_wjets
+fake_nc_m_inc_wjets_nom:        CMS_bbwwsl_FakeRate_nc_nom_mu_inc_wjets
+fake_nc_m_inc_wjets_slope:      CMS_bbwwsl_FakeRate_nc_slope_mu_inc_wjets
+fake_nc_e_inc_otherh_nom:       CMS_bbwwsl_FakeRate_nc_nom_e_inc_otherh
+fake_nc_e_inc_otherh_slope:     CMS_bbwwsl_FakeRate_nc_slope_e_inc_otherh
+fake_nc_m_inc_otherh_nom:       CMS_bbwwsl_FakeRate_nc_nom_mu_inc_otherh
+fake_nc_m_inc_otherh_slope:     CMS_bbwwsl_FakeRate_nc_slope_mu_inc_otherh
+fake_nc_e_res_top_nom:          CMS_bbwwsl_FakeRate_nc_nom_e_res_top
+fake_nc_e_res_top_slope:        CMS_bbwwsl_FakeRate_nc_slope_e_res_top
+fake_nc_m_res_top_nom:          CMS_bbwwsl_FakeRate_nc_nom_mu_res_top
+fake_nc_m_res_top_slope:        CMS_bbwwsl_FakeRate_nc_slope_mu_res_top
+fake_nc_e_boosted_top_nom:      CMS_bbwwsl_FakeRate_nc_nom_e_boosted_top
+fake_nc_e_boosted_top_slope:    CMS_bbwwsl_FakeRate_nc_slope_e_boosted_top
+fake_nc_m_boosted_top_nom:      CMS_bbwwsl_FakeRate_nc_nom_mu_boosted_top
+fake_nc_m_boosted_top_slope:    CMS_bbwwsl_FakeRate_nc_slope_mu_boosted_top

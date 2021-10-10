@@ -153,7 +153,10 @@ def returnHighLevelMVAInputs(self,l1,l2,met,jets,bjets,electrons,muons,channel):
             }
 
 def returnParamMVAInputs(self):
-    return {('year',     'Year',         (3,2016.,2019.))    : op.c_int(int(self.era))}
+    if self.args.era is None:
+        return {('year',     'Year',         (3,2016.,2019.))    : op.c_int(int(self.era))}
+    else:
+        return {('year',     'Year',         (3,2016.,2019.))    : op.c_int(int(self.args.era))}
 
 def returnEventNrMVAInputs(self,t):
     return {('eventnr',  'Event number', (int(1e6+1),0.,1e6))     : t.event}

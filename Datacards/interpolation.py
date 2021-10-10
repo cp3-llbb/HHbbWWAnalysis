@@ -1,12 +1,14 @@
-import ROOT
+import os
 import math
 import ctypes
 import logging
+import ROOT
 from time import perf_counter
 
-ROOT.gInterpreter.ProcessLine('#include "th1fmorph.cc"')
-ROOT.gInterpreter.ProcessLine('#include "th2fmorph.cc"')
-ROOT.gInterpreter.ProcessLine('#include "morphing.h"')
+path = os.path.abspath(os.path.dirname(__file__))
+ROOT.gInterpreter.ProcessLine(f'#include "{os.path.join(path,"th1fmorph.cc")}"')
+ROOT.gInterpreter.ProcessLine(f'#include "{os.path.join(path,"th2fmorph.cc")}"')
+ROOT.gInterpreter.ProcessLine(f'#include "{os.path.join(path,"morphing.h")}"')
 
 from IPython import embed
 

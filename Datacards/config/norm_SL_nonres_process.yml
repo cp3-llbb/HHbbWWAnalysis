@@ -23,18 +23,18 @@ CMS_bbwwsl_fakes_norm:
 
 CMS_bbwwsl_ST_norm_boost:
   hist: 
-    - HH_boosted_GGF
-    - HH_boosted_VBF
-    - HH_boosted_Top
+    - HH_DL_boosted_GGF
+    - HH_DL_boosted_VBF
+    - HH_DL_boosted_Top
   proc: 
     - ST
   val: 1.2
 
 CMS_bbwwsl_TT_norm_boost:
   hist: 
-    - HH_boosted_GGF
-    - HH_boosted_VBF
-    - HH_boosted_Top
+    - HH_DL_boosted_GGF
+    - HH_DL_boosted_VBF
+    - HH_DL_boosted_Top
   proc: 
     - TT
   val: 1.2

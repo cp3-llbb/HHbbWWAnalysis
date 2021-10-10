@@ -1,7 +1,7 @@
 path: /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/FakeNC_SL_2016_MCFakes/
 use_syst: False
 
-outputDir: datacards/datacard_SL_FNC_MCFakes_2016
+outputDir: /home/ucl/cp3/fbury/scratch/Datacards/datacard_SL_FNC_MCFakes_2016
 
 yamlName: plots.yml
 

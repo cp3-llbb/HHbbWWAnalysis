@@ -134,7 +134,9 @@ class ReweightingNLO:
         for x in range(1,h.GetNbinsX()+1):
             hy = h.ProjectionY(h.GetName()+f'_py{x}',x,x)
             hy.SetMaximum(h.GetMaximum()*1.1)
-            hy.SetTitle(f'{title};cos(#theta_{{HH}}^{{*}})')
+            hy.SetTitle(f'{title}')
+            hy.GetXaxis().SetTitle('cos(#theta_{HH}^{*})')
+            hy.GetYaxis().SetTitle('weight')
             hy.Draw(opt)
             leg.AddEntry(hy,f'M_{{HH}} #in [{self.mHHEdges[x-1][0]:6.0f},{self.mHHEdges[x-1][1]:6.0f}]')
             if 'same' not in opt:
@@ -151,7 +153,9 @@ class ReweightingNLO:
         for y in range(1,h.GetNbinsY()+1):
             hx = h.ProjectionX(h.GetName()+f'_px{y}',y,y)
             hx.SetMaximum(h.GetMaximum()*1.1)
-            hx.SetTitle(f'{title};M_{{HH}}')
+            hy.SetTitle(f'{title}')
+            hy.GetXaxis().SetTitle('M_{HH}')
+            hy.GetYaxis().SetTitle('weight')
             hx.Draw(opt)
             leg.AddEntry(hx,f'cos(#theta_{{HH}}^{{*}} #in [{self.cosThetaEdges[y-1][0]:3.2f},{self.cosThetaEdges[y-1][1]:3.2f}]')
             if 'same' not in opt:

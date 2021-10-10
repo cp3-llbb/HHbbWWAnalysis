@@ -584,10 +584,6 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         self.yields.add(selNode.sel)
 
             if self.args.analysis == 'res':
-                # Mass for resonance in parametric DNN #
-                if self.args.mass is None:
-                    raise RuntimeError('You need to provide the mass of the resonance')
-                self.nodes = ['DY','GGF','H','Rare','ST','TT','TTVX','VVV']
 
                 # HME computation #
 #                if 'Resolved' in selObjectDict['selObject'].selName:
@@ -677,9 +673,16 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
                 inputs = {inpName:val  for (inpName,_,_),val in inputsAll.items()}
                 
-                # Mass scan #
+                # Mass for resonance in parametric DNN #
                 print ('Using parametric DNN with')
-                for mass in self.args.mass:
+                if self.args.mass is not None:
+                    masses = self.args.mass
+                else:
+                    print ('No mass requested, will run each sample with its mass')
+                    masses = [sampleCfg['mass']]
+
+                self.nodes = ['DY','GGF','H','Rare','ST','TT','TTVX','VVV']
+                for mass in masses:
                     # Select correct DNN #
                     print ('... MH = {}'.format(mass))
                     if mass <= 500:
@@ -689,7 +692,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                         DNN = DNN_HighMass
                         input_names = input_names_LowMass
 
-                    # Defint the inputs #
+                    # Define the inputs #
                     inputs['param'] = op.c_float(mass) 
                     inputsArr = []
                     for inpName in input_names:

@@ -130,6 +130,11 @@ One lepton and and one jet argument must be specified in addition to the require
                             type        = float,
                             default     = None,
                             help="Mass to use for the parametric DNN (can be several)")
+        parser.add_argument("--era", 
+                            action      = 'store',
+                            type        = int,
+                            default     = None,
+                            help="Era to be fed to the parametric DNN")
         parser.add_argument("--PrintYield", 
                             action      = "store_true",
                             default     = False,
@@ -371,7 +376,11 @@ One lepton and and one jet argument must be specified in addition to the require
                     subsetDict = yaml.load(handle,yaml.SafeLoader)
                 for sampleName,sampleCfg in subsetDict.items():
                     if self.args.analysis == 'res' and 'type' in sampleCfg.keys() and sampleCfg['type'] == 'signal':
+                        if 'mass' not in sampleCfg.keys():
+                            raise RuntimeError(f'Yaml config {item["config"]} sample {sampleName} does not have `mass` entry')
                         mass = float(re.findall('M-\d+',sampleName)[0].replace('M-',''))
+                        if float(mass) != float(sampleCfg['mass']):
+                            raise RuntimeError(f'Yaml config {item["config"]} sample {sampleName} have `mass` entry {sampleCfg["mass"]} but name tells {mass}')
                         if self.args.mass is not None and mass not in self.args.mass:
                             continue
                     samples[sampleName] = sampleCfg
@@ -1090,7 +1099,7 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                            Pre-firing rates                               #
         #############################################################################
-        if era in ["2016","2017"] and self.is_MC:
+        if era in ["2016","2017"] and self.is_MC and hasattr(t,'L1PreFiringWeight_Nom'):
             self.L1Prefiring = op.systematic(t.L1PreFiringWeight_Nom,
                                              name = "L1PreFiring",
                                              up   = t.L1PreFiringWeight_Up,

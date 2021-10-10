@@ -14,4 +14,4 @@ args:
       - Boosted1B:  "--Boosted1Btag"
   - "--datadriven=FakeExtrapolation,DYEstimation"
  
-output: /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full{era}NanoV7_TTHIDLoose_Fake_DNN11_DYEstimation_{cat}/
+output: /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full{era}NanoV7_NonResonant_DNN11_Fake_DYEstimation_{cat}

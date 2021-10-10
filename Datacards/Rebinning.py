@@ -1,4 +1,5 @@
 import sys
+from copy import deepcopy
 import numpy as np
 import scipy
 import logging
@@ -25,16 +26,13 @@ def compareTwoAxes(x1,x2):
 
 def processHistogramToROOT(h,htype):
     if isinstance(h,htype):
-        hist = h 
+        hist = deepcopy(h)
     elif isinstance(h,list):
-        hist = None
-        for hi in h:
+        hist = deepcopy(h[0])
+        for hi in h[1:]:
             if not isinstance(hi,htype):
                 raise RuntimeError('Not a ROOT histogram')
-            if hist is None:
-                hist = hi
-            else:
-                hist.Add(hi)
+            hist.Add(hi)
     else:
         raise RuntimeError('Not a ROOT histogram nor a list of ROOT histograms : '+str(type(h)))
     return hist
@@ -43,21 +41,15 @@ def processHistogramToNumpy(h,htype,getter):
         if isinstance(h,htype):
             e,w,s = getter(h) 
         elif isinstance(h,list):
-            e = None
-            w = None
-            s = None
-            for hi in h:
+            e,w,s = getter(h[0])
+            s = s**2
+            for hi in h[1:]:
                 if not isinstance(hi,htype):
                     raise RuntimeError('Not a ROOT histogram')
                 ei,wi,si = getter(hi)
-                if e is None and w is None:
-                    w = wi
-                    e = ei
-                    s = si**2
-                else:
-                    assert np.array_equal(e,ei)
-                    w += wi
-                    s += si**2
+                assert np.array_equal(e,ei)
+                w += wi
+                s += si**2
             s = np.sqrt(s)
         else:
             raise RuntimeError('Not a ROOT histogram nor a list of ROOT histograms : '+str(type(h)))
@@ -323,7 +315,6 @@ class Rebin2D(Rebin):
             raise RuntimeError('New bin edges have not been computed, is the rebin_method() not implemented')
         nw,ns = self.rebin2D(e,w,s,self.ne)
         return self.fillHistogram2D(self.ne,nw,ns,h.GetName()+'rebin')
-        
 
 
     @staticmethod
@@ -461,6 +452,7 @@ class Linearize2D(Rebin2D):
         else:
             eminor = [eminor for _ in range(len(nw))] 
 
+
         ne,nw,ns = self.linearize(nw,ns,eminor,emajor)
         nh = self.fillHistogram1D(ne,nw,ns,h.GetName()+"lin")
         self.savePlotData(eminor,emajor)
@@ -488,7 +480,7 @@ class Linearize2D(Rebin2D):
             idx = np.digitize(xmajor,self.nemajor) - 1
             emajor = self.nemajor
             nw = [np.sum(w[np.where(idx==i)],axis=0) for i in np.unique(idx)] 
-            ns = [np.sum(s[np.where(idx==i)],axis=0) for i in np.unique(idx)] 
+            ns = [np.sqrt(np.sum((s[np.where(idx==i)])**2,axis=0)) for i in np.unique(idx)] 
         else:
             nw = [arr.ravel() for arr in np.vsplit(w,w.shape[0])]
             ns = [arr.ravel() for arr in np.vsplit(s,s.shape[0])]
@@ -503,7 +495,7 @@ class Linearize2D(Rebin2D):
         for i in range(len(xpos)-1):
             label = f"{emajor[i]} < {ylabel} < {emajor[i+1]}"
             poslabel = [(xpos[i] + 0.1 * (xpos[i+1]-xpos[i]))/xpos[-1],0.75]
-            labels.append({'text':label,'position':poslabel,'size':26-2*len(eminor)})
+            labels.append({'text':label,'position':poslabel,'size':22-2*len(eminor)})
         self.plotData = {'labels':labels,'lines':lines}
 
     def getPlotData(self):

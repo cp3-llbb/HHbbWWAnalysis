@@ -2,9 +2,9 @@ module: SkimmerHHtobbWWHME.py:SkimmerHME
 
 config: 
   era:
-    - 2016: Yaml/analysis2016_v7.yml
+#    - 2016: Yaml/analysis2016_v7.yml
 #    - 2017: Yaml/analysis2017_v7.yml
-#    - 2018: Yaml/analysis2018_v7.yml
+    - 2018: Yaml/analysis2018_v7.yml
 
 args:
   - --subset=mc,data,bbww2l,bbtautau,graviton,radion
@@ -17,7 +17,7 @@ args:
     - MuMu: --Channel=MuMu
     - ElMu: --Channel=ElMu
   - type:   
-    - "SR" : "" # SR
+    - "SR" : "" 
     - "FakeCR": "--FakeCR"
     - "DYCR"  : "--DYCR"
   - --NoSystematics

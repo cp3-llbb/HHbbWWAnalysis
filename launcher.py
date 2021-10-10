@@ -70,7 +70,7 @@ class BambooLauncher:
             if not debug:
                 slurmIds = self.sendJobs(scripts,submit)
                 print ('Submitted : '+' '.join(slurmIds))
-        elif self.mode == 'debug':
+        elif self.mode == 'print':
             print ('Printing commands [{}]'.format(len(cmds)))
             for cmd in cmds:
                 print(cmd)
@@ -350,9 +350,9 @@ if __name__=="__main__":
         raise RuntimeError("Must provide the YAML file")
     if not os.path.isfile(args.yaml):
         raise RuntimeError("YAML file {} is not a valid file".format(args.yaml))
+    submitArgs = None
     if args.submit is not None:
         submitArgs = {}
-        print (args.submit)
         for item in args.submit:
             if '=' not in item:
                 print(f'Warning : no `=` in {item}, will be ignored')

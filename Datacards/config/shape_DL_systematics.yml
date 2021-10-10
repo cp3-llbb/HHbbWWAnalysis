@@ -1,7 +1,8 @@
 # PDF #
-Fact:   pdf_fact
-Renorm: pdf_renorm
-Mixed:  pdf_mixed
+Fact:   discard 
+Renorm: discard
+Mixed:  discard
+Envelope: CMS_bbwwdl_thu_shape
 
 # PS #
 psFSR: CMS_bbwwdl_PS_FSR
@@ -98,10 +99,19 @@ dy_resolved_2b:         CMS_bbwwdl_DY_resolved2b_{era}
 
 dy_resolved_nonclosure_dy_vvv_shape1 : CMS_bbwwdl_DY_ncc1_resolved_dy_vvv_{era}
 dy_resolved_nonclosure_dy_vvv_shape2 : CMS_bbwwdl_DY_ncc2_resolved_dy_vvv_{era}
+dy_resolved_nonclosure_top_shape1 : CMS_bbwwdl_DY_ncc1_resolved_top_{era}
+dy_resolved_nonclosure_top_shape2 : CMS_bbwwdl_DY_ncc2_resolved_top_{era}
+dy_boosted_nonclosure_top_shape1 : CMS_bbwwdl_DY_ncc1_boosted_top_{era}
+dy_boosted_nonclosure_top_shape2 : CMS_bbwwdl_DY_ncc2_boosted_top_{era}
 dy_boosted_nonclosure_dy_vvv_shape1 : CMS_bbwwdl_DY_ncc1_boost_dy_vvv
 dy_boosted_nonclosure_dy_vvv_shape2 : CMS_bbwwdl_DY_ncc2_boost_dy_vvv
-
+dy_inclusive_nonclosure_dy_vvv_shape1 : CMS_bbwwdl_DY_ncc1_inclusive_dy_vvv_{era}
+dy_inclusive_nonclosure_dy_vvv_shape2 : CMS_bbwwdl_DY_ncc2_inclusive_dy_vvv_{era}
 dy_resolved_nonclosure_other_shape1 : CMS_bbwwdl_DY_ncc1_resolved_other_{era}
 dy_resolved_nonclosure_other_shape2 : CMS_bbwwdl_DY_ncc2_resolved_other_{era}
 dy_boosted_nonclosure_other_shape1 : CMS_bbwwdl_DY_ncc1_boosted_other
 dy_boosted_nonclosure_other_shape2 : CMS_bbwwdl_DY_ncc2_boosted_other
+dy_inclusive_nonclosure_otherh_shape1 : CMS_bbwwdl_DY_ncc1_inclusive_otherh_{era}
+dy_inclusive_nonclosure_otherh_shape2 : CMS_bbwwdl_DY_ncc2_inclusive_otherh_{era}
+dy_inclusive_nonclosure_otherh_shape1 : CMS_bbwwdl_DY_ncc1_inclusive_otherh_{era}
+dy_inclusive_nonclosure_otherh_shape2 : CMS_bbwwdl_DY_ncc2_inclusive_otherh_{era}
