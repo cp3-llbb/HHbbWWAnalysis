@@ -274,10 +274,12 @@ class Datacard:
             self.sampleToGroup = {}
             for group in self.groups.keys():
                 if 'files' not in self.groups[group]:
-                    raise RuntimeError("No 'files' item in group {}".format(group))
-                files = self.groups[group]['files']
+                    logging.warning("No 'files' item in group {}".format(group))
+                    files = []
+                else:
+                    files = self.groups[group]['files']
                 if not isinstance(files,list):
-                    raise RuntimeError("Group %s does not consist in a list"%group)
+                    files = [files]
                 for f in files:
                     if f in self.sampleToGroup.keys():
                         self.sampleToGroup[f].append(group)
@@ -407,12 +409,18 @@ class Datacard:
                         if sample not in yamlDict['samples'].keys():
                             yamlDict['samples'].update({sample:data})
                     
+                # Few checks #
+                for sample in yamlDict['samples'].keys():
+                    for key in ['cross-section','generated-events']:
+                        if key in yamlDict['samples'][sample].keys() and yamlDict['samples'][sample][key] < 0:
+                            logging.warning(f'Sample {sample} has {key} = {yamlDict["samples"][sample][key]} (< 0), this might not be expected')
 
                 # Get plot options #
                 if 'plots' not in yamlDict.keys(): 
                     yamlDict['plots'] = full_dict['plots']
                 else:
                     yamlDict['plots'].update(full_dict['plots'])
+
         # Overwrite some values based on config #
         info_to_override = ['cross-section','generated-events','branching-ratio']
         for sample in yamlDict['samples'].keys():
@@ -513,53 +521,54 @@ class Datacard:
                 d.cd()
             for group in self.content[histName].keys():
                 # Loop over systematics first to fix and save #
-                for systName in self.content[histName][group].keys():
-                    if self.pseudodata and group == 'data_real': # avoid writing data when using pseudodata
-                        continue
-                    if systName ==  "nominal": # will do afterwards
-                        continue
-                    if systName.endswith('Down'): # wait for the Up and do both at the same time
-                        continue
-
-                    if systName.endswith('Up'): 
-                        # Get correct name #
-                        systName = systName[:-2]
-                        if systName not in self.shapeSyst.keys():
-                            logging.warning("Could not find {} in systematic dict".format(systName))
+                if self.use_syst:
+                    for systName in self.content[histName][group].keys():
+                        if self.pseudodata and group == 'data_real': # avoid writing data when using pseudodata
                             continue
-                        CMSName = self.shapeSyst[systName]
-                        if '{era}' in CMSName:
-                            CMSName = CMSName.format(era=self.era)
-
-                        if CMSName == 'discard':
+                        if systName ==  "nominal": # will do afterwards
                             continue
-        
-                        systNameUp   = systName + "Up"
-                        systNameDown = systName + "Down"
-                         
-                        if systNameUp not in self.content[histName][group].keys():
-                            raise RuntimeError(f"Could not find syst named {systNameUp} in group {group} for histogram {histName}")
-                        if systNameDown not in self.content[histName][group].keys():
-                            raise RuntimeError(f"Could not find syst named {systNameDown} in group {group} for histogram {histName}")
+                        if systName.endswith('Down'): # wait for the Up and do both at the same time
+                            continue
 
-                        # Fix shape in case needed #
-                        self.fixHistograms(hnom  = self.content[histName][group]['nominal'],
-                                            hup   = self.content[histName][group][systNameUp],
-                                            hdown = self.content[histName][group][systNameDown])
+                        if systName.endswith('Up'): 
+                            # Get correct name #
+                            systName = systName[:-2]
+                            if systName not in self.shapeSyst.keys():
+                                logging.warning("Could not find {} in systematic dict".format(systName))
+                                continue
+                            CMSName = self.shapeSyst[systName]
+                            if '{era}' in CMSName:
+                                CMSName = CMSName.format(era=self.era)
 
-                        # Write to file #
-                        CMSNameUp   = f"{group}__{CMSName}Up"
-                        CMSNameDown = f"{group}__{CMSName}Down"
+                            if CMSName == 'discard':
+                                continue
+            
+                            systNameUp   = systName + "Up"
+                            systNameDown = systName + "Down"
+                             
+                            if systNameUp not in self.content[histName][group].keys():
+                                raise RuntimeError(f"Could not find syst named {systNameUp} in group {group} for histogram {histName}")
+                            if systNameDown not in self.content[histName][group].keys():
+                                raise RuntimeError(f"Could not find syst named {systNameDown} in group {group} for histogram {histName}")
 
-                        self.content[histName][group][systNameUp].SetTitle(CMSNameUp)
-                        self.content[histName][group][systNameUp].SetName(CMSNameUp)
-                        self.content[histName][group][systNameDown].SetTitle(CMSNameDown)
-                        self.content[histName][group][systNameDown].SetName(CMSNameDown)
-        
-                        self.content[histName][group][systNameUp].Write(CMSNameUp) 
-                        self.content[histName][group][systNameDown].Write(CMSNameDown) 
-                    else:
-                        raise RuntimeError(f"Something wrong happened with {systName} in group {group} for histogram {histName}")
+                            # Fix shape in case needed #
+                            self.fixHistograms(hnom  = self.content[histName][group]['nominal'],
+                                                hup   = self.content[histName][group][systNameUp],
+                                                hdown = self.content[histName][group][systNameDown])
+
+                            # Write to file #
+                            CMSNameUp   = f"{group}__{CMSName}Up"
+                            CMSNameDown = f"{group}__{CMSName}Down"
+
+                            self.content[histName][group][systNameUp].SetTitle(CMSNameUp)
+                            self.content[histName][group][systNameUp].SetName(CMSNameUp)
+                            self.content[histName][group][systNameDown].SetTitle(CMSNameDown)
+                            self.content[histName][group][systNameDown].SetName(CMSNameDown)
+            
+                            self.content[histName][group][systNameUp].Write(CMSNameUp) 
+                            self.content[histName][group][systNameDown].Write(CMSNameDown) 
+                        else:
+                            raise RuntimeError(f"Something wrong happened with {systName} in group {group} for histogram {histName}")
 
                 # Save nominal (done after because can be correct when fixing systematics) #
                 if 'nominal' not in self.content[histName][group].keys():
@@ -729,9 +738,11 @@ class Datacard:
             if ":" not in corrConfig['module']:
                 raise RuntimeError(f"`:` needs to be in the module arg {corrConfig['module']}")
             lib, clsName = corrConfig['module'].split(':')
+            lib = os.path.join(os.path.abspath(os.path.dirname(__file__)),lib)
             if not os.path.isfile(lib):
                 raise RuntimeError(f'File {lib} does not exist')
-            mod = importlib.import_module(lib.replace('.py',''))
+            spec = importlib.util.spec_from_file_location(clsName,lib)
+            mod = spec.loader.load_module()
             cls = getattr(mod, clsName, None)(**corrConfig['init'])
             logging.info(f"Applying {corrConfig['module']}")
             for cat in self.content.keys():
@@ -750,16 +761,16 @@ class Datacard:
                     additional_syst = cls.additional(self.content[cat][cls.group]['nominal'],**catCfg)
                 # Correct nominal and all syst hists #
                 if hasattr(cls,'modify'):
-                    logging.info(f'\t\t-> applying corrections')
+                    logging.info(f'\t\t-> applying corrections with key in file {catCfg["key"]}')
                     for hist in self.content[cat][cls.group].values():
                         cls.modify(hist,**catCfg)
                 # Add the additional syst to the content #
                 for key in additional_syst.keys():
-                    logging.info(f"\t\t-> Adding systematic shape {catCfg['systName']}")
+                    logging.info(f'\t\t-> Adding systematic shape {key}')
                 self.content[cat][cls.group].update(additional_syst)
 
     def applyRegrouping(self):
-        logging.info('Applying Regrouping of categories')
+        logging.info('Applying regrouping of categories')
         self.checkForMissingNominals()
 
         # Initialize and checks #
@@ -1741,7 +1752,7 @@ class Datacard:
                             def fileChecker(f,idx):
                                 F = ROOT.TFile(f)
                                 valid = True
-                                if 'limit' not in [key.GetName() for key in F.GetListOfKeys()]:
+                                if not F.GetListOfKeys().FindObject('limit'):
                                     valid = False
                                     logging.debug(f'Tree limit not found in {f}')
                                 else:
@@ -1759,7 +1770,7 @@ class Datacard:
                             def fileChecker(f,idx):
                                 F = ROOT.TFile(f)
                                 valid = True
-                                if 'limit' not in [key.GetName() for key in F.GetListOfKeys()]:
+                                if not F.GetListOfKeys().FindObject('limit'):
                                     valid = False
                                     logging.debug(f'Tree limit not found in {f}')
                                 else:
@@ -1805,6 +1816,7 @@ class Datacard:
                                     arrayIds.append(str(idx))
                                 else:
                                     if not fileChecker(rootfile[0],idx):
+                                        #os.remove(rootfile[0])
                                         arrayIds.append(str(idx))
                         if arrayIds is None:
                             slurmCmd = f'sbatch {subScript}'
@@ -1972,10 +1984,11 @@ class Datacard:
                         for rootfile in glob.glob(os.path.join(subdirBin,'batch','output','*','higgs*root')):
                             if os.path.join(subdirBin,'batch','output','1','higgs') not in rootfile: # avoid taking data measurement in toys
                                 hadd_cmd.append(rootfile)
-                        rc = self.run_command(hadd_cmd)
-                        if rc != 0:
-                            raise RuntimeError(f"Hadd command `{' '.join(hadd_cmd)}` failed")
-                        logging.debug(f'Created {toys_file}')
+                        if len(hadd_cmd) > 2:
+                            rc = self.run_command(hadd_cmd)
+                            if rc != 0:
+                                raise RuntimeError(f"Hadd command `{' '.join(hadd_cmd)}` failed")
+                            logging.debug(f'Created {toys_file}')
                     if not os.path.exists(data_file):
                         rootfile = glob.glob(os.path.join(subdirBin,'batch','output','1','*root'))
                         if len(rootfile) != 1:
@@ -1986,8 +1999,11 @@ class Datacard:
                     # Inspect root files to get data and toys test statistics #
                     def getLimitValues(f):
                         F = ROOT.TFile(f)
-                        t = F.Get('limit')
-                        limits = [event.limit for event in t]
+                        if F.GetListOfKeys().FindObject('limit'):
+                            t = F.Get('limit')
+                            limits = [event.limit for event in t]
+                        else:
+                            limits = []
                         F.Close()
                         return limits
 
@@ -2259,7 +2275,7 @@ class Datacard:
                                'n_bins'     : 32,
                                'data'       : [],
                                'algorithm'  : 'saturated',
-                               'campaign'   : campaign}
+                               'campaign'   : 'run2'}
                     for subdirBinPath in subdirBinPaths:
                         path_json = os.path.join(subdirBinPath,'gof.json')
                         if not os.path.exists(path_json):
