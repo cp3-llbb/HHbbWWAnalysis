@@ -72,12 +72,11 @@ def parse_sacct(args):
                     statdf = partdf[partdf['status']==status]
                     arrays = pd.unique(statdf['array'])
                     for array in arrays:
-                        if "[" in array: 
-                            ps = subprocess.Popen(['squeue','-j',jobid,'-r','--noheader','--long'], stdout=subprocess.PIPE)
-                            outs,_ = ps.communicate()
-                            sup = len([o for o in outs.decode("utf-8").splitlines() if 'PENDING' in o and partition in o])
-                            num += sup -1
-                            N += sup -1
+                        ps = subprocess.Popen(['squeue','-j',jobid,'-r','--noheader','--long'], stdout=subprocess.PIPE)
+                        outs,_ = ps.communicate()
+                        sup = len([o for o in outs.decode("utf-8").splitlines() if 'PENDING' in o and partition in o])
+                        num += sup -1
+                        N += sup -1
                 try:
                     printout += "\t\t"+status.ljust(20,' ')+"{:5d}  [{:6.2f}%]\n".format(num,num/N*100)
                 except ZeroDivisionError:

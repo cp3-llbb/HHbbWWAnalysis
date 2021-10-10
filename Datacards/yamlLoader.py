@@ -47,8 +47,12 @@ class YMLIncludeLoader(yaml.SafeLoader):
             with open(filename, 'r') as f:
                 return yaml.load(f, YMLIncludeLoader)
         else:
-            return yaml.load({'filename':filename,'formatting':self._formatting}, 
-                             Loader=YMLIncludeLoader) 
+            try:
+                return yaml.load({'filename':filename,'formatting':self._formatting}, 
+                                 Loader=YMLIncludeLoader) 
+            except yaml.parser.ParserError as err:
+                logging.error(f'Parser error when loading file {filename}, see log below')
+                raise err
 
 YMLIncludeLoader.add_constructor('!include', YMLIncludeLoader.include)
 

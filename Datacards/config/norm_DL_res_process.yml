@@ -9,10 +9,10 @@ CMS_bbww_TT_norm:
 
 CMS_bbwwdl_top_norm_boost:
   hist: 
-   - HH_boosted_GGF
-   - HH_boosted_H
-   - HH_boosted_DY_VVV
-   - HH_boosted_other
+   - HH_DL_{mass}_boosted_GGF
+   - HH_DL_{mass}_boosted_H
+   - HH_DL_{mass}_boosted_DY_VVV
+   - HH_DL_{mass}_boosted_other
   proc: 
     - ST
     - TT

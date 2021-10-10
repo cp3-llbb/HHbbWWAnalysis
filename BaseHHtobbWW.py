@@ -130,6 +130,11 @@ One lepton and and one jet argument must be specified in addition to the require
                             type        = float,
                             default     = None,
                             help="Mass to use for the parametric DNN (can be several)")
+        parser.add_argument("--era", 
+                            action      = 'store',
+                            type        = int,
+                            default     = None,
+                            help="Era to be fed to the parametric DNN")
         parser.add_argument("--PrintYield", 
                             action      = "store_true",
                             default     = False,
@@ -371,7 +376,11 @@ One lepton and and one jet argument must be specified in addition to the require
                     subsetDict = yaml.load(handle,yaml.SafeLoader)
                 for sampleName,sampleCfg in subsetDict.items():
                     if self.args.analysis == 'res' and 'type' in sampleCfg.keys() and sampleCfg['type'] == 'signal':
+                        if 'mass' not in sampleCfg.keys():
+                            raise RuntimeError(f'Yaml config {item["config"]} sample {sampleName} does not have `mass` entry')
                         mass = float(re.findall('M-\d+',sampleName)[0].replace('M-',''))
+                        if float(mass) != float(sampleCfg['mass']):
+                            raise RuntimeError(f'Yaml config {item["config"]} sample {sampleName} have `mass` entry {sampleCfg["mass"]} but name tells {mass}')
                         if self.args.mass is not None and mass not in self.args.mass:
                             continue
                     samples[sampleName] = sampleCfg
@@ -389,14 +398,16 @@ One lepton and and one jet argument must be specified in addition to the require
     #-------------------------------------------------------------------------------------------#
     def readCounters(self, resultsFile):
         counters = super(BaseNanoHHtobbWW, self).readCounters(resultsFile)
-        # TH samples correction #
-        if 'generated_sum_corrected' in [key.GetName() for key in resultsFile.GetListOfKeys()]:
-            counters["genEventSumw_fixed"] = resultsFile.Get('generated_sum_corrected').GetBinContent(1)
+        # Corrections to the generated sum "
+        if resultsFile.GetListOfKeys().FindObject('generated_sum_corrected'):
+            sample = os.path.basename(resultsFile.GetName())
+            print (f'Sample {sample} : genEventSumw correction from {counters["genEventSumw"]:.3f} to {resultsFile.Get("generated_sum_corrected").GetBinContent(1):.3f}')
+            counters["genEventSumw"] = resultsFile.Get('generated_sum_corrected').GetBinContent(1)
         return counters
 
     def mergeCounters(self, outF, infileNames, sample=None):
         super(BaseNanoHHtobbWW, self).mergeCounters(outF, infileNames, sample)
-        if 'generated_sum_corrected' in [key.GetName() for key in outF.GetListOfKeys()]: # Main file
+        if outF.GetListOfKeys().FindObject('generated_sum_corrected'): # Main file 
             self.generated_sum_corrected = copy.deepcopy(outF.Get('generated_sum_corrected'))
         else: # All the additional files ("datadriven")
             if hasattr(self,'generated_sum_corrected'): 
@@ -425,6 +436,9 @@ One lepton and and one jet argument must be specified in addition to the require
                                                                                                  # will do Jet and MET variations, and not the Rochester correction
                                                                                backend       = ("lazy" if self.args.onlypost else self.args.backend))
     
+        # Plots in base that need to be propagated to the Plotters #
+        self.base_plots = []
+
 
         #----- Helper classes declaration ----#
         if self.args.analysis == "res":
@@ -436,16 +450,25 @@ One lepton and and one jet argument must be specified in addition to the require
         #----- CutFlow report -----#
         self.yields = CutFlowReport("yields",printInLog=self.args.PrintYield,recursive=self.args.PrintYield)
 
+
+        #----- Safeguards for signals -----#
+        if "HH" in sample:
+            noSel = noSel.refine('HHMCWeight',cut=[op.abs(tree.genWeight)<100])
+            if self.args.PrintYield:
+                self.yields.add(noSel)
+            # Correct the gen event weight sum #
+            self.base_plots.append(Plot.make1D("generated_sum_corrected",
+                                               op.c_float(0.5),
+                                               noSel,
+                                               EquidistantBinning(1,0.,1.),
+                                               weight=tree.genWeight, 
+                                               autoSyst=False))
+
         #----- Genweight -----#
         if self.is_MC:
             noSel = noSel.refine("genWeight", weight=tree.genWeight)
             if self.args.PrintYield:
                 self.yields.add(noSel)
-
-
-#        if self.args.PrintYield:
-#            noSel = noSel.refine("initial",cut=op.c_bool(True)) # To note start for the yield table printout
-#            self.yields.add(noSel)
 
         # Event cut #
         if self.args.Events:
@@ -453,12 +476,6 @@ One lepton and and one jet argument must be specified in addition to the require
             for e in self.args.Events:
                 print ('... %d'%e)
             noSel = noSel.refine('eventcut',cut = [op.OR(*[tree.event == e for e in self.args.Events])])
-            if self.args.PrintYield:
-                self.yields.add(noSel)
-
-        # Safeguards for signals #
-        if "HH" in sample:
-            noSel = noSel.refine('HHMCWeight',cut=[op.abs(tree.genWeight)<100])
             if self.args.PrintYield:
                 self.yields.add(noSel)
 
@@ -527,50 +544,63 @@ One lepton and and one jet argument must be specified in addition to the require
             #         ' [7] is renscfact=2d0 facscfact=1d0 ',         
             #         ' [8] is renscfact=2d0 facscfact=2d0 ']    
             # Clipping is done to avoid malicious files in ST samples
-            if hasattr(tree,"LHEScaleWeight"):
+            basicScaleWeight = op.systematic(op.c_float(1.),
+                                             name         = "ScaleWeight",
+                                             Factup       = op.c_float(1.),
+                                             Factdown     = op.c_float(1.),
+                                             Renormup     = op.c_float(1.),
+                                             Renormdown   = op.c_float(1.),
+                                             Mixedup      = op.c_float(1.),
+                                             Mixeddown    = op.c_float(1.),
+                                             Envelopeup   = op.c_float(1.),
+                                             Envelopedown = op.c_float(1.))
+            if sample.startswith('ST'): # Dropped because bugs in the LHE scale weights
+                self.scaleWeight = basicScaleWeight
+            elif hasattr(tree,"LHEScaleWeight"): # If has tree -> find the values
                 factor = 1.
                 if sample.startswith('DYToLL_0J') or sample.startswith('DYToLL_1J'):
                     # Bug of factor 0.5, see https://hypernews.cern.ch/HyperNews/CMS/get/generators/4383.html?inline=-1 (only in the "8" weights case)
                     factor = 2.
                 self.scaleWeight = op.multiSwitch((op.AND(op.rng_len(tree.LHEScaleWeight) == 9, tree.LHEScaleWeight[4] != 0.),
                                                                         op.systematic(op.c_float(1.),    #tree.LHEScaleWeight[4],
-                                                                                      name       = "ScaleWeight",
-                                                                                      Factup     = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[5]/tree.LHEScaleWeight[4])),
-                                                                                      Factdown   = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[3]/tree.LHEScaleWeight[4])),
-                                                                                      Renormup   = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[7]/tree.LHEScaleWeight[4])),
-                                                                                      Renormdown = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[1]/tree.LHEScaleWeight[4])),
-                                                                                      Mixedup    = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[8]/tree.LHEScaleWeight[4])),
-                                                                                      Mixeddown  = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[0]/tree.LHEScaleWeight[4])))),
-                                                                        
+                                                                                      name          = "ScaleWeight",
+                                                                                      Factup        = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[5]/tree.LHEScaleWeight[4])),
+                                                                                      Factdown      = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[3]/tree.LHEScaleWeight[4])),
+                                                                                      Renormup      = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[7]/tree.LHEScaleWeight[4])),
+                                                                                      Renormdown    = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[1]/tree.LHEScaleWeight[4])),
+                                                                                      Mixedup       = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[8]/tree.LHEScaleWeight[4])),
+                                                                                      Mixeddown     = op.min(op.c_float(10.),op.max(op.c_float(0.),tree.LHEScaleWeight[0]/tree.LHEScaleWeight[4])),
+                                                                                      Envelopeup    = op.min(op.c_float(10.),
+                                                                                                             op.max(op.max(op.max(tree.LHEScaleWeight[5]/tree.LHEScaleWeight[4], # Fact up 
+                                                                                                                                  tree.LHEScaleWeight[7]/tree.LHEScaleWeight[4]), # Renorm up
+                                                                                                                           tree.LHEScaleWeight[8]/tree.LHEScaleWeight[4]), # Mixed up
+                                                                                                                    op.c_float(0.))),
+                                                                                      Envelopedown  = op.max(op.c_float(0.),
+                                                                                                             op.min(op.min(op.min(tree.LHEScaleWeight[3]/tree.LHEScaleWeight[4], # Fact down
+                                                                                                                                  tree.LHEScaleWeight[1]/tree.LHEScaleWeight[4]), # Renorm down
+                                                                                                                           tree.LHEScaleWeight[0]/tree.LHEScaleWeight[4]), # Mixed own 
+                                                                                                                    op.c_float(10.))))),
                                                   (op.rng_len(tree.LHEScaleWeight) == 8, 
-                                                               op.systematic(op.c_float(1.),
-                                                                             name       = "ScaleWeight",
-                                                                             Factup     = factor * tree.LHEScaleWeight[4],
-                                                                             Factdown   = factor * tree.LHEScaleWeight[3],
-                                                                             Renormup   = factor * tree.LHEScaleWeight[6],
-                                                                             Renormdown = factor * tree.LHEScaleWeight[1],
-                                                                             Mixedup    = factor * tree.LHEScaleWeight[7],
-                                                                             Mixeddown  = factor * tree.LHEScaleWeight[0])),
-                                                  op.systematic(op.c_float(1.),
-                                                                name       = "ScaleWeight",
-                                                                Factup     = op.c_float(1.),
-                                                                Factdown   = op.c_float(1.),
-                                                                Renormup   = op.c_float(1.),
-                                                                Renormdown = op.c_float(1.),
-                                                                Mixedup    = op.c_float(1.),
-                                                                Mixeddown  = op.c_float(1.)))
+                                                              op.systematic(op.c_float(1.),
+                                                                            name         = "ScaleWeight",
+                                                                            Factup       = factor * tree.LHEScaleWeight[4],
+                                                                            Factdown     = factor * tree.LHEScaleWeight[3],
+                                                                            Renormup     = factor * tree.LHEScaleWeight[6],
+                                                                            Renormdown   = factor * tree.LHEScaleWeight[1],
+                                                                            Mixedup      = factor * tree.LHEScaleWeight[7],
+                                                                            Mixeddown    = factor * tree.LHEScaleWeight[0],
+                                                                            Envelopeup   = op.max(op.max(factor * tree.LHEScaleWeight[4],    # Fact up
+                                                                                                         factor * tree.LHEScaleWeight[6]),    # Renorm up
+                                                                                                  factor * tree.LHEScaleWeight[7]),   # Mixed up
+                                                                            Envelopedown = op.min(op.min(factor * tree.LHEScaleWeight[3],    # Fact down
+                                                                                                         factor * tree.LHEScaleWeight[1]),    # Renorm down
+                                                                                                  factor * tree.LHEScaleWeight[0]))), # Mixed down
+                                                  basicScaleWeight)
 
                                                                                                  
-            else:
-                self.scaleWeight = op.systematic(op.c_float(1.),
-                                                 name       = "ScaleWeight",
-                                                 Factup     = op.c_float(1.),
-                                                 Factdown   = op.c_float(1.),
-                                                 Renormup   = op.c_float(1.),
-                                                 Renormdown = op.c_float(1.),
-                                                 Mixedup    = op.c_float(1.),
-                                                 Mixeddown  = op.c_float(1.))
-
+            else: # No tree -> use 1
+                self.scaleWeight = basicScaleWeight
+                                          
             noSel = noSel.refine("PDFScaleWeights", weight = [self.scaleWeight])
             if self.args.PrintYield:
                 self.yields.add(noSel)
@@ -932,7 +962,6 @@ One lepton and and one jet argument must be specified in addition to the require
         self.era = era
         self.tree = t
 
-        self.base_plots = []
 
         ###########################################################################
         #                              Pseudo-data                                #
@@ -1070,7 +1099,7 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                            Pre-firing rates                               #
         #############################################################################
-        if era in ["2016","2017"] and self.is_MC:
+        if era in ["2016","2017"] and self.is_MC and hasattr(t,'L1PreFiringWeight_Nom'):
             self.L1Prefiring = op.systematic(t.L1PreFiringWeight_Nom,
                                              name = "L1PreFiring",
                                              up   = t.L1PreFiringWeight_Up,

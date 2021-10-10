@@ -5,43 +5,43 @@ singleH: &singleH [ggH_hbb,ggH_hgg,ggH_hmm,ggH_htt,ggH_hww,ggH_hzz,qqH_hbb,qqH_h
 backgrounds : &back [TT,ST,DY,WJets,VV,VVV,Other_bbWW,Fakes,ggH_hbb,ggH_hgg,ggH_hmm,ggH_htt,ggH_hww,ggH_hzz,qqH_hbb,qqH_hgg,qqH_hmm,qqH_htt,qqH_hww,qqH_hzz,ttH_hbb,ttH_hww,WH_hbb,ZH_hbb,ZH_htt,ZH_hww,SM H_hww,SM H_hww,VH_hww]
 
 
-HH_resolved1b_GGF:
+HH_DL_resolved1b_GGF:
   method : threshold 
   params : [*thresh,*back,[TT,ST,DY]]
-HH_resolved2b_GGF:
+HH_DL_resolved2b_GGF:
   method : threshold 
   params : [*thresh,*back,[TT,ST,DY]]
-HH_boosted_GGF:
-  method : threshold 
-  params : [*thresh,*back,[TT,ST,DY]]
-
-HH_resolved1b_VBF:
-  method : threshold 
-  params : [*thresh,*back,[TT,ST,DY]]
-HH_resolved2b_VBF:
-  method : threshold 
-  params : [*thresh,*back,[TT,ST,DY]]
-HH_boosted_VBF:
+HH_DL_boosted_GGF:
   method : threshold 
   params : [*thresh,*back,[TT,ST,DY]]
 
-HH_resolved2b_H:
+HH_DL_resolved1b_VBF:
+  method : threshold 
+  params : [*thresh,*back,[TT,ST,DY]]
+HH_DL_resolved2b_VBF:
+  method : threshold 
+  params : [*thresh,*back,[TT,ST,DY]]
+HH_DL_boosted_VBF:
+  method : threshold 
+  params : [*thresh,*back,[TT,ST,DY]]
+
+HH_DL_resolved2b_H:
   method : quantile
   params : [*quant, *back]
-HH_resolved1b_H:
+HH_DL_resolved1b_H:
   method : quantile
   params : [*quant, *back]
-HH_boosted_H:
+HH_DL_boosted_H:
   method : quantile
   params : [*quant, *back]
 
-HH_resolved_DY_VVV:
+HH_DL_resolved_DY_VVV:
   method : quantile
   params : [*quant, [DY,VV,VVV]]
-HH_boosted_DY_VVV:
+HH_DL_boosted_DY_VVV:
   method : quantile
   params : [*quant, [DY,VV,VVV]]
-HH_inclusive_other:
+HH_DL_inclusive_other:
   method : quantile
   params : [*quant, [TT,ST,WJets,Other_bbWW]]
 

@@ -15,6 +15,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-250:
   order: 10
   type: signal
   hide: True
+  mass: 250
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-260:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -28,6 +29,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-260:
   order: 10
   type: signal
   hide: True
+  mass: 260
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-270:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -41,6 +43,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-270:
   order: 10
   type: signal
   hide: True
+  mass: 270
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-280:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -54,6 +57,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-280:
   order: 10
   type: signal
   hide: True
+  mass: 280
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-300:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -67,6 +71,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-300:
   order: 10
   type: signal
   hide: True
+  mass: 300
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-320:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -80,6 +85,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-320:
   order: 10
   type: signal
   hide: True
+  mass: 320
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-350:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -93,6 +99,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-350:
   order: 10
   type: signal
   hide: True
+  mass: 350
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-400:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -106,6 +113,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-400:
   order: 10
   type: signal
   hide: True
+  mass: 400
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-450:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -119,6 +127,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-450:
   order: 10
   type: signal
   hide: True
+  mass: 450
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-500:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -132,6 +141,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-500:
   order: 10
   type: signal
   hide: True
+  mass: 500
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-550:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -145,6 +155,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-550:
   order: 10
   type: signal
   hide: True
+  mass: 550
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-600:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -158,6 +169,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-600:
   order: 10
   type: signal
   hide: True
+  mass: 600
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-650:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -171,6 +183,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-650:
   order: 10
   type: signal
   hide: True
+  mass: 650
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-700:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -184,6 +197,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-700:
   order: 10
   type: signal
   hide: True
+  mass: 700
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-750:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -197,6 +211,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-750:
   order: 10
   type: signal
   hide: True
+  mass: 750
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-800:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -210,6 +225,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-800:
   order: 10
   type: signal
   hide: True
+  mass: 800
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-850:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -223,6 +239,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-850:
   order: 10
   type: signal
   hide: True
+  mass: 850
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-900:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -236,6 +253,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-900:
   order: 10
   type: signal
   hide: True
+  mass: 900
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1000:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -249,6 +267,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1000:
   order: 10
   type: signal
   hide: True
+  mass: 1000
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1250:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -262,6 +281,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1250:
   order: 10
   type: signal
   hide: True
+  mass: 1250
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1500:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -275,6 +295,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1500:
   order: 10
   type: signal
   hide: True
+  mass: 1500
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1750:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -288,6 +309,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1750:
   order: 10
   type: signal
   hide: True
+  mass: 1750
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-2000:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -301,6 +323,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-2000:
   order: 10
   type: signal
   hide: True
+  mass: 2000
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-2500:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -314,6 +337,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-2500:
   order: 10
   type: signal
   hide: True
+  mass: 2500
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-3000:
   cross-section: 1.
   branching-ratio: 0.109369082142029
@@ -327,4 +351,5 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-3000:
   order: 10
   type: signal
   hide: True
+  mass: 3000
 
