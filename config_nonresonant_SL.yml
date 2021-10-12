@@ -13,6 +13,6 @@ args:
       - Resolved2B: "--Resolved2Btag"
       - Boosted:  "--Boosted"
   - "--datadriven=FakeExtrapolation"
-  - "--NoSystematics"
+  #- "--NoSystematics"
  
-output: /nfs/scratch/fynu/gsaha/PlotNoSyst2018SL/full{era}NanoV7_TTHIDLoose_Fake_DNNSL01_{cat}/
+output: /nfs/scratch/fynu/gsaha/PlotNoSyst2018SL_Debug/full{era}NanoV7_TTHIDLoose_Fake_DNNSL01_{cat}/

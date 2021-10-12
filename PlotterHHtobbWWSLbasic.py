@@ -324,7 +324,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             lepton       = leptonCont[channel]
             vbf          = selObjectDict['VBFJets']
             inputsLeps   = mvaEvaluatorSL_nonres.returnLeptonsMVAInputs   (self  = self, lep  = lepton)
-            inputsJets   = mvaEvaluatorSL_nonres.returnJetsMVAInputs      (self  = self, jets = self.ak4Jets)
+            inputsJets   = mvaEvaluatorSL_nonres.returnJetsMVAInputs      (self  = self, bjets = self.bJetsByScore, jets = self.probableWJets)
             inputsMET    = mvaEvaluatorSL_nonres.returnMETMVAInputs       (self  = self, met  = self.corrMET)
             inputsFatjet = mvaEvaluatorSL_nonres.returnFatjetMVAInputs    (self  = self, fatjets = self.ak8Jets)
             inputsHL     = mvaEvaluatorSL_nonres.returnHighLevelMVAInputs (self  = self,
@@ -344,6 +344,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             print ("Param variables  : %d"%len(inputsParam)) 
             print ("Event variables  : %d"%len(inputsEventNr))
             
+            '''
             plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLeps))
             plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets)) 
             plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))
@@ -351,7 +352,8 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL)) 
             plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam)) 
             plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsEventNr))
-            
+            '''
+
             from  mvaEvaluatorSL_nonres import inputStaticCast
 
             inputs = [op.array("double",*inputStaticCast(inputsLeps,"float")),
@@ -373,9 +375,7 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             if self.args.PrintYield:
                 for selNode in selObjNodesDict.values():
                     self.yields.add(selNode.sel)
-
             
-
         #----- Add the Yield plots -----#
         if self.args.PrintYield or self.args.OnlyYield:
             plots.append(self.yields)

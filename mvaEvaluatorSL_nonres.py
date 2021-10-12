@@ -6,40 +6,40 @@ def returnLeptonsMVAInputs(self,lep):
             ('lep_Px',       'Lead lepton P_x [GeV]',        (40,-200.,200.))     : lep.p4.Px(),
             ('lep_Py',       'Lead lepton P_y [GeV]',        (40,-200.,200.))     : lep.p4.Py(),
             ('lep_Pz',       'Lead lepton P_z [GeV]',        (40,-200.,200.))     : lep.p4.Pz(),
-            ('lep_charge',   'Lead lepton charge',           (2,0.,2.)   )        : lep.charge,
-            ('lep_pdgId',    'Lead lepton pdg ID',           (45,-22.,22.) )      : lep.pdgId}
+            ('lep_pdgId',    'Lead lepton pdg ID',           (45,-22.,22.) )      : lep.pdgId,
+            ('lep_charge',   'Lead lepton charge',           (2,0.,2.)   )        : lep.charge}
 
-def returnJetsMVAInputs(self,jets):
-    return {('j1_E',        'Lead jet E [GeV]',             (50,0.,500.))        : op.switch(op.rng_len(jets)>0,jets[0].p4.E(),op.c_float(0.)),
-            ('j1_Px',       'Lead jet P_x [GeV]',           (40,-200.,200.))     : op.switch(op.rng_len(jets)>0,jets[0].p4.Px(),op.c_float(0.)),
-            ('j1_Py',       'Lead jet P_y [GeV]',           (40,-200.,200.))     : op.switch(op.rng_len(jets)>0,jets[0].p4.Py(),op.c_float(0.)),
-            ('j1_Pz',       'Lead jet P_z [GeV]',           (40,-200.,200.))     : op.switch(op.rng_len(jets)>0,jets[0].p4.Pz(),op.c_float(0.)),
-            ('j1_btag',     'Lead jet btag score',          (50,0.,1.)  )        : op.switch(op.rng_len(jets)>0,jets[0].btagDeepFlavB,op.c_float(0.)),
-            ('j2_E',        'Sublead jet E [GeV]',          (50,0.,500.))        : op.switch(op.rng_len(jets)>1,jets[1].p4.E(),op.c_float(0.)),
-            ('j2_Px',       'Sublead jet P_x [GeV]',        (40,-200.,200.))     : op.switch(op.rng_len(jets)>1,jets[1].p4.Px(),op.c_float(0.)),
-            ('j2_Py',       'Sublead jet P_y [GeV]',        (40,-200.,200.))     : op.switch(op.rng_len(jets)>1,jets[1].p4.Py(),op.c_float(0.)),
-            ('j2_Pz',       'Sublead jet P_z [GeV]',        (40,-200.,200.))     : op.switch(op.rng_len(jets)>1,jets[1].p4.Pz(),op.c_float(0.)),
-            ('j2_btag',     'Sublead jet btag score',       (50,0.,1.)  )        : op.switch(op.rng_len(jets)>1,jets[1].btagDeepFlavB,op.c_float(0.)),
-            ('j3_E',        'Subsublead jet E [GeV]',       (50,0.,500.))        : op.switch(op.rng_len(jets)>2,jets[2].p4.E(),op.c_float(0.)),
-            ('j3_Px',       'Subsublead jet P_x [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>2,jets[2].p4.Px(),op.c_float(0.)),
-            ('j3_Py',       'Subsublead jet P_y [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>2,jets[2].p4.Py(),op.c_float(0.)),
-            ('j3_Pz',       'Subsublead jet P_z [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>2,jets[2].p4.Pz(),op.c_float(0.)),
-            ('j3_btag',     'Subsublead jet btag score',    (50,0.,1.)  )        : op.switch(op.rng_len(jets)>2,jets[2].btagDeepFlavB,op.c_float(0.)),
-            ('j4_E',        'Subsubsublead jet E [GeV]',    (50,0.,500.))        : op.switch(op.rng_len(jets)>3,jets[3].p4.E(),op.c_float(0.)),
-            ('j4_Px',       'Subsubsublead jet P_x [GeV]',  (40,-200.,200.))     : op.switch(op.rng_len(jets)>3,jets[3].p4.Px(),op.c_float(0.)),
-            ('j4_Py',       'Subsubsublead jet P_y [GeV]',  (40,-200.,200.))     : op.switch(op.rng_len(jets)>3,jets[3].p4.Py(),op.c_float(0.)),
-            ('j4_Pz',       'Subsubsublead jet P_z [GeV]',  (40,-200.,200.))     : op.switch(op.rng_len(jets)>3,jets[3].p4.Pz(),op.c_float(0.)),
-            ('j4_btag',     'Subsubsublead jet btag score', (50,0.,1.)  )        : op.switch(op.rng_len(jets)>3,jets[3].btagDeepFlavB,op.c_float(0.)),
-            ('j5_E',        'Subsublead jet E [GeV]',       (50,0.,500.))        : op.switch(op.rng_len(jets)>4,jets[4].p4.E(),op.c_float(0.)),
-            ('j5_Px',       'Subsublead jet P_x [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>4,jets[4].p4.Px(),op.c_float(0.)),
-            ('j5_Py',       'Subsublead jet P_y [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>4,jets[4].p4.Py(),op.c_float(0.)),
-            ('j5_Pz',       'Subsublead jet P_z [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>4,jets[4].p4.Pz(),op.c_float(0.)),
-            ('j5_btag',     'Subsublead jet btag score',    (50,0.,1.)  )        : op.switch(op.rng_len(jets)>4,jets[4].btagDeepFlavB,op.c_float(0.)),
-            ('j6_E',        'Subsublead jet E [GeV]',       (50,0.,500.))        : op.switch(op.rng_len(jets)>5,jets[5].p4.E(),op.c_float(0.)),
-            ('j6_Px',       'Subsublead jet P_x [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>5,jets[5].p4.Px(),op.c_float(0.)),
-            ('j6_Py',       'Subsublead jet P_y [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>5,jets[5].p4.Py(),op.c_float(0.)),
-            ('j6_Pz',       'Subsublead jet P_z [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>5,jets[5].p4.Pz(),op.c_float(0.)),
-            ('j6_btag',     'Subsublead jet btag score',    (50,0.,1.)  )        : op.switch(op.rng_len(jets)>5,jets[5].btagDeepFlavB,op.c_float(0.))}
+def returnJetsMVAInputs(self, bjets, jets):
+    return {('j1_E',        'Lead jet E [GeV]',             (50,0.,500.))        : op.switch(op.rng_len(bjets)>0,bjets[0].p4.E(),op.c_float(0.)),
+            ('j1_Px',       'Lead jet P_x [GeV]',           (40,-200.,200.))     : op.switch(op.rng_len(bjets)>0,bjets[0].p4.Px(),op.c_float(0.)),
+            ('j1_Py',       'Lead jet P_y [GeV]',           (40,-200.,200.))     : op.switch(op.rng_len(bjets)>0,bjets[0].p4.Py(),op.c_float(0.)),
+            ('j1_Pz',       'Lead jet P_z [GeV]',           (40,-200.,200.))     : op.switch(op.rng_len(bjets)>0,bjets[0].p4.Pz(),op.c_float(0.)),
+            ('j1_btag',     'Lead jet btag score',          (50,0.,1.)  )        : op.switch(op.rng_len(bjets)>0,bjets[0].btagDeepFlavB,op.c_float(0.)),
+            ('j2_E',        'Sublead jet E [GeV]',          (50,0.,500.))        : op.switch(op.rng_len(bjets)>1,bjets[1].p4.E(),op.c_float(0.)),
+            ('j2_Px',       'Sublead jet P_x [GeV]',        (40,-200.,200.))     : op.switch(op.rng_len(bjets)>1,bjets[1].p4.Px(),op.c_float(0.)),
+            ('j2_Py',       'Sublead jet P_y [GeV]',        (40,-200.,200.))     : op.switch(op.rng_len(bjets)>1,bjets[1].p4.Py(),op.c_float(0.)),
+            ('j2_Pz',       'Sublead jet P_z [GeV]',        (40,-200.,200.))     : op.switch(op.rng_len(bjets)>1,bjets[1].p4.Pz(),op.c_float(0.)),
+            ('j2_btag',     'Sublead jet btag score',       (50,0.,1.)  )        : op.switch(op.rng_len(bjets)>1,bjets[1].btagDeepFlavB,op.c_float(0.)),
+            ('j3_E',        'Subsublead jet E [GeV]',       (50,0.,500.))        : op.switch(op.rng_len(jets)>0,jets[0].p4.E(),op.c_float(0.)),
+            ('j3_Px',       'Subsublead jet P_x [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>0,jets[0].p4.Px(),op.c_float(0.)),
+            ('j3_Py',       'Subsublead jet P_y [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>0,jets[0].p4.Py(),op.c_float(0.)),
+            ('j3_Pz',       'Subsublead jet P_z [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>0,jets[0].p4.Pz(),op.c_float(0.)),
+            ('j3_btag',     'Subsublead jet btag score',    (50,0.,1.)  )        : op.switch(op.rng_len(jets)>0,jets[0].btagDeepFlavB,op.c_float(0.)),
+            ('j4_E',        'Subsubsublead jet E [GeV]',    (50,0.,500.))        : op.switch(op.rng_len(jets)>1,jets[1].p4.E(),op.c_float(0.)),
+            ('j4_Px',       'Subsubsublead jet P_x [GeV]',  (40,-200.,200.))     : op.switch(op.rng_len(jets)>1,jets[1].p4.Px(),op.c_float(0.)),
+            ('j4_Py',       'Subsubsublead jet P_y [GeV]',  (40,-200.,200.))     : op.switch(op.rng_len(jets)>1,jets[1].p4.Py(),op.c_float(0.)),
+            ('j4_Pz',       'Subsubsublead jet P_z [GeV]',  (40,-200.,200.))     : op.switch(op.rng_len(jets)>1,jets[1].p4.Pz(),op.c_float(0.)),
+            ('j4_btag',     'Subsubsublead jet btag score', (50,0.,1.)  )        : op.switch(op.rng_len(jets)>1,jets[1].btagDeepFlavB,op.c_float(0.)),
+            ('j5_E',        'Subsublead jet E [GeV]',       (50,0.,500.))        : op.switch(op.rng_len(jets)>2,jets[2].p4.E(),op.c_float(0.)),
+            ('j5_Px',       'Subsublead jet P_x [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>2,jets[2].p4.Px(),op.c_float(0.)),
+            ('j5_Py',       'Subsublead jet P_y [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>2,jets[2].p4.Py(),op.c_float(0.)),
+            ('j5_Pz',       'Subsublead jet P_z [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>2,jets[2].p4.Pz(),op.c_float(0.)),
+            ('j5_btag',     'Subsublead jet btag score',    (50,0.,1.)  )        : op.switch(op.rng_len(jets)>2,jets[2].btagDeepFlavB,op.c_float(0.)),
+            ('j6_E',        'Subsublead jet E [GeV]',       (50,0.,500.))        : op.switch(op.rng_len(jets)>3,jets[3].p4.E(),op.c_float(0.)),
+            ('j6_Px',       'Subsublead jet P_x [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>3,jets[3].p4.Px(),op.c_float(0.)),
+            ('j6_Py',       'Subsublead jet P_y [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>3,jets[3].p4.Py(),op.c_float(0.)),
+            ('j6_Pz',       'Subsublead jet P_z [GeV]',     (40,-200.,200.))     : op.switch(op.rng_len(jets)>3,jets[3].p4.Pz(),op.c_float(0.)),
+            ('j6_btag',     'Subsublead jet btag score',    (50,0.,1.)  )        : op.switch(op.rng_len(jets)>3,jets[3].btagDeepFlavB,op.c_float(0.))}
 
 # this is the leading fat bJet or normal fat jet?
 def returnFatjetMVAInputs(self,fatjets):
@@ -146,4 +146,3 @@ def returnEventNr(self,t):
 def inputStaticCast(inputDict,cast='float'):
     return [op.static_cast(cast,v) for v in inputDict.values()]
 '''
-    

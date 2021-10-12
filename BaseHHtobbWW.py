@@ -1105,9 +1105,9 @@ One lepton and and one jet argument must be specified in addition to the require
                 self.yields.add(noSel)
 
         # MET corrections #
+        #self.corrMET = t.MET if era != "2017" else t.METFixEE2017
         self.rawMET = t.MET if era != "2017" else t.METFixEE2017
         self.corrMET = METcorrection(self.rawMET,t.PV,sample,era,self.is_MC) 
-
 
         #############################################################################
         #                      Lepton Lambdas Variables                             #
@@ -1473,9 +1473,7 @@ One lepton and and one jet argument must be specified in addition to the require
         self.ak8BJets = op.select(self.ak8Jets, self.lambda_ak8Btag)
         self.ak8nonBJets = op.select(self.ak8Jets, self.lambda_ak8noBtag)
         # Ak4 Jet Collection cleaned from Ak8b #
-        #self.lambda_cleanAk4FromAk8b = lambda ak4j : op.NOT(op.AND(op.rng_len(self.ak8BJets) > 0, op.deltaR(ak4j.p4,self.ak8BJets[0].p4) <= 0.8))
         self.lambda_cleanAk4FromAk8b = lambda ak4j : op.AND(op.rng_len(self.ak8BJets) > 0, op.deltaR(ak4j.p4,self.ak8BJets[0].p4) > 1.2)
-        #self.ak4JetsCleanedFromAk8b  = op.select(self.ak4LightJetsByPt, self.lambda_cleanAk4FromAk8b)
         self.ak4JetsCleanedFromAk8b  = op.select(self.ak4Jets, self.lambda_cleanAk4FromAk8b)
         
         # used as a BDT input for SemiBoosted category
@@ -1546,7 +1544,7 @@ One lepton and and one jet argument must be specified in addition to the require
             # Efficiency and mistags do not have uncertainties, the systematics are in the SF 
             self.jetpuid_mc_eff = self.SF.get_scalefactor("lepton", ('jet_puid_eff','eff_{}_L'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer))
             self.jetpuid_mc_mis = self.SF.get_scalefactor("lepton", ('jet_puid_eff','mistag_{}_L'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer))
-                # Eff and mistag do not have systematics, only the SF do
+            # Eff and mistag do not have systematics, only the SF do
             self.jetpuid_sf_eff = self.SF.get_scalefactor("lepton", ('jet_puid_sf','eff_{}_L'.format(era)),combine="weight", systName="jetpuid_eff", defineOnFirstUse=(not forSkimmer))
             self.jetpuid_sf_mis = self.SF.get_scalefactor("lepton", ('jet_puid_sf','mistag_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag", defineOnFirstUse=(not forSkimmer))
 
