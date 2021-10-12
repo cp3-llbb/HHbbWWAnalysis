@@ -4,6 +4,7 @@ qqHH_CV_0p5_C2V_1_kl_1_hbbhwwdl:
   type: mc
   legend: HH bbWW VBF (CV 0.5 - C2V 1 - C3 1) 
   order: 14
+  hide: True
   line-color: '#fc0505'
   line-type: 1
   files:
@@ -12,6 +13,7 @@ qqHH_CV_1p5_C2V_1_kl_1_hbbhwwdl:
   type: mc
   legend: HH bbWW VBF (CV 1.5 - C2V 1 - C3 1) 
   order: 14
+  hide: True
   line-color: '#fc0505'
   line-type: 1
   files:
@@ -20,6 +22,7 @@ qqHH_CV_1_C2V_0_kl_1_hbbhwwdl:
   type: mc
   legend: HH bbWW VBF (CV 1 - C2V 0 - C3 1) 
   order: 14
+  hide: True
   line-color: '#fc0505'
   line-type: 1
   files:
@@ -28,6 +31,7 @@ qqHH_CV_1_C2V_1_kl_0_hbbhwwdl:
   type: mc
   legend: HH bbWW VBF (CV 1 - C2V 1 - C3 0) 
   order: 14
+  hide: True
   line-color: '#fc0505'
   line-type: 1
   files:
@@ -36,6 +40,7 @@ qqHH_CV_1_C2V_1_kl_1_hbbhwwdl:
   type: mc
   legend: HH bbWW VBF (CV 1 - C2V 1 - C3 1) 
   order: 14
+  hide: True
   line-color: '#fc0505'
   line-type: 1
   files:
@@ -44,6 +49,7 @@ qqHH_CV_1_C2V_1_kl_2_hbbhwwdl:
   type: mc
   legend: HH bbWW VBF (CV 1 - C2V 1 - C3 2) 
   order: 14
+  hide: True
   line-color: '#fc0505'
   line-type: 1
   files:
@@ -52,6 +58,7 @@ qqHH_CV_1_C2V_2_kl_1_hbbhwwdl:
   type: mc
   legend: HH bbWW VBF (CV 1 - C2V 2 - C3 1) 
   order: 14
+  hide: True
   line-color: '#fc0505'
   line-type: 1
   files:
@@ -62,6 +69,7 @@ qqHH_CV_0p5_C2V_1_kl_1_hbbhtt:
   type: mc
   legend: HH bb#tau#tau VBF (CV 0.5 - C2V 1 - C3 1) 
   order: 14
+  hide: True
   line-color: '#fc0505'
   line-type: 1
   files:
@@ -70,6 +78,7 @@ qqHH_CV_1p5_C2V_1_kl_1_hbbhtt:
   type: mc
   legend: HH bb#tau#tau VBF (CV 1.5 - C2V 1 - C3 1) 
   order: 14
+  hide: True
   line-color: '#fc0505'
   line-type: 1
   files:
@@ -78,6 +87,7 @@ qqHH_CV_1_C2V_0_kl_1_hbbhtt:
   type: mc
   legend: HH bb#tau#tau VBF (CV 1 - C2V 0 - C3 1) 
   order: 14
+  hide: True
   line-color: '#fc0505'
   line-type: 1
   files:
@@ -86,6 +96,7 @@ qqHH_CV_1_C2V_1_kl_0_hbbhtt:
   type: mc
   legend: HH bb#tau#tau VBF (CV 1 - C2V 1 - C3 0) 
   order: 14
+  hide: True
   line-color: '#fc0505'
   line-type: 1
   files:
@@ -94,6 +105,7 @@ qqHH_CV_1_C2V_1_kl_1_hbbhtt:
   type: mc
   legend: HH bb#tau#tau VBF (CV 1 - C2V 1 - C3 1) 
   order: 14
+  hide: True
   line-color: '#fc0505'
   line-type: 1
   files:
@@ -102,6 +114,7 @@ qqHH_CV_1_C2V_1_kl_2_hbbhtt:
   type: mc
   legend: HH bb#tau#tau VBF (CV 1 - C2V 1 - C3 2) 
   order: 14
+  hide: True
   line-color: '#fc0505'
   line-type: 1
   files:
@@ -110,6 +123,7 @@ qqHH_CV_1_C2V_2_kl_1_hbbhtt:
   type: mc
   legend: HH bb#tau#tau VBF (CV 1 - C2V 2 - C3 1) 
   order: 14
+  hide: True
   line-color: '#fc0505'
   line-type: 1
   files:

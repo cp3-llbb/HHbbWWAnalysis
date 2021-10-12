@@ -3,7 +3,7 @@ path:
 - /nfs/scratch/fynu/gsaha/Sync_Aachen/PlotOutWithFullSyst2018_Resolved1B
 - /nfs/scratch/fynu/gsaha/Sync_Aachen/PlotOutWithFullSyst2018_Resolved2B
 
-outputDir: datacards/datacard_fit_NonResonant_SL_DNN001_2018
+outputDir: /home/ucl/cp3/fbury/scratch/Datacards/datacard_fit_NonResonant_SL_DNN001_2018
 
 use_syst: True
 

@@ -49,6 +49,9 @@ samples:
     # TTToHadronic (For SL fake non closure) #
   - config: analysis2016_v7_TTHadronic.yml
     keys: tt
+    # GRAVITON 2018 for 2016 #
+  - config: analysis2016_v7_bbww2l_graviton_from_2018.yml
+    keys: [bbww2l,graviton_fix]
 
   
 datadriven: !include datadriven.yml

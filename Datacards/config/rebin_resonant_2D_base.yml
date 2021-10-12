@@ -1,4 +1,4 @@
-HH_resolved1b_GGF:
+HH_DL_resolved1b_GGF:
   method: rebinlinearize2d
   params: 
     - y
@@ -7,7 +7,7 @@ HH_resolved1b_GGF:
     - Threshold
     - [*thresh,[TT,ST,DY],3,0.3]
     - [ggHH_M_base_hbbhwwdl,ggHH_M_base_hbbhtt]
-HH_resolved2b_GGF:
+HH_DL_resolved2b_GGF:
   method: rebinlinearize2d
   params: 
     - y
@@ -16,7 +16,7 @@ HH_resolved2b_GGF:
     - Threshold
     - [*thresh,[TT,ST,DY],3,0.3]
     - [ggHH_M_base_hbbhwwdl,ggHH_M_base_hbbhtt]
-HH_boosted_GGF:
+HH_DL_boosted_GGF:
   method: rebinlinearize2d
   params: 
     - y
@@ -27,23 +27,23 @@ HH_boosted_GGF:
     - [ggHH_M_base_hbbhwwdl,ggHH_M_base_hbbhtt]
 
 
-HH_resolved2b_H:
+HH_DL_resolved2b_H:
   method : quantile
   params : [*quant, *back]
-HH_resolved1b_H:
+HH_DL_resolved1b_H:
   method : quantile
   params : [*quant, *back]
-HH_boosted_H:
+HH_DL_boosted_H:
   method : quantile
   params : [[0.,0.33,0.66,1.], *back]
 
-HH_resolved_DY_VVV:
+HH_DL_resolved_DY_VVV:
   method : quantile
   params : [*quant, *back]
-HH_boosted_DY_VVV:
+HH_DL_boosted_DY_VVV:
   method : quantile
   params : [*quant, *back]
-HH_inclusive_other:
+HH_DL_inclusive_other:
   method : quantile
   params : [*quant, *back]
 

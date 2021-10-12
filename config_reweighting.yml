@@ -6,9 +6,7 @@ config:
     - 2018: Yaml/analysis2018_v7.yml
 
 args:
-  - --subset=bbtautau,bbww2l,bbww1l,GGFLO,GGFNLO
-  - weight:
-    - Histograms : ""
-    - ReweightedHistograms : "--reweighting"
-      
-output: /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/Signal{weight}_{era}
+  - "--subset=bbww1l,bbww2l,bbtautau,GGFLO,GGFNLO"
+ 
+output: /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/SignalHistograms_{era}_v2
+

@@ -1,5 +1,4 @@
-module: SkimmerHHtobbWWHME.py:SkimmerHME
-
+module: SkimmerHHtobbWWDL.py:SkimmerNanoHHtobbWWDL
 config: 
   era:
 #    - 2016: Yaml/analysis2016_v7.yml
@@ -7,7 +6,9 @@ config:
     - 2018: Yaml/analysis2018_v7.yml
 
 args:
-  - --subset=mc,data,bbww2l,bbtautau,graviton,radion
+  - type:
+    - background: --subset=mc
+    - signal:     --subset=bbww2l,bbtautau,graviton,radion
   - cat:
     - Resolved1B: --Resolved1Btag
     - Resolved2B: --Resolved2Btag
@@ -16,11 +17,7 @@ args:
     - ElEl: --Channel=ElEl
     - MuMu: --Channel=MuMu
     - ElMu: --Channel=ElMu
-  - type:   
-    - "SR" : "" 
-    - "FakeCR": "--FakeCR"
-    - "DYCR"  : "--DYCR"
   - --NoSystematics
   - --analysis=res
 
-output: /nfs/scratch/fynu/gsaha/SkimsHME/Skim{era}_{cat}_{channel}_{type}
+output: /home/ucl/cp3/fbury/scratch/SkimsHHbbWWResonant/Skim{era}_{type}_{cat}_{channel}

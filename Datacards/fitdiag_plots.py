@@ -4,6 +4,7 @@ import os
 import math
 import ROOT
 import logging
+import ctypes
 from collections import OrderedDict
 
 
@@ -485,22 +486,32 @@ def process_data_histo(
         bin_width = 1.0
         if divideByBinWidth:
             bin_width = histtotal.GetXaxis().GetBinWidth(ii + 1)
-        xp = ROOT.Double()
-        yp = ROOT.Double()
+        xp = ctypes.c_double(0.)
+        yp = ctypes.c_double(0.)
+        #xp = ROOT.Double()
+        #yp = ROOT.Double()
         dataTGraph.GetPoint(ii, xp, yp)
 
         # do noot draw erroor bars on empty bins
         if yp == 0.0 :
-            yp = ROOT.Double(-100)
-            errYhigh = ROOT.Double(0)
-            errYlow = ROOT.Double(0)
+            #yp = ROOT.Double(-100)
+            #errYhigh = ROOT.Double(0)
+            #errYlow = ROOT.Double(0)
+            yp = ctypes.c_double(-100.)
+            errYhigh = ctypes.c_double(0.)
+            errYlow = ctypes.c_double(0.)
         else :
-            errYhigh = dataTGraph.GetErrorYhigh(ii)
-            errYlow = dataTGraph.GetErrorYlow(ii)
+            errYhigh = ctypes.c_double(dataTGraph.GetErrorYhigh(ii))
+            errYlow = ctypes.c_double(dataTGraph.GetErrorYlow(ii))
 
-        dataTGraph1.SetPoint(ii + lastbin, template.GetBinCenter(ii + lastbin + 1), yp / bin_width)
-        dataTGraph1.SetPointEYlow(ii + lastbin, errYlow / bin_width)
-        dataTGraph1.SetPointEYhigh(ii + lastbin, errYhigh / bin_width)
+        #dataTGraph1.SetPoint(ii + lastbin, template.GetBinCenter(ii + lastbin + 1), yp / bin_width)
+        #dataTGraph1.SetPointEYlow(ii + lastbin, errYlow / bin_width)
+        #dataTGraph1.SetPointEYhigh(ii + lastbin, errYhigh / bin_width)
+        #dataTGraph1.SetPointEXlow(ii + lastbin, template.GetBinWidth(ii + 1) / 2.0)
+        #dataTGraph1.SetPointEXhigh(ii + lastbin, template.GetBinWidth(ii + 1) / 2.0)
+        dataTGraph1.SetPoint(ii + lastbin, template.GetBinCenter(ii + lastbin + 1), yp.value / bin_width)
+        dataTGraph1.SetPointEYlow(ii + lastbin, errYlow.value / bin_width)
+        dataTGraph1.SetPointEYhigh(ii + lastbin, errYhigh.value / bin_width)
         dataTGraph1.SetPointEXlow(ii + lastbin, template.GetBinWidth(ii + 1) / 2.0)
         dataTGraph1.SetPointEXhigh(ii + lastbin, template.GetBinWidth(ii + 1) / 2.0)
     del dataTGraph
@@ -737,13 +748,13 @@ def err_data(dataTGraph1, template, dataTGraph, histtotal, folder, fin, divideBy
         if histtotal.GetBinContent(ii + 1) == 0:
             continue
         dividend = histtotal.GetBinContent(ii + 1) * bin_width
-        xp = ROOT.Double()
-        yp = ROOT.Double()
+        xp = ctypes.c_double(0.) #ROOT.Double()
+        yp = ctypes.c_double(0.) #ROOT.Double()
         dataTGraph.GetPoint(ii, xp, yp)
-        if yp > 0:
+        if yp.value > 0:
             if dividend > 0:
                 dataTGraph1.SetPoint(
-                    ii + lastbin, template.GetBinCenter(ii + lastbin + 1), yp / dividend - 1
+                    ii + lastbin, template.GetBinCenter(ii + lastbin + 1), yp.value / dividend - 1
                 )
             else:
                 dataTGraph1.SetPoint(ii + lastbin, template.GetBinCenter(ii + lastbin + 1), -1.0)
