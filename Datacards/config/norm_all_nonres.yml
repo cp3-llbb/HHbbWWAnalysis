@@ -1,0 +1,34 @@
+  2016:
+    - !include norm_lumi.yml
+    - !include norm_BR.yml
+    - !include norm_QCDscale.yml
+    - !include norm_alpha_s.yml
+    - !include norm_pdf.yml
+    - !include norm_misc.yml
+    - !include norm_DL_nonres_process.yml
+    - !include norm_fakes_2016.yml
+    - !include norm_DY_NonRes.yml
+    - footer: !include norm_footer_DL.yml
+  2017:
+    - !include norm_lumi.yml
+    - !include norm_BR.yml
+    - !include norm_QCDscale.yml
+    - !include norm_alpha_s.yml
+    - !include norm_pdf.yml
+    - !include norm_misc.yml
+    - !include norm_DL_nonres_process.yml
+    - !include norm_fakes_2017.yml
+    - !include norm_DY_NonRes.yml
+    - footer: !include norm_footer_DL.yml
+  2018:
+    - !include norm_lumi.yml
+    - !include norm_BR.yml
+    - !include norm_QCDscale.yml
+    - !include norm_alpha_s.yml
+    - !include norm_pdf.yml
+    - !include norm_misc.yml
+    - !include norm_DL_nonres_process.yml
+    - !include norm_fakes_2018.yml
+    - !include norm_DY_NonRes.yml
+    - footer: !include norm_footer_DL.yml
+

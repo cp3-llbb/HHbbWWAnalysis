@@ -51,46 +51,48 @@ mu_FR_Loose_DL_norm_syst:   CMS_bbwwdl_FakeRate_m_norm_{era}
 mu_FR_Loose_DL_pt_syst:     CMS_bbwwdl_FakeRate_m_pt_{era}
 muonCorrFR:                 CMS_bbwwdl_FakeRate_m_nonclosure_{era}
     
-# jes/jer
-jer:                    CMS_JER_{era}
+# JER
+jer:                    CMS_res_j_{era}
 
-jmr:                    CMS_JMR_{era}
-jms:                    CMS_JMS_{era}
-jesTotal:               CMS_JES_Total
+# Fatjet mass corrections 
+jmr:                    CMS_AK8_JMR
+jms:                    CMS_AK8_JMS
     # -> fatjets
+
+# MET jet uncertainties
 unclustEn:              CMS_unclusteredEnergy_{era}
-    # -> Met 
 
-jesAbsolute:            CMS_JES_Abs
-jesBBEC1:               CMS_JES_BBEC1
-jesEC2:                 CMS_JES_EC2
-jesHF:                  CMS_JES_HF
-jesRelativeBal:         CMS_JES_RelBal
-jesFlavorQCD:           CMS_JES_FlavQCD
-jesHEMIssue:            CMS_JES_HEMIssue
+# JES 
+jesAbsolute:            CMS_scale_j_Abs
+jesBBEC1:               CMS_scale_j_BBEC1
+jesEC2:                 CMS_scale_j_EC2
+jesHF:                  CMS_scale_j_HF
+jesRelativeBal:         CMS_scale_j_RelBal
+jesFlavorQCD:           CMS_scale_j_FlavQCD
+jesHEMIssue:            CMS_HEM_{era}  
 
 
-jesAbsolute_2016:       CMS_JES_Abs_2016
-jesBBEC1_2016:          CMS_JES_BBEC1_2016
-jesEC2_2016:            CMS_JES_EC2_2016
-jesHF_2016:             CMS_JES_HF_2016
-jesRelativeSample_2016: CMS_JES_RelSample_2016
+jesAbsolute_2016:       CMS_scale_j_Abs_2016
+jesBBEC1_2016:          CMS_scale_j_BBEC1_2016
+jesEC2_2016:            CMS_scale_j_EC2_2016
+jesHF_2016:             CMS_scale_j_HF_2016
+jesRelativeSample_2016: CMS_scale_j_RelSample_2016
 
-jesAbsolute_2017:       CMS_JES_Abs_2017
-jesBBEC1_2017:          CMS_JES_BBEC1_2017
-jesEC2_2017:            CMS_JES_EC2_2017
-jesHF_2017:             CMS_JES_HF_2017
-jesRelativeSample_2017: CMS_JES_RelSample_2017
+jesAbsolute_2017:       CMS_scale_j_Abs_2017
+jesBBEC1_2017:          CMS_scale_j_BBEC1_2017
+jesEC2_2017:            CMS_scale_j_EC2_2017
+jesHF_2017:             CMS_scale_j_HF_2017
+jesRelativeSample_2017: CMS_scale_j_RelSample_2017
 
-jesAbsolute_2018:       CMS_JES_Abs_2018
-jesBBEC1_2018:          CMS_JES_BBEC1_2018
-jesEC2_2018:            CMS_JES_EC2_2018
-jesHF_2018:             CMS_JES_HF_2018
-jesRelativeSample_2018: CMS_JES_RelSample_2018
+jesAbsolute_2018:       CMS_scale_j_Abs_2018
+jesBBEC1_2018:          CMS_scale_j_BBEC1_2018
+jesEC2_2018:            CMS_scale_j_EC2_2018
+jesHF_2018:             CMS_scale_j_HF_2018
+jesRelativeSample_2018: CMS_scale_j_RelSample_2018
 
 # Jet PU ID #
-jetpuid_eff:            CMS_PUJET_eff_{era}
-jetpuid_mistag:         CMS_PUJET_mistag_{era}
+jetpuid_eff:            CMS_eff_j_PUJET_id_{era}
+jetpuid_mistag:         CMS_eff_j_PUJET_mistag_{era}
 
 # DY #
 dy_boosted_1b:          CMS_bbwwdl_DY_boost_{era}

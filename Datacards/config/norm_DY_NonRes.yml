@@ -1,0 +1,96 @@
+CMS_bbwwdl_DYEstimation_nonclosure_boosted_GGF:
+  hist: HH_DL_boosted_GGF
+  proc: DY
+  val:
+  - 0.409
+  - 1.591
+CMS_bbwwdl_DYEstimation_nonclosure_boosted_VBF:
+  hist: HH_DL_boosted_VBF
+  proc: DY
+  val:
+  - 0.752
+  - 1.248
+CMS_bbwwdl_DYEstimation_nonclosure_resolved1b_GGF_2016:
+  era: '2016'
+  hist: HH_DL_resolved1b_GGF
+  proc: DY
+  val:
+  - 0.231
+  - 1.769
+CMS_bbwwdl_DYEstimation_nonclosure_resolved1b_GGF_2017:
+  era: '2017'
+  hist: HH_DL_resolved1b_GGF
+  proc: DY
+  val:
+  - 0.798
+  - 1.202
+CMS_bbwwdl_DYEstimation_nonclosure_resolved1b_GGF_2018:
+  era: '2018'
+  hist: HH_DL_resolved1b_GGF
+  proc: DY
+  val:
+  - 0.801
+  - 1.199
+CMS_bbwwdl_DYEstimation_nonclosure_resolved1b_VBF_2016:
+  era: '2016'
+  hist: HH_DL_resolved1b_VBF
+  proc: DY
+  val:
+  - 0.217
+  - 1.783
+CMS_bbwwdl_DYEstimation_nonclosure_resolved1b_VBF_2017:
+  era: '2017'
+  hist: HH_DL_resolved1b_VBF
+  proc: DY
+  val:
+  - 0.881
+  - 1.119
+CMS_bbwwdl_DYEstimation_nonclosure_resolved1b_VBF_2018:
+  era: '2018'
+  hist: HH_DL_resolved1b_VBF
+  proc: DY
+  val:
+  - 0.882
+  - 1.118
+CMS_bbwwdl_DYEstimation_nonclosure_resolved2b_GGF_2016:
+  era: '2016'
+  hist: HH_DL_resolved2b_GGF
+  proc: DY
+  val:
+  - 0.209
+  - 1.791
+CMS_bbwwdl_DYEstimation_nonclosure_resolved2b_GGF_2017:
+  era: '2017'
+  hist: HH_DL_resolved2b_GGF
+  proc: DY
+  val:
+  - 0.946
+  - 1.054
+CMS_bbwwdl_DYEstimation_nonclosure_resolved2b_GGF_2018:
+  era: '2018'
+  hist: HH_DL_resolved2b_GGF
+  proc: DY
+  val:
+  - 0.316
+  - 1.684
+CMS_bbwwdl_DYEstimation_nonclosure_resolved2b_VBF_2016:
+  era: '2016'
+  hist: HH_DL_resolved2b_VBF
+  proc: DY
+  val:
+  - 0.238
+  - 1.762
+CMS_bbwwdl_DYEstimation_nonclosure_resolved2b_VBF_2017:
+  era: '2017'
+  hist: HH_DL_resolved2b_VBF
+  proc: DY
+  val:
+  - 0.917
+  - 1.083
+CMS_bbwwdl_DYEstimation_nonclosure_resolved2b_VBF_2018:
+  era: '2018'
+  hist: HH_DL_resolved2b_VBF
+  proc: DY
+  val:
+  - 0.731
+  - 1.269
