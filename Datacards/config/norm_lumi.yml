@@ -3,20 +3,20 @@
 #################################
 #             Lumi              # 
 #################################
-CMS_lumi_13TeV_2016:
+lumi_13TeV_2016:
   - era: 2016
     val: 1.010
     proc: ['\DY','\Fakes']
-CMS_lumi_13TeV_2017:
+lumi_13TeV_2017:
   - era: 2017
     val: 1.020
     proc: ['\DY','\Fakes']
-CMS_lumi_13TeV_2018:
+lumi_13TeV_2018:
   - era: 2018
     val: 1.015
     proc: ['\DY','\Fakes']
 
-CMS_lumi_13TeV_2016_2017_2018:
+lumi_13TeV_correlated:
   - era: 2016
     val: 1.006
     proc: ['\DY','\Fakes']
@@ -27,7 +27,7 @@ CMS_lumi_13TeV_2016_2017_2018:
     val: 1.020
     proc: ['\DY','\Fakes']
 
-CMS_lumi_13TeV_2017_2018:
+lumi_13TeV_1718:
   - era: 2017
     val: 1.006
     proc: ['\DY','\Fakes']

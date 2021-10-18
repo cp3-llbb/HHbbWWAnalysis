@@ -1,8 +1,8 @@
 tree: Events
 eras: 
   '2017':
-    luminosity: 41529.152060112
-    luminosity-error: 0.023
+    luminosity: 41530
+    luminosity-error: 0.025
 dbcache: ../dascache2017
 samples:
     # BACKGROUNDS #

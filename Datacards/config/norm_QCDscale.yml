@@ -19,13 +19,13 @@ QCDscale_VV:
 
 QCDscale_qqHH:
   proc:
-  - qqHH_CV_0p5_C2V_1_kl_1_hbbhwwdl
-  - qqHH_CV_1p5_C2V_1_kl_1_hbbhwwdl
-  - qqHH_CV_1_C2V_0_kl_1_hbbhwwdl
-  - qqHH_CV_1_C2V_1_kl_0_hbbhwwdl
-  - qqHH_CV_1_C2V_1_kl_1_hbbhwwdl
-  - qqHH_CV_1_C2V_1_kl_2_hbbhwwdl
-  - qqHH_CV_1_C2V_2_kl_1_hbbhwwdl
+  - qqHH_CV_0p5_C2V_1_kl_1_hbbhww
+  - qqHH_CV_1p5_C2V_1_kl_1_hbbhww
+  - qqHH_CV_1_C2V_0_kl_1_hbbhww
+  - qqHH_CV_1_C2V_1_kl_0_hbbhww
+  - qqHH_CV_1_C2V_1_kl_1_hbbhww
+  - qqHH_CV_1_C2V_1_kl_2_hbbhww
+  - qqHH_CV_1_C2V_2_kl_1_hbbhww
   - qqHH_CV_0p5_C2V_1_kl_1_hbbhwwsl
   - qqHH_CV_1p5_C2V_1_kl_1_hbbhwwsl
   - qqHH_CV_1_C2V_0_kl_1_hbbhwwsl

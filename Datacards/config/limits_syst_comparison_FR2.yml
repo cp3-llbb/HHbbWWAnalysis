@@ -1,0 +1,472 @@
+outputDir: Limits/Resonant_syst_comparison_FR2
+
+legend:
+  position: [0.50,0.45,0.85,0.90]
+  textsize: 0.02
+
+combine: 
+   limits_DL: limits
+   limits_SL: limits
+   limits_combined: limits
+   gof: gof
+   pulls: pulls_impacts
+   impacts: pulls_impacts
+   prefit: prefit
+   postfit_b: postfit_b
+
+plotting_limit: &plotting_limit
+    legend: 
+        SetX1: 0.50
+        SetX2: 0.88
+        SetY1: 0.55
+        SetY2: 0.9
+        SetFillColor: 0
+        SetTextFont: 42
+        SetTextSize: 0.018
+    canvas: 
+        SetWindowSize: [800,600]
+        SetLeftMargin: 0.15
+        SetRightMargin: 0.1
+        SetTopMargin: 0.06
+        SetBottomMargin: 0.10
+        SetLogy: True
+        SetGridx: True 
+        SetGridy: True
+        SetTickx: True
+        SetTicky: True
+    lines: 
+        SetLineWidth: 2 
+        SetMarkerStyle: 20
+        SetMarkerSize: 0.6
+        SetMarkerColor: 9
+        GetXaxis.SetTitle: 'Resonant mass [GeV]'
+        GetYaxis.SetTitle: '95% C.L. limits on production rate (pb)'
+
+plots:
+  # LIMITS PLOTS #
+  - name: limits_spin0_DL
+    title: 'Spin 0 limits'
+    options: *plotting_limit
+    curves: 
+      "1D 2016":        ["1D FR2 spin 0","limits_DL","combination_2016"]
+      "1D 2017":        ["1D FR2 spin 0","limits_DL","combination_2017"]
+      "1D 2018":        ["1D FR2 spin 0","limits_DL","combination_2018"]
+      "1D Full Run 2":  ["1D FR2 spin 0","limits_DL","combination"]
+      "2D 2016":        ["2D FR2 spin 0","limits_DL","combination_2016"]
+      "2D 2017":        ["2D FR2 spin 0","limits_DL","combination_2017"]
+      "2D 2018":        ["2D FR2 spin 0","limits_DL","combination_2018"]
+      "2D Full Run 2":  ["2D FR2 spin 0","limits_DL","combination"]
+    legend:
+      "1D 2016":        "DL 2016 (MVA binning)"
+      "1D 2017":        "DL 2017 (MVA binning)"
+      "1D 2018":        "DL 2018 (MVA binning)"
+      "1D Full Run 2":  "DL Full Run 2 (MVA binning)"
+      "2D 2016":        "DL 2016 (MVA vs HME binning)"
+      "2D 2017":        "DL 2017 (MVA vs HME binning)"
+      "2D 2018":        "DL 2018 (MVA vs HME binning)"
+      "2D Full Run 2":  "DL Full Run 2 (MVA vs HME binning)"
+    lines:
+      "1D 2016":        {'SetLineStyle': 1,'SetLineColor': '#D81B60'} 
+      "1D 2017":        {'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "1D 2018":        {'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+      "1D Full Run 2":  {'SetLineStyle': 1,'SetLineColor': '#004D40'}
+      "2D 2016":        {'SetLineStyle': 2,'SetLineColor': '#D81B60'}
+      "2D 2017":        {'SetLineStyle': 2,'SetLineColor': '#1E88E5'}
+      "2D 2018":        {'SetLineStyle': 2,'SetLineColor': '#FFC107'}
+      "2D Full Run 2":  {'SetLineStyle': 2,'SetLineColor': '#004D40'}
+
+  - name: limits_spin2_DL
+    title: 'Spin 2 limits'
+    options: *plotting_limit
+    curves: 
+      "1D 2016":        ["1D FR2 spin 0","limits_DL","combination_2016"]
+      "1D 2017":        ["1D FR2 spin 0","limits_DL","combination_2017"]
+      "1D 2018":        ["1D FR2 spin 0","limits_DL","combination_2018"]
+      "1D Full Run 2":  ["1D FR2 spin 0","limits_DL","combination"]
+      "2D 2016":        ["2D FR2 spin 0","limits_DL","combination_2016"]
+      "2D 2017":        ["2D FR2 spin 0","limits_DL","combination_2017"]
+      "2D 2018":        ["2D FR2 spin 0","limits_DL","combination_2018"]
+      "2D Full Run 2":  ["2D FR2 spin 0","limits_DL","combination"]
+    legend:
+      "1D 2016":        "DL 2016 (MVA binning)"
+      "1D 2017":        "DL 2017 (MVA binning)"
+      "1D 2018":        "DL 2018 (MVA binning)"
+      "1D Full Run 2":  "DL Full Run 2 (MVA binning)"
+      "2D 2016":        "DL 2016 (MVA vs HME binning)"
+      "2D 2017":        "DL 2017 (MVA vs HME binning)"
+      "2D 2018":        "DL 2018 (MVA vs HME binning)"
+      "2D Full Run 2":  "DL Full Run 2 (MVA vs HME binning)"
+    lines:
+      "1D 2016":        {'SetLineStyle': 1,'SetLineColor': '#D81B60'} 
+      "1D 2017":        {'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "1D 2018":        {'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+      "1D Full Run 2":  {'SetLineStyle': 1,'SetLineColor': '#004D40'}
+      "2D 2016":        {'SetLineStyle': 2,'SetLineColor': '#D81B60'}
+      "2D 2017":        {'SetLineStyle': 2,'SetLineColor': '#1E88E5'}
+      "2D 2018":        {'SetLineStyle': 2,'SetLineColor': '#FFC107'}
+      "2D Full Run 2":  {'SetLineStyle': 2,'SetLineColor': '#004D40'}
+  - name: limits_spin2_comb
+    title: ''
+    options: *plotting_limit
+    curves: 
+      "DL_spin2":       ["2D FR2 spin 2","limits_DL","combination"]
+      "SL_spin2":       ["2D FR2 spin 2","limits_SL",""]
+      "comb_spin2":     ["2D FR2 spin 2","limits_combined",""]
+    legend:
+      "DL_spin2":       "DL spin 2"
+      "SL_spin2":       "SL spin 2"
+      "comb_spin2":     "SL+DL spin 2"
+    lines:
+      "DL_spin2":       {'SetLineStyle': 1,'SetLineColor': '#D81B60'}
+      "SL_spin2":       {'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "comb_spin2":     {'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+  - name: limits_spin0_comb
+    title: ''
+    options: *plotting_limit
+    curves: 
+      "DL_spin0":       ["2D FR2 spin 0","limits_DL","combination"]
+      "SL_spin0":       ["2D FR2 spin 0","limits_SL",""]
+      "comb_spin0":     ["2D FR2 spin 0","limits_combined",""]
+    legend:
+      "DL_spin0":       "DL spin 0"
+      "SL_spin0":       "SL spin 0"
+      "comb_spin0":     "SL+DL spin 0"
+    lines:
+      "DL_spin0":       {'SetLineStyle': 1,'SetLineColor': '#D81B60'}
+      "SL_spin0":       {'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "comb_spin0":     {'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+
+  # GOF PLOTS #
+  - name: gof
+    title: 'Goodness-of-fit'
+    options:
+        legend: 
+            SetX1: 0.72
+            SetX2: 1.
+            SetY1: 0.45
+            SetY2: 0.90
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.04
+            SetBorderSize: 0
+        canvas: 
+            SetWindowSize: [1200,600]
+            SetLeftMargin: 0.1
+            SetRightMargin: 0.3
+            SetTopMargin: 0.10
+            SetBottomMargin: 0.10
+            SetLogy: False
+            SetGridx: True 
+            SetGridy: True
+            SetTickx: True
+            SetTicky: True
+        lines: 
+            GetYaxis.SetRangeUser: [0.,100.]
+            SetLineWidth: 2 
+            GetXaxis.SetTitle: 'Resonant mass [GeV]'
+            GetYaxis.SetTitle: 'GOF p-value [%]'
+    curves: 
+      "combination":                                ["2D FR2 spin 2","gof","combination"]
+      "combination_2016":                           ["2D FR2 spin 2","gof","combination_2016"]
+      "combination_2017":                           ["2D FR2 spin 2","gof","combination_2017"]
+      "combination_2018":                           ["2D FR2 spin 2","gof","combination_2018"]
+      "combination_HH_DL_{mass}_inclusive_DY_VVV":  ["2D FR2 spin 2","gof","combination_HH_DL_{mass}_inclusive_DY_VVV"]
+      "combination_HH_DL_{mass}_resolved_other":    ["2D FR2 spin 2","gof","combination_HH_DL_{mass}_resolved_other"]
+      "combination_HH_DL_{mass}_boosted_other":     ["2D FR2 spin 2","gof","combination_HH_DL_{mass}_boosted_other"]
+    legend:
+      "combination":                                "Full Run 2"
+      "combination_2016":                           "Full 2016"
+      "combination_2017":                           "Full 2017"
+      "combination_2018":                           "Full 2018"
+      "combination_HH_DL_{mass}_inclusive_DY_VVV":  "Inclusive DY+VVV"
+      "combination_HH_DL_{mass}_resolved_other":    "Resolved other"
+      "combination_HH_DL_{mass}_boosted_other":     "Boosted other"
+    lines:
+      "combination":                                {'SetLineStyle':1, SetMarkerStyle: 22,SetMarkerSize: 1}
+      "combination_2016":                           {'SetLineStyle':1, SetMarkerStyle: 20,SetMarkerSize: 1} 
+      "combination_2017":                           {'SetLineStyle':1, SetMarkerStyle: 20,SetMarkerSize: 1} 
+      "combination_2018":                           {'SetLineStyle':1, SetMarkerStyle: 20,SetMarkerSize: 1} 
+      "combination_HH_DL_{mass}_inclusive_DY_VVV":  {'SetLineStyle':2} 
+      "combination_HH_DL_{mass}_resolved_other":    {'SetLineStyle':2} 
+      "combination_HH_DL_{mass}_boosted_other":     {'SetLineStyle':2} 
+
+curves:
+  #########################################################################
+  #                              Graviton 1D                              #
+  #########################################################################
+    1D FR2 spin 2:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            limits_SL: []
+            limits_combined: []
+            prefit: []
+            postfit_b: []
+        points:
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=260 branch=LowMass
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=270 branch=LowMass
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=280 branch=LowMass  --interpolation config/interpolation_DL_res.yml spin=spin2 param1=270 param2=300 paramInt=280 --interpolation_config1 config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml spin=spin2 mass=270 branch=LowMass --interpolation_config2 config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml spin=spin2 mass=300 branch=LowMass --interpolation_era 2016
+              label: 280
+              custom: {mass: 280}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=300 branch=LowMass
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=450 branch=LowMass 
+              label: 450 
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=550 branch=HighMass
+              label: 550
+              custom: {mass: 550}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=650 branch=HighMass 
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=700 branch=HighMass 
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=750 branch=HighMass  --interpolation config/interpolation_DL_res.yml spin=spin2 param1=700 param2=800 paramInt=750 --interpolation_config1 config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml spin=spin2 mass=700 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml spin=spin2 mass=800 branch=HighMass --interpolation_era 2016
+              label: 750
+              custom: {mass: 750}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=850 branch=HighMass  --interpolation config/interpolation_DL_res.yml spin=spin2 param1=800 param2=900 paramInt=850 --interpolation_config1 config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml spin=spin2 mass=800 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml spin=spin2 mass=900 branch=HighMass --interpolation_era 2016
+              label: 850
+              custom: {mass: 850}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom spin=spin2 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+  
+    #########################################################################
+    #                             Graviton 2D                               #
+    #########################################################################
+
+    2D FR2 spin 2:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            limits_SL: []
+            limits_combined: []
+            gof:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+                - combination_HH_DL_{mass}_inclusive_DY_VVV
+                - combination_HH_DL_{mass}_boosted_other
+                - combination_HH_DL_{mass}_resolved_other
+                - HH_DL_{mass}_boosted_other_2016
+                - HH_DL_{mass}_boosted_other_2017
+                - HH_DL_{mass}_boosted_other_2018
+                - HH_DL_{mass}_resolved_other_2016
+                - HH_DL_{mass}_resolved_other_2017
+                - HH_DL_{mass}_resolved_other_2018
+                - HH_DL_{mass}_inclusive_DY_VVV_2016
+                - HH_DL_{mass}_inclusive_DY_VVV_2017
+                - HH_DL_{mass}_inclusive_DY_VVV_2018    
+            prefit: []
+            postfit_b: []
+        points:
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=260 branch=LowMass
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=270 branch=LowMass
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=280 branch=LowMass  --interpolation config/interpolation_DL_res.yml spin=spin2 param1=270 param2=300 paramInt=280 --interpolation_config1 config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml spin=spin2 mass=270 branch=LowMass --interpolation_config2 config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml spin=spin2 mass=300 branch=LowMass --interpolation_era 2016
+              label: 280
+              custom: {mass: 280}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=300 branch=LowMass
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=450 branch=LowMass 
+              label: 450 
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=550 branch=HighMass
+              label: 550
+              custom: {mass: 550}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=650 branch=HighMass 
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=700 branch=HighMass 
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=750 branch=HighMass  --interpolation config/interpolation_DL_res.yml spin=spin2 param1=700 param2=800 paramInt=750 --interpolation_config1 config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml spin=spin2 mass=700 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml spin=spin2 mass=800 branch=HighMass --interpolation_era 2016
+              label: 750
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=850 branch=HighMass  --interpolation config/interpolation_DL_res.yml spin=spin2 param1=800 param2=900 paramInt=850 --interpolation_config1 config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml spin=spin2 mass=800 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml spin=spin2 mass=900 branch=HighMass --interpolation_era 2016
+              label: 850
+              custom: {mass: 850}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+
+    #########################################################################
+    #                             Radion 1D                               #
+    #########################################################################
+
+    1D FR2 spin 0:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            limits_SL: []
+            limits_combined: []
+            prefit: []
+            postfit_b: []
+        points:
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=260 branch=LowMass   
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=270 branch=LowMass   
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=280 branch=LowMass  --interpolation config/interpolation_DL_res.yml spin=spin0 param1=270 param2=300 paramInt=280 --interpolation_config1 config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml spin=spin0 mass=270 branch=LowMass --interpolation_config2 config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml spin=spin0 mass=300 branch=LowMass --interpolation_era 2016
+              label: 280
+              custom: {mass: 280}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=300 branch=LowMass  --interpolation config/interpolation_DL_res.yml spin=spin0 param1=280 param2=320 paramInt=300 --interpolation_config1 config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml spin=spin0 mass=280 branch=LowMass --interpolation_config2 config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml spin=spin0 mass=320 branch=LowMass --interpolation_era 2017
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=450 branch=LowMass  --interpolation config/interpolation_DL_res.yml spin=spin0 param1=400 param2=500 paramInt=450 --interpolation_config1 config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml spin=spin0 mass=400 branch=LowMass --interpolation_config2 config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml spin=spin0 mass=500 branch=LowMass --interpolation_era 2018
+              label: 450 
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=550 branch=HighMass  --interpolation config/interpolation_DL_res.yml spin=spin0 param1=500 param2=600 paramInt=550 --interpolation_config1 config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml spin=spin0 mass=500 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml spin=spin0 mass=600 branch=HighMass --interpolation_era 2017
+              label: 550
+              custom: {mass: 550}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=650 branch=HighMass  --interpolation config/interpolation_DL_res.yml spin=spin0 param1=600 param2=750 paramInt=650 --interpolation_config1 config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml spin=spin0 mass=600 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml spin=spin0 mass=750 branch=HighMass --interpolation_era 2016
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=700 branch=HighMass  --interpolation config/interpolation_DL_res.yml spin=spin0 param1=600 param2=750 paramInt=700 --interpolation_config1 config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml spin=spin0 mass=600 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml spin=spin0 mass=750 branch=HighMass --interpolation_era 2016
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=750 branch=HighMass  
+              label: 750
+              custom: {mass: 750}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=850 branch=HighMass  --interpolation config/interpolation_DL_res.yml spin=spin0 param1=800 param2=900 paramInt=850 --interpolation_config1 config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml spin=spin0 mass=800 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml spin=spin0 mass=900 branch=HighMass --interpolation_era 2016
+              label: 850
+              custom: {mass: 850}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_1D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+
+    
+    
+
+    #########################################################################
+    #                             Radion 2D                               #
+    #########################################################################
+
+    2D FR2 spin 0:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            limits_SL: []
+            limits_combined: []
+            prefit: []
+            postfit_b: []
+        points:
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=260 branch=LowMass   
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=270 branch=LowMass   
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=280 branch=LowMass  --interpolation config/interpolation_DL_res.yml spin=spin0 param1=270 param2=300 paramInt=280 --interpolation_config1 config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml spin=spin0 mass=270 branch=LowMass --interpolation_config2 config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml spin=spin0 mass=300 branch=LowMass --interpolation_era 2016
+              label: 280
+              custom: {mass: 280}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=300 branch=LowMass  --interpolation config/interpolation_DL_res.yml spin=spin0 param1=280 param2=320 paramInt=300 --interpolation_config1 config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml spin=spin0 mass=280 branch=LowMass --interpolation_config2 config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml spin=spin0 mass=320 branch=LowMass --interpolation_era 2017
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=450 branch=LowMass  --interpolation config/interpolation_DL_res.yml spin=spin0 param1=400 param2=500 paramInt=450 --interpolation_config1 config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml spin=spin0 mass=400 branch=LowMass --interpolation_config2 config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml spin=spin0 mass=500 branch=LowMass --interpolation_era 2018
+              label: 450 
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=550 branch=HighMass  --interpolation config/interpolation_DL_res.yml spin=spin0 param1=500 param2=600 paramInt=550 --interpolation_config1 config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml spin=spin0 mass=500 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml spin=spin0 mass=600 branch=HighMass --interpolation_era 2017
+              label: 550
+              custom: {mass: 550}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=650 branch=HighMass  --interpolation config/interpolation_DL_res.yml spin=spin0 param1=600 param2=750 paramInt=650 --interpolation_config1 config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml spin=spin0 mass=600 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml spin=spin0 mass=750 branch=HighMass --interpolation_era 2016
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=700 branch=HighMass  --interpolation config/interpolation_DL_res.yml spin=spin0 param1=600 param2=750 paramInt=700 --interpolation_config1 config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml spin=spin0 mass=600 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml spin=spin0 mass=750 branch=HighMass --interpolation_era 2016
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=750 branch=HighMass  
+              label: 750
+              custom: {mass: 750}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=850 branch=HighMass  --interpolation config/interpolation_DL_res.yml spin=spin0 param1=800 param2=900 paramInt=850 --interpolation_config1 config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml spin=spin0 mass=800 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml spin=spin0 mass=900 branch=HighMass --interpolation_era 2016
+              label: 850
+              custom: {mass: 850}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Radion_2D_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin0 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+

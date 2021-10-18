@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import yaml
+import copy
 import shutil
 import argparse
 import subprocess
@@ -15,23 +16,28 @@ from yamlLoader import YMLIncludeLoader
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 ROOT.gStyle.SetPalette(55)
+ROOT.gErrorIgnoreLevel = 2001
 
 
-def runCommand(command,combine_args=None,subdirs={},debug=False):
+def runCommand(command,combine_args={},subdirs={},plotIt=False,debug=False):
     # Modify command #
-    command = command.split(' ')
+    command = command.split()
     if '--combine' in command:
         raise RuntimeError('Please do not use --combine in your commands')
     if '-u' not in command:
         command.insert(1,'-u')
-    if combine_args is not None and isinstance(combine_args,list) and len(combine_args) > 0:
-        command += ['--combine'] + combine_args
+    if combine_args is not None and isinstance(combine_args,dict) and len(combine_args) > 0:
+        combine_cmd = ['--combine']
+        for combine_arg in combine_args.keys():
+            if combine_arg in subdirs.keys():
+                combine_cmd.append(combine_arg)
+        if len(combine_cmd) > 1:
+            command.extend(combine_cmd)
     if debug:
         command.append('--debug')
+    if plotIt:
+        command += ['--plotIt']
 
-    #command += ['--plotIt']
-
-    #print (' '.join(command))
 
     # Run command #
     process = subprocess.Popen(command,
@@ -59,39 +65,47 @@ def runCommand(command,combine_args=None,subdirs={},debug=False):
     else:
         # Get results based on subdirs #
         results = {}
-        for combineType,subdirNames in subdirs.items(): 
-            results[combineType] = {}
+        for combineMode,subdirNames in subdirs.items(): 
+            if len(subdirNames) == 0:
+                subdirNames = ['']
+            if combineMode not in combine_args.keys():
+                continue
+            combineType = combine_args[combineMode]
+            results[combineMode] = {}
             for subdirName in subdirNames:
-                json_file = os.path.join(output_path,combineType,subdirName,f'{combineType}.json')
+                json_file = os.path.join(output_path,combineMode,subdirName,f'{combineType}.json')
                 subdirName = os.path.basename(subdirName)
                 if os.path.exists(json_file):
                     with open(json_file,'r') as handle:
                         result = json.load(handle)
-                    results[combineType][subdirName] = result
+                    results[combineMode][subdirName] = result
                 else:
-                    #print (f'Combine type {combineType} file {json_file} does not exist')
-                    results[combineType][subdirName] = None
-
+                    #print (f'Combine type {combineMode} file {json_file} does not exist')
+                    results[combineMode][subdirName] = None
     return results
             
             
 
 class Scan:
-    def __init__(self,curves,legend,combine_args,path_out,jobs,force,unblind,debug):
-        self.curves         = curves
-        self.legend         = legend
+    def __init__(self,combine_args,plotIt,jobs,force,no_save,unblind,debug,**kwargs):
+        self.curves         = kwargs['curves']
+        self.legend         = kwargs['legend']
+        self.combine        = kwargs['combine']
+        self.outputDir      = kwargs['outputDir']
+        self.plots          = kwargs['plots']
         self.combine_args   = combine_args
-        self.path_out       = path_out
+        self.plotIt         = plotIt
         self.jobs           = jobs
         self.force          = force
+        self.no_save        = no_save
         self.unblind        = unblind
         self.debug          = debug
 
         # Make directory #
-        if not os.path.isdir(self.path_out):
-            os.makedirs(self.path_out)
+        if not os.path.isdir(self.outputDir):
+            os.makedirs(self.outputDir)
 
-        path_save = os.path.join(self.path_out,'graphs.root')
+        path_save = os.path.join(self.outputDir,'graphs.root')
         is_save = os.path.exists(path_save) and not self.force
 
         if self.combine_args is None:
@@ -99,171 +113,245 @@ class Scan:
 
         if not is_save:
             if self.force:
-                print ('Root save found, but will produce it anyway')
+                print ('Root save found, but will run anyway')
             else:
                 print ('Root save not found, will produce it')
             self.runTasks()
-
         else:
             print ('Root save found, will load it')
-            F = ROOT.TFile(path_save,'READ')
-            for curveName in self.curves.keys():
-                # Get curve directory #
-                if not hasattr(F,curveName):
-                    raise RuntimeError(f'Curve name `{curveName}` not found in {path_save}')
-                curveDir = getattr(F,curveName)
-                self.curves[curveName]['graphs'] = {}
-                for combineType in self.combine_args:
-                    # Get combine type directory #
-                    if not hasattr(curveDir,combineType):
-                        raise RuntimeError(f'Curve name `{curveName}` combine type {combineType} not found in {path_save}')
-                    combineTypeDir = getattr(curveDir,combineType)
-                    self.curves[curveName]['graphs'][combineType] = {}
-                    for key in combineTypeDir.GetListOfKeys():
-                        # Get subname directory #
-                        if not hasattr(combineTypeDir,key.GetName()):
-                            raise RuntimeError(f'Curve name `{curveName}` combine type {combineType} entry {key.GetName()} not found in {path_save}')
-                        subnameDir = getattr(combineTypeDir,key.GetName())
-                        self.curves[curveName]['graphs'][combineType][key.GetName()] = []
-                        for g in subnameDir.GetListOfKeys():
-                            self.curves[curveName]['graphs'][combineType][key.GetName()].append(subnameDir.Get(g.GetName()))
+            self.loadSave(path_save)
 
         # Producing graphs #
         if not is_save:
-            for curveName in self.curves.keys():
-                self.curves[curveName]['graphs'] = {}
-                self.curves[curveName]['labelConv'] = {}
-                resultsPerPoint = {}
-                for point in self.curves[curveName]['points']:
-                    for combineType, results in point['results'].items():
-                        if combineType not in resultsPerPoint.keys():
-                            self.curves[curveName]['graphs'][combineType] = {}
-                            self.curves[curveName]['labelConv'][combineType] = {}
-                            resultsPerPoint[combineType] = {}
-                        for resultName,resultVals in results.items():
-                            if resultName not in resultsPerPoint[combineType].keys():
-                                resultsPerPoint[combineType][resultName] = {}
-                            resultsPerPoint[combineType][resultName][point['label']] = resultVals
-                                
-                for combineType in resultsPerPoint.keys():
-                    if combineType == 'limits':
-                        for resultName,resultVals in resultsPerPoint[combineType].items():
-                            graphs,labelConv = self.produceLimitGraphs(resultsPerPoint[combineType][resultName]) 
-                            self.curves[curveName]['graphs'][combineType][resultName] = graphs
-                            self.curves[curveName]['labelConv'][combineType][resultName] = labelConv
-                    elif combineType == 'gof':
-                        for resultName,resultVals in resultsPerPoint[combineType].items():
-                            self.curves[curveName]['graphs'][combineType][resultName] = self.produceGofGraph(resultsPerPoint[combineType][resultName])
-                    else:
-                        raise RuntimeError(f'Combine type {combineType} not understood')
+            print ('Producing graphs')
+            self.produceGraphs()
+            print ('... done')
+            if not self.no_save:
+                print (f'Creating save file {path_save}')
+                self.produceSave(path_save)
+                print ('... done')
+
                     
-        embed()
+        # LIMITS #
+        for curveName, values in self.curves.items():
+            for combineMode in values['modes'].keys():
+                combineType = self.combine[combineMode] 
+                if combineType != 'limits':
+                    continue
+                labelConv = values['labelConv'] if 'labelConv' in values.keys() else None
+                for subname in values['modes'][combineMode]:
+                    graphs = values['graphs'][combineMode][subname]
+                    if graphs is not None:
+                        self.plotLimits(graphs      = graphs,
+                                        suffix      = f'limit_{curveName}_{subname}',
+                                        labelConv   = labelConv)
+                        
+
+        # PLOTS #
+        for plotCfg in self.plots:
+            lines = []
+            legends = []
+            graphs = []
+            attributes = []
+            title = ""
+            # Name #
+            if 'name' not in plotCfg.keys():
+                raise RuntimeError('Missing `name`')
+            name = plotCfg['name']
+            # Find the graphs #
+            for line,names in plotCfg['curves'].items():
+                lines.append(line)
+                assert len(names) == 3
+                curveName,combineMode,subname = names
+                combineType = self.combine[combineMode]
+                if combineType == 'limits':
+                    graph = self.curves[names[0]]['graphs'][names[1]][names[2]][1]
+                if combineType == 'gof':
+                    graph = self.curves[names[0]]['graphs'][names[1]][names[2]][0]
+                graphs.append(graph)
+            # Check for attributes #
+            if 'options' in plotCfg.keys():
+                options = plotCfg['options']
+            # Get attributes #
+            if 'lines' in plotCfg.keys():
+                for line in lines:
+                    if line in plotCfg['lines'].keys():
+                        attributes.append(plotCfg['lines'][line])
+                    else:
+                        attributes.append({})
+            # Get legend entries #
+            if 'legend' in plotCfg.keys():
+                for line in lines:
+                    legends.append(plotCfg['legend'][line]) 
+            # Title #
+            if 'title' in plotCfg.keys():
+                title = plotCfg['title']
+            # Run the plot #
+            self.plotMultipleGraphs(graphs      = graphs,
+                                    legends     = legends,
+                                    options     = options,
+                                    attributes  = attributes,
+                                    title       = title,
+                                    name        = name)
                 
-        ###   LIMIT   ###
-        if 'limits' in combine_args:
-            # Per curve limit plot #
-            subnames = []
-            for curveName in self.curves.keys():
-                if 'labelConv' in self.curves[curveName].keys():
-                    labelConv = self.curves[curveName]['labelConv']
-                else:
-                    labelConv = None
-                for subname in self.curves[curveName]['graphs']['limits'].keys():
-                    self.plotLimits(graphs=self.curves[curveName]['graphs']['limits'][subname],suffix=f'{curveName}_{subname}',labelConv=labelConv)
-                    if subname not in subnames:
-                        subnames.append(subname)
-
-            # Multi limit plot #
-            for subname in subnames:
-                multiGraphs = []
-                curveNames = []
-                attributes = []
-                for curveName in self.curves.keys():
-                    if self.curves[curveName]['graphs']['limits'][subname] is not None:
-                        curveNames.append(curveName)
-                        multiGraphs.append(self.curves[curveName]['graphs']['limits'][subname][1])
-                        attributes.append(self.curves[curveName]['attributes'])
-                self.plotMultipleGraphs(graphs=multiGraphs,suffixes=curveNames,attributes=attributes,title=f'limits_{subname}',labelConv=labelConv)
-
-
-        ###   GOF   ### 
-        if 'gof' in combine_args:
-            # get subnames #
-            subnames = []
-            for curveName in self.curves.keys():
-                subnames += [key for key in self.curves[curveName]['graphs']['gof'].keys() if key not in subnames]
-            # Produce GOF plots #
-            for subname in subnames:
-                multiGraphs = []
-                curveNames = []
-                for curveName in self.curves.keys():
-                    graph = self.curves[curveName]['graphs']['gof'][subname]
-                    if graph is not None:
-                        curveNames.append(curveName)
-                        multiGraphs.append(graph)
-                self.plotMultipleGraphs(graphs=multiGraphs,suffixes=curveNames,attributes=None,title=f'gof_{subname}',labelConv=None)
+    def loadSave(self,path_save):
+        F = ROOT.TFile(path_save,'READ')
+        for curveName in self.curves.keys():
+            # Get curve directory #
+            if not hasattr(F,curveName):
+                raise RuntimeError(f'Curve name `{curveName}` not found in {path_save}')
+            curveDir = getattr(F,curveName)
+            self.curves[curveName]['graphs'] = {}
+            for combineMode in self.combine_args:
+                # Check if curve has the mode in the config #
+                if not combineMode in self.combine.keys():
+                    continue
+                if not hasattr(curveDir,combineMode):
+                    print (f'Curve name `{curveName}` with combine type `{combineMode}` not found in {path_save}')
+                    continue
+                combineModeDir = getattr(curveDir,combineMode)
+                self.curves[curveName]['graphs'][combineMode] = {}
+                for key in combineModeDir.GetListOfKeys():
+                    # Get subname directory #
+                    if not hasattr(combineModeDir,key.GetName()):
+                        raise RuntimeError(f'Curve name `{curveName}` combine type {combineMode} entry {key.GetName()} not found in {path_save}')
+                    if key.GetClassName() == "TDirectoryFile":
+                        subnameDir = getattr(combineModeDir,key.GetName())
+                        self.curves[curveName]['graphs'][combineMode][key.GetName()] = []
+                        for g in subnameDir.GetListOfKeys():
+                            self.curves[curveName]['graphs'][combineMode][key.GetName()].append(subnameDir.Get(g.GetName()))
+                    elif key.GetClassName() == "TGraph":
+                        if '' not in self.curves[curveName]['graphs'][combineMode].keys():
+                            self.curves[curveName]['graphs'][combineMode][''] = [combineModeDir.Get(key.GetName())]
+                        else:
+                            self.curves[curveName]['graphs'][combineMode][''].append(combineModeDir.Get(key.GetName()))
+                    else:
+                        raise RuntimeError(f'Curve name `{curveName}` combine type {combineMode} entry {key.GetName()} type {key.GetClassName()} not understood in {path_save}')
 
 
-        ###   SAVE   ###
-        if not is_save:
-            print (f'Creating save file {path_save}')
-            F = ROOT.TFile(path_save,'RECREATE')
-            for curveName in self.curves.keys():
-                curveDir = F.mkdir(curveName,curveName)
-                curveDir.cd()
-                for combineType in combine_args:
-                    combineTypeDir = curveDir.mkdir(combineType,combineType)
-                    combineTypeDir.cd()
-                    for subname in self.curves[curveName]['graphs'][combineType]:
-                        subnameDir = combineTypeDir.mkdir(subname,subname)
+    def produceSave(self,path_save):
+        F = ROOT.TFile(path_save,'RECREATE')
+        for curveName in self.curves.keys():
+            curveDir = F.mkdir(curveName,curveName)
+            curveDir.cd()
+            for combineMode in self.combine_args:
+                if combineMode in self.curves[curveName]['graphs'].keys():
+                    combineModeDir = curveDir.mkdir(combineMode,combineMode)
+                    combineModeDir.cd()
+                    for subname in self.curves[curveName]['graphs'][combineMode]:
+                        if len(subname) == 0:
+                            subnameDir = combineModeDir
+                        else:
+                            subnameDir = combineModeDir.mkdir(subname,subname)
                         subnameDir.cd()
-                        if self.curves[curveName]['graphs'][combineType][subname] is not None:
-                            graphs = self.curves[curveName]['graphs'][combineType][subname]
+                        if self.curves[curveName]['graphs'][combineMode][subname] is not None:
+                            graphs = self.curves[curveName]['graphs'][combineMode][subname]
                             if not isinstance(graphs,tuple) and not isinstance(graphs,list):
                                 graphs = [graphs]
                             for graph in graphs:
                                 graph.Write(graph.GetName(),ROOT.TObject.kOverwrite)
-                    combineTypeDir.cd()
-                F.Close()
-                print ('... done')
-
+                    combineModeDir.cd()
+        F.Close()
  
     def runTasks(self):
         # Create list of args #
         pool_cmds = []
         for curveName,values in self.curves.items():
+            subdirs = {}
+            combine_args = {}
+            for combineMode in self.combine_args:
+                if combineMode not in values['modes']:
+                    print(f'Key {combineMode} missing in curve {curveName} : will not run it')
+                else:
+                    subdirs[combineMode] = values['modes'][combineMode]
+                    combine_args[combineMode] = self.combine[combineMode]
+
+            mainSubdDirs = copy.deepcopy(subdirs)
             for ipoint,point in enumerate(values['points']):
                 if not 'command' in point.keys():
                     continue
-                subdirs = {}
-                for combine_arg in self.combine_args:
-                    if not combine_arg in point.keys():
-                        print(f'Key {combine_arg} missing in entry {ipoint} of curve {curveName} : will run it but no plotting used')
-                    else:
-                        subdirs[combine_arg] = point[combine_arg]
+                if 'custom' in point.keys():
+                    subdirs = copy.deepcopy(mainSubdDirs)
+                    for subkey, subvalues in subdirs.items():
+                        subdirs[subkey] = [subval.format(**point['custom']) for subval in subvalues]
+
                 pool_cmds.append((point['command'],     # command 
-                                  self.combine_args,    # combine args 
-                                  subdirs,              # subdir
+                                  combine_args,    # combine args 
+                                  subdirs,              # subdirs
+                                  self.plotIt,          # plotIt
                                   self.debug))          # debug
+
         # Run the pool #
         with mp.Pool(processes=min(mp.cpu_count(),self.jobs)) as pool:
             results = pool.starmap(runCommand, pool_cmds)
+
         # Add values to curves dict #
         idx = 0
         for icurve,curveName in enumerate(self.curves.keys()):
             for ipoint in range(len(self.curves[curveName]['points'])):
                 if 'command' in self.curves[curveName]['points'][ipoint].keys():
                     result = results[idx]
-                    for combineType in result.keys():
-                        for subname in result[combineType].keys():
-                            if result[combineType][subname] is None:
+                    presult = {}  # processed result
+                    # If custom defined, save it to reverse #
+                    if 'custom' in self.curves[curveName]['points'][ipoint].keys():
+                        custom = self.curves[curveName]['points'][ipoint]['custom']
+                    else:
+                        custom = None
+                    # Loop through results dict # 
+                    for combineMode in result.keys():
+                        combineType = self.combine[combineMode]
+                        presult[combineMode] = {}
+                        for subname in result[combineMode].keys():
+                            if result[combineMode][subname] is None:
                                 continue
+                            subres = result[combineMode][subname]
+                            # Reverse the custom #
+                            if custom is not None:
+                                for key,val in custom.items():
+                                    subname = subname.replace(str(val),f'{{{key}}}')
+                            # Format the results #
                             if combineType == 'limits':
-                                result[combineType][subname] = {float(k):float(v) for k,v in result[combineType][subname].items()}
+                                # Use floats for both keys and values #
+                                presult[combineMode][subname] = {float(k):float(v) for k,v in subres.items()}
                             if combineType == 'gof':
-                                result[combineType][subname] = self.produceGofValue(result[combineType][subname])
-                    self.curves[curveName]['points'][ipoint]['results'] = result
+                                # From toys and data, produce p value #
+                                presult[combineMode][subname] = self.produceGofValue(subres)
+                    # Add to the curves content #
+                    self.curves[curveName]['points'][ipoint]['results'] = presult
+                    # Iterate through results #
                     idx += 1
+
+    def produceGraphs(self):
+        for curveName in self.curves.keys():
+            self.curves[curveName]['graphs'] = {}
+            self.curves[curveName]['labelConv'] = {}
+            resultsPerPoint = {}
+            for point in self.curves[curveName]['points']:
+                for combineMode, results in point['results'].items():
+                    if combineMode not in resultsPerPoint.keys():
+                        self.curves[curveName]['graphs'][combineMode] = {}
+                        self.curves[curveName]['labelConv'][combineMode] = {}
+                        resultsPerPoint[combineMode] = {}
+                    for resultName,resultVals in results.items():
+                        if resultName not in resultsPerPoint[combineMode].keys():
+                            resultsPerPoint[combineMode][resultName] = {}
+                        resultsPerPoint[combineMode][resultName][point['label']] = resultVals
+                            
+            for combineMode in resultsPerPoint.keys():
+                combineType = self.combine[combineMode]
+                if combineType == 'limits':
+                    for resultName,resultVals in resultsPerPoint[combineMode].items():
+                        graphs,labelConv = self.produceLimitGraphs(resultsPerPoint[combineMode][resultName]) 
+                        self.curves[curveName]['graphs'][combineMode][resultName] = graphs
+                        self.curves[curveName]['labelConv'][combineMode][resultName] = labelConv
+                elif combineType == 'gof':
+                    for resultName,resultVals in resultsPerPoint[combineMode].items():
+                        self.curves[curveName]['graphs'][combineMode][resultName] = [self.produceGofGraph(resultsPerPoint[combineMode][resultName])]
+                elif combineType == 'pulls_impacts':
+                    pass
+                else:
+                    raise RuntimeError(f'Combine type {combineType} from mode {combineMode} not understood')
+
 
     def produceGofValue(self,gofResult):
         data = gofResult['data']
@@ -281,7 +369,6 @@ class Scan:
         return g
             
         
-
     def produceLimitGraphs(self,limitsPerPoint):
         if len(limitsPerPoint) == 0:
             return None,None
@@ -398,7 +485,7 @@ class Scan:
         c1.SetTickx()  
         c1.SetTicky()  
 
-        pdfPath = os.path.join(self.path_out,f'limits{suffix}.pdf')
+        pdfPath = os.path.join(self.outputDir,f'{suffix}.pdf')
         c1.Print(pdfPath+'[')
 
         # Plot #
@@ -413,9 +500,9 @@ class Scan:
         b1.GetYaxis().SetRangeUser(ylow*0.9, yhigh*1.2)
         b1.SetStats(0)
         #b1.GetXaxis().SetNDivisions(len(xpoints))
-        if labelConv is not None:
-            for label,x in labelConv.items():
-                b1.GetXaxis().SetBinLabel(b1.GetXaxis().FindBin(x),label)
+        #if labelConv is not None:
+        #    for label,x in labelConv.items():
+        #        b1.GetXaxis().SetBinLabel(b1.GetXaxis().FindBin(x),label)
         b1.LabelsOption("v")
         b1.LabelsDeflate("X")
         b1.LabelsDeflate("Y")
@@ -426,12 +513,6 @@ class Scan:
         g_central.Draw("lpsame")
         if self.unblind:
             g_data.Draw("lpsame")
-
-#        g_central.Write()
-#        g_data.Write()
-#        g_onesigma.Write()
-#        g_twosigma.Write()
-
         
         # Legend #
         leg = ROOT.TLegend(*self.legend['position'])
@@ -459,36 +540,90 @@ class Scan:
 
         c1.Print(pdfPath+']')
 
-    def plotMultipleGraphs(self,graphs,suffixes,attributes,title,labelConv=None):
+        print (f'Produced single limit plot : {pdfPath}')
+
+    def useAttributes(self,obj,methodDict):
+        for method,val in methodDict.items():
+            if '.' in method:
+                methods = method.split('.')
+                nobj = obj
+                for method in methods[:-1]:
+                    nobj = getattr(obj,method)()
+                self.applyAttribute(nobj,methods[-1],val)
+            else:
+                self.applyAttribute(obj,method,val)
+
+    def applyAttribute(self,obj,method,val):
+        if not hasattr(obj,method):
+            raise RuntimeError(f'Object {obj.__class__.__name__} does not have method {method}')
+        if isinstance(val,list) or isinstance(val,tuple):
+            getattr(obj,method)(*val)
+        elif isinstance(val,int) or isinstance(val,float):
+            getattr(obj,method)(val)
+        elif isinstance(val,str):
+            if 'Color' in method and val.startswith('#'):
+                val = ROOT.TColor.GetColor(val)
+            getattr(obj,method)(val)
+        else:
+            raise RuntimeError(f'Type {type(val)} not understood')
+
+                
+    def plotMultipleGraphs(self,graphs,legends,options,title,name,attributes=[],labelConv=None):
         if len(graphs) == 0:
             print (f'No multi graph found for label {suffix}')
             return 
 
         # Canvas #
-        c1 = ROOT.TCanvas("c1","c1",600, 600)
-        c1.SetLeftMargin(0.15)
-        c1.SetRightMargin(0.1)
-        c1.SetTopMargin(0.05)
-        c1.SetBottomMargin(0.10)
-        c1.SetLogy()
-        c1.SetGridx()  
-        c1.SetGridy()  
-        c1.SetTickx()  
-        c1.SetTicky()  
+        c1 = ROOT.TCanvas("c1","c1",800, 600)
+        if 'canvas' in options.keys():
+            self.useAttributes(c1,options['canvas'])
 
-        pdfPath = os.path.join(self.path_out,f'{title}.pdf')
+        pdfPath = os.path.join(self.outputDir,f'{name.replace(" ","_")}.pdf')
         c1.Print(pdfPath+'[')
 
+        # Add main `lines` attribute to per-line attributes #
+        if len(attributes) == 0:
+            attributes = [{}] * len(graphs)
+        elif len(attributes) != len(graphs):
+            raise RuntimeError(f'Plot {name} has {len(graphs)} but {len(attributes)} line plot options')
+        if 'lines' in options.keys():
+            for i in range(len(attributes)):
+                for key,val in options['lines'].items():
+                    if key not in attributes[i].keys():
+                        attributes[i][key] = val
+
+        # Check if some overrides are done anywhere, otherwise use default #
+        custom_color = False
+        custom_yrange = False
+        for attribute in attributes:
+            for key in attribute.keys():
+                if 'Set' in key and 'Color' in key:
+                    custom_color = True
+                if 'SetRange' in key and 'GetYaxis' in key:
+                    custom_yrange = True
+
         # Plot #
-        xpoints = sorted(list(set([val for graph in graphs for val in list(graph.GetX()) if graph is not None])))
-        minx = min(xpoints)*0.9
-        maxx = max(xpoints)*1.1
-        b1 = ROOT.TH1F("b2","b2", len(xpoints)*2, minx, maxx)
-        b1.SetTitle(" ")
-        b1.GetYaxis().SetTitle("95% C.L. limits on production rate (pb)")
-        ylow  = min([g.GetHistogram().GetMinimum() for g in graphs])
-        yhigh = max([g.GetHistogram().GetMaximum() for g in graphs])
-        b1.GetYaxis().SetRangeUser(ylow, yhigh)
+        xpoints = list()
+        for graph in graphs:
+            if graphs is None or graph.GetN()>0:
+                for val in graph.GetX():
+                    if val not in xpoints:
+                        xpoints.append(val)
+        xpoints = sorted(xpoints)
+        if len(xpoints) > 0:
+            minx = min(xpoints)*0.9
+            maxx = max(xpoints)*1.1
+        else:
+            minx = 0.
+            maxx = 1.
+        b1 = ROOT.TH1F("b2","b2", min(1,len(xpoints)*2), minx, maxx)
+        b1.SetTitle(title)
+        if 'lines' in options.keys():
+            self.useAttributes(b1,options['lines'])
+        if not custom_yrange:
+            ylow  = min([g.GetHistogram().GetMinimum() for g in graphs]) * 1.1
+            yhigh = max([g.GetHistogram().GetMaximum() for g in graphs]) * 1.1
+            b1.GetYaxis().SetRangeUser(ylow, yhigh)
         b1.SetStats(0)
         #b1.GetXaxis().SetNDivisions(len(xpoints))
         if labelConv is not None:
@@ -497,43 +632,32 @@ class Scan:
         b1.LabelsDeflate("X")
         b1.LabelsDeflate("Y")
 
-        # Check if color set anywhere, otherwise use Palette #
-        custom_color = False
-        for attribute in attributes:
-            for key in attribute.keys():
-                if 'Color' in key:
-                    custom_color = True
+
+        # Legend #
+        if 'legend' in options.keys():
+            leg = ROOT.TLegend()
+            self.useAttributes(leg,options['legend'])
+            for g,legend in zip(graphs,legends):
+                leg.AddEntry(g,legend,"lp")
 
         # Legend #
         N = len(graphs)
-        leg = ROOT.TLegend(*self.legend['position'])
-        leg.SetFillColor(ROOT.kWhite)
-        leg.SetTextFont(42)
-        leg.SetTextSize(self.legend['textsize'])
         b1.Draw()
+
         for g in graphs:
-            g.SetLineWidth(2)
-            g.SetLineStyle(7)
-            g.SetLineColor(9)
-            g.SetMarkerStyle(20)
-            g.SetMarkerSize(0.6)
-            g.SetMarkerColor(9)
             if custom_color:
                 g.Draw("lpsame")
             else:
                 g.Draw("lpsame PLC")
 
         # Attributes #
-        for g,suffix,attribute in zip(graphs,suffixes,attributes):
-            for funcName,val in attribute.items():
-                if not hasattr(g,funcName):
-                    raise RuntimeError(f'Graph {g.GetName()} of type {g.__class__.__name__} has not method called {funcName}')
-                if isinstance(val,str) and val.startswith('#'):
-                    val = ROOT.TColor.GetColor(val)
-                getattr(g,funcName)(val)
-            leg.AddEntry(g,f"#splitline{{Expected 95% upper limit}}{{{str(suffix)}}}","l")
+        for g,attribute in zip(graphs,attributes):
+            self.useAttributes(g,attribute)
 
-       
+
+        if 'legend' in options.keys():
+            leg.Draw()
+        
 #        tex0 = ROOT.TLatex(0.08,0.91, "#scale[1.4]{#font[61]{CMS}} Internal"+" "*5+"35.87 fb^{-1}(13 TeV),2016")
 #        tex0.SetNDC()
 #        tex0.SetTextSize(.04)
@@ -543,13 +667,11 @@ class Scan:
 #        tex1.SetNDC(); tex1.SetTextSize(.04); tex1.SetTextFont(42)
 #        tex1.Draw("same")
         
-        leg.Draw("same")
-        c1.Print(pdfPath)
-
-        c1.SetLogy(False)
         c1.Print(pdfPath)
 
         c1.Print(pdfPath+']')
+        print (f'Produced multi graph plot : {pdfPath}')
+
 
 
 if __name__=="__main__":
@@ -558,10 +680,16 @@ if __name__=="__main__":
                         help='Yaml containing parameters')
     parser.add_argument('-j','--jobs', action='store', required=False, type=int, default=1,
                         help='Number of commands to run in parallel (default = 1), using -1 will spawn all the commands')
+    parser.add_argument('--combine', action='store', nargs='*', required=False, type=str, default=[],
+                        help='Combine modes to run (as defined in the config file')
+    parser.add_argument('--plotIt', action='store_true', required=False, default=False,
+                        help='Browse datacard files and produce plots via plotIt')
     parser.add_argument('--unblind', action='store_true', required=False, default=False,
                         help='Unblind data')
     parser.add_argument('--force', action='store_true', required=False, default=False,
                         help='Force recreation of save')
+    parser.add_argument('--no_save', action='store_true', required=False, default=False,
+                        help='Does not create the root save file (to be combined with --force probably)')
     parser.add_argument('--debug', action='store_true', required=False, default=False,
                         help='Avoids sending jobs')
     parser.add_argument('-a','--additional', action='store', required=False, default=None, type=str,
@@ -572,12 +700,12 @@ if __name__=="__main__":
         content = yaml.load(handle,Loader=YMLIncludeLoader)
 
    
-    instance = Scan(curves          = content['curves'],
-                    legend          = content['legend'],
-                    combine_args    = content['combine'],
-                    path_out        = content['outputDir'],
+    instance = Scan(**content,
+                    combine_args    = args.combine,
+                    plotIt          = args.plotIt,
                     jobs            = args.jobs,
                     force           = args.force,
+                    no_save         = args.no_save,
                     debug           = args.debug,
                     unblind         = args.unblind)
 
