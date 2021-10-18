@@ -1,5 +1,5 @@
 
-ggHH_kl_0_kt_1_hbbhwwdl:
+ggHH_kl_0_kt_1_hbbhww:
   type: signal
   legend: HH bbWW GGF (cHHH0) 
   order: 14
@@ -13,7 +13,7 @@ ggHH_kl_0_kt_1_hbbhwwdl:
   fill-type: 3345
   files:
     - GluGluToHHTo2B2VTo2L2Nu_NLOBenchmarkcHHH0.root
-ggHH_kl_1_kt_1_hbbhwwdl:
+ggHH_kl_1_kt_1_hbbhww:
   type: signal
   legend: HH bbWW GGF (cHHH1) 
   order: 14
@@ -27,7 +27,7 @@ ggHH_kl_1_kt_1_hbbhwwdl:
   fill-type: 3345
   files:
     - GluGluToHHTo2B2VTo2L2Nu_NLOBenchmarkcHHH1.root
-ggHH_kl_2p45_kt_1_hbbhwwdl:
+ggHH_kl_2p45_kt_1_hbbhww:
   type: signal
   legend: HH bbWW GGF (cHHH2p45) 
   order: 14
@@ -41,7 +41,7 @@ ggHH_kl_2p45_kt_1_hbbhwwdl:
   fill-type: 3345
   files:
     - GluGluToHHTo2B2VTo2L2Nu_NLOBenchmarkcHHH2p45.root
-ggHH_kl_5_kt_1_hbbhwwdl:
+ggHH_kl_5_kt_1_hbbhww:
   type: signal
   legend: HH bbWW GGF (cHHH5) 
   order: 14
@@ -115,7 +115,7 @@ ggHH_kl_5_kt_1_hbbhtt:
 
 
 
-qqHH_CV_0p5_C2V_1_kl_1_hbbhwwdl:
+qqHH_CV_0p5_C2V_1_kl_1_hbbhww:
   type: signal
   legend: HH bbWW VBF (CV 0.5 - C2V 1 - C3 1) 
   order: 14
@@ -127,7 +127,7 @@ qqHH_CV_0p5_C2V_1_kl_1_hbbhwwdl:
   fill-type: 3354
   files:
     - VBFHHTo2B2VTo2L2Nu_CV_0_5_C2V_1_C3_1_dipoleRecoilOff.root
-qqHH_CV_1p5_C2V_1_kl_1_hbbhwwdl:
+qqHH_CV_1p5_C2V_1_kl_1_hbbhww:
   type: signal
   legend: HH bbWW VBF (CV 1.5 - C2V 1 - C3 1) 
   order: 14
@@ -139,7 +139,7 @@ qqHH_CV_1p5_C2V_1_kl_1_hbbhwwdl:
   fill-type: 3354
   files:
     - VBFHHTo2B2VTo2L2Nu_CV_1_5_C2V_1_C3_1_dipoleRecoilOff.root
-qqHH_CV_1_C2V_0_kl_1_hbbhwwdl:
+qqHH_CV_1_C2V_0_kl_1_hbbhww:
   type: signal
   legend: HH bbWW VBF (CV 1 - C2V 0 - C3 1) 
   order: 14
@@ -151,7 +151,7 @@ qqHH_CV_1_C2V_0_kl_1_hbbhwwdl:
   fill-type: 3354
   files:
     - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_0_C3_1_dipoleRecoilOff.root
-qqHH_CV_1_C2V_1_kl_0_hbbhwwdl:
+qqHH_CV_1_C2V_1_kl_0_hbbhww:
   type: signal
   legend: HH bbWW VBF (CV 1 - C2V 1 - C3 0) 
   order: 14
@@ -163,7 +163,7 @@ qqHH_CV_1_C2V_1_kl_0_hbbhwwdl:
   fill-type: 3354
   files:
     - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_0_dipoleRecoilOff.root
-qqHH_CV_1_C2V_1_kl_1_hbbhwwdl:
+qqHH_CV_1_C2V_1_kl_1_hbbhww:
   type: signal
   legend: HH bbWW VBF (CV 1 - C2V 1 - C3 1) 
   order: 14
@@ -175,7 +175,7 @@ qqHH_CV_1_C2V_1_kl_1_hbbhwwdl:
   fill-type: 3354
   files:
     - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_1_dipoleRecoilOff.root
-qqHH_CV_1_C2V_1_kl_2_hbbhwwdl:
+qqHH_CV_1_C2V_1_kl_2_hbbhww:
   type: signal
   legend: HH bbWW VBF (CV 1 - C2V 1 - C3 2) 
   order: 14
@@ -187,7 +187,7 @@ qqHH_CV_1_C2V_1_kl_2_hbbhwwdl:
   fill-type: 3354
   files:
     - VBFHHTo2B2VTo2L2Nu_CV_1_C2V_1_C3_2_dipoleRecoilOff.root
-qqHH_CV_1_C2V_2_kl_1_hbbhwwdl:
+qqHH_CV_1_C2V_2_kl_1_hbbhww:
   type: signal
   legend: HH bbWW VBF (CV 1 - C2V 2 - C3 1) 
   order: 14

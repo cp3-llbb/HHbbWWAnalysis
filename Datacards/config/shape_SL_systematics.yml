@@ -5,8 +5,8 @@ Mixed:  discard
 Envelope: CMS_bbwwdl_thu_shape
 
 # PS #
-psFSR: CMS_bbwwsl_PS_FSR
-psISR: CMS_bbwwsl_PS_ISR
+psFSR: CMS_bbwwsl_ps_fsr
+psISR: CMS_bbwwsl_ps_isr
 
 # Basics #
 L1PreFiring:        CMS_l1_ecal_prefiring_{era}

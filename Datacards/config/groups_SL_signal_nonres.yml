@@ -16,7 +16,6 @@ ggHH_kl_1_kt_1_hbbhww:
   type: signal
   legend: HH bbWW GGF (cHHH1) 
   order: 14
-  hide: True
   line-color: '#288a24'
   fill-color: '#288a24'
   line-type: 1
@@ -69,7 +68,6 @@ ggHH_kl_1_kt_1_hbbhtt:
   type: signal
   legend: HH bb#tau#tau GGF (cHHH1) 
   order: 14
-  hide: True
   line-color: '#c4082e'
   fill-color: '#c4082e'
   line-type: 1

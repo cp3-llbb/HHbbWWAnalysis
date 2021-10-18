@@ -19,33 +19,33 @@ pdf_Higgs_ggHH:
   - ggHH_kl_0_kt_1_hbbhwwsl
   - ggHH_kl_5_kt_1_hbbhwwsl
   - ggHH_kl_2p45_kt_1_hbbhwwsl
-  - ggHH_kl_1_kt_1_hbbhwwdl
-  - ggHH_kl_0_kt_1_hbbhwwdl
-  - ggHH_kl_5_kt_1_hbbhwwdl
-  - ggHH_kl_2p45_kt_1_hbbhwwdl
+  - ggHH_kl_1_kt_1_hbbhww
+  - ggHH_kl_0_kt_1_hbbhww
+  - ggHH_kl_5_kt_1_hbbhww
+  - ggHH_kl_2p45_kt_1_hbbhww
   - ggHH_kl_1_kt_1_hbbhtt
   - ggHH_kl_0_kt_1_hbbhtt
   - ggHH_kl_5_kt_1_hbbhtt
   - ggHH_kl_2p45_kt_1_hbbhtt
   # Resonant #
-  - signal_ggf_{spin}_250_hbbhwwdl
-  - signal_ggf_{spin}_260_hbbhwwdl
-  - signal_ggf_{spin}_270_hbbhwwdl
-  - signal_ggf_{spin}_280_hbbhwwdl
-  - signal_ggf_{spin}_300_hbbhwwdl
-  - signal_ggf_{spin}_320_hbbhwwdl
-  - signal_ggf_{spin}_350_hbbhwwdl
-  - signal_ggf_{spin}_400_hbbhwwdl
-  - signal_ggf_{spin}_450_hbbhwwdl
-  - signal_ggf_{spin}_500_hbbhwwdl
-  - signal_ggf_{spin}_550_hbbhwwdl
-  - signal_ggf_{spin}_600_hbbhwwdl
-  - signal_ggf_{spin}_650_hbbhwwdl
-  - signal_ggf_{spin}_700_hbbhwwdl
-  - signal_ggf_{spin}_750_hbbhwwdl
-  - signal_ggf_{spin}_800_hbbhwwdl
-  - signal_ggf_{spin}_850_hbbhwwdl
-  - signal_ggf_{spin}_900_hbbhwwdl
+  - signal_ggf_{spin}_250_hbbhww
+  - signal_ggf_{spin}_260_hbbhww
+  - signal_ggf_{spin}_270_hbbhww
+  - signal_ggf_{spin}_280_hbbhww
+  - signal_ggf_{spin}_300_hbbhww
+  - signal_ggf_{spin}_320_hbbhww
+  - signal_ggf_{spin}_350_hbbhww
+  - signal_ggf_{spin}_400_hbbhww
+  - signal_ggf_{spin}_450_hbbhww
+  - signal_ggf_{spin}_500_hbbhww
+  - signal_ggf_{spin}_550_hbbhww
+  - signal_ggf_{spin}_600_hbbhww
+  - signal_ggf_{spin}_650_hbbhww
+  - signal_ggf_{spin}_700_hbbhww
+  - signal_ggf_{spin}_750_hbbhww
+  - signal_ggf_{spin}_800_hbbhww
+  - signal_ggf_{spin}_850_hbbhww
+  - signal_ggf_{spin}_900_hbbhww
   - signal_ggf_{spin}_250_hbbhtt
   - signal_ggf_{spin}_260_hbbhtt
   - signal_ggf_{spin}_270_hbbhtt
@@ -86,13 +86,13 @@ pdf_Higgs_ggHH:
 
 pdf_Higgs_qqHH:
   proc:
-  - qqHH_CV_0p5_C2V_1_kl_1_hbbhwwdl
-  - qqHH_CV_1p5_C2V_1_kl_1_hbbhwwdl
-  - qqHH_CV_1_C2V_0_kl_1_hbbhwwdl
-  - qqHH_CV_1_C2V_1_kl_0_hbbhwwdl
-  - qqHH_CV_1_C2V_1_kl_1_hbbhwwdl
-  - qqHH_CV_1_C2V_1_kl_2_hbbhwwdl
-  - qqHH_CV_1_C2V_2_kl_1_hbbhwwdl
+  - qqHH_CV_0p5_C2V_1_kl_1_hbbhww
+  - qqHH_CV_1p5_C2V_1_kl_1_hbbhww
+  - qqHH_CV_1_C2V_0_kl_1_hbbhww
+  - qqHH_CV_1_C2V_1_kl_0_hbbhww
+  - qqHH_CV_1_C2V_1_kl_1_hbbhww
+  - qqHH_CV_1_C2V_1_kl_2_hbbhww
+  - qqHH_CV_1_C2V_2_kl_1_hbbhww
   - qqHH_CV_0p5_C2V_1_kl_1_hbbhwwsl
   - qqHH_CV_1p5_C2V_1_kl_1_hbbhwwsl
   - qqHH_CV_1_C2V_0_kl_1_hbbhwwsl
