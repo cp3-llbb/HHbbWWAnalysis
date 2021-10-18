@@ -45,7 +45,11 @@ class YMLIncludeLoader(yaml.SafeLoader):
             raise RuntimeError(f'{filename} is not a valid file')
         if self._formatting is None:
             with open(filename, 'r') as f:
-                return yaml.load(f, YMLIncludeLoader)
+                try:
+                    return yaml.load(f, YMLIncludeLoader)
+                except yaml.parser.ParserError as err: 
+                    logging.error(f'Parser error when loading file {filename}, see log below')
+                    raise err
         else:
             try:
                 return yaml.load({'filename':filename,'formatting':self._formatting}, 
