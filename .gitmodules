@@ -7,6 +7,3 @@
 [submodule "Datacards/HiggsAnalysis/CombinedLimit"]
 	path = Datacards/HiggsAnalysis/CombinedLimit
 	url = https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git
-[submodule "Datacards/inference"]
-	path = Datacards/inference
-	url = https://gitlab.cern.ch/hh/tools/inference.git
