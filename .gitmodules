@@ -4,3 +4,6 @@
 [submodule "MachineLearning/ml-models"]
 	path = MachineLearning/ml-models
 	url = https://gitlab.cern.ch/cms-hh-bbww/ml-models.git
+[submodule "Datacards/BambooDatacardProducer"]
+	path = Datacards/BambooDatacardProducer
+	url = git@github.com:FlorianBury/BambooDatacardProducer.git
