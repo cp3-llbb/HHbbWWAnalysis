@@ -1,0 +1,38 @@
+HH_SL_resolved1b_GGF:
+  - HH_SL_e_resolved1b_GGF
+  - HH_SL_m_resolved1b_GGF
+HH_SL_resolved1b_VBF:
+  - HH_SL_e_resolved1b_VBF
+  - HH_SL_m_resolved1b_VBF
+
+HH_SL_resolved2b_GGF:
+  - HH_SL_e_resolved2b_GGF
+  - HH_SL_m_resolved2b_GGF
+    
+HH_SL_resolved2b_VBF:
+  - HH_SL_e_resolved2b_VBF
+  - HH_SL_m_resolved2b_VBF
+    
+HH_SL_boosted_GGF:
+  - HH_SL_e_boosted_GGF
+  - HH_SL_m_boosted_GGF
+    
+HH_SL_boosted_VBF:
+  - HH_SL_e_boosted_VBF
+  - HH_SL_m_boosted_VBF
+    
+HH_SL_inclusive_WJets:
+  - HH_SL_e_inclusive_WJets
+  - HH_SL_m_inclusive_WJets
+    
+HH_SL_inclusive_other:
+  - HH_SL_e_inclusive_other
+  - HH_SL_m_inclusive_other
+    
+HH_SL_resolved_TopH:
+  - HH_SL_e_resolved_TopH
+  - HH_SL_m_resolved_TopH
+    
+HH_SL_boosted_TopH:
+  - HH_SL_e_boosted_TopH
+  - HH_SL_m_boosted_TopH

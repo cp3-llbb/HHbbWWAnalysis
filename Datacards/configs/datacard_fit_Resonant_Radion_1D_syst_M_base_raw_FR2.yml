@@ -1,0 +1,131 @@
+path: 
+  2016:
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_Fake_Resonant_Boosted1B_syst_M_{mass}/
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_Fake_Resonant_Resolved1B_syst_M_{mass}/
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_Fake_Resonant_Resolved2B_syst_M_{mass}/
+  2017:
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_Resonant_Boosted1B_syst_M_{mass}/
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_Resonant_Resolved1B_syst_M_{mass}/
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_Resonant_Resolved2B_syst_M_{mass}/
+  2018:
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_Boosted1B_{branch}_syst_M_{mass}/
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_Resolved1B_{branch}_syst_M_{mass}/
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_Resolved2B_{branch}_syst_M_{mass}/
+
+outputDir: /home/ucl/cp3/fbury/scratch/Datacards/bbww_dl/Resonant/datacard_fit_Resonant_{branch}_Radion_1D_syst_M_{mass}_raw_FR2
+
+use_syst: True
+
+yamlName: plots_DYEstimation_FakeExtrapolation.yml
+
+produce_plots: True
+
+era: 
+ - 2016
+ - 2017
+ - 2018
+
+legend:
+  position:
+  - 0.2
+  - 0.7
+  - 0.9
+  - 0.9
+  columns: 3
+
+combineConfigs: !include combine_Radion_DL_res.yml
+
+normSyst  : !include norm_all_res.yml
+
+shapeSyst  : !include shape_DL_systematics.yml
+
+histCorrections: !include nonclosure_DY_res.yml
+
+histConverter: 
+  2016: !include resonant_cat_param_1D_mass_fix.yml
+  2017: !include resonant_cat_param_1D_mass_fix.yml
+  2018: !include resonant_cat_param_1D_mass.yml
+
+groups:
+  2016:
+    - !include groups_DL_bkg_2016.yml
+    - !include groups_DY_datadriven_2016.yml
+    - !include groups_Fakes_2016.yml
+    - !include groups_data_2016.yml
+    - signal_ggf_{spin}_{mass}_hbbhww:
+        type: signal
+        legend: "Radion {mass} GeV #rightarrowHH#rightarrowbbWW [1 pb]"
+        order: 14
+        line-color: '#288a24'
+        fill-color: '#288a24'
+        line-type: 1
+        line-width: 2
+        fill-type: 3345
+        files:
+          - GluGluToRadionToHHTo2B2VTo2L2Nu_M-{mass}.root
+      signal_ggf_{spin}_{mass}_hbbhtt:
+        type: signal
+        legend: "Radion {mass} GeV #rightarrowHH#rightarrowbb#tau#tau [1 pb]"
+        order: 14
+        line-color: '#c91a26'
+        fill-color: '#c91a26'
+        line-type: 1
+        line-width: 2
+        fill-type: 3354
+        files:
+          - GluGluToRadionToHHTo2B2Tau_M-{mass}.root
+  2017:
+    - !include groups_DL_bkg_2017.yml
+    - !include groups_DY_datadriven_2017.yml
+    - !include groups_Fakes_2017.yml
+    - !include groups_data_2017.yml
+    - signal_ggf_{spin}_{mass}_hbbhww:
+        type: signal
+        legend: "Radion {mass} GeV #rightarrowHH#rightarrowbbWW [1 pb]"
+        order: 14
+        line-color: '#288a24'
+        fill-color: '#288a24'
+        line-type: 1
+        line-width: 2
+        fill-type: 3345
+        files:
+          - GluGluToRadionToHHTo2B2VTo2L2Nu_M-{mass}.root
+      signal_ggf_{spin}_{mass}_hbbhtt:
+        type: signal
+        legend: "Radion {mass} GeV #rightarrowHH#rightarrowbb#tau#tau [1 pb]"
+        order: 14
+        line-color: '#c91a26'
+        fill-color: '#c91a26'
+        line-type: 1
+        line-width: 2
+        fill-type: 3354
+        files:
+          - GluGluToRadionToHHTo2B2Tau_M-{mass}.root
+  2018:
+    - !include groups_DL_bkg_2018.yml
+    - !include groups_DY_datadriven_2018.yml
+    - !include groups_Fakes_2018.yml
+    - !include groups_data_2018.yml
+    - signal_ggf_{spin}_{mass}_hbbhww:
+        type: signal
+        legend: "Radion {mass} GeV #rightarrowHH#rightarrowbbWW [1 pb]"
+        order: 14
+        line-color: '#288a24'
+        fill-color: '#288a24'
+        line-type: 1
+        line-width: 2
+        fill-type: 3345
+        files:
+          - GluGluToRadionToHHTo2B2VTo2L2Nu_M-{mass}.root
+      signal_ggf_{spin}_{mass}_hbbhtt:
+        type: signal
+        legend: "Radion {mass} GeV #rightarrowHH#rightarrowbb#tau#tau [1 pb]"
+        order: 14
+        line-color: '#c91a26'
+        fill-color: '#c91a26'
+        line-type: 1
+        line-width: 2
+        fill-type: 3354
+        files:
+          - GluGluToRadionToHHTo2B2Tau_M-{mass}.root
+

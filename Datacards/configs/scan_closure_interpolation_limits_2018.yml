@@ -1,0 +1,304 @@
+outputDir: Scans/Resonant_limits_raw/
+
+combine: 
+  limits_DL: limits
+
+canvas:  &canvas
+    SetWindowSize: [600,600]
+    SetLeftMargin: 0.15
+    SetRightMargin: 0.05
+    SetTopMargin: 0.06
+    SetBottomMargin: 0.15
+    SetLogy: True
+    #SetGridx: True 
+    #SetGridy: True
+    SetTickx: True
+    SetTicky: True
+
+limit_header: &limit_header
+    - text: 'CMS'
+      options: 
+          SetNDC: True
+          SetX: 0.18
+          SetY: 0.86
+          SetTextFont: 62
+          SetTextSize: 0.07
+    - text: 'Preliminary'
+      options: 
+          SetNDC: True
+          SetX: 0.18
+          SetY: 0.81
+          SetTextFont: 62
+          SetTextSize: 0.05
+    - text: '138 fb^{-1} (13 TeV)'
+      options: 
+          SetNDC: True
+          SetX: 0.72
+          SetY: 0.95
+          SetTextFont: 42
+          SetTextSize: 0.04
+
+plots:
+  # MULTI LIMITS PLOTS #
+  - name: comparison
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma x B(X#rightarrow HH #rightarrow bbWW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.03,40]
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.55
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.022
+            SetBorderSize: 0
+    curves: 
+      "True 1D":         ["True 1D","limits_DL",""]
+      "Interpolated 1D": ["Interpolated 1D","limits_DL",""]
+      "True 2D":         ["True 2D","limits_DL",""]
+      "Interpolated 2D": ["Interpolated 2D","limits_DL",""]
+    legend:
+      "True 1D":         "True points (1D)"
+      "Interpolated 1D": "Interpolated points (1D)"
+      "True 2D":         "True points (2D)"
+      "Interpolated 2D": "Interpolated points (2D)"
+    lines:
+      "True 1D":         {'SetLineStyle': 1,'SetLineColor': '#D81B60'}
+      "Interpolated 1D": {'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "True 2D":         {'SetLineStyle': 2,'SetLineColor': '#D81B60'}
+      "Interpolated 2D": {'SetLineStyle': 2,'SetLineColor': '#1E88E5'}
+
+
+curves:
+    #########################################################################
+    #                             True points                               #
+    #########################################################################
+
+    'True 1D':
+        modes: 
+            limits_DL: []
+        points:
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=260 branch=LowMass type=true
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=270 branch=LowMass type=true
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=280 branch=LowMass type=true
+              label: 280
+              custom: {mass: 280}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=300 branch=LowMass type=true
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=350 branch=LowMass type=true
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=400 branch=LowMass type=true
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=450 branch=LowMass type=true
+              label: 450
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=500 branch=LowMass type=true
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=550 branch=HighMass type=true
+              label: 550
+              custom: {mass: 550}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=600 branch=HighMass type=true
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=650 branch=HighMass type=true
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=700 branch=HighMass type=true
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=750 branch=HighMass type=true
+              label: 750
+              custom: {mass: 750}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=800 branch=HighMass type=true
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=850 branch=HighMass type=true
+              label: 850
+              custom: {mass: 850}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=900 branch=HighMass type=true
+              label: 900
+              custom: {mass: 900}
+
+    #########################################################################
+    #                         Interpolated points                           #
+    #########################################################################
+    'Interpolated 1D':
+        modes: 
+            limits_DL: []
+        points:
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=270 branch=LowMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=260 param2=280 paramInt=270 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=1D mass=260 branch=LowMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=1D mass=280 branch=LowMass type=interpolated --interpolation_era 2018
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=280 branch=LowMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=270 param2=300 paramInt=280 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=1D mass=270 branch=LowMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=1D mass=300 branch=LowMass type=interpolated --interpolation_era 2018
+              label: 280
+              custom: {mass: 280}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=300 branch=LowMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=280 param2=350 paramInt=300 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=1D mass=280 branch=LowMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=1D mass=350 branch=LowMass type=interpolated --interpolation_era 2018
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=350 branch=LowMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=300 param2=400 paramInt=350 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=1D mass=300 branch=LowMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=1D mass=400 branch=LowMass type=interpolated --interpolation_era 2018
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=400 branch=LowMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=350 param2=450 paramInt=400 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=1D mass=350 branch=LowMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=1D mass=450 branch=LowMass type=interpolated --interpolation_era 2018
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=450 branch=LowMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=400 param2=500 paramInt=450 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=1D mass=400 branch=LowMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=1D mass=500 branch=LowMass type=interpolated --interpolation_era 2018
+              label: 450
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=1D mass=500 branch=LowMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=450 param2=550 paramInt=500 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=1D mass=450 branch=LowMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=1D mass=550 branch=LowMass type=interpolated --interpolation_era 2018
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=550 branch=HighMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=500 param2=600 paramInt=550 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=1D mass=500 branch=HighMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=1D mass=600 branch=HighMass type=interpolated --interpolation_era 2018
+              label: 550
+              custom: {mass: 550}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=600 branch=HighMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=550 param2=650 paramInt=600 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=1D mass=550 branch=HighMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=1D mass=650 branch=HighMass type=interpolated --interpolation_era 2018
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=650 branch=HighMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=600 param2=700 paramInt=650 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=1D mass=600 branch=HighMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=1D mass=700 branch=HighMass type=interpolated --interpolation_era 2018
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=700 branch=HighMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=650 param2=750 paramInt=700 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=1D mass=650 branch=HighMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=1D mass=750 branch=HighMass type=interpolated --interpolation_era 2018
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=750 branch=HighMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=700 param2=800 paramInt=750 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=1D mass=700 branch=HighMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=1D mass=800 branch=HighMass type=interpolated --interpolation_era 2018
+              label: 750
+              custom: {mass: 750}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=800 branch=HighMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=750 param2=850 paramInt=800 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=1D mass=750 branch=HighMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=1D mass=850 branch=HighMass type=interpolated --interpolation_era 2018
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=1D mass=850 branch=HighMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=800 param2=900 paramInt=850 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=1D mass=800 branch=HighMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=1D mass=900 branch=HighMass type=interpolated --interpolation_era 2018
+              label: 850
+              custom: {mass: 850}
+
+
+
+    #########################################################################
+    #                             True points                               #
+    #########################################################################
+
+    'True 2D':
+        modes: 
+            limits_DL: []
+        points:
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=260 branch=LowMass type=true
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=270 branch=LowMass type=true
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=280 branch=LowMass type=true
+              label: 280
+              custom: {mass: 280}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=300 branch=LowMass type=true
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=350 branch=LowMass type=true
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=400 branch=LowMass type=true
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=450 branch=LowMass type=true
+              label: 450
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=500 branch=LowMass type=true
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=550 branch=HighMass type=true
+              label: 550
+              custom: {mass: 550}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=600 branch=HighMass type=true
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=650 branch=HighMass type=true
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=700 branch=HighMass type=true
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=750 branch=HighMass type=true
+              label: 750
+              custom: {mass: 750}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=800 branch=HighMass type=true
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=850 branch=HighMass type=true
+              label: 850
+              custom: {mass: 850}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=900 branch=HighMass type=true
+              label: 900
+              custom: {mass: 900}
+
+    #########################################################################
+    #                         Interpolated points                           #
+    #########################################################################
+    'Interpolated 2D':
+        modes: 
+            limits_DL: []
+        points:
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=270 branch=LowMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=260 param2=280 paramInt=270 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=2D mass=260 branch=LowMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=2D mass=280 branch=LowMass type=interpolated --interpolation_era 2018
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=280 branch=LowMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=270 param2=300 paramInt=280 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=2D mass=270 branch=LowMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=2D mass=300 branch=LowMass type=interpolated --interpolation_era 2018
+              label: 280
+              custom: {mass: 280}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=300 branch=LowMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=280 param2=350 paramInt=300 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=2D mass=280 branch=LowMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=2D mass=350 branch=LowMass type=interpolated --interpolation_era 2018
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=350 branch=LowMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=300 param2=400 paramInt=350 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=2D mass=300 branch=LowMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=2D mass=400 branch=LowMass type=interpolated --interpolation_era 2018
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=400 branch=LowMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=350 param2=450 paramInt=400 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=2D mass=350 branch=LowMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=2D mass=450 branch=LowMass type=interpolated --interpolation_era 2018
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=450 branch=LowMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=400 param2=500 paramInt=450 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=2D mass=400 branch=LowMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=2D mass=500 branch=LowMass type=interpolated --interpolation_era 2018
+              label: 450
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=LowMass dim=2D mass=500 branch=LowMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=450 param2=550 paramInt=500 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=2D mass=450 branch=LowMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=LowMass dim=2D mass=550 branch=LowMass type=interpolated --interpolation_era 2018
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=550 branch=HighMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=500 param2=600 paramInt=550 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=2D mass=500 branch=HighMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=2D mass=600 branch=HighMass type=interpolated --interpolation_era 2018
+              label: 550
+              custom: {mass: 550}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=600 branch=HighMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=550 param2=650 paramInt=600 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=2D mass=550 branch=HighMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=2D mass=650 branch=HighMass type=interpolated --interpolation_era 2018
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=650 branch=HighMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=600 param2=700 paramInt=650 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=2D mass=600 branch=HighMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=2D mass=700 branch=HighMass type=interpolated --interpolation_era 2018
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=700 branch=HighMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=650 param2=750 paramInt=700 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=2D mass=650 branch=HighMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=2D mass=750 branch=HighMass type=interpolated --interpolation_era 2018
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=750 branch=HighMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=700 param2=800 paramInt=750 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=2D mass=700 branch=HighMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=2D mass=800 branch=HighMass type=interpolated --interpolation_era 2018
+              label: 750
+              custom: {mass: 750}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=800 branch=HighMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=750 param2=850 paramInt=800 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=2D mass=750 branch=HighMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=2D mass=850 branch=HighMass type=interpolated --interpolation_era 2018
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_closure_limits_spin2_2018.yml  --era 2018 --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 branch=HighMass dim=2D mass=850 branch=HighMass type=interpolated --interpolation config/interpolation_DL_res.yml  spin=spin2 param1=800 param2=900 paramInt=850 --interpolation_config1 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=2D mass=800 branch=HighMass type=interpolated --interpolation_config2 config/datacard_fit_Resonant_closure_limits_spin2_2018.yml spin=spin2 branch=HighMass dim=2D mass=900 branch=HighMass type=interpolated --interpolation_era 2018
+              label: 850
+              custom: {mass: 850}
+
+
+

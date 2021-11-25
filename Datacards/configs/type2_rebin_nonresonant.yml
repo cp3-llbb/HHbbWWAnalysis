@@ -1,0 +1,45 @@
+HH_DL_resolved1b_GGF:
+  method : boundary
+  params : [[0.0, 0.255, 0.2775, 0.2975, 0.3175, 0.3375, 0.3575, 0.3775, 0.3975, 0.42, 0.4425, 0.4625, 0.4825, 0.5025, 0.525, 0.56, 1.0]]
+HH_DL_resolved2b_GGF:
+  method : boundary
+  params : [[0.0, 0.255, 0.28, 0.3025, 0.3225, 0.3425, 0.3625, 0.385, 0.4075, 0.43, 0.4525, 0.4775, 0.5025, 0.545, 1.0]]
+HH_DL_boosted_GGF:
+  method : boundary
+  params : [[0.0, 0.2825, 0.3525, 1.0]]
+
+HH_DL_resolved1b_VBF:
+  method : boundary
+  params : [[0.0, 0.26, 0.2875, 0.3125, 0.335, 0.3525, 0.37, 0.385, 0.3975, 0.4725, 0.5, 0.545, 1.0]]
+HH_DL_resolved2b_VBF:
+  method : boundary
+  params : [[0.0, 0.27, 0.305, 0.34, 0.37, 0.4, 0.4275, 0.455, 0.495, 0.54, 1.0]]
+HH_DL_boosted_VBF:
+  method : boundary
+  params : [[0.0, 0.3925, 1.0]]
+
+HH_DL_resolved1b_H:
+  method : boundary
+  params : [[0.0, 0.255, 0.2775, 0.2975, 0.3175, 0.34, 0.3675, 0.4075, 1.0]]
+HH_DL_resolved2b_H:
+  method : boundary
+  params : [[0.0, 0.2625, 0.285, 0.3025, 0.3225, 0.3425, 0.37, 0.4125, 1.0]]
+HH_DL_boosted_H:
+  method : boundary
+  params : [[0.0, 0.2775, 0.3075, 0.335, 0.36, 0.3875, 0.42, 0.4625, 1.0]]
+
+HH_DL_resolved_DY_VVV:
+  method : boundary
+  params : [[0.0, 0.28, 0.3225, 0.3625, 0.4025, 0.4425, 0.4825, 0.54, 1.0]]
+HH_DL_boosted_DY_VVV:
+  method : boundary
+  params : [[0.0, 0.2975, 0.3575, 0.415, 0.4725, 0.535, 0.6075, 0.6925, 1.0]]
+
+HH_DL_resolved_other:
+  method : boundary
+  params : [[0.0, 0.2825, 0.315, 0.345, 0.3725, 0.4025, 0.4325, 0.475, 1.0]]
+HH_DL_boosted_other:
+  method : boundary
+  params : [[0.,0.2925,0.3525,1.]]
+
+

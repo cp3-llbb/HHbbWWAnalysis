@@ -1,0 +1,57 @@
+path: 
+  2018:
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_Boosted1B_{branch}_syst_M_{mass}/
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_Resolved1B_{branch}_syst_M_{mass}/
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_Resolved2B_{branch}_syst_M_{mass}/
+
+outputDir: /home/ucl/cp3/fbury/scratch/Datacards/bbww_dl/InterpolationClosure/test_{type}_{branch}_{mass}_2018/
+
+use_syst: False
+
+yamlName: plots_DYEstimation_FakeExtrapolation.yml
+
+produce_plots: True
+
+era: 
+ - 2018
+
+combineConfigs: 
+  - !include combine_DL_res.yml
+
+
+normSyst  : !include norm_all_res.yml
+
+shapeSyst  : !include shape_DL_systematics.yml
+
+histCorrections: !include nonclosure_DY_res.yml
+
+histConverter: 
+  HH_DL_{mass}_GGF:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtagM{mass}GGF_DNNOutput_GGF
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtagM{mass}GGF_DNNOutput_GGF
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtagM{mass}GGF_DNNOutput_GGF
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtagsM{mass}GGF_DNNOutput_GGF
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtagsM{mass}GGF_DNNOutput_GGF
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtagsM{mass}GGF_DNNOutput_GGF
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtagM{mass}GGF_DNNOutput_GGF
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtagM{mass}GGF_DNNOutput_GGF
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtagM{mass}GGF_DNNOutput_GGF
+  HH_DL_{mass}_HME:
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag_HME
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag_HME
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedOneBtag_HME
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags_HME
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags_HME
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedTwoAk4JetsExclusiveResolvedTwoBtags_HME
+    - ElEl_Has2FakeableElElOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag_HME
+    - ElMu_Has2FakeableElMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag_HME
+    - MuMu_Has2FakeableMuMuOSWithTriggersPtCutsPreMllCutOutZTightSelectedOneAk8JetInclusiveBoostedOneBtag_HME
+
+groups:
+  2018:
+    - !include groups_bkg_2018.yml
+    - !include groups_Fakes_2018.yml
+    - !include groups_data_2018.yml
+    - !include groups_DL_signal_res_spin2.yml
+
+

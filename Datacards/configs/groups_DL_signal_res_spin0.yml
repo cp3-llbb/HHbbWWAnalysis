@@ -1,0 +1,23 @@
+signal_ggf_spin0_{mass}_hbbhww:
+  type: signal  
+  legend: "Radion#rightarrowHH#rightarrowbbWW ({mass} GeV)"
+  order: 14
+  line-color: '#288a24'
+  fill-color: '#288a24'
+  line-type: 1
+  line-width: 2
+  fill-type: 3345
+  files:
+    - GluGluToRadionToHHTo2B2VTo2L2Nu_M-{mass}.root
+signal_ggf_spin0_{mass}_hbbhtt:
+  type: signal
+  legend: "Radion#rightarrowHH#rightarrowbb#tau#tau ({mass} GeV)"
+  order: 14
+  line-color: '#c91a26'
+  fill-color: '#c91a26'
+  line-type: 1
+  line-width: 2
+  fill-type: 3354
+  files:
+    - GluGluToRadionToHHTo2B2Tau_M-{mass}.root
+

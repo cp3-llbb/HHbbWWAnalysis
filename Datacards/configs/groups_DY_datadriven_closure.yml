@@ -1,0 +1,12 @@
+DY:
+  fill-color: '#1a83a1'
+  legend: Drell-Yan (from pseudodata)
+  order: 3
+  type: mc
+  files:
+    - DYJetsToLL_M-10to50DYEstimation.root
+    - DYJetsToLL_M-50DYEstimation.root
+    - DYToLL_0JDYEstimation.root
+    - DYToLL_1JDYEstimation.root
+    - DYToLL_2JDYEstimation.root
+

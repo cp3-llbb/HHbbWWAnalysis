@@ -1,0 +1,146 @@
+# Signal categories #
+HH_DL_resolved1b_GGF:
+  method: threshold
+  params: 
+    - [1.e-05, 1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0]
+    - [TT,ST,DY]
+    - 15
+    - 0.075
+    - [ggHH_kl_1_kt_1_hbbhww,ggHH_kl_1_kt_1_hbbhtt]
+HH_DL_resolved2b_GGF:
+  method: threshold
+  params: 
+    - [1.e-05, 1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0]
+    - [TT,ST,DY]
+    - 15
+    - 0.075
+    - [ggHH_kl_1_kt_1_hbbhww,ggHH_kl_1_kt_1_hbbhtt]
+HH_DL_boosted_GGF:
+  method: threshold
+  params: 
+    - [1.e-05, 1.0, 4.0]
+    - [TT,ST,DY]
+    - 3
+    - 0.075
+    - [ggHH_kl_1_kt_1_hbbhww,ggHH_kl_1_kt_1_hbbhtt]
+
+HH_DL_resolved1b_VBF:
+  method: threshold
+  params: 
+    - [1.e-05, 1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0]
+    - [TT,ST,DY]
+    - 15
+    - 0.075
+    - [qqHH_CV_1_C2V_1_kl_1_hbbhww,qqHH_CV_1_C2V_1_kl_1_hbbhtt]
+HH_DL_resolved2b_VBF:
+  method: threshold
+  params: 
+    - [1.e-05, 1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0]
+    - [TT,ST,DY]
+    - 15
+    - 0.075
+    - [qqHH_CV_1_C2V_1_kl_1_hbbhww,qqHH_CV_1_C2V_1_kl_1_hbbhtt]
+HH_DL_boosted_VBF:
+  method: threshold
+  params: 
+    - [1.e-05, 1.0, 4.0]
+    - [TT,ST,DY]
+    - 3
+    - 0.075
+    - [qqHH_CV_1_C2V_1_kl_1_hbbhww,qqHH_CV_1_C2V_1_kl_1_hbbhtt]
+
+HH_SL_resolved1b_GGF:
+  method: threshold
+  params: 
+    - [1.e-05, 1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0]
+    - [TT,ST,DY]
+    - 15
+    - 0.075
+    - [ggHH_kl_1_kt_1_hbbhww,ggHH_kl_1_kt_1_hbbhtt]
+HH_SL_resolved2b_GGF:
+  method: threshold
+  params: 
+    - [1.e-05, 1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0]
+    - [TT,ST,DY]
+    - 15
+    - 0.075
+    - [ggHH_kl_1_kt_1_hbbhww,ggHH_kl_1_kt_1_hbbhtt]
+HH_SL_boosted_GGF:
+  method: threshold
+  params: 
+    - [1.e-05, 1.0, 4.0]
+    - [TT,ST,DY]
+    - 3
+    - 0.075
+    - [ggHH_kl_1_kt_1_hbbhww,ggHH_kl_1_kt_1_hbbhtt]
+
+HH_SL_resolved1b_VBF:
+  method: threshold
+  params: 
+    - [1.e-05, 1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0]
+    - [TT,ST,WJets]
+    - 15
+    - 0.075
+    - [qqHH_CV_1_C2V_1_kl_1_hbbhww,qqHH_CV_1_C2V_1_kl_1_hbbhtt]
+HH_SL_resolved2b_VBF:
+  method: threshold
+  params: 
+    - [1.e-05, 1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0, 100.0, 121.0, 144.0, 169.0, 196.0]
+    - [TT,ST,WJets]
+    - 15
+    - 0.075
+    - [qqHH_CV_1_C2V_1_kl_1_hbbhww,qqHH_CV_1_C2V_1_kl_1_hbbhtt]
+HH_SL_boosted_VBF:
+  method: threshold
+  params: 
+    - [1.e-05, 1.0, 4.0]
+    - [TT,ST,WJets]
+    - 3
+    - 0.075
+    - [qqHH_CV_1_C2V_1_kl_1_hbbhww,qqHH_CV_1_C2V_1_kl_1_hbbhtt]
+
+
+# Background categories #
+backgrounds : &back [TT,ST,DY,WJets,VV,VVV,Other_bbWW,ggH_hbb,ggH_hgg,ggH_hmm,ggH_htt,ggH_hww,ggH_hzz,qqH_hbb,qqH_hgg,qqH_hmm,qqH_htt,qqH_hww,qqH_hzz,ttH_hbb,ttH_hww,WH_hbb,ZH_hbb,ZH_htt,ZH_hww,tHq_hww,tHW_hww,VH_hww] 
+
+HH_DL_inclusive_DY_VVV:
+  method : quantile
+  params : 
+    - [0.,0.2,0.4,0.6,0.8,1.]
+    - *back
+
+HH_DL_resolved_other:
+  method : quantile
+  params : 
+    - [0.,0.2,0.4,0.6,0.8,1.]
+    - *back
+HH_DL_boosted_other:
+  method : quantile
+  params : 
+    - [0.,0.33,0.66,1.]
+    - *back
+
+HH_SL_inclusive_WJets:
+  method : quantile
+  params : 
+    - [0.,0.2,0.4,0.6,0.8,1.]
+    - *back
+
+HH_SL_inclusive_other:
+  method : quantile
+  params : 
+    - [0.,0.2,0.4,0.6,0.8,1.]
+    - *back
+
+HH_SL_resolved_TopH:
+  method : quantile
+  params : 
+    - [0.,0.2,0.4,0.6,0.8,1.]
+    - *back
+
+HH_SL_boosted_TopH:
+  method : quantile
+  params : 
+    - [0.,0.33,0.66,1.]
+    - *back
+

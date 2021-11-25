@@ -1,0 +1,46 @@
+quantiles :   
+  - &quant5 [0., 0.2, 0.4, 0.6, 0.8 ,1.]
+  - &quant3 [0., 0.33, 0.66, 1.]
+  - &quantHME [0.,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+backgrounds : &back [TT,ST,DY,WJets,VV,VVV,Other_bbWW,ggH_hbb,ggH_hgg,ggH_hmm,ggH_htt,ggH_hww,ggH_hzz,qqH_hbb,qqH_hgg,qqH_hmm,qqH_htt,qqH_hww,qqH_hzz,ttH_hbb,ttH_hww,WH_hbb,ZH_hbb,ZH_htt,ZH_hww,tHq_hww,tHW_hww,VH_hww]
+
+
+HH_DL_{mass}_resolved1b_GGF:
+  method: rebinlinearize2d
+  params: 
+    - y
+    - Quantile
+    - [*quantHME]
+    - Threshold2
+    - [[1.0, 4.0, 9.0, 16.0, 25.0],[TT,ST,DY]]
+    - [signal_ggf_{spin}_{mass}_hbbhww,signal_ggf_{spin}_{mass}_hbbhtt]
+HH_DL_{mass}_resolved2b_GGF:
+  method: rebinlinearize2d
+  params: 
+    - y
+    - Quantile
+    - [*quantHME]
+    - Threshold2
+    - [[1.0, 4.0, 9.0, 16.0, 25.0],[TT,ST,DY]]
+    - [signal_ggf_{spin}_{mass}_hbbhww,signal_ggf_{spin}_{mass}_hbbhtt]
+HH_DL_{mass}_boosted_GGF:
+  method: rebinlinearize2d
+  params: 
+    - y
+    - Quantile
+    - [*quantHME]
+    - Threshold2
+    - [[1.0, 4.0, 9.0, 16.0, 25.0],[TT,ST,DY]]
+    - [signal_ggf_{spin}_{mass}_hbbhww,signal_ggf_{spin}_{mass}_hbbhtt]
+
+
+HH_DL_{mass}_inclusive_DY_VVV:
+  method : quantile
+  params : [*quant5, *back]
+HH_DL_{mass}_resolved_other:
+  method : quantile
+  params : [*quant5, *back]
+HH_DL_{mass}_boosted_other:
+  method : quantile
+  params : [*quant3, *back]
+

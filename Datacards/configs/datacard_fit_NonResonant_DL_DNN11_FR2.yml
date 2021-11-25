@@ -1,0 +1,71 @@
+path: 
+  2016:
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved1B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved2B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_NonResonant_DNN11_Fake_DYEstimation_Boosted1B
+  2017:
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved1B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved2B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_NonResonant_DNN11_Fake_DYEstimation_Boosted1B
+  2018:
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved1B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved2B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_NonResonant_DNN11_Fake_DYEstimation_Boosted1B
+
+outputDir: /home/ucl/cp3/fbury/scratch/Datacards/bbww_dl/NonResonant/datacard_fit_NonResonant_DL_syst_FR2/
+
+use_syst: True
+
+yamlName: 
+  - plots_DYEstimation_FakeExtrapolation.yml
+
+produce_plots: True
+
+era: 
+  - 2016
+  - 2017
+  - 2018
+
+combineConfigs: !include combine_DL_nonres.yml
+
+legend:
+  position:
+  - 0.2
+  - 0.7
+  - 0.9
+  - 0.9
+  columns: 3
+
+normSyst  : !include norm_all_nonres.yml
+
+
+shapeSyst  : !include shape_DL_systematics.yml
+
+rebin: 
+  2016: !include rebin_DL_nonresonant_2016.yml
+  2017: !include rebin_DL_nonresonant_2017.yml
+  2018: !include rebin_DL_nonresonant_2018.yml
+  
+histCorrections: !include nonclosure_DY_nonres.yml
+
+histConverter: !include cat_DL_nonresonant.yml
+  
+groups:
+  2016:
+    - !include groups_DL_bkg_2016.yml
+    - !include groups_DY_datadriven_2016.yml
+    - !include groups_Fakes_2016.yml
+    - !include groups_data_2016.yml
+    - !include groups_DL_signal_nonres.yml
+  2017:
+    - !include groups_DL_bkg_2017.yml
+    - !include groups_DY_datadriven_2017.yml
+    - !include groups_Fakes_2017.yml
+    - !include groups_data_2017.yml
+    - !include groups_DL_signal_nonres.yml
+  2018:
+    - !include groups_DL_bkg_2018.yml
+    - !include groups_DY_datadriven_2018.yml
+    - !include groups_Fakes_2018.yml
+    - !include groups_data_2018.yml
+    - !include groups_DL_signal_nonres.yml

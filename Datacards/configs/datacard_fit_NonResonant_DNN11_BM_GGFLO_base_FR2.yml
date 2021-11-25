@@ -1,0 +1,152 @@
+path: 
+  2016:
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved1B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved2B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_NonResonant_DNN11_Fake_DYEstimation_Boosted1B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_NonResonant_DNN11_Fake_DYEstimation_GGFLO_Benchmark{BM}
+  2017:
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved1B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved2B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_NonResonant_DNN11_Fake_DYEstimation_Boosted1B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_NonResonant_DNN11_Fake_DYEstimation_GGFLO_Benchmark{BM}
+  2018:
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved1B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved2B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_NonResonant_DNN11_Fake_DYEstimation_Boosted1B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_NonResonant_DNN11_Fake_DYEstimation_GGFLO_Benchmark{BM}
+
+
+
+outputDir: /home/ucl/cp3/fbury/scratch/Datacards/bbww_dl/NonResonant/datacard_fit_NonResonant_BM_GGFLO_{BM}_syst_FR2/
+
+use_syst: True
+
+textfiles: datacard_{BM}_{}.txt
+
+yamlName: 
+  - plots_DYEstimation_FakeExtrapolation.yml
+  - plots.yml
+
+produce_plots: True
+
+era: 
+  - 2016
+  - 2017
+  - 2018
+
+combineConfigs: !include combine_DL_nonres.yml
+
+legend:
+  position:
+  - 0.2
+  - 0.7
+  - 0.9
+  - 0.9
+  columns: 3
+
+histCorrections: !include nonclosure_DY_nonres.yml
+
+normSyst: !include norm_all_nonres.yml
+
+shapeSyst  : !include shape_DL_systematics.yml
+
+  
+rebin: 
+  2016: !include rebin_DL_nonresonant_2016.yml
+  2017: !include rebin_DL_nonresonant_2017.yml
+  2018: !include rebin_DL_nonresonant_2018.yml
+
+
+histConverter: !include cat_DL_nonresonant.yml
+
+  
+groups:
+  2016:
+    - !include groups_DL_bkg_2016.yml
+    - !include groups_DY_datadriven_2016.yml
+    - !include groups_Fakes_2016.yml
+    - !include groups_data_2016.yml
+    - !include groups_DL_BM_qqHH.yml
+    - ggHH_BM_{BM}_hbbhww:
+        type: signal
+        legend: HH bbWW GGF (BM {BM}) 
+        order: 14
+        line-color: '#288a24'
+        fill-color: '#288a24'
+        line-type: 1
+        line-width: 2
+        fill-type: 3345
+        files:
+          - GluGluToHHTo2B2VTo2L2Nu_NLOBenchmark{BM}.root
+    
+      ggHH_BM_{BM}_hbbhtt:
+        type: signal
+        legend: HH bb#tau#tau GGF (BM {BM}) 
+        order: 14
+        line-color: '#c91a26'
+        line-type: 1
+        fill-color: '#c91a26'
+        line-width: 2
+        fill-type: 3354
+        files:
+          - GluGluToHHTo2B2Tau_NLOBenchmark{BM}.root
+  2017:
+    - !include groups_DL_bkg_2017.yml
+    - !include groups_DY_datadriven_2017.yml
+    - !include groups_Fakes_2017.yml
+    - !include groups_data_2017.yml
+    - !include groups_DL_BM_qqHH.yml
+    - ggHH_BM_{BM}_hbbhww:
+        type: signal
+        legend: HH bbWW GGF (BM {BM}) 
+        order: 14
+        line-color: '#288a24'
+        fill-color: '#288a24'
+        line-type: 1
+        line-width: 2
+        fill-type: 3345
+        files:
+          - GluGluToHHTo2B2VTo2L2Nu_NLOBenchmark{BM}.root
+    
+      ggHH_BM_{BM}_hbbhtt:
+        type: signal
+        legend: HH bb#tau#tau GGF (BM {BM}) 
+        order: 14
+        line-color: '#c91a26'
+        line-type: 1
+        fill-color: '#c91a26'
+        line-width: 2
+        fill-type: 3354
+        files:
+          - GluGluToHHTo2B2Tau_NLOBenchmark{BM}.root
+  2018:
+    - !include groups_DL_bkg_2018.yml
+    - !include groups_DY_datadriven_2018.yml
+    - !include groups_Fakes_2018.yml
+    - !include groups_data_2018.yml
+    - !include groups_DL_BM_qqHH.yml
+    - ggHH_BM_{BM}_hbbhww:
+        type: signal
+        legend: HH bbWW GGF (BM {BM}) 
+        order: 14
+        line-color: '#288a24'
+        fill-color: '#288a24'
+        line-type: 1
+        line-width: 2
+        fill-type: 3345
+        files:
+          - GluGluToHHTo2B2VTo2L2Nu_NLOBenchmark{BM}.root
+    
+      ggHH_BM_{BM}_hbbhtt:
+        type: signal
+        legend: HH bb#tau#tau GGF (BM {BM}) 
+        order: 14
+        line-color: '#c91a26'
+        line-type: 1
+        fill-color: '#c91a26'
+        line-width: 2
+        fill-type: 3354
+        files:
+          - GluGluToHHTo2B2Tau_NLOBenchmark{BM}.root
+
+
