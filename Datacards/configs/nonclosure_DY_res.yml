@@ -1,7 +1,7 @@
   2016:
     - module: nonclosure.py:NonClosureDY
       init: 
-        path_json: config/fit_results_Res{branch}.json
+        path_json: ../configs/fit_results_Res{branch}.json
       categories: 
         HH_DL_{mass}_inclusive_DY_VVV : 
           key:      HH_{mass}_inclusive_DY_VVV_2016 
@@ -15,7 +15,7 @@
   2017:
     - module: nonclosure.py:NonClosureDY
       init: 
-        path_json: config/fit_results_Res{branch}.json
+        path_json: ../configs/fit_results_Res{branch}.json
       categories: 
         HH_DL_{mass}_inclusive_DY_VVV : 
           key:      HH_{mass}_inclusive_DY_VVV_2017 
@@ -29,7 +29,7 @@
   2018:
     - module: nonclosure.py:NonClosureDY
       init: 
-        path_json: config/fit_results_Res{branch}.json
+        path_json: ../configs/fit_results_Res{branch}.json
       categories: 
         HH_DL_{mass}_inclusive_DY_VVV : 
           key:      HH_{mass}_inclusive_DY_VVV_2018 

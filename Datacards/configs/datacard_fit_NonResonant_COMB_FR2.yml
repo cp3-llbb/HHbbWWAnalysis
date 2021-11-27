@@ -35,7 +35,7 @@ yamlName:
   - plots_DYEstimation_FakeExtrapolation.yml
   - plots_FakeExtrapolation.yml
 
-produce_plots: True
+plotIt: !include plotIt_nonres_COMB.yml
 
 era: 
   - 2016
@@ -43,14 +43,6 @@ era:
   - 2018
 
 combineConfigs: !include combine_DL_nonres.yml
-
-legend:
-  position:
-  - 0.2
-  - 0.7
-  - 0.9
-  - 0.9
-  columns: 3
 
 normSyst  : !include norm_comb_nonres.yml
 

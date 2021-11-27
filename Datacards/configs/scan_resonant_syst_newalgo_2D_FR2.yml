@@ -200,6 +200,8 @@ plots:
       "new algo FR2  v4":  ["2D new algo v4","limits_DL","combination"]
       "new algo FR2  v3":  ["2D new algo v3","limits_DL","combination"]
       "new algo FR2  v5":  ["2D new algo v5","limits_DL","combination"]
+      "new algo FR2  v6":  ["2D new algo v6","limits_DL","combination"]
+      "new algo FR2  v7":  ["2D new algo v7","limits_DL","combination"]
     legend:
       "old algo FR2 ":  "Old algo FR2  (5 HME x 5 DNN bins)"
       "new algo FR2 ":  "New algo FR2  (5 HME x 5 DNN bins)"
@@ -207,288 +209,291 @@ plots:
       "new algo FR2  v4":  "New algo FR2  (10 HME x 5 DNN bins)"
       "new algo FR2  v3":  "New algo FR2  (10 HME x 10 DNN bins)"
       "new algo FR2  v5":  "New algo FR2  (15 HME x 5 DNN bins)"
+      "new algo FR2  v6":  "Tao FR2 (3 DNN bins)"
+      "new algo FR2  v7":  "Tao FR2 (5 DNN bins)"
     lines:
       "old algo FR2 ":  {'SetLineStyle': 1,'SetLineColor': '#332288'}
       "new algo FR2 ":  {'SetLineStyle': 1,'SetLineColor': '#117733'}
       "new algo FR2  v2":  {'SetLineStyle': 1,'SetLineColor': '#88CCEE'}
       "new algo FR2  v4":  {'SetLineStyle': 1,'SetLineColor': '#DDCC77'}
       "new algo FR2  v3":  {'SetLineStyle': 1,'SetLineColor': '#CC6677'}
-      "new algo FR2  v5":  {'SetLineStyle': 1,'SetLineColor': '#882255'}
+      "new algo FR2  v6":  {'SetLineStyle': 1,'SetLineColor': '#887222'}
+      "new algo FR2  v7":  {'SetLineStyle': 1,'SetLineColor': '#0f0d02'}
 
 curves:
   #########################################################################
   #                              Graviton 2D                              #
   #########################################################################
-#    2D old algo:
-#        modes: 
-#            limits_DL:
-#                - combination
-#                - combination_2016
-#                - combination_2017
-#                - combination_2018
-#        points:
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=260 branch=LowMass
-#              label: 260
-#              custom: {mass: 260}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=270 branch=LowMass
-#              label: 270
-#              custom: {mass: 270}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=300 branch=LowMass
-#              label: 300
-#              custom: {mass: 300}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=350 branch=LowMass
-#              label: 350
-#              custom: {mass: 350}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=400 branch=LowMass
-#              label: 400
-#              custom: {mass: 400}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=450 branch=LowMass 
-#              label: 450 
-#              custom: {mass: 450}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=500 branch=LowMass 
-#              label: 500
-#              custom: {mass: 500}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=600 branch=HighMass
-#              label: 600
-#              custom: {mass: 600}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=650 branch=HighMass 
-#              label: 650
-#              custom: {mass: 650}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=700 branch=HighMass 
-#              label: 700
-#              custom: {mass: 700}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=800 branch=HighMass  
-#              label: 800
-#              custom: {mass: 800}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=900 branch=HighMass  
-#              label: 900
-#              custom: {mass: 900}
-#
-#    2D new algo:
-#        modes: 
-#            limits_DL:
-#                - combination
-#                - combination_2016
-#                - combination_2017
-#                - combination_2018
-#        points:
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=260 branch=LowMass
-#              label: 260
-#              custom: {mass: 260}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=270 branch=LowMass
-#              label: 270
-#              custom: {mass: 270}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=300 branch=LowMass
-#              label: 300
-#              custom: {mass: 300}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=350 branch=LowMass
-#              label: 350
-#              custom: {mass: 350}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=400 branch=LowMass
-#              label: 400
-#              custom: {mass: 400}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=450 branch=LowMass 
-#              label: 450 
-#              custom: {mass: 450}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=500 branch=LowMass 
-#              label: 500
-#              custom: {mass: 500}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=600 branch=HighMass
-#              label: 600
-#              custom: {mass: 600}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=650 branch=HighMass 
-#              label: 650
-#              custom: {mass: 650}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=700 branch=HighMass 
-#              label: 700
-#              custom: {mass: 700}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=800 branch=HighMass  
-#              label: 800
-#              custom: {mass: 800}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=900 branch=HighMass  
-#              label: 900
-#              custom: {mass: 900}
-# 
-#    2D new algo v2:
-#        modes: 
-#            limits_DL:
-#                - combination
-#                - combination_2016
-#                - combination_2017
-#                - combination_2018
-#        points:
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=260 branch=LowMass
-#              label: 260
-#              custom: {mass: 260}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=270 branch=LowMass
-#              label: 270
-#              custom: {mass: 270}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=300 branch=LowMass
-#              label: 300
-#              custom: {mass: 300}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=350 branch=LowMass
-#              label: 350
-#              custom: {mass: 350}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=400 branch=LowMass
-#              label: 400
-#              custom: {mass: 400}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=450 branch=LowMass 
-#              label: 450 
-#              custom: {mass: 450}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=500 branch=LowMass 
-#              label: 500
-#              custom: {mass: 500}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=600 branch=HighMass
-#              label: 600
-#              custom: {mass: 600}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=650 branch=HighMass 
-#              label: 650
-#              custom: {mass: 650}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=700 branch=HighMass 
-#              label: 700
-#              custom: {mass: 700}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=800 branch=HighMass  
-#              label: 800
-#              custom: {mass: 800}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=900 branch=HighMass  
-#              label: 900
-#              custom: {mass: 900}
-# 
-#    2D new algo v3:
-#        modes: 
-#            limits_DL:
-#                - combination
-#                - combination_2016
-#                - combination_2017
-#                - combination_2018
-#        points:
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=260 branch=LowMass
-#              label: 260
-#              custom: {mass: 260}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=270 branch=LowMass
-#              label: 270
-#              custom: {mass: 270}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=300 branch=LowMass
-#              label: 300
-#              custom: {mass: 300}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=350 branch=LowMass
-#              label: 350
-#              custom: {mass: 350}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=400 branch=LowMass
-#              label: 400
-#              custom: {mass: 400}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=450 branch=LowMass 
-#              label: 450 
-#              custom: {mass: 450}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=500 branch=LowMass 
-#              label: 500
-#              custom: {mass: 500}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=600 branch=HighMass
-#              label: 600
-#              custom: {mass: 600}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=650 branch=HighMass 
-#              label: 650
-#              custom: {mass: 650}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=700 branch=HighMass 
-#              label: 700
-#              custom: {mass: 700}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=800 branch=HighMass  
-#              label: 800
-#              custom: {mass: 800}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=900 branch=HighMass  
-#              label: 900
-#              custom: {mass: 900}
-#    2D new algo v4:
-#        modes: 
-#            limits_DL:
-#                - combination
-#                - combination_2016
-#                - combination_2017
-#                - combination_2018
-#        points:
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=260 branch=LowMass
-#              label: 260
-#              custom: {mass: 260}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=270 branch=LowMass
-#              label: 270
-#              custom: {mass: 270}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=300 branch=LowMass
-#              label: 300
-#              custom: {mass: 300}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=350 branch=LowMass
-#              label: 350
-#              custom: {mass: 350}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=400 branch=LowMass
-#              label: 400
-#              custom: {mass: 400}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=450 branch=LowMass 
-#              label: 450 
-#              custom: {mass: 450}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=500 branch=LowMass 
-#              label: 500
-#              custom: {mass: 500}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=600 branch=HighMass
-#              label: 600
-#              custom: {mass: 600}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=650 branch=HighMass 
-#              label: 650
-#              custom: {mass: 650}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=700 branch=HighMass 
-#              label: 700
-#              custom: {mass: 700}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=800 branch=HighMass  
-#              label: 800
-#              custom: {mass: 800}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=900 branch=HighMass  
-#              label: 900
-#              custom: {mass: 900}
-# 
-#    2D new algo v5:
-#        modes: 
-#            limits_DL:
-#                - combination
-#                - combination_2016
-#                - combination_2017
-#                - combination_2018
-#        points:
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=260 branch=LowMass
-#              label: 260
-#              custom: {mass: 260}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=270 branch=LowMass
-#              label: 270
-#              custom: {mass: 270}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=300 branch=LowMass
-#              label: 300
-#              custom: {mass: 300}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=350 branch=LowMass
-#              label: 350
-#              custom: {mass: 350}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=400 branch=LowMass
-#              label: 400
-#              custom: {mass: 400}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=450 branch=LowMass 
-#              label: 450 
-#              custom: {mass: 450}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=500 branch=LowMass 
-#              label: 500
-#              custom: {mass: 500}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=600 branch=HighMass
-#              label: 600
-#              custom: {mass: 600}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=650 branch=HighMass 
-#              label: 650
-#              custom: {mass: 650}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=700 branch=HighMass 
-#              label: 700
-#              custom: {mass: 700}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=800 branch=HighMass  
-#              label: 800
-#              custom: {mass: 800}
-#            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=900 branch=HighMass  
-#              label: 900
-#              custom: {mass: 900}
-# 
-# 
+    2D old algo:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+        points:
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=260 branch=LowMass
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=270 branch=LowMass
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=300 branch=LowMass
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=450 branch=LowMass 
+              label: 450 
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=650 branch=HighMass 
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=700 branch=HighMass 
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+
+    2D new algo:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+        points:
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=260 branch=LowMass
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=270 branch=LowMass
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=300 branch=LowMass
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=450 branch=LowMass 
+              label: 450 
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=650 branch=HighMass 
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=700 branch=HighMass 
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+ 
+    2D new algo v2:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+        points:
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=260 branch=LowMass
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=270 branch=LowMass
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=300 branch=LowMass
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=450 branch=LowMass 
+              label: 450 
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=650 branch=HighMass 
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=700 branch=HighMass 
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo2_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+ 
+    2D new algo v3:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+        points:
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=260 branch=LowMass
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=270 branch=LowMass
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=300 branch=LowMass
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=450 branch=LowMass 
+              label: 450 
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=650 branch=HighMass 
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=700 branch=HighMass 
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo3_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+    2D new algo v4:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+        points:
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=260 branch=LowMass
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=270 branch=LowMass
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=300 branch=LowMass
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=450 branch=LowMass 
+              label: 450 
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=650 branch=HighMass 
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=700 branch=HighMass 
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo4_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+ 
+    2D new algo v5:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+        points:
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=260 branch=LowMass
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=270 branch=LowMass
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=300 branch=LowMass
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=450 branch=LowMass 
+              label: 450 
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=650 branch=HighMass 
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=700 branch=HighMass 
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_newalgo5_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=15000 --custom dim=2D spin=spin2 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+ 
+ 
     2D new algo v6:
         modes: 
             limits_DL:

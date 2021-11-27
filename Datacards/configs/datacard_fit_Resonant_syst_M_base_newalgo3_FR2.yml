@@ -23,15 +23,7 @@ era:
  - 2017
  - 2018
 
-plotIt:
-  legend:
-    position:
-    - 0.2
-    - 0.7
-    - 0.9
-    - 0.9
-    columns: 3
-  unitary_bin_width: True
+plotIt: !include plotIt_res_DL.yml
   
 combineConfigs: 
   - !include combine_DL_res.yml

@@ -1,0 +1,71 @@
+legend:
+  position:
+  - 0.2
+  - 0.7
+  - 0.9
+  - 0.9
+  columns: 3
+unitary_bin_width: True
+plots: 
+  # Double Lepton #
+  HH_DL_resolved1b_GGF: 
+    x-axis: 'DNN output'
+    blinded-range: [0,100]
+  HH_DL_resolved2b_GGF: 
+    x-axis: 'DNN output'
+    blinded-range: [0,100]
+  HH_DL_boosted_GGF: 
+    x-axis: 'DNN output'
+    blinded-range: [0,100]
+  HH_DL_resolved1b_VBF: 
+    x-axis: 'DNN output'
+    blinded-range: [0,100]
+  HH_DL_resolved2b_VBF: 
+    x-axis: 'DNN output'
+    blinded-range: [0,100]
+  HH_DL_boosted_VBF: 
+    x-axis: 'DNN output'
+    blinded-range: [0,100]
+  HH_DL_inclusive_DY_VVV: 
+    x-axis: 'DNN output'
+    blinded-range: discard
+  HH_DL_resolved_other: 
+    x-axis: 'DNN output'
+    blinded-range: discard
+  HH_DL_boosted_other: 
+    x-axis: 'DNN output'
+    blinded-range: discard
+
+  # Single Lepton #
+  HH_SL_resolved1b_GGF: 
+    x-axis: 'DNN output'
+    blinded-range: [0,100]
+  HH_SL_resolved2b_GGF: 
+    x-axis: 'DNN output'
+    blinded-range: [0,100]
+  HH_SL_boosted_GGF: 
+    x-axis: 'DNN output'
+    blinded-range: [0,100]
+  HH_SL_resolved1b_VBF: 
+    x-axis: 'DNN output'
+    blinded-range: [0,100]
+  HH_SL_resolved2b_VBF: 
+    x-axis: 'DNN output'
+    blinded-range: [0,100]
+  HH_SL_boosted_VBF: 
+    x-axis: 'DNN output'
+    blinded-range: [0,100]
+  HH_SL_inclusive_WJets:
+    x-axis: 'DNN output'
+    blinded-range: discard
+  HH_SL_inclusive_other:
+    x-axis: 'DNN output'
+    blinded-range: discard
+  HH_SL_resolved_TopH:
+    x-axis: 'DNN output'
+    blinded-range: discard
+  HH_SL_boosted_TopH:
+    x-axis: 'DNN output'
+    blinded-range: discard
+
+ 

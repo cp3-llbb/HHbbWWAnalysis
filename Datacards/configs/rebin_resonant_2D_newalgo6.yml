@@ -10,7 +10,7 @@ HH_DL_{mass}_resolved1b_GGF:
   params: 
     - y
     - Boundary 
-    - [[0.,287,330,379,435,518,621,745,894,1072,1286,2000]]
+    - [[0,285,330,380,435,520,620,745,895,1075,1285,2000]]
     - Threshold2
     - [[1.0, 4.0, 9.0],[TT,ST,DY]]
     - [signal_ggf_{spin}_{mass}_hbbhww,signal_ggf_{spin}_{mass}_hbbhtt]
@@ -19,7 +19,7 @@ HH_DL_{mass}_resolved2b_GGF:
   params: 
     - y
     - Boundary 
-    - [[0.,287,330,379,435,518,621,745,894,1072,1286,2000]]
+    - [[0,285,330,380,435,520,620,745,895,1075,1285,2000]]
     - Threshold2
     - [[1.0, 4.0, 9.0],[TT,ST,DY]]
     - [signal_ggf_{spin}_{mass}_hbbhww,signal_ggf_{spin}_{mass}_hbbhtt]
@@ -28,7 +28,7 @@ HH_DL_{mass}_boosted_GGF:
   params: 
     - y
     - Boundary 
-    - [[0.,287,330,379,435,518,621,745,894,1072,1286,2000]]
+    - [[0,285,330,380,435,520,620,745,895,1075,1285,2000]]
     - Threshold2
     - [[1.0, 4.0, 9.0],[TT,ST,DY]]
     - [signal_ggf_{spin}_{mass}_hbbhww,signal_ggf_{spin}_{mass}_hbbhtt]
