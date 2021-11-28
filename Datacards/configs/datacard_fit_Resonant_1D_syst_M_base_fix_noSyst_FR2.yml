@@ -1,0 +1,58 @@
+path: 
+  2016:
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_Fake_Resonant_{type}_test_signals
+  2017:
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_Resonant_{type}_test_signals
+  2018:
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_{type}_test_signals
+
+outputDir: /nfs/scratch/fynu/fbury/Datacards/bbww_dl/TestInterpolation/ComparisonFix/datacard_fit_Resonant_1D_syst_M_{mass}_{type}_noSyst_FR2
+
+use_syst: False
+
+yamlName: plots.yml
+
+produce_plots: True
+
+era: 
+ - 2016
+ - 2017
+ - 2018
+
+legend:
+  position:
+  - 0.2
+  - 0.7
+  - 0.9
+  - 0.9
+  columns: 3
+
+histConverter: !include resonant_cat_param_1D_mass_fix.yml
+  
+groups:
+- ggHH_Graviton_M_{mass}_hbbhww:
+    type: signal
+    cross-section: 1
+    branching-ratio: 1
+    legend: "Graviton {mass} GeV #rightarrowHH#rightarrowbbWW [1 pb]"
+    order: 14
+    line-color: '#288a24'
+    fill-color: '#288a24'
+    line-type: 1
+    line-width: 2
+    fill-type: 3345
+    files:
+      - GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-{mass}.root
+- ggHH_Radion_M_{mass}_hbbhww:
+    type: signal
+    cross-section: 1
+    branching-ratio: 1
+    legend: "Radion {mass} GeV #rightarrowHH#rightarrowbbWW [1 pb]"
+    order: 14
+    line-color: '#288a24'
+    fill-color: '#288a24'
+    line-type: 1
+    line-width: 2
+    fill-type: 3345
+    files:
+      - GluGluToRadionToHHTo2B2VTo2L2Nu_M-{mass}.root

@@ -1,0 +1,43 @@
+param1 : {param1}
+param2 : {param2}
+paramInt: {paramInt}
+
+matchingHist:
+  # Signals #
+  HH_DL_{paramInt}_GGF:
+    {param1} :  HH_DL_{param1}_GGF
+    {param2} :  HH_DL_{param2}_GGF
+  HH_DL_{paramInt}_HME:
+    {param1} :  HH_DL_{param1}_HME
+    {param2} :  HH_DL_{param2}_HME
+
+
+matchingGroup:
+  # Signals #
+  signal_ggf_{spin}_{paramInt}_hbbhww: 
+    {param1} :  signal_ggf_{spin}_{param1}_hbbhww
+    {param2} :  signal_ggf_{spin}_{param2}_hbbhww
+  signal_ggf_{spin}_{paramInt}_hbbhtt:
+    {param1} :  signal_ggf_{spin}_{param1}_hbbhtt
+    {param2} :  signal_ggf_{spin}_{param2}_hbbhtt
+
+plotIt:
+  signal_ggf_{spin}_{paramInt}_hbbhww: 
+    type: signal
+    legend: "{paramInt} GeV #rightarrowHH#rightarrowbbWW [1 pb]"
+    order: 14
+    line-color: '#288a24'
+    fill-color: '#288a24'
+    line-type: 1
+    line-width: 2
+    fill-type: 3345
+  signal_ggf_{spin}_{paramInt}_hbbhtt:
+    type: signal
+    legend: "{paramInt} GeV #rightarrowHH#rightarrowbb#tau#tau [1 pb]"
+    order: 14
+    line-color: '#c91a26'
+    fill-color: '#c91a26'
+    line-type: 1
+    line-width: 2
+    fill-type: 3354
+

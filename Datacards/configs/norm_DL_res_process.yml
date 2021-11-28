@@ -1,0 +1,21 @@
+#################################
+#         Ad hoc norm           # 
+#################################
+CMS_bbww_TT_norm:
+  group: 
+    - ST
+    - TT
+  val: 1.2
+
+CMS_bbwwdl_top_norm_boost:
+  cat: 
+   - HH_DL_{mass}_boosted_GGF
+   - HH_DL_{mass}_boosted_H
+   - HH_DL_{mass}_boosted_DY_VVV
+   - HH_DL_{mass}_boosted_other
+  group: 
+    - ST
+    - TT
+  val: 1.2
+
+

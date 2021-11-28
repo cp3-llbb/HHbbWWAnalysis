@@ -21,8 +21,15 @@ def returnResonantMVAInputs(self,l1,l2,channel,jets,bjets,fatjets,met,electrons,
                 lambda res, elm : op.extMethod("std::min", returnType="Float_t")(res, fn(elm))
                         ) )(fun) )
 
+
+    if self.args.era is None:
+        era = op.c_int(int(self.era))
+    else:
+        era = op.c_int(int(self.args.era))
+        print (f'Using {self.args.era} as DNN input')
+
     return {('eventnr',                 'Event number',                             (100,0.,1e6))        : self.tree.event,
-            ('era',                     'Era',                                      (3,2016.,2019.))     : op.c_int(int(self.era)),
+            ('era',                     'Era',                                      (3,2016.,2019.))     : era,
             ('l1_E',                    'Lead lepton E [GeV]',                      (50,0.,500.))        : op.switch(l1conept(l1) >= l2conept(l2) , l1.p4.E(), l2.p4.E()),
             ('l1_Px',                   'Lead lepton P_x [GeV]',                    (40,-200.,200.))     : op.switch(l1conept(l1) >= l2conept(l2) , l1.p4.Px(), l2.p4.Px()),
             ('l1_Py',                   'Lead lepton P_y [GeV]',                    (40,-200.,200.))     : op.switch(l1conept(l1) >= l2conept(l2) , l1.p4.Py(), l2.p4.Py()),

@@ -1,0 +1,67 @@
+  gof:
+    mode: gof
+    command: "combine -M GoodnessOfFit --algo=saturated --toysFrequentist"
+    toys: 500
+    toys-per-job: 10
+    combine_bins: True
+    combine_eras: True
+    split_bins: True
+    split_eras: True
+    plotting:
+      n_bins        : 32
+      #left_margin   : 200
+      #right_margin  : 20
+    submit :  
+      time: '0-04:00:00'
+      mem : 3000
+    bins:
+      - HH_DL_inclusive_DY_VVV
+      - HH_DL_resolved_other
+      - HH_DL_boosted_other
+  pulls:
+    mode: pulls_impacts
+    command: "combine -M MultiDimFit --verbose 3 --mass 125.0 --redefineSignalPOIs r --setParameterRanges r=-6000.0,6000.0 --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 1 --cminDefaultMinimizerTolerance 0.1 --cminFallbackAlgo Minuit2,0:0.2 --cminFallbackAlgo Minuit2,0:0.4 --floatOtherPOIs 1 --saveInactivePOI 1 --saveNLL --X-rtd REMOVE_CONSTANT_ZERO_POINT=1 --X-rtd MINIMIZER_freezeDisassociatedParams --X-rtd MINIMIZER_multiMin_hideConstants --X-rtd MINIMIZER_multiMin_maskConstraints --X-rtd MINIMIZER_multiMin_maskChannels=2 --X-rtd MINIMIZER_no_analytic"
+    #command: "combine -M MultiDimFit -d {} --verbose 3 --redefineSignalPOIs r  --setParameterRanges r=-6000.0,6000.0 --keepFailures --robustFit 1 --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 --X-rtd MINIMIZER_no_analytic"
+    mc_stats: False
+    unblind: True
+    submit :  
+      time: '0-01:00:00'
+      mem : 3000
+    plotting:
+      left_margin           : 400
+      right_margin          : 20
+      label_size            : 18
+      parameters_per_page   : 200
+      order_by_impact       : False
+      impact_range          : 10
+    bins:
+      - HH_DL_inclusive_DY_VVV
+      - HH_DL_resolved_other
+      - HH_DL_boosted_other
+  impacts:
+    mode: pulls_impacts
+    command: "combine -M MultiDimFit --verbose 3 --mass 125.0 --redefineSignalPOIs r --setParameters r=1.0   --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 1 --cminDefaultMinimizerTolerance 0.1 --cminFallbackAlgo Minuit2,0:0.2 --cminFallbackAlgo Minuit2,0:0.4 --floatOtherPOIs 1 --saveInactivePOI 1 --X-rtd MINIMIZER_no_analytic --X-rtd REMOVE_CONSTANT_ZERO_POINT=1 --saveNLL"
+
+    #command: "combine -M MultiDimFit -d {} --verbose 3 --redefineSignalPOIs r --setParameters r=1.0 --setParameterRanges r=-6000.0,6000.0 --keepFailures --robustFit 1 --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 --X-rtd MINIMIZER_no_analytic "
+        #   --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 --X-rtd MINIMIZER_no_analytic --robustHesse true
+    mc_stats: False
+    submit :  
+      time: '0-01:00:00'
+      mem : 3000
+    plotting:
+      left_margin           : 400
+      right_margin          : 20
+      label_size            : 18
+      parameters_per_page   : 200
+      order_by_impact       : False
+      #impact_range          : 10
+    bins:
+      - HH_DL_resolved1b_GGF
+      - HH_DL_resolved2b_GGF
+      - HH_DL_boosted_GGF
+      - HH_DL_resolved1b_VBF
+      - HH_DL_resolved2b_VBF
+      - HH_DL_boosted_VBF
+      - HH_DL_inclusive_DY_VVV
+      - HH_DL_resolved_other
+      - HH_DL_boosted_other

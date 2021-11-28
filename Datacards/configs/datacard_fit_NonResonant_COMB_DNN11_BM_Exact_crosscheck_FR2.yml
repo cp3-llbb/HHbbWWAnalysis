@@ -1,0 +1,86 @@
+path: 
+  2016:
+    # DL #
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved1B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved2B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_NonResonant_DNN11_Fake_DYEstimation_Boosted1B
+    # SL #
+    - /nfs/scratch/fynu/gsaha/PlotNoSyst2018SL_Debug/full2016NanoV7_TTHIDLoose_Fake_DNNSL01_Boosted
+    - /nfs/scratch/fynu/gsaha/PlotNoSyst2018SL_Debug/full2016NanoV7_TTHIDLoose_Fake_DNNSL01_Resolved1B
+    - /nfs/scratch/fynu/gsaha/PlotNoSyst2018SL_Debug/full2016NanoV7_TTHIDLoose_Fake_DNNSL01_Resolved2B
+  2017:
+    # DL #
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved1B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved2B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_NonResonant_DNN11_Fake_DYEstimation_Boosted1B
+    # SL #
+    - /nfs/scratch/fynu/gsaha/PlotNoSyst2018SL_Debug/full2017NanoV7_TTHIDLoose_Fake_DNNSL01_Boosted
+    - /nfs/scratch/fynu/gsaha/PlotNoSyst2018SL_Debug/full2017NanoV7_TTHIDLoose_Fake_DNNSL01_Resolved1B
+    - /nfs/scratch/fynu/gsaha/PlotNoSyst2018SL_Debug/full2017NanoV7_TTHIDLoose_Fake_DNNSL01_Resolved2B
+  2018:
+    # DL #
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved1B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_NonResonant_DNN11_Fake_DYEstimation_Resolved2B
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_NonResonant_DNN11_Fake_DYEstimation_Boosted1B
+    # SL #
+    - /nfs/scratch/fynu/gsaha/PlotNoSyst2018SL_Debug/full2018NanoV7_TTHIDLoose_Fake_DNNSL01_Boosted
+    - /nfs/scratch/fynu/gsaha/PlotNoSyst2018SL_Debug/full2018NanoV7_TTHIDLoose_Fake_DNNSL01_Resolved1B
+    - /nfs/scratch/fynu/gsaha/PlotNoSyst2018SL_Debug/full2018NanoV7_TTHIDLoose_Fake_DNNSL01_Resolved2B
+
+
+
+outputDir: /home/ucl/cp3/fbury/scratch/Datacards/bbww/NonResonant/datacard_fit_NonResonant_BM_Exact_crosscheck_FR2
+
+use_syst: True
+
+yamlName: 
+  - plots_DYEstimation_FakeExtrapolation.yml
+  - plots_FakeExtrapolation.yml
+
+produce_plots: True
+
+era: 
+  - 2016
+  - 2017
+  - 2018
+
+combineConfigs: !include combine_DL_nonres.yml
+
+legend:
+  position:
+  - 0.2
+  - 0.7
+  - 0.9
+  - 0.9
+  columns: 3
+
+
+normSyst  : !include norm_comb_nonres.yml
+
+shapeSyst  : !include shape_comb_systematics.yml
+
+rebin: !include rebin_comb_nonresonant.yml
+  
+histCorrections: !include nonclosure_DY_nonres.yml
+
+histConverter: !include cat_comb_nonresonant.yml
+
+groups:
+  2016:
+    - !include groups_bkg_2016.yml
+    - !include groups_Fakes_2016.yml
+    - !include groups_data_2016.yml
+    - !include groups_DL_signal_nonres.yml
+    - !include groups_SL_signal_nonres.yml
+  2017:
+    - !include groups_bkg_2017.yml
+    - !include groups_Fakes_2017.yml
+    - !include groups_data_2017.yml
+    - !include groups_DL_signal_nonres.yml
+    - !include groups_SL_signal_nonres.yml
+  2018:
+    - !include groups_bkg_2018.yml
+    - !include groups_Fakes_2018.yml
+    - !include groups_data_2018.yml
+    - !include groups_DL_signal_nonres.yml
+    - !include groups_SL_signal_nonres.yml

@@ -1,0 +1,61 @@
+path: 
+  2016:
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_Fake_Resonant_Boosted1B_syst_M_{mass}/
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_Fake_Resonant_Resolved1B_syst_M_{mass}/
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_Fake_Resonant_Resolved2B_syst_M_{mass}/
+  2017:
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_Resonant_Boosted1B_syst_M_{mass}/
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_Resonant_Resolved1B_syst_M_{mass}/
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_Resonant_Resolved2B_syst_M_{mass}/
+  2018:
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_Boosted1B_{branch}_syst_M_{mass}/
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_Resolved1B_{branch}_syst_M_{mass}/
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_Resolved2B_{branch}_syst_M_{mass}/
+
+outputDir: /home/ucl/cp3/fbury/scratch/Datacards/bbww_dl/Resonant/datacard_fit_Resonant_{branch}_{spin}_{dim}_syst_M_{mass}_newalgo_FR2
+
+use_syst: True
+
+yamlName: plots_DYEstimation_FakeExtrapolation.yml
+
+
+era: 
+ - 2016
+ - 2017
+ - 2018
+
+
+plotIt: !include plotIt_res_DL.yml
+  
+combineConfigs: 
+  - !include combine_DL_res.yml
+
+normSyst  : !include norm_all_res.yml
+
+shapeSyst  : !include shape_DL_systematics.yml
+
+rebin: !include rebin_resonant_{dim}_newalgo.yml
+
+histCorrections: !include nonclosure_DY_res.yml
+
+histConverter: 
+  2016: !include resonant_cat_param_{dim}_mass_fix.yml
+  2017: !include resonant_cat_param_{dim}_mass_fix.yml
+  2018: !include resonant_cat_param_{dim}_mass.yml
+
+groups:
+  2016:
+    - !include groups_bkg_2016.yml
+    - !include groups_Fakes_2016.yml
+    - !include groups_data_2016.yml
+    - !include groups_DL_signal_res_{spin}.yml
+  2017:
+    - !include groups_bkg_2017.yml
+    - !include groups_Fakes_2017.yml
+    - !include groups_data_2017.yml
+    - !include groups_DL_signal_res_{spin}.yml
+  2018:
+    - !include groups_bkg_2018.yml
+    - !include groups_Fakes_2018.yml
+    - !include groups_data_2018.yml
+    - !include groups_DL_signal_res_{spin}.yml

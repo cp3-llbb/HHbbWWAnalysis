@@ -1,0 +1,252 @@
+#################  2016 ###################
+2016:
+  #######  DY  #######
+  - module: nonclosure.py:NonClosureDY
+    init: 
+      path_json : ../configs/fit_results_NonRes.json
+    categories: 
+      HH_DL_inclusive_DY_VVV : 
+        key:      HH_inclusive_DY_VVV_2016
+        systName: dy_inclusive_nonclosure_dy_vvv
+      HH_DL_resolved_other: 
+        key:      HH_resolved_other_2016
+        systName: dy_resolved_nonclosure_other
+      HH_DL_boosted_other:
+        key:      HH_boosted_other
+        systName: dy_boosted_nonclosure_other
+  #######  Fakes  #######
+  - module: nonclosure.py:NonClosureFake
+    init: 
+      path_json: ../configs/factors_SL_Fake_2016.json
+    histConverter: !include cat_SL_nonresonant_channel.yml 
+    regroup: !include cat_SL_nonresonant_regroup.yml
+    categories: 
+      HH_SL_e_resolved1b_GGF:
+        key:      HH_SL_e_resolved1b_GGF_2016
+        systName: fake_nc_e_res1b_GGF
+      HH_SL_m_resolved1b_GGF:
+        key:      HH_SL_m_resolved1b_GGF_2016
+        systName: fake_nc_m_res1b_GGF
+      HH_SL_e_resolved1b_VBF:
+        key:      HH_SL_e_resolved1b_VBF_2016
+        systName: fake_nc_e_res1b_VBF
+      HH_SL_m_resolved1b_VBF:
+        key:      HH_SL_m_resolved1b_VBF_2016
+        systName: fake_nc_m_res1b_VBF
+      HH_SL_e_resolved2b_GGF:
+        key:      HH_SL_e_resolved2b_GGF_2016
+        systName: fake_nc_e_res2b_GGF
+      HH_SL_m_resolved2b_GGF:
+        key:      HH_SL_m_resolved2b_GGF_2016
+        systName: fake_nc_m_res2b_GGF
+      HH_SL_e_resolved2b_VBF:
+        key:      HH_SL_e_resolved2b_VBF_2016
+        systName: fake_nc_e_res2b_VBF
+      HH_SL_m_resolved2b_VBF:
+        key:      HH_SL_m_resolved2b_VBF_2016
+        systName: fake_nc_m_res2b_VBF
+      HH_SL_e_boosted_GGF:
+        key:      HH_SL_e_boosted_GGF_2016
+        systName: fake_nc_e_boosted_GGF
+      HH_SL_m_boosted_GGF:
+        key:      HH_SL_m_boosted_GGF_2016
+        systName: fake_nc_m_boosted_GGF
+      HH_SL_e_boosted_VBF:
+        key:      HH_SL_e_boosted_VBF_2016
+        systName: fake_nc_e_boosted_VBF
+      HH_SL_m_boosted_VBF:
+        key:      HH_SL_m_boosted_VBF_2016
+        systName: fake_nc_m_boosted_VBF
+      HH_SL_e_inclusive_WJets:
+        key:      HH_SL_e_inclusive_WJets_2016
+        systName: fake_nc_e_inc_wjets
+      HH_SL_m_inclusive_WJets:
+        key:      HH_SL_m_inclusive_WJets_2016
+        systName: fake_nc_m_inc_wjets
+      HH_SL_e_inclusive_other:
+        key:      HH_SL_e_inclusive_other_2016
+        systName: fake_nc_e_inc_otherh
+      HH_SL_m_inclusive_other:
+        key:      HH_SL_m_inclusive_other_2016
+        systName: fake_nc_m_inc_otherh
+      HH_SL_e_resolved_TopH:
+        key:      HH_SL_e_resolved_TopH_2016
+        systName: fake_nc_e_res_top
+      HH_SL_m_resolved_TopH:
+        key:      HH_SL_m_resolved_TopH_2016
+        systName: fake_nc_m_res_top
+      HH_SL_e_boosted_TopH:
+        key:      HH_SL_e_boosted_TopH_2016
+        systName: fake_nc_e_boosted_top
+      HH_SL_m_boosted_TopH:
+        key:      HH_SL_m_boosted_TopH_2016
+        systName: fake_nc_m_boosted_top
+
+
+#################  2017 ###################
+2017:
+  #######  DY  #######
+  - module: nonclosure.py:NonClosureDY
+    init: 
+      path_json : ../configs/fit_results_NonRes.json
+    categories: 
+      HH_DL_inclusive_DY_VVV : 
+        key:      HH_inclusive_DY_VVV_2017
+        systName: dy_inclusive_nonclosure_dy_vvv
+      HH_DL_resolved_other: 
+        key:      HH_resolved_other_2017
+        systName: dy_resolved_nonclosure_other
+      HH_DL_boosted_other:
+        key:      HH_boosted_other
+        systName: dy_boosted_nonclosure_other
+  #######  Fakes  #######
+  - module: nonclosure.py:NonClosureFake
+    init: 
+      path_json: ../configs/factors_SL_Fake_2017.json
+    categories: 
+      HH_SL_e_resolved1b_GGF:
+        key:      HH_SL_e_resolved1b_GGF_2017
+        systName: fake_nc_e_res1b_GGF
+      HH_SL_m_resolved1b_GGF:
+        key:      HH_SL_m_resolved1b_GGF_2017
+        systName: fake_nc_m_res1b_GGF
+      HH_SL_e_resolved1b_VBF:
+        key:      HH_SL_e_resolved1b_VBF_2017
+        systName: fake_nc_e_res1b_VBF
+      HH_SL_m_resolved1b_VBF:
+        key:      HH_SL_m_resolved1b_VBF_2017
+        systName: fake_nc_m_res1b_VBF
+      HH_SL_e_resolved2b_GGF:
+        key:      HH_SL_e_resolved2b_GGF_2017
+        systName: fake_nc_e_res2b_GGF
+      HH_SL_m_resolved2b_GGF:
+        key:      HH_SL_m_resolved2b_GGF_2017
+        systName: fake_nc_m_res2b_GGF
+      HH_SL_e_resolved2b_VBF:
+        key:      HH_SL_e_resolved2b_VBF_2017
+        systName: fake_nc_e_res2b_VBF
+      HH_SL_m_resolved2b_VBF:
+        key:      HH_SL_m_resolved2b_VBF_2017
+        systName: fake_nc_m_res2b_VBF
+      HH_SL_e_boosted_GGF:
+        key:      HH_SL_e_boosted_GGF_2017
+        systName: fake_nc_e_boosted_GGF
+      HH_SL_m_boosted_GGF:
+        key:      HH_SL_m_boosted_GGF_2017
+        systName: fake_nc_m_boosted_GGF
+      HH_SL_e_boosted_VBF:
+        key:      HH_SL_e_boosted_VBF_2017
+        systName: fake_nc_e_boosted_VBF
+      HH_SL_m_boosted_VBF:
+        key:      HH_SL_m_boosted_VBF_2017
+        systName: fake_nc_m_boosted_VBF
+      HH_SL_e_inclusive_WJets:
+        key:      HH_SL_e_inclusive_WJets_2017
+        systName: fake_nc_e_inc_wjets
+      HH_SL_m_inclusive_WJets:
+        key:      HH_SL_m_inclusive_WJets_2017
+        systName: fake_nc_m_inc_wjets
+      HH_SL_e_inclusive_other:
+        key:      HH_SL_e_inclusive_other_2017
+        systName: fake_nc_e_inc_otherh
+      HH_SL_m_inclusive_other:
+        key:      HH_SL_m_inclusive_other_2017
+        systName: fake_nc_m_inc_otherh
+      HH_SL_e_resolved_TopH:
+        key:      HH_SL_e_resolved_TopH_2017
+        systName: fake_nc_e_res_top
+      HH_SL_m_resolved_TopH:
+        key:      HH_SL_m_resolved_TopH_2017
+        systName: fake_nc_m_res_top
+      HH_SL_e_boosted_TopH:
+        key:      HH_SL_e_boosted_TopH_2017
+        systName: fake_nc_e_boosted_top
+      HH_SL_m_boosted_TopH:
+        key:      HH_SL_m_boosted_TopH_2017
+        systName: fake_nc_m_boosted_top
+
+
+#################  2018 ###################
+2018:
+  #######  DY  #######
+  - module: nonclosure.py:NonClosureDY
+    init: 
+      path_json : ../configs/fit_results_NonRes.json
+    categories: 
+      HH_DL_inclusive_DY_VVV : 
+        key:      HH_inclusive_DY_VVV_2018
+        systName: dy_inclusive_nonclosure_dy_vvv
+      HH_DL_resolved_other: 
+        key:      HH_resolved_other_2018
+        systName: dy_resolved_nonclosure_other
+      HH_DL_boosted_other:
+        key:      HH_boosted_other
+        systName: dy_boosted_nonclosure_other
+  #######  Fakes  #######
+  - module: nonclosure.py:NonClosureFake
+    init: 
+      path_json: ../configs/factors_SL_Fake_2017.json
+    categories: 
+      HH_SL_e_resolved1b_GGF:
+        key:      HH_SL_e_resolved1b_GGF_2017
+        systName: fake_nc_e_res1b_GGF
+      HH_SL_m_resolved1b_GGF:
+        key:      HH_SL_m_resolved1b_GGF_2017
+        systName: fake_nc_m_res1b_GGF
+      HH_SL_e_resolved1b_VBF:
+        key:      HH_SL_e_resolved1b_VBF_2017
+        systName: fake_nc_e_res1b_VBF
+      HH_SL_m_resolved1b_VBF:
+        key:      HH_SL_m_resolved1b_VBF_2017
+        systName: fake_nc_m_res1b_VBF
+      HH_SL_e_resolved2b_GGF:
+        key:      HH_SL_e_resolved2b_GGF_2017
+        systName: fake_nc_e_res2b_GGF
+      HH_SL_m_resolved2b_GGF:
+        key:      HH_SL_m_resolved2b_GGF_2017
+        systName: fake_nc_m_res2b_GGF
+      HH_SL_e_resolved2b_VBF:
+        key:      HH_SL_e_resolved2b_VBF_2017
+        systName: fake_nc_e_res2b_VBF
+      HH_SL_m_resolved2b_VBF:
+        key:      HH_SL_m_resolved2b_VBF_2017
+        systName: fake_nc_m_res2b_VBF
+      HH_SL_e_boosted_GGF:
+        key:      HH_SL_e_boosted_GGF_2017
+        systName: fake_nc_e_boosted_GGF
+      HH_SL_m_boosted_GGF:
+        key:      HH_SL_m_boosted_GGF_2017
+        systName: fake_nc_m_boosted_GGF
+      HH_SL_e_boosted_VBF:
+        key:      HH_SL_e_boosted_VBF_2017
+        systName: fake_nc_e_boosted_VBF
+      HH_SL_m_boosted_VBF:
+        key:      HH_SL_m_boosted_VBF_2017
+        systName: fake_nc_m_boosted_VBF
+      HH_SL_e_inclusive_WJets:
+        key:      HH_SL_e_inclusive_WJets_2017
+        systName: fake_nc_e_inc_wjets
+      HH_SL_m_inclusive_WJets:
+        key:      HH_SL_m_inclusive_WJets_2017
+        systName: fake_nc_m_inc_wjets
+      HH_SL_e_inclusive_other:
+        key:      HH_SL_e_inclusive_other_2017
+        systName: fake_nc_e_inc_otherh
+      HH_SL_m_inclusive_other:
+        key:      HH_SL_m_inclusive_other_2017
+        systName: fake_nc_m_inc_otherh
+      HH_SL_e_resolved_TopH:
+        key:      HH_SL_e_resolved_TopH_2017
+        systName: fake_nc_e_res_top
+      HH_SL_m_resolved_TopH:
+        key:      HH_SL_m_resolved_TopH_2017
+        systName: fake_nc_m_res_top
+      HH_SL_e_boosted_TopH:
+        key:      HH_SL_e_boosted_TopH_2017
+        systName: fake_nc_e_boosted_top
+      HH_SL_m_boosted_TopH:
+        key:      HH_SL_m_boosted_TopH_2017
+        systName: fake_nc_m_boosted_top
+
+
+
