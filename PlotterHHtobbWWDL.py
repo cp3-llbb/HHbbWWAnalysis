@@ -188,16 +188,23 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             for region in hmeReaders.keys():
                 for cat in hmeReaders[region].keys():
                     for channel in hmeReaders[region][cat].keys():
-                        pathToSkim = treePath.format(era     = self.era,
-                                                     cat     = cat,
-                                                     channel = channel, 
-                                                     region  = region,
-                                                     sample  = self.sample)
+                        if 'related-sample' in sampleCfg.keys():
+                            pathToSkim = treePath.format(era     = self.era,
+                                                         cat     = cat,
+                                                         channel = channel, 
+                                                         region  = region,
+                                                         sample  = sampleCfg["related-sample"])
+                        else:
+                            pathToSkim = treePath.format(era     = self.era,
+                                                         cat     = cat,
+                                                         channel = channel, 
+                                                         region  = region,
+                                                         sample  = self.sample)
                         if not os.path.exists(pathToSkim):
                             raise RuntimeError(f'Could not find skim {pathToSkim}')
                         hmeReaders[region][cat][channel] = op.define("hme::HMEReader", 
                                                                      f'hme::HMEReader <<name>>{{"{pathToSkim}"}}; // for {self.sample.replace("-","")}',
-                                                                     nameHint=f"bamboo_hmeReader{region}{cat}{channel}{self.sample.replace('-','')}")
+                                                                     nameHint=f'bamboo_hmeReader{region}{cat}{channel}{self.sample.replace("-","")}')
 
         #----- Channel and trigger plots -----#
 

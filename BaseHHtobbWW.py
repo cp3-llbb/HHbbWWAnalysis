@@ -1115,7 +1115,10 @@ One lepton and and one jet argument must be specified in addition to the require
         # Get MC PU weight file #
         puWeightsFile = None
         if self.is_MC:
-            puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "pileup",sample+'_%s.json'%era)
+            if 'related-sample' in sampleCfg.keys():
+                puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "pileup",f'{sampleCfg["related-sample"]}_{era}.json')
+            else:
+                puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "pileup",f'{sample}_{era}.json')
             if not os.path.exists(puWeightsFile):
                 raise RuntimeError("Could not find pileup file %s"%puWeightsFile)
             from bamboo.analysisutils import makePileupWeight
@@ -1685,10 +1688,6 @@ One lepton and and one jet argument must be specified in addition to the require
                     op.systematic(op.c_float(1.00), name="ttH_electronMuon_trigSF", up=op.c_float(1.01), down=op.c_float(0.99)))
         #----- Fake rates -----#
         FRSysts = [f'Loose_{channel}_pt_syst',f'Loose_{channel}_barrel_syst',f'Loose_{channel}_norm_syst']
-        #self.electronFRList = [self.SF.get_scalefactor("lepton", ('electron_fakerates_'+era, syst), combine="weight", systName="el_FR_"+syst, defineOnFirstUse=(not forSkimmer),
-        #                                     additionalVariables={'Pt' : lambda obj : self.electron_conept[obj.idx]}) for syst in FRSysts]
-        #self.muonFRList = [self.SF.get_scalefactor("lepton", ('muon_fakerates_'+era, syst), combine="weight", systName="mu_FR_"+syst, defineOnFirstUse=(not forSkimmer),
-        #                                 additionalVariables={'Pt' : lambda obj : self.muon_conept[obj.idx]}) for syst in FRSysts ] 
         self.electronFRList = [self.SF.get_scalefactor("lepton", ('electron_fakerates_'+era, syst), combine="weight", systName="el_FR_"+syst, 
                                              additionalVariables={'Pt' : lambda obj : self.electron_conept[obj.idx]}) for syst in FRSysts]
         self.muonFRList = [self.SF.get_scalefactor("lepton", ('muon_fakerates_'+era, syst), combine="weight", systName="mu_FR_"+syst, 
@@ -1968,7 +1967,10 @@ One lepton and and one jet argument must be specified in addition to the require
             elif self.args.BtagReweightingOff:
                 pass # Do not apply any SF
             else:
-                ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(self.sample,self.era))
+                if 'related-sample' in self.sampleCfg.keys():
+                    ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag',f'BtagReweightingRatio_jetN_{self.sampleCfg["related-sample"]}_{self.era}.json')
+                else:
+                    ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag',f'BtagReweightingRatio_jetN_{self.sample}_{self.era}.json')
                 if not os.path.exists(ReweightingFileName):
                     raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
                 print ('Reweighting file',ReweightingFileName)
