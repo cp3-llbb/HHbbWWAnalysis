@@ -12,20 +12,19 @@ path:
     - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_Resolved1B_{branch}_syst_M_{mass}/
     - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_Resolved2B_{branch}_syst_M_{mass}/
 
-outputDir: /home/ucl/cp3/fbury/scratch/Datacards/bbww_dl/Resonant/datacard_fit_Resonant_{branch}_{spin}_{dim}_syst_M_{mass}_newalgo7_FR2
+outputDir: /home/ucl/cp3/fbury/scratch/Datacards/bbww_dl/Resonant/datacard_fit_Resonant_{branch}_{spin}_{dim}_{algo}_algo_syst_M_{mass}_final_FR2
 
 use_syst: True
 
 yamlName: plots_DYEstimation_FakeExtrapolation.yml
+
+plotIt: !include plotIt_res_DL.yml
 
 era: 
  - 2016
  - 2017
  - 2018
 
-  
-plotIt: !include plotIt_res_DL.yml
-  
 combineConfigs: 
   - !include combine_DL_res.yml
 
@@ -33,7 +32,7 @@ normSyst  : !include norm_all_res.yml
 
 shapeSyst  : !include shape_DL_systematics.yml
 
-rebin: !include rebin_resonant_{dim}_newalgo7.yml
+rebin: !include rebin_resonant_{branch}_{dim}_{algo}_algo.yml
 
 histCorrections: !include nonclosure_DY_res.yml
 

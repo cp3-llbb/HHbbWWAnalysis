@@ -1115,7 +1115,10 @@ One lepton and and one jet argument must be specified in addition to the require
         # Get MC PU weight file #
         puWeightsFile = None
         if self.is_MC:
-            puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "pileup",sample+'_%s.json'%era)
+            if 'related-sample' in sampleCfg.keys():
+                puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "pileup",f'{sampleCfg["related-sample"]}_{era}.json')
+            else:
+                puWeightsFile = os.path.join(os.path.dirname(__file__), "data", "pileup",f'{sample}_{era}.json')
             if not os.path.exists(puWeightsFile):
                 raise RuntimeError("Could not find pileup file %s"%puWeightsFile)
             from bamboo.analysisutils import makePileupWeight
@@ -1584,11 +1587,18 @@ One lepton and and one jet argument must be specified in addition to the require
             ####  Muons ####
             self.muLooseId = self.SF.get_scalefactor("lepton", 'muon_loose_{}'.format(era), combine="weight", systName="mu_loose", defineOnFirstUse=(not forSkimmer)) 
             self.lambda_MuonLooseSF = lambda mu : [op.switch(self.lambda_is_matched(mu), self.muLooseId(mu), op.c_float(1.))]
-            self.muTightMVA = self.SF.get_scalefactor("lepton", 'muon_tightMVArelaxed_{}'.format(era), combine="weight", systName="mu_tightmva", defineOnFirstUse=(not forSkimmer))
+            self.muOldTightMVA = self.SF.get_scalefactor("lepton", 'muon_tightMVA_{}'.format(era), combine="weight", defineOnFirstUse=(not forSkimmer))
+                # -> Old too tight ID
+            self.muNewTightMVA = self.SF.get_scalefactor("lepton", 'muon_tightMVArelaxed_{}'.format(era), combine="weight", systName="mu_tight", defineOnFirstUse=(not forSkimmer))
+                # -> New relaxed ID
+            self.mutightMVARelaxation = lambda mu: op.systematic(op.c_float(1.), name="mu_tth", 
+                                                                 up   = 1+op.abs(self.muOldTightMVA(mu)-self.muNewTightMVA(mu))/2,
+                                                                 down = 1-op.abs(self.muOldTightMVA(mu)-self.muNewTightMVA(mu))/2)
+                # Systematic to take into account the relaxation of the ttH ID : |SF_final - SF| / 2 added as SF_final ± SF_err_x
 
             self.lambda_MuonTightSF = lambda mu : [op.switch(self.lambda_muonTightSel(mu),      # check if actual tight lepton (needed because in Fake CR one of the dilepton is not)
                                                              op.switch(self.lambda_is_matched(mu), # check if gen matched
-                                                                       self.muTightMVA(mu),
+                                                                       self.muNewTightMVA(mu) * self.mutightMVARelaxation(mu),
                                                                        op.c_float(1.)),
                                                              op.c_float(1.))]
 
@@ -1597,32 +1607,36 @@ One lepton and and one jet argument must be specified in addition to the require
             self.elPOGTight = self.SF.get_scalefactor("lepton", 'electron_POGSF_{}'.format(era), combine="weight", systName="el_pogtight", defineOnFirstUse=(not forSkimmer))
 
             ####  Electrons ####
+            self.elLooseId = self.SF.get_scalefactor("lepton", 'electron_looseid_{}'.format(era) , combine="weight", systName="el_loose", defineOnFirstUse=(not forSkimmer))
+            self.elLooseEff = self.SF.get_scalefactor("lepton", 'electron_looseeff_{}'.format(era) , combine="weight", systName="el_loose", defineOnFirstUse=(not forSkimmer))
             if era == "2016" or era == "2017": # Electron reco eff depend on Pt for 2016 and 2017
-                self.elLooseRecoPtLt20 = self.SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptlt20'), combine="weight", systName="el_loosereco", defineOnFirstUse=(not forSkimmer))
-                self.elLooseRecoPtGt20 = self.SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptgt20'), combine="weight", systName="el_loosereco", defineOnFirstUse=(not forSkimmer))
-                # /!\ In analysis YAML file 2016 and 2017 for systematics : must use el_looserecoptlt20 and el_looserecoptgt20
-
+                self.elLooseRecoPtGt20 = self.SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptgt20'),
+                                                                 combine="weight", systName="el_loose", defineOnFirstUse=(not forSkimmer))
+                self.elLooseRecoPtLt20 = self.SF.get_scalefactor("lepton", ('electron_loosereco_{}'.format(era) , 'electron_loosereco_ptlt20'),
+                                                                 combine="weight", systName="el_loose", defineOnFirstUse=(not forSkimmer))
+                self.elLooseReco = lambda el: op.switch(el.pt>20,self.elLooseRecoPtGt20(el),self.elLooseRecoPtGt20(el))
             elif era == "2018": # Does not depend on pt for 2018
-                self.elLooseReco = self.SF.get_scalefactor("lepton", 'electron_loosereco_{}'.format(era), combine="weight", systName="el_loosereco", defineOnFirstUse=(not forSkimmer))
-                # /!\ In analysis YAML file 2018 for systematics : must use el_loosereco
+                self.elLooseReco = self.SF.get_scalefactor("lepton", 'electron_loosereco_{}'.format(era), combine="weight", systName="el_loose", defineOnFirstUse=(not forSkimmer))
 
-            self.elLooseId = self.SF.get_scalefactor("lepton", 'electron_looseid_{}'.format(era) , combine="weight", systName="el_looseid", defineOnFirstUse=(not forSkimmer))
-            self.elLooseEff = self.SF.get_scalefactor("lepton", 'electron_looseeff_{}'.format(era) , combine="weight", systName="el_looseeff", defineOnFirstUse=(not forSkimmer))
+            # reco-to-loose single systematic = reco x loose id x loose eff
+            # Up/down = product up/down -> need to have the same name 
 
-            if era == "2016" or era == "2017":
-                self.lambda_ElectronLooseSF = lambda el : [op.switch(self.lambda_is_matched(el),self.elLooseId(el),op.c_float(1.)), 
-                                                           op.switch(self.lambda_is_matched(el),self.elLooseEff(el),op.c_float(1.)), 
-                                                           op.switch(self.lambda_is_matched(el),op.switch(el.pt>20, self.elLooseRecoPtGt20(el), self.elLooseRecoPtLt20(el)),op.c_float(1.))]
-            elif era == "2018": 
-                self.lambda_ElectronLooseSF = lambda el : [op.switch(self.lambda_is_matched(el),self.elLooseId(el),op.c_float(1.)),
-                                                           op.switch(self.lambda_is_matched(el),self.elLooseEff(el),op.c_float(1.)),
-                                                           op.switch(self.lambda_is_matched(el),self.elLooseReco(el),op.c_float(1.))]
+            self.lambda_ElectronLooseSF = lambda el : [op.switch(self.lambda_is_matched(el),self.elLooseId(el),op.c_float(1.)),
+                                                       op.switch(self.lambda_is_matched(el),self.elLooseEff(el),op.c_float(1.)),
+                                                       op.switch(self.lambda_is_matched(el),self.elLooseReco(el),op.c_float(1.))]
 
-            self.elTightMVA = self.SF.get_scalefactor("lepton", 'electron_tightMVArelaxed_{}'.format(era) , combine="weight", systName="el_tightmva", defineOnFirstUse=(not forSkimmer))
+            self.elOldTightMVA = self.SF.get_scalefactor("lepton", 'electron_tightMVA_{}'.format(era) , combine="weight", defineOnFirstUse=(not forSkimmer))
+                # -> Old too tight ID
+            self.elNewTightMVA = self.SF.get_scalefactor("lepton", 'electron_tightMVArelaxed_{}'.format(era) , combine="weight", systName="el_tight", defineOnFirstUse=(not forSkimmer))
+                # -> New relaxed ID
+            self.eltightMVARelaxation = lambda el: op.systematic(op.c_float(1.), name="el_tth", 
+                                                                 up   = 1+op.abs(self.elOldTightMVA(el)-self.elNewTightMVA(el))/2,
+                                                                 down = 1-op.abs(self.elOldTightMVA(el)-self.elNewTightMVA(el))/2)
+                # Systematic to take into account the relaxation of the ttH ID : |SF_final - SF| / 2 added as SF_final ± SF_err_x
 
             self.lambda_ElectronTightSF = lambda el : [op.switch(self.lambda_electronTightSel(el),      # check if actual tight lepton (needed because in Fake CR one of the dilepton is not)
                                                                  op.switch(self.lambda_is_matched(el), # check if gen matched
-                                                                           self.elTightMVA(el),
+                                                                           self.elNewTightMVA(el) * self.eltightMVARelaxation(el),
                                                                            op.c_float(1.)),
                                                                  op.c_float(1.))]
 
@@ -1685,10 +1699,6 @@ One lepton and and one jet argument must be specified in addition to the require
                     op.systematic(op.c_float(1.00), name="ttH_electronMuon_trigSF", up=op.c_float(1.01), down=op.c_float(0.99)))
         #----- Fake rates -----#
         FRSysts = [f'Loose_{channel}_pt_syst',f'Loose_{channel}_barrel_syst',f'Loose_{channel}_norm_syst']
-        #self.electronFRList = [self.SF.get_scalefactor("lepton", ('electron_fakerates_'+era, syst), combine="weight", systName="el_FR_"+syst, defineOnFirstUse=(not forSkimmer),
-        #                                     additionalVariables={'Pt' : lambda obj : self.electron_conept[obj.idx]}) for syst in FRSysts]
-        #self.muonFRList = [self.SF.get_scalefactor("lepton", ('muon_fakerates_'+era, syst), combine="weight", systName="mu_FR_"+syst, defineOnFirstUse=(not forSkimmer),
-        #                                 additionalVariables={'Pt' : lambda obj : self.muon_conept[obj.idx]}) for syst in FRSysts ] 
         self.electronFRList = [self.SF.get_scalefactor("lepton", ('electron_fakerates_'+era, syst), combine="weight", systName="el_FR_"+syst, 
                                              additionalVariables={'Pt' : lambda obj : self.electron_conept[obj.idx]}) for syst in FRSysts]
         self.muonFRList = [self.SF.get_scalefactor("lepton", ('muon_fakerates_'+era, syst), combine="weight", systName="mu_FR_"+syst, 
@@ -1968,7 +1978,10 @@ One lepton and and one jet argument must be specified in addition to the require
             elif self.args.BtagReweightingOff:
                 pass # Do not apply any SF
             else:
-                ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag','BtagReweightingRatio_jetN_{}_{}.json'.format(self.sample,self.era))
+                if 'related-sample' in self.sampleCfg.keys():
+                    ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag',f'BtagReweightingRatio_jetN_{self.sampleCfg["related-sample"]}_{self.era}.json')
+                else:
+                    ReweightingFileName = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','ScaleFactors_Btag',f'BtagReweightingRatio_jetN_{self.sample}_{self.era}.json')
                 if not os.path.exists(ReweightingFileName):
                     raise RuntimeError("Could not find reweighting file %s"%ReweightingFileName)
                 print ('Reweighting file',ReweightingFileName)

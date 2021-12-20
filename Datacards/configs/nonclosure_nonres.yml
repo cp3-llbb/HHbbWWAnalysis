@@ -81,6 +81,29 @@
       HH_SL_m_boosted_TopH:
         key:      HH_SL_m_boosted_TopH_2016
         systName: fake_nc_m_boosted_top
+  #######  Underlying event  #######
+  - module: nonclosure.py:UnderlyingEvent
+    init: 
+      path_json: ../configs/UE_NonRes2016.json
+    categories: 
+      HH_DL_resolved1b_GGF:
+        systName: underlying_event
+      HH_DL_resolved1b_VBF:
+        systName: underlying_event
+      HH_DL_resolved2b_GGF:
+        systName: underlying_event
+      HH_DL_resolved2b_GGF:
+        systName: underlying_event
+      HH_DL_boosted_GGF:
+        systName: underlying_event
+      HH_DL_boosted_VBF:
+        systName: underlying_event
+      HH_DL_inclusive_DY_VVV:
+        systName: underlying_event
+      HH_DL_resolved_other:
+        systName: underlying_event
+      HH_DL_boosted_other:
+        systName: underlying_event
 
 
 #################  2017 ###################
@@ -164,6 +187,30 @@
       HH_SL_m_boosted_TopH:
         key:      HH_SL_m_boosted_TopH_2017
         systName: fake_nc_m_boosted_top
+  #######  Underlying event  #######
+  - module: nonclosure.py:UnderlyingEvent
+    init: 
+      path_json: ../configs/UE_NonRes2017.json
+    categories: 
+      HH_DL_resolved1b_GGF:
+        systName: underlying_event
+      HH_DL_resolved1b_VBF:
+        systName: underlying_event
+      HH_DL_resolved2b_GGF:
+        systName: underlying_event
+      HH_DL_resolved2b_GGF:
+        systName: underlying_event
+      HH_DL_boosted_GGF:
+        systName: underlying_event
+      HH_DL_boosted_VBF:
+        systName: underlying_event
+      HH_DL_inclusive_DY_VVV:
+        systName: underlying_event
+      HH_DL_resolved_other:
+        systName: underlying_event
+      HH_DL_boosted_other:
+        systName: underlying_event
+
 
 
 #################  2018 ###################
@@ -185,68 +232,92 @@
   #######  Fakes  #######
   - module: nonclosure.py:NonClosureFake
     init: 
-      path_json: ../configs/factors_SL_Fake_2017.json
+      path_json: ../configs/factors_SL_Fake_2018.json
     categories: 
       HH_SL_e_resolved1b_GGF:
-        key:      HH_SL_e_resolved1b_GGF_2017
+        key:      HH_SL_e_resolved1b_GGF_2018
         systName: fake_nc_e_res1b_GGF
       HH_SL_m_resolved1b_GGF:
-        key:      HH_SL_m_resolved1b_GGF_2017
+        key:      HH_SL_m_resolved1b_GGF_2018
         systName: fake_nc_m_res1b_GGF
       HH_SL_e_resolved1b_VBF:
-        key:      HH_SL_e_resolved1b_VBF_2017
+        key:      HH_SL_e_resolved1b_VBF_2018
         systName: fake_nc_e_res1b_VBF
       HH_SL_m_resolved1b_VBF:
-        key:      HH_SL_m_resolved1b_VBF_2017
+        key:      HH_SL_m_resolved1b_VBF_2018
         systName: fake_nc_m_res1b_VBF
       HH_SL_e_resolved2b_GGF:
-        key:      HH_SL_e_resolved2b_GGF_2017
+        key:      HH_SL_e_resolved2b_GGF_2018
         systName: fake_nc_e_res2b_GGF
       HH_SL_m_resolved2b_GGF:
-        key:      HH_SL_m_resolved2b_GGF_2017
+        key:      HH_SL_m_resolved2b_GGF_2018
         systName: fake_nc_m_res2b_GGF
       HH_SL_e_resolved2b_VBF:
-        key:      HH_SL_e_resolved2b_VBF_2017
+        key:      HH_SL_e_resolved2b_VBF_2018
         systName: fake_nc_e_res2b_VBF
       HH_SL_m_resolved2b_VBF:
-        key:      HH_SL_m_resolved2b_VBF_2017
+        key:      HH_SL_m_resolved2b_VBF_2018
         systName: fake_nc_m_res2b_VBF
       HH_SL_e_boosted_GGF:
-        key:      HH_SL_e_boosted_GGF_2017
+        key:      HH_SL_e_boosted_GGF_2018
         systName: fake_nc_e_boosted_GGF
       HH_SL_m_boosted_GGF:
-        key:      HH_SL_m_boosted_GGF_2017
+        key:      HH_SL_m_boosted_GGF_2018
         systName: fake_nc_m_boosted_GGF
       HH_SL_e_boosted_VBF:
-        key:      HH_SL_e_boosted_VBF_2017
+        key:      HH_SL_e_boosted_VBF_2018
         systName: fake_nc_e_boosted_VBF
       HH_SL_m_boosted_VBF:
-        key:      HH_SL_m_boosted_VBF_2017
+        key:      HH_SL_m_boosted_VBF_2018
         systName: fake_nc_m_boosted_VBF
       HH_SL_e_inclusive_WJets:
-        key:      HH_SL_e_inclusive_WJets_2017
+        key:      HH_SL_e_inclusive_WJets_2018
         systName: fake_nc_e_inc_wjets
       HH_SL_m_inclusive_WJets:
-        key:      HH_SL_m_inclusive_WJets_2017
+        key:      HH_SL_m_inclusive_WJets_2018
         systName: fake_nc_m_inc_wjets
       HH_SL_e_inclusive_other:
-        key:      HH_SL_e_inclusive_other_2017
+        key:      HH_SL_e_inclusive_other_2018
         systName: fake_nc_e_inc_otherh
       HH_SL_m_inclusive_other:
-        key:      HH_SL_m_inclusive_other_2017
+        key:      HH_SL_m_inclusive_other_2018
         systName: fake_nc_m_inc_otherh
       HH_SL_e_resolved_TopH:
-        key:      HH_SL_e_resolved_TopH_2017
+        key:      HH_SL_e_resolved_TopH_2018
         systName: fake_nc_e_res_top
       HH_SL_m_resolved_TopH:
-        key:      HH_SL_m_resolved_TopH_2017
+        key:      HH_SL_m_resolved_TopH_2018
         systName: fake_nc_m_res_top
       HH_SL_e_boosted_TopH:
-        key:      HH_SL_e_boosted_TopH_2017
+        key:      HH_SL_e_boosted_TopH_2018
         systName: fake_nc_e_boosted_top
       HH_SL_m_boosted_TopH:
-        key:      HH_SL_m_boosted_TopH_2017
+        key:      HH_SL_m_boosted_TopH_2018
         systName: fake_nc_m_boosted_top
+  #######  Underlying event  #######
+  - module: nonclosure.py:UnderlyingEvent
+    init: 
+      path_json: ../configs/UE_NonRes2018.json
+    categories: 
+      HH_DL_resolved1b_GGF:
+        systName: underlying_event
+      HH_DL_resolved1b_VBF:
+        systName: underlying_event
+      HH_DL_resolved2b_GGF:
+        systName: underlying_event
+      HH_DL_resolved2b_GGF:
+        systName: underlying_event
+      HH_DL_boosted_GGF:
+        systName: underlying_event
+      HH_DL_boosted_VBF:
+        systName: underlying_event
+      HH_DL_inclusive_DY_VVV:
+        systName: underlying_event
+      HH_DL_resolved_other:
+        systName: underlying_event
+      HH_DL_boosted_other:
+        systName: underlying_event
+
 
 
 

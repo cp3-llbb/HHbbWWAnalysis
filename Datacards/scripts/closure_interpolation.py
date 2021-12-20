@@ -5,6 +5,9 @@ import ROOT
 import ctypes
 
 from IPython import embed
+
+sys.path.append('../BambooDatacardProducer/')
+
 from context import TFileOpen
 from interpolation import Interpolation
 
@@ -134,8 +137,6 @@ masses = [
     ('300','350','400'),
     ('350','400','450'),
     ('400','450','500'),
-    ('450','500','550'),
-    ('450','500','550'),
     ('500','550','600'),
     ('550','600','650'),
     ('600','650','700'),
@@ -152,8 +153,6 @@ branches = [
     ('LowMass','LowMass','LowMass'),
     ('LowMass','LowMass','LowMass'),
     ('LowMass','LowMass','LowMass'),
-    ('LowMass','LowMass','HighMass'),
-    ('HighMass','HighMass','HighMass'),
     ('HighMass','HighMass','HighMass'),
     ('HighMass','HighMass','HighMass'),
     ('HighMass','HighMass','HighMass'),

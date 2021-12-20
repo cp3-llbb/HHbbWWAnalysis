@@ -18,11 +18,11 @@ plots:
     blinded-range: [0,100]
   HH_DL_{mass}_inclusive_DY_VVV: 
     x-axis: 'DNN output'
-    blinded-range: []
+    blinded-range: discard
   HH_DL_{mass}_resolved_other: 
     x-axis: 'DNN output'
-    blinded-range: []
+    blinded-range: discard
   HH_DL_{mass}_boosted_other: 
     x-axis: 'DNN output'
-    blinded-range: []
+    blinded-range: discard
   

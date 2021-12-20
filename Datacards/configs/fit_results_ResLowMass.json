@@ -1,5 +1,5 @@
 {
-    "HH_250_boosted_DY_VVV": {
+    "HH_DL_250_boosted_DY_VVV": {
         "coefficients": [
             1.0672487649193714,
             -0.10630227195781475
@@ -15,7 +15,7 @@
             ]
         ]
     },
-    "HH_250_boosted_Top": {
+    "HH_DL_250_boosted_Top": {
         "coefficients": [
             1.2136957308745489,
             -0.057030186846665415
@@ -31,7 +31,7 @@
             ]
         ]
     },
-    "HH_250_boosted_other": {
+    "HH_DL_250_boosted_other": {
         "coefficients": [
             1.0889345699568977,
             0.2905161941410485
@@ -47,7 +47,7 @@
             ]
         ]
     },
-    "HH_250_inclusive_DY_VVV_2016": {
+    "HH_DL_250_inclusive_DY_VVV_2016": {
         "coefficients": [
             0.9603226191157268,
             -0.10768663972134507
@@ -63,7 +63,7 @@
             ]
         ]
     },
-    "HH_250_inclusive_DY_VVV_2017": {
+    "HH_DL_250_inclusive_DY_VVV_2017": {
         "coefficients": [
             0.9784690813887076,
             -0.1257906158880426
@@ -79,7 +79,7 @@
             ]
         ]
     },
-    "HH_250_inclusive_DY_VVV_2018": {
+    "HH_DL_250_inclusive_DY_VVV_2018": {
         "coefficients": [
             1.0330262609190017,
             -0.19291056224397937
@@ -95,7 +95,7 @@
             ]
         ]
     },
-    "HH_250_inclusive_OtherH_2016": {
+    "HH_DL_250_inclusive_OtherH_2016": {
         "coefficients": [
             1.337006253702377,
             -0.4745820688572847
@@ -111,7 +111,7 @@
             ]
         ]
     },
-    "HH_250_inclusive_OtherH_2017": {
+    "HH_DL_250_inclusive_OtherH_2017": {
         "coefficients": [
             1.0705933181736484,
             -0.20147766219270455
@@ -127,7 +127,7 @@
             ]
         ]
     },
-    "HH_250_inclusive_OtherH_2018": {
+    "HH_DL_250_inclusive_OtherH_2018": {
         "coefficients": [
             1.2349396391636802,
             -0.4124723625776454
@@ -143,7 +143,7 @@
             ]
         ]
     },
-    "HH_250_resolved_DY_VVV_2016": {
+    "HH_DL_250_resolved_DY_VVV_2016": {
         "coefficients": [
             0.964820602287658,
             -0.11613760041460709
@@ -159,7 +159,7 @@
             ]
         ]
     },
-    "HH_250_resolved_DY_VVV_2017": {
+    "HH_DL_250_resolved_DY_VVV_2017": {
         "coefficients": [
             0.9822462132019265,
             -0.13232676653484035
@@ -175,7 +175,7 @@
             ]
         ]
     },
-    "HH_250_resolved_DY_VVV_2018": {
+    "HH_DL_250_resolved_DY_VVV_2018": {
         "coefficients": [
             1.0352931466387836,
             -0.19771482937824472
@@ -191,7 +191,7 @@
             ]
         ]
     },
-    "HH_250_resolved_Top_2016": {
+    "HH_DL_250_resolved_Top_2016": {
         "coefficients": [
             1.028781471517697,
             -0.1427682784950263
@@ -207,7 +207,7 @@
             ]
         ]
     },
-    "HH_250_resolved_Top_2017": {
+    "HH_DL_250_resolved_Top_2017": {
         "coefficients": [
             1.0485036134574952,
             -0.15971279551981568
@@ -223,7 +223,7 @@
             ]
         ]
     },
-    "HH_250_resolved_Top_2018": {
+    "HH_DL_250_resolved_Top_2018": {
         "coefficients": [
             1.1885458311974657,
             -0.3048262548403872
@@ -239,7 +239,7 @@
             ]
         ]
     },
-    "HH_250_resolved_other_2016": {
+    "HH_DL_250_resolved_other_2016": {
         "coefficients": [
             1.1627927243401883,
             -0.2760340039355724
@@ -255,7 +255,7 @@
             ]
         ]
     },
-    "HH_250_resolved_other_2017": {
+    "HH_DL_250_resolved_other_2017": {
         "coefficients": [
             1.0637795976002278,
             -0.1809656600933769
@@ -271,7 +271,7 @@
             ]
         ]
     },
-    "HH_250_resolved_other_2018": {
+    "HH_DL_250_resolved_other_2018": {
         "coefficients": [
             1.1777663258963715,
             -0.307720885682264
@@ -287,7 +287,7 @@
             ]
         ]
     },
-    "HH_260_boosted_DY_VVV": {
+    "HH_DL_260_boosted_DY_VVV": {
         "coefficients": [
             1.0693338954623106,
             -0.0886783387958095
@@ -303,7 +303,7 @@
             ]
         ]
     },
-    "HH_260_boosted_Top": {
+    "HH_DL_260_boosted_Top": {
         "coefficients": [
             0.72225201319815,
             0.5454265383593235
@@ -319,7 +319,7 @@
             ]
         ]
     },
-    "HH_260_boosted_other": {
+    "HH_DL_260_boosted_other": {
         "coefficients": [
             1.2961104479901853,
             0.05899409191540273
@@ -335,7 +335,7 @@
             ]
         ]
     },
-    "HH_260_inclusive_DY_VVV_2016": {
+    "HH_DL_260_inclusive_DY_VVV_2016": {
         "coefficients": [
             1.0256352074086432,
             -0.18961817259626865
@@ -351,7 +351,7 @@
             ]
         ]
     },
-    "HH_260_inclusive_DY_VVV_2017": {
+    "HH_DL_260_inclusive_DY_VVV_2017": {
         "coefficients": [
             1.0192066964691093,
             -0.18552913932224002
@@ -367,7 +367,7 @@
             ]
         ]
     },
-    "HH_260_inclusive_DY_VVV_2018": {
+    "HH_DL_260_inclusive_DY_VVV_2018": {
         "coefficients": [
             1.029931206675689,
             -0.17766044089617705
@@ -383,7 +383,7 @@
             ]
         ]
     },
-    "HH_260_inclusive_OtherH_2016": {
+    "HH_DL_260_inclusive_OtherH_2016": {
         "coefficients": [
             1.168154367792507,
             -0.28126417110442636
@@ -399,7 +399,7 @@
             ]
         ]
     },
-    "HH_260_inclusive_OtherH_2017": {
+    "HH_DL_260_inclusive_OtherH_2017": {
         "coefficients": [
             1.044582007673882,
             -0.18141831412807802
@@ -415,7 +415,7 @@
             ]
         ]
     },
-    "HH_260_inclusive_OtherH_2018": {
+    "HH_DL_260_inclusive_OtherH_2018": {
         "coefficients": [
             1.179348251791686,
             -0.3815234008108387
@@ -431,7 +431,7 @@
             ]
         ]
     },
-    "HH_260_resolved_DY_VVV_2016": {
+    "HH_DL_260_resolved_DY_VVV_2016": {
         "coefficients": [
             1.033826391405596,
             -0.203290080244659
@@ -447,7 +447,7 @@
             ]
         ]
     },
-    "HH_260_resolved_DY_VVV_2017": {
+    "HH_DL_260_resolved_DY_VVV_2017": {
         "coefficients": [
             1.0231822727129323,
             -0.19136018719664974
@@ -463,7 +463,7 @@
             ]
         ]
     },
-    "HH_260_resolved_DY_VVV_2018": {
+    "HH_DL_260_resolved_DY_VVV_2018": {
         "coefficients": [
             1.0293119550632237,
             -0.1785162940084386
@@ -479,7 +479,7 @@
             ]
         ]
     },
-    "HH_260_resolved_Top_2016": {
+    "HH_DL_260_resolved_Top_2016": {
         "coefficients": [
             1.1986151455843845,
             -0.49216931561708177
@@ -495,7 +495,7 @@
             ]
         ]
     },
-    "HH_260_resolved_Top_2017": {
+    "HH_DL_260_resolved_Top_2017": {
         "coefficients": [
             1.0809833303192173,
             -0.19440855225596973
@@ -511,7 +511,7 @@
             ]
         ]
     },
-    "HH_260_resolved_Top_2018": {
+    "HH_DL_260_resolved_Top_2018": {
         "coefficients": [
             1.194816497284487,
             -0.35993095862208113
@@ -527,7 +527,7 @@
             ]
         ]
     },
-    "HH_260_resolved_other_2016": {
+    "HH_DL_260_resolved_other_2016": {
         "coefficients": [
             1.1094782984514822,
             -0.2349564136116985
@@ -543,7 +543,7 @@
             ]
         ]
     },
-    "HH_260_resolved_other_2017": {
+    "HH_DL_260_resolved_other_2017": {
         "coefficients": [
             1.0466866584956496,
             -0.16151628237101825
@@ -559,7 +559,7 @@
             ]
         ]
     },
-    "HH_260_resolved_other_2018": {
+    "HH_DL_260_resolved_other_2018": {
         "coefficients": [
             1.1979594973972898,
             -0.3737452440822082
@@ -575,7 +575,7 @@
             ]
         ]
     },
-    "HH_270_boosted_DY_VVV": {
+    "HH_DL_270_boosted_DY_VVV": {
         "coefficients": [
             1.1339856433420394,
             -0.16694357117112543
@@ -591,7 +591,7 @@
             ]
         ]
     },
-    "HH_270_boosted_Top": {
+    "HH_DL_270_boosted_Top": {
         "coefficients": [
             2.0170876421613526,
             -1.2537307066028003
@@ -607,7 +607,7 @@
             ]
         ]
     },
-    "HH_270_boosted_other": {
+    "HH_DL_270_boosted_other": {
         "coefficients": [
             1.5713475710231046,
             -0.43811428281696435
@@ -623,7 +623,7 @@
             ]
         ]
     },
-    "HH_270_inclusive_DY_VVV_2016": {
+    "HH_DL_270_inclusive_DY_VVV_2016": {
         "coefficients": [
             0.993609642301392,
             -0.14731674367408662
@@ -639,7 +639,7 @@
             ]
         ]
     },
-    "HH_270_inclusive_DY_VVV_2017": {
+    "HH_DL_270_inclusive_DY_VVV_2017": {
         "coefficients": [
             0.980918611419412,
             -0.12064085252465992
@@ -655,7 +655,7 @@
             ]
         ]
     },
-    "HH_270_inclusive_DY_VVV_2018": {
+    "HH_DL_270_inclusive_DY_VVV_2018": {
         "coefficients": [
             1.0751428439814583,
             -0.23229259048900494
@@ -671,7 +671,7 @@
             ]
         ]
     },
-    "HH_270_inclusive_OtherH_2016": {
+    "HH_DL_270_inclusive_OtherH_2016": {
         "coefficients": [
             1.0725980486639781,
             -0.15511715969967388
@@ -687,7 +687,7 @@
             ]
         ]
     },
-    "HH_270_inclusive_OtherH_2017": {
+    "HH_DL_270_inclusive_OtherH_2017": {
         "coefficients": [
             0.9907169686811508,
             -0.11404231995211868
@@ -703,7 +703,7 @@
             ]
         ]
     },
-    "HH_270_inclusive_OtherH_2018": {
+    "HH_DL_270_inclusive_OtherH_2018": {
         "coefficients": [
             1.2891817281605307,
             -0.4577893497795573
@@ -719,7 +719,7 @@
             ]
         ]
     },
-    "HH_270_resolved_DY_VVV_2016": {
+    "HH_DL_270_resolved_DY_VVV_2016": {
         "coefficients": [
             0.9987465632562478,
             -0.15721419381743584
@@ -735,7 +735,7 @@
             ]
         ]
     },
-    "HH_270_resolved_DY_VVV_2017": {
+    "HH_DL_270_resolved_DY_VVV_2017": {
         "coefficients": [
             0.9841851739033437,
             -0.12607619969885603
@@ -751,7 +751,7 @@
             ]
         ]
     },
-    "HH_270_resolved_DY_VVV_2018": {
+    "HH_DL_270_resolved_DY_VVV_2018": {
         "coefficients": [
             1.0781742434265573,
             -0.23686820767649885
@@ -767,7 +767,7 @@
             ]
         ]
     },
-    "HH_270_resolved_Top_2016": {
+    "HH_DL_270_resolved_Top_2016": {
         "coefficients": [
             1.0859095205814957,
             -0.4012328272951929
@@ -783,7 +783,7 @@
             ]
         ]
     },
-    "HH_270_resolved_Top_2017": {
+    "HH_DL_270_resolved_Top_2017": {
         "coefficients": [
             0.9509758544247096,
             -0.012322645621984478
@@ -799,7 +799,7 @@
             ]
         ]
     },
-    "HH_270_resolved_Top_2018": {
+    "HH_DL_270_resolved_Top_2018": {
         "coefficients": [
             1.0880407102560194,
             -0.25905580284601043
@@ -815,7 +815,7 @@
             ]
         ]
     },
-    "HH_270_resolved_other_2016": {
+    "HH_DL_270_resolved_other_2016": {
         "coefficients": [
             1.037568810498935,
             -0.13690566478712493
@@ -831,7 +831,7 @@
             ]
         ]
     },
-    "HH_270_resolved_other_2017": {
+    "HH_DL_270_resolved_other_2017": {
         "coefficients": [
             0.972669522696835,
             -0.06273622676609658
@@ -847,7 +847,7 @@
             ]
         ]
     },
-    "HH_270_resolved_other_2018": {
+    "HH_DL_270_resolved_other_2018": {
         "coefficients": [
             1.1825902187999557,
             -0.3618490787194982
@@ -863,7 +863,7 @@
             ]
         ]
     },
-    "HH_280_boosted_DY_VVV": {
+    "HH_DL_280_boosted_DY_VVV": {
         "coefficients": [
             1.1352562481016089,
             -0.24602169555316286
@@ -879,7 +879,7 @@
             ]
         ]
     },
-    "HH_280_boosted_Top": {
+    "HH_DL_280_boosted_Top": {
         "coefficients": [
             1.137684140343641,
             -0.1680974394954321
@@ -895,7 +895,7 @@
             ]
         ]
     },
-    "HH_280_boosted_other": {
+    "HH_DL_280_boosted_other": {
         "coefficients": [
             1.2116096685683975,
             0.03102222700176455
@@ -911,7 +911,7 @@
             ]
         ]
     },
-    "HH_280_inclusive_DY_VVV_2016": {
+    "HH_DL_280_inclusive_DY_VVV_2016": {
         "coefficients": [
             1.02471343813964,
             -0.1828074674095247
@@ -927,7 +927,7 @@
             ]
         ]
     },
-    "HH_280_inclusive_DY_VVV_2017": {
+    "HH_DL_280_inclusive_DY_VVV_2017": {
         "coefficients": [
             0.9981107712923873,
             -0.14101676891696985
@@ -943,7 +943,7 @@
             ]
         ]
     },
-    "HH_280_inclusive_DY_VVV_2018": {
+    "HH_DL_280_inclusive_DY_VVV_2018": {
         "coefficients": [
             1.036753791368213,
             -0.18083655300547616
@@ -959,7 +959,7 @@
             ]
         ]
     },
-    "HH_280_inclusive_OtherH_2016": {
+    "HH_DL_280_inclusive_OtherH_2016": {
         "coefficients": [
             1.089452605909613,
             -0.16501041479700984
@@ -975,7 +975,7 @@
             ]
         ]
     },
-    "HH_280_inclusive_OtherH_2017": {
+    "HH_DL_280_inclusive_OtherH_2017": {
         "coefficients": [
             1.090618267953863,
             -0.2507080002045623
@@ -991,7 +991,7 @@
             ]
         ]
     },
-    "HH_280_inclusive_OtherH_2018": {
+    "HH_DL_280_inclusive_OtherH_2018": {
         "coefficients": [
             1.1535471188689703,
             -0.31084754433687517
@@ -1007,7 +1007,7 @@
             ]
         ]
     },
-    "HH_280_resolved_DY_VVV_2016": {
+    "HH_DL_280_resolved_DY_VVV_2016": {
         "coefficients": [
             1.0322370645425916,
             -0.19691715149698355
@@ -1023,7 +1023,7 @@
             ]
         ]
     },
-    "HH_280_resolved_DY_VVV_2017": {
+    "HH_DL_280_resolved_DY_VVV_2017": {
         "coefficients": [
             1.0025000337238432,
             -0.14873725748747368
@@ -1039,7 +1039,7 @@
             ]
         ]
     },
-    "HH_280_resolved_DY_VVV_2018": {
+    "HH_DL_280_resolved_DY_VVV_2018": {
         "coefficients": [
             1.0353493194660786,
             -0.17866897121297115
@@ -1055,7 +1055,7 @@
             ]
         ]
     },
-    "HH_280_resolved_Top_2016": {
+    "HH_DL_280_resolved_Top_2016": {
         "coefficients": [
             1.060313608218302,
             -0.24641211652403744
@@ -1071,7 +1071,7 @@
             ]
         ]
     },
-    "HH_280_resolved_Top_2017": {
+    "HH_DL_280_resolved_Top_2017": {
         "coefficients": [
             0.9578790546907586,
             -0.038935543215990624
@@ -1087,7 +1087,7 @@
             ]
         ]
     },
-    "HH_280_resolved_Top_2018": {
+    "HH_DL_280_resolved_Top_2018": {
         "coefficients": [
             1.0172688208974834,
             -0.11708009766556124
@@ -1103,7 +1103,7 @@
             ]
         ]
     },
-    "HH_280_resolved_other_2016": {
+    "HH_DL_280_resolved_other_2016": {
         "coefficients": [
             1.0421908528718902,
             -0.12112478862071563
@@ -1119,7 +1119,7 @@
             ]
         ]
     },
-    "HH_280_resolved_other_2017": {
+    "HH_DL_280_resolved_other_2017": {
         "coefficients": [
             1.04672878241431,
             -0.173588194617203
@@ -1135,7 +1135,7 @@
             ]
         ]
     },
-    "HH_280_resolved_other_2018": {
+    "HH_DL_280_resolved_other_2018": {
         "coefficients": [
             1.0738960432392364,
             -0.20127461684111198
@@ -1151,7 +1151,7 @@
             ]
         ]
     },
-    "HH_300_boosted_DY_VVV": {
+    "HH_DL_300_boosted_DY_VVV": {
         "coefficients": [
             1.0186535618287091,
             -0.003680523408045673
@@ -1167,7 +1167,7 @@
             ]
         ]
     },
-    "HH_300_boosted_Top": {
+    "HH_DL_300_boosted_Top": {
         "coefficients": [
             1.3007435121613842,
             -0.35846365943106806
@@ -1183,7 +1183,7 @@
             ]
         ]
     },
-    "HH_300_boosted_other": {
+    "HH_DL_300_boosted_other": {
         "coefficients": [
             1.4251518764571287,
             -0.28965866092748055
@@ -1199,7 +1199,7 @@
             ]
         ]
     },
-    "HH_300_inclusive_DY_VVV_2016": {
+    "HH_DL_300_inclusive_DY_VVV_2016": {
         "coefficients": [
             0.9993767385399319,
             -0.1435250394791627
@@ -1215,7 +1215,7 @@
             ]
         ]
     },
-    "HH_300_inclusive_DY_VVV_2017": {
+    "HH_DL_300_inclusive_DY_VVV_2017": {
         "coefficients": [
             1.0570949008169777,
             -0.22826527349790776
@@ -1231,7 +1231,7 @@
             ]
         ]
     },
-    "HH_300_inclusive_DY_VVV_2018": {
+    "HH_DL_300_inclusive_DY_VVV_2018": {
         "coefficients": [
             0.9774249897941558,
             -0.09832411327362924
@@ -1247,7 +1247,7 @@
             ]
         ]
     },
-    "HH_300_inclusive_OtherH_2016": {
+    "HH_DL_300_inclusive_OtherH_2016": {
         "coefficients": [
             0.9959407868757539,
             -0.059810797163489964
@@ -1263,7 +1263,7 @@
             ]
         ]
     },
-    "HH_300_inclusive_OtherH_2017": {
+    "HH_DL_300_inclusive_OtherH_2017": {
         "coefficients": [
             1.021340670439914,
             -0.17378010976683975
@@ -1279,7 +1279,7 @@
             ]
         ]
     },
-    "HH_300_inclusive_OtherH_2018": {
+    "HH_DL_300_inclusive_OtherH_2018": {
         "coefficients": [
             1.150185961247461,
             -0.3694279248444435
@@ -1295,7 +1295,7 @@
             ]
         ]
     },
-    "HH_300_resolved_DY_VVV_2016": {
+    "HH_DL_300_resolved_DY_VVV_2016": {
         "coefficients": [
             1.0149547556707268,
             -0.1681337284700277
@@ -1311,7 +1311,7 @@
             ]
         ]
     },
-    "HH_300_resolved_DY_VVV_2017": {
+    "HH_DL_300_resolved_DY_VVV_2017": {
         "coefficients": [
             1.0615333028385299,
             -0.2351224169222604
@@ -1327,7 +1327,7 @@
             ]
         ]
     },
-    "HH_300_resolved_DY_VVV_2018": {
+    "HH_DL_300_resolved_DY_VVV_2018": {
         "coefficients": [
             0.9759514847751373,
             -0.09618478684449029
@@ -1343,7 +1343,7 @@
             ]
         ]
     },
-    "HH_300_resolved_Top_2016": {
+    "HH_DL_300_resolved_Top_2016": {
         "coefficients": [
             0.8548471265554413,
             0.012965436986501433
@@ -1359,7 +1359,7 @@
             ]
         ]
     },
-    "HH_300_resolved_Top_2017": {
+    "HH_DL_300_resolved_Top_2017": {
         "coefficients": [
             0.9079728405094585,
             0.05364834582314321
@@ -1375,7 +1375,7 @@
             ]
         ]
     },
-    "HH_300_resolved_Top_2018": {
+    "HH_DL_300_resolved_Top_2018": {
         "coefficients": [
             1.0362260107715355,
             -0.14956850741087407
@@ -1391,7 +1391,7 @@
             ]
         ]
     },
-    "HH_300_resolved_other_2016": {
+    "HH_DL_300_resolved_other_2016": {
         "coefficients": [
             0.9480900814464353,
             -0.02344685589542199
@@ -1407,7 +1407,7 @@
             ]
         ]
     },
-    "HH_300_resolved_other_2017": {
+    "HH_DL_300_resolved_other_2017": {
         "coefficients": [
             0.9890819821834465,
             -0.1071727121141941
@@ -1423,7 +1423,7 @@
             ]
         ]
     },
-    "HH_300_resolved_other_2018": {
+    "HH_DL_300_resolved_other_2018": {
         "coefficients": [
             1.0978391598392692,
             -0.2563619323398925
@@ -1439,7 +1439,7 @@
             ]
         ]
     },
-    "HH_320_boosted_DY_VVV": {
+    "HH_DL_320_boosted_DY_VVV": {
         "coefficients": [
             1.1849224418272564,
             -0.2235504096197328
@@ -1455,7 +1455,7 @@
             ]
         ]
     },
-    "HH_320_boosted_Top": {
+    "HH_DL_320_boosted_Top": {
         "coefficients": [
             1.0097401986279182,
             -0.029826334628084927
@@ -1471,7 +1471,7 @@
             ]
         ]
     },
-    "HH_320_boosted_other": {
+    "HH_DL_320_boosted_other": {
         "coefficients": [
             1.259381628424605,
             -0.07291282727733198
@@ -1487,7 +1487,7 @@
             ]
         ]
     },
-    "HH_320_inclusive_DY_VVV_2016": {
+    "HH_DL_320_inclusive_DY_VVV_2016": {
         "coefficients": [
             1.0603400047973275,
             -0.22678041392356593
@@ -1503,7 +1503,7 @@
             ]
         ]
     },
-    "HH_320_inclusive_DY_VVV_2017": {
+    "HH_DL_320_inclusive_DY_VVV_2017": {
         "coefficients": [
             1.046071444199597,
             -0.2241404053742913
@@ -1519,7 +1519,7 @@
             ]
         ]
     },
-    "HH_320_inclusive_DY_VVV_2018": {
+    "HH_DL_320_inclusive_DY_VVV_2018": {
         "coefficients": [
             0.9876734226226587,
             -0.10287955522177117
@@ -1535,7 +1535,7 @@
             ]
         ]
     },
-    "HH_320_inclusive_OtherH_2016": {
+    "HH_DL_320_inclusive_OtherH_2016": {
         "coefficients": [
             1.0412839371626001,
             -0.15990600412963146
@@ -1551,7 +1551,7 @@
             ]
         ]
     },
-    "HH_320_inclusive_OtherH_2017": {
+    "HH_DL_320_inclusive_OtherH_2017": {
         "coefficients": [
             1.0684967021149916,
             -0.22936768599904012
@@ -1567,7 +1567,7 @@
             ]
         ]
     },
-    "HH_320_inclusive_OtherH_2018": {
+    "HH_DL_320_inclusive_OtherH_2018": {
         "coefficients": [
             1.231213625619544,
             -0.4657205728782928
@@ -1583,7 +1583,7 @@
             ]
         ]
     },
-    "HH_320_resolved_DY_VVV_2016": {
+    "HH_DL_320_resolved_DY_VVV_2016": {
         "coefficients": [
             1.0768427319715872,
             -0.2529279440723329
@@ -1599,7 +1599,7 @@
             ]
         ]
     },
-    "HH_320_resolved_DY_VVV_2017": {
+    "HH_DL_320_resolved_DY_VVV_2017": {
         "coefficients": [
             1.0477447872820305,
             -0.22832090606466807
@@ -1615,7 +1615,7 @@
             ]
         ]
     },
-    "HH_320_resolved_DY_VVV_2018": {
+    "HH_DL_320_resolved_DY_VVV_2018": {
         "coefficients": [
             0.9849842703289231,
             -0.09905582316318991
@@ -1631,7 +1631,7 @@
             ]
         ]
     },
-    "HH_320_resolved_Top_2016": {
+    "HH_DL_320_resolved_Top_2016": {
         "coefficients": [
             0.8755525212657633,
             0.06449159905002798
@@ -1647,7 +1647,7 @@
             ]
         ]
     },
-    "HH_320_resolved_Top_2017": {
+    "HH_DL_320_resolved_Top_2017": {
         "coefficients": [
             0.9403133962066585,
             0.013646206627302841
@@ -1663,7 +1663,7 @@
             ]
         ]
     },
-    "HH_320_resolved_Top_2018": {
+    "HH_DL_320_resolved_Top_2018": {
         "coefficients": [
             0.9266075415536699,
             -0.028288088880907065
@@ -1679,7 +1679,7 @@
             ]
         ]
     },
-    "HH_320_resolved_other_2016": {
+    "HH_DL_320_resolved_other_2016": {
         "coefficients": [
             0.9667255824181108,
             -0.04239833736167649
@@ -1695,7 +1695,7 @@
             ]
         ]
     },
-    "HH_320_resolved_other_2017": {
+    "HH_DL_320_resolved_other_2017": {
         "coefficients": [
             1.031049627172716,
             -0.1498017470157564
@@ -1711,7 +1711,7 @@
             ]
         ]
     },
-    "HH_320_resolved_other_2018": {
+    "HH_DL_320_resolved_other_2018": {
         "coefficients": [
             1.1311956104306664,
             -0.30304347626543693
@@ -1727,7 +1727,7 @@
             ]
         ]
     },
-    "HH_350_boosted_DY_VVV": {
+    "HH_DL_350_boosted_DY_VVV": {
         "coefficients": [
             1.1525267329221767,
             -0.11031582024072312
@@ -1743,7 +1743,7 @@
             ]
         ]
     },
-    "HH_350_boosted_Top": {
+    "HH_DL_350_boosted_Top": {
         "coefficients": [
             2.0682987778002127,
             -1.326813533098312
@@ -1759,7 +1759,7 @@
             ]
         ]
     },
-    "HH_350_boosted_other": {
+    "HH_DL_350_boosted_other": {
         "coefficients": [
             1.7658861457157278,
             -0.8780593494872133
@@ -1775,7 +1775,7 @@
             ]
         ]
     },
-    "HH_350_inclusive_DY_VVV_2016": {
+    "HH_DL_350_inclusive_DY_VVV_2016": {
         "coefficients": [
             1.0643890635955509,
             -0.2315744671722888
@@ -1791,7 +1791,7 @@
             ]
         ]
     },
-    "HH_350_inclusive_DY_VVV_2017": {
+    "HH_DL_350_inclusive_DY_VVV_2017": {
         "coefficients": [
             1.0551722336080118,
             -0.2344623525865805
@@ -1807,7 +1807,7 @@
             ]
         ]
     },
-    "HH_350_inclusive_DY_VVV_2018": {
+    "HH_DL_350_inclusive_DY_VVV_2018": {
         "coefficients": [
             0.9795990925991064,
             -0.12149931303800195
@@ -1823,7 +1823,7 @@
             ]
         ]
     },
-    "HH_350_inclusive_OtherH_2016": {
+    "HH_DL_350_inclusive_OtherH_2016": {
         "coefficients": [
             0.9810084423874692,
             -0.0409860754264483
@@ -1839,7 +1839,7 @@
             ]
         ]
     },
-    "HH_350_inclusive_OtherH_2017": {
+    "HH_DL_350_inclusive_OtherH_2017": {
         "coefficients": [
             1.1080082976590697,
             -0.2968177774385489
@@ -1855,7 +1855,7 @@
             ]
         ]
     },
-    "HH_350_inclusive_OtherH_2018": {
+    "HH_DL_350_inclusive_OtherH_2018": {
         "coefficients": [
             1.3442629879822392,
             -0.6573390350196415
@@ -1871,7 +1871,7 @@
             ]
         ]
     },
-    "HH_350_resolved_DY_VVV_2016": {
+    "HH_DL_350_resolved_DY_VVV_2016": {
         "coefficients": [
             1.0849405246047261,
             -0.2659363375336
@@ -1887,7 +1887,7 @@
             ]
         ]
     },
-    "HH_350_resolved_DY_VVV_2017": {
+    "HH_DL_350_resolved_DY_VVV_2017": {
         "coefficients": [
             1.0560376540409406,
             -0.2390268866843182
@@ -1903,7 +1903,7 @@
             ]
         ]
     },
-    "HH_350_resolved_DY_VVV_2018": {
+    "HH_DL_350_resolved_DY_VVV_2018": {
         "coefficients": [
             0.9785026819527103,
             -0.12100617410649457
@@ -1919,7 +1919,7 @@
             ]
         ]
     },
-    "HH_350_resolved_Top_2016": {
+    "HH_DL_350_resolved_Top_2016": {
         "coefficients": [
             1.054969074310595,
             -0.28277127450314876
@@ -1935,7 +1935,7 @@
             ]
         ]
     },
-    "HH_350_resolved_Top_2017": {
+    "HH_DL_350_resolved_Top_2017": {
         "coefficients": [
             0.9595221279356276,
             -0.02289445683033725
@@ -1951,7 +1951,7 @@
             ]
         ]
     },
-    "HH_350_resolved_Top_2018": {
+    "HH_DL_350_resolved_Top_2018": {
         "coefficients": [
             1.0841964996437932,
             -0.1365483985694672
@@ -1967,7 +1967,7 @@
             ]
         ]
     },
-    "HH_350_resolved_other_2016": {
+    "HH_DL_350_resolved_other_2016": {
         "coefficients": [
             0.9568764775533897,
             -0.013287065151922718
@@ -1983,7 +1983,7 @@
             ]
         ]
     },
-    "HH_350_resolved_other_2017": {
+    "HH_DL_350_resolved_other_2017": {
         "coefficients": [
             1.0487622686232692,
             -0.18677710174161666
@@ -1999,7 +1999,7 @@
             ]
         ]
     },
-    "HH_350_resolved_other_2018": {
+    "HH_DL_350_resolved_other_2018": {
         "coefficients": [
             1.2068858422206112,
             -0.3813983875319415
@@ -2015,7 +2015,7 @@
             ]
         ]
     },
-    "HH_400_boosted_DY_VVV": {
+    "HH_DL_400_boosted_DY_VVV": {
         "coefficients": [
             1.1503613248459166,
             -0.053347730514779985
@@ -2031,7 +2031,7 @@
             ]
         ]
     },
-    "HH_400_boosted_Top": {
+    "HH_DL_400_boosted_Top": {
         "coefficients": [
             1.1758400918868062,
             -0.11239834966123242
@@ -2047,7 +2047,7 @@
             ]
         ]
     },
-    "HH_400_boosted_other": {
+    "HH_DL_400_boosted_other": {
         "coefficients": [
             1.848936969769412,
             -0.8905278133225012
@@ -2063,7 +2063,7 @@
             ]
         ]
     },
-    "HH_400_inclusive_DY_VVV_2016": {
+    "HH_DL_400_inclusive_DY_VVV_2016": {
         "coefficients": [
             0.9700532353386229,
             -0.11531045949962829
@@ -2079,7 +2079,7 @@
             ]
         ]
     },
-    "HH_400_inclusive_DY_VVV_2017": {
+    "HH_DL_400_inclusive_DY_VVV_2017": {
         "coefficients": [
             0.9842320031488183,
             -0.127969369061678
@@ -2095,7 +2095,7 @@
             ]
         ]
     },
-    "HH_400_inclusive_DY_VVV_2018": {
+    "HH_DL_400_inclusive_DY_VVV_2018": {
         "coefficients": [
             0.9793058814709562,
             -0.12166359071415532
@@ -2111,7 +2111,7 @@
             ]
         ]
     },
-    "HH_400_inclusive_OtherH_2016": {
+    "HH_DL_400_inclusive_OtherH_2016": {
         "coefficients": [
             1.221864259896473,
             -0.38101699313084625
@@ -2127,7 +2127,7 @@
             ]
         ]
     },
-    "HH_400_inclusive_OtherH_2017": {
+    "HH_DL_400_inclusive_OtherH_2017": {
         "coefficients": [
             1.1924679564082532,
             -0.42764075499409876
@@ -2143,7 +2143,7 @@
             ]
         ]
     },
-    "HH_400_inclusive_OtherH_2018": {
+    "HH_DL_400_inclusive_OtherH_2018": {
         "coefficients": [
             1.1649663007002742,
             -0.35865515584263685
@@ -2159,7 +2159,7 @@
             ]
         ]
     },
-    "HH_400_resolved_DY_VVV_2016": {
+    "HH_DL_400_resolved_DY_VVV_2016": {
         "coefficients": [
             0.9729974937801708,
             -0.12575683843396163
@@ -2175,7 +2175,7 @@
             ]
         ]
     },
-    "HH_400_resolved_DY_VVV_2017": {
+    "HH_DL_400_resolved_DY_VVV_2017": {
         "coefficients": [
             0.9844850156948861,
             -0.13285664598722105
@@ -2191,7 +2191,7 @@
             ]
         ]
     },
-    "HH_400_resolved_DY_VVV_2018": {
+    "HH_DL_400_resolved_DY_VVV_2018": {
         "coefficients": [
             0.9806127819179413,
             -0.12423086028459204
@@ -2207,7 +2207,7 @@
             ]
         ]
     },
-    "HH_400_resolved_Top_2016": {
+    "HH_DL_400_resolved_Top_2016": {
         "coefficients": [
             0.8378521112559433,
             0.15907944770371377
@@ -2223,7 +2223,7 @@
             ]
         ]
     },
-    "HH_400_resolved_Top_2017": {
+    "HH_DL_400_resolved_Top_2017": {
         "coefficients": [
             0.8972721906291687,
             0.010927473067339065
@@ -2239,7 +2239,7 @@
             ]
         ]
     },
-    "HH_400_resolved_Top_2018": {
+    "HH_DL_400_resolved_Top_2018": {
         "coefficients": [
             0.964874676870982,
             0.06482473153217837
@@ -2255,7 +2255,7 @@
             ]
         ]
     },
-    "HH_400_resolved_other_2016": {
+    "HH_DL_400_resolved_other_2016": {
         "coefficients": [
             1.0347787474035879,
             -0.10044821097936985
@@ -2271,7 +2271,7 @@
             ]
         ]
     },
-    "HH_400_resolved_other_2017": {
+    "HH_DL_400_resolved_other_2017": {
         "coefficients": [
             1.0857277831781793,
             -0.2633766531935876
@@ -2287,7 +2287,7 @@
             ]
         ]
     },
-    "HH_400_resolved_other_2018": {
+    "HH_DL_400_resolved_other_2018": {
         "coefficients": [
             1.0656048357330221,
             -0.1441452149187123
@@ -2303,7 +2303,7 @@
             ]
         ]
     },
-    "HH_450_boosted_DY_VVV": {
+    "HH_DL_450_boosted_DY_VVV": {
         "coefficients": [
             1.114753634040033,
             0.05334207545428819
@@ -2319,7 +2319,7 @@
             ]
         ]
     },
-    "HH_450_boosted_Top": {
+    "HH_DL_450_boosted_Top": {
         "coefficients": [
             1.2239193507321136,
             -0.16722601813233864
@@ -2335,7 +2335,7 @@
             ]
         ]
     },
-    "HH_450_boosted_other": {
+    "HH_DL_450_boosted_other": {
         "coefficients": [
             1.0666326060733275,
             0.15277003637392209
@@ -2351,7 +2351,7 @@
             ]
         ]
     },
-    "HH_450_inclusive_DY_VVV_2016": {
+    "HH_DL_450_inclusive_DY_VVV_2016": {
         "coefficients": [
             0.9969914995582406,
             -0.16647615369675545
@@ -2367,7 +2367,7 @@
             ]
         ]
     },
-    "HH_450_inclusive_DY_VVV_2017": {
+    "HH_DL_450_inclusive_DY_VVV_2017": {
         "coefficients": [
             0.9977825360081997,
             -0.1551297059201628
@@ -2383,7 +2383,7 @@
             ]
         ]
     },
-    "HH_450_inclusive_DY_VVV_2018": {
+    "HH_DL_450_inclusive_DY_VVV_2018": {
         "coefficients": [
             1.051761744875686,
             -0.23311932937124713
@@ -2399,7 +2399,7 @@
             ]
         ]
     },
-    "HH_450_inclusive_OtherH_2016": {
+    "HH_DL_450_inclusive_OtherH_2016": {
         "coefficients": [
             1.2526733898457019,
             -0.426949709434858
@@ -2415,7 +2415,7 @@
             ]
         ]
     },
-    "HH_450_inclusive_OtherH_2017": {
+    "HH_DL_450_inclusive_OtherH_2017": {
         "coefficients": [
             1.186795971414864,
             -0.44088765106232325
@@ -2431,7 +2431,7 @@
             ]
         ]
     },
-    "HH_450_inclusive_OtherH_2018": {
+    "HH_DL_450_inclusive_OtherH_2018": {
         "coefficients": [
             1.252153867854568,
             -0.47379148946929156
@@ -2447,7 +2447,7 @@
             ]
         ]
     },
-    "HH_450_resolved_DY_VVV_2016": {
+    "HH_DL_450_resolved_DY_VVV_2016": {
         "coefficients": [
             1.0041573975750606,
             -0.18075687480418196
@@ -2463,7 +2463,7 @@
             ]
         ]
     },
-    "HH_450_resolved_DY_VVV_2017": {
+    "HH_DL_450_resolved_DY_VVV_2017": {
         "coefficients": [
             0.9974268508632869,
             -0.1592794814297486
@@ -2479,7 +2479,7 @@
             ]
         ]
     },
-    "HH_450_resolved_DY_VVV_2018": {
+    "HH_DL_450_resolved_DY_VVV_2018": {
         "coefficients": [
             1.0526858454184067,
             -0.2377870287308253
@@ -2495,7 +2495,7 @@
             ]
         ]
     },
-    "HH_450_resolved_Top_2016": {
+    "HH_DL_450_resolved_Top_2016": {
         "coefficients": [
             1.000373779644684,
             -0.22323958252203213
@@ -2511,7 +2511,7 @@
             ]
         ]
     },
-    "HH_450_resolved_Top_2017": {
+    "HH_DL_450_resolved_Top_2017": {
         "coefficients": [
             1.0149541745203987,
             -0.20880365602087997
@@ -2527,7 +2527,7 @@
             ]
         ]
     },
-    "HH_450_resolved_Top_2018": {
+    "HH_DL_450_resolved_Top_2018": {
         "coefficients": [
             0.933258393602922,
             0.07046523947596167
@@ -2543,7 +2543,7 @@
             ]
         ]
     },
-    "HH_450_resolved_other_2016": {
+    "HH_DL_450_resolved_other_2016": {
         "coefficients": [
             1.0806754437871915,
             -0.19405343511225429
@@ -2559,7 +2559,7 @@
             ]
         ]
     },
-    "HH_450_resolved_other_2017": {
+    "HH_DL_450_resolved_other_2017": {
         "coefficients": [
             1.1085281574113341,
             -0.3227343136256355
@@ -2575,7 +2575,7 @@
             ]
         ]
     },
-    "HH_450_resolved_other_2018": {
+    "HH_DL_450_resolved_other_2018": {
         "coefficients": [
             1.0608320235982873,
             -0.12911789649851338
@@ -2591,7 +2591,7 @@
             ]
         ]
     },
-    "HH_500_boosted_DY_VVV": {
+    "HH_DL_500_boosted_DY_VVV": {
         "coefficients": [
             0.9715160973404202,
             0.19310480685972087
@@ -2607,7 +2607,7 @@
             ]
         ]
     },
-    "HH_500_boosted_Top": {
+    "HH_DL_500_boosted_Top": {
         "coefficients": [
             1.138577237100727,
             0.27042255934530496
@@ -2623,7 +2623,7 @@
             ]
         ]
     },
-    "HH_500_boosted_other": {
+    "HH_DL_500_boosted_other": {
         "coefficients": [
             1.055903171136811,
             0.24027423710469217
@@ -2639,7 +2639,7 @@
             ]
         ]
     },
-    "HH_500_inclusive_DY_VVV_2016": {
+    "HH_DL_500_inclusive_DY_VVV_2016": {
         "coefficients": [
             1.0248669773647274,
             -0.19831134329468642
@@ -2655,7 +2655,7 @@
             ]
         ]
     },
-    "HH_500_inclusive_DY_VVV_2017": {
+    "HH_DL_500_inclusive_DY_VVV_2017": {
         "coefficients": [
             1.0622046479699456,
             -0.2444228467842767
@@ -2671,7 +2671,7 @@
             ]
         ]
     },
-    "HH_500_inclusive_DY_VVV_2018": {
+    "HH_DL_500_inclusive_DY_VVV_2018": {
         "coefficients": [
             1.0261387206840946,
             -0.19104414147527102
@@ -2687,7 +2687,7 @@
             ]
         ]
     },
-    "HH_500_inclusive_OtherH_2016": {
+    "HH_DL_500_inclusive_OtherH_2016": {
         "coefficients": [
             1.2872495194581342,
             -0.43105565362848386
@@ -2703,7 +2703,7 @@
             ]
         ]
     },
-    "HH_500_inclusive_OtherH_2017": {
+    "HH_DL_500_inclusive_OtherH_2017": {
         "coefficients": [
             1.1544424379794627,
             -0.40215616182783337
@@ -2719,7 +2719,7 @@
             ]
         ]
     },
-    "HH_500_inclusive_OtherH_2018": {
+    "HH_DL_500_inclusive_OtherH_2018": {
         "coefficients": [
             1.0451747872144688,
             -0.19678882112193513
@@ -2735,7 +2735,7 @@
             ]
         ]
     },
-    "HH_500_resolved_DY_VVV_2016": {
+    "HH_DL_500_resolved_DY_VVV_2016": {
         "coefficients": [
             1.0322817394870842,
             -0.21286996656060603
@@ -2751,7 +2751,7 @@
             ]
         ]
     },
-    "HH_500_resolved_DY_VVV_2017": {
+    "HH_DL_500_resolved_DY_VVV_2017": {
         "coefficients": [
             1.060133064431885,
             -0.244496193090381
@@ -2767,7 +2767,7 @@
             ]
         ]
     },
-    "HH_500_resolved_DY_VVV_2018": {
+    "HH_DL_500_resolved_DY_VVV_2018": {
         "coefficients": [
             1.0261892912514694,
             -0.19467076725693847
@@ -2783,7 +2783,7 @@
             ]
         ]
     },
-    "HH_500_resolved_Top_2016": {
+    "HH_DL_500_resolved_Top_2016": {
         "coefficients": [
             0.94335452896782,
             -0.16090392659609584
@@ -2799,7 +2799,7 @@
             ]
         ]
     },
-    "HH_500_resolved_Top_2017": {
+    "HH_DL_500_resolved_Top_2017": {
         "coefficients": [
             0.967049277318079,
             -0.16146532121405577
@@ -2815,7 +2815,7 @@
             ]
         ]
     },
-    "HH_500_resolved_Top_2018": {
+    "HH_DL_500_resolved_Top_2018": {
         "coefficients": [
             1.0895163945914028,
             -0.17314261629334546
@@ -2831,7 +2831,7 @@
             ]
         ]
     },
-    "HH_500_resolved_other_2016": {
+    "HH_DL_500_resolved_other_2016": {
         "coefficients": [
             1.0790683128533913,
             -0.1872041705410965
@@ -2847,7 +2847,7 @@
             ]
         ]
     },
-    "HH_500_resolved_other_2017": {
+    "HH_DL_500_resolved_other_2017": {
         "coefficients": [
             1.066615992874008,
             -0.25780023185519896
@@ -2863,7 +2863,7 @@
             ]
         ]
     },
-    "HH_500_resolved_other_2018": {
+    "HH_DL_500_resolved_other_2018": {
         "coefficients": [
             1.1087379879659403,
             -0.21722240127820924
@@ -2879,7 +2879,7 @@
             ]
         ]
     },
-    "HH_550_boosted_DY_VVV": {
+    "HH_DL_550_boosted_DY_VVV": {
         "coefficients": [
             1.4780540732895606,
             -0.4933292070804705
@@ -2895,7 +2895,7 @@
             ]
         ]
     },
-    "HH_550_boosted_Top": {
+    "HH_DL_550_boosted_Top": {
         "coefficients": [
             0.864126139419341,
             0.5601898811045966
@@ -2911,7 +2911,7 @@
             ]
         ]
     },
-    "HH_550_boosted_other": {
+    "HH_DL_550_boosted_other": {
         "coefficients": [
             1.0729952809773189,
             0.1994951757822826
@@ -2927,7 +2927,7 @@
             ]
         ]
     },
-    "HH_550_inclusive_DY_VVV_2016": {
+    "HH_DL_550_inclusive_DY_VVV_2016": {
         "coefficients": [
             1.0192463798171116,
             -0.19558672218515688
@@ -2943,7 +2943,7 @@
             ]
         ]
     },
-    "HH_550_inclusive_DY_VVV_2017": {
+    "HH_DL_550_inclusive_DY_VVV_2017": {
         "coefficients": [
             1.0398895479674555,
             -0.21965581030419562
@@ -2959,7 +2959,7 @@
             ]
         ]
     },
-    "HH_550_inclusive_DY_VVV_2018": {
+    "HH_DL_550_inclusive_DY_VVV_2018": {
         "coefficients": [
             1.0868168992630673,
             -0.2725570431026052
@@ -2975,7 +2975,7 @@
             ]
         ]
     },
-    "HH_550_inclusive_OtherH_2016": {
+    "HH_DL_550_inclusive_OtherH_2016": {
         "coefficients": [
             1.0381712676091075,
             -0.08691623943782974
@@ -2991,7 +2991,7 @@
             ]
         ]
     },
-    "HH_550_inclusive_OtherH_2017": {
+    "HH_DL_550_inclusive_OtherH_2017": {
         "coefficients": [
             1.152904828713677,
             -0.37507916618945913
@@ -3007,7 +3007,7 @@
             ]
         ]
     },
-    "HH_550_inclusive_OtherH_2018": {
+    "HH_DL_550_inclusive_OtherH_2018": {
         "coefficients": [
             1.1760720558230937,
             -0.43276983503142813
@@ -3023,7 +3023,7 @@
             ]
         ]
     },
-    "HH_550_resolved_DY_VVV_2016": {
+    "HH_DL_550_resolved_DY_VVV_2016": {
         "coefficients": [
             1.0228638324146546,
             -0.2046026342342459
@@ -3039,7 +3039,7 @@
             ]
         ]
     },
-    "HH_550_resolved_DY_VVV_2017": {
+    "HH_DL_550_resolved_DY_VVV_2017": {
         "coefficients": [
             1.0350731589192508,
             -0.21317054533065716
@@ -3055,7 +3055,7 @@
             ]
         ]
     },
-    "HH_550_resolved_DY_VVV_2018": {
+    "HH_DL_550_resolved_DY_VVV_2018": {
         "coefficients": [
             1.085440970249959,
             -0.27479140005058084
@@ -3071,7 +3071,7 @@
             ]
         ]
     },
-    "HH_550_resolved_Top_2016": {
+    "HH_DL_550_resolved_Top_2016": {
         "coefficients": [
             1.125835986633754,
             -0.49465526729217657
@@ -3087,7 +3087,7 @@
             ]
         ]
     },
-    "HH_550_resolved_Top_2017": {
+    "HH_DL_550_resolved_Top_2017": {
         "coefficients": [
             1.0543536611208815,
             -0.26869496070079374
@@ -3103,7 +3103,7 @@
             ]
         ]
     },
-    "HH_550_resolved_Top_2018": {
+    "HH_DL_550_resolved_Top_2018": {
         "coefficients": [
             1.2515998962496262,
             -0.47467682435635844
@@ -3119,7 +3119,7 @@
             ]
         ]
     },
-    "HH_550_resolved_other_2016": {
+    "HH_DL_550_resolved_other_2016": {
         "coefficients": [
             0.9796112065508675,
             -0.03496331899214922
@@ -3135,7 +3135,7 @@
             ]
         ]
     },
-    "HH_550_resolved_other_2017": {
+    "HH_DL_550_resolved_other_2017": {
         "coefficients": [
             1.0905584530117436,
             -0.27645829737039945
@@ -3151,7 +3151,7 @@
             ]
         ]
     },
-    "HH_550_resolved_other_2018": {
+    "HH_DL_550_resolved_other_2018": {
         "coefficients": [
             1.2414193113555787,
             -0.4639749171599702
@@ -3167,7 +3167,7 @@
             ]
         ]
     },
-    "HH_600_boosted_DY_VVV": {
+    "HH_DL_600_boosted_DY_VVV": {
         "coefficients": [
             1.0801012653166515,
             -0.020025493983102056
@@ -3183,7 +3183,7 @@
             ]
         ]
     },
-    "HH_600_boosted_Top": {
+    "HH_DL_600_boosted_Top": {
         "coefficients": [
             0.7778563509946922,
             0.8979632987899031
@@ -3199,7 +3199,7 @@
             ]
         ]
     },
-    "HH_600_boosted_other": {
+    "HH_DL_600_boosted_other": {
         "coefficients": [
             0.9182526062744505,
             0.4936323793373037
@@ -3215,7 +3215,7 @@
             ]
         ]
     },
-    "HH_600_inclusive_DY_VVV_2016": {
+    "HH_DL_600_inclusive_DY_VVV_2016": {
         "coefficients": [
             0.9782301406524753,
             -0.14738031774777066
@@ -3231,7 +3231,7 @@
             ]
         ]
     },
-    "HH_600_inclusive_DY_VVV_2017": {
+    "HH_DL_600_inclusive_DY_VVV_2017": {
         "coefficients": [
             0.9887072800583002,
             -0.14711709539932857
@@ -3247,7 +3247,7 @@
             ]
         ]
     },
-    "HH_600_inclusive_DY_VVV_2018": {
+    "HH_DL_600_inclusive_DY_VVV_2018": {
         "coefficients": [
             1.0244782787871063,
             -0.18877348528084567
@@ -3263,7 +3263,7 @@
             ]
         ]
     },
-    "HH_600_inclusive_OtherH_2016": {
+    "HH_DL_600_inclusive_OtherH_2016": {
         "coefficients": [
             1.0736134364969903,
             -0.17843077700692625
@@ -3279,7 +3279,7 @@
             ]
         ]
     },
-    "HH_600_inclusive_OtherH_2017": {
+    "HH_DL_600_inclusive_OtherH_2017": {
         "coefficients": [
             1.1810092775528718,
             -0.39945928098682565
@@ -3295,7 +3295,7 @@
             ]
         ]
     },
-    "HH_600_inclusive_OtherH_2018": {
+    "HH_DL_600_inclusive_OtherH_2018": {
         "coefficients": [
             1.2268360116638568,
             -0.46904277932855976
@@ -3311,7 +3311,7 @@
             ]
         ]
     },
-    "HH_600_resolved_DY_VVV_2016": {
+    "HH_DL_600_resolved_DY_VVV_2016": {
         "coefficients": [
             0.9848707326595819,
             -0.16003881336802003
@@ -3327,7 +3327,7 @@
             ]
         ]
     },
-    "HH_600_resolved_DY_VVV_2017": {
+    "HH_DL_600_resolved_DY_VVV_2017": {
         "coefficients": [
             0.9895566785600661,
             -0.14823745929567259
@@ -3343,7 +3343,7 @@
             ]
         ]
     },
-    "HH_600_resolved_DY_VVV_2018": {
+    "HH_DL_600_resolved_DY_VVV_2018": {
         "coefficients": [
             1.0213707175457154,
             -0.18682401624594458
@@ -3359,7 +3359,7 @@
             ]
         ]
     },
-    "HH_600_resolved_Top_2016": {
+    "HH_DL_600_resolved_Top_2016": {
         "coefficients": [
             1.3267423049450466,
             -0.7599401706126233
@@ -3375,7 +3375,7 @@
             ]
         ]
     },
-    "HH_600_resolved_Top_2017": {
+    "HH_DL_600_resolved_Top_2017": {
         "coefficients": [
             1.038487465505833,
             -0.2775557329040823
@@ -3391,7 +3391,7 @@
             ]
         ]
     },
-    "HH_600_resolved_Top_2018": {
+    "HH_DL_600_resolved_Top_2018": {
         "coefficients": [
             1.157897869611096,
             -0.2751523934704246
@@ -3407,7 +3407,7 @@
             ]
         ]
     },
-    "HH_600_resolved_other_2016": {
+    "HH_DL_600_resolved_other_2016": {
         "coefficients": [
             1.1089653118235423,
             -0.21344748205168323
@@ -3423,7 +3423,7 @@
             ]
         ]
     },
-    "HH_600_resolved_other_2017": {
+    "HH_DL_600_resolved_other_2017": {
         "coefficients": [
             1.1181478186778504,
             -0.3212274440396948
@@ -3439,7 +3439,7 @@
             ]
         ]
     },
-    "HH_600_resolved_other_2018": {
+    "HH_DL_600_resolved_other_2018": {
         "coefficients": [
             1.18748962661051,
             -0.33462487463492424
@@ -3455,7 +3455,7 @@
             ]
         ]
     },
-    "HH_650_boosted_DY_VVV": {
+    "HH_DL_650_boosted_DY_VVV": {
         "coefficients": [
             1.3217104610921888,
             -0.3243126703701548
@@ -3471,7 +3471,7 @@
             ]
         ]
     },
-    "HH_650_boosted_Top": {
+    "HH_DL_650_boosted_Top": {
         "coefficients": [
             1.0003281905712158,
             -0.21084406664324826
@@ -3487,7 +3487,7 @@
             ]
         ]
     },
-    "HH_650_boosted_other": {
+    "HH_DL_650_boosted_other": {
         "coefficients": [
             0.8484543470836531,
             0.5357887039939114
@@ -3503,7 +3503,7 @@
             ]
         ]
     },
-    "HH_650_inclusive_DY_VVV_2016": {
+    "HH_DL_650_inclusive_DY_VVV_2016": {
         "coefficients": [
             0.9943089289231835,
             -0.16129928108033023
@@ -3519,7 +3519,7 @@
             ]
         ]
     },
-    "HH_650_inclusive_DY_VVV_2017": {
+    "HH_DL_650_inclusive_DY_VVV_2017": {
         "coefficients": [
             1.0381119092199533,
             -0.24160135562588345
@@ -3535,7 +3535,7 @@
             ]
         ]
     },
-    "HH_650_inclusive_DY_VVV_2018": {
+    "HH_DL_650_inclusive_DY_VVV_2018": {
         "coefficients": [
             1.0708399629957595,
             -0.25340273896452775
@@ -3551,7 +3551,7 @@
             ]
         ]
     },
-    "HH_650_inclusive_OtherH_2016": {
+    "HH_DL_650_inclusive_OtherH_2016": {
         "coefficients": [
             1.0604403794908117,
             -0.11744689050395264
@@ -3567,7 +3567,7 @@
             ]
         ]
     },
-    "HH_650_inclusive_OtherH_2017": {
+    "HH_DL_650_inclusive_OtherH_2017": {
         "coefficients": [
             1.132141592932869,
             -0.2820721744536838
@@ -3583,7 +3583,7 @@
             ]
         ]
     },
-    "HH_650_inclusive_OtherH_2018": {
+    "HH_DL_650_inclusive_OtherH_2018": {
         "coefficients": [
             1.0994556967048659,
             -0.3177921685732292
@@ -3599,7 +3599,7 @@
             ]
         ]
     },
-    "HH_650_resolved_DY_VVV_2016": {
+    "HH_DL_650_resolved_DY_VVV_2016": {
         "coefficients": [
             0.9921612877915188,
             -0.16130633377920003
@@ -3615,7 +3615,7 @@
             ]
         ]
     },
-    "HH_650_resolved_DY_VVV_2017": {
+    "HH_DL_650_resolved_DY_VVV_2017": {
         "coefficients": [
             1.0380985213672165,
             -0.24011605309275352
@@ -3631,7 +3631,7 @@
             ]
         ]
     },
-    "HH_650_resolved_DY_VVV_2018": {
+    "HH_DL_650_resolved_DY_VVV_2018": {
         "coefficients": [
             1.0644558285647594,
             -0.24752032731180715
@@ -3647,7 +3647,7 @@
             ]
         ]
     },
-    "HH_650_resolved_Top_2016": {
+    "HH_DL_650_resolved_Top_2016": {
         "coefficients": [
             1.1477493863540853,
             -0.31800312213803006
@@ -3663,7 +3663,7 @@
             ]
         ]
     },
-    "HH_650_resolved_Top_2017": {
+    "HH_DL_650_resolved_Top_2017": {
         "coefficients": [
             1.0728075928442427,
             -0.3315431750400283
@@ -3679,7 +3679,7 @@
             ]
         ]
     },
-    "HH_650_resolved_Top_2018": {
+    "HH_DL_650_resolved_Top_2018": {
         "coefficients": [
             1.0442280639723276,
             -0.0359448738490453
@@ -3695,7 +3695,7 @@
             ]
         ]
     },
-    "HH_650_resolved_other_2016": {
+    "HH_DL_650_resolved_other_2016": {
         "coefficients": [
             1.0976779966152712,
             -0.1669182269499012
@@ -3711,7 +3711,7 @@
             ]
         ]
     },
-    "HH_650_resolved_other_2017": {
+    "HH_DL_650_resolved_other_2017": {
         "coefficients": [
             1.1031044985101237,
             -0.28098451199438684
@@ -3727,7 +3727,7 @@
             ]
         ]
     },
-    "HH_650_resolved_other_2018": {
+    "HH_DL_650_resolved_other_2018": {
         "coefficients": [
             1.1087069518537327,
             -0.19570878718622842
@@ -3743,7 +3743,7 @@
             ]
         ]
     },
-    "HH_700_boosted_DY_VVV": {
+    "HH_DL_700_boosted_DY_VVV": {
         "coefficients": [
             1.2348494008261717,
             -0.19883218067487268
@@ -3759,7 +3759,7 @@
             ]
         ]
     },
-    "HH_700_boosted_Top": {
+    "HH_DL_700_boosted_Top": {
         "coefficients": [
             1.2538232450962303,
             -0.47853140152485585
@@ -3775,7 +3775,7 @@
             ]
         ]
     },
-    "HH_700_boosted_other": {
+    "HH_DL_700_boosted_other": {
         "coefficients": [
             0.8187898108081342,
             0.5608858878163695
@@ -3791,7 +3791,7 @@
             ]
         ]
     },
-    "HH_700_inclusive_DY_VVV_2016": {
+    "HH_DL_700_inclusive_DY_VVV_2016": {
         "coefficients": [
             0.9972062263437402,
             -0.16628283727603094
@@ -3807,7 +3807,7 @@
             ]
         ]
     },
-    "HH_700_inclusive_DY_VVV_2017": {
+    "HH_DL_700_inclusive_DY_VVV_2017": {
         "coefficients": [
             1.0780584980407355,
             -0.3024612934595737
@@ -3823,7 +3823,7 @@
             ]
         ]
     },
-    "HH_700_inclusive_DY_VVV_2018": {
+    "HH_DL_700_inclusive_DY_VVV_2018": {
         "coefficients": [
             1.0199447932151204,
             -0.18823776877927084
@@ -3839,7 +3839,7 @@
             ]
         ]
     },
-    "HH_700_inclusive_OtherH_2016": {
+    "HH_DL_700_inclusive_OtherH_2016": {
         "coefficients": [
             1.1791974396716909,
             -0.297340801690606
@@ -3855,7 +3855,7 @@
             ]
         ]
     },
-    "HH_700_inclusive_OtherH_2017": {
+    "HH_DL_700_inclusive_OtherH_2017": {
         "coefficients": [
             1.1406113107032454,
             -0.30702787907604273
@@ -3871,7 +3871,7 @@
             ]
         ]
     },
-    "HH_700_inclusive_OtherH_2018": {
+    "HH_DL_700_inclusive_OtherH_2018": {
         "coefficients": [
             1.0291858087653591,
             -0.19604404501716552
@@ -3887,7 +3887,7 @@
             ]
         ]
     },
-    "HH_700_resolved_DY_VVV_2016": {
+    "HH_DL_700_resolved_DY_VVV_2016": {
         "coefficients": [
             0.9990213525655405,
             -0.17182431596083542
@@ -3903,7 +3903,7 @@
             ]
         ]
     },
-    "HH_700_resolved_DY_VVV_2017": {
+    "HH_DL_700_resolved_DY_VVV_2017": {
         "coefficients": [
             1.07982778743405,
             -0.3043515935649625
@@ -3919,7 +3919,7 @@
             ]
         ]
     },
-    "HH_700_resolved_DY_VVV_2018": {
+    "HH_DL_700_resolved_DY_VVV_2018": {
         "coefficients": [
             1.018387810245919,
             -0.18952515281628643
@@ -3935,7 +3935,7 @@
             ]
         ]
     },
-    "HH_700_resolved_Top_2016": {
+    "HH_DL_700_resolved_Top_2016": {
         "coefficients": [
             1.0201522290177887,
             -0.23628159427771114
@@ -3951,7 +3951,7 @@
             ]
         ]
     },
-    "HH_700_resolved_Top_2017": {
+    "HH_DL_700_resolved_Top_2017": {
         "coefficients": [
             1.1004938183167159,
             -0.3977770171388669
@@ -3967,7 +3967,7 @@
             ]
         ]
     },
-    "HH_700_resolved_Top_2018": {
+    "HH_DL_700_resolved_Top_2018": {
         "coefficients": [
             1.103606606917412,
             -0.13138909117284683
@@ -3983,7 +3983,7 @@
             ]
         ]
     },
-    "HH_700_resolved_other_2016": {
+    "HH_DL_700_resolved_other_2016": {
         "coefficients": [
             1.052620244352081,
             -0.13122768091659798
@@ -3999,7 +3999,7 @@
             ]
         ]
     },
-    "HH_700_resolved_other_2017": {
+    "HH_DL_700_resolved_other_2017": {
         "coefficients": [
             1.128099259682779,
             -0.3319636791805845
@@ -4015,7 +4015,7 @@
             ]
         ]
     },
-    "HH_700_resolved_other_2018": {
+    "HH_DL_700_resolved_other_2018": {
         "coefficients": [
             1.122246302001071,
             -0.20567809349370295
@@ -4031,7 +4031,7 @@
             ]
         ]
     },
-    "HH_750_boosted_DY_VVV": {
+    "HH_DL_750_boosted_DY_VVV": {
         "coefficients": [
             1.1858180953223811,
             -0.18867156609843724
@@ -4047,7 +4047,7 @@
             ]
         ]
     },
-    "HH_750_boosted_Top": {
+    "HH_DL_750_boosted_Top": {
         "coefficients": [
             1.2430408209033117,
             -0.37688505437020525
@@ -4063,7 +4063,7 @@
             ]
         ]
     },
-    "HH_750_boosted_other": {
+    "HH_DL_750_boosted_other": {
         "coefficients": [
             1.0021813093433023,
             0.3203935541364896
@@ -4079,7 +4079,7 @@
             ]
         ]
     },
-    "HH_750_inclusive_DY_VVV_2016": {
+    "HH_DL_750_inclusive_DY_VVV_2016": {
         "coefficients": [
             1.0326887782838663,
             -0.21648163997575903
@@ -4095,7 +4095,7 @@
             ]
         ]
     },
-    "HH_750_inclusive_DY_VVV_2017": {
+    "HH_DL_750_inclusive_DY_VVV_2017": {
         "coefficients": [
             1.0462279506665904,
             -0.24459467644511798
@@ -4111,7 +4111,7 @@
             ]
         ]
     },
-    "HH_750_inclusive_DY_VVV_2018": {
+    "HH_DL_750_inclusive_DY_VVV_2018": {
         "coefficients": [
             0.962731053711903,
             -0.09613056824305716
@@ -4127,7 +4127,7 @@
             ]
         ]
     },
-    "HH_750_inclusive_OtherH_2016": {
+    "HH_DL_750_inclusive_OtherH_2016": {
         "coefficients": [
             1.1939436304719253,
             -0.3340313373233828
@@ -4143,7 +4143,7 @@
             ]
         ]
     },
-    "HH_750_inclusive_OtherH_2017": {
+    "HH_DL_750_inclusive_OtherH_2017": {
         "coefficients": [
             1.1190888739205052,
             -0.25756888903578956
@@ -4159,7 +4159,7 @@
             ]
         ]
     },
-    "HH_750_inclusive_OtherH_2018": {
+    "HH_DL_750_inclusive_OtherH_2018": {
         "coefficients": [
             1.193719034094426,
             -0.43020242645687706
@@ -4175,7 +4175,7 @@
             ]
         ]
     },
-    "HH_750_resolved_DY_VVV_2016": {
+    "HH_DL_750_resolved_DY_VVV_2016": {
         "coefficients": [
             1.029683366345124,
             -0.21410373050704876
@@ -4191,7 +4191,7 @@
             ]
         ]
     },
-    "HH_750_resolved_DY_VVV_2017": {
+    "HH_DL_750_resolved_DY_VVV_2017": {
         "coefficients": [
             1.0461127110408466,
             -0.2433045292042705
@@ -4207,7 +4207,7 @@
             ]
         ]
     },
-    "HH_750_resolved_DY_VVV_2018": {
+    "HH_DL_750_resolved_DY_VVV_2018": {
         "coefficients": [
             0.9622470312081366,
             -0.0992996472403194
@@ -4223,7 +4223,7 @@
             ]
         ]
     },
-    "HH_750_resolved_Top_2016": {
+    "HH_DL_750_resolved_Top_2016": {
         "coefficients": [
             0.976036405668976,
             -0.054660730403419296
@@ -4239,7 +4239,7 @@
             ]
         ]
     },
-    "HH_750_resolved_Top_2017": {
+    "HH_DL_750_resolved_Top_2017": {
         "coefficients": [
             1.0818169417776737,
             -0.3782779648455859
@@ -4255,7 +4255,7 @@
             ]
         ]
     },
-    "HH_750_resolved_Top_2018": {
+    "HH_DL_750_resolved_Top_2018": {
         "coefficients": [
             1.0739831081010769,
             -0.18587304711580407
@@ -4271,7 +4271,7 @@
             ]
         ]
     },
-    "HH_750_resolved_other_2016": {
+    "HH_DL_750_resolved_other_2016": {
         "coefficients": [
             1.151731207499254,
             -0.27589475206347647
@@ -4287,7 +4287,7 @@
             ]
         ]
     },
-    "HH_750_resolved_other_2017": {
+    "HH_DL_750_resolved_other_2017": {
         "coefficients": [
             1.1060840661555096,
             -0.29882004065755696
@@ -4303,7 +4303,7 @@
             ]
         ]
     },
-    "HH_750_resolved_other_2018": {
+    "HH_DL_750_resolved_other_2018": {
         "coefficients": [
             1.1376119656226593,
             -0.29335257868173065
@@ -4319,7 +4319,7 @@
             ]
         ]
     },
-    "HH_800_boosted_DY_VVV": {
+    "HH_DL_800_boosted_DY_VVV": {
         "coefficients": [
             0.9850019499472303,
             0.14005972600135627
@@ -4335,7 +4335,7 @@
             ]
         ]
     },
-    "HH_800_boosted_Top": {
+    "HH_DL_800_boosted_Top": {
         "coefficients": [
             1.365889854607056,
             -0.49747246060781836
@@ -4351,7 +4351,7 @@
             ]
         ]
     },
-    "HH_800_boosted_other": {
+    "HH_DL_800_boosted_other": {
         "coefficients": [
             1.0657687161491194,
             0.04241226224096697
@@ -4367,7 +4367,7 @@
             ]
         ]
     },
-    "HH_800_inclusive_DY_VVV_2016": {
+    "HH_DL_800_inclusive_DY_VVV_2016": {
         "coefficients": [
             1.0618860840643796,
             -0.24807615550482323
@@ -4383,7 +4383,7 @@
             ]
         ]
     },
-    "HH_800_inclusive_DY_VVV_2017": {
+    "HH_DL_800_inclusive_DY_VVV_2017": {
         "coefficients": [
             0.9815032573417619,
             -0.14862990474599785
@@ -4399,7 +4399,7 @@
             ]
         ]
     },
-    "HH_800_inclusive_DY_VVV_2018": {
+    "HH_DL_800_inclusive_DY_VVV_2018": {
         "coefficients": [
             0.9952979759092875,
             -0.13451028661830236
@@ -4415,7 +4415,7 @@
             ]
         ]
     },
-    "HH_800_inclusive_OtherH_2016": {
+    "HH_DL_800_inclusive_OtherH_2016": {
         "coefficients": [
             1.109420395806082,
             -0.2326846109815288
@@ -4431,7 +4431,7 @@
             ]
         ]
     },
-    "HH_800_inclusive_OtherH_2017": {
+    "HH_DL_800_inclusive_OtherH_2017": {
         "coefficients": [
             1.1086239050491116,
             -0.21301894389360246
@@ -4447,7 +4447,7 @@
             ]
         ]
     },
-    "HH_800_inclusive_OtherH_2018": {
+    "HH_DL_800_inclusive_OtherH_2018": {
         "coefficients": [
             1.0370011771601688,
             -0.20279965359277025
@@ -4463,7 +4463,7 @@
             ]
         ]
     },
-    "HH_800_resolved_DY_VVV_2016": {
+    "HH_DL_800_resolved_DY_VVV_2016": {
         "coefficients": [
             1.0660800850255,
             -0.25476414713618994
@@ -4479,7 +4479,7 @@
             ]
         ]
     },
-    "HH_800_resolved_DY_VVV_2017": {
+    "HH_DL_800_resolved_DY_VVV_2017": {
         "coefficients": [
             0.9802562430300023,
             -0.14630971880472432
@@ -4495,7 +4495,7 @@
             ]
         ]
     },
-    "HH_800_resolved_DY_VVV_2018": {
+    "HH_DL_800_resolved_DY_VVV_2018": {
         "coefficients": [
             0.9974886998120855,
             -0.1412517121944285
@@ -4511,7 +4511,7 @@
             ]
         ]
     },
-    "HH_800_resolved_Top_2016": {
+    "HH_DL_800_resolved_Top_2016": {
         "coefficients": [
             0.7742460050795457,
             0.3356797480117214
@@ -4527,7 +4527,7 @@
             ]
         ]
     },
-    "HH_800_resolved_Top_2017": {
+    "HH_DL_800_resolved_Top_2017": {
         "coefficients": [
             1.04344988195942,
             -0.25211853282588403
@@ -4543,7 +4543,7 @@
             ]
         ]
     },
-    "HH_800_resolved_Top_2018": {
+    "HH_DL_800_resolved_Top_2018": {
         "coefficients": [
             0.9651227806247434,
             0.01056345552529574
@@ -4559,7 +4559,7 @@
             ]
         ]
     },
-    "HH_800_resolved_other_2016": {
+    "HH_DL_800_resolved_other_2016": {
         "coefficients": [
             1.0260480273250863,
             -0.08208131526489428
@@ -4575,7 +4575,7 @@
             ]
         ]
     },
-    "HH_800_resolved_other_2017": {
+    "HH_DL_800_resolved_other_2017": {
         "coefficients": [
             1.075625453090881,
             -0.2087090842862501
@@ -4591,7 +4591,7 @@
             ]
         ]
     },
-    "HH_800_resolved_other_2018": {
+    "HH_DL_800_resolved_other_2018": {
         "coefficients": [
             0.9743528369490534,
             -0.015934227789910885
@@ -4607,7 +4607,7 @@
             ]
         ]
     },
-    "HH_850_boosted_DY_VVV": {
+    "HH_DL_850_boosted_DY_VVV": {
         "coefficients": [
             0.867899122364858,
             0.22081317786748583
@@ -4623,7 +4623,7 @@
             ]
         ]
     },
-    "HH_850_boosted_Top": {
+    "HH_DL_850_boosted_Top": {
         "coefficients": [
             1.6578339643556854,
             -0.8129943131138857
@@ -4639,7 +4639,7 @@
             ]
         ]
     },
-    "HH_850_boosted_other": {
+    "HH_DL_850_boosted_other": {
         "coefficients": [
             1.208612028564958,
             -0.005774270162063502
@@ -4655,7 +4655,7 @@
             ]
         ]
     },
-    "HH_850_inclusive_DY_VVV_2016": {
+    "HH_DL_850_inclusive_DY_VVV_2016": {
         "coefficients": [
             1.0557168925005542,
             -0.22907583997751668
@@ -4671,7 +4671,7 @@
             ]
         ]
     },
-    "HH_850_inclusive_DY_VVV_2017": {
+    "HH_DL_850_inclusive_DY_VVV_2017": {
         "coefficients": [
             0.9431085527970087,
             -0.08838517973921052
@@ -4687,7 +4687,7 @@
             ]
         ]
     },
-    "HH_850_inclusive_DY_VVV_2018": {
+    "HH_DL_850_inclusive_DY_VVV_2018": {
         "coefficients": [
             0.8940493700838598,
             0.012053386437111496
@@ -4703,7 +4703,7 @@
             ]
         ]
     },
-    "HH_850_inclusive_OtherH_2016": {
+    "HH_DL_850_inclusive_OtherH_2016": {
         "coefficients": [
             1.1087619559057895,
             -0.25541078093028535
@@ -4719,7 +4719,7 @@
             ]
         ]
     },
-    "HH_850_inclusive_OtherH_2017": {
+    "HH_DL_850_inclusive_OtherH_2017": {
         "coefficients": [
             1.1121709178099837,
             -0.20844489128351298
@@ -4735,7 +4735,7 @@
             ]
         ]
     },
-    "HH_850_inclusive_OtherH_2018": {
+    "HH_DL_850_inclusive_OtherH_2018": {
         "coefficients": [
             0.9806253466953706,
             -0.07973460462178819
@@ -4751,7 +4751,7 @@
             ]
         ]
     },
-    "HH_850_resolved_DY_VVV_2016": {
+    "HH_DL_850_resolved_DY_VVV_2016": {
         "coefficients": [
             1.063030580469844,
             -0.238666627175606
@@ -4767,7 +4767,7 @@
             ]
         ]
     },
-    "HH_850_resolved_DY_VVV_2017": {
+    "HH_DL_850_resolved_DY_VVV_2017": {
         "coefficients": [
             0.9422443825279736,
             -0.0860482042034959
@@ -4783,7 +4783,7 @@
             ]
         ]
     },
-    "HH_850_resolved_DY_VVV_2018": {
+    "HH_DL_850_resolved_DY_VVV_2018": {
         "coefficients": [
             0.9008402822395398,
             -0.0002844966674760769
@@ -4799,7 +4799,7 @@
             ]
         ]
     },
-    "HH_850_resolved_Top_2016": {
+    "HH_DL_850_resolved_Top_2016": {
         "coefficients": [
             0.845545952858878,
             0.1253329754080673
@@ -4815,7 +4815,7 @@
             ]
         ]
     },
-    "HH_850_resolved_Top_2017": {
+    "HH_DL_850_resolved_Top_2017": {
         "coefficients": [
             0.9264320745337606,
             -0.012407991695550114
@@ -4831,7 +4831,7 @@
             ]
         ]
     },
-    "HH_850_resolved_Top_2018": {
+    "HH_DL_850_resolved_Top_2018": {
         "coefficients": [
             1.1085063211438275,
             -0.19962572819752322
@@ -4847,7 +4847,7 @@
             ]
         ]
     },
-    "HH_850_resolved_other_2016": {
+    "HH_DL_850_resolved_other_2016": {
         "coefficients": [
             1.0352800479755329,
             -0.14833590330324867
@@ -4863,7 +4863,7 @@
             ]
         ]
     },
-    "HH_850_resolved_other_2017": {
+    "HH_DL_850_resolved_other_2017": {
         "coefficients": [
             1.0453969451211769,
             -0.1413552389099897
@@ -4879,7 +4879,7 @@
             ]
         ]
     },
-    "HH_850_resolved_other_2018": {
+    "HH_DL_850_resolved_other_2018": {
         "coefficients": [
             1.0502640309339273,
             -0.12001339554768166
@@ -4895,7 +4895,7 @@
             ]
         ]
     },
-    "HH_900_boosted_DY_VVV": {
+    "HH_DL_900_boosted_DY_VVV": {
         "coefficients": [
             0.9545083200471883,
             0.053511643219660586
@@ -4911,7 +4911,7 @@
             ]
         ]
     },
-    "HH_900_boosted_Top": {
+    "HH_DL_900_boosted_Top": {
         "coefficients": [
             1.1246686023679662,
             -0.04992591297232656
@@ -4927,7 +4927,7 @@
             ]
         ]
     },
-    "HH_900_boosted_other": {
+    "HH_DL_900_boosted_other": {
         "coefficients": [
             0.8707728994851198,
             0.6408904737257141
@@ -4943,7 +4943,7 @@
             ]
         ]
     },
-    "HH_900_inclusive_DY_VVV_2016": {
+    "HH_DL_900_inclusive_DY_VVV_2016": {
         "coefficients": [
             1.0868184173846482,
             -0.26631922296696553
@@ -4959,7 +4959,7 @@
             ]
         ]
     },
-    "HH_900_inclusive_DY_VVV_2017": {
+    "HH_DL_900_inclusive_DY_VVV_2017": {
         "coefficients": [
             0.9538497219992889,
             -0.10741277580445957
@@ -4975,7 +4975,7 @@
             ]
         ]
     },
-    "HH_900_inclusive_DY_VVV_2018": {
+    "HH_DL_900_inclusive_DY_VVV_2018": {
         "coefficients": [
             0.9541139261057425,
             -0.07434736534390364
@@ -4991,7 +4991,7 @@
             ]
         ]
     },
-    "HH_900_inclusive_OtherH_2016": {
+    "HH_DL_900_inclusive_OtherH_2016": {
         "coefficients": [
             1.121072719511619,
             -0.285507180866461
@@ -5007,7 +5007,7 @@
             ]
         ]
     },
-    "HH_900_inclusive_OtherH_2017": {
+    "HH_DL_900_inclusive_OtherH_2017": {
         "coefficients": [
             1.1054169075582858,
             -0.19680466087641232
@@ -5023,7 +5023,7 @@
             ]
         ]
     },
-    "HH_900_inclusive_OtherH_2018": {
+    "HH_DL_900_inclusive_OtherH_2018": {
         "coefficients": [
             0.9317851579568188,
             -0.046278221323405026
@@ -5039,7 +5039,7 @@
             ]
         ]
     },
-    "HH_900_resolved_DY_VVV_2016": {
+    "HH_DL_900_resolved_DY_VVV_2016": {
         "coefficients": [
             1.0868512140529125,
             -0.26672933027283735
@@ -5055,7 +5055,7 @@
             ]
         ]
     },
-    "HH_900_resolved_DY_VVV_2017": {
+    "HH_DL_900_resolved_DY_VVV_2017": {
         "coefficients": [
             0.9520547527843686,
             -0.10543302896924829
@@ -5071,7 +5071,7 @@
             ]
         ]
     },
-    "HH_900_resolved_DY_VVV_2018": {
+    "HH_DL_900_resolved_DY_VVV_2018": {
         "coefficients": [
             0.9588184905180833,
             -0.08288149400482932
@@ -5087,7 +5087,7 @@
             ]
         ]
     },
-    "HH_900_resolved_Top_2016": {
+    "HH_DL_900_resolved_Top_2016": {
         "coefficients": [
             1.3363801971975315,
             -1.0320150811135693
@@ -5103,7 +5103,7 @@
             ]
         ]
     },
-    "HH_900_resolved_Top_2017": {
+    "HH_DL_900_resolved_Top_2017": {
         "coefficients": [
             0.8775872756635974,
             0.0038362142840855993
@@ -5119,7 +5119,7 @@
             ]
         ]
     },
-    "HH_900_resolved_Top_2018": {
+    "HH_DL_900_resolved_Top_2018": {
         "coefficients": [
             1.1005513203710184,
             -0.17236747060153498
@@ -5135,7 +5135,7 @@
             ]
         ]
     },
-    "HH_900_resolved_other_2016": {
+    "HH_DL_900_resolved_other_2016": {
         "coefficients": [
             1.0476174311748208,
             -0.1844407518725816
@@ -5151,7 +5151,7 @@
             ]
         ]
     },
-    "HH_900_resolved_other_2017": {
+    "HH_DL_900_resolved_other_2017": {
         "coefficients": [
             1.026451751254573,
             -0.12505954250575152
@@ -5167,7 +5167,7 @@
             ]
         ]
     },
-    "HH_900_resolved_other_2018": {
+    "HH_DL_900_resolved_other_2018": {
         "coefficients": [
             1.0715759321676375,
             -0.17379589362648798
