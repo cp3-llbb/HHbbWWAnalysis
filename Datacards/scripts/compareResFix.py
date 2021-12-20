@@ -51,7 +51,7 @@ for mass in masses:
                         #h.SetTitle(f'Sample era {x_era}, DNN input era {y_era}')
                         h.SetLineWidth(2)
                         h.Scale(1./h.Integral())
-                        h.Rebin(5)
+                        h.Rebin(10)
                         if sample_era == '2016':
                             h.SetLineColor(ROOT.TColor.GetColor('#648FFF'))
                         if sample_era == '2017':
@@ -61,12 +61,14 @@ for mass in masses:
                     Fs.append(F)
                     hs[test_era][sample_era] = h
 
+            is_None = True
 
             leg = [None]*3
             for i,test_era in enumerate(eras):
                 pad = C.cd(i+1)
                 pad.SetTopMargin(0.15)
                 if hs[test_era]['2016'] is not None and hs[test_era]['2017'] is not None and hs[test_era]['2018'] is not None:
+                    is_None = False
                     leg[i] = ROOT.TLegend(0.15,0.6,0.45,0.82)
                     hmax = max([h.GetMaximum() for h in hs[test_era].values()])*1.1
                     hs[test_era]['2016'].SetTitle(f'Using {test_era} as DNN input')
@@ -77,7 +79,8 @@ for mass in masses:
                     for era in eras:
                         leg[i].AddEntry(hs['2016'][era],f'{era} sample')
                     leg[i].Draw()
- 
+            if is_None:
+                continue
             C.cd()
             title.Draw()
             C.Print (pdfName,f'Title:{sample}_{cat}')

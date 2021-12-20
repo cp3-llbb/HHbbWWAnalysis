@@ -49,6 +49,12 @@ samples:
     # TTToHadronic (For SL fake non closure) #
   - config: analysis2017_v7_TTHadronic.yml
     keys: tt
+    # Underlying event #
+  - config: analysis2017_v7_UE.yml
+    keys: UE
+    # Underlying event #
+  - config: analysis2017_v7_UE.yml
+    keys: UE
 
   
 datadriven: !include datadriven.yml

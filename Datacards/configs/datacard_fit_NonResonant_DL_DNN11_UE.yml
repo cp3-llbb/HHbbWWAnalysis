@@ -1,0 +1,66 @@
+path: 
+  2016:
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2016NanoV7_NonResonant_DNN11_UE
+  2017:
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2017NanoV7_NonResonant_DNN11_UE
+  2018:
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2018NanoV7_NonResonant_DNN11_UE
+
+outputDir: /home/ucl/cp3/fbury/scratch/Datacards/bbww_dl/NonResonant/datacard_fit_NonResonant_DL_syst_UE/
+
+use_syst: False
+
+yamlName: 
+  - plots.yml
+
+era: 
+  - 2016
+  - 2017
+  - 2018
+
+histConverter: !include cat_DL_nonresonant.yml
+  
+groups:
+  ST_UE_nom:
+    type: mc
+    files:
+      - ST_schannel_4f_UE_nom.root
+      - ST_tchannel_antitop_4f_UE_nom.root
+      - ST_tchannel_top_4f_UE_nom.root
+      - ST_tW_antitop_5f_UE_nom.root
+      - ST_tW_top_5f_UE_nom.root
+  TT_UE_nom:
+    type: mc
+    files:
+      - TTTo2L2Nu_UE_nom.root
+      - TTToHadronic_UE_nom.root
+      - TTToSemiLeptonic_UE_nom.root
+  ST_UE_down:
+    type: mc
+    files:
+      - ST_schannel_4f_UE_down.root
+      - ST_tchannel_antitop_4f_UE_down.root
+      - ST_tchannel_top_4f_UE_down.root
+      - ST_tW_antitop_5f_UE_down.root
+      - ST_tW_top_5f_UE_down.root
+  TT_UE_down:
+    type: mc
+    files:
+      - TTTo2L2Nu_UE_down.root
+      - TTToHadronic_UE_down.root
+      - TTToSemiLeptonic_UE_down.root
+  ST_UE_up:
+    type: mc
+    files:
+      - ST_schannel_4f_UE_up.root
+      - ST_tchannel_antitop_4f_UE_up.root
+      - ST_tchannel_top_4f_UE_up.root
+      - ST_tW_antitop_5f_UE_up.root
+      - ST_tW_top_5f_UE_up.root
+  TT_UE_up:
+    type: mc
+    files:
+      - TTTo2L2Nu_UE_up.root
+      - TTToHadronic_UE_up.root
+      - TTToSemiLeptonic_UE_up.root
+

@@ -19,7 +19,7 @@ use_syst: True
 yamlName: 
   - plots_DYEstimation_FakeExtrapolation.yml
 
-produce_plots: True
+plotIt: !include plotIt_nonres_COMB.yml
 
 era: 
   - 2016
@@ -28,25 +28,16 @@ era:
 
 combineConfigs: !include combine_DL_nonres.yml
 
-legend:
-  position:
-  - 0.2
-  - 0.7
-  - 0.9
-  - 0.9
-  columns: 3
-
 normSyst  : !include norm_all_nonres.yml
 
-
-shapeSyst  : !include shape_DL_systematics.yml
+shapeSyst  : !include shape_comb_systematics.yml
 
 rebin: 
   2016: !include rebin_DL_nonresonant_2016.yml
   2017: !include rebin_DL_nonresonant_2017.yml
   2018: !include rebin_DL_nonresonant_2018.yml
   
-histCorrections: !include nonclosure_DY_nonres.yml
+histCorrections: !include nonclosure_nonres.yml
 
 histConverter: !include cat_DL_nonresonant.yml
   

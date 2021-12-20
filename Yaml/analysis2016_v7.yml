@@ -52,6 +52,9 @@ samples:
     # GRAVITON 2018 for 2016 #
   - config: analysis2016_v7_bbww2l_graviton_from_2018.yml
     keys: [bbww2l,graviton_fix]
+    # Underlying event #
+  - config: analysis2016_v7_UE.yml
+    keys: UE
 
   
 datadriven: !include datadriven.yml

@@ -8,6 +8,7 @@ Envelope:
     CMS_bbwwsl_thu_shape:
         cat: [".*SL.*"]
     
+underlying_event: underlying_event
 
 # PS #
 psFSR: 
