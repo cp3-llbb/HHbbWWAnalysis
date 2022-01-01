@@ -50,7 +50,6 @@ results = {}
 for cat in plotDict.keys():
     results[cat] = {}
     for sample in plotDict[cat].keys():
-        print (cat,sample)
         results[cat][sample] = []
         h_nom = plotDict[cat][sample]['nom']
         h_down = plotDict[cat][sample]['down']
@@ -65,7 +64,6 @@ for cat in plotDict.keys():
             y_nom = h_nom.GetBinContent(i)
             y_down = h_down.GetBinContent(i)
             y_up = h_up.GetBinContent(i)
-            print (edges,y_nom,y_up,y_down)
             results[cat][sample].append({'bin': edges,
                                          'up': y_up / y_nom if y_nom > 1e-5 else 1.,
                                          'down': y_down / y_nom if y_nom > 1e-5 else 1.})

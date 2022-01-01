@@ -24,7 +24,7 @@ DYToLL_0J:
   era: '2018'
   generated-events: 'genEventSumw'
   group: DY
-  split: 20
+  split: 30
 DYToLL_1J:
   cross-section: 897.8
   db: das:/DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
@@ -84,14 +84,14 @@ ST_tchannel_antitop_4f:
   era: '2018'
   generated-events: 'genEventSumw'
   group: ST
-  split: 15
+  split: 20
 ST_tchannel_top_4f:
   cross-section: 136.02
   db: das:/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
   era: '2018'
   generated-events: 'genEventSumw'
   group: ST
-  split: 15
+  split: 30
 ST_schannel_4f:
   cross-section: 3.364
   db: das:/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21_ext2-v1/NANOAODSIM
@@ -158,7 +158,7 @@ GluGluHToBB:
   era: '2018'
   generated-events: 'genEventSumw'
   group: SM
-  split: 3
+  split: 5
 GluGluHToGG:
   cross-section: 0.11028
   db: das:/GluGluHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
@@ -299,7 +299,7 @@ ZZTo2L2Q:
   era: '2018'
   generated-events: 'genEventSumw'
   group: VVV
-  split: 10
+  split: 20
 ZZTo4L:
   cross-section: 1.256
   db:
@@ -308,7 +308,7 @@ ZZTo4L:
   era: '2018'
   generated-events: 'genEventSumw'
   group: VVV
-  split: 40
+  split: 50
 WWTo2L2Nu:
   cross-section: 12.2
   db: das:/WWTo2L2Nu_NNPDF31_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
@@ -331,7 +331,7 @@ WZTo3LNu:
   era: '2018'
   generated-events: 'genEventSumw'
   group: VVV
-  split: 5
+  split: 10
 WZTo2L2Q:
   cross-section: 5.6
   db: das:/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
@@ -544,14 +544,14 @@ TTZH:
   group: ttVX
   split: 5
 
-##### Rares
+##### Rares/
 WGToLNuG:
   cross-section: 191.6
   db: das:/WGToLNuG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21_ext1-v1/NANOAODSIM
   era: '2018'
   generated-events: 'genEventSumw'
   group: Rares
-  split: 3
+  split: 5
 TGJets:
   cross-section: 1.018
   db: das:/TGJets_leptonDecays_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21_ext1-v1/NANOAODSIM
