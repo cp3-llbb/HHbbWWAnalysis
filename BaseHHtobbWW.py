@@ -734,7 +734,6 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
-                                  mcYearForFatJets      = era, 
                                   regroupTag            = "V2",
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
@@ -835,7 +834,6 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
-                                  mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = backend, 
@@ -935,7 +933,6 @@ One lepton and and one jet argument must be specified in addition to the require
                     configureJets(variProxy             = tree._FatJet, 
                                   jetType               = "AK8PFPuppi", 
                                   jec                   = jecTag,
-                                  mcYearForFatJets      = era, 
                                   mayWriteCache         = isNotWorker, 
                                   isMC                  = self.is_MC,
                                   backend               = backend, 
@@ -2179,7 +2176,7 @@ One lepton and and one jet argument must be specified in addition to the require
                              hme_pair, 
                              op.construct(op.typeOf(hme_pair), [op.c_float(0.), op.c_float(0.)]))
 
-        hme_pair = op.forSystematicVariation(hme_pair, "jet", "nominal")   # no variations, always nominal
+        hme_pair = op.forSystematicVariation(hme_pair, "nominal")   # no variations, always nominal
         forceDefine(hme_pair, sel)
         hme = hme_pair.first
         eff = hme_pair.second
@@ -2199,7 +2196,7 @@ One lepton and and one jet argument must be specified in addition to the require
                              hme_pair, 
                              op.construct(op.typeOf(hme_pair), [op.c_float(0.), op.c_float(0.)]))
 
-        hme_pair = op.forSystematicVariation(hme_pair, "jet", "nominal")   # no variations, always nominal
+        hme_pair = op.forSystematicVariation(hme_pair, "nominal")   # no variations, always nominal
         forceDefine(hme_pair, sel)
         hme = hme_pair.first
         eff = hme_pair.second
