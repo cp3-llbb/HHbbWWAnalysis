@@ -4,6 +4,20 @@
 # /!\ For 2016 DL BR : need scaling factor (added already) 0.622253
 # See https://indico.cern.ch/event/1071729/#177-signal-scaling
 ##### Double Lepton 
+GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-250:
+  cross-section: 1.
+  branching-ratio: 0.017217669930468738
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v1/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-250_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbbl#nul#nu (M = 250)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 250
 GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-260:
   cross-section: 1.
   branching-ratio: 0.017217669930468738
@@ -32,6 +46,20 @@ GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-270:
   type: signal
   hide: True
   mass: 270
+GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-280:
+  cross-section: 1.
+  branching-ratio: 0.017217669930468738
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v2/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-280_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbbl#nul#nu (M = 280)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 280
 GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-300:
   cross-section: 1.
   branching-ratio: 0.017217669930468738
@@ -46,6 +74,20 @@ GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-300:
   type: signal
   hide: True
   mass: 300
+GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-320:
+  cross-section: 1.
+  branching-ratio: 0.017217669930468738
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v1/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-320_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbbl#nul#nu (M = 320)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 320
 GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-350:
   cross-section: 1.
   branching-ratio: 0.017217669930468738
@@ -158,6 +200,20 @@ GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-700:
   type: signal
   hide: True
   mass: 700
+GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-750:
+  cross-section: 1.
+  branching-ratio: 0.017217669930468738
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v2/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-750_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbbl#nul#nu (M = 750)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 750
 GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-800:
   cross-section: 1.
   branching-ratio: 0.017217669930468738
@@ -172,6 +228,20 @@ GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-800:
   type: signal
   hide: True
   mass: 800
+GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-850:
+  cross-section: 1.
+  branching-ratio: 0.017217669930468738
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v1/GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-850_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbbl#nul#nu (M = 850)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 850
 GluGluToBulkGravitonToHHTo2B2VTo2L2Nu_M-900:
   cross-section: 1.
   branching-ratio: 0.017217669930468738

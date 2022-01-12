@@ -13,7 +13,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-250:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 250)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
@@ -27,7 +27,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-260:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 260)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
@@ -41,11 +41,25 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-270:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 270)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
   mass: 270
+GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-280:
+  cross-section: 1.
+  branching-ratio: 0.085748641471815
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v1/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-280_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 280)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 280
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-300:
   cross-section: 1.
   branching-ratio: 0.085748641471815
@@ -55,11 +69,25 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-300:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 300)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
   mass: 300
+GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-320:
+  cross-section: 1.
+  branching-ratio: 0.085748641471815
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v2/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-320_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 320)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 320
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-350:
   cross-section: 1.
   branching-ratio: 0.085748641471815
@@ -69,7 +97,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-350:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 350)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
@@ -83,7 +111,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-400:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 400)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
@@ -97,7 +125,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-450:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 450)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
@@ -111,7 +139,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-500:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 500)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
@@ -125,7 +153,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-550:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 550)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
@@ -139,7 +167,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-600:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 600)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
@@ -153,7 +181,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-650:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 650)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
@@ -167,11 +195,25 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-700:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 700)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
   mass: 700
+GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-750:
+  cross-section: 1.
+  branching-ratio: 0.085748641471815
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v1/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-750_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 750)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 750
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-800:
   cross-section: 1.
   branching-ratio: 0.085748641471815
@@ -181,11 +223,25 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-800:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 800)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
   mass: 800
+GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-850:
+  cross-section: 1.
+  branching-ratio: 0.085748641471815
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v2/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-850_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 850)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 850
 GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-900:
   cross-section: 1.
   branching-ratio: 0.085748641471815
@@ -195,7 +251,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-900:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 900)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
@@ -209,7 +265,7 @@ GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-1000:
   legend: 'G#rightarrowHH#rightarrowbblql#nu (M = 1000)' 
   line-type: 1
   line-color: "#288a24"
-  split: 20
+  split: 1
   order: 10
   type: signal
   hide: True
