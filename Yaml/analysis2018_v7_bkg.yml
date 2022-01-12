@@ -31,14 +31,14 @@ DYToLL_1J:
   era: '2018'
   generated-events: 'genEventSumw'
   group: DY
-  split: 20
+  split: 30
 DYToLL_2J:
   cross-section: 335.8
   db: das:/DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
   era: '2018'
   generated-events: 'genEventSumw'
   group: DY
-  split: 20
+  split: 30
 
 ##### ttbar
 TTTo2L2Nu:
@@ -47,14 +47,14 @@ TTTo2L2Nu:
   era: '2018'
   generated-events: 'genEventSumw'
   group: ttbar
-  split: 200
+  split: 500
 TTToSemiLeptonic:
   cross-section: 365.52
   db: das:/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
   era: '2018'
   generated-events: 'genEventSumw'
   group: ttbar
-  split: 50
+  split: 100
 TTToHadronic:
   cross-section: 377.85
   db: das:/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
@@ -70,21 +70,21 @@ ST_tW_top_5f:
   era: '2018'
   generated-events: 'genEventSumw'
   group: ST
-  split: 10
+  split: 20
 ST_tW_antitop_5f:
   cross-section: 35.85
   db: das:/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21_ext1-v1/NANOAODSIM
   era: '2018'
   generated-events: 'genEventSumw'
   group: ST
-  split: 10
+  split: 20
 ST_tchannel_antitop_4f:
   cross-section: 80.95
   db: das:/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
   era: '2018'
   generated-events: 'genEventSumw'
   group: ST
-  split: 20
+  split: 50
 ST_tchannel_top_4f:
   cross-section: 136.02
   db: das:/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
@@ -98,14 +98,14 @@ ST_schannel_4f:
   era: '2018'
   generated-events: 'genEventSumw'
   group: ST
-  split: 10
+  split: 30
 ST_tWll_5f:
   cross-section: 0.01096
   db: das:/ST_tWll_5f_LO_TuneCP5_PSweights_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21_ext1-v1/NANOAODSIM
   era: '2018'
   generated-events: 'genEventSumw'
   group: ST
-  split: 10
+  split: 20
 
 ##### Single Higgs
 GluGluHToTauTau:
@@ -228,7 +228,7 @@ ttHJetTobb:
   era: '2018'
   generated-events: 'genEventSumw'
   group: SM
-  split: 5
+  split: 10
 THQ:
   cross-section: 0.07096
   db: das:/THQ_ctcvcp_4f_Hincl_13TeV_madgraph_pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
@@ -308,7 +308,7 @@ ZZTo4L:
   era: '2018'
   generated-events: 'genEventSumw'
   group: VVV
-  split: 50
+  split: 80
 WWTo2L2Nu:
   cross-section: 12.2
   db: das:/WWTo2L2Nu_NNPDF31_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
@@ -338,7 +338,7 @@ WZTo2L2Q:
   era: '2018'
   generated-events: 'genEventSumw'
   group: VVV
-  split: 10
+  split: 30
 WWToLNuQQ:
   cross-section: 50.45
   db: das:/WWToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
@@ -396,14 +396,14 @@ WJetsToLNu:
   era: '2018'
   generated-events: 'genEventSumw'
   group: Wjets
-  split: 20
+  split: 60
 W1JetsToLNu:
   cross-section: 9442.49
   db: das:/W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
   era: '2018'
   generated-events: 'genEventSumw'
   group: Wjets
-  split: 20
+  split: 30
 W2JetsToLNu:
   cross-section: 3252.49
   db: das:/W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM
@@ -551,7 +551,7 @@ WGToLNuG:
   era: '2018'
   generated-events: 'genEventSumw'
   group: Rares
-  split: 5
+  split: 20
 TGJets:
   cross-section: 1.018
   db: das:/TGJets_leptonDecays_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21_ext1-v1/NANOAODSIM
