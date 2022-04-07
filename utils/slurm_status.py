@@ -12,6 +12,8 @@ parser.add_argument('-u','--user', action='store', required=True, type=str,
                     help='User name')
 parser.add_argument('-j','--jobid', action='store', required=False, nargs='+', type=str,
                     help='Job ID (can be several)')
+parser.add_argument('-s','--sum', action='store_true', required=False, default=False,
+                    help='Only displays the sum of all jobs status from the different job ids')
 parser.add_argument('-l','--loop', action='store', required=False, type=int,
                     help='Looping time in seconds')
 parser.add_argument('--active', action='store_true', required=False, default=False,
@@ -36,16 +38,22 @@ def parse_sacct(args):
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     out, _ = p.communicate()
 
-    dict_jobs = None
+    dict_jobs = {'jobid':[],'array':[],'status':[],'partition':[]}
     for line in out.decode("utf-8").splitlines():
         j, s, p = line.split()
+        arrs = []
         if '_' in j:
             j, a = j.split('_')
+            if s == 'PENDING': # Need to develop array line
+                ps = subprocess.Popen(['squeue','-j',j,'-r','-t','pending','--noheader'], stdout=subprocess.PIPE)
+                outs,_ = ps.communicate()
+                for pline in outs.decode("utf-8").splitlines():
+                    arrs.append(pline.split()[0].split('_')[1])
+            else:
+                arrs.append(a)
         else:
-            a = 1
-        if dict_jobs is None:
-            dict_jobs = {'jobid':[j],'array':[a],'status':[s],'partition':[p]}
-        else:
+            arrs = [1]
+        for a in arrs:
             dict_jobs['jobid'].append(j)
             dict_jobs['array'].append(a)
             dict_jobs['status'].append(s)
@@ -54,6 +62,9 @@ def parse_sacct(args):
     df_jobs = pd.DataFrame.from_dict(dict_jobs)
 
     status_list = ['PENDING','RUNNING','COMPLETED']
+
+    if args.sum:
+        df_jobs['jobid'] = 'total'
 
     printout = ""
     for jobid in pd.unique(df_jobs['jobid']):
@@ -68,15 +79,6 @@ def parse_sacct(args):
             N = partdf.shape[0]
             for status in statuses:
                 num = partdf[partdf['status']==status].shape[0]
-                if status == "PENDING": # Need to develop array line
-                    statdf = partdf[partdf['status']==status]
-                    arrays = pd.unique(statdf['array'])
-                    for array in arrays:
-                        ps = subprocess.Popen(['squeue','-j',jobid,'-r','--noheader','--long'], stdout=subprocess.PIPE)
-                        outs,_ = ps.communicate()
-                        sup = len([o for o in outs.decode("utf-8").splitlines() if 'PENDING' in o and partition in o])
-                        num += sup -1
-                        N += sup -1
                 try:
                     printout += "\t\t"+status.ljust(20,' ')+"{:5d}  [{:6.2f}%]\n".format(num,num/N*100)
                 except ZeroDivisionError:
