@@ -45,15 +45,16 @@ def parse_sacct(args):
         arrs = []
         if '_' in j:
             j, a = j.split('_')
-            pending_flag = j != prev_j
-            prev_j = j
+            if j != prev_j: 
+                pending_flag = True
+                prev_j = j
             if s == 'PENDING': 
                 if pending_flag:
                     ps = subprocess.Popen(['squeue','-j',j,'-r','-t','pending','--noheader'], stdout=subprocess.PIPE)
                     outs,_ = ps.communicate()
                     for pline in outs.decode("utf-8").splitlines():
                         arrs.append(pline.split()[0].split('_')[1])
-                    pending_flag = False 
+                    pending_flag = False
                 else:
                     continue
             else:
