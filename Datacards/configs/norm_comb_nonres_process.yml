@@ -1,71 +1,67 @@
 #################################
 #         Ad hoc norm           # 
 #################################
-CMS_bbww_TT_norm:
+CMS_bbwwsl_fakes_norm_2016:
+  era: '2016'
+  cat: ['.*SL.*']
+  group: Fakes
+  val: 1.3
+CMS_bbwwsl_fakes_norm_2017:
+  era: '2017'
+  cat: ['.*SL.*']
+  group: Fakes
+  val: 1.3
+CMS_bbwwsl_fakes_norm_2018:
+  era: '2018'
+  cat: ['.*SL.*']
+  group: Fakes
+  val: 1.3
+
+
+CMS_bbwwdl_tt_norm:
   group: 
     - TT
   val: 1.2
-
-CMS_bbww_ST_norm:
+  cat: ['.*DL.*']
+CMS_bbwwdl_st_norm:
   group: 
     - ST
   val: 1.2
+  cat: ['.*DL.*']
+CMS_bbwwdl_tt_norm_boost:
+  group: 
+    - TT
+  cat: ['.*DL.*boosted.*']
+  val: 1.2
+CMS_bbwwdl_st_norm_boost:
+  group: 
+    - ST
+  cat: ['.*DL.*boosted.*']
+  val: 1.2
 
-CMS_bbww_WJets_norm:
+CMS_bbwwsl_tt_norm:
+  group: 
+    - TT
+  val: 1.2
+  cat: ['.*SL.*']
+CMS_bbwwsl_st_norm:
+  group: 
+    - ST
+  val: 1.2
+  cat: ['.*SL.*']
+CMS_bbwwsl_wjets_norm:
   group: 
     - WJets
   val: 1.2
-
-CMS_bbwwsl_fakes_norm:
-  group:
-    - Fakes
-  val: 1.3
-  cat:
-    - HH_SL_resolved1b_GGF
-    - HH_SL_resolved2b_GGF
-    - HH_SL_boosted_GGF
-    - HH_SL_resolved1b_VBF
-    - HH_SL_resolved2b_VBF
-    - HH_SL_boosted_VBF
-    - HH_SL_inclusive_WJets
-    - HH_SL_inclusive_other
-    - HH_SL_resolved_TopH
-    - HH_SL_boosted_TopH
-
-CMS_bbwwsl_ST_norm_boost:
-  cat: 
-    - HH_SL_boosted_GGF
-    - HH_SL_boosted_VBF
-    - HH_SL_boosted_TopH
-  group: 
-    - ST
-  val: 1.2
-
-CMS_bbwwsl_TT_norm_boost:
-  cat: 
-    - HH_SL_boosted_GGF
-    - HH_SL_boosted_VBF
-    - HH_SL_boosted_TopH
+  cat: ['.*SL.*']
+CMS_bbwwsl_tt_norm_boost:
   group: 
     - TT
+  cat: ['.*SL.*boosted.*']
   val: 1.2
-
-CMS_bbwwdl_ST_norm_boost:
-  cat: 
-   - HH_DL_boosted_GGF
-   - HH_DL_boosted_VBF
-   - HH_DL_boosted_other
+CMS_bbwwsl_st_norm_boost:
   group: 
     - ST
+  cat: ['.*SL.*boosted.*']
   val: 1.2
-
-CMS_bbwwdl_TT_norm_boost:
-  cat: 
-   - HH_DL_boosted_GGF
-   - HH_DL_boosted_VBF
-   - HH_DL_boosted_other
-  group: 
-    - TT
-  val: 1.2
-
 

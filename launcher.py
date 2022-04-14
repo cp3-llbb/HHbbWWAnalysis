@@ -269,12 +269,23 @@ class BambooLauncher:
             if isinstance(arg,str):
                 fixedArgs.append(arg)
             elif isinstance(arg,dict):
-                if len(arg.keys()) != 1:
-                    raise RuntimeError('Currently only one key is possible per argument')
-                key = list(arg.keys())[0]
-                toVaryArgs[key] = arg[key]
+                for key in arg.keys():
+                    toVaryArgs[key] = []
+                    if isinstance(arg[key],list):
+                        for item in arg[key]:
+                            if not isinstance(item,dict):
+                                raise ValueError('If you use arguments in a list, the items need to be a single entry dictionnary')
+                            if len(item) != 1:
+                                raise ValueError('If you use arguments in a list, only one set of key and value is possible')
+                            toVaryArgs[key].append(item)
+                    elif isinstance(arg[key],dict):
+                        for k,v in arg[key].items():
+                            toVaryArgs[key].append({k:v})
+                    else:
+                        raise ValueError(f'Entry {key} type {type(arg[key])} not understood')
             else:
-                raise RuntimeError("Could not understand arg {}".format(arg))
+                raise RuntimeError(f"Could not understand arg {arg} type {type(arg)}")
+
 
         toVaryIdx = {key:[i for i in range(len(val))] for key,val in toVaryArgs.items()}
         variedIdx = []

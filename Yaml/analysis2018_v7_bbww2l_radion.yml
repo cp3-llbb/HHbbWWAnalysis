@@ -114,6 +114,20 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-400:
   type: signal
   hide: True
   mass: 400
+GluGluToRadionToHHTo2B2VTo2L2Nu_M-450:
+  cross-section: 1.
+  branching-ratio: 0.027669886574221
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIIAutumn18NanoAODv7_102X_upgrade2018_realistic_v21_v2/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450_narrow_TuneCP5_PSWeights_13TeV-madgraph-pythia8.txt
+  era: '2018'
+  generated-events: genEventSumw
+  legend: 'R#rightarrowHH#rightarrowbbl#nul#nu (M = 450)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 450
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-500:
   cross-section: 1.
   branching-ratio: 0.027669886574221
