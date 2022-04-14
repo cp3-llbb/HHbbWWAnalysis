@@ -1,8 +1,8 @@
 tree: Events
 eras:
   '2016': 
-    luminosity: 35922 #pb 
-    luminosity-error: 0.025     #pb
+    luminosity: 36330 #pb 
+    luminosity-error: 0.012
 dbcache: ../dascache2016
 samples:
     # BACKGROUNDS #
@@ -49,10 +49,9 @@ samples:
     # TTToHadronic (For SL fake non closure) #
   - config: analysis2016_v7_TTHadronic.yml
     keys: tt
-    # GRAVITON 2018 for 2016 #
-  - config: analysis2016_v7_bbww2l_graviton_from_2018.yml
-    keys: [bbww2l,graviton_fix]
-
+    # Theory #
+  - config: analysis2016_v7_theory.yml
+    keys: theory
   
 datadriven: !include datadriven.yml
 benchmarks: !include benchmarks.yml

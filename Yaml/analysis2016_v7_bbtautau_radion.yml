@@ -184,6 +184,20 @@ GluGluToRadionToHHTo2B2Tau_M-600:
   type: signal
   hide: True
   mass: 600
+GluGluToRadionToHHTo2B2Tau_M-650:
+  cross-section: 1.
+  branching-ratio: 0.073056256
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v1/GluGluToRadionToHHTo2B2Tau_M-650_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'R#rightarrowHH#rightarrowbb#tau#tau (M = 650)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 650
 GluGluToRadionToHHTo2B2Tau_M-700:
   cross-section: 1.
   branching-ratio: 0.073056256

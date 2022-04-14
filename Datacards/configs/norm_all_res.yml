@@ -1,0 +1,48 @@
+  2016:
+    - !include norm_lumi.yml
+    - !include norm_BR.yml
+    - !include norm_QCDscale.yml
+    - !include norm_alpha_s.yml
+    - !include norm_pdf.yml
+    - !include norm_misc.yml
+    - !include norm_DL_res_process.yml
+    - !include norm_fakes_2016.yml
+    - !include norm_DY_Res{branch}.yml
+    - footer:
+        - "nuisance edit rename TT * CMS_bbwwdl_ps_fsr CMS_bbwwdl_ps_fsr_TT"
+        - "nuisance edit rename DY * CMS_bbwwdl_ps_isr CMS_bbwwdl_ps_isr_DY"
+        - "nuisance edit rename TT * CMS_bbwwdl_ps_fsr CMS_bbwwdl_ps_fsr_TT"
+        - "nuisance edit rename DY * CMS_bbwwdl_ps_isr CMS_bbwwdl_ps_isr_DY"
+  2017:
+    - !include norm_lumi.yml
+    - !include norm_BR.yml
+    - !include norm_QCDscale.yml
+    - !include norm_alpha_s.yml
+    - !include norm_pdf.yml
+    - !include norm_misc.yml
+    - !include norm_DL_res_process.yml
+    - !include norm_fakes_2017.yml
+    - !include norm_DY_Res{branch}.yml
+    - footer:
+        - "nuisance edit rename TT * CMS_bbwwdl_ps_fsr CMS_bbwwdl_ps_fsr_TT"
+        - "nuisance edit rename DY * CMS_bbwwdl_ps_isr CMS_bbwwdl_ps_isr_DY"
+        - "nuisance edit rename TT * CMS_bbwwdl_ps_fsr CMS_bbwwdl_ps_fsr_TT"
+        - "nuisance edit rename DY * CMS_bbwwdl_ps_isr CMS_bbwwdl_ps_isr_DY"
+  2018:
+    - !include norm_lumi.yml
+    - !include norm_BR.yml
+    - !include norm_QCDscale.yml
+    - !include norm_alpha_s.yml
+    - !include norm_pdf.yml
+    - !include norm_misc.yml
+    - !include norm_DL_res_process.yml
+    - !include norm_fakes_2018.yml
+    - !include norm_DY_Res{branch}.yml
+    - footer:
+        - "nuisance edit rename TT * CMS_bbwwdl_ps_fsr CMS_bbwwdl_ps_fsr_TT"
+        - "nuisance edit rename DY * CMS_bbwwdl_ps_isr CMS_bbwwdl_ps_isr_DY"
+        - "nuisance edit rename TT * CMS_bbwwdl_ps_fsr CMS_bbwwdl_ps_fsr_TT"
+        - "nuisance edit rename DY * CMS_bbwwdl_ps_isr CMS_bbwwdl_ps_isr_DY"
+
+
+

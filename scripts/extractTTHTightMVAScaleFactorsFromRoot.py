@@ -74,8 +74,9 @@ for key in f.GetListOfKeys():
             shift_pt = abs(1-h_pt.GetBinContent(bin_pt))
             val_SF_up = max(1+shift_eta,1+shift_pt)*val_SF
             val_SF_down = min(1-shift_eta,1-shift_pt)*val_SF
-            #error_tot = math.sqrt(error_eta**2+error_pt**2)
-            pt_data = {'bin': [pt_binning[j], pt_binning[j + 1]], 'value': val_SF, 'error_low': val_SF-val_SF_down, 'error_high': val_SF_up-val_SF}
+            shift = max(shift_eta,shift_pt)
+            #pt_data = {'bin': [pt_binning[j], pt_binning[j + 1]], 'value': val_SF, 'error_low': val_SF-val_SF_down, 'error_high': val_SF_up-val_SF}
+            pt_data = {'bin': [pt_binning[j], pt_binning[j + 1]], 'value': 1., 'error_low': shift, 'error_high': shift}
 
             eta_data['values'].append(pt_data)
 

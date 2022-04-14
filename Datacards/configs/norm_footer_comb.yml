@@ -1,0 +1,38 @@
+- line: "nuisance edit rename TT    * CMS_bbwwdl_ps_fsr CMS_bbwwdl_ps_fsr_tt"
+  cat : [".*DL.*"]
+- line: "nuisance edit rename DY    * CMS_bbwwdl_ps_isr CMS_bbwwdl_ps_fsr_dy"
+  cat : [".*DL.*"]
+- line: "nuisance edit rename ST    * CMS_bbwwdl_ps_isr CMS_bbwwdl_ps_fsr_st"
+  cat : [".*DL.*"]
+- line: "nuisance edit rename TT    * CMS_bbwwdl_ps_isr CMS_bbwwdl_ps_isr_tt"
+  cat : [".*DL.*"]
+- line: "nuisance edit rename DY    * CMS_bbwwdl_ps_isr CMS_bbwwdl_ps_isr_dy"
+  cat : [".*DL.*"]
+- line: "nuisance edit rename ST    * CMS_bbwwdl_ps_isr CMS_bbwwdl_ps_isr_st"
+  cat : [".*DL.*"]
+- line: "nuisance edit rename TT    * CMS_bbwwdl_thu_shape CMS_bbwwdl_thu_shape_tt"
+  cat : [".*DL.*"]
+- line: "nuisance edit rename DY    * CMS_bbwwdl_thu_shape CMS_bbwwdl_thu_shape_dy"
+  cat : [".*DL.*"]
+- line: "nuisance edit rename ST    * CMS_bbwwdl_thu_shape CMS_bbwwdl_thu_shape_st"
+  cat : [".*DL.*"]
+
+- line: "nuisance edit rename TT    * CMS_bbwwsl_ps_fsr CMS_bbwwsl_ps_fsr_tt"
+  cat : [".*SL.*"]
+- line: "nuisance edit rename WJets * CMS_bbwwsl_ps_isr CMS_bbwwsl_ps_fsr_wjets"
+  cat : [".*SL.*"]
+- line: "nuisance edit rename ST    * CMS_bbwwsl_ps_isr CMS_bbwwsl_ps_fsr_st"
+  cat : [".*SL.*"]
+- line: "nuisance edit rename TT    * CMS_bbwwsl_ps_isr CMS_bbwwsl_ps_isr_tt"
+  cat : [".*SL.*"]
+- line: "nuisance edit rename WJets * CMS_bbwwsl_ps_isr CMS_bbwwsl_ps_isr_wjets"
+  cat : [".*SL.*"]
+- line: "nuisance edit rename ST    * CMS_bbwwsl_ps_isr CMS_bbwwsl_ps_isr_st"
+  cat : [".*SL.*"]
+- line: "nuisance edit rename TT    * CMS_bbwwsl_thu_shape CMS_bbwwsl_thu_shape_tt"
+  cat : [".*SL.*"]
+- line: "nuisance edit rename WJets * CMS_bbwwsl_thu_shape CMS_bbwwsl_thu_shape_wjets"
+  cat : [".*SL.*"]
+- line: "nuisance edit rename ST    * CMS_bbwwsl_thu_shape CMS_bbwwsl_thu_shape_st"
+  cat : [".*SL.*"]
+

@@ -1,0 +1,44 @@
+path: 
+  2016:
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2016NanoV7_TTHIDLoose_Fake_Resonant_HighMass_DYEstimation_allmass/
+  2017:
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_Resonant_HighMass_DYEstimation_allmass/
+  2018:
+    - /nfs/scratch/fynu/fbury/BambooOutputHHtobbWW/full2018NanoV7_TTHIDLoose_Fake_Resonant_HighMass_DYEstimation_allmass/
+use_syst: False
+
+outputDir: /home/ucl/cp3/fbury/scratch/Datacards/bbww_dl/Resonant/datacard_fit_Resonant_HighMass_DY_MC_FR2
+
+yamlName: plots.yml
+
+produce_plots: True
+
+era: 
+  - 2016
+  - 2017
+  - 2018
+
+legend:
+  position:
+  - 0.2
+  - 0.7
+  - 0.9
+  - 0.9
+  columns: 3
+
+histConverter: !include resonant_cat_allmass.yml
+
+
+groups:
+  2016:
+  - !include groups_DL_bkg_2016.yml
+  - !include groups_data_2016.yml
+  - !include groups_DY_MC.yml
+  2017:
+  - !include groups_DL_bkg_2017.yml
+  - !include groups_data_2017.yml
+  - !include groups_DY_MC.yml
+  2018:
+  - !include groups_DL_bkg_2018.yml
+  - !include groups_data_2018.yml
+  - !include groups_DY_MC.yml

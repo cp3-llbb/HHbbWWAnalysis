@@ -1,0 +1,67 @@
+#################################
+#         Ad hoc norm           # 
+#################################
+CMS_bbwwsl_fakes_norm_2016:
+  era: '2016'
+  cat: ['.*SL.*']
+  group: Fakes
+  val: 1.3
+CMS_bbwwsl_fakes_norm_2017:
+  era: '2017'
+  cat: ['.*SL.*']
+  group: Fakes
+  val: 1.3
+CMS_bbwwsl_fakes_norm_2018:
+  era: '2018'
+  cat: ['.*SL.*']
+  group: Fakes
+  val: 1.3
+
+
+CMS_bbwwdl_tt_norm:
+  group: 
+    - TT
+  val: 1.2
+  cat: ['.*DL.*']
+CMS_bbwwdl_st_norm:
+  group: 
+    - ST
+  val: 1.2
+  cat: ['.*DL.*']
+CMS_bbwwdl_tt_norm_boost:
+  group: 
+    - TT
+  cat: ['.*DL.*boosted.*']
+  val: 1.2
+CMS_bbwwdl_st_norm_boost:
+  group: 
+    - ST
+  cat: ['.*DL.*boosted.*']
+  val: 1.2
+
+CMS_bbwwsl_tt_norm:
+  group: 
+    - TT
+  val: 1.2
+  cat: ['.*SL.*']
+CMS_bbwwsl_st_norm:
+  group: 
+    - ST
+  val: 1.2
+  cat: ['.*SL.*']
+CMS_bbwwsl_wjets_norm:
+  group: 
+    - WJets
+  val: 1.2
+  cat: ['.*SL.*']
+CMS_bbwwsl_tt_norm_boost:
+  group: 
+    - TT
+  cat: ['.*SL.*boosted.*']
+  val: 1.2
+CMS_bbwwsl_st_norm_boost:
+  group: 
+    - ST
+  cat: ['.*SL.*boosted.*']
+  val: 1.2
+

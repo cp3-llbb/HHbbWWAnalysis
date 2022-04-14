@@ -1,10 +1,26 @@
 ################################
 #  Resonant Graviton signals   #
 ################################
+# /!\ For 2016 DL BR : need scaling factor (added already) 0.622253
+# See https://indico.cern.ch/event/1071729/#177-signal-scaling
 ##### Double Lepton 
+GluGluToRadionToHHTo2B2VTo2L2Nu_M-250:
+  cross-section: 1.
+  branching-ratio: 0.017217669930468738
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v2/GluGluToRadionToHHTo2B2VTo2L2Nu_M-250_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'R#rightarrowHH#rightarrowbbl#nul#nu (M = 250)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 250
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-260:
   cross-section: 1.
-  branching-ratio: 0.027669886574221
+  branching-ratio: 0.017217669930468738
   db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-260_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   era: '2016'
   generated-events: genEventSumw
@@ -18,7 +34,7 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-260:
   mass: 260
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-270:
   cross-section: 1.
-  branching-ratio: 0.027669886574221
+  branching-ratio: 0.017217669930468738
   db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-270_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   era: '2016'
   generated-events: genEventSumw
@@ -30,9 +46,23 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-270:
   type: signal
   hide: True
   mass: 270
+GluGluToRadionToHHTo2B2VTo2L2Nu_M-280:
+  cross-section: 1.
+  branching-ratio: 0.017217669930468738
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v1/GluGluToRadionToHHTo2B2VTo2L2Nu_M-280_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'R#rightarrowHH#rightarrowbbl#nul#nu (M = 280)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 280
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-300:
   cross-section: 1.
-  branching-ratio: 0.027669886574221
+  branching-ratio: 0.017217669930468738
   db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-300_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   era: '2016'
   generated-events: genEventSumw
@@ -44,9 +74,23 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-300:
   type: signal
   hide: True
   mass: 300
+GluGluToRadionToHHTo2B2VTo2L2Nu_M-320:
+  cross-section: 1.
+  branching-ratio: 0.017217669930468738
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v1/GluGluToRadionToHHTo2B2VTo2L2Nu_M-320_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'R#rightarrowHH#rightarrowbbl#nul#nu (M = 320)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 320
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-350:
   cross-section: 1.
-  branching-ratio: 0.027669886574221
+  branching-ratio: 0.017217669930468738
   db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-350_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   era: '2016'
   generated-events: genEventSumw
@@ -60,7 +104,7 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-350:
   mass: 350
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-400:
   cross-section: 1.
-  branching-ratio: 0.027669886574221
+  branching-ratio: 0.017217669930468738
   db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-400_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   era: '2016'
   generated-events: genEventSumw
@@ -74,7 +118,7 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-400:
   mass: 400
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-450:
   cross-section: 1.
-  branching-ratio: 0.027669886574221
+  branching-ratio: 0.017217669930468738
   db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-450_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   era: '2016'
   generated-events: genEventSumw
@@ -88,7 +132,7 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-450:
   mass: 450
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-500:
   cross-section: 1.
-  branching-ratio: 0.027669886574221
+  branching-ratio: 0.017217669930468738
   db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-500_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   era: '2016'
   generated-events: genEventSumw
@@ -102,7 +146,7 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-500:
   mass: 500
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-550:
   cross-section: 1.
-  branching-ratio: 0.027669886574221
+  branching-ratio: 0.017217669930468738
   db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-550_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   era: '2016'
   generated-events: genEventSumw
@@ -116,7 +160,7 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-550:
   mass: 550
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-600:
   cross-section: 1.
-  branching-ratio: 0.027669886574221
+  branching-ratio: 0.017217669930468738
   db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-600_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   era: '2016'
   generated-events: genEventSumw
@@ -130,7 +174,7 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-600:
   mass: 600
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-650:
   cross-section: 1.
-  branching-ratio: 0.027669886574221
+  branching-ratio: 0.017217669930468738
   db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-650_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   era: '2016'
   generated-events: genEventSumw
@@ -142,9 +186,23 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-650:
   type: signal
   hide: True
   mass: 650
+GluGluToRadionToHHTo2B2VTo2L2Nu_M-700:
+  cross-section: 1.
+  branching-ratio: 0.017217669930468738
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v1/GluGluToRadionToHHTo2B2VTo2L2Nu_M-700_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'R#rightarrowHH#rightarrowbbl#nul#nu (M = 700)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 700
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-750:
   cross-section: 1.
-  branching-ratio: 0.027669886574221
+  branching-ratio: 0.017217669930468738
   db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-750_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   era: '2016'
   generated-events: genEventSumw
@@ -158,7 +216,7 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-750:
   mass: 750
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-800:
   cross-section: 1.
-  branching-ratio: 0.027669886574221
+  branching-ratio: 0.017217669930468738
   db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-800_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   era: '2016'
   generated-events: genEventSumw
@@ -170,9 +228,23 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-800:
   type: signal
   hide: True
   mass: 800
+GluGluToRadionToHHTo2B2VTo2L2Nu_M-850:
+  cross-section: 1.
+  branching-ratio: 0.017217669930468738
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIISummer16NanoAODv7_102X_mcRun2_asymptotic_v8_v1/GluGluToRadionToHHTo2B2VTo2L2Nu_M-850_narrow_13TeV-madgraph-pythia8.txt
+  era: '2016'
+  generated-events: genEventSumw
+  legend: 'R#rightarrowHH#rightarrowbbl#nul#nu (M = 850)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 850
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-900:
   cross-section: 1.
-  branching-ratio: 0.027669886574221
+  branching-ratio: 0.017217669930468738
   db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-900_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   era: '2016'
   generated-events: genEventSumw
@@ -186,7 +258,7 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-900:
   mass: 900
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-1000:
   cross-section: 1.
-  branching-ratio: 0.027669886574221
+  branching-ratio: 0.017217669930468738
   db: das:/GluGluToRadionToHHTo2B2VTo2L2Nu_M-1000_narrow_13TeV-madgraph-v2/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   era: '2016'
   generated-events: genEventSumw

@@ -21,8 +21,15 @@ def returnResonantMVAInputs(self,l1,l2,channel,jets,bjets,fatjets,met,electrons,
                 lambda res, elm : op.extMethod("std::min", returnType="Float_t")(res, fn(elm))
                         ) )(fun) )
 
+
+    if self.args.era is None:
+        era = op.c_int(int(self.era))
+    else:
+        era = op.c_int(int(self.args.era))
+        print (f'Using {self.args.era} as DNN input')
+
     return {('eventnr',                 'Event number',                             (100,0.,1e6))        : self.tree.event,
-            ('era',                     'Era',                                      (3,2016.,2019.))     : op.c_int(int(self.era)),
+            ('era',                     'Era',                                      (3,2016.,2019.))     : era,
             ('l1_E',                    'Lead lepton E [GeV]',                      (50,0.,500.))        : op.switch(l1conept(l1) >= l2conept(l2) , l1.p4.E(), l2.p4.E()),
             ('l1_Px',                   'Lead lepton P_x [GeV]',                    (40,-200.,200.))     : op.switch(l1conept(l1) >= l2conept(l2) , l1.p4.Px(), l2.p4.Px()),
             ('l1_Py',                   'Lead lepton P_y [GeV]',                    (40,-200.,200.))     : op.switch(l1conept(l1) >= l2conept(l2) , l1.p4.Py(), l2.p4.Py()),
@@ -70,13 +77,13 @@ def returnResonantMVAInputs(self,l1,l2,channel,jets,bjets,fatjets,met,electrons,
             ('ht',                      'HT(jets) [GeV]',                           (100,0.,1000.))      : op.rng_sum(jets, lambda j : j.pt),
             ('min_dr_jets_lep1',        'Min(#Delta R(lead lepton,jets))',          (25,0.,5.))          : op.switch(op.rng_len(jets) > 0,
                                                                                                                      op.switch(l1conept(l1) >= l2conept(l2),
-                                                                                                                               self.HLL.MinDR_part1_partCont(l1,jets),
-                                                                                                                               self.HLL.MinDR_part1_partCont(l2,jets)),
+                                                                                                                               self.HLL.MinDR_part1_partCont(l1.p4,jets),
+                                                                                                                               self.HLL.MinDR_part1_partCont(l2.p4,jets)),
                                                                                                                      op.c_float(0.)),
             ('min_dr_jets_lep2',        'Min(#Delta R(sublead lepton,jets))',       (25,0.,5.))          : op.switch(op.rng_len(jets) > 0,
                                                                                                                      op.switch(l1conept(l1) >= l2conept(l2),
-                                                                                                                               self.HLL.MinDR_part1_partCont(l2,jets),
-                                                                                                                               self.HLL.MinDR_part1_partCont(l1,jets)),
+                                                                                                                               self.HLL.MinDR_part1_partCont(l2.p4,jets),
+                                                                                                                               self.HLL.MinDR_part1_partCont(l1.p4,jets)),
                                                                                                                      op.c_float(0.)),
             ('m_ll',                    'Dilepton invariant mass [GeV]',            (100,0.,1000.))      : op.invariant_mass(l1.p4,l2.p4),
             ('dr_ll',                   'Dilepton #Delta R',                        (25,0.,5.))          : op.deltaR(l1.p4,l2.p4),
@@ -97,10 +104,10 @@ def returnResonantMVAInputs(self,l1,l2,channel,jets,bjets,fatjets,met,electrons,
                                                                                                                      op.deltaR(bjets[0].p4,bjets[1].p4),
                                                                                                                      op.c_float(0.)),
             ('min_dr_leps_b1',          'Min(#Delta R(lead bjet,dilepton))',        (25,0.,5.))          : op.switch(op.rng_len(bjets)>=1,
-                                                                                                                     self.HLL.MinDR_part1_dipart(bjets[0],[l1,l2]),
+                                                                                                                     self.HLL.MinDR_part1_dipart(bjets[0].p4,[l1.p4,l2.p4]),
                                                                                                                      op.c_float(0.)),
             ('min_dr_leps_b2',          'Min(#Delta R(sublead bjet,dilepton))',     (25,0.,5.))          : op.switch(op.rng_len(bjets)>=2,
-                                                                                                                     self.HLL.MinDR_part1_dipart(bjets[1],[l1,l2]),
+                                                                                                                     self.HLL.MinDR_part1_dipart(bjets[1].p4,[l1.p4,l2.p4]),
                                                                                                                      op.c_float(0.)),
             ('lep1_conept',             'Lead lepton cone-P_T [GeV]',               (40,0.,200.))        : op.switch(l1conept(l1) >= l2conept(l2) , l1conept(l1) , l2conept(l2)),
             ('lep2_conept',             'Sublead lepton cone-P_T [GeV]',            (40,0.,200.))        : op.switch(l1conept(l1) >= l2conept(l2) , l2conept(l2) , l1conept(l1)),

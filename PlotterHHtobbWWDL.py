@@ -60,8 +60,8 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
 
         #----- Machine Learning Model -----#                
         if self.args.analysis == 'nonres':
-            model_num = "11"
-            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn',model_num,'model','model.pb')
+            model_num = "12"
+            path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','DL',model_num,'model','model.pb')
             input_names = ["lep","jet","fat","met","hl","param","eventnr"]
             output_name = "Identity"
 
@@ -188,16 +188,23 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             for region in hmeReaders.keys():
                 for cat in hmeReaders[region].keys():
                     for channel in hmeReaders[region][cat].keys():
-                        pathToSkim = treePath.format(era     = self.era,
-                                                     cat     = cat,
-                                                     channel = channel, 
-                                                     region  = region,
-                                                     sample  = self.sample)
+                        if 'related-sample' in sampleCfg.keys():
+                            pathToSkim = treePath.format(era     = self.era,
+                                                         cat     = cat,
+                                                         channel = channel, 
+                                                         region  = region,
+                                                         sample  = sampleCfg["related-sample"])
+                        else:
+                            pathToSkim = treePath.format(era     = self.era,
+                                                         cat     = cat,
+                                                         channel = channel, 
+                                                         region  = region,
+                                                         sample  = self.sample)
                         if not os.path.exists(pathToSkim):
                             raise RuntimeError(f'Could not find skim {pathToSkim}')
                         hmeReaders[region][cat][channel] = op.define("hme::HMEReader", 
                                                                      f'hme::HMEReader <<name>>{{"{pathToSkim}"}}; // for {self.sample.replace("-","")}',
-                                                                     nameHint=f"bamboo_hmeReader{region}{cat}{channel}{self.sample.replace('-','')}")
+                                                                     nameHint=f'bamboo_hmeReader{region}{cat}{channel}{self.sample.replace("-","")}')
 
         #----- Channel and trigger plots -----#
 
@@ -453,7 +460,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         for channelDict in ChannelDictList:
             # Branch out the LO -> NLO reweighting #
             channelDict["sel"] = self.addSignalReweighting(channelDict["sel"])
-            plots.extend(makeDoubleLeptonSelectedResolvedVariables(**channelDict,HLL=self.HLL))
+            #plots.extend(makeDoubleLeptonSelectedResolvedVariables(**channelDict,HLL=self.HLL))
 
         #----- Selected variables : Boosted -----#
         ChannelDictList = []
@@ -472,7 +479,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         if not self.args.OnlyYield:
             for channelDict in ChannelDictList:
                 channelDict["sel"] = self.addSignalReweighting(channelDict["sel"])
-                plots.extend(makeDoubleLeptonSelectedBoostedVariables(**channelDict,HLL=self.HLL))
+                #plots.extend(makeDoubleLeptonSelectedBoostedVariables(**channelDict,HLL=self.HLL))
 
         #----- Machine Learning plots -----#
         selObjectDictList = []
@@ -513,6 +520,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             assert category is not None
             dilepton = dileptonsCont[channel]
 
+            #-----------------  NON RESONANT  -------------------#
             if self.args.analysis == 'nonres':
                 self.nodes = ['GGF','VBF','H', 'DY', 'ST', 'TT', 'TTVX', 'VVV', 'Rare']
 
@@ -529,7 +537,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                                                 met       = self.corrMET)     
                 inputsFatjet = mvaEvaluatorDL_nonres.returnFatjetMVAInputs(
                                                 self      = self,
-                                                fatjets   = self.ak8Jets)
+                                                fatjets   = self.ak8BJets)
                 inputsHL = mvaEvaluatorDL_nonres.returnHighLevelMVAInputs(
                                                 self      = self,
                                                 l1        = dilepton[0],
@@ -537,8 +545,8 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                                                 met       = self.corrMET,
                                                 jets      = self.ak4Jets,
                                                 bjets     = self.ak4JetsByBtagScore[:op.min(op.rng_len(self.ak4JetsByBtagScore),op.static_cast("std::size_t",op.c_int(2)))],
-                                                electrons = self.electronsTightSel,
-                                                muons     = self.muonsTightSel,
+                                                electrons = self.electronsFakeSel,
+                                                muons     = self.muonsFakeSel,
                                                 channel   = selObjectDict['channel'])
 
                 inputsParam = mvaEvaluatorDL_nonres.returnParamMVAInputs(self)
@@ -583,6 +591,7 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     for selNode in selObjNodesDict.values():
                         self.yields.add(selNode.sel)
 
+            #-----------------  RESONANT  -------------------#
             if self.args.analysis == 'res':
 
                 # HME computation #
@@ -649,13 +658,10 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     switchCond.insert(0,FakeCond)
 
                 HME = op.defineOnFirstUse(op.multiSwitch(*switchCond))
-                #HME = op.multiSwitch(*switchCond)
-                #HME = op.forSystematicVariation(HME, "jet", "nominal")
-                #forceDefine(HME,selObjectDict['selObject'].sel)
 
                 # Add HME plots #
-                if not self.args.OnlyYield:
-                    plots.extend(makeDoubleLeptonHMEPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],HME))
+                #if not self.args.OnlyYield:
+                #    plots.extend(makeDoubleLeptonHMEPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],HME))
 
                 # Inputs of MVA #
                 inputsAll = mvaEvaluatorDL_res.returnResonantMVAInputs(
@@ -670,6 +676,10 @@ class PlotterNanoHHtobbWWDL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                                                 electrons = self.electronsTightSel,
                                                 muons     = self.muonsTightSel)
 
+
+                # Add DNN input plots #
+                #if not self.args.OnlyYield:
+                #    plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsAll))
 
                 inputs = {inpName:val  for (inpName,_,_),val in inputsAll.items()}
                 

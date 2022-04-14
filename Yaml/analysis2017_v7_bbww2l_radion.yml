@@ -58,6 +58,20 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-280:
   type: signal
   hide: True
   mass: 280
+GluGluToRadionToHHTo2B2VTo2L2Nu_M-300:
+  cross-section: 1.
+  branching-ratio: 0.027669886574221
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIIFall17NanoAODv7_102X_mc2017_realistic_v8_v2/GluGluToRadionToHHTo2B2VTo2L2Nu_M-300_narrow_13TeV-madgraph-pythia8.txt
+  era: '2017'
+  generated-events: genEventSumw
+  legend: 'R#rightarrowHH#rightarrowbbl#nul#nu (M = 300)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 300
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-320:
   cross-section: 1.
   branching-ratio: 0.027669886574221
@@ -128,6 +142,20 @@ GluGluToRadionToHHTo2B2VTo2L2Nu_M-500:
   type: signal
   hide: True
   mass: 500
+GluGluToRadionToHHTo2B2VTo2L2Nu_M-550:
+  cross-section: 1.
+  branching-ratio: 0.027669886574221
+  files: /nfs/user/fbury/CustomResonantHHProduction/RunIIFall17NanoAODv7_102X_mc2017_realistic_v8_v1/GluGluToRadionToHHTo2B2VTo2L2Nu_M-550_narrow_13TeV-madgraph-pythia8.txt
+  era: '2017'
+  generated-events: genEventSumw
+  legend: 'R#rightarrowHH#rightarrowbbl#nul#nu (M = 550)' 
+  line-type: 1
+  line-color: "#288a24"
+  split: 1
+  order: 10
+  type: signal
+  hide: True
+  mass: 550
 GluGluToRadionToHHTo2B2VTo2L2Nu_M-600:
   cross-section: 1.
   branching-ratio: 0.027669886574221

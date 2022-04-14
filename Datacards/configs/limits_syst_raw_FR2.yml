@@ -1,0 +1,82 @@
+outputDir: Scans/Resonant_raw/
+
+combine: 
+   limits_DL: limits
+   limits_SL: limits
+   limits_combined: limits
+   gof: gof
+   pulls: pulls_impacts
+   impacts: pulls_impacts
+   prefit: prefit
+   postfit_b: postfit_b
+curves:
+    #########################################################################
+    #                             Graviton 2D                               #
+    #########################################################################
+
+    2D FR2 spin 2:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            limits_SL: []
+            limits_combined: []
+            gof:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+                - combination_HH_DL_{mass}_inclusive_DY_VVV
+                - combination_HH_DL_{mass}_boosted_other
+                - combination_HH_DL_{mass}_resolved_other
+                - HH_DL_{mass}_boosted_other_2016
+                - HH_DL_{mass}_boosted_other_2017
+                - HH_DL_{mass}_boosted_other_2018
+                - HH_DL_{mass}_resolved_other_2016
+                - HH_DL_{mass}_resolved_other_2017
+                - HH_DL_{mass}_resolved_other_2018
+                - HH_DL_{mass}_inclusive_DY_VVV_2016
+                - HH_DL_{mass}_inclusive_DY_VVV_2017
+                - HH_DL_{mass}_inclusive_DY_VVV_2018    
+            prefit: []
+            postfit_b: []
+        points:
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_raw_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=260 branch=LowMass
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_raw_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=270 branch=LowMass
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_raw_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=300 branch=LowMass
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_raw_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_raw_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_raw_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=450 branch=LowMass 
+              label: 450 
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_raw_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_raw_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_raw_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=650 branch=HighMass 
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_raw_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=700 branch=HighMass 
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_raw_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_raw_FR2.yml  --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom spin=spin2 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+

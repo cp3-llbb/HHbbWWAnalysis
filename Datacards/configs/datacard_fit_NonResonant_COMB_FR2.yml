@@ -1,0 +1,73 @@
+path: 
+  2016:
+    # DL #
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2016NanoV7_DL_NonResonant_DNN11_Fake_DYEstimation_Boosted1B
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2016NanoV7_DL_NonResonant_DNN11_Fake_DYEstimation_Resolved1B
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2016NanoV7_DL_NonResonant_DNN11_Fake_DYEstimation_Resolved2B
+    # SL #
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2016NanoV7_SL_NonResonant_DNN01_Fake_Boosted
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2016NanoV7_SL_NonResonant_DNN01_Fake_Resolved1B
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2016NanoV7_SL_NonResonant_DNN01_Fake_Resolved2B
+  2017:
+    # DL #
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2017NanoV7_DL_NonResonant_DNN11_Fake_DYEstimation_Boosted1B
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2017NanoV7_DL_NonResonant_DNN11_Fake_DYEstimation_Resolved1B
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2017NanoV7_DL_NonResonant_DNN11_Fake_DYEstimation_Resolved2B
+    # SL #
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2017NanoV7_SL_NonResonant_DNN01_Fake_Boosted
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2017NanoV7_SL_NonResonant_DNN01_Fake_Resolved1B
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2017NanoV7_SL_NonResonant_DNN01_Fake_Resolved2B
+  2018:
+    # DL #
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2018NanoV7_DL_NonResonant_DNN11_Fake_DYEstimation_Boosted1B
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2018NanoV7_DL_NonResonant_DNN11_Fake_DYEstimation_Resolved1B
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2018NanoV7_DL_NonResonant_DNN11_Fake_DYEstimation_Resolved2B
+    # SL #
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2018NanoV7_SL_NonResonant_DNN01_Fake_Boosted
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2018NanoV7_SL_NonResonant_DNN01_Fake_Resolved1B
+    - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/NonResonant/full2018NanoV7_SL_NonResonant_DNN01_Fake_Resolved2B
+
+
+outputDir: /home/ucl/cp3/fbury/scratch/Datacards/bbww/NonResonant/datacard_fit_NonResonant_syst_FR2/
+
+use_syst: True
+
+yamlName: 
+  - plots_DYEstimation_FakeExtrapolation.yml
+  - plots_FakeExtrapolation.yml
+
+plotIt: !include plotIt_nonres_COMB.yml
+
+era: 
+  - 2016
+  - 2017
+  - 2018
+
+combineConfigs: !include combine_nonres.yml
+
+normSyst  : !include norm_comb_nonres.yml
+
+shapeSyst  : !include shape_comb_systematics.yml
+
+rebin: !include rebin_comb_nonresonant.yml
+  
+histCorrections: !include nonclosure_nonres.yml
+
+histConverter: !include cat_comb_nonresonant.yml
+  
+groups:
+  2016:
+    - !include groups_bkg_2016.yml
+    - !include groups_Fakes_2016.yml
+    - !include groups_data_2016.yml
+    - !include groups_COMB_signal_nonres.yml
+  2017:
+    - !include groups_bkg_2017.yml
+    - !include groups_Fakes_2017.yml
+    - !include groups_data_2017.yml
+    - !include groups_COMB_signal_nonres.yml
+  2018:
+    - !include groups_bkg_2018.yml
+    - !include groups_Fakes_2018.yml
+    - !include groups_data_2018.yml
+    - !include groups_COMB_signal_nonres.yml

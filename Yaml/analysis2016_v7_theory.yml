@@ -1,0 +1,296 @@
+#################################
+#           NOMINAL             #
+#################################
+TTTo2L2Nu_nom:
+  cross-section: 88.4
+  db: das:/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTTo2L2Nu
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+TTToSemiLeptonic_nom:
+  cross-section: 365.52
+  db: das:/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToSemiLeptonic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+TTToHadronic_nom:
+  cross-section: 377.85
+  db: das:/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToHadronic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+#################################
+#      UNDERLYING EVENT         #
+#################################
+# UE (underlying_event):
+#     Directly inferred from up/down variations of the datasets
+
+TTTo2L2Nu_UE_down:
+  cross-section: 88.4
+  db: das:/TTTo2L2Nu_TuneCP5down_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTTo2L2Nu
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+TTTo2L2Nu_UE_up:
+  cross-section: 88.4
+  db: das:/TTTo2L2Nu_TuneCP5up_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTTo2L2Nu
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+TTToSemiLeptonic_UE_down:
+  cross-section: 365.52
+  db: das:/TTToSemiLeptonic_TuneCP5down_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToSemiLeptonic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+TTToSemiLeptonic_UE_up:
+  cross-section: 365.52
+  db: das:/TTToSemiLeptonic_TuneCP5up_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToSemiLeptonic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+TTToHadronic_UE_down:
+  cross-section: 377.85
+  db: das:/TTToHadronic_TuneCP5down_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToHadronic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+TTToHadronic_UE_up:
+  cross-section: 377.85
+  db: das:/TTToHadronic_TuneCP5up_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToHadronic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+#################################
+#            M TOP              #
+#################################
+# mtop (top mass variation, 3 GeV shift):
+#     Up = 175.5 GeV
+#     Down = 169.5 GeV
+#     (assuming Up and Down histograms are normalized to nominal)
+
+TTTo2L2Nu_mtop_down:
+  cross-section: 88.4
+  db: ["das:/TTTo2L2Nu_TuneCP5_PSweights_mtop1695_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_backup_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/TTTo2L2Nu_TuneCP5_PSweights_mtop1695_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_backup_102X_mcRun2_asymptotic_v8_ext1-v2/NANOAODSIM"]
+  related-sample: TTTo2L2Nu
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+TTTo2L2Nu_mtop_up:
+  cross-section: 88.4
+  db: ["das:/TTTo2L2Nu_TuneCP5_PSweights_mtop1755_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_backup_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/TTTo2L2Nu_TuneCP5_PSweights_mtop1755_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_backup_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
+  related-sample: TTTo2L2Nu
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+TTToSemiLeptonic_mtop_down:
+  cross-section: 365.52
+  db: das:/TTToSemiLeptonic_TuneCP5_PSweights_mtop1695_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_backup_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToSemiLeptonic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+TTToSemiLeptonic_mtop_up:
+  cross-section: 365.52
+  db: das:/TTToSemiLeptonic_TuneCP5_PSweights_mtop1755_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_backup_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToSemiLeptonic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+TTToHadronic_mtop_down:
+  cross-section: 377.85
+  db: das:/TTToHadronic_TuneCP5_PSweights_mtop1695_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_backup_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToHadronic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+TTToHadronic_mtop_up:
+  cross-section: 377.85
+  db: das:/TTToHadronic_TuneCP5_PSweights_mtop1755_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_backup_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToHadronic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+#################################
+#      COLOR RECONNECTION       #
+#################################
+#CR (color reconnection):
+#    Up = nominal + abs(nominal - max{GluonMove, QCDbased, erdON})
+#    Down = nominal - abs(nominal - max{GluonMove, QCDbased, erdON})
+#    (assuming that the GluonMove, QCDbased and erdON histograms are normalized to the same integral as the nominal histogram)
+
+TTTo2L2Nu_GluonMove:
+  cross-section: 88.4
+  db: ["das:/TTTo2L2Nu_TuneCP5CR2_GluonMove_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/TTTo2L2Nu_TuneCP5CR2_GluonMove_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
+  related-sample: TTTo2L2Nu
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+TTToSemiLeptonic_GluonMove:
+  cross-section: 365.52
+  db: das:/TTToSemiLeptonic_TuneCP5CR2_GluonMove_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToSemiLeptonic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+TTToHadronic_GluonMove:
+  cross-section: 377.85
+  db: das:/TTToHadronic_TuneCP5CR2_GluonMove_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToHadronic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+#################################
+#           QCD based           #
+#################################
+TTTo2L2Nu_QCDbased:
+  cross-section: 88.4
+  db: ["das:/TTTo2L2Nu_TuneCP5CR1_QCDbased_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/TTTo2L2Nu_TuneCP5CR1_QCDbased_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
+  related-sample: TTTo2L2Nu
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+TTToSemiLeptonic_QCDbased:
+  cross-section: 365.52
+  db: das:/TTToSemiLeptonic_TuneCP5CR1_QCDbased_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToSemiLeptonic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+TTToHadronic_QCDbased:
+  cross-section: 377.85
+  db: das:/TTToHadronic_TuneCP5CR1_QCDbased_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToHadronic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+#################################
+#             ERD ON            #
+#################################
+TTTo2L2Nu_erdOn:
+  cross-section: 88.4
+  db: ["das:/TTTo2L2Nu_TuneCP5_PSweights_erdON_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/TTTo2L2Nu_TuneCP5_PSweights_erdON_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM","das:/TTTo2L2Nu_TuneCP5_PSweights_erdON_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext2-v1/NANOAODSIM"]
+  related-sample: TTTo2L2Nu
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+TTToSemiLeptonic_erdOn:
+  cross-section: 365.52
+  db: das:/TTToSemiLeptonic_TuneCP5_PSweights_erdON_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToSemiLeptonic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+TTToHadronic_erdOn:
+  cross-section: 377.85
+  db: das:/TTToHadronic_TuneCP5_PSweights_erdON_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToHadronic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+#################################
+#              HDAMP            #
+#################################
+# HDamp (ME-PS matching scale):     
+#  Directly inferred from up/down variations of the datasets
+
+TTTo2L2Nu_hDamp_down:
+  cross-section: 88.4
+  db: ["das:/TTTo2L2Nu_hdampDOWN_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/TTTo2L2Nu_hdampDOWN_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM","das:/TTTo2L2Nu_hdampDOWN_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext2-v1/NANOAODSIM"]
+  related-sample: TTTo2L2Nu
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+TTTo2L2Nu_hDamp_up:
+  cross-section: 88.4
+  db: ["das:/TTTo2L2Nu_hdampUP_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/TTTo2L2Nu_hdampUP_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM","das:/TTTo2L2Nu_hdampUP_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext2-v1/NANOAODSIM"]
+  related-sample: TTTo2L2Nu
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+TTToSemiLeptonic_hDamp_down:
+  cross-section: 365.52
+  db: das:/TTToSemiLeptonic_hdampDOWN_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToSemiLeptonic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+TTToSemiLeptonic_hDamp_up:
+  cross-section: 365.52
+  db: das:/TTToSemiLeptonic_hdampUP_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToSemiLeptonic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+
+TTToHadronic_hDamp_down:
+  cross-section: 377.85
+  db: das:/TTToHadronic_hdampDOWN_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToHadronic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+TTToHadronic_hDamp_up:
+  cross-section: 377.85
+  db: das:/TTToHadronic_hdampUP_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
+  related-sample: TTToHadronic
+  era: '2016'
+  generated-events: 'genEventSumw'
+  group: ttbar
+  split: 1000
+

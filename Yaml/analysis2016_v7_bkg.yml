@@ -15,28 +15,28 @@ DYJetsToLL_M-50:
   cross-section: 6077.22 # pb
   group: DY
   era: '2016'
-  split: 30
+  split: 100
 DYToLL_0J:
   db: ["das:/DYToLL_0J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM", "das:/DYToLL_0J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_backup_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 4843.6 #pb
   group: DY
   era: '2016'
-  split: 20
+  split: 30
 DYToLL_1J:
   db: ["das:/DYToLL_1J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM","das:/DYToLL_1J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_backup_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 897.8 #pb
   group: DY
   era: '2016'
-  split: 20
+  split: 30
 DYToLL_2J:
   db: ["das:/DYToLL_2J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/DYToLL_2J_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 335.8  #pb
   group: DY
   era: '2016'
-  split: 20
+  split: 30
 
 ##### ttbar
 TTTo2L2Nu: 
@@ -45,21 +45,21 @@ TTTo2L2Nu:
   cross-section: 88.40
   group: ttbar
   era: '2016'
-  split: 200
+  split: 500
 TTToSemiLeptonic: 
   db: das:/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 365.52
   group: ttbar
   era: '2016'
-  split: 50
+  split: 100
 TTToHadronic: 
   db: das:/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 377.85
   group: ttbar
   era: '2016'
-  split: 50
+  split: 100
 
 #####   single top
 ST_tW_top_5f:
@@ -68,42 +68,42 @@ ST_tW_top_5f:
   cross-section: 35.85
   group: ST
   era: '2016'
-  split: 10
+  split: 20
 ST_tW_antitop_5f:
   db: das:/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 35.85
   group: ST
   era: '2016'
-  split: 10
+  split: 20
 ST_tchannel_antitop_4f:
   db: ["das:/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/ST_t-channel_antitop_4f_inclusiveDecays_13TeV_PSweights-powhegV2-madspin/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 80.95 
   group: ST
   era: '2016'
-  split: 15
+  split: 80
 ST_tchannel_top_4f:
   db: das:/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v2/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 136.02
   group: ST
   era: '2016'
-  split: 15
+  split: 100
 ST_schannel_4f: 
   db: ["das:/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/ST_s-channel_4f_leptonDecays_13TeV_PSweights-amcatnlo-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 3.364
   group: ST
   era: '2016'
-  split: 10
+  split: 30
 ST_tWll_5f: 
   db: das:/ST_tWll_5f_LO_13TeV-MadGraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 0.01096 
   group: ST
   era: '2016'
-  split: 10
+  split: 20
 
 #### Single Higgs 
 GluGluHToTauTau:
@@ -112,7 +112,7 @@ GluGluHToTauTau:
   cross-section: 3.0469
   group: SM
   era: '2016'
-  split: 3
+  split: 10
 GluGluHToZZTo4L:
   db: das:/GluGluHToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
@@ -147,7 +147,7 @@ GluGluHToBB:
   cross-section: 28.293
   group: SM
   era: '2016'
-  split: 3
+  split: 10
 GluGluHToGG:
   db: das:/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext2-v1/NANOAODSIM
   generated-events: 'genEventSumw'
@@ -161,119 +161,119 @@ VBFHToTauTau:
   cross-section: 0.2372
   group: SM
   era: '2016'
-  split: 1
+  split: 3
 VBFHToZZTo4L:
   db: das:/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 0.0010099
   group: SM
   era: '2016'
-  split: 1
+  split: 3
 VBFHToWWToLNuQQ:
   db: das:/VBFHToWWToLNuQQ_M125_13TeV_powheg_JHUGenV628_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 0.35517
   group: SM
   era: '2016'
-  split: 1
+  split: 3
 VBFHToWWTo2L2Nu:
   db: das:/VBFHToWWTo2L2Nu_M125_13TeV_powheg_JHUgenv628_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 0.085894
   group: SM
   era: '2016'
-  split: 1
+  split: 3
 VBFHToMuMu:
   db: das:/VBFHToMuMu_M-125_TuneCP5_PSweights_13TeV_powheg_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 0.00082296
   group: SM
   era: '2016'
-  split: 1
+  split: 3
 VBFHToBB:
   db: ["das:/VBFHToBB_M-125_13TeV_powheg_pythia8_weightfix/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/VBFHToBB_M-125_13TeV_powheg_pythia8_weightfix/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 2.2026
   group: SM
   era: '2016'
-  split: 1
+  split: 3
 VBFHToGG:
   db: ["das:/VBFHToGG_M125_13TeV_amcatnlo_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM","das:/VBFHToGG_M125_13TeV_amcatnlo_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext2-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 0.0085851
   group: SM
   era: '2016'
-  split: 1
+  split: 3
 ttHJetToNonbb:
   db: das:/ttHJetToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_mWCutfix/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 0.2118
   group: SM
   era: '2016'
-  split: 5
+  split: 20
 ttHJetTobb:
   db: das:/ttHJetTobb_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext3-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 0.2953
   group: SM
   era: '2016'
-  split: 5
+  split: 10
 THQ:
   db: das:/THQ_ctcvcp_HIncl_M125_TuneCP5_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 0.07096
   group: SM
   era: '2016'
-  split: 15
+  split: 80
 THW:
   db: das:/THW_ctcvcp_HIncl_M125_TuneCP5_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 0.01561
   group: SM
   era: '2016'
-  split: 15
+  split: 30
 VHToNonbb:
   db: das:/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 0.9425
   group: SM
   era: '2016'
-  split: 1
+  split: 3
 ZH_HToBB_ZToLL:
   db: das:/ZH_HToBB_ZToLL_M125_13TeV_powheg_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 0.05198
   group: SM
   era: '2016'
-  split: 1
+  split: 10
 ZHToTauTau:
   db: das:/ZHToTauTau_M125_13TeV_powheg_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 0.05544
   group: SM
   era: '2016'
-  split: 1
+  split: 3
 HZJ_HToWW:
   db: das:/HZJ_HToWW_M125_13TeV_powheg_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 0.1889
   group: SM
   era: '2016'
-  split: 1
+  split: 3
 WminusH_HToBB_WToLNu:
   db: ["das:/WminusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/WminusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 0.1012
   group: SM
   era: '2016'
-  split: 1
+  split: 3
 WplusH_HToBB_WToLNu:
   db: ["das:/WplusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/WplusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 0.1595
   group: SM
   era: '2016'
-  split: 1
+  split: 3
 
 ##### VV(V) 
 ZZTo2L2Q:
@@ -282,14 +282,14 @@ ZZTo2L2Q:
   cross-section: 5.52 
   group: VVV 
   era: '2016'
-  split: 10
+  split: 60
 ZZTo4L:
   db: das:/ZZTo4L_13TeV_powheg_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 1.256 
   group: VVV
   era: '2016'
-  split: 40
+  split: 200
 WWTo2L2Nu:
   db: das:/WWTo2L2Nu_13TeV-powheg/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
@@ -310,21 +310,21 @@ WZTo3LNu:
   cross-section: 4.43
   group: VVV
   era: '2016'
-  split: 5
+  split: 10
 WZTo2L2Q:
   db: das:/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 5.60
   group: VVV
   era: '2016'
-  split: 10
+  split: 30
 WWToLNuQQ:
   db: ["das:/WWToLNuQQ_13TeV-powheg/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/WWToLNuQQ_13TeV-powheg/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 50.45 
   group: VVV
   era: '2016'
-  split: 5
+  split: 10
 WZG:
   db: das:/WZG_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
@@ -338,7 +338,7 @@ ZGTo2LG:
   cross-section: 123.9
   group: VVV
   era: '2016'
-  split: 5
+  split: 20
 WWW:
   db: das:/WWW_4F_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
@@ -375,91 +375,91 @@ WJetsToLNu:
   cross-section: 61526.7 
   group: Wjets
   era: '2016'
-  split: 20
+  split: 60
 W1JetsToLNu:
   db: das:/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 9442.49
   group: Wjets
   era: '2016'
-  split: 20
+  split: 30
 W2JetsToLNu:
   db: ["das:/W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 3252.49
   group: Wjets
   era: '2016'
-  split: 20
+  split: 30
 W3JetsToLNu:
   db: ["das:/W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 1153.42
   group: Wjets
   era: '2016'
-  split: 20
+  split: 30
 W4JetsToLNu:
   db: ["das:/W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext2-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 634.05
   group: Wjets
   era: '2016'
-  split: 20
+  split: 30
 WJetsToLNu_HT-70To100:
   db: das:/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 1504.92
   group: Wjets
   era: '2016'
-  split: 10
+  split: 20
 WJetsToLNu_HT-100To200:
   db: ["das:/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 1625.08
   group: Wjets
   era: '2016'
-  split: 10
+  split: 20
 WJetsToLNu_HT-200To400:
   db: ["das:/WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM","das:/WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext2-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 477.96
   group: Wjets
   era: '2016'
-  split: 10
+  split: 20
 WJetsToLNu_HT-400To600:
   db: ["das:/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 67.441
   group: Wjets
   era: '2016'
-  split: 10
+  split: 20
 WJetsToLNu_HT-600To800:
   db: ["das:/WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 15.096
   group: Wjets
   era: '2016'
-  split: 10
+  split: 20
 WJetsToLNu_HT-800To1200:
   db: ["das:/WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 6.3626
   group: Wjets
   era: '2016'
-  split: 5
+  split: 20
 WJetsToLNu_HT-1200To2500:
   db: ["das:/WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 1.2658
   group: Wjets
   era: '2016'
-  split: 10
+  split: 20
 WJetsToLNu_HT-2500ToInf:
   db: ["das:/WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 0.009405
   group: Wjets
   era: '2016'
-  split: 10
+  split: 20
 
 ##### TTVX
 TTZToLLNuNu_M-10:
@@ -468,7 +468,7 @@ TTZToLLNuNu_M-10:
   cross-section: 0.2814
   group: ttVX
   era: '2016'
-  split: 10
+  split: 30
 TTZToLL_M-1to10:
   db: das:/TTZToLL_M-1to10_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv7-Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
@@ -482,14 +482,14 @@ TTZToQQ:
   cross-section: 0.5868
   group: ttVX
   era: '2016'
-  split: 5
+  split: 20
 TTWJetsToLNu:
   db: das:/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext2-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 0.1960
   group: ttVX
   era: '2016'
-  split: 10
+  split: 20
 TTWJetsToQQ:
   db: das:/TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
@@ -526,28 +526,28 @@ WGToLNuG:
   cross-section: 191.6
   group: Rares 
   era: '2016'
-  split: 3
+  split: 30
 TGJets:
   db: das:/TGJets_leptonDecays_13TeV_amcatnlo_madspin_pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'
   cross-section: 1.018
   group: Rares 
   era: '2016'
-  split: 5
+  split: 10
 TTGJets:
   db: ["das:/TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM","das:/TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 4.215
   group: Rares 
   era: '2016'
-  split: 10
+  split: 20
 tZq_ll:
   db: ["das:/tZq_ll_4f_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM","das:/tZq_ll_4f_PSweights_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM"]
   generated-events: 'genEventSumw'
   cross-section: 0.07358
   group: Rares 
   era: '2016'
-  split: 40
+  split: 80
 WpWpJJ:
   db: das:/WpWpJJ_EWK-QCD_TuneCUETP8M1_13TeV-madgraph-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM
   generated-events: 'genEventSumw'

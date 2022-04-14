@@ -1,0 +1,36 @@
+#  https://gitlab.cern.ch/hh/naming-conventions#systematic-uncertainties
+
+#################################
+#             Lumi              # 
+#################################
+lumi_13TeV_2016:
+  - era: 2016
+    val: 1.010
+    group: ['\DY','\Fakes']
+lumi_13TeV_2017:
+  - era: 2017
+    val: 1.020
+    group: ['\DY','\Fakes']
+lumi_13TeV_2018:
+  - era: 2018
+    val: 1.015
+    group: ['\DY','\Fakes']
+
+lumi_13TeV_correlated:
+  - era: 2016
+    val: 1.006
+    group: ['\DY','\Fakes']
+  - era: 2017
+    val: 1.009
+    group: ['\DY','\Fakes']
+  - era: 2018
+    val: 1.020
+    group: ['\DY','\Fakes']
+
+lumi_13TeV_1718:
+  - era: 2017
+    val: 1.006
+    group: ['\DY','\Fakes']
+  - era: 2018
+    val: 1.002
+    group: ['\DY','\Fakes']

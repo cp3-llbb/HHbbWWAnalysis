@@ -1,0 +1,1227 @@
+outputDir: ../Scans/Resonant_noInterpolation_syst_comparison_FR2
+
+combine: 
+   limits_DL: limits
+   limits_SL: limits
+   limits_combined: limits
+   gof: gof
+   pulls: pulls_impacts
+   impacts: pulls_impacts
+   prefit: prefit
+   postfit_b: postfit_b
+
+canvas:  &canvas
+    SetWindowSize: [600,600]
+    SetLeftMargin: 0.15
+    SetRightMargin: 0.05
+    SetTopMargin: 0.06
+    SetBottomMargin: 0.15
+    SetLogy: True
+    #SetGridx: True 
+    #SetGridy: True
+    SetTickx: True
+    SetTicky: True
+
+limit_header: &limit_header
+    - text: 'CMS'
+      options: 
+          SetNDC: True
+          SetX: 0.18
+          SetY: 0.86
+          SetTextFont: 62
+          SetTextSize: 0.07
+    - text: 'Preliminary'
+      options: 
+          SetNDC: True
+          SetX: 0.18
+          SetY: 0.81
+          SetTextFont: 62
+          SetTextSize: 0.05
+    - text: '138 fb^{-1} (13 TeV)'
+      options: 
+          SetNDC: True
+          SetX: 0.72
+          SetY: 0.95
+          SetTextFont: 42
+          SetTextSize: 0.04
+
+
+plots:
+  # SINGLE LIMIT PLOTS #
+  - name: limit_spin0_DL_FR2
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-0} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.01,100]
+        legend: 
+            SetX1: 0.60
+            SetX2: 0.93
+            SetY1: 0.65
+            SetY2: 0.91
+            SetTextFont: 62
+            SetTextSize: 0.03
+            SetBorderSize: 0
+        texts: *limit_header
+        additional: 
+            - name: 'Theory (Radion)'
+              type: TGraph
+              options:
+                  SetLineStyle: 1   
+                  SetLineColor: 601
+                  SetLineWidth: 3
+              data: 
+                  - [200,1.84328840910824]
+                  - [260,1.03747926851447]
+                  - [300,0.72522822653439]
+                  - [400,0.33944710047512]
+                  - [500,0.19742323944547]
+                  - [600,0.12490041679203]
+                  - [700,0.08098381862967]
+                  - [750,0.06607634952868]
+                  - [800,0.05469429541780]
+                  - [900,0.03767157732275]
+    curves: 
+      "2D Full Run 2":  ["2D FR2 spin 0","limits_DL","combination"]
+  - name: limit_spin2_DL_FR2
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-2} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.001,100]
+        legend: 
+            SetX1: 0.60
+            SetX2: 0.93
+            SetY1: 0.65
+            SetY2: 0.91
+            SetTextFont: 62
+            SetTextSize: 0.03
+            SetBorderSize: 0
+        texts: *limit_header
+        additional: 
+            - name: 'Theory (Graviton)'
+              type: TGraph
+              options:
+                  SetLineStyle: 1   
+                  SetLineColor: 601
+                  SetLineWidth: 3
+              data: 
+                  - [200,1.14827802534612]
+                  - [260,0.34246888475235] 
+                  - [300,0.17929253378211]
+                  - [400,0.04865072686334]
+                  - [500,0.01762707495048]
+                  - [600,0.00740337147920]
+                  - [700,0.00352541499009]
+                  - [750,0.00250808095009]
+                  - [800,0.00183321579485]
+                  - [900,0.00098711619722] 
+    curves: 
+      "2D Full Run 2":  ["2D FR2 spin 2","limits_DL","combination"]
+  - name: limit_spin0_SL_FR2
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-0} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.01,100]
+        legend: 
+            SetX1: 0.60
+            SetX2: 0.93
+            SetY1: 0.65
+            SetY2: 0.91
+            SetTextFont: 62
+            SetTextSize: 0.03
+            SetBorderSize: 0
+        texts: *limit_header
+        additional: 
+            - name: 'Theory (Radion)'
+              type: TGraph
+              options:
+                  SetLineStyle: 1   
+                  SetLineColor: 601
+                  SetLineWidth: 3
+              data: 
+                  - [200,3.3383836879991] 
+                  - [260,1.8789809828629]
+                  - [300,1.3134624346226]
+                  - [400,0.6147733895386]
+                  - [500,0.3575536627583]
+                  - [600,0.2262074192961]
+                  - [700,0.1466699718661]
+                  - [750,0.1196710218211]
+                  - [800,0.0990569586111]
+                  - [900,0.0682270764651]
+    curves: 
+      "SL_spin0":       ["2D FR2 spin 0","limits_SL","combination"]
+  - name: limit_spin2_SL_FR2
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-2} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.001,100]
+        legend: 
+            SetX1: 0.60
+            SetX2: 0.93
+            SetY1: 0.65
+            SetY2: 0.91
+            SetTextFont: 62
+            SetTextSize: 0.03
+            SetBorderSize: 0
+        texts: *limit_header
+        additional: 
+            - name: 'Theory (Graviton)'
+              type: TGraph
+              options:
+                  SetLineStyle: 1   
+                  SetLineColor: 601
+                  SetLineWidth: 3
+              data: 
+                  - [200,2.0796488548] 
+                  - [260,0.6202461496]
+                  - [300,0.3247171018]
+                  - [400,0.0881114383]
+                  - [500,0.0319244341]
+                  - [600,0.0134082623]
+                  - [700,0.0063848868]
+                  - [750,0.0045423909]
+                  - [800,0.0033201411]
+                  - [900,0.0017877683]
+    curves: 
+      "SL_spin2":       ["2D FR2 spin 2","limits_SL","combination"]
+  - name: limit_spin0_comb_FR2
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-0} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.01,100]
+        legend: 
+            SetX1: 0.60
+            SetX2: 0.93
+            SetY1: 0.65
+            SetY2: 0.91
+            SetTextFont: 62
+            SetTextSize: 0.03
+            SetBorderSize: 0
+        texts: *limit_header
+        additional: 
+            - name: 'Theory (Radion)'
+              type: TGraph
+              options:
+                  SetLineStyle: 1   
+                  SetLineColor: 601
+                  SetLineWidth: 3
+              data: 
+                  - [200,3.8447426123] 
+                  - [260,2.1639808145]
+                  - [300,1.5126856179]
+                  - [400,0.7080209072]
+                  - [500,0.4117866404]
+                  - [600,0.2605180786]
+                  - [700,0.1689165606]
+                  - [750,0.1378224674]
+                  - [800,0.1140817070]
+                  - [900,0.0785756140]
+    curves: 
+      "comb_spin0":       ["2D FR2 spin 0","limits_combined","combination"]
+  - name: limit_spin2_comb_FR2
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-2} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.001,100]
+        legend: 
+            SetX1: 0.60
+            SetX2: 0.93
+            SetY1: 0.65
+            SetY2: 0.91
+            SetTextFont: 62
+            SetTextSize: 0.03
+            SetBorderSize: 0
+        texts: *limit_header
+        additional: 
+            - name: 'Theory (Graviton)'
+              type: TGraph
+              options:
+                  SetLineStyle: 1   
+                  SetLineColor: 601
+                  SetLineWidth: 3
+              data: 
+                  - [200,2.395085561765] 
+                  - [260,0.714323764035]
+                  - [300,0.373969499994]
+                  - [400,0.101475993537]
+                  - [500,0.036766664325]
+                  - [600,0.015441999016]
+                  - [700,0.007353332865]
+                  - [750,0.005231371095]
+                  - [800,0.003823733089]
+                  - [900,0.002058933202]
+    curves: 
+      "comb_spin2":       ["2D FR2 spin 2","limits_combined","combination"]
+
+  # MULTI LIMITS PLOTS #
+  - name: limits_spin0_DL
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.0
+            GetYaxis.SetTitle: '#sigma(X_{spin-0} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.03,40]
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.55
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.022
+            SetBorderSize: 0
+    curves: 
+      "1D 2016":        ["1D FR2 spin 0","limits_DL","combination_2016"]
+      "1D 2017":        ["1D FR2 spin 0","limits_DL","combination_2017"]
+      "1D 2018":        ["1D FR2 spin 0","limits_DL","combination_2018"]
+      "1D Full Run 2":  ["1D FR2 spin 0","limits_DL","combination"]
+      "2D 2016":        ["2D FR2 spin 0","limits_DL","combination_2016"]
+      "2D 2017":        ["2D FR2 spin 0","limits_DL","combination_2017"]
+      "2D 2018":        ["2D FR2 spin 0","limits_DL","combination_2018"]
+      "2D Full Run 2":  ["2D FR2 spin 0","limits_DL","combination"]
+    legend:
+      "1D 2016":        "DL 2016 (MVA binning)"
+      "1D 2017":        "DL 2017 (MVA binning)"
+      "1D 2018":        "DL 2018 (MVA binning)"
+      "1D Full Run 2":  "DL Full Run 2 (MVA binning)"
+      "2D 2016":        "DL 2016 (MVA vs HME binning)"
+      "2D 2017":        "DL 2017 (MVA vs HME binning)"
+      "2D 2018":        "DL 2018 (MVA vs HME binning)"
+      "2D Full Run 2":  "DL Full Run 2 (MVA vs HME binning)"
+    lines:
+      "1D 2016":        {'SetLineStyle': 1,'SetLineColor': '#D81B60'} 
+      "1D 2017":        {'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "1D 2018":        {'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+      "1D Full Run 2":  {'SetLineStyle': 1,'SetLineColor': '#004D40'}
+      "2D 2016":        {'SetLineStyle': 2,'SetLineColor': '#D81B60'}
+      "2D 2017":        {'SetLineStyle': 2,'SetLineColor': '#1E88E5'}
+      "2D 2018":        {'SetLineStyle': 2,'SetLineColor': '#FFC107'}
+      "2D Full Run 2":  {'SetLineStyle': 2,'SetLineColor': '#004D40'}
+
+  - name: limits_spin2_DL
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-2} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.03,40]
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.55
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.022
+            SetBorderSize: 0
+    curves: 
+      "1D 2016":        ["1D FR2 spin 2","limits_DL","combination_2016"]
+      "1D 2017":        ["1D FR2 spin 2","limits_DL","combination_2017"]
+      "1D 2018":        ["1D FR2 spin 2","limits_DL","combination_2018"]
+      "1D Full Run 2":  ["1D FR2 spin 2","limits_DL","combination"]
+      "2D 2016":        ["2D FR2 spin 2","limits_DL","combination_2016"]
+      "2D 2017":        ["2D FR2 spin 2","limits_DL","combination_2017"]
+      "2D 2018":        ["2D FR2 spin 2","limits_DL","combination_2018"]
+      "2D Full Run 2":  ["2D FR2 spin 2","limits_DL","combination"]
+    legend:
+      "1D 2016":        "DL 2016 (MVA binning)"
+      "1D 2017":        "DL 2017 (MVA binning)"
+      "1D 2018":        "DL 2018 (MVA binning)"
+      "1D Full Run 2":  "DL Full Run 2 (MVA binning)"
+      "2D 2016":        "DL 2016 (MVA vs HME binning)"
+      "2D 2017":        "DL 2017 (MVA vs HME binning)"
+      "2D 2018":        "DL 2018 (MVA vs HME binning)"
+      "2D Full Run 2":  "DL Full Run 2 (MVA vs HME binning)"
+    lines:
+      "1D 2016":        {'SetLineStyle': 1,'SetLineColor': '#D81B60'} 
+      "1D 2017":        {'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "1D 2018":        {'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+      "1D Full Run 2":  {'SetLineStyle': 1,'SetLineColor': '#004D40'}
+      "2D 2016":        {'SetLineStyle': 2,'SetLineColor': '#D81B60'}
+      "2D 2017":        {'SetLineStyle': 2,'SetLineColor': '#1E88E5'}
+      "2D 2018":        {'SetLineStyle': 2,'SetLineColor': '#FFC107'}
+      "2D Full Run 2":  {'SetLineStyle': 2,'SetLineColor': '#004D40'}
+  - name: limits_spin0_SL
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-0} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.03,40]
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.55
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.022
+            SetBorderSize: 0
+    curves: 
+      "1D 2016":        ["1D FR2 spin 0","limits_SL","combination_2016"]
+      "1D 2017":        ["1D FR2 spin 0","limits_SL","combination_2017"]
+      "1D 2018":        ["1D FR2 spin 0","limits_SL","combination_2018"]
+      "1D Full Run 2":  ["1D FR2 spin 0","limits_SL","combination"]
+    legend:
+      "1D 2016":        "SL 2016"
+      "1D 2017":        "SL 2017"
+      "1D 2018":        "SL 2018"
+      "1D Full Run 2":  "SL Full Run 2"
+    lines:
+      "1D 2016":        {'SetLineStyle': 1,'SetLineColor': '#D81B60'} 
+      "1D 2017":        {'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "1D 2018":        {'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+      "1D Full Run 2":  {'SetLineStyle': 1,'SetLineColor': '#004D40'}
+
+  - name: limits_spin2_SL
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-2} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.03,40]
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.55
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.022
+            SetBorderSize: 0
+    curves: 
+      "1D 2016":        ["1D FR2 spin 2","limits_SL","combination_2016"]
+      "1D 2017":        ["1D FR2 spin 2","limits_SL","combination_2017"]
+      "1D 2018":        ["1D FR2 spin 2","limits_SL","combination_2018"]
+      "1D Full Run 2":  ["1D FR2 spin 2","limits_SL","combination"]
+    legend:
+      "1D 2016":        "SL 2016"
+      "1D 2017":        "SL 2017"
+      "1D 2018":        "SL 2018"
+      "1D Full Run 2":  "SL Full Run 2"
+    lines:
+      "1D 2016":        {'SetLineStyle': 1,'SetLineColor': '#D81B60'} 
+      "1D 2017":        {'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "1D 2018":        {'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+      "1D Full Run 2":  {'SetLineStyle': 1,'SetLineColor': '#004D40'}
+
+  - name: limits_spin2_comb
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-2} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.02,40]
+        texts: *limit_header
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.50
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.03
+            SetBorderSize: 0
+    curves: 
+      "DL_spin2_2016":       ["2D FR2 spin 2","limits_DL","combination_2016"]
+      "DL_spin2_2017":       ["2D FR2 spin 2","limits_DL","combination_2017"]
+      "DL_spin2_2018":       ["2D FR2 spin 2","limits_DL","combination_2018"]
+      "DL_spin2_FR2":        ["2D FR2 spin 2","limits_DL","combination"]
+      "SL_spin2_2016":       ["2D FR2 spin 2","limits_SL","combination_2016"]
+      "SL_spin2_2017":       ["2D FR2 spin 2","limits_SL","combination_2017"]
+      "SL_spin2_2018":       ["2D FR2 spin 2","limits_SL","combination_2018"]
+      "SL_spin2_FR2":        ["2D FR2 spin 2","limits_SL","combination"]
+      "comb_spin2_2016":     ["2D FR2 spin 2","limits_combined","combination_2016"]
+      "comb_spin2_2017":     ["2D FR2 spin 2","limits_combined","combination_2017"]
+      "comb_spin2_2018":     ["2D FR2 spin 2","limits_combined","combination_2018"]
+      "comb_spin2_FR2":      ["2D FR2 spin 2","limits_combined","combination"]
+    legend:
+      "DL_spin2_2016":       "DL 2016"
+      "DL_spin2_2017":       "DL 2017"
+      "DL_spin2_2018":       "DL 2018"
+      "DL_spin2_FR2":        "DL FR2"
+      "SL_spin2_2016":       "SL 2016"
+      "SL_spin2_2017":       "SL 2017"
+      "SL_spin2_2018":       "SL 2018"
+      "SL_spin2_FR2":        "SL FR2"
+      "comb_spin2_2016":     "SL+DL 2016"
+      "comb_spin2_2017":     "SL+DL 2017"
+      "comb_spin2_2018":     "SL+DL 2018"
+      "comb_spin2_FR2":      "SL+DL FR2"
+    lines:
+      "DL_spin2_2016":      {'SetLineWidth': 2,'SetLineStyle': 2,'SetLineColor': '#D81B60'} 
+      "DL_spin2_2017":      {'SetLineWidth': 2,'SetLineStyle': 2,'SetLineColor': '#1E88E5'}
+      "DL_spin2_2018":      {'SetLineWidth': 2,'SetLineStyle': 2,'SetLineColor': '#FFC107'}
+      "DL_spin2_FR2":       {'SetLineWidth': 2,'SetLineStyle': 2,'SetLineColor': '#004D40'}
+      "SL_spin2_2016":      {'SetLineWidth': 2,'SetLineStyle': 9,'SetLineColor': '#D81B60'} 
+      "SL_spin2_2017":      {'SetLineWidth': 2,'SetLineStyle': 9,'SetLineColor': '#1E88E5'}
+      "SL_spin2_2018":      {'SetLineWidth': 2,'SetLineStyle': 9,'SetLineColor': '#FFC107'}
+      "SL_spin2_FR2":       {'SetLineWidth': 2,'SetLineStyle': 9,'SetLineColor': '#004D40'}
+      "comb_spin2_2016":    {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#D81B60'} 
+      "comb_spin2_2017":    {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "comb_spin2_2018":    {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+      "comb_spin2_FR2":     {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#004D40'}
+  - name: limits_spin2_2016
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-2} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.02,40]
+        texts: *limit_header
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.50
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.03
+            SetBorderSize: 0
+    curves: 
+      "DL_spin2_2016":       ["2D FR2 spin 2","limits_DL","combination_2016"]
+      "SL_spin2_2016":       ["2D FR2 spin 2","limits_SL","combination_2016"]
+      "comb_spin2_2016":     ["2D FR2 spin 2","limits_combined","combination_2016"]
+    legend:
+      "DL_spin2_2016":       "DL 2016"
+      "SL_spin2_2016":       "SL 2016"
+      "comb_spin2_2016":     "SL+DL 2016"
+    lines:
+      "DL_spin2_2016":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#D81B60'}
+      "SL_spin2_2016":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "comb_spin2_2016":    {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+  - name: limits_spin2_2017
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-2} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.02,40]
+        texts: *limit_header
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.50
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.03
+            SetBorderSize: 0
+    curves: 
+      "DL_spin2_2017":       ["2D FR2 spin 2","limits_DL","combination_2017"]
+      "SL_spin2_2017":       ["2D FR2 spin 2","limits_SL","combination_2017"]
+      "comb_spin2_2017":     ["2D FR2 spin 2","limits_combined","combination_2017"]
+    legend:
+      "DL_spin2_2017":       "DL 2017"
+      "SL_spin2_2017":       "SL 2017"
+      "comb_spin2_2017":     "SL+DL 2017"
+    lines:
+      "DL_spin2_2017":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#D81B60'}
+      "SL_spin2_2017":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "comb_spin2_2017":    {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+
+  - name: limits_spin2_2018
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-2} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.02,40]
+        texts: *limit_header
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.50
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.03
+            SetBorderSize: 0
+    curves: 
+      "DL_spin2_2018":       ["2D FR2 spin 2","limits_DL","combination_2018"]
+      "SL_spin2_2018":       ["2D FR2 spin 2","limits_SL","combination_2018"]
+      "comb_spin2_2018":     ["2D FR2 spin 2","limits_combined","combination_2018"]
+    legend:
+      "DL_spin2_2018":       "DL 2018"
+      "SL_spin2_2018":       "SL 2018"
+      "comb_spin2_2018":     "SL+DL 2018"
+    lines:
+      "DL_spin2_2018":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#D81B60'}
+      "SL_spin2_2018":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "comb_spin2_2018":    {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+
+  - name: limits_spin2_FR2
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-2} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.02,40]
+        texts: *limit_header
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.50
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.03
+            SetBorderSize: 0
+    curves: 
+      "DL_spin2_FR2":       ["2D FR2 spin 2","limits_DL","combination"]
+      "SL_spin2_FR2":       ["2D FR2 spin 2","limits_SL","combination"]
+      "comb_spin2_FR2":     ["2D FR2 spin 2","limits_combined","combination"]
+    legend:
+      "DL_spin2_FR2":       "DL FR2"
+      "SL_spin2_FR2":       "SL FR2"
+      "comb_spin2_FR2":     "SL+DL FR2"
+    lines:
+      "DL_spin2_FR2":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#D81B60'}
+      "SL_spin2_FR2":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "comb_spin2_FR2":    {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+  - name: limits_spin0_comb
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-0} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.02,40]
+        texts: *limit_header
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.50
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.03
+            SetBorderSize: 0
+    curves: 
+      "DL_spin0_2016":       ["2D FR2 spin 0","limits_DL","combination_2016"]
+      "DL_spin0_2017":       ["2D FR2 spin 0","limits_DL","combination_2017"]
+      "DL_spin0_2018":       ["2D FR2 spin 0","limits_DL","combination_2018"]
+      "DL_spin0_FR2":        ["2D FR2 spin 0","limits_DL","combination"]
+      "SL_spin0_2016":       ["2D FR2 spin 0","limits_SL","combination_2016"]
+      "SL_spin0_2017":       ["2D FR2 spin 0","limits_SL","combination_2017"]
+      "SL_spin0_2018":       ["2D FR2 spin 0","limits_SL","combination_2018"]
+      "SL_spin0_FR2":        ["2D FR2 spin 0","limits_SL","combination"]
+      "comb_spin0_2016":     ["2D FR2 spin 0","limits_combined","combination_2016"]
+      "comb_spin0_2017":     ["2D FR2 spin 0","limits_combined","combination_2017"]
+      "comb_spin0_2018":     ["2D FR2 spin 0","limits_combined","combination_2018"]
+      "comb_spin0_FR2":      ["2D FR2 spin 0","limits_combined","combination"]
+    legend:
+      "DL_spin0_2016":       "DL 2016"
+      "DL_spin0_2017":       "DL 2017"
+      "DL_spin0_2018":       "DL 2018"
+      "DL_spin0_FR2":        "DL FR2"
+      "SL_spin0_2016":       "SL 2016"
+      "SL_spin0_2017":       "SL 2017"
+      "SL_spin0_2018":       "SL 2018"
+      "SL_spin0_FR2":        "SL FR2"
+      "comb_spin0_2016":     "SL+DL 2016"
+      "comb_spin0_2017":     "SL+DL 2017"
+      "comb_spin0_2018":     "SL+DL 2018"
+      "comb_spin0_FR2":      "SL+DL FR2"
+    lines:
+      "DL_spin0_2016":      {'SetLineWidth': 2,'SetLineStyle': 2,'SetLineColor': '#D81B60'} 
+      "DL_spin0_2017":      {'SetLineWidth': 2,'SetLineStyle': 2,'SetLineColor': '#1E88E5'}
+      "DL_spin0_2018":      {'SetLineWidth': 2,'SetLineStyle': 2,'SetLineColor': '#FFC107'}
+      "DL_spin0_FR2":       {'SetLineWidth': 2,'SetLineStyle': 2,'SetLineColor': '#004D40'}
+      "SL_spin0_2016":      {'SetLineWidth': 2,'SetLineStyle': 9,'SetLineColor': '#D81B60'} 
+      "SL_spin0_2017":      {'SetLineWidth': 2,'SetLineStyle': 9,'SetLineColor': '#1E88E5'}
+      "SL_spin0_2018":      {'SetLineWidth': 2,'SetLineStyle': 9,'SetLineColor': '#FFC107'}
+      "SL_spin0_FR2":       {'SetLineWidth': 2,'SetLineStyle': 9,'SetLineColor': '#004D40'}
+      "comb_spin0_2016":    {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#D81B60'} 
+      "comb_spin0_2017":    {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "comb_spin0_2018":    {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+      "comb_spin0_FR2":     {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#004D40'}
+  - name: limits_spin0_2016
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-0} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.02,40]
+        texts: *limit_header
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.50
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.03
+            SetBorderSize: 0
+    curves: 
+      "DL_spin0_2016":       ["2D FR2 spin 0","limits_DL","combination_2016"]
+      "SL_spin0_2016":       ["2D FR2 spin 0","limits_SL","combination_2016"]
+      "comb_spin0_2016":     ["2D FR2 spin 0","limits_combined","combination_2016"]
+    legend:
+      "DL_spin0_2016":       "DL 2016"
+      "SL_spin0_2016":       "SL 2016"
+      "comb_spin0_2016":     "SL+DL 2016"
+    lines:
+      "DL_spin0_2016":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#D81B60'}
+      "SL_spin0_2016":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "comb_spin0_2016":    {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+  - name: limits_spin0_2017
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-0} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.02,40]
+        texts: *limit_header
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.50
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.03
+            SetBorderSize: 0
+    curves: 
+      "DL_spin0_2017":       ["2D FR2 spin 0","limits_DL","combination_2017"]
+      "SL_spin0_2017":       ["2D FR2 spin 0","limits_SL","combination_2017"]
+      "comb_spin0_2017":     ["2D FR2 spin 0","limits_combined","combination_2017"]
+    legend:
+      "DL_spin0_2017":       "DL 2017"
+      "SL_spin0_2017":       "SL 2017"
+      "comb_spin0_2017":     "SL+DL 2017"
+    lines:
+      "DL_spin0_2017":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#D81B60'}
+      "SL_spin0_2017":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "comb_spin0_2017":    {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+
+  - name: limits_spin0_2018
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-0} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.02,40]
+        texts: *limit_header
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.50
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.03
+            SetBorderSize: 0
+    curves: 
+      "DL_spin0_2018":       ["2D FR2 spin 0","limits_DL","combination_2018"]
+      "SL_spin0_2018":       ["2D FR2 spin 0","limits_SL","combination_2018"]
+      "comb_spin0_2018":     ["2D FR2 spin 0","limits_combined","combination_2018"]
+    legend:
+      "DL_spin0_2018":       "DL 2018"
+      "SL_spin0_2018":       "SL 2018"
+      "comb_spin0_2018":     "SL+DL 2018"
+    lines:
+      "DL_spin0_2018":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#D81B60'}
+      "SL_spin0_2018":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "comb_spin0_2018":    {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+
+  - name: limits_spin0_FR2
+    title: ''
+    options: 
+        canvas: *canvas
+        lines:  
+            SetLineWidth: 2
+            GetXaxis.SetTitle: 'm_{X} (GeV)'
+            GetXaxis.SetTitleFont: 42
+            GetXaxis.SetTitleSize: 0.05
+            GetXaxis.SetTitleOffset: 1.1
+            GetXaxis.SetLabelSize: 0.05
+            GetYaxis.SetTitle: '#sigma(X_{spin-0} #rightarrow HH #rightarrow b#bar{b}WW) [pb]'
+            GetYaxis.SetTitleSize: 0.05
+            GetYaxis.SetTitleFont: 42
+            GetYaxis.SetTitleOffset: 1.2
+            GetYaxis.SetLabelSize: 0.05
+            GetYaxis.SetRangeUser: [0.02,40]
+        texts: *limit_header
+        legend: 
+            SetX1: 0.50
+            SetX2: 0.88
+            SetY1: 0.50
+            SetY2: 0.9
+            SetFillColor: 0
+            SetTextFont: 42
+            SetTextSize: 0.03
+            SetBorderSize: 0
+    curves: 
+      "DL_spin0_FR2":       ["2D FR2 spin 0","limits_DL","combination"]
+      "SL_spin0_FR2":       ["2D FR2 spin 0","limits_SL","combination"]
+      "comb_spin0_FR2":     ["2D FR2 spin 0","limits_combined","combination"]
+    legend:
+      "DL_spin0_FR2":       "DL FR2"
+      "SL_spin0_FR2":       "SL FR2"
+      "comb_spin0_FR2":     "SL+DL FR2"
+    lines:
+      "DL_spin0_FR2":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#D81B60'}
+      "SL_spin0_FR2":      {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#1E88E5'}
+      "comb_spin0_FR2":    {'SetLineWidth': 2,'SetLineStyle': 1,'SetLineColor': '#FFC107'}
+curves:
+  #########################################################################
+  #                                Graviton                               #
+  #########################################################################
+    1D FR2 spin 2:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            limits_SL: 
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            limits_combined:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            prefit: []
+            postfit_b: []
+        points:
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=1D spin=spin2 mass=260 branch=LowMass
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=1D spin=spin2 mass=270 branch=LowMass
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=1D spin=spin2 mass=300 branch=LowMass
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=1D spin=spin2 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=1D spin=spin2 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=1D spin=spin2 mass=450 branch=LowMass 
+              label: 450 
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=1D spin=spin2 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=1D spin=spin2 mass=550 branch=HighMass
+              label: 550
+              custom: {mass: 550}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=1D spin=spin2 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=1D spin=spin2 mass=650 branch=HighMass 
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=1D spin=spin2 mass=700 branch=HighMass 
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=1D spin=spin2 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=1D spin=spin2 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+    2D FR2 spin 2:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            limits_SL: 
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            limits_combined:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            gof: []
+            pulls: []
+            impacts: []
+            prefit: []
+            postfit_b: []
+        points:
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=2D spin=spin2 mass=260 branch=LowMass
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=2D spin=spin2 mass=270 branch=LowMass
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=2D spin=spin2 mass=300 branch=LowMass
+              label: 300
+              custom: {mass: 300}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=2D spin=spin2 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=2D spin=spin2 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=2D spin=spin2 mass=450 branch=LowMass 
+              label: 450 
+              custom: {mass: 450}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=2D spin=spin2 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=2D spin=spin2 mass=550 branch=HighMass
+              label: 550
+              custom: {mass: 550}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=2D spin=spin2 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=2D spin=spin2 mass=650 branch=HighMass 
+              label: 650
+              custom: {mass: 650}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=2D spin=spin2 mass=700 branch=HighMass 
+              label: 700
+              custom: {mass: 700}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=2D spin=spin2 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=9000 --custom algo=new dim=2D spin=spin2 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+  
+
+    #########################################################################
+    #                                Radion                                 #
+    #########################################################################
+
+    1D FR2 spin 0:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            limits_SL: 
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            limits_combined:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            prefit: []
+            postfit_b: []
+        points:
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=1D spin=spin0 mass=260 branch=LowMass   
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=1D spin=spin0 mass=270 branch=LowMass   
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=1D spin=spin0 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=1D spin=spin0 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=1D spin=spin0 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=1D spin=spin0 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=1D spin=spin0 mass=750 branch=HighMass  
+              label: 750
+              custom: {mass: 750}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=1D spin=spin0 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=1D spin=spin0 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+
+    2D FR2 spin 0:
+        modes: 
+            limits_DL:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            limits_SL: 
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            limits_combined:
+                - combination
+                - combination_2016
+                - combination_2017
+                - combination_2018
+            prefit: []
+            postfit_b: []
+        points:
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=2D spin=spin0 mass=260 branch=LowMass   
+              label: 260
+              custom: {mass: 260}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=2D spin=spin0 mass=270 branch=LowMass   
+              label: 270
+              custom: {mass: 270}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=2D spin=spin0 mass=350 branch=LowMass
+              label: 350
+              custom: {mass: 350}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=2D spin=spin0 mass=400 branch=LowMass
+              label: 400
+              custom: {mass: 400}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=2D spin=spin0 mass=500 branch=LowMass 
+              label: 500
+              custom: {mass: 500}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=2D spin=spin0 mass=600 branch=HighMass
+              label: 600
+              custom: {mass: 600}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=2D spin=spin0 mass=750 branch=HighMass  
+              label: 750
+              custom: {mass: 750}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=2D spin=spin0 mass=800 branch=HighMass  
+              label: 800
+              custom: {mass: 800}
+            - command: python produceDataCards.py --yaml ../configs/datacard_fit_Resonant_syst_M_base_final_FR2.yml  --split --submit time=0-16:00:00  mem-per-cpu=12000 --custom algo=new dim=2D spin=spin0 mass=900 branch=HighMass  
+              label: 900
+              custom: {mass: 900}
+
+
+    ######################################################
+    #                      CUSTOM                        #
+    ######################################################
+    bbWW_2016_spin0:
+        modes: 
+            limits_combined: []
+        points: !include ../data/HIG-17-006-spin0_proc.yml
+        scale: 0.0361403 # 1 / [BR(HH->bbWW) + BR (HH->bbZZ)] / 1000 (fb->pb)
+    bbWW_2016_spin2:
+        modes: 
+            limits_combined: []
+        points: !include ../data/HIG-17-006-spin2_proc.yml
+        scale: 0.0361403  # BR(HH->bbWW) + BR (HH->bbZZ) / 1000 (fb->p)
+    B2G_DL_spin0:
+        modes: 
+            limits_DL: []
+        points: !include ../data/B2G-20-007-spin0_DL.yml
+    B2G_SL_spin0:
+        modes: 
+            limits_SL: []
+        points: !include ../data/B2G-20-007-spin0_SL.yml
+    B2G_spin0:
+        modes: 
+            limits_combined: []
+        points: !include ../data/B2G-20-007-spin0.yml
+    B2G_DL_spin2:
+        modes: 
+            limits_DL: []
+        points: !include ../data/B2G-20-007-spin2_DL.yml
+    B2G_SL_spin2:
+        modes: 
+            limits_SL: []
+        points: !include ../data/B2G-20-007-spin2_SL.yml
+    B2G_spin2:
+        modes: 
+            limits_combined: []
+        points: !include ../data/B2G-20-007-spin2.yml
+

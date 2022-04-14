@@ -1,0 +1,224 @@
+path: 
+  - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_DNN11_DYEstimation_HT_Resolved1B/
+  - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_DNN11_DYEstimation_HT_Resolved2B/
+  - /home/ucl/cp3/fbury/scratch/BambooOutputHHtobbWW/full2017NanoV7_TTHIDLoose_Fake_DNN11_DYEstimation_HT_Boosted1B/
+
+use_syst: True
+
+combineConfigs: 
+  limits:
+    mode: limits
+    command: "combine -M AsymptoticLimits -t -1 -d {}"
+    bins:
+      - HH_DL_resolved1b_GGF
+      - HH_DL_resolved2b_GGF
+      - HH_DL_boosted_GGF
+      - HH_DL_resolved1b_VBF
+      - HH_DL_resolved2b_VBF
+      - HH_DL_boosted_VBF
+      - HH_DL_resolved1b_H
+      - HH_DL_resolved2b_H
+      - HH_DL_boosted_H
+      - HH_DL_resolved_DY_VVV
+      - HH_DL_boosted_DY_VVV
+      - HH_DL_resolved_other
+      - HH_DL_boosted_other
+  prefit:
+    mode: prefit 
+    command: "combine -M FitDiagnostics {} --verbose 3 --mass 125  --redefineSignalPOIs r --setParameters r=1.0 --setParameterRanges r=-1000,1000 --saveShapes --saveWithUncertainties --saveNormalizations --saveWorkspace --saveToys --saveNLL --saveOverallShapes --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 --X-rtd MINIMIZER_no_analytic --keepFailures  --skipSBFit --skipBOnlyFit --ignoreCovWarning -n HHbbWW"
+    bins:
+      - HH_DL_resolved1b_GGF
+      - HH_DL_resolved2b_GGF
+      - HH_DL_boosted_GGF
+      - HH_DL_resolved1b_VBF
+      - HH_DL_resolved2b_VBF
+      - HH_DL_boosted_VBF
+      - HH_DL_resolved1b_H
+      - HH_DL_resolved2b_H
+      - HH_DL_boosted_H
+      - HH_DL_resolved_DY_VVV
+      - HH_DL_boosted_DY_VVV
+      - HH_DL_resolved_other
+      - HH_DL_boosted_other
+    split: True
+    plotting:
+        main: !include prefit_main.yml
+        plots: 
+          - name: GGFnode
+            header: GGF node
+            bins : [HH_DL_resolved1b_GGF,HH_DL_resolved2b_GGF,HH_DL_boosted_GGF]
+            labels: ['Resolved 1b','Resolved 2b','Boosted']
+            labelpos: [0.5, 8.5, 17]
+            unblind: False
+          - name: VBFnode
+            header: VBF node
+            bins : [HH_DL_resolved1b_VBF,HH_DL_resolved2b_VBF,HH_DL_boosted_VBF]
+            labels: ['Resolved 1b','Resolved 2b','Boosted']
+            labelpos: [0.5, 8.5, 17]
+            unblind: False
+          - name: Hnode
+            header: single H node
+            bins : [HH_DL_resolved1b_H,HH_DL_resolved2b_H,HH_DL_boosted_H]
+            labels: ['Resolved 1b','Resolved 2b','Boosted']
+            labelpos: [0.5, 8.5, 17]
+            unblind: True
+          - name: DYnode
+            header: DY + VV(V) node
+            bins : [HH_DL_resolved_DY_VVV,HH_DL_boosted_DY_VVV]
+            labels: ['Resolved','Boosted']
+            labelpos: [2, 10]
+            unblind: True
+          - name: Othernode
+            header: TT + Other BKG node
+            bins : [HH_DL_resolved_other,HH_DL_boosted_other]
+            labels: ['Resolved','Boosted']
+            labelpos: [2, 8]
+            unblind: True
+  postfit_b:
+    mode: postfit_b
+    command: "combine -M FitDiagnostics {} --verbose 3 --mass 125  --redefineSignalPOIs r --setParameters r=1.0 --setParameterRanges r=-1000,1000 --saveShapes --saveWithUncertainties --saveNormalizations --saveWorkspace --saveToys --saveNLL --saveOverallShapes --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 --X-rtd MINIMIZER_no_analytic --keepFailures  --skipSBFit --ignoreCovWarning -n HHbbWW"
+    bins:
+      - HH_DL_resolved1b_H
+      - HH_DL_resolved2b_H
+      - HH_DL_boosted_H
+      - HH_DL_resolved_DY_VVV
+      - HH_DL_boosted_DY_VVV
+      - HH_DL_resolved_other
+      - HH_DL_boosted_other
+    plotting:
+        main: !include postfit_main.yml
+        plots: 
+          - name: Hnode
+            header: single H node
+            bins : [HH_DL_resolved1b_H,HH_DL_resolved2b_H,HH_DL_boosted_H]
+            labels: ['Resolved 1b','Resolved 2b','Boosted']
+            labelpos: [0.5, 8.5, 17]
+            unblind: True
+          - name: DYnode
+            header: DY + VV(V) node
+            bins : [HH_DL_resolved_DY_VVV,HH_DL_boosted_DY_VVV]
+            labels: ['Resolved','Boosted']
+            labelpos: [2, 10]
+            unblind: True
+          - name: Othernode
+            header: TT + Other BKG node
+            bins : [HH_DL_resolved_other,HH_DL_boosted_other]
+            labels: ['Resolved','Boosted']
+            labelpos: [2, 8]
+            unblind: True
+
+  postfit_s:
+    mode: postfit_s
+    command: "combine -M FitDiagnostics {} --verbose 3 --mass 125  --redefineSignalPOIs r --setParameters r=1.0 --setParameterRanges r=-1000,1000 --saveShapes --saveWithUncertainties --saveNormalizations --saveWorkspace --saveToys --saveNLL --saveOverallShapes --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 --X-rtd MINIMIZER_no_analytic --keepFailures  --skipBOnlyFit --ignoreCovWarning -n HHbbWW"
+    bins:
+      - HH_DL_resolved1b_GGF
+      - HH_DL_resolved2b_GGF
+      - HH_DL_boosted_GGF
+      - HH_DL_resolved1b_VBF
+      - HH_DL_resolved2b_VBF
+      - HH_DL_boosted_VBF
+      - HH_DL_resolved1b_H
+      - HH_DL_resolved2b_H
+      - HH_DL_boosted_H
+      - HH_DL_resolved_DY_VVV
+      - HH_DL_boosted_DY_VVV
+      - HH_DL_resolved_other
+      - HH_DL_boosted_other
+    plotting:
+        main: !include postfit_main.yml
+        plots: 
+          - name: GGFnode
+            header: GGF node
+            bins : [HH_DL_resolved1b_GGF,HH_DL_resolved2b_GGF,HH_DL_boosted_GGF]
+            labels: ['Resolved 1b','Resolved 2b','Boosted']
+            labelpos: [0.5, 8.5, 17]
+            unblind: False
+          - name: VBFnode
+            header: VBF node
+            bins : [HH_DL_resolved1b_VBF,HH_DL_resolved2b_VBF,HH_DL_boosted_VBF]
+            labels: ['Resolved 1b','Resolved 2b','Boosted']
+            labelpos: [0.5, 8.5, 17]
+            unblind: False
+          - name: Hnode
+            header: single H node
+            bins : [HH_DL_resolved1b_H,HH_DL_resolved2b_H,HH_DL_boosted_H]
+            labels: ['Resolved 1b','Resolved 2b','Boosted']
+            labelpos: [0.5, 8.5, 17]
+            unblind: True
+          - name: DYnode
+            header: DY + VV(V) node
+            bins : [HH_DL_resolved_DY_VVV,HH_DL_boosted_DY_VVV]
+            labels: ['Resolved','Boosted']
+            labelpos: [2, 10]
+            unblind: True
+          - name: Othernode
+            header: TT + Other BKG node
+            bins : [HH_DL_resolved_other,HH_DL_boosted_other]
+            labels: ['Resolved','Boosted']
+            labelpos: [2, 8]
+            unblind: True
+
+
+
+
+yamlName: plots_DYEstimation_FakeExtrapolation.yml
+
+produce_plots: True
+
+era: 2017
+
+legend:
+  position:
+  - 0.8
+  - 0.6
+  - 0.99
+  - 0.99
+
+shapeSyst : !include shape_DL_systematics.yml
+normSyst  : !include norm_datadriven_systematics.yml
+
+rebin: !include rebin_DL_nonresonant.yml
+
+DYnonclosure:
+  path : config/fit_results.json
+  hist:
+    HH_DL_resolved_DY_VVV : 
+      entry: HH_DL_resolved_DY_VVV_2017
+      name: dy_resolved_nonclosure_dy_vvv
+    HH_DL_boosted_DY_VVV : 
+      entry: HH_DL_boosted_DY_VVV
+      name: dy_boosted_nonclosure_dy_vvv
+    HH_DL_inclusive_other: 
+      entry: HH_DL_inclusive_other_2017
+      name: dy_nonclosure_other
+  group: DY
+
+histConverter: !include cat_DL_nonresonant.yml
+
+  
+groups: 
+  - !include groups_DL_bkg_2017.yml
+  - !include groups_DY_datadriven_2017.yml
+  - !include groups_data_2017.yml
+  - !include groups_Fakes_2017.yml
+  #- !include groups_DL_BM_qqHH.yml
+  - ggHH_BM_SM_hbbhww:
+      type: signal
+      legend: HH#rightarrowbb2l2#nu
+      order: 14
+      line-color: '#288a24'
+      line-type: 1
+      files:
+        - GluGluToHHTo2B2VTo2L2Nu_node_cHHH1.root
+  
+    ggHH_BM_SM_hbbhtt:
+      type: signal
+      legend: HH#rightarrowbb#tau#tau
+      order: 14
+      line-color: '#288a24'
+      line-type: 1
+      files:
+        - GluGluToHHTo2B2Tau_node_cHHH1.root
+
+
+

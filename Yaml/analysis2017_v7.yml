@@ -1,8 +1,8 @@
 tree: Events
 eras: 
   '2017':
-    luminosity: 41529.152060112
-    luminosity-error: 0.023
+    luminosity: 41530
+    luminosity-error: 0.025
 dbcache: ../dascache2017
 samples:
     # BACKGROUNDS #
@@ -49,6 +49,9 @@ samples:
     # TTToHadronic (For SL fake non closure) #
   - config: analysis2017_v7_TTHadronic.yml
     keys: tt
+    # Theory #
+  - config: analysis2017_v7_theory.yml
+    keys: theory
 
   
 datadriven: !include datadriven.yml

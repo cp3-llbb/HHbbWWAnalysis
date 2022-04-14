@@ -172,8 +172,8 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     self.yields.add(ElSelObjResolved2b.sel)
                     self.yields.add(MuSelObjResolved2b.sel)
 
-                addPrintout(ElSelObjResolved2b.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
-                addPrintout(MuSelObjResolved2b.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
+                #addPrintout(ElSelObjResolved2b.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
+                #addPrintout(MuSelObjResolved2b.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
                 
                 if not self.args.OnlyYield:
                     ChannelDictListR.append({'channel':'El','selObj':ElSelObjResolved2b,'sel':ElSelObjResolved2b.sel,
@@ -211,8 +211,8 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                     self.yields.add(ElSelObjResolved1b.sel)
                     self.yields.add(MuSelObjResolved1b.sel)
 
-                addPrintout(ElSelObjResolved1b.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
-                addPrintout(MuSelObjResolved1b.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
+                #addPrintout(ElSelObjResolved1b.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
+                #addPrintout(MuSelObjResolved1b.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
                 
                 if not self.args.OnlyYield:
                     ChannelDictListR.append({'channel':'El','selObj':ElSelObjResolved1b,'sel':ElSelObjResolved1b.sel,
@@ -262,8 +262,8 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 self.yields.add(ElSelObjBoosted.sel)
                 self.yields.add(MuSelObjBoosted.sel)
 
-            addPrintout(ElSelObjBoosted.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
-            addPrintout(MuSelObjBoosted.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
+            #addPrintout(ElSelObjBoosted.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
+            #addPrintout(MuSelObjBoosted.sel, "bamboo_printEntry", op.extVar("ULong_t", "rdfentry_"), t.event)
 
             if not self.args.OnlyYield:
                 ChannelDictListB.append({'channel':'El','selObj':ElSelObjBoosted, 'sel':ElSelObjBoosted.sel,
@@ -292,27 +292,6 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
                 #plots.extend(makeMETPlots(**{k:channelDict[k] for k in commonItems}, met=self.corrMET))
                 # HighLevel #
                 ##plots.extend(makeHighLevelPlotsBoosted(**{k:channelDict[k] for k in BoostedKeys}, HLL=self.HLL))
-                
-
-                inputsCommon  = returnCommonInputs_Boosted(self)
-                inputsClassic = returnClassicInputs_Boosted(self, **{k:channelDict[k] for k in ClassicInputKeys})
-                inputsLBN     = returnLBNInputs_Boosted(self, **{k:channelDict[k] for k in LBNInputKeys})
-                input_names   = [key[0] for key in inputsClassic.keys()] + ['LBN_inputs','eventnr']
-                inputs_array  = [op.array("double",val) for val in inputStaticCast(inputsCommon,"float")]
-                inputs_array.append(op.array("double",*inputStaticCast(inputsClassic,"float")))
-                inputs_array.append(op.array("double",*inputStaticCast(inputsLBN,"float")))
-                inputs_array.append(op.array("long",*inputStaticCast(inputsEventNr,"long")))
-                
-                DNN_SM  = op.mvaEvaluator (path_model_boosted_SM, mvaType='Tensorflow',otherArgs=(input_names, output_name))
-                DNN_BSM = op.mvaEvaluator(path_model_boosted_BSM, mvaType='Tensorflow',otherArgs=(input_names, output_name))
-                DNN_Score_SM  = DNN_SM (*inputs_array)
-                DNN_Score_BSM = DNN_BSM (*inputs_array)
-                
-                selObjNodesDict_SM     = makeDNNOutputNodesSelections(self,channelDict['selObj'],DNN_Score_SM,suffix='_SM_')
-                selObjNodesDict_BSM    = makeDNNOutputNodesSelections(self,channelDict['selObj'],DNN_Score_BSM,suffix='_BSM_')
-                logger.info('Filling DNN responses Boosted')
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_SM,DNN_Score_SM,self.nodes,channel=selObjectDNNDict['channel']))
-                plots.extend(makeDoubleLeptonMachineLearningOutputPlots(selObjNodesDict_BSM,DNN_Score_BSM,self.nodes,channel=selObjectDNNDict['channel']))
             '''
 
         # ML
@@ -344,16 +323,6 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             print ("Param variables  : %d"%len(inputsParam)) 
             print ("Event variables  : %d"%len(inputsEventNr))
             
-            '''
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsLeps))
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets)) 
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsMET)) 
-            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL)) 
-            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam)) 
-            plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsEventNr))
-            '''
-
             from  mvaEvaluatorSL_nonres import inputStaticCast
 
             inputs = [op.array("double",*inputStaticCast(inputsLeps,"float")),

@@ -1,0 +1,56 @@
+param1 : {param1}
+param2 : {param2}
+paramInt: {paramInt}
+
+matchingHist:
+  # Signals #
+  HH_DL_{paramInt}_resolved1b_GGF:
+    {param1} :  HH_DL_{param1}_resolved1b_GGF
+    {param2} :  HH_DL_{param2}_resolved1b_GGF
+  HH_DL_{paramInt}_resolved2b_GGF:
+    {param1} :  HH_DL_{param1}_resolved2b_GGF
+    {param2} :  HH_DL_{param2}_resolved2b_GGF
+  HH_DL_{paramInt}_boosted_GGF:
+    {param1} :  HH_DL_{param1}_boosted_GGF
+    {param2} :  HH_DL_{param2}_boosted_GGF
+  
+  # Background s #
+  HH_DL_{paramInt}_inclusive_DY_VVV:
+    {param1} :  HH_DL_{param1}_inclusive_DY_VVV
+    {param2} :  HH_DL_{param2}_inclusive_DY_VVV
+  HH_DL_{paramInt}_resolved_other:
+    {param1} :  HH_DL_{param1}_resolved_other 
+    {param2} :  HH_DL_{param2}_resolved_other 
+  HH_DL_{paramInt}_boosted_other:
+    {param1} :  HH_DL_{param1}_boosted_other
+    {param2} :  HH_DL_{param2}_boosted_other
+
+matchingGroup:
+  # Signals #
+  signal_ggf_{spin}_{paramInt}_hbbhww: 
+    {param1} :  signal_ggf_{spin}_{param1}_hbbhww
+    {param2} :  signal_ggf_{spin}_{param2}_hbbhww
+  signal_ggf_{spin}_{paramInt}_hbbhtt:
+    {param1} :  signal_ggf_{spin}_{param1}_hbbhtt
+    {param2} :  signal_ggf_{spin}_{param2}_hbbhtt
+
+plotIt:
+  signal_ggf_{spin}_{paramInt}_hbbhww: 
+    type: signal
+    legend: "{paramInt} GeV #rightarrowHH#rightarrowbbWW [1 pb]"
+    order: 14
+    line-color: '#288a24'
+    fill-color: '#288a24'
+    line-type: 1
+    line-width: 2
+    fill-type: 3345
+  signal_ggf_{spin}_{paramInt}_hbbhtt:
+    type: signal
+    legend: "{paramInt} GeV #rightarrowHH#rightarrowbb#tau#tau [1 pb]"
+    order: 14
+    line-color: '#c91a26'
+    fill-color: '#c91a26'
+    line-type: 1
+    line-width: 2
+    fill-type: 3354
+

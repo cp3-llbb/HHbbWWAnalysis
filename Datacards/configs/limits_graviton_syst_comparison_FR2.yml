@@ -1,0 +1,257 @@
+outputDir: Scans/Resonant_graviton_syst_comparison_FR2
+
+legend:
+  position: [0.50,0.45,0.85,0.90]
+  textsize: 0.02
+
+combine: 
+   limits_DL: limits
+   limits_SL: limits
+   limits_combined: limits
+   gof: gof
+   pulls: pulls
+   impacts: impacts
+
+plotting_limit: &plotting_limit
+    legend: 
+        SetX1: 0.50
+        SetX2: 0.85
+        SetY1: 0.45
+        SetY2: 0.90
+        SetFillColor: 0
+        SetTextFont: 42
+        SetTextSize: 0.02
+    canvas: 
+        SetWindowPosition: [800,600]
+        SetLeftMargin: 0.15
+        SetRightMargin: 0.1
+        SetTopMargin: 0.05
+        SetBottomMargin: 0.10
+        SetLogy: True
+        SetGridx: True 
+        SetGridy: True
+        SetTickx: True
+        SetTicky: True
+
+lines_1D: &lines_1D
+    lines: 
+        SetLineWidth: 2 
+        SetLineStyle: 2 
+        GetXaxis.SetTitle: 'Resonant mass [GeV]'
+        GetYaxis.SetTitle: '95% C.L. limits on production rate (pb)'
+lines_2D: &lines_2D
+    lines: 
+        SetLineWidth: 2 
+        SetLineStyle: 1
+        GetXaxis.SetTitle: 'Resonant mass [GeV]'
+        GetYaxis.SetTitle: '95% C.L. limits on production rate (pb)'
+
+
+curves:
+  #########################################################################
+  #                                   1D                                  #
+  #########################################################################
+    1D FR2:
+        modes: 
+            limits_DL:
+                subdirs: 
+                    combination: 
+                        SetLineColor: '#332288'
+                    combination_2016: 
+                        SetLineColor: '#117733'
+                    combination_2017: 
+                        SetLineColor: '#44AA99'
+                    combination_2018: 
+                        SetLineColor: '#88CCEE'
+                plotting: 
+                    <<: *plotting_limit
+                    <<: *lines_1D
+            limits_SL:
+                subdirs: 
+                    combination: 
+                        SetLineColor: '#DDCC77'
+                plotting: 
+                    <<: *plotting_limit
+                    <<: *lines_1D
+            limits_combined:
+                subdirs: 
+                    combination: 
+                        SetLineColor: '#CC6677'
+                plotting: 
+                    <<: *plotting_limit
+                    <<: *lines_1D
+            gof:
+                subdirs: 
+                    combination: {}
+                    combination_2016: {}
+                    combination_2017: {}
+                    combination_2018: {}
+                    combination_HH_DL_{mass}_inclusive_DY_VVV: {}
+                    combination_HH_DL_{mass}_boosted_other: {}
+                    combination_HH_DL_{mass}_resolved_other: {}
+                    HH_DL_{mass}_boosted_other_2016: {}
+                    HH_DL_{mass}_boosted_other_2017: {}
+                    HH_DL_{mass}_boosted_other_2018: {}
+                    HH_DL_{mass}_resolved_other_2016: {}
+                    HH_DL_{mass}_resolved_other_2017: {}
+                    HH_DL_{mass}_resolved_other_2018: {}
+                    HH_DL_{mass}_inclusive_DY_VVV_2016: {}
+                    HH_DL_{mass}_inclusive_DY_VVV_2017: {}
+                    HH_DL_{mass}_inclusive_DY_VVV_2018: {}
+                plotting:
+                    legend: 
+                        SetX1: 0.50
+                        SetX2: 0.85
+                        SetY1: 0.45
+                        SetY2: 0.90
+                        SetFillColor: 0
+                        SetTextFont: 42
+                        SetTextSize: 0.02
+                    canvas: 
+                        SetWindowPosition: [800,600]
+                        SetLeftMargin: 0.15
+                        SetRightMargin: 0.3
+                        SetTopMargin: 0.05
+                        SetBottomMargin: 0.10
+                        SetLogy: False
+                        SetGridx: True 
+                        SetGridy: True
+                        SetTickx: True
+                        SetTicky: True
+
+
+        points:
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=260 branch=LowMass
+            label: 260
+            custom: 
+                mass: 260
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=270 branch=LowMass
+            label: 270
+            custom: 
+                mass: 270
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=280 branch=LowMass  --interpolation config/interpolation_DL_res.yml param1=270 param2=300 paramInt=280 --interpolation_config1 config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml mass=270 branch=LowMass --interpolation_config2 config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml mass=300 branch=LowMass --interpolation_era 2016
+            label: 280
+            custom: 
+                mass: 280
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=300 branch=LowMass
+            label: 300
+            custom: 
+                mass: 300
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=350 branch=LowMass
+            label: 350
+            custom: 
+                mass: 350
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=400 branch=LowMass
+            label: 400
+            custom: 
+                mass: 400
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=450 branch=LowMass 
+            label: 450 
+            custom: 
+                mass: 450
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=500 branch=LowMass 
+            label: 500
+            custom: 
+                mass: 500
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=550 branch=HighMass
+            label: 550
+            custom: 
+                mass: 550
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=600 branch=HighMass
+            label: 600
+            custom: 
+                mass: 600
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=650 branch=HighMass 
+            label: 650
+            custom: 
+                mass: 650
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=700 branch=HighMass 
+            label: 700
+            custom: 
+                mass: 700
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=750 branch=HighMass  --interpolation config/interpolation_DL_res.yml param1=700 param2=800 paramInt=750 --interpolation_config1 config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml mass=700 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml mass=800 branch=HighMass --interpolation_era 2016
+            label: 750
+            custom: 
+                mass: 750
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=800 branch=HighMass  
+            label: 800
+            custom: 
+                mass: 800
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=850 branch=HighMass  --interpolation config/interpolation_DL_res.yml param1=800 param2=900 paramInt=850 --interpolation_config1 config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml mass=800 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml mass=900 branch=HighMass --interpolation_era 2016
+            label: 850
+            custom: 
+                mass: 850
+          - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_1D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=9000 --custom mass=900 branch=HighMass  
+            label: 900
+            custom: 
+                mass: 900
+  
+    #########################################################################
+    #                                   2D                                  #
+    #########################################################################
+
+    2D FR2:
+        modes: 
+            limits_DL:
+                subdirs: 
+                    combination: 
+                        SetLineColor: '#D81B60'
+                    combination_2016: 
+                        SetLineColor: '#1E88E5'
+                    combination_2017: 
+                        SetLineColor: '#FFC107'
+                    combination_2018: 
+                        SetLineColor: '#004D40'
+                plotting: 
+                    <<: *plotting_limit
+                    <<: *lines_2D
+            limits_SL:
+                subdirs: 
+                    combination: {}    
+                plotting: 
+                    <<: *plotting_limit
+                    <<: *lines_2D
+            limits_combined:
+                subdirs: 
+                    combination: {}
+                plotting: 
+                    <<: *plotting_limit
+                    <<: *lines_2D
+        points:
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=260 branch=LowMass
+              label: 260
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=270 branch=LowMass
+              label: 270
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=280 branch=LowMass  --interpolation config/interpolation_DL_res.yml param1=270 param2=300 paramInt=280 --interpolation_config1 config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml mass=270 branch=LowMass --interpolation_config2 config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml mass=300 branch=LowMass --interpolation_era 2016
+              label: 280
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=300 branch=LowMass
+              label: 300
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=350 branch=LowMass
+              label: 350
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=400 branch=LowMass
+              label: 400
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=450 branch=LowMass 
+              label: 450 
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=500 branch=LowMass 
+              label: 500
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=550 branch=HighMass
+              label: 550
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=600 branch=HighMass
+              label: 600
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=650 branch=HighMass 
+              label: 650
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=700 branch=HighMass 
+              label: 700
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=750 branch=HighMass  --interpolation config/interpolation_DL_res.yml param1=700 param2=800 paramInt=750 --interpolation_config1 config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml mass=700 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml mass=800 branch=HighMass --interpolation_era 2016
+              label: 750
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=800 branch=HighMass  
+              label: 800
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=850 branch=HighMass  --interpolation config/interpolation_DL_res.yml param1=800 param2=900 paramInt=850 --interpolation_config1 config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml mass=800 branch=HighMass --interpolation_config2 config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml mass=900 branch=HighMass --interpolation_era 2016
+              label: 850
+            - command: python produceDataCards.py --yaml config/datacard_fit_Resonant_Graviton_2D_syst_M_base_FR2.yml --split --submit time=0-08:00:00  mem-per-cpu=12000 --custom mass=900 branch=HighMass  
+              label: 900
+      
+      
+    
+    
+    
