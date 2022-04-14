@@ -694,7 +694,7 @@ One lepton and and one jet argument must be specified in addition to the require
                               smear                 = "Summer16_25nsV1_MC", 
                               jesUncertaintySources = "Merged",
                               uncertaintiesFallbackJetType = "AK4PFchs",
-                              mcYearForFatJets      = era if self.args.analysis == 'nonres' else None, 
+                              #mcYearForFatJets      = era if self.args.analysis == 'nonres' else None, 
                               regroupTag            = "V2",
                               enableSystematics     = lambda v : not "jesTotal" in v,
                               mayWriteCache         = isNotWorker, 
@@ -793,7 +793,7 @@ One lepton and and one jet argument must be specified in addition to the require
                               regroupTag            = "V2",
                               enableSystematics     = lambda v : not "jesTotal" in v,
                               uncertaintiesFallbackJetType = "AK4PFchs",
-                              mcYearForFatJets      = era if self.args.analysis == 'nonres' else None, 
+                              #mcYearForFatJets      = era if self.args.analysis == 'nonres' else None, 
                               mayWriteCache         = isNotWorker, 
                               isMC                  = self.is_MC,
                               backend               = backend, 
@@ -1132,9 +1132,9 @@ One lepton and and one jet argument must be specified in addition to the require
                 self.yields.add(noSel)
 
         # MET corrections #
-        #self.corrMET = t.MET if era != "2017" else t.METFixEE2017
         self.rawMET = t.MET if era != "2017" else t.METFixEE2017
         self.corrMET = METcorrection(self.rawMET,t.PV,sample,era,self.is_MC) 
+
 
         #############################################################################
         #                      Lepton Lambdas Variables                             #
@@ -1326,6 +1326,7 @@ One lepton and and one jet argument must be specified in addition to the require
         #############################################################################
         #                               Triggers                                    #
         #############################################################################
+          
         #----- Trigger mask for data -----#
         if not self.is_MC:
             if era == "2018": # For 2018 the electron samples are merged, need to build according dict for primary dataset
@@ -1583,7 +1584,7 @@ One lepton and and one jet argument must be specified in addition to the require
             # Efficiency and mistags do not have uncertainties, the systematics are in the SF 
             self.jetpuid_mc_eff = self.SF.get_scalefactor("lepton", ('jet_puid_eff','eff_{}_L'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer))
             self.jetpuid_mc_mis = self.SF.get_scalefactor("lepton", ('jet_puid_eff','mistag_{}_L'.format(era)),combine="weight", defineOnFirstUse=(not forSkimmer))
-            # Eff and mistag do not have systematics, only the SF do
+                # Eff and mistag do not have systematics, only the SF do
             self.jetpuid_sf_eff = self.SF.get_scalefactor("lepton", ('jet_puid_sf','eff_{}_L'.format(era)),combine="weight", systName="jetpuid_eff", defineOnFirstUse=(not forSkimmer))
             self.jetpuid_sf_mis = self.SF.get_scalefactor("lepton", ('jet_puid_sf','mistag_{}_L'.format(era)),combine="weight", systName="jetpuid_mistag", defineOnFirstUse=(not forSkimmer))
 

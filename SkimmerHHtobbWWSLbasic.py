@@ -16,7 +16,8 @@ from BaseHHtobbWW import BaseNanoHHtobbWW
 from selectionDef import *
 from highlevelLambdas import *
 from variableMakerSL_Basic import *
-import mvaEvaluatorSL_nonres
+import mvaEvaluatorSL_nonres_DNN01 as mva01
+import mvaEvaluatorSL_nonres_DNN02 as mva02
 from bamboo.root import gbl
 import ROOT
 
@@ -37,7 +38,7 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
         # Initialize varsToKeep dict #
         varsToKeep = dict()  
         if not self.inclusive_sel:
-            jet_level    = ["Resolved2Btag","Resolved1Btag","Boosted"]
+            jet_level    = ["Resolved2Btag","Resolved1Btag","Boosted"] 
             # Only one lepton_level must be in args and Only one jet_level must be in args
             if [boolean for (level,boolean) in self.args.__dict__.items() if level in jet_level].count(True) != 1:
                 raise RuntimeError("Only one of the jet arguments must be used, check --help")
@@ -46,19 +47,21 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 raise RuntimeError("Channel must be either 'El' or 'Mu'")            
             
             #----- Machine Learning Model -----#                
-            model_nums  = ["01","12"]
+            model_nums  = ["01","02"]
             path_model_01 = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','SL',model_nums[0],'model','model.pb')
-            input_names   = ["lep","jet","fat","met","hl","param","eventnr"]
+            path_model_02 = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','SL',model_nums[1],'model','model.pb')
+            input_names_01   = ["lep","jet","fat","met","hl","param","eventnr"]
+            input_names_02   = ["lep","jet","fat","met","nu","hl","param","eventnr"]
             output_name   = "Identity"
         
             if not self.args.OnlyYield:
-                print ("DNN model : %s"%path_model_01)
-                if not os.path.exists(path_model_01):
-                    raise RuntimeError('Could not find model file %s'%path_model_01)
+                print ("DNN model : %s"%path_model_02)
+                if not os.path.exists(path_model_02):
+                    raise RuntimeError('Could not find model file %s'%path_model_02)
                 try:
-                    DNN_01 = op.mvaEvaluator(path_model_01,mvaType='Tensorflow',otherArgs=(input_names, output_name))
+                    DNN_02 = op.mvaEvaluator(path_model_02,mvaType='Tensorflow',otherArgs=(input_names_02, output_name))
                 except:
-                    raise RuntimeError('Could not load model %s'%path_model_01)
+                    raise RuntimeError('Could not load model %s'%path_model_02)
 
             self.nodes = ['GGF','VBF','TT','ST','WJets','H','Other']
 
@@ -75,18 +78,19 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 selObj = ElSelObj
                 #lepton = self.electronsTightSel[0]
                 lepton = self.electronsFakeSel[0]
+                lepconep4 = self.getElectronConeP4(lepton)
                 
             if self.args.Channel == "Mu":
                 selObj = MuSelObj
                 #lepton = self.muonsTightSel[0]
                 lepton = self.muonsFakeSel[0]
-            
+                lepconep4 = self.getMuonConeP4(lepton)
 
             #----- Jet selection -----#
             # Since the selections in one line, we can use the non copy option of the selection to modify the selection object internally
             if any([self.args.__dict__[item] for item in ["Resolved2Btag","Resolved1Btag"]]):
                 makeResolvedSelection(self,selObj)
-                #VBFJetPairs = mvaEvaluatorSL_nonres.VBFJetPairs_Resolved(self)
+                #VBFJetPairs = mvaEvaluatorSL_nonres_DNN01.VBFJetPairs_Resolved(self)
                 VBFJetPairs = self.VBFJetPairsResolved
                 if self.args.Resolved2Btag:
                     makeExclusiveResolvedSelection(self,selObj,nbJet=2)
@@ -98,7 +102,7 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
 
             if self.args.Boosted:
                 makeBoostedSelection(self,selObj)
-                #VBFJetPairs = mvaEvaluatorSL_nonres.VBFJetPairs_Boosted(self)
+                #VBFJetPairs = mvaEvaluatorSL_nonres_DNN01.VBFJetPairs_Boosted(self)
                 VBFJetPairs = self.VBFJetPairsBoosted
                 print('BoostedHbb')
 
@@ -111,23 +115,19 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
         if self.args.Synchronization:
             # Event variables #
             varsToKeep["event"]             = None # Already in tree
-            varsToKeep["eventnr_eventnr"]   = t.event
             varsToKeep["run"]               = None # Already in tree 
-            varsToKeep["hl_run"]            = t.run # Already in tree 
             varsToKeep["ls"]                = t.luminosityBlock
-            varsToKeep["hl_lumi"]           = t.luminosityBlock
-
-            varsToKeep["is_e"]          = op.c_bool(True) if self.args.Channel == 'El' else op.c_bool(False)
-            varsToKeep["is_m"]          = op.c_bool(True) if self.args.Channel == 'Mu' else op.c_bool(False)
 
             varsToKeep["n_presel_mu"]       = op.static_cast("UInt_t",op.rng_len(self.muonsPreSel))
             varsToKeep["n_fakeablesel_mu"]  = op.static_cast("UInt_t",op.rng_len(self.muonsFakeSel))
-            varsToKeep["n_mvasel_mu"]       = op.static_cast("UInt_t",op.rng_len(self.muonsTightSel))
+            varsToKeep["n_tightsel_mu"]     = op.static_cast("UInt_t",op.rng_len(self.muonsTightSel))
             varsToKeep["n_presel_ele"]      = op.static_cast("UInt_t",op.rng_len(self.electronsPreSel))
             varsToKeep["n_fakeablesel_ele"] = op.static_cast("UInt_t",op.rng_len(self.electronsFakeSel))
-            varsToKeep["n_mvasel_ele"]      = op.static_cast("UInt_t",op.rng_len(self.electronsTightSel))
-            varsToKeep["n_presel_ak4Jet"]   = op.static_cast("UInt_t",op.rng_len(self.ak4Jets))
-            varsToKeep["n_presel_ak8Jet"]   = op.static_cast("UInt_t",op.rng_len(self.ak8Jets))    
+            varsToKeep["n_tightsel_ele"]    = op.static_cast("UInt_t",op.rng_len(self.electronsTightSel))
+
+            varsToKeep["n_ak4Jet"]          = op.static_cast("UInt_t",op.rng_len(self.ak4Jets))
+
+            varsToKeep["n_ak8Jet"]   = op.static_cast("UInt_t",op.rng_len(self.ak8Jets))    
             varsToKeep["n_presel_ak8BJet"]  = op.static_cast("UInt_t",op.rng_len(self.ak8BJets))    
             varsToKeep["n_loose_ak4BJet"]   = op.static_cast("UInt_t",op.rng_len(self.ak4BJetsLoose))    
             varsToKeep["n_medium_ak4BJet"]  = op.static_cast("UInt_t",op.rng_len(self.ak4BJets))
@@ -271,27 +271,27 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 varsToKeep["ak4JetVBFPair2_eta"]             = op.switch(op.rng_len(VBFJetPairs) >= 1, VBFJetPairs[0][1].eta, op.c_float(-9999.))
                 varsToKeep["ak4JetVBFPair2_phi"]             = op.switch(op.rng_len(VBFJetPairs) >= 1, VBFJetPairs[0][1].phi, op.c_float(-9999.))
                 varsToKeep["ak4JetVBFPair2_E"]               = op.switch(op.rng_len(VBFJetPairs) >= 1, VBFJetPairs[0][1].p4.E(), op.c_float(-9999.))
-
+                '''
                 # inputs : 
-                inputsLeps = mvaEvaluatorSL_nonres.returnLeptonsMVAInputs (self  = self, lep  = lepton)
-                inputsJets = mvaEvaluatorSL_nonres.returnJetsMVAInputs    (self  = self, bjets = self.bJetsByScore, jets = self.probableWJets)
-                inputsMET = mvaEvaluatorSL_nonres.returnMETMVAInputs      (self  = self, met  = self.corrMET)
-                inputsFatjet = mvaEvaluatorSL_nonres.returnFatjetMVAInputs(self  = self, fatjets = self.ak8Jets)
-                inputsHL = mvaEvaluatorSL_nonres.returnHighLevelMVAInputs (self  = self,
-                                                                           lep   = lepton,
-                                                                           bjets = self.bJetsByScore,
-                                                                           wjets = self.wJetsByPt,
-                                                                           VBFJetPairs = VBFJetPairs,
-                                                                           channel   = self.args.Channel)
-                inputsParam   = mvaEvaluatorSL_nonres.returnParamMVAInputs    (self)
-                inputsEventNr = mvaEvaluatorSL_nonres.returnEventNrMVAInputs  (self,t)
+                inputsLeps = mvaEvaluatorSL_nonres_DNN01.returnLeptonsMVAInputs (self  = self, lep  = lepton)
+                inputsJets = mvaEvaluatorSL_nonres_DNN01.returnJetsMVAInputs    (self  = self, bjets = self.bJetsByScore, jets = self.probableWJets)
+                inputsMET = mvaEvaluatorSL_nonres_DNN01.returnMETMVAInputs      (self  = self, met  = self.corrMET)
+                inputsFatjet = mvaEvaluatorSL_nonres_DNN01.returnFatjetMVAInputs(self  = self, fatjets = self.ak8Jets)
+                inputsHL = mvaEvaluatorSL_nonres_DNN01.returnHighLevelMVAInputs (self  = self,
+                                                                                 lep   = lepton,
+                                                                                 bjets = self.bJetsByScore,
+                                                                                 wjets = self.wJetsByPt,
+                                                                                 VBFJetPairs = VBFJetPairs,
+                                                                                 channel   = self.args.Channel)
+                inputsParam   = mvaEvaluatorSL_nonres_DNN01.returnParamMVAInputs    (self)
+                inputsEventNr = mvaEvaluatorSL_nonres_DNN01.returnEventNrMVAInputs  (self,t)
 
                 inputDict = {**inputsLeps, **inputsJets, **inputsMET, **inputsFatjet, **inputsHL} 
 
                 for (varname,_,_),var in inputDict.items():
                     varsToKeep[varname] = var
 
-                from  mvaEvaluatorSL_nonres import inputStaticCast
+                from  mvaEvaluatorSL_nonres_DNN01 import inputStaticCast
 
                 inputs = [op.array("double",*inputStaticCast(inputsLeps,"float")),
                           op.array("double",*inputStaticCast(inputsJets,"float")),
@@ -305,7 +305,7 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
                 
                 for node, output in zip(self.nodes,output_01):
                     varsToKeep['DNN_node_'+node] = output
-
+                '''
             # AK8 Jets #
             for i in range(1,3): # 2 leading fatjets 
                 varsToKeep["ak8Jet{}_pt".format(i)]                 = op.switch(op.rng_len(self.ak8BJets) >= i, self.ak8BJets[i-1].pt, op.c_float(-9999.))
@@ -441,37 +441,57 @@ class SkimmerNanoHHtobbWWSL(BaseNanoHHtobbWW,SkimmerModule):
         varsToKeep["run"]       = None # Already in tree          
         varsToKeep["ls"]        = t.luminosityBlock
 
-        inputsLeps = mvaEvaluatorSL_nonres.returnLeptonsMVAInputs (self  = self, lep  = lepton)
-        inputsJets = mvaEvaluatorSL_nonres.returnJetsMVAInputs    (self  = self, bjets = self.bJetsByScore, jets = self.probableWJets)
-        inputsMET = mvaEvaluatorSL_nonres.returnMETMVAInputs      (self  = self, met  = self.corrMET)
-        inputsFatjet = mvaEvaluatorSL_nonres.returnFatjetMVAInputs(self  = self, fatjets = self.ak8Jets)
-        inputsHL = mvaEvaluatorSL_nonres.returnHighLevelMVAInputs (self  = self,
-                                                                   lep   = lepton,
-                                                                   bjets = self.bJetsByScore,
-                                                                   wjets = self.wJetsByPt,
-                                                                   VBFJetPairs = VBFJetPairs,
-                                                                   channel   = self.args.Channel)
-        inputsParam   = mvaEvaluatorSL_nonres.returnParamMVAInputs    (self)
-        inputsEventNr = mvaEvaluatorSL_nonres.returnEventNrMVAInputs  (self,t)
+        '''
+        inputsLeps   = mva02.returnLeptonsMVAInputs   (self  = self, lep  = lepton)
+        inputsJets   = mva02.returnJetsMVAInputs      (self  = self, bjets = self.bJetsByScore, jets = self.probableWJets)
+        inputsMET    = mva02.returnMETMVAInputs       (self  = self, met  = self.corrMET)
+        inputsFatjet = mva02.returnFatjetMVAInputs    (self  = self, fatbjets = self.ak8BJets)
+        inputNeu     = mva02.returnNuMVAInputs        (self  = self)
+        inputsHL     = mva02.returnHighLevelMVAInputs (self  = self,
+                                                       lep   = lepton,
+                                                       bjets = self.bJetsByScore,
+                                                       wjets = self.wJetsByPt,
+                                                       VBFJetPairs = VBFJetPairs,
+                                                       channel   = self.args.Channel)
+        inputsParam   = mva02.returnParamMVAInputs    (self)
+        inputsEventNr = mva02.returnEventNrMVAInputs  (self,t)
+        '''
+        
 
-        inputDict     = {**inputsLeps, **inputsJets, **inputsFatjet, **inputsMET, **inputsHL} 
+        inputsLeps   = mva02.returnLeptonsMVAInputs   (self  = self, lep  = lepton, conep4 = lepconep4)
+        inputsJets   = mva02.returnJetsMVAInputs      (self  = self, bjets = self.bJetsByScore, jets = self.probableWJets)
+        inputsMET    = mva02.returnMETMVAInputs       (self  = self, met  = self.corrMET)
+        inputsFatjet = mva02.returnFatjetMVAInputs    (self  = self, fatbjets = self.ak8BJets)
+        inputNeu     = mva02.returnNuMVAInputs        (self  = self)
+        inputsHL     = mva02.returnHighLevelMVAInputs (self  = self,
+                                                       lep   = lepton,
+                                                       conep4 = lepconep4,
+                                                       bjets = self.bJetsByScore,
+                                                       wjets = self.wJetsByPt,
+                                                       VBFJetPairs = VBFJetPairs,
+                                                       channel   = self.args.Channel)
+        inputsParam   = mva02.returnParamMVAInputs    (self)
+        inputsEventNr = mva02.returnEventNrMVAInputs  (self,t)
+
+        inputDict     = {**inputsLeps, **inputsJets, **inputsFatjet, **inputsMET, **inputNeu, **inputsHL, **inputsParam, **inputsEventNr} 
 
         for (varname,_,_),var in inputDict.items():
             varsToKeep[varname] = var
         
-        from  mvaEvaluatorSL_nonres import inputStaticCast
+        #from  mvaEvaluatorSL_nonres_DNN01 import inputStaticCast
 
-        inputs = [op.array("double",*inputStaticCast(inputsLeps,"float")),
-                  op.array("double",*inputStaticCast(inputsJets,"float")),
-                  op.array("double",*inputStaticCast(inputsFatjet,"float")),
-                  op.array("double",*inputStaticCast(inputsMET,"float")),
-                  op.array("double",*inputStaticCast(inputsHL,"float")),
-                  op.array("double",*inputStaticCast(inputsParam,"float")),
-                  op.array("long",*inputStaticCast(inputsEventNr,"long"))]
+        inputs = [op.array("double",*mva02.inputStaticCast(inputsLeps,"float")),
+                  op.array("double",*mva02.inputStaticCast(inputsJets,"float")),
+                  op.array("double",*mva02.inputStaticCast(inputsFatjet,"float")),
+                  op.array("double",*mva02.inputStaticCast(inputsMET,"float")),
+                  op.array("double",*mva02.inputStaticCast(inputNeu,"float")),
+                  op.array("double",*mva02.inputStaticCast(inputsHL,"float")),
+                  op.array("double",*mva02.inputStaticCast(inputsParam,"float")),
+                  op.array("long",*mva02.inputStaticCast(inputsEventNr,"long"))]
         
-        output_01 = DNN_01(*inputs)
+        output_02 = DNN_02(*inputs)
 
-        for node, output in zip(self.nodes,output_01):
+        for node, output in zip(self.nodes,output_02):
             varsToKeep['DNN_node_'+node] = output
 
         #----- Additional variables -----#
