@@ -435,4 +435,3 @@ for tree, idxs in tree_idxs.items():
     write_table_file(all_rows, table_fn_csv, True)
 
 logging.info('All done: check the results in %s' % output_dir)
-

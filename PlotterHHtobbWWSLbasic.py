@@ -19,34 +19,13 @@ from BaseHHtobbWW import BaseNanoHHtobbWW
 from plotDef import *
 from selectionDef import *
 from JPA import *
-import mvaEvaluatorSL_nonres
+import mvaEvaluatorSL_nonres_DNN01 as mva01
+import mvaEvaluatorSL_nonres_DNN02 as mva02
 from DDHelper import DataDrivenFake, DataDrivenDY
 from bamboo.root import gbl
 import ROOT
 from functools import partial
 
-if not hasattr(gbl, "bamboo_printEntry"):
-    gbl.gInterpreter.Declare("""
-    bool bamboo_printEntry(long entry, float val) {
-      std::cout << "Processing entry #" << entry << ": val " << val << std::endl;
-      return true;
-    }""")
-    gbl.gInterpreter.Declare("""
-    bool bamboo_printComb3_(long entry, const rdfhelpers::Combination<3>& comb, std::size_t idx, double value, UInt_t nJets, UInt_t nComb, const ROOT::VecOps::RVec<rdfhelpers::Combination<3>>& combs, const ROOT::VecOps::RVec<std::size_t>& rng) {
-      std::cout << "Combination #" << idx << " (value " << value << ") for " << entry << ": " << comb.get(0) << ", " << comb.get(1) << ", " << comb.get(2) << ", nJets=" << nJets << ", nSelJets=" << rng.size() << ", nCombinations=" << nComb << std::endl;
-      if ( ( comb.get(0) >= nJets ) || ( comb.get(1) >= nJets ) || ( comb.get(2) >= nJets ) ) {
-        std::cout << "All combinations: " << std::endl;
-        for ( const auto& icomb : combs ) {
-          std::cout << " - " << icomb.get(0) << ", " << icomb.get(1) << ", " << icomb.get(2) << std::endl;
-        }
-        std::cout << "From range with size " << rng.size() << ": ";
-        for ( auto idx : rng) {
-          std::cout << " " << idx;
-        }
-        std::cout << std::endl;
-      }
-      return true;
-    }""")
 #===============================================================================================#
 #                                       PlotterHHtobbWW                                         #
 #===============================================================================================#
@@ -73,12 +52,10 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         if hasattr(self,'base_plots'):
             plots.extend(self.base_plots)
 
-        cutFlowPlots = []
-        
         #----- Machine Learning Model -----#                
-        model_num = "01"
+        model_num = "02"
         path_model = os.path.join(os.path.abspath(os.path.dirname(__file__)),'MachineLearning','ml-models','models','multi-classification','dnn','SL',model_num,'model','model.pb')
-        input_names = ["lep","jet","fat","met","hl","param","eventnr"]
+        input_names = ["lep","jet","fat","met","nu","hl","param","eventnr"]
         output_name = "Identity"
         
         if not self.args.OnlyYield:
@@ -155,10 +132,16 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             ElSelObjResolved = makeResolvedSelection(self,ElSelObj,copy_sel=True)
             MuSelObjResolved = makeResolvedSelection(self,MuSelObj,copy_sel=True)
 
+            plots.append(CutFlowReport("ElSelObjResolved", ElSelObjResolved.sel))
+            plots.append(CutFlowReport("MuSelObjResolved", MuSelObjResolved.sel))
+
             if "Resolved2Btag" in jetplot_level:
                 logger.info ('Resolved2Btag Node Selection')
                 ElSelObjResolved2b        = makeExclusiveResolvedSelection(self, ElSelObjResolved, nbJet=2, copy_sel=True)
                 MuSelObjResolved2b        = makeExclusiveResolvedSelection(self, MuSelObjResolved, nbJet=2, copy_sel=True)
+
+                plots.append(CutFlowReport("ElSelObjResolved2b", ElSelObjResolved2b.sel))
+                plots.append(CutFlowReport("MuSelObjResolved2b", MuSelObjResolved2b.sel))
 
                 selObjectDictList.append({'channel':'El','selObject':ElSelObjResolved2b,'category':'Resolved','VBFJets':self.VBFJetPairsResolved})
                 selObjectDictList.append({'channel':'Mu','selObject':MuSelObjResolved2b,'category':'Resolved','VBFJets':self.VBFJetPairsResolved})
@@ -251,6 +234,9 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             ElSelObjBoosted = makeBoostedSelection(self,ElSelObj,copy_sel=True)
             MuSelObjBoosted = makeBoostedSelection(self,MuSelObj,copy_sel=True)
 
+            plots.append(CutFlowReport("ElSelObjBoosted", ElSelObjBoosted.sel))
+            plots.append(CutFlowReport("MuSelObjBoosted", MuSelObjBoosted.sel))
+
             selObjectDictList.append({'channel':'El','selObject':ElSelObjBoosted,'category':'Boosted','VBFJets':self.VBFJetPairsBoosted})
             selObjectDictList.append({'channel':'Mu','selObject':MuSelObjBoosted,'category':'Boosted','VBFJets':self.VBFJetPairsBoosted})
 
@@ -298,27 +284,46 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
         self.nodes = ['GGF','VBF','TT','ST','WJets','H','Other']
 
         leptonCont = {'El':ElColl[0],'Mu':MuColl[0]}
+        leptonConep4Cont = {'El':self.getElectronConeP4(ElColl[0]), 'Mu':self.getMuonConeP4(MuColl[0])}
         for selObjectDict in selObjectDictList:
             channel      = selObjectDict['channel']
             lepton       = leptonCont[channel]
+            lepconep4    = leptonConep4Cont[channel]
             vbf          = selObjectDict['VBFJets']
-            inputsLeps   = mvaEvaluatorSL_nonres.returnLeptonsMVAInputs   (self  = self, lep  = lepton)
-            inputsJets   = mvaEvaluatorSL_nonres.returnJetsMVAInputs      (self  = self, bjets = self.bJetsByScore, jets = self.probableWJets)
-            inputsMET    = mvaEvaluatorSL_nonres.returnMETMVAInputs       (self  = self, met  = self.corrMET)
-            inputsFatjet = mvaEvaluatorSL_nonres.returnFatjetMVAInputs    (self  = self, fatjets = self.ak8Jets)
-            inputsHL     = mvaEvaluatorSL_nonres.returnHighLevelMVAInputs (self  = self,
-                                                                           lep   = lepton,
-                                                                           bjets = self.bJetsByScore,
-                                                                           wjets = self.wJetsByPt,
-                                                                           VBFJetPairs = vbf,
-                                                                           channel   = selObjectDict['channel'])
-            inputsParam   = mvaEvaluatorSL_nonres.returnParamMVAInputs    (self)
-            inputsEventNr = mvaEvaluatorSL_nonres.returnEventNrMVAInputs  (self,t)
-
+            '''
+            inputsLeps   = mvaEvaluatorSL_nonres_DNN01.returnLeptonsMVAInputs   (self  = self, lep  = lepton)
+            inputsJets   = mvaEvaluatorSL_nonres_DNN01.returnJetsMVAInputs      (self  = self, bjets = self.bJetsByScore, jets = self.probableWJets)
+            inputsMET    = mvaEvaluatorSL_nonres_DNN01.returnMETMVAInputs       (self  = self, met  = self.corrMET)
+            #inputsFatjet = mvaEvaluatorSL_nonres.returnFatjetMVAInputs          (self  = self, fatjets = self.ak8Jets)
+            inputsFatjet = mvaEvaluatorSL_nonres_DNN01.returnFatjetMVAInputs    (self  = self, fatjets = self.ak8BJets)
+            inputsHL     = mvaEvaluatorSL_nonres_DNN01.returnHighLevelMVAInputs (self  = self,
+                                                                                 lep   = lepton,
+                                                                                 bjets = self.bJetsByScore,
+                                                                                 wjets = self.wJetsByPt,
+                                                                                 VBFJetPairs = vbf,
+                                                                                 channel   = selObjectDict['channel'])
+            inputsParam   = mvaEvaluatorSL_nonres_DNN01.returnParamMVAInputs    (self)
+            inputsEventNr = mvaEvaluatorSL_nonres_DNN01.returnEventNrMVAInputs  (self,t)
+            '''
+            inputsLeps   = mva02.returnLeptonsMVAInputs   (self  = self, lep  = lepton, conep4 = lepconep4)
+            inputsJets   = mva02.returnJetsMVAInputs      (self  = self, bjets = self.bJetsByScore, jets = self.probableWJets)
+            inputsMET    = mva02.returnMETMVAInputs       (self  = self, met  = self.corrMET)
+            inputsFatjet = mva02.returnFatjetMVAInputs    (self  = self, fatbjets = self.ak8BJets)
+            inputNeu     = mva02.returnNuMVAInputs        (self  = self)
+            inputsHL     = mva02.returnHighLevelMVAInputs (self  = self,
+                                                           lep   = lepton,
+                                                           conep4 = lepconep4,
+                                                           bjets = self.bJetsByScore,
+                                                           wjets = self.wJetsByPt,
+                                                           VBFJetPairs = vbf,
+                                                           channel   = selObjectDict['channel'])
+            inputsParam   = mva02.returnParamMVAInputs    (self)
+            inputsEventNr = mva02.returnEventNrMVAInputs  (self,t)
             print ("Lepton variables : %d"%len(inputsLeps))                                 
             print ("Jet variables    : %d"%len(inputsJets))
             print ("Fatjet variables : %d"%len(inputsFatjet))                       
             print ("MET variables    : %d"%len(inputsMET)) 
+            print ("Nu variables     : %d"%len(inputNeu))
             print ("HL variables     : %d"%len(inputsHL))
             print ("Param variables  : %d"%len(inputsParam)) 
             print ("Event variables  : %d"%len(inputsEventNr))
@@ -327,19 +332,19 @@ class PlotterNanoHHtobbWWSL(BaseNanoHHtobbWW,DataDrivenBackgroundHistogramsModul
             plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsJets)) 
             plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsFatjet))
             plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsMET)) 
+            plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputNeu)) 
             plots.extend(makeSingleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsHL)) 
             plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsParam)) 
             plots.extend(makeDoubleLeptonMachineLearningInputPlots(selObjectDict['selObject'].sel,selObjectDict['selObject'].selName,selObjectDict['channel'],inputsEventNr))
 
-            from  mvaEvaluatorSL_nonres import inputStaticCast
-
-            inputs = [op.array("double",*inputStaticCast(inputsLeps,"float")),
-                      op.array("double",*inputStaticCast(inputsJets,"float")),
-                      op.array("double",*inputStaticCast(inputsFatjet,"float")),
-                      op.array("double",*inputStaticCast(inputsMET,"float")),
-                      op.array("double",*inputStaticCast(inputsHL,"float")),
-                      op.array("double",*inputStaticCast(inputsParam,"float")),
-                      op.array("long",*inputStaticCast(inputsEventNr,"long"))]
+            inputs = [op.array("double",*mva02.inputStaticCast(inputsLeps,"float")),
+                      op.array("double",*mva02.inputStaticCast(inputsJets,"float")),
+                      op.array("double",*mva02.inputStaticCast(inputsFatjet,"float")),
+                      op.array("double",*mva02.inputStaticCast(inputsMET,"float")),
+                      op.array("double",*mva02.inputStaticCast(inputNeu,"float")),
+                      op.array("double",*mva02.inputStaticCast(inputsHL,"float")),
+                      op.array("double",*mva02.inputStaticCast(inputsParam,"float")),
+                      op.array("long",*mva02.inputStaticCast(inputsEventNr,"long"))]
             
             output = DNN(*inputs)
             selObjNodesDict = makeDNNOutputNodesSelections(self,selObjectDict['selObject'],output,suffix=model_num)

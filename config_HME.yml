@@ -23,4 +23,4 @@ args:
   - --NoSystematics
   - --analysis=res
 
-output: /home/ucl/cp3/fbury/scratch/SkimsHME/Skim{era}_{cat}_{channel}_{type}
+output: /nfs/scratch/fynu/gsaha/SkimsHME/Skim{era}_{cat}_{channel}_{type}

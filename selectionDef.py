@@ -251,7 +251,7 @@ def makeSingleLeptonSelection(self,baseSel,plot_yield=False,use_dd=True,fake_sel
     # Return # 
     return [ElSelObject,MuSelObject]
 
-def makeResolvedSelection(self,selObject,copy_sel=False,plot_yield=False):
+def makeResolvedSelection(self,selObject,copy_sel=False):
     """
     Produces the Ak4 jet selection
     inputs :
@@ -276,7 +276,7 @@ def makeResolvedSelection(self,selObject,copy_sel=False,plot_yield=False):
     if copy_sel :
         return selObject 
 
-def makeBoostedSelection(self,selObject,copy_sel=False,plot_yield=False):
+def makeBoostedSelection(self,selObject,copy_sel=False):
     """
     Produces the Ak8b jet selection
     inputs :
